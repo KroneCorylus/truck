@@ -4,6 +4,7 @@ The version is of the bottom crate `truck-rendimpl`.
 
 ## Unreleased
 
+- Allow `fillet_along_wire` to end at vertices with more than three faces.
 - Add `fillet_along_wire` to `truck-shapeops`.
 - Remove the unfinished multi-edge fillet prototype from `truck-shapeops`.
 - Add `simple_chamfer` and `chamfer_with_side` to `truck-shapeops`.

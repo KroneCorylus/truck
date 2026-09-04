@@ -1,6 +1,8 @@
 mod common;
 
 use common::{blend::*, *};
+use itertools::Itertools;
+use std::collections::HashMap;
 use std::f64::consts::PI;
 use truck_geometry::prelude::*;
 use truck_shapeops::fillet::fillet_along_wire;
@@ -153,6 +155,76 @@ fn fillet_open_chain_around_rounded_corners() {
     let (area, centroid) = fillet_section(radius);
     let chain_length = 2.0 * (w - rho) + (d - 2.0 * rho) + PI * (rho - centroid);
     let expected = base_area * h - area * chain_length;
+    assert_solid(&Solid::new(vec![shell]), expected, &[0], TOL);
+}
+
+/// Solid bounded by planar faces, each given as a loop of vertex indices, counterclockwise seen
+/// from outside.
+fn polyhedron(points: &[Point3], faces: &[&[usize]]) -> Solid {
+    use truck_modeling::{builder, Edge, Shell, Vertex, Wire};
+    let vertices: Vec<Vertex> = points.iter().map(|&p| builder::vertex(p)).collect();
+    let mut edges: HashMap<(usize, usize), Edge> = HashMap::new();
+    let shell: Shell = faces
+        .iter()
+        .map(|face| {
+            let wire: Wire = face
+                .iter()
+                .circular_tuple_windows()
+                .map(|(&i, &j)| match edges.get(&(j, i)) {
+                    Some(edge) => edge.inverse(),
+                    None => {
+                        let edge = builder::line(&vertices[i], &vertices[j]);
+                        edges.insert((i, j), edge.clone());
+                        edge
+                    }
+                })
+                .collect();
+            builder::try_attach_plane(&[wire]).unwrap()
+        })
+        .collect();
+    from_modeling(&truck_modeling::Solid::new(vec![shell]))
+}
+
+/// Fillets a vertical edge of a unit cube topped by a pyramid. The edge ends at a corner of the
+/// roof where four faces meet, so the fillet has to be trimmed against two roof faces and the
+/// ridge between them has to be cut.
+#[test]
+fn fillet_edge_ending_at_four_valent_vertex() {
+    let (apex, radius) = (2.0, 0.4);
+    #[rustfmt::skip]
+    let points = [
+        Point3::new(0.0, 0.0, 0.0), Point3::new(1.0, 0.0, 0.0),
+        Point3::new(1.0, 1.0, 0.0), Point3::new(0.0, 1.0, 0.0),
+        Point3::new(0.0, 0.0, 1.0), Point3::new(1.0, 0.0, 1.0),
+        Point3::new(1.0, 1.0, 1.0), Point3::new(0.0, 1.0, 1.0),
+        Point3::new(0.5, 0.5, 1.0 + apex),
+    ];
+    let solid = polyhedron(
+        &points,
+        &[
+            &[0, 3, 2, 1],
+            &[0, 1, 5, 4],
+            &[1, 2, 6, 5],
+            &[2, 3, 7, 6],
+            &[3, 0, 4, 7],
+            &[4, 5, 8],
+            &[5, 6, 8],
+            &[6, 7, 8],
+            &[7, 4, 8],
+        ],
+    );
+    let shell = solid.into_boundaries().pop().unwrap();
+    let wire = chain(&shell, &[Point3::new(1.0, 0.0, 0.5)]);
+    let faces = shell.len();
+    let shell = fillet_along_wire(&shell, &wire, radius, TOL).unwrap();
+    assert_eq!(shell.len(), faces + 1);
+    assert_tangent_along_blends(&shell, faces..faces + 1);
+
+    // Above the cube the roof rises with slope `2 * apex` away from each top edge, so the height
+    // of the solid over the fillet section is `1 + 2 * apex * min(u, y)` with `u = 1 - x`.
+    let (area, _) = fillet_section(radius);
+    let section_min = radius.powi(3) * (1.0 / 3.0 + f64::sqrt(2.0) / 3.0 - PI / 4.0);
+    let expected = 1.0 + apex / 3.0 - area - 2.0 * apex * section_min;
     assert_solid(&Solid::new(vec![shell]), expected, &[0], TOL);
 }
 

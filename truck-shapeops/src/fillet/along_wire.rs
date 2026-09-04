@@ -131,7 +131,6 @@ fn trim_to_point<C: FilletedCurve<S>, S>(
 /// side. Cuts are shared between the two faces of a cut edge.
 struct Cuts<C> {
     vertices: Vec<[Option<Vertex<Point3>>; 2]>,
-    ders: Vec<[Option<Vector3>; 2]>,
     /// the kept piece of each cut edge, oriented like the underlying edge
     pieces: HashMap<EdgeID<C>, Edge<Point3, C>>,
 }
@@ -162,8 +161,10 @@ impl<C: Clone> Cuts<C> {
 /// `wire` must be continuous and simple, and consecutive edges must share their tangent at the
 /// common vertex. It may be closed. Every edge of the chain must be shared by two faces of the
 /// shell, and at every interior vertex of the chain the faces on each side must either be the
-/// same face or be separated by exactly one edge. An open chain must end at vertices adjacent to
-/// exactly three faces, as for [`fillet_with_side`].
+/// same face or be separated by exactly one edge. An open chain may end at vertices with any
+/// number of faces: the fillet is trimmed against every face between the two side faces, and the
+/// edges between those faces are cut where they meet the fillet. Blending several fillets that
+/// meet at a vertex is not supported.
 ///
 /// Returns the shell with the faces along the chain trimmed and one fillet face per chain edge
 /// appended, in chain order. The fillet faces share their cross edges, so the blend is tangent
@@ -241,46 +242,76 @@ where
         })
     };
 
+    let rbfs: Vec<_> = (0..n)
+        .map(|k| {
+            RbfSurface::new(
+                wire[k].oriented_curve(),
+                shell[sides[k][0]].oriented_surface(),
+                shell[sides[k][1]].oriented_surface(),
+                radius,
+            )
+        })
+        .collect();
+    let mut ranges: Vec<(f64, f64)> = rbfs
+        .iter()
+        .map(|rbf| rbf.edge_curve().range_tuple())
+        .collect();
+    // For an open chain, walk around each end vertex and extend the parameter range of the end
+    // fillet to where the contact curves and the fillet meet the edges leaving the chain.
+    let mut ends: [Option<EndWalk<C>>; 2] = [None, None];
+    if !closed {
+        for (which, j, k) in [(0, 0, 0), (1, n, n - 1)] {
+            let vertex = if j == 0 {
+                wire.front_vertex()?
+            } else {
+                wire.back_vertex()?
+            };
+            let mut walk = walk_around_vertex(
+                shell,
+                sides[k],
+                vertex,
+                adjacent_edge(j, 0)?,
+                &adjacent_edge(j, 1)?,
+            )?;
+            let rbf = &rbfs[k];
+            let t = if j == 0 { ranges[k].0 } else { ranges[k].1 };
+            let (curve0, hint0) = adjacent_hint(&walk.edges[0], vertex);
+            let (curve1, hint1) = adjacent_hint(&walk.edges[walk.faces.len()], vertex);
+            let (_, _, v0, _) =
+                rbf.search_contact_curve0_cross_point_with_adjacent_edge(t, &curve0, hint0, 100)?;
+            let (_, _, v1, _) =
+                rbf.search_contact_curve1_cross_point_with_adjacent_edge(t, &curve1, hint1, 100)?;
+            let mut vs = vec![v0, v1];
+            for edge in &walk.edges[1..walk.faces.len()] {
+                let curve = edge.curve();
+                let (s0, s1) = curve.range_tuple();
+                let hint = if curve.subs(s0).near(&vertex.point()) {
+                    s0
+                } else {
+                    s1
+                };
+                let ((u, v), s) =
+                    algo::surface::search_intersection_parameter(rbf, (0.5, t), &curve, hint, 100)?;
+                walk.crossings.push((Vertex::new(curve.subs(s)), s, (u, v)));
+                vs.push(v);
+            }
+            if j == 0 {
+                ranges[k].0 = vs.into_iter().fold(f64::INFINITY, f64::min);
+            } else {
+                ranges[k].1 = vs.into_iter().fold(f64::NEG_INFINITY, f64::max);
+            }
+            ends[which] = Some(walk);
+        }
+    }
     let mut surfaces = Vec::with_capacity(n);
     for k in 0..n {
-        let rbf = RbfSurface::new(
-            wire[k].oriented_curve(),
-            shell[sides[k][0]].oriented_surface(),
-            shell[sides[k][1]].oriented_surface(),
-            radius,
-        );
-        let (t0, t1) = rbf.edge_curve().range_tuple();
-        let (mut v0, mut v1) = (t0, t1);
-        if !closed && k == 0 {
-            let vertex = wire.front_vertex()?;
-            let (curve0, hint0) = adjacent_hint(&adjacent_edge(0, 0)?, vertex);
-            let (curve1, hint1) = adjacent_hint(&adjacent_edge(0, 1)?, vertex);
-            let (_, _, v00, _) =
-                rbf.search_contact_curve0_cross_point_with_adjacent_edge(t0, &curve0, hint0, 100)?;
-            let (_, _, v01, _) =
-                rbf.search_contact_curve1_cross_point_with_adjacent_edge(t0, &curve1, hint1, 100)?;
-            v0 = v00.min(v01);
-        }
-        if !closed && k == n - 1 {
-            let vertex = wire.back_vertex()?;
-            let (curve0, hint0) = adjacent_hint(&adjacent_edge(n, 0)?, vertex);
-            let (curve1, hint1) = adjacent_hint(&adjacent_edge(n, 1)?, vertex);
-            let (_, _, v10, _) =
-                rbf.search_contact_curve0_cross_point_with_adjacent_edge(t1, &curve0, hint0, 100)?;
-            let (_, _, v11, _) =
-                rbf.search_contact_curve1_cross_point_with_adjacent_edge(t1, &curve1, hint1, 100)?;
-            v1 = v10.max(v11);
-        }
         surfaces.push(ApproxFilletSurface::approx_rolling_ball_fillet(
-            &rbf,
-            (v0, v1),
-            tol,
+            &rbfs[k], ranges[k], tol,
         )?);
     }
 
     let mut cuts = Cuts {
         vertices: vec![[None, None]; nv],
-        ders: vec![[None, None]; nv],
         pieces: HashMap::new(),
     };
     let mut contacts: Vec<[Option<Edge<Point3, C>>; 2]> = vec![[None, None]; n];
@@ -320,10 +351,9 @@ where
                     piece
                 }
                 None => {
-                    let (piece, der) = cut_at_front(&mut curves[0], prev)?;
+                    let (piece, _) = cut_at_front(&mut curves[0], prev)?;
                     cuts.insert(prev, piece.clone())?;
                     cuts.vertices[start_vertex][side] = Some(piece.back().clone());
-                    cuts.ders[start_vertex][side] = Some(der);
                     piece
                 }
             });
@@ -335,10 +365,9 @@ where
                     piece
                 }
                 None => {
-                    let (piece, der) = cut_at_back(&mut curves[m - 1], next)?;
+                    let (piece, _) = cut_at_back(&mut curves[m - 1], next)?;
                     cuts.insert(next, piece.clone())?;
                     cuts.vertices[end_vertex][side] = Some(piece.front().clone());
-                    cuts.ders[end_vertex][side] = Some(der);
                     piece
                 }
             });
@@ -431,79 +460,79 @@ where
         .collect::<Option<_>>()?;
     let blend_surfaces: Vec<S> = surfaces.iter().map(|af| af.to_same_geometry()).collect();
 
-    let mut cross: Vec<Edge<Point3, C>> = Vec::with_capacity(nv);
-    let mut end_edge = None;
-    for j in 0..nv {
-        let interior = closed || (0 < j && j < n);
-        let edge = if interior {
+    let mut cross: Vec<Vec<Edge<Point3, C>>> = vec![Vec::new(); nv];
+    for (j, edges) in cross.iter_mut().enumerate() {
+        if closed || (0 < j && j < n) {
             let k = (j + n - 1) % n;
             let v = surfaces[k].range_tuple().1 .1;
             let curve = surfaces[k].fillet_bezier(v).to_same_geometry();
-            Edge::new(&vertices[j][0], &vertices[j][1], curve)
-        } else if j == 0 {
-            let ((u0, u1), (v0, _)) = surfaces[0].range_tuple();
-            create_pcurve_edge(
-                (&vertices[0][0], (u0, v0), cuts.ders[0][0]?),
-                (&vertices[0][1], (u1, v0), cuts.ders[0][1]?),
-                blend_surfaces[0].clone(),
-            )?
-        } else {
-            let ((u0, u1), (_, v1)) = surfaces[n - 1].range_tuple();
-            let edge = create_pcurve_edge(
-                (&vertices[n][1], (u1, v1), cuts.ders[n][1]?),
-                (&vertices[n][0], (u0, v1), cuts.ders[n][0]?),
-                blend_surfaces[n - 1].clone(),
-            )?;
-            end_edge = Some(edge.clone());
-            edge.inverse()
-        };
-        cross.push(edge);
+            *edges = vec![Edge::new(&vertices[j][0], &vertices[j][1], curve)];
+        }
+    }
+
+    if !closed {
+        for (which, j, k) in [(0, 0, 0), (1, n, n - 1)] {
+            let walk = ends[which].take()?;
+            let vertex = if j == 0 {
+                wire.front_vertex()?
+            } else {
+                wire.back_vertex()?
+            };
+            let m = walk.faces.len();
+            let ((u0, u1), (v0, v1)) = surfaces[k].range_tuple();
+            let v_end = if j == 0 { v0 } else { v1 };
+            // Points of the cross edge from side 0 to side 1 with their parameters on the fillet,
+            // and the kept piece of the edge leaving the chain at each of them.
+            let mut points = vec![(vertices[j][0].clone(), (u0, v_end))];
+            let mut pieces = vec![cuts.piece(&walk.edges[0])?];
+            for (i, (w, s, uv)) in walk.crossings.iter().enumerate() {
+                let edge = &walk.edges[i + 1];
+                let uv = surfaces[k].search_parameter(w.point(), Some(*uv), 100)?;
+                points.push((w.clone(), uv));
+                let (front, back) = edge.cut_with_parameter(w, *s)?;
+                pieces.push(if edge.back() == vertex { front } else { back });
+            }
+            points.push((vertices[j][1].clone(), (u1, v_end)));
+            pieces.push(cuts.piece(&walk.edges[m])?);
+
+            let blend = &blend_surfaces[k];
+            for i in 0..m {
+                let idx = walk.faces[i];
+                let face_surface = shell[idx].oriented_surface();
+                let ((w0, uv0), (w1, uv1)) = (&points[i], &points[i + 1]);
+                let direction = w1.point() - w0.point();
+                let der0 = cross_tangent(blend, *uv0, &face_surface, w0.point(), direction)?;
+                let der1 = cross_tangent(blend, *uv1, &face_surface, w1.point(), direction)?;
+                let piece = create_pcurve_edge((w0, *uv0, der0), (w1, *uv1, der1), blend.clone())?;
+                let (fillet_edge, left, right) = match j {
+                    0 => (
+                        piece.clone(),
+                        toward(&pieces[i], w0, true),
+                        toward(&pieces[i + 1], w1, false),
+                    ),
+                    _ => (
+                        piece.inverse(),
+                        toward(&pieces[i + 1], w1, true),
+                        toward(&pieces[i], w0, false),
+                    ),
+                };
+                faces[idx] =
+                    create_new_side(&faces[idx], &fillet_edge, blend, vertex.id(), &left, &right)?;
+                cross[j].push(piece);
+            }
+        }
     }
 
     let blends: Vec<Face<Point3, C, S>> = (0..n)
         .map(|k| {
-            let boundary = [
-                contacts[k][0].inverse(),
-                cross[k].clone(),
-                contacts[k][1].clone(),
-                cross[(k + 1) % nv].inverse(),
-            ];
+            let boundary: Vec<_> = std::iter::once(contacts[k][0].inverse())
+                .chain(cross[k].iter().cloned())
+                .chain(std::iter::once(contacts[k][1].clone()))
+                .chain(cross[(k + 1) % nv].iter().rev().map(Edge::inverse))
+                .collect();
             Face::new(vec![boundary.into()], blend_surfaces[k].clone())
         })
         .collect();
-
-    if !closed {
-        let end_face = |j: usize| -> Option<usize> {
-            let edge0 = adjacent_edge(j, 0)?;
-            let edge1 = adjacent_edge(j, 1)?;
-            let k = if j == 0 { 0 } else { n - 1 };
-            let face_idx = shell.iter().position(|face| {
-                let contains =
-                    |edge: &Edge<Point3, C>| face.edge_iter().any(|e| e.id() == edge.id());
-                contains(&edge0) && contains(&edge1)
-            })?;
-            (face_idx != sides[k][0] && face_idx != sides[k][1]).then_some(face_idx)
-        };
-        let piece = |j: usize, side: usize| cuts.piece(&adjacent_edge(j, side)?);
-        let idx = end_face(0)?;
-        faces[idx] = create_new_side(
-            &faces[idx],
-            &cross[0],
-            &blend_surfaces[0],
-            wire.front_vertex()?.id(),
-            &piece(0, 0)?,
-            &piece(0, 1)?,
-        )?;
-        let idx = end_face(n)?;
-        faces[idx] = create_new_side(
-            &faces[idx],
-            end_edge.as_ref()?,
-            &blend_surfaces[n - 1],
-            wire.back_vertex()?.id(),
-            &piece(n, 1)?,
-            &piece(n, 0)?,
-        )?;
-    }
 
     faces.extend(blends);
     Some(faces.into())
@@ -518,4 +547,80 @@ fn adjacent_hint<C: ParametricCurve3D + BoundedCurve + Invertible>(
     let (t0, t1) = curve.range_tuple();
     let hint = if edge.back() == vertex { t1 } else { t0 };
     (curve, hint)
+}
+
+/// The faces around an end vertex of an open chain between the two side faces, the edges crossed
+/// walking from side 0 to side 1, and where the fillet meets the edges between those faces.
+struct EndWalk<C> {
+    faces: Vec<usize>,
+    edges: Vec<Edge<Point3, C>>,
+    /// per edge between two faces: the crossing vertex, its parameter on the edge's curve and
+    /// its parameters on the fillet
+    crossings: Vec<(Vertex<Point3>, f64, (f64, f64))>,
+}
+
+/// Walks the faces around `vertex` from side 0, leaving through `edge0`, until side 1 is reached,
+/// which must happen through `edge1`.
+fn walk_around_vertex<C: Clone, S>(
+    shell: &Shell<Point3, C, S>,
+    sides: [usize; 2],
+    vertex: &Vertex<Point3>,
+    edge0: Edge<Point3, C>,
+    edge1: &Edge<Point3, C>,
+) -> Option<EndWalk<C>> {
+    let mut faces = Vec::new();
+    let mut edges = vec![edge0];
+    let mut current = sides[0];
+    for _ in 0..shell.len() {
+        let edge_id = edges.last()?.id();
+        let next = (0..shell.len())
+            .find(|&idx| idx != current && shell[idx].edge_iter().any(|e| e.id() == edge_id))?;
+        if next == sides[1] {
+            let crossings = Vec::new();
+            return (edge_id == edge1.id()).then_some(EndWalk {
+                faces,
+                edges,
+                crossings,
+            });
+        }
+        let other = shell[next]
+            .edge_iter()
+            .find(|e| e.id() != edge_id && (e.front() == vertex || e.back() == vertex))?;
+        faces.push(next);
+        edges.push(other);
+        current = next;
+    }
+    None
+}
+
+/// Tangent of the intersection of `blend` and `surface` at `point`, pointing along `direction`.
+fn cross_tangent<S>(
+    blend: &S,
+    (u, v): (f64, f64),
+    surface: &S,
+    point: Point3,
+    direction: Vector3,
+) -> Option<Vector3>
+where
+    S: ParametricSurface3D + SearchParameter<D2, Point = Point3>,
+{
+    let (s, t) = surface.search_parameter(point, None, 100)?;
+    let tangent = blend.normal(u, v).cross(surface.normal(s, t));
+    Some(if tangent.dot(direction) >= 0.0 {
+        tangent
+    } else {
+        -tangent
+    })
+}
+
+/// `piece` oriented so that it arrives at `vertex` if `arriving`, or leaves it otherwise.
+fn toward<C: Clone>(
+    piece: &Edge<Point3, C>,
+    vertex: &Vertex<Point3>,
+    arriving: bool,
+) -> Edge<Point3, C> {
+    match (piece.back() == vertex) == arriving {
+        true => piece.clone(),
+        false => piece.inverse(),
+    }
 }
