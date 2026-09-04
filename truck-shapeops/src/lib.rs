@@ -11,7 +11,7 @@
 //! ## Fillet and Chamfer
 //!
 //! Fillets and chamfers can be applied to a single edge whose end vertices are each adjacent to exactly three faces.
-//! Continuous edges are currently unsupported.
+//! Constant-radius fillets can also be applied to a tangent-continuous chain of edges with `fillet_along_wire`.
 
 #![cfg_attr(not(debug_assertions), deny(warnings))]
 #![deny(clippy::all, rust_2018_idioms)]
@@ -36,5 +36,5 @@ mod alternative;
 ///
 /// # Current Status
 /// Fillets and chamfers can be applied to a single edge whose end vertices are each adjacent to exactly three faces.
-/// Continuous edges are currently unsupported.
+/// Constant-radius fillets can also be applied to a tangent-continuous chain of edges with `fillet_along_wire`.
 pub mod fillet;

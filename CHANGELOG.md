@@ -4,6 +4,8 @@ The version is of the bottom crate `truck-rendimpl`.
 
 ## Unreleased
 
+- Add `fillet_along_wire` to `truck-shapeops`.
+- Remove the unfinished multi-edge fillet prototype from `truck-shapeops`.
 - Add `simple_chamfer` and `chamfer_with_side` to `truck-shapeops`.
 - Fix `fillet_with_side` for side faces with inverted orientation.
 - Add a geometric test harness to `truck-shapeops` and boolean tests for tangent cases.

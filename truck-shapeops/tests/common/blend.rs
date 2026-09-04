@@ -82,6 +82,10 @@ impl Invertible for Surface {
     }
 }
 
+impl ToSameGeometry<Curve> for NurbsCurve<Vector4> {
+    fn to_same_geometry(&self) -> Curve { Curve::Nurbs(self.clone()) }
+}
+
 impl ToSameGeometry<Curve> for Line<Point3> {
     fn to_same_geometry(&self) -> Curve { Curve::Line(*self) }
 }

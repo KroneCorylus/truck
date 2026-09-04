@@ -44,6 +44,68 @@ fn find_adjacent_edge<P: Clone, C: Clone, S>(
         .map(|(x, _, y)| (x, y))
 }
 
+/// Cuts `front_edge`, which ends where `curve` starts, at its intersection with `curve`, and trims
+/// the start of `curve` to that point. Returns the kept piece of `front_edge` and its tangent at
+/// the cut, oriented along the face loop.
+fn cut_at_front<C, S>(
+    curve: &mut C,
+    front_edge: &Edge<Point3, C>,
+) -> Option<(Edge<Point3, C>, Vector3)>
+where
+    C: FilletedCurve<S>,
+{
+    let front_curve = front_edge.curve();
+    let front_curve_hint = match front_edge.orientation() {
+        true => front_curve.range_tuple().1,
+        false => front_curve.range_tuple().0,
+    };
+    let curve_hint = curve.range_tuple().0;
+    let hint = (curve_hint, front_curve_hint);
+    let (t0, t1) = search_intersection_parameter(curve, &front_curve, hint, 100)?;
+    let p = curve.subs(t0).midpoint(front_curve.subs(t1));
+    let v0 = Vertex::new(p);
+    if !curve_hint.near(&t0) {
+        *curve = curve.cut(t0);
+    }
+    let der = front_curve.der(t1);
+    let new_front_edge = front_edge.cut_with_parameter(&v0, t1)?.0;
+    match front_edge.orientation() {
+        true => Some((new_front_edge, der)),
+        false => Some((new_front_edge, -der)),
+    }
+}
+
+/// Cuts `back_edge`, which starts where `curve` ends, at its intersection with `curve`, and trims
+/// the end of `curve` to that point. Returns the kept piece of `back_edge` and its tangent at the
+/// cut, oriented along the face loop.
+fn cut_at_back<C, S>(
+    curve: &mut C,
+    back_edge: &Edge<Point3, C>,
+) -> Option<(Edge<Point3, C>, Vector3)>
+where
+    C: FilletedCurve<S>,
+{
+    let back_curve = back_edge.curve();
+    let back_curve_hint = match back_edge.orientation() {
+        true => back_curve.range_tuple().0,
+        false => back_curve.range_tuple().1,
+    };
+    let curve_hint = curve.range_tuple().1;
+    let hint = (curve_hint, back_curve_hint);
+    let (t0, t1) = search_intersection_parameter(curve, &back_curve, hint, 100)?;
+    let p = curve.subs(t0).midpoint(back_curve.subs(t1));
+    let v1 = Vertex::new(p);
+    if !t0.near(&curve_hint) {
+        curve.cut(t0);
+    }
+    let der = back_curve.der(t1);
+    let new_back_edge = back_edge.cut_with_parameter(&v1, t1)?.1;
+    match back_edge.orientation() {
+        true => Some((new_back_edge, der)),
+        false => Some((new_back_edge, -der)),
+    }
+}
+
 #[allow(clippy::type_complexity)]
 fn cut_face_by_curve<C, S>(
     face: &Face<Point3, C, S>,
@@ -55,50 +117,8 @@ where
     S: Clone,
 {
     let (front_edge, back_edge) = find_adjacent_edge(face, filleted_edge_id)?;
-
-    let (new_front_edge, front_der) = {
-        let front_curve = front_edge.curve();
-        let front_curve_hint = match front_edge.orientation() {
-            true => front_curve.range_tuple().1,
-            false => front_curve.range_tuple().0,
-        };
-        let curve_hint = curve.range_tuple().0;
-        let hint = (curve_hint, front_curve_hint);
-        let (t0, t1) = search_intersection_parameter(&curve, &front_curve, hint, 100)?;
-        let p = curve.subs(t0).midpoint(front_curve.subs(t1));
-        let v0 = Vertex::new(p);
-        if !curve_hint.near(&t0) {
-            curve = curve.cut(t0);
-        }
-        let der = front_curve.der(t1);
-        let new_front_edge = front_edge.cut_with_parameter(&v0, t1)?.0;
-        match front_edge.orientation() {
-            true => (new_front_edge, der),
-            false => (new_front_edge, -der),
-        }
-    };
-
-    let (new_back_edge, back_der) = {
-        let back_curve = back_edge.curve();
-        let back_curve_hint = match back_edge.orientation() {
-            true => back_curve.range_tuple().0,
-            false => back_curve.range_tuple().1,
-        };
-        let curve_hint = curve.range_tuple().1;
-        let hint = (curve_hint, back_curve_hint);
-        let (t0, t1) = search_intersection_parameter(&curve, &back_curve, hint, 100)?;
-        let p = curve.subs(t0).midpoint(back_curve.subs(t1));
-        let v1 = Vertex::new(p);
-        if !t0.near(&curve_hint) {
-            curve.cut(t0);
-        }
-        let der = back_curve.der(t1);
-        let new_back_edge = back_edge.cut_with_parameter(&v1, t1)?.1;
-        match back_edge.orientation() {
-            true => (new_back_edge, der),
-            false => (new_back_edge, -der),
-        }
-    };
+    let (new_front_edge, front_der) = cut_at_front(&mut curve, &front_edge)?;
+    let (new_back_edge, back_der) = cut_at_back(&mut curve, &back_edge)?;
 
     let fillet_edge = Edge::new(new_front_edge.back(), new_back_edge.front(), curve);
     let new_boundaries = face
@@ -414,170 +434,7 @@ where
     })
 }
 
+mod along_wire;
+pub use along_wire::fillet_along_wire;
 mod chamfer;
 pub use chamfer::{chamfer_with_side, simple_chamfer};
-
-// The following is a prototype implementation for multiple fillets.
-
-/*
-#[derive(Clone, Debug, PartialEq)]
-struct EdgesConnectingToVertex<P, C> {
-    side0: Option<Edge<P, C>>,
-    side1: Option<Edge<P, C>>,
-}
-type Ectv<P, C> = EdgesConnectingToVertex<P, C>;
-
-#[derive(Clone, Debug, PartialEq)]
-struct FacesConnectingToEdge<'a, P, C, S> {
-    side0: &'a Face<P, C, S>,
-    side1: &'a Face<P, C, S>,
-}
-type Fcte<'a, P, C, S> = FacesConnectingToEdge<'a, P, C, S>;
-
-struct CharactersOrganization<'a, P, C, S> {
-    ectvs: Vec<EdgesConnectingToVertex<P, C>>,
-    fctes: Vec<FacesConnectingToEdge<'a, P, C, S>>,
-}
-
-impl<'a, P, C, S> CharactersOrganization<'a, P, C, S> {
-    fn with_capacity(n: usize) -> Self {
-        Self {
-            ectvs: Vec::with_capacity(n + 1),
-            fctes: Vec::with_capacity(n),
-        }
-    }
-}
-
-fn organize_characters<'a, P, C, S>(
-    shell: &'a Shell<P, C, S>,
-    wire: &Wire<P, C>,
-) -> Option<CharactersOrganization<'a, P, C, S>> {
-    if wire.is_empty() || !wire.is_simple() {
-        eprintln!("wire must be non-empty and simple");
-        return None;
-    }
-
-    let mut co = CharactersOrganization::with_capacity(wire.len());
-    let CharactersOrganization { ectvs, fctes } = &mut co;
-
-    for (prev_edge, edge, next_edge) in wire.edge_iter().circular_tuple_windows() {
-        let mut prev_side0_edge = None;
-        let mut prev_side1_edge = None;
-        let mut next_side0_edge = None;
-        let mut next_side1_edge = None;
-        let mut side0_face = None;
-        let mut side1_face = None;
-        for face in shell.face_iter() {
-            for (prev, current, next) in face
-                .boundaries()
-                .iter()
-                .flat_map(|vec| vec.iter().circular_tuple_windows())
-            {
-                if edge == current {
-                    side0_face = Some(face);
-                    if !prev_edge.is_same(&prev) || prev_edge.back() != edge.front() {
-                        prev_side0_edge = Some(prev.clone());
-                    }
-                    if !next_edge.is_same(&next) || next_edge.front() != edge.back() {
-                        next_side0_edge = Some(next.inverse());
-                    }
-                } else if edge.is_same(&current) {
-                    side1_face = Some(face);
-                    if !prev_edge.is_same(&next) || prev_edge.back() != edge.front() {
-                        prev_side1_edge = Some(next.clone());
-                    }
-                    if !next_edge.is_same(&prev) || next_edge.front() != edge.back() {
-                        next_side1_edge = Some(prev.inverse());
-                    }
-                }
-            }
-        }
-        ectvs.push(Ectv {
-            side0: prev_side0_edge,
-            side1: prev_side1_edge,
-        });
-        if next_edge.front() != edge.back() {
-            ectvs.push(Ectv {
-                side0: next_side0_edge,
-                side1: next_side1_edge,
-            });
-        }
-        fctes.push(Fcte {
-            side0: side0_face?,
-            side1: side1_face?,
-        });
-    }
-    ectvs.rotate_right(1);
-    fctes.rotate_right(1);
-
-    Some(co)
-}
-
-fn fillet_faces<C, S, R>(
-    wire: &Wire<Point3, C>,
-    fctes: &[Fcte<'_, Point3, C, S>],
-    radius: R,
-    tol: f64,
-) -> Option<Shell<Point3, C, S>>
-where
-    C: FilletedCurve<S>,
-    S: FilletedSurface<C>,
-    R: RadiusFunction,
-    PCurve<BSplineCurve<Point2>, S>: ToSameGeometry<C>,
-    NurbsCurve<Vector4>: ToSameGeometry<C>,
-    ApproxFilletSurface<S, S>: ToSameGeometry<S>,
-{
-    let mut prev_edge: Option<Edge<Point3, C>> = None;
-    let mut prev_radius: Option<f64> = None;
-    let closure = |(edge, &Fcte { side0, side1 }): (&Edge<Point3, C>, _)| {
-        let curve = edge.oriented_curve();
-        let range = curve.range_tuple();
-        let surface0 = side0.oriented_surface();
-        let surface1 = side1.oriented_surface();
-
-        if let Some(r0) = prev_radius {
-            let (t0, t1) = curve.range_tuple();
-            if !r0.near(&radius.subs(t0)) {
-                return None;
-            }
-            prev_radius = Some(radius.subs(t1));
-        }
-
-        let strict_fillet = RbfSurface::new(curve, surface0, surface1, &radius);
-        let surface = ApproxFilletSurface::approx_rolling_ball_fillet(&strict_fillet, range, tol)?;
-
-        let ((u0, u1), (v0, v1)) = surface.range_tuple();
-
-        let edge0 = prev_edge.take().unwrap_or_else(|| {
-            let nurbs0 = surface.fillet_bezier(v0);
-            let v0 = &Vertex::new(nurbs0.subs(u0));
-            let v1 = &Vertex::new(nurbs0.subs(u1));
-            Edge::new(v0, v1, nurbs0.to_same_geometry())
-        });
-        let mut edge2 = {
-            let nurbs1 = surface.fillet_bezier(v1);
-            let v0 = &Vertex::new(nurbs1.subs(u0));
-            let v1 = &Vertex::new(nurbs1.subs(u1));
-            Edge::new(v0, v1, nurbs1.to_same_geometry())
-        };
-        prev_edge = Some(edge2.clone());
-
-        let pcurve1 = surface.side_pcurve1().to_same_geometry();
-        let edge1 = Edge::new(edge0.back(), edge2.back(), pcurve1);
-        let pcurve0 = surface.side_pcurve0().to_same_geometry();
-        let mut edge3 = Edge::new(edge0.front(), edge2.front(), pcurve0);
-
-        edge2.invert();
-        edge3.invert();
-        let boundary = wire![edge0, edge1, edge2, edge3];
-        Some(Face::new(vec![boundary], surface.to_same_geometry()))
-    };
-    wire.edge_iter().zip(fctes).map(closure).collect()
-}
-
-//mod experiment;
-mod extend_intersection_curve;
-
-#[cfg(test)]
-mod tests;
-*/
