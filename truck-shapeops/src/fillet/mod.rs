@@ -318,7 +318,7 @@ where
                 } else {
                     new_boundary[len - edge_idx - 1] = right_face_back_edge.clone();
                     new_boundary[(2 * len - edge_idx - 2) % len] = left_face_front_edge.clone();
-                    new_boundary.insert(len - edge_idx, fillet_edge.clone());
+                    new_boundary.insert(len - edge_idx - 1, fillet_edge.clone());
                 }
             }
             new_boundary
@@ -354,7 +354,23 @@ where
     ApproxFilletSurface<S, S>: ToSameGeometry<S>,
 {
     let simple_fillet = simple_fillet(face0, face1, filleted_edge_id, radius, tol)?;
+    attach_sides(face0, filleted_edge_id, side0, side1, simple_fillet)
+}
 
+/// Trims the side faces at both ends of a blend face produced by [`simple_fillet`] or
+/// [`simple_chamfer`].
+fn attach_sides<C, S>(
+    face0: &Face<Point3, C, S>,
+    filleted_edge_id: EdgeID<C>,
+    side0: Option<&Face<Point3, C, S>>,
+    side1: Option<&Face<Point3, C, S>>,
+    simple_fillet: SimpleFillet<C, S>,
+) -> Option<FilletWithSide<C, S>>
+where
+    C: FilletedCurve<S>,
+    S: FilletedSurface<C>,
+    IntersectionCurve<C, S, S>: ToSameGeometry<C>,
+{
     let (front_edge0, back_edge0) = {
         let fillet_edge_id = simple_fillet.fillet.absolute_boundaries()[0][0].id();
         find_adjacent_edge(&simple_fillet.face0, fillet_edge_id)?
@@ -397,6 +413,9 @@ where
         side1: new_side1,
     })
 }
+
+mod chamfer;
+pub use chamfer::{chamfer_with_side, simple_chamfer};
 
 // The following is a prototype implementation for multiple fillets.
 

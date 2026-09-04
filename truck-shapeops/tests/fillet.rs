@@ -1,114 +1,10 @@
-use derive_more::From;
 use itertools::Itertools;
 use truck_geometry::prelude::*;
 use truck_meshalgo::prelude::*;
 use truck_shapeops::fillet::*;
 
 mod common;
-use common::*;
-
-#[derive(
-    Clone,
-    Debug,
-    ParametricCurve,
-    BoundedCurve,
-    Cut,
-    SearchNearestParameterD1,
-    ParameterDivision1D,
-    Invertible,
-    From,
-)]
-enum Curve {
-    Line(Line<Point3>),
-    Nurbs(NurbsCurve<Vector4>),
-    Parametric(PCurve<BSplineCurve<Point2>, Box<Surface>>),
-    Intersection(IntersectionCurve<Box<Self>, Box<Surface>, Box<Surface>>),
-}
-
-impl ToSameGeometry<Curve> for IntersectionCurve<Curve, Surface, Surface> {
-    fn to_same_geometry(&self) -> Curve {
-        let (surface0, surface1, leader) = self.clone().destruct();
-        Curve::Intersection(IntersectionCurve::new(
-            Box::new(surface0),
-            Box::new(surface1),
-            Box::new(leader),
-        ))
-    }
-}
-
-impl ToSameGeometry<Curve> for PCurve<BSplineCurve<Point2>, Surface> {
-    fn to_same_geometry(&self) -> Curve {
-        let (curve, surface) = self.clone().decompose();
-        Curve::Parametric(PCurve::new(curve, Box::new(surface)))
-    }
-}
-
-#[derive(
-    Clone,
-    Debug,
-    ParametricSurface3D,
-    SearchParameterD2,
-    SearchNearestParameterD2,
-    ParameterDivision2D,
-    From,
-)]
-enum Surface {
-    Nurbs(NurbsSurface<Vector4>),
-    Fillet(ApproxFilletSurface<Box<Self>, Box<Self>>),
-    Processor(Processor<Box<Self>, Matrix4>),
-}
-
-impl ToSameGeometry<Surface> for ApproxFilletSurface<Surface, Surface> {
-    fn to_same_geometry(&self) -> Surface { Surface::Fillet(self.clone().into()) }
-}
-
-impl Invertible for Surface {
-    fn invert(&mut self) {
-        match self {
-            Self::Nurbs(surface) => surface.invert(),
-            Self::Fillet(_) => {
-                let mut processor = Processor::new(Box::new(self.clone()));
-                processor.invert();
-                *self = Self::Processor(processor);
-            }
-            Self::Processor(processor) => processor.invert(),
-        }
-    }
-}
-
-impl ToSameGeometry<Curve> for Line<Point3> {
-    fn to_same_geometry(&self) -> Curve { Curve::Line(*self) }
-}
-
-impl ToSameGeometry<Surface> for Plane {
-    fn to_same_geometry(&self) -> Surface { Surface::Nurbs(BSplineSurface::from(*self).into()) }
-}
-
-truck_topology::prelude!(Point3, Curve, Surface);
-
-fn face_through(shell: &Shell, point: Point3) -> usize {
-    shell
-        .face_iter()
-        .position(|face| {
-            let surface = face.surface();
-            surface
-                .search_parameter(point, None, 10)
-                .is_some_and(|(u, v)| surface.subs(u, v).near(&point))
-        })
-        .expect("no face through the point")
-}
-
-fn edge_through(shell: &Shell, point: Point3) -> Edge {
-    shell
-        .edge_iter()
-        .find(|edge| {
-            let curve = edge.curve();
-            curve
-                .search_nearest_parameter(point, None, 10)
-                .is_some_and(|t| curve.subs(t).near(&point))
-        })
-        .expect("no edge through the point")
-}
+use common::{blend::*, *};
 
 /// Fillets one edge of a unit cube and checks the exact volume.
 #[test]
@@ -491,4 +387,68 @@ fn complex_surface() {
     poly.put_together_same_attrs(1e-4);
 
     assert_eq!(poly.shell_condition(), ShellCondition::Closed);
+}
+
+/// Same as [`fillet_cube_volume`] on a cube built by sweeping, whose bottom face is stored
+/// inverted. Exercises the inverted branch of the side-face trimming.
+#[test]
+fn fillet_swept_cube_volume() {
+    let cube: truck_modeling::Solid = {
+        use truck_modeling::*;
+        let v = builder::vertex(Point3::origin());
+        let e = builder::tsweep(&v, Vector3::unit_x());
+        let f = builder::tsweep(&e, Vector3::unit_y());
+        builder::tsweep(&f, Vector3::unit_z())
+    };
+    let mut shell = from_modeling(&cube).into_boundaries().pop().unwrap();
+    assert!(shell.face_iter().any(|face| !face.orientation()));
+
+    let face_idx0 = face_through(&shell, Point3::new(0.5, 0.0, 0.5));
+    let face_idx1 = face_through(&shell, Point3::new(1.0, 0.5, 0.5));
+    let edge = edge_through(&shell, Point3::new(1.0, 0.0, 0.5));
+    let front = shell[face_idx0]
+        .edge_iter()
+        .find(|e| e.id() == edge.id())
+        .unwrap()
+        .front()
+        .id();
+    let mut side_idx0 = face_through(&shell, Point3::new(0.5, 0.5, 0.0));
+    let mut side_idx1 = face_through(&shell, Point3::new(0.5, 0.5, 1.0));
+    if !shell[side_idx0].vertex_iter().any(|v| v.id() == front) {
+        std::mem::swap(&mut side_idx0, &mut side_idx1);
+    }
+
+    let radius = 0.2;
+    let FilletWithSide {
+        simple_fillet:
+            SimpleFillet {
+                fillet,
+                face0,
+                face1,
+            },
+        side0,
+        side1,
+    } = fillet_with_side(
+        &shell[face_idx0],
+        &shell[face_idx1],
+        edge.id(),
+        Some(&shell[side_idx0]),
+        Some(&shell[side_idx1]),
+        radius,
+        0.001,
+    )
+    .unwrap();
+    shell[face_idx0] = face0;
+    shell[face_idx1] = face1;
+    shell[side_idx0] = side0.unwrap();
+    shell[side_idx1] = side1.unwrap();
+    shell.push(fillet);
+
+    let solid = Solid::new(vec![shell]);
+    assert_solid(
+        &solid,
+        1.0 - fillet_removed_volume(radius, 1.0),
+        &[0],
+        0.001,
+    );
 }

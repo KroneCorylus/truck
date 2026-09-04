@@ -8,9 +8,9 @@
 //! Cases where faces are tangent to each other are not yet supported.
 //! Furthermore, performance optimization using BSP (Binary Space Partitioning) or similar methods remains a future task.
 //!
-//! ## Fillet
+//! ## Fillet and Chamfer
 //!
-//! Fillets can be applied to a single edge whose end vertices are each adjacent to exactly three faces.
+//! Fillets and chamfers can be applied to a single edge whose end vertices are each adjacent to exactly three faces.
 //! Continuous edges are currently unsupported.
 
 #![cfg_attr(not(debug_assertions), deny(warnings))]
@@ -32,9 +32,9 @@ mod transversal;
 pub use transversal::{and, or, ShapeOpsCurve, ShapeOpsSurface};
 mod alternative;
 
-/// Attaching fillet
+/// Attaching fillets and chamfers
 ///
 /// # Current Status
-/// Fillets can be applied to a single edge whose end vertices are each adjacent to exactly three faces.
+/// Fillets and chamfers can be applied to a single edge whose end vertices are each adjacent to exactly three faces.
 /// Continuous edges are currently unsupported.
 pub mod fillet;

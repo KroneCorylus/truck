@@ -1,6 +1,8 @@
 //! Shared checks and primitives for geometric tests.
 #![allow(dead_code)]
 
+pub mod blend;
+
 use rustc_hash::FxHashSet as HashSet;
 use std::f64::consts::PI;
 use truck_meshalgo::prelude::*;
@@ -53,8 +55,8 @@ where
 }
 
 /// Asserts that the signed volume of the tessellation of `solid` at `tol` matches `expected`.
-/// The allowed error is `tol` times the area of the curved faces, which bounds the chord error.
-/// Planar faces tessellate exactly and do not contribute.
+/// The allowed error is `tol` times the area of the curved faces, which bounds the chord error,
+/// with a floor of `TOLERANCE` for rounding. Planar faces tessellate exactly and do not contribute.
 pub fn assert_volume<C, S>(solid: &Solid<Point3, C, S>, expected: f64, tol: f64)
 where
     C: PolylineableCurve,
@@ -67,7 +69,7 @@ where
         .filter(|mesh| !is_planar(mesh))
         .map(|mesh| surface_area(&mesh))
         .sum();
-    let allowed = curved_area * tol;
+    let allowed = (curved_area * tol).max(TOLERANCE);
     assert!(
         (volume - expected).abs() <= allowed,
         "volume {volume} differs from expected {expected} by more than {allowed}"
