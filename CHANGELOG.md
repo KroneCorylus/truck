@@ -4,6 +4,7 @@ The version is of the bottom crate `truck-rendimpl`.
 
 ## Unreleased
 
+- Add a geometric test harness to `truck-shapeops` and boolean tests for tangent cases.
 - Remove `compression` feature from `vtkio`.
 - Improve `BSplineXXX::least_square`.
 - Add `BSplineXXX::least_square`.

@@ -4,6 +4,9 @@ use truck_geometry::prelude::*;
 use truck_meshalgo::prelude::*;
 use truck_shapeops::fillet::*;
 
+mod common;
+use common::*;
+
 #[derive(
     Clone,
     Debug,
@@ -73,7 +76,87 @@ impl Invertible for Surface {
     }
 }
 
+impl ToSameGeometry<Curve> for Line<Point3> {
+    fn to_same_geometry(&self) -> Curve { Curve::Line(*self) }
+}
+
+impl ToSameGeometry<Surface> for Plane {
+    fn to_same_geometry(&self) -> Surface { Surface::Nurbs(BSplineSurface::from(*self).into()) }
+}
+
 truck_topology::prelude!(Point3, Curve, Surface);
+
+fn face_through(shell: &Shell, point: Point3) -> usize {
+    shell
+        .face_iter()
+        .position(|face| {
+            let surface = face.surface();
+            surface
+                .search_parameter(point, None, 10)
+                .is_some_and(|(u, v)| surface.subs(u, v).near(&point))
+        })
+        .expect("no face through the point")
+}
+
+fn edge_through(shell: &Shell, point: Point3) -> Edge {
+    shell
+        .edge_iter()
+        .find(|edge| {
+            let curve = edge.curve();
+            curve
+                .search_nearest_parameter(point, None, 10)
+                .is_some_and(|t| curve.subs(t).near(&point))
+        })
+        .expect("no edge through the point")
+}
+
+/// Fillets one edge of a unit cube and checks the exact volume.
+#[test]
+fn fillet_cube_volume() {
+    let bbox = BoundingBox::from_iter([Point3::origin(), Point3::new(1.0, 1.0, 1.0)]);
+    let cube: truck_topology::Solid<Point3, Curve, Surface> =
+        truck_modeling::primitive::cuboid(bbox);
+    let mut shell = cube.into_boundaries().pop().unwrap();
+    let face_idx0 = face_through(&shell, Point3::new(0.5, 0.0, 0.5));
+    let face_idx1 = face_through(&shell, Point3::new(1.0, 0.5, 0.5));
+    let edge = edge_through(&shell, Point3::new(1.0, 0.0, 0.5));
+    let side_idx0 = face_through(&shell, Point3::new(0.5, 0.5, 0.0));
+    let side_idx1 = face_through(&shell, Point3::new(0.5, 0.5, 1.0));
+
+    let radius = 0.2;
+    let FilletWithSide {
+        simple_fillet:
+            SimpleFillet {
+                fillet,
+                face0,
+                face1,
+            },
+        side0,
+        side1,
+    } = fillet_with_side(
+        &shell[face_idx0],
+        &shell[face_idx1],
+        edge.id(),
+        Some(&shell[side_idx0]),
+        Some(&shell[side_idx1]),
+        radius,
+        0.001,
+    )
+    .unwrap();
+    shell[face_idx0] = face0;
+    shell[face_idx1] = face1;
+    shell[side_idx0] = side0.unwrap();
+    shell[side_idx1] = side1.unwrap();
+    shell.push(fillet);
+
+    let solid = Solid::new(vec![shell]);
+    assert_solid(
+        &solid,
+        1.0 - fillet_removed_volume(radius, 1.0),
+        &[0],
+        0.001,
+    );
+}
 
 #[test]
 fn create_simple_fillet() {

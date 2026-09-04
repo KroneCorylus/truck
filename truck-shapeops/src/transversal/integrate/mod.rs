@@ -176,6 +176,3 @@ pub fn or<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     let boundaries = or_shell.connected_components();
     Some(Solid::new(boundaries))
 }
-
-#[cfg(test)]
-mod tests;
