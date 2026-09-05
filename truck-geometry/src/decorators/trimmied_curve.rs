@@ -41,29 +41,44 @@ impl<C: ParametricCurve> Cut for TrimmedCurve<C> {
     }
 }
 
+impl<C> TrimmedCurve<C> {
+    /// Replaces a missing hint by the trimmed range, so a periodic curve answers inside it.
+    fn hint_or_range<H: Into<SPHint1D>>(&self, hint: H) -> SPHint1D {
+        match hint.into() {
+            SPHint1D::None => SPHint1D::Range(self.range.0, self.range.1),
+            hint => hint,
+        }
+    }
+}
+
 impl<C: SearchNearestParameter<D1>> SearchNearestParameter<D1> for TrimmedCurve<C> {
     type Point = C::Point;
-    #[inline(always)]
+    /// Nearest parameter within the trimmed range.
     fn search_nearest_parameter<H: Into<SPHint1D>>(
         &self,
         pt: C::Point,
         hint: H,
         trials: usize,
     ) -> Option<f64> {
-        self.curve.search_nearest_parameter(pt, hint, trials)
+        let hint = self.hint_or_range(hint);
+        let t = self.curve.search_nearest_parameter(pt, hint, trials)?;
+        Some(t.clamp(self.range.0, self.range.1))
     }
 }
 
 impl<C: SearchParameter<D1>> SearchParameter<D1> for TrimmedCurve<C> {
     type Point = C::Point;
-    #[inline(always)]
+    /// Parameter of `pt` within the trimmed range, `None` if `pt` lies outside it.
     fn search_parameter<H: Into<SPHint1D>>(
         &self,
         pt: C::Point,
         hint: H,
         trials: usize,
     ) -> Option<f64> {
-        self.curve.search_parameter(pt, hint, trials)
+        let hint = self.hint_or_range(hint);
+        let t = self.curve.search_parameter(pt, hint, trials)?;
+        let (t0, t1) = self.range;
+        (t0 - TOLERANCE..=t1 + TOLERANCE).contains(&t).then_some(t)
     }
 }
 

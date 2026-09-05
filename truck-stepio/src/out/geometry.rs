@@ -477,6 +477,7 @@ impl DisplayByStep for ModelingCurve {
             ModelingCurve::Line(x) => DisplayByStep::fmt(x, idx, f),
             ModelingCurve::BSplineCurve(x) => DisplayByStep::fmt(x, idx, f),
             ModelingCurve::NurbsCurve(x) => DisplayByStep::fmt(x, idx, f),
+            ModelingCurve::Conic(x) => DisplayByStep::fmt(x, idx, f),
             ModelingCurve::IntersectionCurve(x) => DisplayByStep::fmt(x, idx, f),
         }
     }
@@ -488,12 +489,20 @@ impl StepLength for ModelingCurve {
             ModelingCurve::Line(_) => Line::<Point3>::LENGTH,
             ModelingCurve::BSplineCurve(x) => x.step_length(),
             ModelingCurve::NurbsCurve(x) => x.step_length(),
+            ModelingCurve::Conic(x) => x.step_length(),
             ModelingCurve::IntersectionCurve(x) => x.step_length(),
         }
     }
 }
 
-impl StepCurve for ModelingCurve {}
+impl StepCurve for ModelingCurve {
+    fn same_sense(&self) -> bool {
+        match self {
+            ModelingCurve::Conic(x) => x.same_sense(),
+            _ => true,
+        }
+    }
+}
 
 impl DisplayByStep for Plane {
     fn fmt(&self, idx: usize, f: &mut Formatter<'_>) -> Result {

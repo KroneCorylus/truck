@@ -4,6 +4,8 @@ The version is of the bottom crate `truck-rendimpl`.
 
 ## Unreleased
 
+- Add `Curve::Conic` to `truck-modeling`, so `builder::circle_arc` keeps circles and arcs exact.
+- Fix parameter searches on `TrimmedCurve` and `Processor` answering outside the trimmed range of a periodic curve.
 - Support set operations between solids with coincident faces, such as stacked boxes and flush pockets.
 - Support set operations between solids whose faces only touch along a curve or an edge.
 - Fix set operations dropping whole faces of an inverted operand.

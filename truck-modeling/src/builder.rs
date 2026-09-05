@@ -93,12 +93,13 @@ pub enum ArcConstraint {
 /// let transit = Point3::new(0.0, 1.0, 0.0);
 /// let semi_circle = builder::circle_arc(&vertex0, &vertex1, transit);
 /// # let curve = match semi_circle.oriented_curve() {
-/// #       Curve::NurbsCurve(curve) => curve,
+/// #       Curve::Conic(curve) => curve,
 /// #       _ => unreachable!(),
 /// # };
 /// # const N: usize = 10;
+/// # let (t0, t1) = curve.range_tuple();
 /// # for i in 0..=N {
-/// #       let t = curve.knot_vec()[0] + curve.knot_vec().range_length() * i as f64 / N as f64;
+/// #       let t = t0 + (t1 - t0) * i as f64 / N as f64;
 /// #       assert!(curve.subs(t).to_vec().magnitude().near(&1.0));
 /// # }
 /// ```
@@ -111,12 +112,13 @@ pub enum ArcConstraint {
 /// let tangent = Vector3::new(0.0, 1.0, 0.0);
 /// let semi_circle = builder::circle_arc(&vertex0, &vertex1, tangent);
 /// # let curve = match semi_circle.oriented_curve() {
-/// #       Curve::NurbsCurve(curve) => curve,
+/// #       Curve::Conic(curve) => curve,
 /// #       _ => unreachable!(),
 /// # };
 /// # const N: usize = 10;
+/// # let (t0, t1) = curve.range_tuple();
 /// # for i in 0..=N {
-/// #       let t = curve.knot_vec()[0] + curve.knot_vec().range_length() * i as f64 / N as f64;
+/// #       let t = t0 + (t1 - t0) * i as f64 / N as f64;
 /// #       assert!(curve.subs(t).to_vec().magnitude().near(&1.0));
 /// # }
 /// ```

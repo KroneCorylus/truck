@@ -153,20 +153,20 @@ impl SearchNearestParameter<D1> for UnitCircle<Point3> {
     fn search_nearest_parameter<H: Into<SPHint1D>>(
         &self,
         pt: Point3,
-        _: H,
+        hint: H,
         _: usize,
     ) -> Option<f64> {
-        UnitCircle::<Point2>::new().search_nearest_parameter(Point2::new(pt.x, pt.y), None, 0)
+        UnitCircle::<Point2>::new().search_nearest_parameter(Point2::new(pt.x, pt.y), hint, 0)
     }
 }
 
 impl SearchParameter<D1> for UnitCircle<Point3> {
     type Point = Point3;
-    fn search_parameter<H: Into<SPHint1D>>(&self, pt: Point3, _: H, _: usize) -> Option<f64> {
+    fn search_parameter<H: Into<SPHint1D>>(&self, pt: Point3, hint: H, _: usize) -> Option<f64> {
         if !f64::abs(pt.z).so_small() {
             return None;
         }
-        UnitCircle::<Point2>::new().search_parameter(Point2::new(pt.x, pt.y), None, 0)
+        UnitCircle::<Point2>::new().search_parameter(Point2::new(pt.x, pt.y), hint, 0)
     }
 }
 

@@ -510,7 +510,8 @@ where
             self.entity
                 .search_nearest_parameter(inv.transform_point(point), hint, trials)?;
         let hint = self.get_curve_parameter(hint);
-        algo::curve::search_nearest_parameter(self, point, hint, trials)
+        let (t0, t1) = self.range_tuple();
+        algo::curve::search_nearest_parameter(self, point, hint, trials).map(|t| t.clamp(t0, t1))
     }
 }
 

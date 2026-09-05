@@ -131,6 +131,10 @@ impl MyApp {
                         vec![bdb.max(), bdb.min()].into_iter().collect()
                     }
                     Curve::NurbsCurve(curve) => curve.roughly_bounding_box(),
+                    Curve::Conic(curve) => {
+                        let nurbs: NurbsCurve<Vector4> = curve.to_same_geometry();
+                        nurbs.roughly_bounding_box()
+                    }
                     Curve::IntersectionCurve(_) => BoundingBox::new(),
                 };
             });
