@@ -810,6 +810,7 @@ impl DisplayByStep for ModelingSurface {
             ModelingSurface::BSplineSurface(x) => DisplayByStep::fmt(x, idx, f),
             ModelingSurface::NurbsSurface(x) => DisplayByStep::fmt(x, idx, f),
             ModelingSurface::RevolutedCurve(x) => DisplayByStep::fmt(x, idx, f),
+            ModelingSurface::Extruded(x) => DisplayByStep::fmt(x, idx, f),
         }
     }
 }
@@ -821,6 +822,7 @@ impl StepLength for ModelingSurface {
             ModelingSurface::BSplineSurface(x) => x.step_length(),
             ModelingSurface::NurbsSurface(x) => x.step_length(),
             ModelingSurface::RevolutedCurve(x) => x.entity().step_length(),
+            ModelingSurface::Extruded(x) => x.step_length(),
         }
     }
 }

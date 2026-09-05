@@ -137,6 +137,8 @@ pub enum Surface {
     NurbsSurface(NurbsSurface<Vector4>),
     /// revoluted curve
     RevolutedCurve(Processor<RevolutedCurve<Curve>, Matrix4>),
+    /// curve swept along a vector, kept exact
+    Extruded(ExtrudedCurve<Curve, Vector3>),
 }
 
 macro_rules! derive_surface_method {
@@ -146,6 +148,7 @@ macro_rules! derive_surface_method {
             Self::BSplineSurface(got) => $method(got, $($ver), *),
             Self::NurbsSurface(got) => $method(got, $($ver), *),
             Self::RevolutedCurve(got) => $method(got, $($ver), *),
+            Self::Extruded(got) => $method(got, $($ver), *),
         }
     };
 }
@@ -157,6 +160,7 @@ macro_rules! derive_surface_self_method {
             Self::BSplineSurface(got) => Self::BSplineSurface($method(got, $($ver), *)),
             Self::NurbsSurface(got) => Self::NurbsSurface($method(got, $($ver), *)),
             Self::RevolutedCurve(got) => Self::RevolutedCurve($method(got, $($ver), *)),
+            Self::Extruded(got) => Self::Extruded($method(got, $($ver), *)),
         }
     };
 }
@@ -204,6 +208,7 @@ impl IncludeCurve<Curve> for Surface {
                     Curve::IntersectionCurve(_) => unimplemented!(),
                 }
             }
+            Surface::Extruded(surface) => include_curve(&extruded_to_nurbs(surface), curve),
         }
     }
 }
@@ -217,6 +222,13 @@ where S: IncludeCurve<BSplineCurve<Point3>> + IncludeCurve<NurbsCurve<Vector4>> 
         Curve::Conic(curve) => surface.include(&conic_to_nurbs(curve)),
         Curve::IntersectionCurve(_) => unimplemented!(),
     }
+}
+
+/// The extruded curve as a NURBS surface, for the curve inclusion test.
+fn extruded_to_nurbs(surface: &ExtrudedCurve<Curve, Vector3>) -> NurbsSurface<Vector4> {
+    let curve0 = surface.entity_curve();
+    let curve1 = curve0.transformed(Matrix4::from_translation(surface.extruding_vector()));
+    NurbsSurface::new(BSplineSurface::homotopy(curve0.lift_up(), curve1.lift_up()))
 }
 
 #[inline(always)]
@@ -267,6 +279,7 @@ impl SearchNearestParameter<D2> for Surface {
                 };
                 algo::surface::search_nearest_parameter(rotted, point, hint, trials)
             }
+            Surface::Extruded(surface) => surface.search_nearest_parameter(point, hint, trials),
         }
     }
 }
@@ -298,10 +311,7 @@ impl ToSameGeometry<Surface> for ExtrudedCurve<Curve, Vector3> {
                 ))
                 .into()
             }
-            (Curve::Conic(_), Curve::Conic(_)) => {
-                NurbsSurface::new(BSplineSurface::homotopy(curve0.lift_up(), curve1.lift_up()))
-                    .into()
-            }
+            (Curve::Conic(_), Curve::Conic(_)) => Surface::Extruded(self.clone()),
             (Curve::IntersectionCurve(_), Curve::IntersectionCurve(_)) => unimplemented!(),
             _ => unreachable!(),
         }

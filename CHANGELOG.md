@@ -4,6 +4,7 @@ The version is of the bottom crate `truck-rendimpl`.
 
 ## Unreleased
 
+- Add `Surface::Extruded` to `truck-modeling`, so `tsweep` keeps swept circles and arcs exact.
 - Add `Curve::Conic` to `truck-modeling`, so `builder::circle_arc` keeps circles and arcs exact.
 - Fix parameter searches on `TrimmedCurve` and `Processor` answering outside the trimmed range of a periodic curve.
 - Support set operations between solids with coincident faces, such as stacked boxes and flush pockets.
