@@ -43,15 +43,17 @@ pub fn assert_mesh_closed<C, S>(solid: &Solid<Point3, C, S>, tol: f64)
 where
     C: PolylineableCurve,
     S: MeshableSurface, {
-    let mut mesh = solid.triangulation(tol).to_polygon();
-    mesh.put_together_same_attrs(TOLERANCE)
-        .remove_degenerate_faces()
-        .remove_unused_attrs();
-    assert_eq!(
-        mesh.shell_condition(),
-        ShellCondition::Closed,
-        "tessellated mesh is not closed"
-    );
+    for (i, shell) in solid.boundaries().iter().enumerate() {
+        let mut mesh = shell.triangulation(tol).to_polygon();
+        mesh.put_together_same_attrs(TOLERANCE)
+            .remove_degenerate_faces()
+            .remove_unused_attrs();
+        assert_eq!(
+            mesh.shell_condition(),
+            ShellCondition::Closed,
+            "tessellated mesh of shell {i} is not closed"
+        );
+    }
 }
 
 /// Asserts that the signed volume of the tessellation of `solid` at `tol` matches `expected`.

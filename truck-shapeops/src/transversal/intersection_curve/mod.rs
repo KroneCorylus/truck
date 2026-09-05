@@ -162,6 +162,7 @@ where
     let polylines = super::polyline_construction::construct_polylines(&interferences);
     polylines
         .into_iter()
+        .filter(|polyline| !surfaces_graze_along(&surface0, &surface1, polyline))
         .map(|polyline| {
             Some((
                 polyline.clone(),
@@ -173,6 +174,30 @@ where
             ))
         })
         .collect()
+}
+
+/// Whether the surfaces are tangent to each other at every vertex of `polyline`.
+///
+/// Meshes of surfaces that only touch along a curve interfere along that curve when a mesh edge
+/// lies on it. Such a polyline is contact, not a crossing: the surface normals are parallel all
+/// along it, and lifting it to an intersection curve is impossible.
+fn surfaces_graze_along<S0, S1>(
+    surface0: &S0,
+    surface1: &S1,
+    polyline: &PolylineCurve<Point3>,
+) -> bool
+where
+    S0: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>,
+    S1: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>,
+{
+    let normal = |p: Point3| -> Option<(Vector3, Vector3)> {
+        let (u0, v0) = surface0.search_nearest_parameter(p, None, 100)?;
+        let (u1, v1) = surface1.search_nearest_parameter(p, None, 100)?;
+        Some((surface0.normal(u0, v0), surface1.normal(u1, v1)))
+    };
+    polyline
+        .iter()
+        .all(|&p| normal(p).is_some_and(|(n0, n1)| n0.cross(n1).so_small()))
 }
 
 #[cfg(test)]

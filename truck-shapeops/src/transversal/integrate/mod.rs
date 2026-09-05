@@ -135,6 +135,10 @@ fn interior_point<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
 
 /// Sorts the faces whose status the cuts left undecided into `and` (inside the other solid) or
 /// `or` (outside), by ray casting from an interior point against the other solid's mesh.
+///
+/// The signed crossing count of a ray from a point inside a closed mesh is 1. An inverted mesh,
+/// the complement of a solid, has its interior where the count is 0, and −1 inside the
+/// original solid; its orientation shows in the sign of its volume.
 fn classify_unknown<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     unknown: AltCurveShell<C, S>,
     other: &Shell<Point3, PolylineCurve<Point3>, Option<PolygonMesh>>,
@@ -142,14 +146,12 @@ fn classify_unknown<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     or: &mut AltCurveShell<C, S>,
     tol: f64,
 ) -> Option<()> {
+    let mesh = other.to_polygon();
+    let inside_count = if mesh.volume() < 0.0 { 0 } else { 1 };
     unknown.into_iter().try_for_each(|face| {
         let pt = interior_point(&face, tol)?;
         let dir = hash::take_one_unit(pt);
-        let count = other.iter().try_fold(0, |count, face| {
-            let poly = face.surface()?;
-            Some(count + poly.signed_crossing_faces(pt, dir))
-        })?;
-        if count >= 1 {
+        if mesh.signed_crossing_faces(pt, dir) >= inside_count {
             and.push(face);
         } else {
             or.push(face);

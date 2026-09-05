@@ -486,6 +486,10 @@ where
                 &polygon1,
             )?
             .into_iter()
+            .filter(|(polyline, _)| {
+                !runs_along_boundary(polyline, &poly_shell0[face_index0])
+                    && !runs_along_boundary(polyline, &poly_shell1[face_index1])
+            })
             .try_for_each(|(polyline, intersection_curve)| {
                 let mut intersection_curve = intersection_curve.into();
                 let status = ShapesOpStatus::from_is_curve(&intersection_curve)?;
@@ -593,4 +597,28 @@ fn bounding_boxes_overlap(bbox0: &BoundingBox<Point3>, bbox1: &BoundingBox<Point
     (0..3).all(|i| {
         bbox0.min()[i] <= bbox1.max()[i] + TOLERANCE && bbox1.min()[i] <= bbox0.max()[i] + TOLERANCE
     })
+}
+
+/// Whether every segment of `polyline` lies on the boundary of `face`. Faces meeting along a
+/// common edge interfere along that edge; that is contact, not a cut.
+fn runs_along_boundary(
+    polyline: &PolylineCurve,
+    face: &Face<Point3, PolylineCurve, Option<PolygonMesh>>,
+) -> bool {
+    let on_boundary = |p: Point3| {
+        face.edge_iter().any(|edge| {
+            edge.curve()
+                .windows(2)
+                .any(|seg| distance_to_segment(p, seg[0], seg[1]) < TOLERANCE)
+        })
+    };
+    polyline
+        .windows(2)
+        .all(|seg| on_boundary(seg[0].midpoint(seg[1])))
+}
+
+fn distance_to_segment(p: Point3, a: Point3, b: Point3) -> f64 {
+    let ab = b - a;
+    let t = (p - a).dot(ab) / ab.magnitude2().max(TOLERANCE2);
+    p.distance(a + ab * t.clamp(0.0, 1.0))
 }

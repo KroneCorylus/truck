@@ -127,12 +127,20 @@ fn subtract_flush_pocket() {
 }
 
 #[test]
-#[ignore = "tangent contact along a curve is not supported yet"]
 fn union_cylinder_on_plane() {
     let cube = unit_cube();
     let roller = cylinder(Point3::new(0.0, 0.5, 1.25), Vector3::unit_x(), 0.25, 1.0);
     let union = truck_shapeops::or(&cube, &roller, TOL).unwrap();
     assert_solid(&union, 1.0 + cylinder_volume(0.25, 1.0), &[0, 0], TOL);
+}
+
+/// Subtracting a solid that only touches leaves the other solid unchanged.
+#[test]
+fn subtract_cylinder_on_plane() {
+    let cube = unit_cube();
+    let roller = cylinder(Point3::new(0.0, 0.5, 1.25), Vector3::unit_x(), 0.25, 1.0);
+    let difference = subtract(&cube, &roller, TOL).unwrap();
+    assert_solid(&difference, 1.0, &[0], TOL);
 }
 
 #[test]
@@ -144,12 +152,19 @@ fn union_sphere_on_plane() {
 }
 
 #[test]
-#[ignore = "contact along an edge is not supported yet"]
 fn union_boxes_sharing_edge() {
     let cube0 = unit_cube();
     let cube1 = cuboid(Point3::new(1.0, 1.0, 0.0), Point3::new(2.0, 2.0, 1.0));
     let union = truck_shapeops::or(&cube0, &cube1, TOL).unwrap();
     assert_solid(&union, 2.0, &[0, 0], TOL);
+}
+
+#[test]
+fn subtract_boxes_sharing_edge() {
+    let cube0 = unit_cube();
+    let cube1 = cuboid(Point3::new(1.0, 1.0, 0.0), Point3::new(2.0, 2.0, 1.0));
+    let difference = subtract(&cube0, &cube1, TOL).unwrap();
+    assert_solid(&difference, 1.0, &[0], TOL);
 }
 
 #[test]
