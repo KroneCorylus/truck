@@ -803,6 +803,60 @@ impl<C, T: One> StepSurface for Processor<RevolutedCurve<C>, T> {
     fn same_sense(&self) -> bool { !self.orientation() }
 }
 
+/// A circle swept along its own axis, written as `CYLINDRICAL_SURFACE`. The STEP surface's
+/// normal points away from the axis whatever the direction of the circle or the sweep.
+#[derive(Clone, Copy, Debug)]
+struct Cylinder {
+    position: MatrixAsAxis<Matrix4>,
+    radius: f64,
+    /// whether the normal of the swept surface points away from the axis
+    outward: bool,
+}
+
+impl Cylinder {
+    fn from_extruded(surface: &ExtrudedCurve<ModelingCurve, Vector3>) -> Option<Self> {
+        let ModelingCurve::Conic(circle) = surface.entity_curve() else {
+            return None;
+        };
+        let transform = *circle.transform();
+        let (x, y) = (transform[0].truncate(), transform[1].truncate());
+        let location = transform[3].to_point();
+        let (radius, y_radius) = (x.magnitude(), y.magnitude());
+        let axis = x.cross(y) / (radius * y_radius);
+        let vector = surface.extruding_vector();
+        let is_circle = radius.near(&y_radius) && (x.dot(y) / (radius * y_radius)).so_small();
+        let along_axis = (vector.cross(axis) / vector.magnitude()).so_small();
+        if !is_circle || !along_axis {
+            return None;
+        }
+        let (u, _) = circle.range_tuple();
+        let outward = surface.normal(u, 0.0).dot(surface.subs(u, 0.0) - location) > 0.0;
+        let position = Matrix4::from_cols(
+            (x / radius).extend(0.0),
+            (y / y_radius).extend(0.0),
+            axis.extend(0.0),
+            location.to_homogeneous(),
+        );
+        Some(Self {
+            position: MatrixAsAxis(position),
+            radius,
+            outward,
+        })
+    }
+}
+
+impl DisplayByStep for Cylinder {
+    fn fmt(&self, idx: usize, f: &mut Formatter<'_>) -> Result {
+        let position_idx = idx + 1;
+        f.write_fmt(format_args!(
+            "#{idx} = CYLINDRICAL_SURFACE('', #{position_idx}, {radius});\n{position}",
+            radius = FloatDisplay(self.radius),
+            position = StepDataDisplay::new(self.position, position_idx),
+        ))
+    }
+}
+impl_const_step_length!(Cylinder, 1 + MatrixAsAxis::<Matrix4>::LENGTH);
+
 impl DisplayByStep for ModelingSurface {
     fn fmt(&self, idx: usize, f: &mut Formatter<'_>) -> Result {
         match self {
@@ -810,7 +864,10 @@ impl DisplayByStep for ModelingSurface {
             ModelingSurface::BSplineSurface(x) => DisplayByStep::fmt(x, idx, f),
             ModelingSurface::NurbsSurface(x) => DisplayByStep::fmt(x, idx, f),
             ModelingSurface::RevolutedCurve(x) => DisplayByStep::fmt(x, idx, f),
-            ModelingSurface::Extruded(x) => DisplayByStep::fmt(x, idx, f),
+            ModelingSurface::Extruded(x) => match Cylinder::from_extruded(x) {
+                Some(cylinder) => DisplayByStep::fmt(&cylinder, idx, f),
+                None => DisplayByStep::fmt(x, idx, f),
+            },
         }
     }
 }
@@ -822,9 +879,19 @@ impl StepLength for ModelingSurface {
             ModelingSurface::BSplineSurface(x) => x.step_length(),
             ModelingSurface::NurbsSurface(x) => x.step_length(),
             ModelingSurface::RevolutedCurve(x) => x.entity().step_length(),
-            ModelingSurface::Extruded(x) => x.step_length(),
+            ModelingSurface::Extruded(x) => match Cylinder::from_extruded(x) {
+                Some(_) => Cylinder::LENGTH,
+                None => x.step_length(),
+            },
         }
     }
 }
 
-impl StepSurface for ModelingSurface {}
+impl StepSurface for ModelingSurface {
+    fn same_sense(&self) -> bool {
+        match self {
+            ModelingSurface::Extruded(x) => Cylinder::from_extruded(x).is_none_or(|c| c.outward),
+            _ => true,
+        }
+    }
+}

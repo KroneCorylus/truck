@@ -4,6 +4,7 @@ The version is of the bottom crate `truck-rendimpl`.
 
 ## Unreleased
 
+- Write swept circles of `truck-modeling` as `CYLINDRICAL_SURFACE` in STEP output.
 - Add `Surface::Extruded` to `truck-modeling`, so `tsweep` keeps swept circles and arcs exact.
 - Add `Curve::Conic` to `truck-modeling`, so `builder::circle_arc` keeps circles and arcs exact.
 - Fix parameter searches on `TrimmedCurve` and `Processor` answering outside the trimmed range of a periodic curve.
