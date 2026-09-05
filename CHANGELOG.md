@@ -4,6 +4,7 @@ The version is of the bottom crate `truck-rendimpl`.
 
 ## Unreleased
 
+- Support set operations between solids with coincident faces, such as stacked boxes and flush pockets.
 - Support set operations between solids whose faces only touch along a curve or an edge.
 - Fix set operations dropping whole faces of an inverted operand.
 - Fix intersection-curve edges of set operations wiggling and failing to project near cylinder seams.

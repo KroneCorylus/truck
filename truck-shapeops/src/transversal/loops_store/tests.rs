@@ -239,6 +239,7 @@ fn independent_intersection() {
                 assert!(flags[2]);
                 flags[2] = false;
             }
+            status => panic!("unexpected status {status:?}"),
         }
     }
     let mut flags = [true; 3];
@@ -267,6 +268,7 @@ fn independent_intersection() {
                 assert!(flags[2]);
                 flags[2] = false;
             }
+            status => panic!("unexpected status {status:?}"),
         }
     }
 }

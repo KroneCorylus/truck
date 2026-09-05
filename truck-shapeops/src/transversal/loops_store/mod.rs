@@ -9,19 +9,36 @@ use truck_topology::{Vertex, *};
 
 type PolylineCurve = truck_meshalgo::prelude::PolylineCurve<Point3>;
 
+/// Which set operations keep a piece of a face.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ShapesOpStatus {
     Unknown,
     And,
     Or,
+    /// The overlap of two coincident faces whose outward normals agree: kept by both operations.
+    Both,
+    /// A copy of an overlap that is dropped by both operations.
+    Neither,
 }
 
 impl ShapesOpStatus {
+    /// The status seen from the other side of a boundary. The far side of a coincident overlap
+    /// is undetermined.
     fn not(self) -> Self {
         match self {
-            Self::Unknown => Self::Unknown,
             Self::And => Self::Or,
             Self::Or => Self::And,
+            Self::Unknown | Self::Both | Self::Neither => Self::Unknown,
+        }
+    }
+
+    /// The status of the region across a new cut edge, given the status `prev` the region had.
+    /// A transversal cut swaps inside and outside; the boundary of a coincident overlap tells
+    /// nothing about the region beyond it.
+    fn across(self, prev: Self) -> Self {
+        match self {
+            Self::Both | Self::Neither => prev,
+            _ => self.not(),
         }
     }
 }
@@ -179,6 +196,9 @@ impl<P: Copy, C: Clone> Loops<P, C> {
         new_vertex: &Vertex<P>,
         emap: &mut HashMap<EdgeID<C>, Edge<P, C>>,
     ) {
+        if old_vertex == new_vertex {
+            return;
+        }
         self.iter_mut()
             .flat_map(|wire| wire.iter_mut())
             .for_each(|edge| {
@@ -258,8 +278,9 @@ impl<P: Copy, C: Clone> Loops<P, C> {
                     let len = self[wire_index0].len() - 2;
                     let edge_index1 = (len + edge_index1 - edge_index0) % len + 1;
                     let new_wire = self[wire_index0].split_off(edge_index1);
+                    let prev = self[wire_index0].status;
                     self[wire_index0].status = status;
-                    self.push(BoundaryWire::new(new_wire, status.not()));
+                    self.push(BoundaryWire::new(new_wire, status.across(prev)));
                 } else {
                     let mut new_wire0 = self[wire_index1].clone();
                     let mut new_wire1 = new_wire0.split_off(edge_index1);
@@ -339,17 +360,19 @@ impl<P: Copy + Tolerance, C: Clone> LoopsStore<P, C> {
 }
 
 impl<C> LoopsStore<Point3, C> {
-    fn add_geom_vertex<S>(
+    /// Puts `v` on the edge at the given indices, where `kind` came from the polyline
+    /// counterpart. `locate` gives the parameter of `v` on the curve of that edge and may move
+    /// `v` onto the curve.
+    fn add_geom_vertex(
         &mut self,
         (loops_index, wire_index, edge_index): (usize, usize, usize),
         v: &Vertex<Point3>,
         kind: ParameterKind,
-        another_surface: &S,
+        locate: impl FnOnce(&C) -> Option<f64>,
         emap: &mut HashMap<EdgeID<C>, Edge<Point3, C>>,
     ) -> Option<()>
     where
-        C: Cut<Point = Point3, Vector = Vector3> + SearchNearestParameter<D1, Point = Point3>,
-        S: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>,
+        C: Cut<Point = Point3, Vector = Vector3>,
     {
         match kind {
             ParameterKind::Front => {
@@ -367,19 +390,26 @@ impl<C> LoopsStore<Point3, C> {
                 self.change_vertex(&old_vertex, v, emap);
             }
             ParameterKind::Inner(_) => {
-                let curve = self[loops_index][wire_index][edge_index].curve();
-                let (pt, t, _) =
-                    curve_surface_projection(&curve, None, another_surface, None, v.point(), 100)?;
-                v.set_point(pt);
                 let edge = self[loops_index][wire_index][edge_index].absolute_clone();
-                let edge_id = edge.id();
+                let t = locate(&edge.curve())?;
                 let (edge0, edge1) = edge.cut_with_parameter(v, t)?;
                 let new_wire: Wire<_, _> = vec![edge0, edge1].into();
-                self.swap_edge_into_wire(edge_id, &new_wire);
+                self.swap_edge_into_wire(edge.id(), &new_wire);
             }
         }
         Some(())
     }
+}
+
+/// The parameter on `curve` of the point of `curve` on `surface` closest to `v`, moving `v`
+/// onto it.
+fn projected_parameter<C, S>(curve: &C, surface: &S, v: &Vertex<Point3>) -> Option<f64>
+where
+    C: ParametricCurve3D + SearchNearestParameter<D1, Point = Point3>,
+    S: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>, {
+    let (pt, t, _) = curve_surface_projection(curve, None, surface, None, v.point(), 100)?;
+    v.set_point(pt);
+    Some(t)
 }
 
 fn curve_surface_projection<C, S>(
@@ -479,6 +509,32 @@ where
             let surface1 = geom_shell1[face_index1].surface();
             let polygon0 = poly_shell0[face_index0].surface()?;
             let polygon1 = poly_shell1[face_index1].surface()?;
+            if let Some(same_normal) =
+                coincident::coincidence(&surface0, &polygon0, &surface1, &polygon1)
+            {
+                let overlap0 = match same_normal == (ori0 == ori1) {
+                    true => ShapesOpStatus::Both,
+                    false => ShapesOpStatus::Neither,
+                };
+                let mut a = coincident::FaceLoops {
+                    geom: &mut geom_loops_store0,
+                    poly: &mut poly_loops_store0,
+                    index: face_index0,
+                };
+                let mut b = coincident::FaceLoops {
+                    geom: &mut geom_loops_store1,
+                    poly: &mut poly_loops_store1,
+                    index: face_index1,
+                };
+                return coincident::cut(
+                    &mut a,
+                    &mut b,
+                    &surface0,
+                    [&poly_shell0[face_index0], &poly_shell1[face_index1]],
+                    same_normal,
+                    [overlap0, ShapesOpStatus::Neither],
+                );
+            }
             intersection_curve::intersection_curves(
                 surface0.clone(),
                 &polygon0,
@@ -526,7 +582,7 @@ where
                             (face_index0, wire_index, edge_index),
                             &gv0,
                             kind,
-                            &surface1,
+                            |curve| projected_parameter(curve, &surface1, &gv0),
                             &mut gemap0,
                         )?;
                         let polyline = intersection_curve.leader_mut();
@@ -539,7 +595,7 @@ where
                             (face_index0, wire_index, edge_index),
                             &gv1,
                             kind,
-                            &surface1,
+                            |curve| projected_parameter(curve, &surface1, &gv1),
                             &mut gemap1,
                         )?;
                         let polyline = intersection_curve.leader_mut();
@@ -552,7 +608,7 @@ where
                             (face_index1, wire_index, edge_index),
                             &gv0,
                             kind,
-                            &surface0,
+                            |curve| projected_parameter(curve, &surface0, &gv0),
                             &mut gemap0,
                         )?;
                         let polyline = intersection_curve.leader_mut();
@@ -565,7 +621,7 @@ where
                             (face_index1, wire_index, edge_index),
                             &gv1,
                             kind,
-                            &surface0,
+                            |curve| projected_parameter(curve, &surface0, &gv1),
                             &mut gemap1,
                         )?;
                         let polyline = intersection_curve.leader_mut();
@@ -588,6 +644,8 @@ where
         poly_loops_store1,
     })
 }
+
+mod coincident;
 
 #[cfg(test)]
 mod tests;

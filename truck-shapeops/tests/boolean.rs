@@ -100,7 +100,6 @@ fn union_disjoint_cubes() {
 }
 
 #[test]
-#[ignore = "coincident faces are not supported yet"]
 fn union_stacked_cubes() {
     let cube0 = unit_cube();
     let cube1 = cuboid(Point3::new(0.0, 0.0, 1.0), Point3::new(1.0, 1.0, 2.0));
@@ -109,7 +108,6 @@ fn union_stacked_cubes() {
 }
 
 #[test]
-#[ignore = "coincident faces are not supported yet"]
 fn union_offset_stacked_cubes() {
     let cube0 = unit_cube();
     let cube1 = cuboid(Point3::new(0.5, 0.5, 1.0), Point3::new(1.5, 1.5, 2.0));
@@ -118,12 +116,35 @@ fn union_offset_stacked_cubes() {
 }
 
 #[test]
-#[ignore = "coincident faces are not supported yet"]
 fn subtract_flush_pocket() {
     let cube = unit_cube();
     let pocket = cuboid(Point3::new(0.5, 0.25, 0.25), Point3::new(1.0, 0.75, 0.75));
     let result = subtract(&cube, &pocket, TOL).unwrap();
     assert_solid(&result, 1.0 - 0.125, &[0], TOL);
+}
+
+/// Subtracting a solid that shares a face with the same outward normal leaves that face.
+#[test]
+fn subtract_stacked_cube() {
+    let cube0 = unit_cube();
+    let cube1 = cuboid(Point3::new(0.0, 0.0, 1.0), Point3::new(1.0, 1.0, 2.0));
+    let difference = subtract(&cube0, &cube1, TOL).unwrap();
+    assert_solid(&difference, 1.0, &[0], TOL);
+}
+
+/// A box inside the cube sharing four of its faces in part.
+fn inner_box() -> Solid { cuboid(Point3::origin(), Point3::new(0.5, 0.5, 1.0)) }
+
+#[test]
+fn union_inner_box_sharing_faces() {
+    let union = truck_shapeops::or(&unit_cube(), &inner_box(), TOL).unwrap();
+    assert_solid(&union, 1.0, &[0], TOL);
+}
+
+#[test]
+fn intersect_inner_box_sharing_faces() {
+    let intersection = truck_shapeops::and(&unit_cube(), &inner_box(), TOL).unwrap();
+    assert_solid(&intersection, 0.25, &[0], TOL);
 }
 
 #[test]

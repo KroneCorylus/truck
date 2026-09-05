@@ -4,9 +4,12 @@
 //!
 //! ## Boolean Operation
 //!
-//! Boolean operations are supported for shapes where faces intersect transversally.
+//! Boolean operations are supported for shapes where faces intersect transversally or lie on the same surface.
 //! Faces that only touch, along a curve, along a common edge or at a point, are not cut; the result then keeps
-//! one shell per solid. Faces that cross each other through a tangent point, and coincident faces, are not supported.
+//! one shell per solid. Coincident faces are cut along each other's boundaries; their overlap is kept once when
+//! the outward normals agree and dropped when they oppose. Pieces of boundary that two coincident faces share
+//! must be discretized identically, which holds for planar faces and for shared curves.
+//! Faces that cross each other through a tangent point are not supported.
 //! Furthermore, performance optimization using BSP (Binary Space Partitioning) or similar methods remains a future task.
 //!
 //! ## Fillet and Chamfer

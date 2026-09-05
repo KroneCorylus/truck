@@ -117,7 +117,13 @@ where
                 .iter()
                 .all(|wire| wire.status() == ShapesOpStatus::Unknown)
             {
-                res.push(face.clone(), ShapesOpStatus::Unknown);
+                // The loops carry the edges as split and merged by the cuts of other faces.
+                let wires = loops.iter().map(|wire| wire.deref().clone()).collect();
+                let mut new_face = Face::debug_new(wires, face.surface());
+                if !face.orientation() {
+                    new_face.invert();
+                }
+                res.push(new_face, ShapesOpStatus::Unknown);
             } else {
                 let vec = divide_one_face(face, loops, tol)?;
                 vec.into_iter()
