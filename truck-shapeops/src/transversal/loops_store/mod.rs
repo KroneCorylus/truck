@@ -459,9 +459,20 @@ where
     let mut poly_loops_store1: LoopsStore<_, _> = poly_shell1.face_iter().collect();
     let store0_len = geom_loops_store0.len();
     let store1_len = geom_loops_store1.len();
+    let bounding_box = |face: &Face<Point3, PolylineCurve, Option<PolygonMesh>>| {
+        face.surface().map(|mesh| mesh.bounding_box())
+    };
+    let bboxes0: Vec<_> = poly_shell0.iter().map(bounding_box).collect();
+    let bboxes1: Vec<_> = poly_shell1.iter().map(bounding_box).collect();
     (0..store0_len)
         .flat_map(move |i| (0..store1_len).map(move |j| (i, j)))
         .try_for_each(|(face_index0, face_index1)| {
+            let (Some(bbox0), Some(bbox1)) = (&bboxes0[face_index0], &bboxes1[face_index1]) else {
+                return None;
+            };
+            if !bounding_boxes_overlap(bbox0, bbox1) {
+                return Some(());
+            }
             let ori0 = geom_shell0[face_index0].orientation();
             let ori1 = geom_shell1[face_index1].orientation();
             let surface0 = geom_shell0[face_index0].surface();
@@ -576,3 +587,10 @@ where
 
 #[cfg(test)]
 mod tests;
+
+/// Whether two bounding boxes overlap, with a margin of `TOLERANCE`.
+fn bounding_boxes_overlap(bbox0: &BoundingBox<Point3>, bbox1: &BoundingBox<Point3>) -> bool {
+    (0..3).all(|i| {
+        bbox0.min()[i] <= bbox1.max()[i] + TOLERANCE && bbox1.min()[i] <= bbox0.max()[i] + TOLERANCE
+    })
+}

@@ -42,8 +42,54 @@ fn punched_cube() {
 }
 
 #[test]
-#[ignore = "intersection-curve edges fold back near the cylinder seam, so the mesh overlaps"]
 fn punched_cube_mesh_closed() { assert_mesh_closed(&punched_cube_solid(), TOL); }
+
+/// Samples every intersection-curve edge densely and checks the points never turn back. Fails
+/// if the leader of the curve wiggles, which also makes the projection onto the intersection
+/// fail and panic in `subs`.
+fn assert_intersection_edges_smooth(solid: &Solid) {
+    for edge in solid.edge_iter() {
+        let curve = edge.curve();
+        if !matches!(curve, truck_modeling::Curve::IntersectionCurve(_)) {
+            continue;
+        }
+        let (t0, t1) = curve.range_tuple();
+        let n = 200;
+        let points: Vec<Point3> = (0..=n)
+            .map(|k| curve.subs(t0 + (t1 - t0) * k as f64 / n as f64))
+            .collect();
+        for k in 1..n {
+            let (d0, d1) = (points[k] - points[k - 1], points[k + 1] - points[k]);
+            assert!(
+                d0.dot(d1) >= 0.0,
+                "intersection edge turns back at {:?}",
+                points[k]
+            );
+        }
+    }
+}
+
+#[test]
+fn punched_cube_edges_are_smooth() { assert_intersection_edges_smooth(&punched_cube_solid()); }
+
+/// The hole's seam is rotated so that it no longer lines up with the cube's symmetry planes,
+/// and a coarse tolerance is used; this combination used to panic during tessellation.
+#[test]
+fn punched_cube_rotated_seam() {
+    let hole: Solid = {
+        use truck_modeling::*;
+        let base = Point3::new(0.5, 0.5, -0.5);
+        let radial = Vector3::new(f64::cos(0.3), f64::sin(0.3), 0.0);
+        let vertex = builder::vertex(base + radial * 0.25);
+        let circle = builder::rsweep(&vertex, base, Vector3::unit_z(), Rad(7.0), 2);
+        let disk = builder::try_attach_plane(&[circle]).unwrap();
+        builder::tsweep(&disk, Vector3::unit_z() * 2.0)
+    };
+    let tol = 0.05;
+    let punched = subtract(&unit_cube(), &hole, tol).unwrap();
+    assert_intersection_edges_smooth(&punched);
+    assert_solid(&punched, 1.0 - PI / 16.0, &[1], tol);
+}
 
 #[test]
 fn union_disjoint_cubes() {

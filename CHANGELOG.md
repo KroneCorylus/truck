@@ -4,6 +4,8 @@ The version is of the bottom crate `truck-rendimpl`.
 
 ## Unreleased
 
+- Fix intersection-curve edges of set operations wiggling and failing to project near cylinder seams.
+- Classify leftover face pieces of set operations from an interior point, and skip face pairs with disjoint bounding boxes.
 - Allow `fillet_along_wire` to end at vertices with more than three faces.
 - Add `fillet_along_wire` to `truck-shapeops`.
 - Remove the unfinished multi-edge fillet prototype from `truck-shapeops`.
