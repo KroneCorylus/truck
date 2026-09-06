@@ -95,3 +95,23 @@ fn assy_ioi() {
         assert_eq!(node0.edges().len(), node1.edges().len());
     }
 }
+
+/// OCC writes every edge as a surface curve whose master representation is a pcurve; the edges
+/// must still arrive as the lines and circles of the 3D curve.
+#[test]
+fn surface_curves_read_as_space_curves() {
+    use truck_stepio::r#in::{step_geometry::*, *};
+    let input = [STEP_DIRECTORY, "occt-cylinder.step"].concat();
+    let step_string = std::fs::read_to_string(input).unwrap();
+    let table = Table::from_step(&step_string).unwrap();
+    let step_shell = table.shell.values().next().unwrap();
+    let cshell = table.to_compressed_shell(step_shell).unwrap();
+    assert!(!cshell.edges.is_empty());
+    for edge in &cshell.edges {
+        assert!(
+            matches!(edge.curve, Curve3D::Line(_) | Curve3D::Conic(_)),
+            "{:?}",
+            edge.curve
+        );
+    }
+}

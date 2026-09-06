@@ -1697,28 +1697,26 @@ pub struct SurfaceCurve {
     master_representation: PreferredSurfaceCurveRepresentation,
 }
 
+/// The 3D curve is used even when a pcurve is the master representation: an edge of truck needs
+/// a space curve, and a pcurve carries a copy of its surface. The master pcurve is the fallback
+/// when the 3D curve cannot be parsed.
 impl TryFrom<&SurfaceCurve> for Curve3D {
     type Error = StepConvertingError;
-    #[inline(always)]
     fn try_from(value: &SurfaceCurve) -> Result<Self, Self::Error> {
         use PreferredSurfaceCurveRepresentation as PSCR;
-        match &value.master_representation {
-            PSCR::Curve3D => Ok((&value.curve_3d).try_into()?),
-            PSCR::PcurveS1 => {
-                if let Some(PcurveOrSurface::Pcurve(x)) = value.associated_geometry.first() {
-                    Ok(Self::PCurve(x.as_ref().try_into()?))
-                } else {
-                    Err("The 0-indexed associated geometry is nothing or not PCURVE.".into())
-                }
-            }
-            PSCR::PcurveS2 => {
-                if let Some(PcurveOrSurface::Pcurve(x)) = value.associated_geometry.get(1) {
-                    Ok(Self::PCurve(x.as_ref().try_into()?))
-                } else {
-                    Err("The 1-indexed associated geometry is nothing or not PCURVE.".into())
-                }
-            }
-        }
+        let curve_3d = Self::try_from(&value.curve_3d);
+        let pcurve_index = match value.master_representation {
+            PSCR::Curve3D => return curve_3d,
+            PSCR::PcurveS1 => 0,
+            PSCR::PcurveS2 => 1,
+        };
+        curve_3d.or_else(|_| match value.associated_geometry.get(pcurve_index) {
+            Some(PcurveOrSurface::Pcurve(x)) => Ok(Self::PCurve(x.as_ref().try_into()?)),
+            _ => Err(format!(
+                "The {pcurve_index}-indexed associated geometry is nothing or not PCURVE."
+            )
+            .into()),
+        })
     }
 }
 
@@ -2540,32 +2538,29 @@ impl EdgeCurve {
                 Curve3D::PCurve(truck::PCurve::new(Box::new(curve2d), Box::new(surface)))
             }
             CurveAny::SurfaceCurve(c) => {
-                if p.near(&q) {
-                    return Self::sub_parse_curve3d(&c.curve_3d, p, q, same_sense);
-                }
+                // The 3D curve first, as in `TryFrom<&SurfaceCurve>`. The inner call already
+                // applies `same_sense`.
+                let curve_3d = Self::sub_parse_curve3d(&c.curve_3d, p, q, same_sense);
                 use PreferredSurfaceCurveRepresentation::*;
-                match c.master_representation {
-                    Curve3D => Self::sub_parse_curve3d(&c.curve_3d, p, q, same_sense)?,
-                    PcurveS1 => {
-                        if let Some(PcurveOrSurface::Pcurve(c)) = c.associated_geometry.first() {
-                            Self::sub_parse_curve3d(&CurveAny::Pcurve(c.clone()), p, q, true)?
-                        } else {
-                            return Err(
-                                "The 0-indexed associated geometry is nothing or not PCURVE."
-                                    .into(),
-                            );
-                        }
+                let pcurve_index = match c.master_representation {
+                    Curve3D => return curve_3d,
+                    PcurveS1 => 0,
+                    PcurveS2 => 1,
+                };
+                match curve_3d {
+                    Ok(curve) => return Ok(curve),
+                    // a closed edge cannot be trimmed on a pcurve by its coincident ends
+                    Err(err) if p.near(&q) => return Err(err),
+                    Err(_) => {}
+                }
+                match c.associated_geometry.get(pcurve_index) {
+                    Some(PcurveOrSurface::Pcurve(c)) => {
+                        Self::sub_parse_curve3d(&CurveAny::Pcurve(c.clone()), p, q, true)?
                     }
-                    PcurveS2 => {
-                        if let Some(PcurveOrSurface::Pcurve(c)) = c.associated_geometry.get(1) {
-                            Self::sub_parse_curve3d(&CurveAny::Pcurve(c.clone()), p, q, true)?
-                        } else {
-                            return Err(
-                                "The 1-indexed associated geometry is nothing or not PCURVE."
-                                    .into(),
-                            );
-                        }
-                    }
+                    _ => return Err(format!(
+                        "The {pcurve_index}-indexed associated geometry is nothing or not PCURVE."
+                    )
+                    .into()),
                 }
             }
         };

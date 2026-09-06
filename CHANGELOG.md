@@ -4,6 +4,7 @@ The version is of the bottom crate `truck-rendimpl`.
 
 ## Unreleased
 
+- Read the 3D curve of a STEP `SURFACE_CURVE` even when a pcurve is its master representation.
 - Write swept circles of `truck-modeling` as `CYLINDRICAL_SURFACE` in STEP output.
 - Add `Surface::Extruded` to `truck-modeling`, so `tsweep` keeps swept circles and arcs exact.
 - Add `Curve::Conic` to `truck-modeling`, so `builder::circle_arc` keeps circles and arcs exact.
