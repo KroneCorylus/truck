@@ -263,5 +263,7 @@ mod from_pcurve {
 
 /// implementation for trait `truck_modeling::builder`.
 mod geom_impls;
+/// conversion into the enums of `truck-modeling`.
+mod modeling_impls;
 /// implementation for output STEP format.
 mod stepout_impls;

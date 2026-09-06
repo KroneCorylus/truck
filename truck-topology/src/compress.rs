@@ -221,6 +221,69 @@ impl<P: Clone, C: Clone, S: Clone> Solid<P, C, S> {
     }
 }
 
+impl<P, C, S> CompressedShell<P, C, S> {
+    /// Returns a new shell whose points, curves and surfaces are mapped by the closures, with
+    /// the same topology. Returns `None` as soon as a closure does.
+    pub fn try_mapped<Q, D, T>(
+        &self,
+        point_mapping: impl FnMut(&P) -> Option<Q>,
+        mut curve_mapping: impl FnMut(&C) -> Option<D>,
+        mut surface_mapping: impl FnMut(&S) -> Option<T>,
+    ) -> Option<CompressedShell<Q, D, T>> {
+        let vertices = self
+            .vertices
+            .iter()
+            .map(point_mapping)
+            .collect::<Option<_>>()?;
+        let edges = self
+            .edges
+            .iter()
+            .map(|edge| {
+                Some(CompressedEdge {
+                    vertices: edge.vertices,
+                    curve: curve_mapping(&edge.curve)?,
+                })
+            })
+            .collect::<Option<_>>()?;
+        let faces = self
+            .faces
+            .iter()
+            .map(|face| {
+                Some(CompressedFace {
+                    boundaries: face.boundaries.clone(),
+                    orientation: face.orientation,
+                    surface: surface_mapping(&face.surface)?,
+                })
+            })
+            .collect::<Option<_>>()?;
+        Some(CompressedShell {
+            vertices,
+            edges,
+            faces,
+        })
+    }
+}
+
+impl<P, C, S> CompressedSolid<P, C, S> {
+    /// Returns a new solid whose points, curves and surfaces are mapped by the closures, with
+    /// the same topology. Returns `None` as soon as a closure does.
+    pub fn try_mapped<Q, D, T>(
+        &self,
+        mut point_mapping: impl FnMut(&P) -> Option<Q>,
+        mut curve_mapping: impl FnMut(&C) -> Option<D>,
+        mut surface_mapping: impl FnMut(&S) -> Option<T>,
+    ) -> Option<CompressedSolid<Q, D, T>> {
+        let boundaries = self
+            .boundaries
+            .iter()
+            .map(|shell| {
+                shell.try_mapped(&mut point_mapping, &mut curve_mapping, &mut surface_mapping)
+            })
+            .collect::<Option<_>>()?;
+        Some(CompressedSolid { boundaries })
+    }
+}
+
 // -------------------------- test -------------------------- //
 
 #[test]

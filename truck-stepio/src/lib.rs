@@ -2,9 +2,9 @@
 //!
 //! # Current Status
 //!
-//! It is possible to output data modeled by truck-modeling.
+//! It is possible to output data modeled by truck-modeling, and to read STEP shapes into the
+//! reader's own geometry or, through `try_mapped`, into the enums of truck-modeling.
 //! Shapes created by set operations cannot be output yet.
-//! Input will come further down the road.
 
 #![cfg_attr(not(debug_assertions), deny(warnings))]
 #![deny(clippy::all, rust_2018_idioms)]

@@ -4,6 +4,8 @@ The version is of the bottom crate `truck-rendimpl`.
 
 ## Unreleased
 
+- Add `try_mapped` to `CompressedShell` and `CompressedSolid`.
+- Convert curves and surfaces read from STEP into the `truck-modeling` enums, keeping conics and elementary surfaces exact.
 - Read the 3D curve of a STEP `SURFACE_CURVE` even when a pcurve is its master representation.
 - Write swept circles of `truck-modeling` as `CYLINDRICAL_SURFACE` in STEP output.
 - Add `Surface::Extruded` to `truck-modeling`, so `tsweep` keeps swept circles and arcs exact.
