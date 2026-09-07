@@ -231,3 +231,67 @@ fn union_offset_stacked_cubes_counts() {
     let union = truck_shapeops::or(&cube0, &cube1, TOL).unwrap();
     assert_counts(&union, 18, 28, 12);
 }
+
+fn steinmetz_cylinders() -> (Solid, Solid) {
+    let x = cylinder(Point3::new(-2.0, 0.0, 0.0), Vector3::unit_x(), 1.0, 4.0);
+    let z = cylinder(Point3::new(0.0, 0.0, -2.0), Vector3::unit_z(), 1.0, 4.0);
+    assert_solid(&x, 4.0 * PI, &[0], TOL);
+    assert_solid(&z, 4.0 * PI, &[0], TOL);
+    (x, z)
+}
+
+/// Equal-radius perpendicular cylinders cross at two tangent points, with four branches each.
+/// Parent 2330028a panics in Solid::new: the output shell is not oriented and closed.
+#[test]
+#[ignore = "Parent 2330028a panics in Solid::new: the output shell is not oriented and closed."]
+fn tangent_steinmetz_intersection() {
+    let (x, z) = steinmetz_cylinders();
+    let result = truck_shapeops::and(&x, &z, TOL).expect("Steinmetz intersection");
+    assert_solid(&result, 16.0 / 3.0, &[0], TOL);
+}
+
+/// The shared volume of two radius-one cylinders of length four is 16/3.
+/// Parent 2330028a panics in Solid::new: the output shell is not oriented and closed.
+#[test]
+#[ignore = "Parent 2330028a panics in Solid::new: the output shell is not oriented and closed."]
+fn tangent_steinmetz_union() {
+    let (x, z) = steinmetz_cylinders();
+    let result = truck_shapeops::or(&x, &z, TOL).expect("Steinmetz union");
+    assert_solid(&result, 8.0 * PI - 16.0 / 3.0, &[0], TOL);
+}
+
+/// The sphere touches the bore along its equator and cuts a height-1/2 cap below its floor.
+/// The cap volume is pi h^2 (r - h/3) = 5 pi / 24.
+/// Parent 2330028a returns None for the sphere subtraction; the blind bore passes.
+#[test]
+#[ignore = "Parent 2330028a returns None for the sphere subtraction; the blind bore passes."]
+fn tangent_sphere_in_equal_radius_bore() {
+    let block = cuboid(Point3::new(-2.0, -2.0, -2.0), Point3::new(2.0, 2.0, 2.0));
+    let bore = cylinder(Point3::new(0.0, 0.0, -0.5), Vector3::unit_z(), 1.0, 3.0);
+    let ball = sphere(Point3::origin(), 1.0);
+    assert_solid(&block, 64.0, &[0], TOL);
+    assert_solid(&bore, 3.0 * PI, &[0], TOL);
+    assert_solid(&ball, sphere_volume(1.0), &[0], TOL);
+    let bored = subtract(&block, &bore, TOL).expect("blind bore");
+    assert_solid(&bored, 64.0 - 2.5 * PI, &[0], TOL);
+    let result = subtract(&bored, &ball, TOL).expect("sphere seated in bore");
+    assert_solid(&result, 64.0 - 2.5 * PI - 5.0 * PI / 24.0, &[0], TOL);
+}
+
+/// A radius-one rod crosses both end walls of a width-two through slot, removing two
+/// unit lengths of cylinder. The vertical slot and the two new passages give genus three.
+/// Parent 2330028a returns closed topology of genus three, but its tessellated mesh is open.
+#[test]
+#[ignore = "Parent 2330028a returns closed topology of genus three, but its tessellated mesh is open."]
+fn tangent_rod_in_equal_width_slot() {
+    let block = cuboid(Point3::new(-2.0, -2.0, -2.0), Point3::new(2.0, 2.0, 2.0));
+    let slot = cuboid(Point3::new(-1.0, -1.0, -3.0), Point3::new(1.0, 1.0, 3.0));
+    let rod = cylinder(Point3::new(-3.0, 0.0, 0.0), Vector3::unit_x(), 1.0, 6.0);
+    assert_solid(&block, 64.0, &[0], TOL);
+    assert_solid(&slot, 24.0, &[0], TOL);
+    assert_solid(&rod, 6.0 * PI, &[0], TOL);
+    let slotted = subtract(&block, &slot, TOL).expect("through slot");
+    assert_solid(&slotted, 48.0, &[1], TOL);
+    let result = subtract(&slotted, &rod, TOL).expect("rod in slot");
+    assert_solid(&result, 48.0 - 2.0 * PI, &[3], TOL);
+}
