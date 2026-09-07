@@ -104,10 +104,12 @@ pub(super) fn rebuild_solid(
 /// trimmed to the new vertices. Faces replaced together meet each other's new surfaces. The
 /// input is not modified; the result shares with it whatever did not change.
 ///
-/// This first version takes planes only: the new surfaces, the neighbours, and the three faces
-/// that must meet at every vertex of a replaced face. Anything else is
-/// [`LocalOpError::Unsupported`]. A neighbour whose surface no longer meets the new one, or two
-/// new edges that no longer meet at a vertex, is [`LocalOpError::NoIntersection`].
+/// The surfaces involved, new and old, must be planes, cylinders or cones as `elementary`
+/// reports them, and exactly three faces must meet at every vertex of a replaced face; anything
+/// else is [`LocalOpError::Unsupported`]. An edge between two faces neither of which is replaced
+/// keeps its curve, extended or trimmed to its new vertex, which a curve other than a line can
+/// only be within its range. A neighbour whose surface no longer meets the new one, or two new
+/// edges that no longer meet at a vertex, is [`LocalOpError::NoIntersection`].
 /// # Examples
 /// ```
 /// use truck_modeling::*;
@@ -185,22 +187,38 @@ pub fn replace_surfaces(
     let unsupported = |i: usize| LocalOpError::Unsupported {
         face: faces[i].id(),
     };
+    let supported = |surface: &Surface| {
+        matches!(
+            surface.elementary(),
+            Some((
+                Elementary::Plane(_) | Elementary::Cylinder { .. } | Elementary::Cone { .. },
+                _
+            ))
+        )
+    };
     for &i in &touched_faces {
-        if !matches!(effective(i), Surface::Plane(_)) {
-            let edge = faces[i]
+        if !supported(&effective(i)) {
+            // reported against a replaced face next to it, or the first one
+            let next_to = faces[i]
                 .edge_iter()
-                .find(|e| touched_edges.iter().any(|t| t.id() == e.id()))
-                .unwrap();
-            return Err(unsupported(replaced_at(&edge)));
+                .flat_map(|e| faces_of_edge[&e.id()].clone())
+                .find(|j| new_surface.contains_key(j));
+            let first = index[&replacements[0].0];
+            return Err(unsupported(next_to.unwrap_or(first)));
         }
     }
 
+    // an edge between two faces neither of which is replaced keeps its curve
     let mut new_curves: HashMap<EdgeID, Curve> = HashMap::default();
     for edge in &touched_edges {
         let across = &faces_of_edge[&edge.id()];
         let [f0, f1] = across[..] else {
             return Err(unsupported(replaced_at(edge)));
         };
+        if !new_surface.contains_key(&f0) && !new_surface.contains_key(&f1) {
+            new_curves.insert(edge.id(), edge.curve());
+            continue;
+        }
         let (s0, s1) = (effective(f0), effective(f1));
         let domain = |i: usize, s: &Surface| domain_on(s, &faces[i], MARGIN).ok_or(unsupported(i));
         let curves = intersect_surfaces(&s0, domain(f0, &s0)?, &s1, domain(f1, &s1)?, 0.01);
@@ -213,7 +231,7 @@ pub fn replace_surfaces(
             neighbour: faces[neighbour].id(),
         };
         match curves.as_deref() {
-            Some([curve @ Curve::Line(_)]) => new_curves.insert(edge.id(), curve.clone()),
+            Some([curve]) => new_curves.insert(edge.id(), curve.clone()),
             Some([]) | None => return Err(no_intersection),
             Some(_) => return Err(unsupported(face)),
         };
@@ -267,10 +285,11 @@ pub fn replace_surfaces(
                     .unwrap_or_else(|| v.clone())
             };
             let (front, back) = (end(edge.front()), end(edge.back()));
-            let line = Curve::Line(Line(front.point(), back.point()));
-            (edge.id(), Some(Edge::new(&front, &back, line)))
+            let curve = trimmed(&new_curves[&edge.id()], front.point(), back.point())
+                .ok_or(unsupported(replaced_at(edge)))?;
+            Ok((edge.id(), Some(Edge::new(&front, &back, curve))))
         })
-        .collect();
+        .collect::<Result<_, _>>()?;
 
     let rebuilt = |i: usize| -> Face {
         match new_surface.get(&i) {
@@ -297,4 +316,25 @@ pub fn replace_surfaces(
     rebuild_solid(solid, &rebuilt, &HashSet::default()).map_err(|_| LocalOpError::Unsupported {
         face: first.unwrap_or_else(|| faces[0].id()),
     })
+}
+
+/// `curve` between `front` and `back`, running from the one to the other: a line is remade
+/// between them, anything else is cut at their parameters and must contain them.
+fn trimmed(curve: &Curve, front: Point3, back: Point3) -> Option<Curve> {
+    if let Curve::Line(_) = curve {
+        return Some(Curve::Line(Line(front, back)));
+    }
+    let param = |c: &Curve, p: Point3| {
+        c.search_nearest_parameter(p, None, 100)
+            .filter(|&t| c.subs(t).near(&p))
+    };
+    let mut curve = curve.clone();
+    let (mut t0, mut t1) = (param(&curve, front)?, param(&curve, back)?);
+    if t0 > t1 {
+        curve.invert();
+        (t0, t1) = (param(&curve, front)?, param(&curve, back)?);
+    }
+    let mut tail = curve.cut(t0);
+    tail.cut(t1);
+    Some(tail)
 }

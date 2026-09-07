@@ -118,3 +118,36 @@ fn two_cylinders_meet_along_a_curve_on_both() {
         }
     }
 }
+
+/// The angle of a revolved surface is its second parameter; a plane across a revolved line still
+/// gives a circle.
+#[test]
+fn plane_against_revolved_cylinder_is_an_exact_circle() {
+    let generator = Curve::Line(Line(
+        Point3::new(1.0, 0.0, -1.0),
+        Point3::new(1.0, 0.0, 1.0),
+    ));
+    let revolved = Surface::RevolutedCurve(Processor::new(RevolutedCurve::by_revolution(
+        generator,
+        Point3::origin(),
+        Vector3::unit_z(),
+    )));
+    let plane = Surface::Plane(Plane::new(
+        Point3::new(0.0, 0.0, 0.5),
+        Point3::new(1.0, 0.0, 0.5),
+        Point3::new(0.0, 1.0, 0.5),
+    ));
+    let domain = revolved.try_range_tuple();
+    let domain = (domain.0.unwrap(), domain.1.unwrap());
+    let curves =
+        intersect_surfaces(&plane, ((-2.0, 2.0), (-2.0, 2.0)), &revolved, domain, TOL).unwrap();
+    let [curve @ Curve::Conic(_)] = curves.as_slice() else {
+        panic!("{curves:?}");
+    };
+    let (t0, t1) = curve.range_tuple();
+    assert!((t1 - t0 - 2.0 * PI).abs() < 1e-12);
+    for i in 0..20 {
+        let p = curve.subs(t0 + (t1 - t0) * i as f64 / 20.0);
+        assert!((p.x * p.x + p.y * p.y - 1.0).abs() < 1e-12 && (p.z - 0.5).abs() < 1e-12);
+    }
+}

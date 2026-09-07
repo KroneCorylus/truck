@@ -9,13 +9,16 @@ use truck_modeling::{Curve, Elementary, Face, Surface};
 /// A parameter rectangle `((u0, u1), (v0, v1))` of a surface.
 pub type Domain = ((f64, f64), (f64, f64));
 
-/// The parameter rectangle of the loops of `face` on its surface, each side enlarged by
-/// `margin` times the rectangle's diagonal. `None` when a boundary point cannot be projected.
+/// The parameter rectangle of `face` on its surface, each side enlarged by `margin` times the
+/// rectangle's diagonal: a side the surface bounds itself is that bound, a side it leaves open
+/// is the range of the projected loops. An angular side is never extended past a turn. `None`
+/// when a boundary point cannot be projected.
 pub fn parameter_domain(face: &Face, margin: f64) -> Option<Domain> {
     domain_on(&face.surface(), face, margin)
 }
 
-/// The parameter rectangle of the loops of `face` projected onto `surface`.
+/// The parameter rectangle of `face` on `surface`, as [`parameter_domain`] with the loops
+/// projected onto `surface`.
 pub(super) fn domain_on(surface: &Surface, face: &Face, margin: f64) -> Option<Domain> {
     let (mut u, mut v) = ((f64::MAX, f64::MIN), (f64::MAX, f64::MIN));
     let mut hint = None;
@@ -30,14 +33,33 @@ pub(super) fn domain_on(surface: &Surface, face: &Face, margin: f64) -> Option<D
             v = (v.0.min(b), v.1.max(b));
         }
     }
+    let (own_u, own_v) = surface.try_range_tuple();
+    let (u, v) = (own_u.unwrap_or(u), own_v.unwrap_or(v));
     let diagonal = f64::hypot(u.1 - u.0, v.1 - v.0);
-    let enlarge = |(a, b): (f64, f64)| (a - margin * diagonal, b + margin * diagonal);
-    Some((enlarge(u), enlarge(v)))
+    let enlarge = |side: usize, (a, b): (f64, f64)| {
+        let mut extension = margin * diagonal;
+        if angular(surface) == Some(side) {
+            extension = extension.min(0.45 * (2.0 * PI - (b - a)).max(0.0));
+        }
+        (a - extension, b + extension)
+    };
+    Some((enlarge(0, u), enlarge(1, v)))
+}
+
+/// Which parameter of `surface` is an angle, if one is; it must not be extended past a turn.
+fn angular(surface: &Surface) -> Option<usize> {
+    match surface {
+        Surface::Extruded(extruded) => {
+            matches!(extruded.entity_curve(), Curve::Conic(_)).then_some(0)
+        }
+        Surface::RevolutedCurve(_) => Some(1),
+        _ => None,
+    }
 }
 
 /// The curves where `surface0` over `domain0` meets `surface1` over `domain1`. A plane against
 /// a plane gives an exact `Line`, clipped to both rectangles; a plane against a cylinder or a
-/// cone whose axis is normal to it gives an exact `Conic` over the `u` range of its domain.
+/// cone whose axis is normal to it gives an exact `Conic` over the angular range of its domain.
 /// Anything else is tessellated at `tol` over its rectangle and the interference of the two
 /// meshes is lifted onto both surfaces as `IntersectionCurve`s with a smooth leader. Empty when
 /// the surfaces do not meet, or only touch; `None` when a curve cannot be lifted.
@@ -134,9 +156,15 @@ fn exact(
                 return Some(Vec::new());
             }
             let center = on_axis + axis * (height - on_axis.to_vec().dot(axis));
-            // the angle origin of the surface: its point at `u = 0`, projected to the circle
-            let (u0, u1) = domain1.0;
-            let start = surface1.subs(u0, domain1.1 .0);
+            // the angle origin of the surface: its point at the start of its angular range,
+            // projected to the circle
+            let angle = angular(surface1)?;
+            let (a0, a1) = [domain1.0, domain1.1][angle];
+            let at = |t: f64| match angle {
+                0 => surface1.subs(t, domain1.1 .0),
+                _ => surface1.subs(domain1.0 .0, t),
+            };
+            let start = at(a0);
             let x = radial(start, center, axis).normalize();
             let y = axis.cross(x);
             let matrix = Matrix4::from_cols(
@@ -145,10 +173,10 @@ fn exact(
                 axis.extend(0.0),
                 center.to_homogeneous(),
             );
-            let range = if surface1.subs(u1, domain1.1 .0).near(&start) {
+            let range = if at(a1).near(&start) {
                 2.0 * PI
             } else {
-                let end = radial(surface1.subs(u1, domain1.1 .0), center, axis).normalize();
+                let end = radial(at(a1), center, axis).normalize();
                 let angle = x.angle(end).0;
                 match y.dot(end) >= 0.0 {
                     true => angle,

@@ -2,7 +2,11 @@
 
 mod common;
 
-use common::{blend::*, modeling::cuboid, *};
+use common::{
+    blend::*,
+    modeling::{cuboid, cylinder},
+    *,
+};
 use std::f64::consts::PI;
 use truck_geometry::prelude::*;
 use truck_modeling::{builder, FaceID};
@@ -268,4 +272,88 @@ fn deleting_a_box_side_or_a_five_sided_face_is_rejected() {
         matches!(err, LocalOpError::Unsupported { face } if face == top),
         "{err}"
     );
+}
+
+/// A cylinder's top replaced by a plane tilted about a point on the axis keeps its volume, and its
+/// new top edges lie on the cylinder.
+#[test]
+fn cylinder_top_tilted() {
+    let (r, h, slope) = (1.0, 2.0, 0.3);
+    let solid = cylinder(Point3::origin(), Vector3::unit_z(), r, h);
+    let top = face_id_at(&solid, Point3::new(0.0, 0.0, h));
+    let tilted = plane(
+        Point3::new(0.0, 0.0, h),
+        Point3::new(1.0, 0.0, h + slope),
+        Point3::new(0.0, 1.0, h),
+    );
+    let cut = replace_surfaces(&solid, &[(top, tilted)]).unwrap();
+    let harness = from_modeling(&cut);
+    assert_counts(&harness, 4, 6, 4);
+    assert_solid(&harness, PI * r * r * h, &[0], TOL);
+    for edge in cut.edge_iter() {
+        let (p, q) = (edge.front().point(), edge.back().point());
+        if p.z > h - 1.0 && q.z > h - 1.0 {
+            let curve = edge.curve();
+            let (t0, t1) = curve.range_tuple();
+            for i in 0..=10 {
+                let p = curve.subs(t0 + (t1 - t0) * i as f64 / 10.0);
+                assert!((p.x * p.x + p.y * p.y - r * r).abs() < 1e-6, "{p:?}");
+                assert!((p.z - h - slope * p.x).abs() < 1e-6, "{p:?}");
+            }
+        }
+    }
+}
+
+/// A cylinder's top raised keeps exact arcs.
+#[test]
+fn cylinder_top_raised() {
+    let (r, h, d) = (1.0, 2.0, 0.75);
+    let solid = cylinder(Point3::origin(), Vector3::unit_z(), r, h);
+    let top = face_id_at(&solid, Point3::new(0.0, 0.0, h));
+    let higher = plane(
+        Point3::new(0.0, 0.0, h + d),
+        Point3::new(1.0, 0.0, h + d),
+        Point3::new(0.0, 1.0, h + d),
+    );
+    let taller = replace_surfaces(&solid, &[(top, higher)]).unwrap();
+    let arcs = taller
+        .edge_iter()
+        .filter(|edge| {
+            matches!(edge.curve(), truck_modeling::Curve::Conic(_)) && edge.front().point().z > h
+        })
+        .count();
+    assert_eq!(arcs, 2 * 2, "the two top arcs, each seen from two faces");
+    assert_solid(&from_modeling(&taller), PI * r * r * (h + d), &[0], TOL);
+}
+
+/// A face whose neighbours are spline surfaces cannot be replaced.
+#[test]
+fn face_beside_a_spline_is_rejected() {
+    use truck_modeling::{builder, Rad};
+    let square = polygon_at(&[(1.0, -1.0), (1.0, 1.0), (-1.0, 1.0), (-1.0, -1.0)], 0.0);
+    let center = Point3::new(0.0, 0.0, 2.0);
+    let vertex = builder::vertex(center + Vector3::unit_x());
+    let circle: MWire = builder::rsweep(&vertex, center, Vector3::unit_z(), Rad(7.0), 4);
+    let loft: MSolid = builder::try_loft(&builder::align_sections(&[square, circle])).unwrap();
+    let cap = face_id_at(&loft, Point3::new(0.0, 0.0, 2.0));
+    let higher = plane(
+        Point3::new(0.0, 0.0, 3.0),
+        Point3::new(1.0, 0.0, 3.0),
+        Point3::new(0.0, 1.0, 3.0),
+    );
+    let err = replace_surfaces(&loft, &[(cap, higher)]).unwrap_err();
+    assert!(
+        matches!(err, LocalOpError::Unsupported { face } if face == cap),
+        "{err}"
+    );
+}
+
+fn polygon_at(points: &[(f64, f64)], z: f64) -> MWire {
+    let v: Vec<_> = points
+        .iter()
+        .map(|&(x, y)| builder::vertex(Point3::new(x, y, z)))
+        .collect();
+    (0..v.len())
+        .map(|i| builder::line(&v[i], &v[(i + 1) % v.len()]))
+        .collect()
 }

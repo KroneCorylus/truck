@@ -4,6 +4,7 @@ The version is of the bottom crate `truck-rendimpl`.
 
 ## Unreleased
 
+- Let `local::replace_surfaces` in `truck-shapeops` take cylinders and cones as neighbours, keeping the curves of edges between unreplaced faces; fix the exact plane-against-revolved-surface intersection, whose angle is the second parameter.
 - Add `local::delete_face` to `truck-shapeops`: a fillet or chamfer face between planes removed and the sharp edge restored.
 - Add `local::replace_surfaces` to `truck-shapeops`: faces given new surfaces and re-intersected with their neighbours, for planes.
 - Add `local::intersect_surfaces` and `parameter_domain` to `truck-shapeops`: the curves where two surfaces meet, exact for planes against planes, cylinders and cones; `truck-shapeops` now depends on `truck-modeling`.
