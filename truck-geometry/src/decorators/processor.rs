@@ -481,12 +481,25 @@ where
         trials: usize,
     ) -> Option<(f64, f64)> {
         let inv = self.transform.inverse_transform().unwrap();
+        let hint = self.entity_hint(hint.into());
         let (u, v) = self
             .entity
             .search_parameter(inv.transform_point(point), hint, trials)?;
         match self.orientation {
             true => Some((u, v)),
             false => Some((v, u)),
+        }
+    }
+}
+
+impl<E, T> Processor<E, T> {
+    /// `hint` in the parameters of the entity, which are swapped when the orientation is
+    /// inverted.
+    fn entity_hint(&self, hint: SPHint2D) -> SPHint2D {
+        match (self.orientation, hint) {
+            (false, SPHint2D::Parameter(u, v)) => SPHint2D::Parameter(v, u),
+            (false, SPHint2D::Range(urange, vrange)) => SPHint2D::Range(vrange, urange),
+            (_, hint) => hint,
         }
     }
 }
@@ -530,6 +543,7 @@ where
         trials: usize,
     ) -> Option<(f64, f64)> {
         let inv = self.transform.inverse_transform().unwrap();
+        let hint = self.entity_hint(hint.into());
         let hint =
             self.entity
                 .search_nearest_parameter(inv.transform_point(point), hint, trials)?;

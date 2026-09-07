@@ -131,3 +131,40 @@ fn compatible_with_bspsurface(
 ) {
     exec_compatible_with_bspsurface(ycoords, mat, (u, v))?;
 }
+
+/// An inverted processor swaps the parameters, so a hint given in its parameters has to be
+/// swapped back before the entity sees it. A sphere as a revolved meridian shows the failure:
+/// the full circle covers the sphere twice, and a hint read in the wrong order sends the search
+/// to the mirrored sheet, outside the meridian's range.
+#[test]
+fn inverted_processor_swaps_search_hints() {
+    use std::f64::consts::PI;
+    let meridian = Processor::with_transform(
+        TrimmedCurve::new(UnitCircle::<Point3>::new(), (0.0, PI)),
+        Matrix4::from_cols(
+            -Vector4::unit_z(),
+            Vector4::unit_x(),
+            -Vector4::unit_y(),
+            Vector4::unit_w(),
+        ),
+    );
+    let sphere = RevolutedCurve::by_revolution(meridian, Point3::origin(), Vector3::unit_z());
+    let mut inverted = Processor::<_, Matrix4>::new(sphere);
+    inverted.invert();
+
+    let (angle, colatitude) = (4.0, 2.0);
+    let point = inverted.subs(angle, colatitude);
+    let hint = (angle + 0.1, colatitude + 0.1);
+    for (u, v) in [
+        inverted.search_parameter(point, hint, 100).unwrap(),
+        inverted.search_nearest_parameter(point, hint, 100).unwrap(),
+    ] {
+        assert_near!(inverted.subs(u, v), point);
+        assert!(
+            (0.0..=PI).contains(&v),
+            "colatitude {v} is off the meridian"
+        );
+        assert_near!(u, angle);
+        assert_near!(v, colatitude);
+    }
+}

@@ -4,6 +4,7 @@ The version is of the bottom crate `truck-rendimpl`.
 
 ## Unreleased
 
+- Fix parameter searches on an inverted `Processor` surface reading the hint in the wrong parameter order.
 - Add `Surface::elementary` to `truck-modeling`, recognising planes, cylinders, cones, spheres and tori with their parameters.
 - Add `try_mapped` to `CompressedShell` and `CompressedSolid`.
 - Convert curves and surfaces read from STEP into the `truck-modeling` enums, keeping conics and elementary surfaces exact.
