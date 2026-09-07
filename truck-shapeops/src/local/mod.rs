@@ -1,7 +1,9 @@
 //! Local operations: editing a solid face by face, leaving the rest untouched.
 
+mod delete;
 mod intersect;
 mod replace;
+pub use delete::delete_face;
 pub use intersect::{intersect_surfaces, parameter_domain, Domain};
 pub use replace::replace_surfaces;
 use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};

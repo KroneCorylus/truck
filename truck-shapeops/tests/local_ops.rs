@@ -6,7 +6,7 @@ use common::{blend::*, modeling::cuboid, *};
 use std::f64::consts::PI;
 use truck_geometry::prelude::*;
 use truck_modeling::{builder, FaceID};
-use truck_shapeops::local::{move_faces, replace_surfaces, LocalOpError};
+use truck_shapeops::local::{delete_face, move_faces, replace_surfaces, LocalOpError};
 
 type MWire = truck_modeling::Wire;
 type MSolid = truck_modeling::Solid;
@@ -194,4 +194,78 @@ fn two_adjacent_faces_replaced_together() {
         })
         .count();
     assert!(corner_edges >= 1);
+}
+
+/// Box `[0, a] × [0, b] × [0, c]` with the vertical edge at `x = a, y = 0` rounded with `rho`.
+fn rounded_box(a: f64, b: f64, c: f64, rho: f64) -> MSolid {
+    let s = rho / f64::sqrt(2.0);
+    let v: Vec<_> = [(0.0, 0.0), (a - rho, 0.0), (a, rho), (a, b), (0.0, b)]
+        .map(|(x, y)| builder::vertex(Point3::new(x, y, 0.0)))
+        .into();
+    let wire: MWire = vec![
+        builder::line(&v[0], &v[1]),
+        builder::circle_arc(&v[1], &v[2], Point3::new(a - rho + s, rho - s, 0.0)),
+        builder::line(&v[2], &v[3]),
+        builder::line(&v[3], &v[4]),
+        builder::line(&v[4], &v[0]),
+    ]
+    .into();
+    let face = builder::try_attach_plane(&[wire]).unwrap();
+    builder::tsweep(&face, Vector3::unit_z() * c)
+}
+
+/// Removing the round face of a rounded box restores the sharp edge: the two planes meet in one
+/// line and the end faces lose their arc for a vertex.
+#[test]
+fn deleting_a_round_face_restores_the_sharp_edge() {
+    let (a, b, c, rho) = (2.0, 3.0, 1.0, 0.5);
+    let rounded = rounded_box(a, b, c, rho);
+    let round = rounded
+        .face_iter()
+        .find(|face| matches!(face.surface(), MSurface::Extruded(_)))
+        .unwrap()
+        .id();
+    let sharp = delete_face(&rounded, round).unwrap();
+    let harness = from_modeling(&sharp);
+    assert_counts(&harness, 8, 12, 6);
+    assert_solid(&harness, a * b * c, &[0], TOL);
+    let corner = |z: f64| Point3::new(a, 0.0, z);
+    let sharp_edges = sharp
+        .edge_iter()
+        .filter(|edge| {
+            let (p, q) = (edge.front().point(), edge.back().point());
+            matches!(edge.curve(), truck_modeling::Curve::Line(_))
+                && ((p.near(&corner(0.0)) && q.near(&corner(c)))
+                    || (p.near(&corner(c)) && q.near(&corner(0.0))))
+        })
+        .count();
+    assert_eq!(sharp_edges, 2, "the sharp edge once per adjacent face");
+    let top = face_id_at(&sharp, Point3::new(a / 2.0, b / 2.0, c));
+    let top = sharp.face_iter().find(|f| f.id() == top).unwrap();
+    assert_eq!(top.boundaries()[0].len(), 4);
+    assert_solid(
+        &from_modeling(&rounded),
+        a * b * c - (1.0 - PI / 4.0) * rho * rho * c,
+        &[0],
+        TOL,
+    );
+}
+
+#[test]
+fn deleting_a_box_side_or_a_five_sided_face_is_rejected() {
+    let (a, b, c) = (2.0, 3.0, 1.0);
+    let solid = abc_box(a, b, c);
+    let top = face_id_at(&solid, Point3::new(a / 2.0, b / 2.0, c));
+    let err = delete_face(&solid, top).unwrap_err();
+    assert!(
+        matches!(err, LocalOpError::NoIntersection { face, .. } if face == top),
+        "{err}"
+    );
+    let rounded = rounded_box(a, b, c, 0.5);
+    let top = face_id_at(&rounded, Point3::new(a / 2.0, b / 2.0, c));
+    let err = delete_face(&rounded, top).unwrap_err();
+    assert!(
+        matches!(err, LocalOpError::Unsupported { face } if face == top),
+        "{err}"
+    );
 }

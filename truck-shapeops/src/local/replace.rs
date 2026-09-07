@@ -6,9 +6,97 @@ use std::result::Result;
 use truck_geometry::prelude::*;
 use truck_modeling::*;
 
-/// How far, as a fraction of each side, the parameter rectangle of a face is extended when its
-/// surface is intersected with a neighbour's.
-const MARGIN: f64 = 10.0;
+/// How far, as a fraction of its diagonal, the parameter rectangle of a face is extended when
+/// its surface is intersected with a neighbour's.
+pub(super) const MARGIN: f64 = 10.0;
+
+/// The faces of a solid in order, with the faces across every edge and the edges at every vertex.
+pub(super) struct Incidence {
+    pub faces: Vec<Face>,
+    pub index: HashMap<FaceID, usize>,
+    pub faces_of_edge: HashMap<EdgeID, Vec<usize>>,
+    /// absolute edges
+    pub edges_of_vertex: HashMap<VertexID, Vec<Edge>>,
+}
+
+impl Incidence {
+    pub fn new(solid: &Solid) -> Self {
+        let faces: Vec<Face> = solid.face_iter().cloned().collect();
+        let index = faces.iter().enumerate().map(|(i, f)| (f.id(), i)).collect();
+        let mut faces_of_edge: HashMap<EdgeID, Vec<usize>> = HashMap::default();
+        let mut edges_of_vertex: HashMap<VertexID, Vec<Edge>> = HashMap::default();
+        for (i, face) in faces.iter().enumerate() {
+            for edge in face.edge_iter() {
+                faces_of_edge.entry(edge.id()).or_default().push(i);
+                for vertex in [edge.front(), edge.back()] {
+                    let edges = edges_of_vertex.entry(vertex.id()).or_default();
+                    if edges.iter().all(|e| e.id() != edge.id()) {
+                        edges.push(edge.absolute_clone());
+                    }
+                }
+            }
+        }
+        Self {
+            faces,
+            index,
+            faces_of_edge,
+            edges_of_vertex,
+        }
+    }
+}
+
+/// `face` with its loops mapped through `new_edges`: an edge mapped to `None` is left out, one
+/// mapped to a new edge takes it with the loop's orientation, and the others stay. The loops are
+/// the face's oriented loops, so `surface` must be its oriented surface.
+pub(super) fn rebuild_face(
+    face: &Face,
+    new_edges: &HashMap<EdgeID, Option<Edge>>,
+    surface: Surface,
+) -> Face {
+    let loops: Vec<Wire> = face
+        .boundaries()
+        .into_iter()
+        .map(|wire| {
+            wire.iter()
+                .filter_map(|edge| match new_edges.get(&edge.id()) {
+                    Some(Some(new)) if edge.orientation() => Some(new.clone()),
+                    Some(Some(new)) => Some(new.inverse()),
+                    Some(None) => None,
+                    None => Some(edge.clone()),
+                })
+                .collect()
+        })
+        .collect();
+    Face::new(loops, surface)
+}
+
+/// `solid` with the faces in `rebuilt` replaced by index and the faces in `dropped` left out.
+pub(super) fn rebuild_solid(
+    solid: &Solid,
+    rebuilt: &HashMap<usize, Face>,
+    dropped: &HashSet<usize>,
+) -> Result<Solid, truck_topology::errors::Error> {
+    let mut next = 0;
+    let shells: Vec<Shell> = solid
+        .boundaries()
+        .iter()
+        .map(|shell| {
+            shell
+                .iter()
+                .filter_map(|face| {
+                    let i = next;
+                    next += 1;
+                    match rebuilt.get(&i) {
+                        Some(face) => Some(face.clone()),
+                        None if dropped.contains(&i) => None,
+                        None => Some(face.clone()),
+                    }
+                })
+                .collect()
+        })
+        .collect();
+    Solid::try_new(shells)
+}
 
 /// Gives each face in `replacements` its new surface and rebuilds its boundary as the
 /// intersection of that surface with the surfaces of its neighbours, with new vertices where the
@@ -43,9 +131,12 @@ pub fn replace_surfaces(
     solid: &Solid,
     replacements: &[(FaceID, Surface)],
 ) -> Result<Solid, LocalOpError<Surface>> {
-    let faces: Vec<Face> = solid.face_iter().cloned().collect();
-    let index: HashMap<FaceID, usize> =
-        faces.iter().enumerate().map(|(i, f)| (f.id(), i)).collect();
+    let Incidence {
+        faces,
+        index,
+        faces_of_edge,
+        edges_of_vertex,
+    } = Incidence::new(solid);
     let mut new_surface: HashMap<usize, &Surface> = HashMap::default();
     for (face, surface) in replacements {
         let &i = index
@@ -59,20 +150,6 @@ pub fn replace_surfaces(
             None => faces[i].surface(),
         }
     };
-
-    let mut faces_of_edge: HashMap<EdgeID, Vec<usize>> = HashMap::default();
-    let mut edges_of_vertex: HashMap<VertexID, Vec<Edge>> = HashMap::default();
-    for (i, face) in faces.iter().enumerate() {
-        for edge in face.edge_iter() {
-            faces_of_edge.entry(edge.id()).or_default().push(i);
-            for vertex in [edge.front(), edge.back()] {
-                let edges = edges_of_vertex.entry(vertex.id()).or_default();
-                if edges.iter().all(|e| e.id() != edge.id()) {
-                    edges.push(edge.absolute_clone());
-                }
-            }
-        }
-    }
 
     // the vertices of the replaced faces, the edges at them, and the faces across those edges
     let touched_vertices: Vec<Vertex> = {
@@ -180,7 +257,7 @@ pub fn replace_surfaces(
         new_vertices.insert(vertex.id(), Vertex::new(c0.subs(t0)));
     }
 
-    let new_edges: HashMap<EdgeID, Edge> = touched_edges
+    let new_edges: HashMap<EdgeID, Option<Edge>> = touched_edges
         .iter()
         .map(|edge| {
             let end = |v: &Vertex| {
@@ -191,60 +268,33 @@ pub fn replace_surfaces(
             };
             let (front, back) = (end(edge.front()), end(edge.back()));
             let line = Curve::Line(Line(front.point(), back.point()));
-            (edge.id(), Edge::new(&front, &back, line))
+            (edge.id(), Some(Edge::new(&front, &back, line)))
         })
         .collect();
 
     let rebuilt = |i: usize| -> Face {
-        let loops: Vec<Wire> = faces[i]
-            .boundaries()
-            .into_iter()
-            .map(|wire| {
-                wire.iter()
-                    .map(|edge| match new_edges.get(&edge.id()) {
-                        Some(new) if edge.orientation() => new.clone(),
-                        Some(new) => new.inverse(),
-                        None => edge.clone(),
-                    })
-                    .collect()
-            })
-            .collect();
         match new_surface.get(&i) {
-            None => Face::new(loops, faces[i].oriented_surface()),
+            None => rebuild_face(&faces[i], &new_edges, faces[i].oriented_surface()),
             Some(&surface) => {
                 // the loops run counterclockwise about the old outward normal
                 let old = faces[i].oriented_surface();
                 let (u, v) = old.try_range_tuple();
                 let mid = |r: Option<(f64, f64)>| r.map_or(0.5, |(a, b)| (a + b) / 2.0);
                 let outward = old.normal(mid(u), mid(v));
+                let face = rebuild_face(&faces[i], &new_edges, surface.clone());
                 match surface.normal(0.0, 0.0).dot(outward) > 0.0 {
-                    true => Face::new(loops, surface.clone()),
-                    false => Face::new(loops.iter().map(Wire::inverse).collect(), surface.clone())
-                        .inverse(),
+                    true => face,
+                    false => {
+                        let loops = face.boundaries().iter().map(Wire::inverse).collect();
+                        Face::new(loops, surface.clone()).inverse()
+                    }
                 }
             }
         }
     };
-    let mut next = 0;
-    let shells: Vec<Shell> = solid
-        .boundaries()
-        .iter()
-        .map(|shell| {
-            shell
-                .iter()
-                .map(|face| {
-                    let i = next;
-                    next += 1;
-                    match touched_faces.contains(&i) {
-                        true => rebuilt(i),
-                        false => face.clone(),
-                    }
-                })
-                .collect()
-        })
-        .collect();
+    let rebuilt: HashMap<usize, Face> = touched_faces.iter().map(|&i| (i, rebuilt(i))).collect();
     let first = replacements.first().map(|(face, _)| *face);
-    Solid::try_new(shells).map_err(|_| LocalOpError::Unsupported {
+    rebuild_solid(solid, &rebuilt, &HashSet::default()).map_err(|_| LocalOpError::Unsupported {
         face: first.unwrap_or_else(|| faces[0].id()),
     })
 }

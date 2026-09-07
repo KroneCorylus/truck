@@ -31,6 +31,8 @@
 //! `local::intersect_surfaces` gives the curves where two surfaces meet over given parameter rectangles, exact for
 //! a plane against a plane, a cylinder or a cone normal to it, and lifted from the tessellations otherwise.
 //! `local::replace_surfaces` gives faces new surfaces and re-intersects them with their neighbours, for planes only so far.
+//! `local::delete_face` removes a four-edged face between planes, such as the fillet or chamfer of one edge, and
+//! restores the sharp edge.
 
 #![cfg_attr(not(debug_assertions), deny(warnings))]
 #![deny(clippy::all, rust_2018_idioms)]
