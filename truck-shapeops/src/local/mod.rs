@@ -1,7 +1,9 @@
 //! Local operations: editing a solid face by face, leaving the rest untouched.
 
 mod intersect;
+mod replace;
 pub use intersect::{intersect_surfaces, parameter_domain, Domain};
+pub use replace::replace_surfaces;
 use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};
 use std::{fmt, result::Result};
 use truck_geometry::prelude::*;
@@ -29,6 +31,14 @@ pub enum LocalOpError<S> {
         /// the neighbour it leaves
         neighbour: FaceID<S>,
     },
+    /// the new surface of `face` does not meet `neighbour`, or the edges between them meet no
+    /// vertex
+    NoIntersection {
+        /// the replaced face
+        face: FaceID<S>,
+        /// the neighbour
+        neighbour: FaceID<S>,
+    },
 }
 
 impl<S> fmt::Display for LocalOpError<S> {
@@ -41,6 +51,9 @@ impl<S> fmt::Display for LocalOpError<S> {
             ),
             Self::OutsideNeighbour { face, neighbour } => {
                 write!(f, "the moved boundary of {face:?} leaves {neighbour:?}")
+            }
+            Self::NoIntersection { face, neighbour } => {
+                write!(f, "the new surface of {face:?} does not meet {neighbour:?}")
             }
         }
     }

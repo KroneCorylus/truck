@@ -10,9 +10,13 @@ use truck_modeling::{Curve, Elementary, Face, Surface};
 pub type Domain = ((f64, f64), (f64, f64));
 
 /// The parameter rectangle of the loops of `face` on its surface, each side enlarged by
-/// `margin` times its length. `None` when a boundary point cannot be found on the surface.
+/// `margin` times the rectangle's diagonal. `None` when a boundary point cannot be projected.
 pub fn parameter_domain(face: &Face, margin: f64) -> Option<Domain> {
-    let surface = face.surface();
+    domain_on(&face.surface(), face, margin)
+}
+
+/// The parameter rectangle of the loops of `face` projected onto `surface`.
+pub(super) fn domain_on(surface: &Surface, face: &Face, margin: f64) -> Option<Domain> {
     let (mut u, mut v) = ((f64::MAX, f64::MIN), (f64::MAX, f64::MIN));
     let mut hint = None;
     for edge in face.edge_iter() {
@@ -20,13 +24,14 @@ pub fn parameter_domain(face: &Face, margin: f64) -> Option<Domain> {
         let (t0, t1) = curve.range_tuple();
         for i in 0..16 {
             let p = curve.subs(t0 + (t1 - t0) * i as f64 / 16.0);
-            let (a, b) = surface.search_parameter(p, hint, 100)?;
+            let (a, b) = surface.search_nearest_parameter(p, hint, 100)?;
             hint = Some((a, b));
             u = (u.0.min(a), u.1.max(a));
             v = (v.0.min(b), v.1.max(b));
         }
     }
-    let enlarge = |(a, b): (f64, f64)| (a - margin * (b - a), b + margin * (b - a));
+    let diagonal = f64::hypot(u.1 - u.0, v.1 - v.0);
+    let enlarge = |(a, b): (f64, f64)| (a - margin * diagonal, b + margin * diagonal);
     Some((enlarge(u), enlarge(v)))
 }
 
@@ -94,8 +99,10 @@ fn exact(
                 let (du, dv) = plane.search_parameter(point + direction, None, 1)?;
                 clip((u, v), (du - u, dv - v), domain)
             };
-            let (a0, b0) = range(plane, domain0)?;
-            let (a1, b1) = range(other, domain1)?;
+            let (Some((a0, b0)), Some((a1, b1))) = (range(plane, domain0), range(other, domain1))
+            else {
+                return Some(Vec::new());
+            };
             let (a, b) = (a0.max(a1), b0.min(b1));
             Some(match a < b {
                 true => vec![Curve::Line(Line(

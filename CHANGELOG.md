@@ -4,6 +4,7 @@ The version is of the bottom crate `truck-rendimpl`.
 
 ## Unreleased
 
+- Add `local::replace_surfaces` to `truck-shapeops`: faces given new surfaces and re-intersected with their neighbours, for planes.
 - Add `local::intersect_surfaces` and `parameter_domain` to `truck-shapeops`: the curves where two surfaces meet, exact for planes against planes, cylinders and cones; `truck-shapeops` now depends on `truck-modeling`.
 - Add `local::move_faces` to `truck-shapeops`, moving a group of faces such as a hole through a plate rigidly along its neighbours.
 - Follow spline path edges in `builder::sweep_along_wire` by rotation-minimising frames and a loft through the profile copies; the sweep takes the tolerance of that division.
