@@ -43,6 +43,11 @@ pub enum LocalOpError<S> {
         /// the neighbour
         neighbour: FaceID<S>,
     },
+    /// the surface of `face` has no offset of its own kind by the distance asked
+    NoOffset {
+        /// the face
+        face: FaceID<S>,
+    },
 }
 
 impl<S> fmt::Display for LocalOpError<S> {
@@ -59,6 +64,12 @@ impl<S> fmt::Display for LocalOpError<S> {
             Self::NoIntersection { face, neighbour } => {
                 write!(f, "the new surface of {face:?} does not meet {neighbour:?}")
             }
+            Self::NoOffset { face } => {
+                write!(
+                    f,
+                    "the surface of {face:?} has no offset of its own kind by that distance"
+                )
+            }
         }
     }
 }
@@ -68,12 +79,14 @@ impl<S: fmt::Debug> std::error::Error for LocalOpError<S> {}
 /// Points along `curve`, in parameter order.
 const SAMPLES: usize = 16;
 
-/// Moves `faces` of `solid` rigidly by `translation`, with their edges and vertices, and returns
-/// the moved solid; `solid` is not modified. The faces must move as a whole: every loop of a
-/// neighbouring face that touches them consists of moved edges only, is an inner loop of that
-/// neighbour, and after the move still lies on the neighbour's surface, inside its region and
-/// clear of its other loops. That is a hole through a plate moved within the plate. Anything
-/// else needs the neighbours re-intersected and is [`LocalOpError::Unsupported`].
+/// Moves `faces` of `solid` by `translation` and returns the moved solid; `solid` is not
+/// modified. When the faces can move as a whole, every loop of a neighbouring face that touches
+/// them consisting of moved edges only, being an inner loop of that neighbour, and after the
+/// move still lying on the neighbour's surface inside its region and clear of its other loops,
+/// they move rigidly with their edges and vertices: that is a hole through a plate moved within
+/// the plate, and it is exact. Otherwise the faces' surfaces are translated and
+/// [`replace_surfaces`] re-intersects them with their neighbours, as for the top of a box moved
+/// up, with that operation's limits and errors.
 /// # Examples
 /// ```
 /// use truck_modeling::*;
@@ -100,7 +113,58 @@ const SAMPLES: usize = 16;
 /// assert_eq!(moved.face_iter().count(), plate.face_iter().count());
 /// assert!(move_faces(&plate, &faces, Vector3::new(8.0, 0.0, 0.0)).is_err());
 /// ```
-pub fn move_faces<C, S>(
+pub fn move_faces(
+    solid: &truck_modeling::Solid,
+    faces: &[truck_modeling::FaceID],
+    translation: Vector3,
+) -> Result<truck_modeling::Solid, LocalOpError<truck_modeling::Surface>> {
+    match move_faces_rigidly(solid, faces, translation) {
+        Err(LocalOpError::Unsupported { .. }) => {
+            let matrix = Matrix4::from_translation(translation);
+            let replacements = faces
+                .iter()
+                .map(|&id| {
+                    let face = solid
+                        .face_iter()
+                        .find(|face| face.id() == id)
+                        .ok_or(LocalOpError::UnknownFace { face: id })?;
+                    Ok((id, face.surface().transformed(matrix)))
+                })
+                .collect::<Result<Vec<_>, _>>()?;
+            replace_surfaces(solid, &replacements)
+        }
+        other => other,
+    }
+}
+
+/// Offsets `faces` of `solid` by `distance` along their outward normals, through
+/// [`Surface::offset`](truck_modeling::Surface::offset) and [`replace_surfaces`]; a positive
+/// distance moves a face outward, so a boss grows and a hole shrinks. A face whose surface has
+/// no offset of its kind by that distance is [`LocalOpError::NoOffset`].
+pub fn offset_faces(
+    solid: &truck_modeling::Solid,
+    faces: &[truck_modeling::FaceID],
+    distance: f64,
+) -> Result<truck_modeling::Solid, LocalOpError<truck_modeling::Surface>> {
+    let replacements = faces
+        .iter()
+        .map(|&id| {
+            let face = solid
+                .face_iter()
+                .find(|face| face.id() == id)
+                .ok_or(LocalOpError::UnknownFace { face: id })?;
+            let surface = face
+                .oriented_surface()
+                .offset(distance)
+                .map_err(|_| LocalOpError::NoOffset { face: id })?;
+            Ok((id, surface))
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+    replace_surfaces(solid, &replacements)
+}
+
+/// The rigid move of [`move_faces`].
+fn move_faces_rigidly<C, S>(
     solid: &Solid<Point3, C, S>,
     faces: &[FaceID<S>],
     translation: Vector3,

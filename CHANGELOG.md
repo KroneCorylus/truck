@@ -4,6 +4,7 @@ The version is of the bottom crate `truck-rendimpl`.
 
 ## Unreleased
 
+- Let `local::move_faces` in `truck-shapeops` re-intersect the moved surfaces when the faces cannot move rigidly, and add `local::offset_faces`.
 - Add `Surface::offset` to `truck-modeling`: planes, extruded circles and revolved lines and circles offset within their own kind, so cylinders, cones, spheres and tori stay exact.
 - Add `local::draft` to `truck-shapeops`: planar and cylindrical faces tilted about a neutral plane, re-intersected with their neighbours.
 - Let `local::replace_surfaces` in `truck-shapeops` take cylinders and cones as neighbours, keeping the curves of edges between unreplaced faces; fix the exact plane-against-revolved-surface intersection, whose angle is the second parameter.

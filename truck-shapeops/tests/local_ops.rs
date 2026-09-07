@@ -10,7 +10,9 @@ use common::{
 use std::f64::consts::PI;
 use truck_geometry::prelude::*;
 use truck_modeling::{builder, Elementary, FaceID, Rad};
-use truck_shapeops::local::{delete_face, draft, move_faces, replace_surfaces, LocalOpError};
+use truck_shapeops::local::{
+    delete_face, draft, move_faces, offset_faces, replace_surfaces, LocalOpError,
+};
 
 type MWire = truck_modeling::Wire;
 type MSolid = truck_modeling::Solid;
@@ -86,10 +88,11 @@ fn hole_moved_out_of_the_plate_is_rejected() {
         panic!("{err}");
     };
     assert!(faces.contains(&face) && planes.contains(&neighbour));
-    // a hole lifted out of the plate's planes is not a move this operation can do
-    let err = move_faces(&plate, &faces, Vector3::new(0.0, 0.0, 0.5)).unwrap_err();
-    assert!(matches!(err, LocalOpError::Unsupported { face } if faces.contains(&face)));
+    // a hole lifted along its own axis cannot move rigidly; its surfaces re-intersected with
+    // the plate give the plate back
+    let lifted = move_faces(&plate, &faces, Vector3::new(0.0, 0.0, 0.5)).unwrap();
     let volume = size * size * thickness - PI * radius * radius * thickness;
+    assert_solid(&from_modeling(&lifted), volume, &[1], TOL);
     assert_solid(&from_modeling(&plate), volume, &[1], TOL);
 }
 
@@ -471,6 +474,37 @@ fn undraftable_face_is_rejected() {
     let err = draft(&solid, &[top], &bottom_plane(), Vector3::unit_z(), Rad(0.2)).unwrap_err();
     assert!(
         matches!(err, LocalOpError::Unsupported { face } if face == top),
+        "{err}"
+    );
+}
+
+/// The top of a box moved up cannot move rigidly, so its surface is translated and re-intersected.
+#[test]
+fn box_top_moved_up() {
+    let (a, b, c, d) = (2.0, 3.0, 1.0, 0.5);
+    let solid = abc_box(a, b, c);
+    let top = face_id_at(&solid, Point3::new(a / 2.0, b / 2.0, c));
+    let taller = move_faces(&solid, &[top], Vector3::new(0.0, 0.0, d)).unwrap();
+    let harness = from_modeling(&taller);
+    assert_counts(&harness, 8, 12, 6);
+    assert_solid(&harness, a * b * (c + d), &[0], TOL);
+}
+
+/// A hole grown by offsetting its cylindrical faces inward, against their outward normals.
+#[test]
+fn hole_grown_by_offset() {
+    let (size, thickness, radius, d) = (10.0, 1.0, 1.0, 0.5);
+    let center = Point3::new(3.0, 3.0, 0.0);
+    let plate = plate_with_hole(size, thickness, center, radius);
+    let faces = hole_faces(&plate);
+    let grown = offset_faces(&plate, &faces, -d).unwrap();
+    let harness = from_modeling(&grown);
+    assert_counts(&harness, 14, 21, 9);
+    let volume = size * size * thickness - PI * (radius + d) * (radius + d) * thickness;
+    assert_solid(&harness, volume, &[1], TOL);
+    let err = offset_faces(&plate, &faces, radius).unwrap_err();
+    assert!(
+        matches!(err, LocalOpError::NoOffset { face } if faces.contains(&face)),
         "{err}"
     );
 }

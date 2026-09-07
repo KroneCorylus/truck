@@ -26,8 +26,9 @@
 //!
 //! ## Local Operations
 //!
-//! `local::move_faces` moves a group of faces rigidly, such as a hole through a plate, when their boundary stays
-//! on the neighbouring surfaces. Operations that change a face's boundary against its neighbours are unsupported.
+//! `local::move_faces` moves a group of faces, rigidly with their edges when their boundary stays on the neighbouring
+//! surfaces, such as a hole through a plate, and by re-intersection otherwise. `local::offset_faces` offsets faces
+//! along their normals.
 //! `local::intersect_surfaces` gives the curves where two surfaces meet over given parameter rectangles, exact for
 //! a plane against a plane, a cylinder or a cone normal to it, and lifted from the tessellations otherwise.
 //! `local::replace_surfaces` gives faces new surfaces and re-intersects them with their neighbours: planes, cylinders and cones.
