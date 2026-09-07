@@ -43,6 +43,14 @@ pub enum Error {
     /// cf. [`builder::sweep_along_wire`](../builder/fn.sweep_along_wire.html)
     #[error("the profile does not return to its start around the closed path; only planar closed paths are supported.")]
     ClosedPathNotPlanar,
+    /// an offset that would make a radius of the surface vanish.
+    /// cf. [`Surface::offset`](../enum.Surface.html#method.offset)
+    #[error("the offset would make a radius of the surface non-positive.")]
+    OffsetRadiusNotPositive,
+    /// a surface that has no offset of its own kind.
+    /// cf. [`Surface::offset`](../enum.Surface.html#method.offset)
+    #[error("the surface has no offset of its own kind: only planes, extruded circles and revolved lines and circles under rigid transforms do.")]
+    NoTypedOffset,
 }
 
 #[test]

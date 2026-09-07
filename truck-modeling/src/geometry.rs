@@ -482,6 +482,112 @@ impl Elementary {
     }
 }
 
+impl Surface {
+    /// The surface moved by `distance` along its normal, of the same kind: a plane stays a
+    /// plane; an extruded circle keeps its axis and changes its radius, so a cylinder stays a
+    /// cylinder; a revolved line or circle is shifted within its meridian plane, so cylinders,
+    /// cones, spheres and tori stay what they are, with the apex of a cone moving along its
+    /// axis. A negative `distance` moves the surface against its normal.
+    /// # Failures
+    /// - [`Error::OffsetRadiusNotPositive`] when a radius would vanish or turn over
+    /// - [`Error::NoTypedOffset`] for a spline surface, an extruded or revolved curve that is
+    ///   not a line or round circle in the right position, or a revolved surface under a
+    ///   transform that is not a rigid motion
+    pub fn offset(&self, distance: f64) -> Result<Surface> {
+        let no_typed_offset = errors::Error::NoTypedOffset;
+        let not_positive = errors::Error::OffsetRadiusNotPositive;
+        // the transform of a conic with its radius scaled
+        let scaled = |conic: &Processor<TrimmedCurve<UnitCircle<Point3>>, Matrix4>, k: f64| {
+            let mut transform = *conic.transform();
+            transform[0] *= k;
+            transform[1] *= k;
+            Processor::with_transform(*conic.entity(), transform)
+        };
+        match self {
+            Surface::Plane(plane) => {
+                let shift = plane.normal() * distance;
+                Ok(Surface::Plane(Plane::new(
+                    plane.origin() + shift,
+                    plane.origin() + plane.u_axis() + shift,
+                    plane.origin() + plane.v_axis() + shift,
+                )))
+            }
+            Surface::Extruded(extruded) => {
+                let (Curve::Conic(conic), Some((Elementary::Cylinder { .. }, _))) =
+                    (extruded.entity_curve(), self.elementary())
+                else {
+                    return Err(no_typed_offset);
+                };
+                let (center, radius, _) = round_circle(conic).ok_or(no_typed_offset)?;
+                let (u0, _) = conic.range_tuple();
+                let sign = self.normal(u0, 0.0).dot(conic.subs(u0) - center).signum();
+                let new_radius = radius + sign * distance;
+                if new_radius <= TOLERANCE {
+                    return Err(not_positive);
+                }
+                Ok(Surface::Extruded(ExtrudedCurve::by_extrusion(
+                    Curve::Conic(scaled(conic, new_radius / radius)),
+                    extruded.extruding_vector(),
+                )))
+            }
+            Surface::RevolutedCurve(processor) => {
+                let transform = *processor.transform();
+                let columns = [0, 1, 2].map(|i| transform[i].truncate());
+                let rigid = columns.iter().all(|c| c.magnitude().near(&1.0))
+                    && columns[0].dot(columns[1]).so_small()
+                    && columns[1].dot(columns[2]).so_small()
+                    && columns[2].dot(columns[0]).so_small()
+                    && columns[0].cross(columns[1]).dot(columns[2]) > 0.0;
+                if !rigid {
+                    return Err(no_typed_offset);
+                }
+                let revolved = processor.entity();
+                let (origin, axis) = (revolved.origin(), revolved.axis());
+                let (u0, u1) = revolved.entity_curve().range_tuple();
+                let curve = match revolved.entity_curve() {
+                    Curve::Line(Line(p0, p1)) => {
+                        let shift = revolved.normal((u0 + u1) / 2.0, 0.0) * distance;
+                        let (q0, q1) = (p0 + shift, p1 + shift);
+                        // the generator must stay on its side of the axis
+                        let same_side = |p: Point3, q: Point3| {
+                            radial(q, origin, axis).dot(radial(p, origin, axis)) > 0.0
+                                || radial(p, origin, axis).so_small()
+                        };
+                        if !same_side(*p0, q0) || !same_side(*p1, q1) {
+                            return Err(not_positive);
+                        }
+                        Curve::Line(Line(q0, q1))
+                    }
+                    Curve::Conic(conic) => {
+                        if !matches!(
+                            self.elementary(),
+                            Some((Elementary::Sphere { .. } | Elementary::Torus { .. }, _))
+                        ) {
+                            return Err(no_typed_offset);
+                        }
+                        let (center, radius, _) = round_circle(conic).ok_or(no_typed_offset)?;
+                        let sign = revolved
+                            .normal(u0, 0.0)
+                            .dot(conic.subs(u0) - center)
+                            .signum();
+                        let new_radius = radius + sign * distance;
+                        if new_radius <= TOLERANCE {
+                            return Err(not_positive);
+                        }
+                        Curve::Conic(scaled(conic, new_radius / radius))
+                    }
+                    _ => return Err(no_typed_offset),
+                };
+                Ok(Surface::RevolutedCurve(Processor::with_transform(
+                    RevolutedCurve::by_revolution(curve, origin, axis),
+                    transform,
+                )))
+            }
+            _ => Err(no_typed_offset),
+        }
+    }
+}
+
 /// The component of `p - origin` perpendicular to the unit vector `axis`.
 pub(crate) fn radial(p: Point3, origin: Point3, axis: Vector3) -> Vector3 {
     let r = p - origin;
