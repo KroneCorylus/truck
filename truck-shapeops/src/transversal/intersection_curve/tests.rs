@@ -170,3 +170,16 @@ fn tangent_curvature_classification() {
         Some(false)
     );
 }
+
+#[test]
+fn tangent_contact_refines_a_mesh_seed() {
+    let graph = quadratic_graph(1.0, 0.0, -1.0);
+    let plane = Plane::new(
+        Point3::origin(),
+        Point3::new(1.0, 0.0, 0.0),
+        Point3::new(0.0, 1.0, 0.0),
+    );
+    let contact = tangent_contact(&graph, &plane, Point3::new(0.01, -0.02, 0.003)).unwrap();
+    assert_near!(contact, Point3::origin());
+    assert_eq!(tangent_crossing_at(&graph, &plane, contact), Some(true));
+}

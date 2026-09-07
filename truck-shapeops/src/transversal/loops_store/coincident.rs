@@ -73,8 +73,8 @@ where
     merge_shared_pieces(a, b, same_normal);
     let region_a = parameter_boundaries(poly_faces[0], surface, true)?;
     let region_b = parameter_boundaries(poly_faces[1], surface, same_normal)?;
-    add_cut_edges(a, b, surface, &region_a, same_normal, overlap[0]);
-    add_cut_edges(b, a, surface, &region_b, same_normal, overlap[1]);
+    add_cut_edges(a, b, surface, &region_a, same_normal, overlap[0])?;
+    add_cut_edges(b, a, surface, &region_b, same_normal, overlap[1])?;
     mark_overlap(a, b, same_normal, overlap[0]);
     mark_overlap(b, a, same_normal, overlap[1]);
     Some(())
@@ -261,7 +261,8 @@ fn add_cut_edges<C: Clone, S>(
     region: &[Boundary2D],
     same_normal: bool,
     overlap: ShapesOpStatus,
-) where
+) -> Option<()>
+where
     S: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>,
 {
     let present: Vec<_> = into.poly[into.index]
@@ -288,9 +289,10 @@ fn add_cut_edges<C: Clone, S>(
             poly.invert();
             geom.invert();
         }
-        into.poly[into.index].add_edge(poly, overlap);
-        into.geom[into.index].add_edge(geom, overlap);
+        let positions = into.poly[into.index].add_edge(poly, overlap, normal_at(surface))?;
+        into.geom[into.index].add_edge_at(geom, overlap, positions);
     }
+    Some(())
 }
 
 /// Gives `overlap` to every wire of `a` whose region lies under the face of `b`.

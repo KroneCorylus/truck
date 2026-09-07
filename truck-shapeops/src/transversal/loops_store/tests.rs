@@ -780,7 +780,6 @@ fn crossing_edges() {
 /// the four triangular sectors of the diamond, each of area 1/2, without retraced edges.
 /// Parent 0f7747e1 produces two loops instead of four for order [0, 1, 3, 2].
 #[test]
-#[ignore = "Four-branch routing needs a loops-store change; order [0, 1, 3, 2] produces two loops"]
 fn four_branches_at_interior_vertex() {
     use itertools::Itertools;
     let vertices = [
@@ -805,7 +804,11 @@ fn four_branches_at_interior_vertex() {
             } else {
                 ShapesOpStatus::Or
             };
-            loops.add_edge(edge(&center, &vertices[i]), status);
+            loops
+                .add_edge(edge(&center, &vertices[i]), status, |_| {
+                    Some(Vector3::unit_z())
+                })
+                .unwrap();
         }
         assert_eq!(loops.len(), 4, "branch order {order:?}");
         for wire in loops.iter() {

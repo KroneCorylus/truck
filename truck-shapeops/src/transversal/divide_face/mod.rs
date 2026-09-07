@@ -16,7 +16,7 @@ fn create_parameter_boundary<P, C, S>(
 where
     P: Copy,
     C: BoundedCurve<Point = P> + ParameterDivision1D<Point = P>,
-    S: Clone + SearchParameter<D2, Point = P>,
+    S: ParametricSurface<Point = P> + SearchParameter<D2, Point = P>,
 {
     let surface = face.surface();
     let pt = wire.front_vertex().unwrap().point();
@@ -29,7 +29,19 @@ where
         });
         let mut p = *vec.last().unwrap();
         let closure = |q: &P| -> Option<Point2> {
-            p = surface.search_parameter(*q, Some(p.into()), 100)?.into();
+            let mut next: Point2 = surface
+                .search_parameter(*q, Some(p.into()), 100)
+                .or_else(|| surface.search_parameter(*q, None, 100))?
+                .into();
+            for (i, period) in [surface.u_period(), surface.v_period()]
+                .into_iter()
+                .enumerate()
+            {
+                if let Some(period) = period {
+                    next[i] += ((p[i] - next[i]) / period).round() * period;
+                }
+            }
+            p = next;
             Some(p)
         };
         let add: Option<Vec<Point2>> = match edge.orientation() {
@@ -56,7 +68,7 @@ fn divide_one_face<C, S>(
 ) -> Option<Vec<FaceWithShapesOpStatus<C, S>>>
 where
     C: BoundedCurve<Point = Point3> + ParameterDivision1D<Point = Point3>,
-    S: Clone + SearchParameter<D2, Point = Point3>,
+    S: ParametricSurface3D + SearchParameter<D2, Point = Point3>,
 {
     let (mut pre_faces, mut negative_wires) = (Vec::new(), Vec::new());
     let mut map = HashMap::default();
@@ -106,7 +118,7 @@ pub fn divide_faces<C, S>(
 ) -> Option<FacesClassification<Point3, C, S>>
 where
     C: BoundedCurve<Point = Point3> + ParameterDivision1D<Point = Point3>,
-    S: Clone + SearchParameter<D2, Point = Point3>,
+    S: ParametricSurface3D + SearchParameter<D2, Point = Point3>,
 {
     let mut res = FacesClassification::<Point3, C, S>::default();
     shell

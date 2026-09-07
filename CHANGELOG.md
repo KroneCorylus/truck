@@ -4,6 +4,8 @@ The version is of the bottom crate `truck-rendimpl`.
 
 ## Unreleased
 
+- Support sampled tangent-crossing boolean branches and boundary contacts: Steinmetz intersection and union, sphere-in-bore subtraction and rod-in-slot subtraction.
+
 - Reject detected second-order tangent crossings before boolean curve lifting, so the tested Steinmetz operations return `None` instead of panicking; record the four-branch loops-store limitation.
 - Record boolean failures at tangent crossings with analytic-volume tests for Steinmetz intersection and union, a sphere in an equal-radius bore and a rod in an equal-width slot.
 

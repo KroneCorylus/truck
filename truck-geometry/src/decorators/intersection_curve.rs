@@ -31,6 +31,17 @@ where
     };
     let (x, y) = hint0.or_else(|| surface0.search_nearest_parameter(plane_point, hint0, trials))?;
     let (z, w) = hint1.or_else(|| surface1.search_nearest_parameter(plane_point, hint1, trials))?;
+    let p0 = surface0.subs(x, y);
+    let p1 = surface1.subs(z, w);
+    if p0.near(&plane_point)
+        && p1.near(&plane_point)
+        && surface0
+            .normal(x, y)
+            .cross(surface1.normal(z, w))
+            .so_small()
+    {
+        return Some((p0.midpoint(p1), Point2::new(x, y), Point2::new(z, w)));
+    }
     let Vector4 { x, y, z, w } = newton::solve(function, Vector4 { x, y, z, w }, trials).ok()?;
     let point = surface0.subs(x, y).midpoint(surface1.subs(z, w));
     Some((point, Point2::new(x, y), Point2::new(z, w)))
@@ -227,7 +238,10 @@ where
         let [l, l_der, l_der2] = leader.ders(2, t).to_array::<3>();
         let (c, uv0, uv1) = self.search_triple(t, 100).unwrap();
         let (n0, n1) = (surface0.normal(uv0.x, uv0.y), surface1.normal(uv1.x, uv1.y));
-        let n = n0.cross(n1);
+        let mut n = n0.cross(n1);
+        if n.so_small() {
+            n = l_der - n0 * n0.dot(l_der);
+        }
         let k = (l_der.magnitude2() - (c - l).dot(l_der2)) / n.dot(l_der);
         n * k
     }
@@ -244,6 +258,21 @@ where
     }
     fn ders(&self, n: usize, t: f64) -> CurveDers<Vector3> {
         let (c, uv0, uv1) = self.search_triple(t, 100).unwrap();
+        if self
+            .surface0
+            .normal(uv0.x, uv0.y)
+            .cross(self.surface1.normal(uv1.x, uv1.y))
+            .so_small()
+        {
+            // At a singular endpoint the split branch's leader selects the tangent;
+            // the transversal recurrence divides by the vanishing normal cross product.
+            let mut derivatives = self.leader.ders(n, t);
+            derivatives[0] = c.to_vec();
+            if n > 0 {
+                derivatives[1] = self.der(t);
+            }
+            return derivatives;
+        }
         let mut uv0ders = CurveDers::new(n);
         uv0ders[0] = uv0.to_vec();
         let mut uv1ders = CurveDers::new(n);
@@ -451,5 +480,33 @@ mod double_projection_tests {
     #[property_test]
     fn sphere_case(#[strategy = 0f64..=(2.0 * PI)] t: f64, #[strategy = 0.5f64..=1.5f64] r: f64) {
         exec_sphere_case(t, r)?;
+    }
+}
+
+#[test]
+fn intersection_branch_at_a_tangent_endpoint() {
+    let saddle = BSplineSurface::new(
+        (KnotVec::bezier_knot(1), KnotVec::bezier_knot(1)),
+        vec![
+            vec![Point3::new(-1.0, -1.0, 1.0), Point3::new(-1.0, 1.0, -1.0)],
+            vec![Point3::new(1.0, -1.0, -1.0), Point3::new(1.0, 1.0, 1.0)],
+        ],
+    );
+    let plane = Plane::new(
+        Point3::origin(),
+        Point3::new(1.0, 0.0, 0.0),
+        Point3::new(0.0, 1.0, 0.0),
+    );
+    let curve = IntersectionCurve::new(
+        saddle,
+        plane,
+        Line(Point3::origin(), Point3::new(1.0, 0.0, 0.0)),
+    );
+    for curve in [curve.clone(), curve.inverse()] {
+        for t in [0.0, 0.5, 1.0] {
+            assert_near!(curve.subs(t), curve.leader().subs(t));
+            assert_near!(curve.der(t), curve.leader().der(t));
+            assert_near!(curve.der2(t), Vector3::zero());
+        }
     }
 }

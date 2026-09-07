@@ -242,9 +242,7 @@ fn steinmetz_cylinders() -> (Solid, Solid) {
 
 /// Equal-radius perpendicular cylinders cross at two tangent points, with four branches each.
 /// Parent 2330028a panics in Solid::new: the output shell is not oriented and closed.
-/// Step 36 rejects the crossing with None; the volume target is still unmet.
 #[test]
-#[ignore = "Parent 2330028a panics in Solid::new: the output shell is not oriented and closed."]
 fn tangent_steinmetz_intersection() {
     let (x, z) = steinmetz_cylinders();
     let result = truck_shapeops::and(&x, &z, TOL).expect("Steinmetz intersection");
@@ -253,9 +251,7 @@ fn tangent_steinmetz_intersection() {
 
 /// The shared volume of two radius-one cylinders of length four is 16/3.
 /// Parent 2330028a panics in Solid::new: the output shell is not oriented and closed.
-/// Step 36 rejects the crossing with None; the volume target is still unmet.
 #[test]
-#[ignore = "Parent 2330028a panics in Solid::new: the output shell is not oriented and closed."]
 fn tangent_steinmetz_union() {
     let (x, z) = steinmetz_cylinders();
     let result = truck_shapeops::or(&x, &z, TOL).expect("Steinmetz union");
@@ -266,7 +262,6 @@ fn tangent_steinmetz_union() {
 /// The cap volume is pi h^2 (r - h/3) = 5 pi / 24.
 /// Parent 2330028a returns None for the sphere subtraction; the blind bore passes.
 #[test]
-#[ignore = "Parent 2330028a returns None for the sphere subtraction; the blind bore passes."]
 fn tangent_sphere_in_equal_radius_bore() {
     let block = cuboid(Point3::new(-2.0, -2.0, -2.0), Point3::new(2.0, 2.0, 2.0));
     let bore = cylinder(Point3::new(0.0, 0.0, -0.5), Vector3::unit_z(), 1.0, 3.0);
@@ -284,7 +279,6 @@ fn tangent_sphere_in_equal_radius_bore() {
 /// unit lengths of cylinder. The vertical slot and the two new passages give genus three.
 /// Parent 2330028a returns closed topology of genus three, but its tessellated mesh is open.
 #[test]
-#[ignore = "Parent 2330028a returns closed topology of genus three, but its tessellated mesh is open."]
 fn tangent_rod_in_equal_width_slot() {
     let block = cuboid(Point3::new(-2.0, -2.0, -2.0), Point3::new(2.0, 2.0, 2.0));
     let slot = cuboid(Point3::new(-1.0, -1.0, -3.0), Point3::new(1.0, 1.0, 3.0));
@@ -296,12 +290,4 @@ fn tangent_rod_in_equal_width_slot() {
     assert_solid(&slotted, 48.0, &[1], TOL);
     let result = subtract(&slotted, &rod, TOL).expect("rod in slot");
     assert_solid(&result, 48.0 - 2.0 * PI, &[3], TOL);
-}
-
-/// Detected tangent crossings must fail cleanly until four-branch loops are supported.
-#[test]
-fn tangent_steinmetz_returns_none() {
-    let (x, z) = steinmetz_cylinders();
-    assert!(truck_shapeops::and(&x, &z, TOL).is_none());
-    assert!(truck_shapeops::or(&x, &z, TOL).is_none());
 }

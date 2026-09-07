@@ -249,25 +249,60 @@ impl<P: Copy, C: Clone> Loops<P, C> {
         &mut self,
         edge0: Edge<P, C>,
         status: ShapesOpStatus,
-    ) -> [Option<(usize, usize)>; 2] {
-        let a = self.iter().enumerate().find_map(|(i, wire)| {
-            wire.iter().enumerate().find_map(|(j, edge)| {
-                if edge.front() == edge0.back() {
-                    Some((i, j))
-                } else {
-                    None
-                }
-            })
-        });
-        let b = self.iter().enumerate().find_map(|(i, wire)| {
-            wire.iter().enumerate().find_map(|(j, edge)| {
-                if edge.front() == edge0.front() {
-                    Some((i, j))
-                } else {
-                    None
-                }
-            })
-        });
+        normal: impl Fn(P) -> Option<Vector3>,
+    ) -> Option<[Option<(usize, usize)>; 2]>
+    where
+        P: std::ops::Sub<P, Output = Vector3>,
+        C: BoundedCurve<Point = P, Vector = Vector3>,
+    {
+        let direction = |edge: &Edge<P, C>| {
+            let curve = edge.curve();
+            let (a, b) = curve.range_tuple();
+            let t = if edge.orientation() {
+                a + (b - a) * 1.0e-4
+            } else {
+                b - (b - a) * 1.0e-4
+            };
+            curve.subs(t) - edge.front().point()
+        };
+        let position = |incoming: &Edge<P, C>| {
+            let candidates: Vec<_> = self
+                .iter()
+                .enumerate()
+                .flat_map(|(i, wire)| {
+                    wire.iter().enumerate().filter_map(move |(j, edge)| {
+                        (edge.front() == incoming.back()).then_some((i, j))
+                    })
+                })
+                .collect();
+            if candidates.len() < 2 {
+                return Some(candidates.first().copied());
+            }
+            // Follow the next clockwise ray from the incoming edge's reverse. This
+            // selects the face sector even when earlier cuts repeat the vertex.
+            let reverse = direction(&incoming.inverse());
+            let n = normal(incoming.back().point())?;
+            Some(candidates.into_iter().min_by(|&(i, j), &(k, l)| {
+                let angle = |d: Vector3| {
+                    (-n.dot(reverse.cross(d)))
+                        .atan2(reverse.dot(d))
+                        .rem_euclid(std::f64::consts::TAU)
+                };
+                angle(direction(&self[i][j])).total_cmp(&angle(direction(&self[k][l])))
+            }))
+        };
+        let a = position(&edge0)?;
+        let b = position(&edge0.inverse())?;
+        self.add_edge_at(edge0, status, [a, b]);
+        Some([a, b])
+    }
+
+    fn add_edge_at(
+        &mut self,
+        edge0: Edge<P, C>,
+        status: ShapesOpStatus,
+        [a, b]: [Option<(usize, usize)>; 2],
+    ) {
         if let Some((wire_index0, edge_index0)) = a {
             self[wire_index0].rotate_left(edge_index0);
             self[wire_index0].push_front(edge0.clone());
@@ -302,7 +337,6 @@ impl<P: Copy, C: Clone> Loops<P, C> {
             )),
             _ => {}
         }
-        [a, b]
     }
 }
 
@@ -333,8 +367,20 @@ impl<P: Copy + Tolerance, C: Clone> LoopsStore<P, C> {
     where
         C: Cut<Point = P> + SearchParameter<D1, Point = P>,
     {
-        let pt = v.point();
-        let (wire_index, edge_index, kind) = self[loops_index].search_parameter(pt)?;
+        let position = self[loops_index].search_parameter(v.point())?;
+        self.add_polygon_vertex_at(loops_index, v, position, emap)
+    }
+
+    fn add_polygon_vertex_at(
+        &mut self,
+        loops_index: usize,
+        v: &Vertex<P>,
+        (wire_index, edge_index, kind): (usize, usize, ParameterKind),
+        emap: &mut HashMap<EdgeID<C>, Edge<P, C>>,
+    ) -> Option<(usize, usize, ParameterKind)>
+    where
+        C: Cut<Point = P> + SearchParameter<D1, Point = P>,
+    {
         match kind {
             ParameterKind::Front => {
                 let old_vertex = self[loops_index][wire_index][edge_index]
@@ -547,6 +593,27 @@ where
                     &polygon1,
                 )?
                 .into_iter()
+                .flat_map(|(mut polyline, mut curve)| {
+                    let mut pieces = Vec::new();
+                    {
+                        let on_boundary = |point| {
+                            [&poly_shell0[face_index0], &poly_shell1[face_index1]]
+                                .into_iter()
+                                .flat_map(|face| face.absolute_boundaries().iter())
+                                .flat_map(|wire| wire.iter())
+                                .any(|edge| edge.curve().search_parameter(point, None, 1).is_some())
+                        };
+                        let cuts: Vec<_> = (1..polyline.len() - 1)
+                            .filter(|&i| on_boundary(polyline[i]))
+                            .collect();
+                        for i in cuts.into_iter().rev() {
+                            pieces.push((polyline.cut(i as f64), curve.cut(i as f64)));
+                        }
+                    }
+                    pieces.push((polyline, curve));
+                    pieces.reverse();
+                    pieces
+                })
                 .filter(|(polyline, _)| {
                     !runs_along_boundary(polyline, &poly_shell0[face_index0])
                         && !runs_along_boundary(polyline, &poly_shell1[face_index1])
@@ -576,68 +643,53 @@ where
                         let pv1 = Vertex::new(polyline.back());
                         let gv0 = Vertex::new(polyline.front());
                         let gv1 = Vertex::new(polyline.back());
-                        let mut pemap0 = HashMap::default();
-                        let mut pemap1 = HashMap::default();
-                        let mut gemap0 = HashMap::default();
-                        let mut gemap1 = HashMap::default();
-                        let idx00 =
-                            poly_loops_store0.add_polygon_vertex(face_index0, &pv0, &mut pemap0);
-                        if let Some((wire_index, edge_index, kind)) = idx00 {
-                            geom_loops_store0.add_geom_vertex(
-                                (face_index0, wire_index, edge_index),
-                                &gv0,
-                                kind,
-                                |curve| projected_parameter(curve, &surface1, &gv0),
-                                &mut gemap0,
+                        for (pv, gv) in [(&pv0, &gv0), (&pv1, &gv1)] {
+                            let mut pemap = HashMap::default();
+                            let mut gemap = HashMap::default();
+                            insert_intersection_vertex(
+                                &mut poly_loops_store0,
+                                &mut geom_loops_store0,
+                                face_index0,
+                                pv,
+                                gv,
+                                &surface1,
+                                &mut pemap,
+                                &mut gemap,
                             )?;
-                            let polyline = intersection_curve.leader_mut();
-                            *polyline.first_mut().unwrap() = gv0.point();
-                        }
-                        let idx01 =
-                            poly_loops_store0.add_polygon_vertex(face_index0, &pv1, &mut pemap1);
-                        if let Some((wire_index, edge_index, kind)) = idx01 {
-                            geom_loops_store0.add_geom_vertex(
-                                (face_index0, wire_index, edge_index),
-                                &gv1,
-                                kind,
-                                |curve| projected_parameter(curve, &surface1, &gv1),
-                                &mut gemap1,
+                            insert_intersection_vertex(
+                                &mut poly_loops_store1,
+                                &mut geom_loops_store1,
+                                face_index1,
+                                pv,
+                                gv,
+                                &surface0,
+                                &mut pemap,
+                                &mut gemap,
                             )?;
-                            let polyline = intersection_curve.leader_mut();
-                            *polyline.last_mut().unwrap() = gv1.point();
                         }
-                        let idx10 =
-                            poly_loops_store1.add_polygon_vertex(face_index1, &pv0, &mut pemap0);
-                        if let Some((wire_index, edge_index, kind)) = idx10 {
-                            geom_loops_store1.add_geom_vertex(
-                                (face_index1, wire_index, edge_index),
-                                &gv0,
-                                kind,
-                                |curve| projected_parameter(curve, &surface0, &gv0),
-                                &mut gemap0,
-                            )?;
-                            let polyline = intersection_curve.leader_mut();
-                            *polyline.first_mut().unwrap() = gv0.point();
-                        }
-                        let idx11 =
-                            poly_loops_store1.add_polygon_vertex(face_index1, &pv1, &mut pemap1);
-                        if let Some((wire_index, edge_index, kind)) = idx11 {
-                            geom_loops_store1.add_geom_vertex(
-                                (face_index1, wire_index, edge_index),
-                                &gv1,
-                                kind,
-                                |curve| projected_parameter(curve, &surface0, &gv1),
-                                &mut gemap1,
-                            )?;
-                            let polyline = intersection_curve.leader_mut();
-                            *polyline.last_mut().unwrap() = gv1.point();
-                        }
+                        *intersection_curve.leader_mut().first_mut().unwrap() = gv0.point();
+                        *intersection_curve.leader_mut().last_mut().unwrap() = gv1.point();
+                        let mut polyline = polyline;
+                        *polyline.first_mut().unwrap() = pv0.point();
+                        *polyline.last_mut().unwrap() = pv1.point();
                         let pedge = Edge::new(&pv0, &pv1, polyline);
                         let gedge = Edge::new(&gv0, &gv1, intersection_curve.into());
-                        poly_loops_store0[face_index0].add_edge(pedge.clone(), status0);
-                        geom_loops_store0[face_index0].add_edge(gedge.clone(), status0);
-                        poly_loops_store1[face_index1].add_edge(pedge, status1);
-                        geom_loops_store1[face_index1].add_edge(gedge, status1);
+                        let positions = poly_loops_store0[face_index0].add_edge(
+                            pedge.clone(),
+                            status0,
+                            normal_at(&surface0),
+                        )?;
+                        geom_loops_store0[face_index0].add_edge_at(
+                            gedge.clone(),
+                            status0,
+                            positions,
+                        );
+                        let positions = poly_loops_store1[face_index1].add_edge(
+                            pedge,
+                            status1,
+                            normal_at(&surface1),
+                        )?;
+                        geom_loops_store1[face_index1].add_edge_at(gedge, status1, positions);
                     }
                     Some(())
                 })
@@ -688,4 +740,56 @@ fn distance_to_segment(p: Point3, a: Point3, b: Point3) -> f64 {
     let ab = b - a;
     let t = (p - a).dot(ab) / ab.magnitude2().max(TOLERANCE2);
     p.distance(a + ab * t.clamp(0.0, 1.0))
+}
+
+fn normal_at<S>(surface: &S) -> impl Fn(Point3) -> Option<Vector3> + '_
+where S: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3> {
+    move |p| {
+        let (u, v) = surface.search_nearest_parameter(p, None, 100)?;
+        let normal = surface.normal(u, v);
+        (normal.magnitude2().is_finite() && normal.magnitude2() > 0.0).then(|| normal.normalize())
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+fn insert_intersection_vertex<C, S>(
+    poly: &mut LoopsStore<Point3, PolylineCurve>,
+    geom: &mut LoopsStore<Point3, C>,
+    index: usize,
+    pv: &Vertex<Point3>,
+    gv: &Vertex<Point3>,
+    other: &S,
+    pemap: &mut HashMap<EdgeID<PolylineCurve>, Edge<Point3, PolylineCurve>>,
+    gemap: &mut HashMap<EdgeID<C>, Edge<Point3, C>>,
+) -> Option<()>
+where
+    C: Cut<Point = Point3, Vector = Vector3> + SearchNearestParameter<D1, Point = Point3>,
+    S: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>,
+{
+    let Some((w, e, mut kind)) = poly[index].search_parameter(pv.point()) else {
+        return Some(());
+    };
+    let mut parameter = None;
+    if matches!(kind, ParameterKind::Inner(_)) {
+        let curve = geom[index][w][e].curve();
+        let t = projected_parameter(&curve, other, gv)?;
+        parameter = Some(t);
+        let geometric_kind = ParameterKind::try_new(t, curve.range_tuple())?;
+        match geometric_kind {
+            ParameterKind::Front => pv.set_point(poly[index][w][e].absolute_front().point()),
+            ParameterKind::Back => pv.set_point(poly[index][w][e].absolute_back().point()),
+            ParameterKind::Inner(_) => {}
+        }
+        if !matches!(geometric_kind, ParameterKind::Inner(_)) {
+            kind = geometric_kind;
+        }
+    }
+    poly.add_polygon_vertex_at(index, pv, (w, e, kind), pemap)?;
+    geom.add_geom_vertex(
+        (index, w, e),
+        gv,
+        kind,
+        |curve| parameter.or_else(|| projected_parameter(curve, other, gv)),
+        gemap,
+    )
 }
