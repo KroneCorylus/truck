@@ -4,6 +4,7 @@ The version is of the bottom crate `truck-rendimpl`.
 
 ## Unreleased
 
+- Add `truck-hlr`: hidden-line projection of a solid onto a plane, its edges as `truck-drafting` curves split at their crossings and classified visible or hidden.
 - Add `local::thicken` to `truck-shapeops`: a planar shell made into a slab of a thickness.
 - Add `local::shell` to `truck-shapeops`: a convex-edged solid hollowed inward to walls of a thickness, with chosen faces opened.
 - Let `local::move_faces` in `truck-shapeops` re-intersect the moved surfaces when the faces cannot move rigidly, and add `local::offset_faces`.
