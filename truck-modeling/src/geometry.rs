@@ -96,7 +96,12 @@ impl ToSameGeometry<Curve> for BSplineCurve<Point3> {
 impl Curve {
     /// Into non-ratinalized 4-dimensional B-spline curve
     pub fn lift_up(&self) -> BSplineCurve<Vector4> {
-        match self {
+        self.try_lift_up()
+            .expect("intersection curve cannot connect by homotopy")
+    }
+    /// The non-rationalized 4-dimensional B-spline form, `None` for an intersection curve.
+    pub fn try_lift_up(&self) -> Option<BSplineCurve<Vector4>> {
+        Some(match self {
             Curve::Line(curve) => Curve::BSplineCurve((*curve).into()).lift_up(),
             Curve::BSplineCurve(curve) => BSplineCurve::new(
                 curve.knot_vec().clone(),
@@ -108,11 +113,27 @@ impl Curve {
             ),
             Curve::NurbsCurve(curve) => curve.non_rationalized().clone(),
             Curve::Conic(curve) => conic_to_nurbs(curve).into_non_rationalized(),
-            Curve::IntersectionCurve(_) => {
-                unimplemented!("intersection curve cannot connect by homotopy")
-            }
-        }
+            Curve::IntersectionCurve(_) => return None,
+        })
     }
+}
+
+impl TryFrom<&Curve> for NurbsCurve<Vector4> {
+    type Error = errors::Error;
+    fn try_from(curve: &Curve) -> Result<Self> {
+        curve
+            .try_lift_up()
+            .map(NurbsCurve::new)
+            .ok_or(errors::Error::NoNurbsForm)
+    }
+}
+
+impl ToSameGeometry<Curve> for NurbsCurve<Vector4> {
+    fn to_same_geometry(&self) -> Curve { Curve::NurbsCurve(self.clone()) }
+}
+
+impl ToSameGeometry<Surface> for NurbsSurface<Vector4> {
+    fn to_same_geometry(&self) -> Surface { Surface::NurbsSurface(self.clone()) }
 }
 
 /// 3-dimensional surfaces

@@ -12,6 +12,7 @@ type Edge<C> = truck_topology::Edge<Point3, C>;
 type Wire<C> = truck_topology::Wire<Point3, C>;
 type Face<C, S> = truck_topology::Face<Point3, C, S>;
 type Shell<C, S> = truck_topology::Shell<Point3, C, S>;
+type Solid<C, S> = truck_topology::Solid<Point3, C, S>;
 
 /// Creates and returns a vertex by a three dimensional point.
 /// # Examples
@@ -765,6 +766,301 @@ where
         }
     }
     shell
+}
+
+/// Skins a smooth surface through `sections`, one face per matched edge.
+///
+/// The sections are given aligned: edge `i` of each wire matches edge `i` of the next, in the same
+/// direction; [`align_sections`] does this for wires that are not. Every section must be
+/// continuous, and all of them closed or all of them open. The surface through edge run `i` is a
+/// NURBS surface whose iso-curves at the section parameters are the section curves themselves, and
+/// which is one cubic B-spline across the sections (of degree `N - 1` for fewer than four), so the
+/// loft is tangent continuous across interior sections. The rails between corresponding vertices
+/// are edges shared by neighbouring faces. Sections wound counterclockwise about the direction of
+/// the loft give outward faces.
+///
+/// The faces come in edge order. Nothing is fitted: lines, conics and B-splines keep their exact
+/// form, though a conic is parameterised on its face by its rational quadratic form, not by angle.
+/// # Failures
+/// - [`Error::TooFewLoftSections`] for fewer than two sections
+/// - [`Error::LoftSectionsMismatch`] naming a section with a different number of edges from the first
+/// - [`Error::LoftSectionsCoincide`] when the first and last sections are the same wire, or two
+///   consecutive sections lie on each other
+/// - [`Error::NoNurbsForm`] when a section curve is an intersection curve, or has different weights
+///   at its ends
+/// - a topological error when a section is not continuous
+/// # Examples
+/// ```
+/// use truck_modeling::*;
+/// let square: Wire = {
+///     let v: Vec<Vertex> = [(1.0, -1.0), (1.0, 1.0), (-1.0, 1.0), (-1.0, -1.0)]
+///         .iter()
+///         .map(|&(x, y)| builder::vertex(Point3::new(x, y, 0.0)))
+///         .collect();
+///     (0..4).map(|i| builder::line(&v[i], &v[(i + 1) % 4])).collect()
+/// };
+/// let circle: Wire = {
+///     let center = Point3::new(0.0, 0.0, 2.0);
+///     let vertex = builder::vertex(center + Vector3::unit_x());
+///     builder::rsweep(&vertex, center, Vector3::unit_z(), Rad(7.0), 4)
+/// };
+/// let sections = builder::align_sections(&[square, circle]);
+/// let shell: Shell = builder::try_loft_shell(&sections).unwrap();
+/// assert_eq!(shell.len(), 4);
+/// let solid: Solid = builder::try_loft(&sections).unwrap();
+/// assert_eq!(solid.boundaries()[0].len(), 6);
+/// ```
+pub fn try_loft_shell<C, S>(sections: &[Wire<C>]) -> Result<Shell<C, S>>
+where
+    C: Invertible,
+    for<'a> NurbsCurve<Vector4>: TryFrom<&'a C, Error = Error>,
+    NurbsCurve<Vector4>: ToSameGeometry<C>,
+    NurbsSurface<Vector4>: ToSameGeometry<S>, {
+    let (Some(first), Some(last)) = (sections.first(), sections.last()) else {
+        return Err(Error::TooFewLoftSections);
+    };
+    if sections.len() < 2 {
+        return Err(Error::TooFewLoftSections);
+    }
+    let n = first.len();
+    if let Some(j) = sections.iter().position(|wire| wire.len() != n) {
+        return Err(Error::LoftSectionsMismatch(0, j));
+    }
+    if n == 0 {
+        return Err(errors::Error::EmptyWire.into());
+    }
+    if first == last {
+        return Err(Error::LoftSectionsCoincide(0, sections.len() - 1));
+    }
+    let closed = sections.iter().all(Wire::is_closed);
+    let nv = if closed { n } else { n + 1 };
+    let vertex = |wire: &Wire<C>, i: usize| -> Vertex {
+        match i < n {
+            true => wire[i].front().clone(),
+            false => wire[n - 1].back().clone(),
+        }
+    };
+
+    let runs = (0..n)
+        .map(|i| {
+            sections
+                .iter()
+                .map(|wire| unit_end_weights(NurbsCurve::try_from(&wire[i].oriented_curve())?))
+                .collect()
+        })
+        .collect::<Result<Vec<_>>>()?;
+    let rail_points: Vec<Vec<Point3>> = (0..nv)
+        .map(|i| {
+            sections
+                .iter()
+                .map(|wire| vertex(wire, i).point())
+                .collect()
+        })
+        .collect();
+    let (surfaces, rail_curves) = skin(runs, &rail_points)?;
+
+    let rails: Vec<Edge<C>> = rail_curves
+        .into_iter()
+        .enumerate()
+        .map(|(i, curve)| {
+            Edge::new(
+                &vertex(first, i),
+                &vertex(last, i),
+                curve.to_same_geometry(),
+            )
+        })
+        .collect();
+    surfaces
+        .into_iter()
+        .enumerate()
+        .map(|(i, surface)| {
+            let wire = wire![
+                first[i].clone(),
+                rails[(i + 1) % nv].clone(),
+                last[i].inverse(),
+                rails[i].inverse(),
+            ];
+            Ok(Face::try_new(vec![wire], surface.to_same_geometry())?)
+        })
+        .collect()
+}
+
+/// [`try_loft_shell`] closed with planar caps on the first and last sections.
+/// # Failures
+/// Those of [`try_loft_shell`] and [`try_attach_plane`], and a topological error when the shell
+/// is not closed.
+pub fn try_loft<C, S>(sections: &[Wire<C>]) -> Result<Solid<C, S>>
+where
+    C: Invertible + ParametricCurve3D + BoundedCurve,
+    for<'a> NurbsCurve<Vector4>: TryFrom<&'a C, Error = Error>,
+    NurbsCurve<Vector4>: ToSameGeometry<C>,
+    NurbsSurface<Vector4>: ToSameGeometry<S>,
+    Plane: IncludeCurve<C> + ToSameGeometry<S>, {
+    let mut shell = try_loft_shell(sections)?;
+    let (first, last) = (&sections[0], &sections[sections.len() - 1]);
+    shell.push(try_attach_plane(vec![first.inverse()])?);
+    shell.push(try_attach_plane(vec![last.clone()])?);
+    Ok(Solid::try_new(vec![shell])?)
+}
+
+/// Rotates and reverses each section after the first so that its vertices are, in order, nearest
+/// to those of the section before it, as [`try_loft_shell`] expects. Only closed wires are
+/// rotated. A section with a different number of edges from the one before it is left as it is.
+pub fn align_sections<C: Invertible>(sections: &[Wire<C>]) -> Vec<Wire<C>> {
+    let points = |wire: &Wire<C>| -> Vec<Point3> {
+        wire.iter()
+            .map(|edge| edge.front().point())
+            .chain(wire.back().map(|edge| edge.back().point()))
+            .collect()
+    };
+    let rotations = |wire: Wire<C>| -> Vec<Wire<C>> {
+        match wire.is_closed() {
+            true => (0..wire.len())
+                .map(|r| {
+                    wire.iter()
+                        .cycle()
+                        .skip(r)
+                        .take(wire.len())
+                        .cloned()
+                        .collect()
+                })
+                .collect(),
+            false => vec![wire],
+        }
+    };
+    let mut aligned: Vec<Wire<C>> = Vec::with_capacity(sections.len());
+    for wire in sections {
+        let candidate = match aligned.last() {
+            Some(prev) if prev.len() == wire.len() && !wire.is_empty() => {
+                let target = points(prev);
+                let distance = |wire: &Wire<C>| -> f64 {
+                    points(wire)
+                        .iter()
+                        .zip(&target)
+                        .map(|(p, q)| p.distance2(*q))
+                        .sum()
+                };
+                rotations(wire.clone())
+                    .into_iter()
+                    .chain(rotations(wire.inverse()))
+                    .min_by(|a, b| distance(a).total_cmp(&distance(b)))
+                    .unwrap()
+            }
+            _ => wire.clone(),
+        };
+        aligned.push(candidate);
+    }
+    aligned
+}
+
+/// The curve scaled so that its first weight is 1. `Err` when the last weight then differs from
+/// 1: the rails of a loft interpolate the end points with weight 1 and must lie on the faces.
+fn unit_end_weights(curve: NurbsCurve<Vector4>) -> Result<NurbsCurve<Vector4>> {
+    let (knot_vec, mut control_points) = curve.into_non_rationalized().destruct();
+    let w0 = control_points[0].w;
+    control_points.iter_mut().for_each(|p| *p /= w0);
+    if !control_points[control_points.len() - 1].w.near(&1.0) {
+        return Err(Error::NoNurbsForm);
+    }
+    Ok(NurbsCurve::new(BSplineCurve::new(knot_vec, control_points)))
+}
+
+/// Makes the curves of one run share their degree and knot vector.
+fn compatible(mut run: Vec<NurbsCurve<Vector4>>) -> Vec<NurbsCurve<Vector4>> {
+    let degree = run.iter().map(NurbsCurve::degree).max().unwrap_or(0);
+    for curve in &mut run {
+        for _ in curve.degree()..degree {
+            curve.elevate_degree();
+        }
+    }
+    // the first curve collects every knot, then hands the union back
+    for _ in 0..2 {
+        let (head, tail) = run.split_at_mut(1);
+        for curve in tail {
+            head[0].syncro_knots(curve);
+        }
+    }
+    run
+}
+
+/// Interpolates the control points of every run and the points of every rail across the sections
+/// with one cubic B-spline parameterisation: chord-length parameters averaged over all rows, knots
+/// averaged from them. Returns the surface of each run and the curve of each rail.
+#[allow(clippy::type_complexity)]
+fn skin(
+    runs: Vec<Vec<NurbsCurve<Vector4>>>,
+    rails: &[Vec<Point3>],
+) -> Result<(Vec<NurbsSurface<Vector4>>, Vec<NurbsCurve<Vector4>>)> {
+    let runs: Vec<Vec<NurbsCurve<Vector4>>> = runs.into_iter().map(compatible).collect();
+    let sections = runs[0].len();
+
+    let mut params = vec![0.0; sections];
+    let mut rows = 0;
+    for run in &runs {
+        for k in 0..run[0].non_rationalized().control_points().len() {
+            let points: Vec<Point3> = run.iter().map(|c| c.control_point(k).to_point()).collect();
+            let chords: Vec<f64> = points.windows(2).map(|w| w[0].distance(w[1])).collect();
+            let length: f64 = chords.iter().sum();
+            if length.so_small() {
+                continue;
+            }
+            let mut sum = 0.0;
+            for (j, chord) in chords.iter().enumerate() {
+                sum += chord / length;
+                params[j + 1] += sum;
+            }
+            rows += 1;
+        }
+    }
+    match rows {
+        0 => {
+            params = (0..sections)
+                .map(|j| j as f64 / (sections - 1) as f64)
+                .collect()
+        }
+        _ => params.iter_mut().for_each(|t| *t /= rows as f64),
+    }
+    if let Some(j) = (1..sections).find(|&j| params[j] - params[j - 1] <= TOLERANCE) {
+        return Err(Error::LoftSectionsCoincide(j - 1, j));
+    }
+
+    let degree = usize::min(3, sections - 1);
+    let mut knots = vec![0.0; degree + 1];
+    knots.extend(
+        (1..sections - degree).map(|j| params[j..j + degree].iter().sum::<f64>() / degree as f64),
+    );
+    knots.extend(vec![1.0; degree + 1]);
+    let knot_vec = KnotVec::from(knots);
+    let interpolate = |points: Vec<Vector4>| -> BSplineCurve<Vector4> {
+        let parameter_points: Vec<_> = params.iter().copied().zip(points).collect();
+        BSplineCurve::interpole(knot_vec.clone(), parameter_points)
+    };
+
+    let surfaces = runs
+        .iter()
+        .map(|run| {
+            let control_points: Vec<Vec<Vector4>> =
+                (0..run[0].non_rationalized().control_points().len())
+                    .map(|k| {
+                        let points = run.iter().map(|c| *c.control_point(k)).collect();
+                        interpolate(points).destruct().1
+                    })
+                    .collect();
+            let knot_u = run[0].non_rationalized().knot_vec().clone();
+            NurbsSurface::new(BSplineSurface::new(
+                (knot_u, knot_vec.clone()),
+                control_points,
+            ))
+        })
+        .collect();
+    let rail_curves = rails
+        .iter()
+        .map(|points| {
+            let points = points.iter().map(|p| p.to_vec().extend(1.0)).collect();
+            NurbsCurve::new(interpolate(points))
+        })
+        .collect();
+    Ok((surfaces, rail_curves))
 }
 
 #[cfg(test)]

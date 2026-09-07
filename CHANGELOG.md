@@ -4,6 +4,7 @@ The version is of the bottom crate `truck-rendimpl`.
 
 ## Unreleased
 
+- Add `builder::try_loft_shell`, `try_loft` and `align_sections` to `truck-modeling`: a NURBS skin through aligned sections whose iso-curves are the sections themselves.
 - Let `fillet_along_wire` in `truck-shapeops` take a radius that varies along the chain, as any `ScalarFunctionD1` of the wire parameter.
 - Report the faces, edges and vertices the STEP reader of `truck-stepio` leaves out, with the entity that caused it, instead of dropping them silently.
 - Add `Table::try_from_step` and `Table::unsupported` to `truck-stepio`, reporting why a file is not STEP, which records failed and which entity types are not implemented.
