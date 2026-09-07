@@ -1,4 +1,5 @@
 use crate::alternative::Alternative;
+use crate::profile::{self, Stage};
 
 use super::*;
 use truck_geometry::prelude::*;
@@ -173,28 +174,41 @@ fn process_one_pair_of_shells<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     tol: f64,
 ) -> Option<[Shell<Point3, C, S>; 2]> {
     nonpositive_tolerance!(tol);
+    let start = profile::now();
     let poly_shell0 = shell0.triangulation(tol);
     let poly_shell1 = shell1.triangulation(tol);
+    profile::lap(Stage::Triangulation, start);
     let altshell0: AltCurveShell<C, S> =
         shell0.mapped(|x| *x, |c| Alternative::FirstType(c.clone()), Clone::clone);
     let altshell1: AltCurveShell<C, S> =
         shell1.mapped(|x| *x, |c| Alternative::FirstType(c.clone()), Clone::clone);
+    let start = profile::now();
+    let quadruple =
+        loops_store::create_loops_stores(&altshell0, &poly_shell0, &altshell1, &poly_shell1);
+    profile::lap(Stage::LoopsStore, start);
     let loops_store::LoopsStoreQuadruple {
         geom_loops_store0: loops_store0,
         geom_loops_store1: loops_store1,
         ..
-    } = loops_store::create_loops_stores(&altshell0, &poly_shell0, &altshell1, &poly_shell1)?;
+    } = quadruple?;
+    let start = profile::now();
     let mut cls0 = divide_face::divide_faces(&altshell0, &loops_store0, tol)?;
     cls0.integrate_by_component();
     let mut cls1 = divide_face::divide_faces(&altshell1, &loops_store1, tol)?;
     cls1.integrate_by_component();
+    profile::lap(Stage::Division, start);
+    let start = profile::now();
     let [mut and0, mut or0, unknown0] = cls0.and_or_unknown();
     classify_unknown(unknown0, &poly_shell1, &mut and0, &mut or0, tol)?;
     let [mut and1, mut or1, unknown1] = cls1.and_or_unknown();
     classify_unknown(unknown1, &poly_shell0, &mut and1, &mut or1, tol)?;
+    profile::lap(Stage::Classification, start);
     and0.append(&mut and1);
     or0.append(&mut or1);
-    Some([altshell_to_shell(&and0)?, altshell_to_shell(&or0)?])
+    let start = profile::now();
+    let shells = [altshell_to_shell(&and0)?, altshell_to_shell(&or0)?];
+    profile::lap(Stage::Fitting, start);
+    Some(shells)
 }
 
 /// Intersection of two solids.

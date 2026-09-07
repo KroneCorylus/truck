@@ -38,6 +38,8 @@
 )]
 
 mod healing;
+#[doc(hidden)]
+pub mod profile;
 pub use healing::{RobustSplitClosedEdgesAndFaces, SplitClosedEdgesAndFaces};
 mod transversal;
 pub use transversal::{and, or, ShapeOpsCurve, ShapeOpsSurface};
