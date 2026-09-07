@@ -55,6 +55,7 @@ impl ToSameGeometry<Curve> for PCurve<BSplineCurve<Point2>, Surface> {
 pub enum Surface {
     Modeling(truck_modeling::Surface),
     Nurbs(NurbsSurface<Vector4>),
+    Round(Processor<Sphere, Matrix4>),
     Fillet(ApproxFilletSurface<Box<Self>, Box<Self>>),
     Processor(Processor<Box<Self>, Matrix4>),
 }
@@ -72,6 +73,7 @@ impl Invertible for Surface {
         match self {
             Self::Modeling(surface) => surface.invert(),
             Self::Nurbs(surface) => surface.invert(),
+            Self::Round(surface) => surface.invert(),
             Self::Fillet(_) => {
                 let mut processor = Processor::new(Box::new(self.clone()));
                 processor.invert();
@@ -130,4 +132,12 @@ pub fn edge_through(shell: &Shell, point: Point3) -> Edge {
                 .is_some_and(|t| t0 <= t && t <= t1 && curve.subs(t).near(&point))
         })
         .expect("no edge through the point")
+}
+
+impl ToSameGeometry<Surface> for NurbsSurface<Vector4> {
+    fn to_same_geometry(&self) -> Surface { Surface::Nurbs(self.clone()) }
+}
+
+impl ToSameGeometry<Surface> for Processor<Sphere, Matrix4> {
+    fn to_same_geometry(&self) -> Surface { Surface::Round(*self) }
 }

@@ -438,3 +438,6 @@ mod along_wire;
 pub use along_wire::fillet_along_wire;
 mod chamfer;
 pub use chamfer::{chamfer_with_side, simple_chamfer};
+
+mod edges;
+pub use edges::fillet_edges;

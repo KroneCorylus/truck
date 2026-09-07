@@ -4,6 +4,8 @@ The version is of the bottom crate `truck-rendimpl`.
 
 ## Unreleased
 
+- Add `fillet_edges` for convex planar shells, joining equal-radius straight-edge fillets with exact spherical corners where three edges meet.
+
 - Support sampled tangent-crossing boolean branches and boundary contacts: Steinmetz intersection and union, sphere-in-bore subtraction and rod-in-slot subtraction.
 
 - Reject detected second-order tangent crossings before boolean curve lifting, so the tested Steinmetz operations return `None` instead of panicking; record the four-branch loops-store limitation.

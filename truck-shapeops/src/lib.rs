@@ -26,7 +26,8 @@
 //!
 //! Fillets and chamfers can be applied to a single edge whose end vertices are each adjacent to exactly three faces.
 //! Fillets with a constant or varying radius can also be applied to a tangent-continuous chain of edges with `fillet_along_wire`,
-//! whose ends may be at vertices with any number of faces. Blending several fillets that meet at a vertex is unsupported.
+//! whose ends may be at vertices with any number of faces. `fillet_edges` blends equal-radius straight-edge
+//! chains on closed convex planar shells, with exact spherical patches at three-edge corners.
 //!
 //! ## Local Operations
 //!
@@ -69,5 +70,6 @@ pub mod local;
 /// # Current Status
 /// Fillets and chamfers can be applied to a single edge whose end vertices are each adjacent to exactly three faces.
 /// Fillets with a constant or varying radius can also be applied to a tangent-continuous chain of edges with `fillet_along_wire`,
-/// whose ends may be at vertices with any number of faces. Blending several fillets that meet at a vertex is unsupported.
+/// whose ends may be at vertices with any number of faces. `fillet_edges` adds equal-radius spherical
+/// corners where three selected edges of a closed convex planar shell meet.
 pub mod fillet;
