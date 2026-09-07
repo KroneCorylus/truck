@@ -1,6 +1,9 @@
 //! Replacing the surfaces of faces and re-intersecting them with their neighbours.
 
-use super::{intersect::domain_on, intersect_surfaces, LocalOpError};
+use super::{
+    intersect::{domain_on, project},
+    intersect_surfaces, LocalOpError,
+};
 use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};
 use std::result::Result;
 use truck_geometry::prelude::*;
@@ -208,7 +211,9 @@ pub fn replace_surfaces(
         }
     }
 
-    // an edge between two faces neither of which is replaced keeps its curve
+    // an edge between two faces neither of which is replaced keeps its curve; one between
+    // faces whose effective surfaces coincide, like the seams of a drafted boss, is not an
+    // intersection and takes its old line projected onto the new surface
     let mut new_curves: HashMap<EdgeID, Curve> = HashMap::default();
     for edge in &touched_edges {
         let across = &faces_of_edge[&edge.id()];
@@ -220,6 +225,17 @@ pub fn replace_surfaces(
             continue;
         }
         let (s0, s1) = (effective(f0), effective(f1));
+        if coincide(&s0, &s1) {
+            let Curve::Line(Line(p, q)) = edge.curve() else {
+                return Err(unsupported(replaced_at(edge)));
+            };
+            let (p, q) = (project(&s0, p), project(&s0, q));
+            let (Some(p), Some(q)) = (p, q) else {
+                return Err(unsupported(replaced_at(edge)));
+            };
+            new_curves.insert(edge.id(), Curve::Line(Line(p, q)));
+            continue;
+        }
         let domain = |i: usize, s: &Surface| domain_on(s, &faces[i], MARGIN).ok_or(unsupported(i));
         let curves = intersect_surfaces(&s0, domain(f0, &s0)?, &s1, domain(f1, &s1)?, 0.01);
         let (face, neighbour) = match new_surface.contains_key(&f0) {
@@ -247,8 +263,31 @@ pub fn replace_surfaces(
         if faces_here.len() != 3 || edges.len() != 3 {
             return Err(unsupported(replaced_at(&edges[0])));
         }
-        let (c0, c1) = (&new_curves[&edges[0].id()], &new_curves[&edges[1].id()]);
+        // the pair of new curves crossing most squarely at the old vertex: two arcs of one
+        // circle, as at the seam of a cylinder, meet in no isolated point
         let point = vertex.point();
+        let tangent = |e: &Edge| -> Option<Vector3> {
+            let curve = &new_curves[&e.id()];
+            let t = curve.search_nearest_parameter(point, None, 100)?;
+            Some(curve.der(t).normalize())
+        };
+        let tangents: Vec<Option<Vector3>> = edges.iter().map(tangent).collect();
+        let mut best = None;
+        for i in 0..edges.len() {
+            for j in i + 1..edges.len() {
+                if let (Some(a), Some(b)) = (tangents[i], tangents[j]) {
+                    let crossing = a.cross(b).magnitude();
+                    if best.is_none_or(|(_, _, c)| crossing > c) {
+                        best = Some((i, j, crossing));
+                    }
+                }
+            }
+        }
+        let Some((i, j, _)) = best else {
+            return Err(unsupported(replaced_at(&edges[0])));
+        };
+        let (e0, e1) = (&edges[i], &edges[j]);
+        let (c0, c1) = (&new_curves[&e0.id()], &new_curves[&e1.id()]);
         let hint = (
             c0.search_nearest_parameter(point, None, 100),
             c1.search_nearest_parameter(point, None, 100),
@@ -260,8 +299,8 @@ pub fn replace_surfaces(
             _ => None,
         };
         let Some((t0, _)) = met.filter(|&(t0, t1)| c0.subs(t0).near(&c1.subs(t1))) else {
-            let across = &faces_of_edge[&edges[1].id()];
-            let face = replaced_at(&edges[0]);
+            let across = &faces_of_edge[&e1.id()];
+            let face = replaced_at(e0);
             let neighbour = across
                 .iter()
                 .copied()
@@ -272,7 +311,13 @@ pub fn replace_surfaces(
                 neighbour: faces[neighbour].id(),
             });
         };
-        new_vertices.insert(vertex.id(), Vertex::new(c0.subs(t0)));
+        // a vertex that does not move stays the same object, bit for bit
+        let point = c0.subs(t0);
+        let new = match point.near(&vertex.point()) {
+            true => vertex.clone(),
+            false => Vertex::new(point),
+        };
+        new_vertices.insert(vertex.id(), new);
     }
 
     let new_edges: HashMap<EdgeID, Option<Edge>> = touched_edges
@@ -337,4 +382,49 @@ fn trimmed(curve: &Curve, front: Point3, back: Point3) -> Option<Curve> {
     let mut tail = curve.cut(t0);
     tail.cut(t1);
     Some(tail)
+}
+
+/// Whether two surfaces are the same plane, cylinder or cone.
+fn coincide(a: &Surface, b: &Surface) -> bool {
+    use Elementary::*;
+    let (Some((a, _)), Some((b, _))) = (a.elementary(), b.elementary()) else {
+        return false;
+    };
+    match (a, b) {
+        (Plane(p), Plane(q)) => {
+            p.normal().cross(q.normal()).so_small()
+                && (q.subs(0.0, 0.0) - p.subs(0.0, 0.0))
+                    .dot(p.normal())
+                    .so_small()
+        }
+        (
+            Cylinder {
+                origin: o0,
+                axis: a0,
+                radius: r0,
+            },
+            Cylinder {
+                origin: o1,
+                axis: a1,
+                radius: r1,
+            },
+        ) => {
+            a0.cross(a1).so_small()
+                && r0.near(&r1)
+                && super::intersect::radial(o1, o0, a0).so_small()
+        }
+        (
+            Cone {
+                apex: p0,
+                axis: a0,
+                half_angle: h0,
+            },
+            Cone {
+                apex: p1,
+                axis: a1,
+                half_angle: h1,
+            },
+        ) => p0.near(&p1) && (a0 - a1).so_small() && h0.0.near(&h1.0),
+        _ => false,
+    }
 }

@@ -33,6 +33,7 @@
 //! `local::replace_surfaces` gives faces new surfaces and re-intersects them with their neighbours: planes, cylinders and cones.
 //! `local::delete_face` removes a four-edged face between planes, such as the fillet or chamfer of one edge, and
 //! restores the sharp edge.
+//! `local::draft` tilts planar and cylindrical faces about a neutral plane, cylinders becoming cones.
 
 #![cfg_attr(not(debug_assertions), deny(warnings))]
 #![deny(clippy::all, rust_2018_idioms)]

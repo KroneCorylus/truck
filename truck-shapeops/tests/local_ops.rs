@@ -9,8 +9,8 @@ use common::{
 };
 use std::f64::consts::PI;
 use truck_geometry::prelude::*;
-use truck_modeling::{builder, FaceID};
-use truck_shapeops::local::{delete_face, move_faces, replace_surfaces, LocalOpError};
+use truck_modeling::{builder, Elementary, FaceID, Rad};
+use truck_shapeops::local::{delete_face, draft, move_faces, replace_surfaces, LocalOpError};
 
 type MWire = truck_modeling::Wire;
 type MSolid = truck_modeling::Solid;
@@ -356,4 +356,121 @@ fn polygon_at(points: &[(f64, f64)], z: f64) -> MWire {
     (0..v.len())
         .map(|i| builder::line(&v[i], &v[(i + 1) % v.len()]))
         .collect()
+}
+
+fn side_faces(solid: &MSolid, pull: Vector3) -> Vec<FaceID> {
+    solid
+        .face_iter()
+        .filter(|face| {
+            let surface = face.oriented_surface();
+            let (u, v) = surface.try_range_tuple();
+            let mid = |r: Option<(f64, f64)>| r.map_or(0.0, |(a, b)| (a + b) / 2.0);
+            surface.normal(mid(u), mid(v)).dot(pull).abs() < 0.5
+        })
+        .map(|face| face.id())
+        .collect()
+}
+
+fn bottom_plane() -> Plane {
+    Plane::new(
+        Point3::origin(),
+        Point3::new(1.0, 0.0, 0.0),
+        Point3::new(0.0, 1.0, 0.0),
+    )
+}
+
+/// The four sides of a box drafted about its bottom: a frustum of a pyramid whose side normals
+/// lean away from the pull by the angle, with the bottom untouched bit for bit.
+#[test]
+fn box_sides_drafted() {
+    let (a, b, c, tan): (f64, f64, f64, f64) = (2.0, 3.0, 1.0, 0.25);
+    let angle = Rad(tan.atan());
+    let solid = abc_box(a, b, c);
+    let sides = side_faces(&solid, Vector3::unit_z());
+    assert_eq!(sides.len(), 4);
+    let drafted = draft(&solid, &sides, &bottom_plane(), Vector3::unit_z(), angle).unwrap();
+    let harness = from_modeling(&drafted);
+    assert_counts(&harness, 8, 12, 6);
+    let volume = a * b * c + (a + b) * tan * c * c + 4.0 * tan * tan * c * c * c / 3.0;
+    assert_solid(&harness, volume, &[0], TOL);
+    for face in drafted.face_iter().filter(|f| sides.contains(&f.id())) {
+        let normal = face.oriented_surface().normal(0.0, 0.0);
+        assert!((normal.z + angle.0.sin()).abs() < 1e-12, "{normal:?}");
+    }
+    let old: Vec<Point3> = solid
+        .vertex_iter()
+        .map(|v| v.point())
+        .filter(|p| p.z == 0.0)
+        .collect();
+    let new: Vec<Point3> = drafted
+        .vertex_iter()
+        .map(|v| v.point())
+        .filter(|p| p.z == 0.0)
+        .collect();
+    assert!(
+        !old.is_empty() && old.iter().all(|p| new.contains(p)),
+        "{new:?}"
+    );
+}
+
+#[test]
+fn two_opposite_sides_drafted() {
+    let (a, b, c, tan): (f64, f64, f64, f64) = (2.0, 3.0, 1.0, 0.25);
+    let solid = abc_box(a, b, c);
+    let sides = [
+        face_id_at(&solid, Point3::new(0.0, b / 2.0, c / 2.0)),
+        face_id_at(&solid, Point3::new(a, b / 2.0, c / 2.0)),
+    ];
+    let drafted = draft(
+        &solid,
+        &sides,
+        &bottom_plane(),
+        Vector3::unit_z(),
+        Rad(tan.atan()),
+    )
+    .unwrap();
+    assert_solid(
+        &from_modeling(&drafted),
+        a * b * c + b * tan * c * c,
+        &[0],
+        TOL,
+    );
+}
+
+/// A cylindrical boss drafted about its base is the frustum of a cone.
+#[test]
+fn cylindrical_boss_drafted_to_a_cone() {
+    let (r, h, tan): (f64, f64, f64) = (1.0, 2.0, 0.25);
+    let solid = cylinder(Point3::origin(), Vector3::unit_z(), r, h);
+    let sides = side_faces(&solid, Vector3::unit_z());
+    assert_eq!(sides.len(), 2);
+    let drafted = draft(
+        &solid,
+        &sides,
+        &bottom_plane(),
+        Vector3::unit_z(),
+        Rad(tan.atan()),
+    )
+    .unwrap();
+    for face in drafted.face_iter().filter(|f| sides.contains(&f.id())) {
+        assert!(matches!(
+            face.surface().elementary(),
+            Some((Elementary::Cone { .. }, _))
+        ));
+    }
+    let harness = from_modeling(&drafted);
+    assert_counts(&harness, 4, 6, 4);
+    let volume = PI * (r * r * h + r * tan * h * h + tan * tan * h * h * h / 3.0);
+    assert_solid(&harness, volume, &[0], TOL);
+}
+
+#[test]
+fn undraftable_face_is_rejected() {
+    let solid = abc_box(2.0, 3.0, 1.0);
+    let top = face_id_at(&solid, Point3::new(1.0, 1.5, 1.0));
+    let err = draft(&solid, &[top], &bottom_plane(), Vector3::unit_z(), Rad(0.2)).unwrap_err();
+    assert!(
+        matches!(err, LocalOpError::Unsupported { face } if face == top),
+        "{err}"
+    );
 }

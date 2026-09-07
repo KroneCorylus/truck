@@ -17,33 +17,85 @@ pub fn parameter_domain(face: &Face, margin: f64) -> Option<Domain> {
     domain_on(&face.surface(), face, margin)
 }
 
-/// The parameter rectangle of `face` on `surface`, as [`parameter_domain`] with the loops
-/// projected onto `surface`.
+/// The parameter rectangle of `face` on `surface`, as [`parameter_domain`]. An angular side is
+/// measured geometrically along the loops and unwrapped, since a revolved surface's own range
+/// is a full turn whatever the face covers and the nearest-parameter search of a periodic
+/// surface is not to be trusted with the turn; a side the surface bounds is that bound; only
+/// what is left is found by projecting the loops.
 pub(super) fn domain_on(surface: &Surface, face: &Face, margin: f64) -> Option<Domain> {
-    let (mut u, mut v) = ((f64::MAX, f64::MIN), (f64::MAX, f64::MIN));
-    let mut hint = None;
-    for edge in face.edge_iter() {
-        let curve = edge.curve();
-        let (t0, t1) = curve.range_tuple();
-        for i in 0..16 {
-            let p = curve.subs(t0 + (t1 - t0) * i as f64 / 16.0);
-            let (a, b) = surface.search_nearest_parameter(p, hint, 100)?;
-            hint = Some((a, b));
-            u = (u.0.min(a), u.1.max(a));
-            v = (v.0.min(b), v.1.max(b));
+    let angular = angular(surface);
+    let own = surface.try_range_tuple();
+    let mut range: [Option<(f64, f64)>; 2] = [None, None];
+    for (side, own) in [own.0, own.1].into_iter().enumerate() {
+        range[side] = match angular == Some(side) {
+            true => angular_range(surface, face).or(own),
+            false => own,
+        };
+    }
+    if range.iter().any(Option::is_none) {
+        let mut projected = [(f64::MAX, f64::MIN); 2];
+        let mut hint = None;
+        for p in loop_samples(face) {
+            let (u, v) = surface.search_nearest_parameter(p, hint, 100)?;
+            hint = Some((u, v));
+            for (side, value) in [u, v].into_iter().enumerate() {
+                projected[side] = (projected[side].0.min(value), projected[side].1.max(value));
+            }
+        }
+        for side in 0..2 {
+            range[side].get_or_insert(projected[side]);
         }
     }
-    let (own_u, own_v) = surface.try_range_tuple();
-    let (u, v) = (own_u.unwrap_or(u), own_v.unwrap_or(v));
+    let [u, v] = range.map(Option::unwrap);
     let diagonal = f64::hypot(u.1 - u.0, v.1 - v.0);
     let enlarge = |side: usize, (a, b): (f64, f64)| {
         let mut extension = margin * diagonal;
-        if angular(surface) == Some(side) {
+        if angular == Some(side) {
             extension = extension.min(0.45 * (2.0 * PI - (b - a)).max(0.0));
         }
         (a - extension, b + extension)
     };
     Some((enlarge(0, u), enlarge(1, v)))
+}
+
+/// Sixteen points on every edge of `face`, in loop order and direction.
+fn loop_samples(face: &Face) -> impl Iterator<Item = Point3> + '_ {
+    face.edge_iter().flat_map(|edge| {
+        let curve = edge.oriented_curve();
+        let (t0, t1) = curve.range_tuple();
+        (0..16).map(move |i| curve.subs(t0 + (t1 - t0) * i as f64 / 16.0))
+    })
+}
+
+/// The range of the angle about the axis of `surface`, a cylinder or cone, covered by the loops
+/// of `face`, measured from the surface's angular origin and unwrapped along the loops.
+fn angular_range(surface: &Surface, face: &Face) -> Option<(f64, f64)> {
+    let (origin, axis) = match surface.elementary()? {
+        (Elementary::Cylinder { origin, axis, .. }, _) => (origin, axis),
+        (Elementary::Cone { apex, axis, .. }, _) => (apex, axis),
+        _ => return None,
+    };
+    let (u0, v0) = surface.try_range_tuple();
+    let mid = |r: Option<(f64, f64)>| r.map_or(0.0, |(a, b)| (a + b) / 2.0);
+    let start = match angular(surface)? {
+        0 => surface.subs(0.0, mid(v0)),
+        _ => surface.subs(mid(u0), 0.0),
+    };
+    let x = radial(start, origin, axis).normalize();
+    let y = axis.cross(x);
+    let mut range = (f64::MAX, f64::MIN);
+    let mut last = 0.0;
+    for p in loop_samples(face) {
+        let r = radial(p, origin, axis);
+        if r.so_small() {
+            continue;
+        }
+        let mut angle = f64::atan2(y.dot(r), x.dot(r));
+        angle -= 2.0 * PI * ((angle - last) / (2.0 * PI)).round();
+        last = angle;
+        range = (range.0.min(angle), range.1.max(angle));
+    }
+    (range.0 <= range.1).then_some(range)
 }
 
 /// Which parameter of `surface` is an angle, if one is; it must not be extended past a turn.
@@ -160,9 +212,17 @@ fn exact(
             // projected to the circle
             let angle = angular(surface1)?;
             let (a0, a1) = [domain1.0, domain1.1][angle];
+            // the other parameter at the middle of the surface's own range, a point of
+            // positive radius on the surface's own nappe
+            let own = surface1.try_range_tuple();
+            let other = match angle {
+                0 => own.1,
+                _ => own.0,
+            };
+            let other = other.map_or(0.0, |(a, b)| (a + b) / 2.0);
             let at = |t: f64| match angle {
-                0 => surface1.subs(t, domain1.1 .0),
-                _ => surface1.subs(domain1.0 .0, t),
+                0 => surface1.subs(t, other),
+                _ => surface1.subs(other, t),
             };
             let start = at(a0);
             let x = radial(start, center, axis).normalize();
@@ -191,7 +251,7 @@ fn exact(
     }
 }
 
-fn radial(p: Point3, origin: Point3, axis: Vector3) -> Vector3 {
+pub(super) fn radial(p: Point3, origin: Point3, axis: Vector3) -> Vector3 {
     let r = p - origin;
     r - axis * r.dot(axis)
 }
@@ -214,4 +274,32 @@ fn clip(start: (f64, f64), direction: (f64, f64), domain: Domain) -> Option<(f64
         b = b.min(t0.max(t1));
     }
     (a < b).then_some((a, b))
+}
+
+/// The nearest point of `surface` to `p`, by the geometry of a plane, cylinder or cone.
+pub(super) fn project(surface: &Surface, p: Point3) -> Option<Point3> {
+    Some(match surface.elementary()?.0 {
+        Elementary::Plane(plane) => {
+            let (origin, normal) = (plane.subs(0.0, 0.0), plane.normal());
+            p - normal * (p - origin).dot(normal)
+        }
+        Elementary::Cylinder {
+            origin,
+            axis,
+            radius,
+        } => {
+            let r = radial(p, origin, axis);
+            p - r + r.normalize() * radius
+        }
+        Elementary::Cone {
+            apex,
+            axis,
+            half_angle,
+        } => {
+            let r = radial(p, apex, axis).normalize();
+            let generator = axis * half_angle.0.cos() + r * half_angle.0.sin();
+            apex + generator * (p - apex).dot(generator)
+        }
+        _ => return None,
+    })
 }
