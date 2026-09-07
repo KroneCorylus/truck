@@ -4,11 +4,13 @@ mod delete;
 mod draft;
 mod intersect;
 mod replace;
+mod shell;
 pub use delete::delete_face;
 pub use draft::draft;
 pub use intersect::{intersect_surfaces, parameter_domain, Domain};
 pub use replace::replace_surfaces;
 use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};
+pub use shell::shell;
 use std::{fmt, result::Result};
 use truck_geometry::prelude::*;
 use truck_meshalgo::prelude::*;
@@ -48,6 +50,15 @@ pub enum LocalOpError<S> {
         /// the face
         face: FaceID<S>,
     },
+    /// the edge between `face` and `neighbour` is concave, which an offset cannot cross yet
+    Concave {
+        /// one face at the edge
+        face: FaceID<S>,
+        /// the other
+        neighbour: FaceID<S>,
+    },
+    /// a shell or thickening asked for outward, or with no thickness
+    NotInward,
 }
 
 impl<S> fmt::Display for LocalOpError<S> {
@@ -70,6 +81,10 @@ impl<S> fmt::Display for LocalOpError<S> {
                     "the surface of {face:?} has no offset of its own kind by that distance"
                 )
             }
+            Self::Concave { face, neighbour } => {
+                write!(f, "the edge between {face:?} and {neighbour:?} is concave")
+            }
+            Self::NotInward => write!(f, "the thickness must be positive, going inward"),
         }
     }
 }

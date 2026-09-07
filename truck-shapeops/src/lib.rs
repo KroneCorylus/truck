@@ -35,6 +35,7 @@
 //! `local::delete_face` removes a four-edged face between planes, such as the fillet or chamfer of one edge, and
 //! restores the sharp edge.
 //! `local::draft` tilts planar and cylindrical faces about a neutral plane, cylinders becoming cones.
+//! `local::shell` hollows a convex-edged solid to walls of a thickness, with chosen faces opened.
 
 #![cfg_attr(not(debug_assertions), deny(warnings))]
 #![deny(clippy::all, rust_2018_idioms)]

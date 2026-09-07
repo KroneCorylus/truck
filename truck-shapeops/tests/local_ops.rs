@@ -11,7 +11,7 @@ use std::f64::consts::PI;
 use truck_geometry::prelude::*;
 use truck_modeling::{builder, Elementary, FaceID, Rad};
 use truck_shapeops::local::{
-    delete_face, draft, move_faces, offset_faces, replace_surfaces, LocalOpError,
+    delete_face, draft, move_faces, offset_faces, replace_surfaces, shell, LocalOpError,
 };
 
 type MWire = truck_modeling::Wire;
@@ -507,4 +507,84 @@ fn hole_grown_by_offset() {
         matches!(err, LocalOpError::NoOffset { face } if faces.contains(&face)),
         "{err}"
     );
+}
+
+#[test]
+fn box_shelled_with_the_top_open() {
+    let (a, b, c, t) = (2.0, 3.0, 1.0, 0.2);
+    let solid = abc_box(a, b, c);
+    let top = face_id_at(&solid, Point3::new(a / 2.0, b / 2.0, c));
+    let hollow = shell(&solid, &[top], t).unwrap();
+    let harness = from_modeling(&hollow);
+    assert_counts(&harness, 16, 24, 11);
+    let volume = a * b * c - (a - 2.0 * t) * (b - 2.0 * t) * (c - t);
+    assert_solid(&harness, volume, &[0], TOL);
+    assert_solid(&from_modeling(&solid), a * b * c, &[0], TOL);
+}
+
+#[test]
+fn cylinder_shelled_with_one_end_open() {
+    let (r, h, t) = (1.0, 2.0, 0.2);
+    let solid = cylinder(Point3::origin(), Vector3::unit_z(), r, h);
+    let top = face_id_at(&solid, Point3::new(0.0, 0.0, h));
+    let cup = shell(&solid, &[top], t).unwrap();
+    let harness = from_modeling(&cup);
+    assert_topology(&harness, &[0]);
+    assert_mesh_closed(&harness, TOL);
+    let volume = PI * (r * r * h - (r - t) * (r - t) * (h - t));
+    assert_volume(&harness, volume, TOL);
+}
+
+#[test]
+fn box_shelled_closed_has_two_shells() {
+    let (a, b, c, t) = (2.0, 3.0, 1.0, 0.2);
+    let solid = abc_box(a, b, c);
+    let hollow = shell(&solid, &[], t).unwrap();
+    let harness = from_modeling(&hollow);
+    assert_counts(&harness, 16, 24, 12);
+    let volume = a * b * c - (a - 2.0 * t) * (b - 2.0 * t) * (c - 2.0 * t);
+    assert_solid(&harness, volume, &[0, 0], TOL);
+}
+
+/// A block with a pocket has concave edges around the pocket's floor and walls.
+#[test]
+fn concave_pocket_is_rejected() {
+    let base = polygon_at(
+        &[
+            (0.0, 0.0),
+            (3.0, 0.0),
+            (3.0, 3.0),
+            (2.0, 3.0),
+            (2.0, 1.0),
+            (1.0, 1.0),
+            (1.0, 3.0),
+            (0.0, 3.0),
+        ],
+        0.0,
+    );
+    let face = builder::try_attach_plane(&[base]).unwrap();
+    let block: MSolid = builder::tsweep(&face, Vector3::unit_z());
+    let err = shell(&block, &[], 0.1).unwrap_err();
+    let LocalOpError::Concave { face, neighbour } = err else {
+        panic!("{err}");
+    };
+    let normals: Vec<Vector3> = [face, neighbour]
+        .iter()
+        .map(|id| {
+            block
+                .face_iter()
+                .find(|f| f.id() == *id)
+                .unwrap()
+                .oriented_surface()
+                .normal(0.0, 0.0)
+        })
+        .collect();
+    assert!(
+        normals[0].cross(normals[1]).magnitude() > 0.5,
+        "{normals:?}"
+    );
+    assert!(matches!(
+        shell(&block, &[], -0.1),
+        Err(LocalOpError::NotInward)
+    ));
 }
