@@ -3,7 +3,10 @@ use ruststep::{
     primitive::Logical,
     tables::PlaceHolder,
 };
-use std::{collections::HashMap, str::FromStr};
+use std::{
+    collections::{BTreeMap, HashMap},
+    str::FromStr,
+};
 use truck_stepio::r#in::*;
 
 #[test]
@@ -700,6 +703,7 @@ ENDSEC;
             (
                 999,
                 DummyHolder {
+                    name: "HOGE".to_string(),
                     record: "Record { name: \"HOGE\", parameter: List([String(\"Dummy\"), Ref(Entity(110)), Integer(3)]) }".to_string(),
                     is_simple: true,
                 }
@@ -707,6 +711,7 @@ ENDSEC;
             (
                 33,
                 DummyHolder {
+                    name: "(GEOMETRIC_REPRESENTATION_CONTEXT PARAMETRIC_REPRESENTATION_CONTEXT REPRESENTATION_CONTEXT)".to_string(),
                     record: "[Record { name: \"GEOMETRIC_REPRESENTATION_CONTEXT\", parameter: List([Integer(2)]) }, \
 Record { name: \"PARAMETRIC_REPRESENTATION_CONTEXT\", parameter: List([]) }, \
 Record { name: \"REPRESENTATION_CONTEXT\", parameter: List([String(\"2D SPACE\"), String(\"\")]) }]".to_string(),
@@ -717,4 +722,41 @@ Record { name: \"REPRESENTATION_CONTEXT\", parameter: List([String(\"2D SPACE\")
         ..Default::default()
     };
     assert_eq!(table, ans_table);
+}
+
+const HEADER: &str = "ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION(('test'), '2;1');
+FILE_NAME('test.step', '2026-09-07T00:00:00', (''), (''), '', '', '');
+FILE_SCHEMA(('AUTOMOTIVE_DESIGN'));
+ENDSEC;
+";
+
+#[test]
+fn try_from_step() {
+    assert!(matches!(
+        Table::try_from_step("not a STEP file"),
+        Err(ParseError::Syntax(_))
+    ));
+    assert!(matches!(
+        Table::try_from_step(&format!("{HEADER}END-ISO-10303-21;")),
+        Err(ParseError::NoDataSection)
+    ));
+    let step = format!(
+        "{HEADER}DATA;
+#1 = CARTESIAN_POINT('', (0.0, 0.0, 0.0));
+#2 = HOGE('', #1, 3);
+#3 = CARTESIAN_POINT('', 'x');
+#4 = ( FUGA(#1) PIYO() );
+ENDSEC;
+END-ISO-10303-21;"
+    );
+    let table = Table::try_from_step(&step).unwrap();
+    assert_eq!(table.cartesian_point.len(), 1);
+    assert_eq!(
+        table.unsupported(),
+        BTreeMap::from([("HOGE".to_string(), 1), ("(FUGA PIYO)".to_string(), 1)])
+    );
+    assert_eq!(table.errors.len(), 1);
+    assert_eq!(table.errors[0].0, 3);
 }

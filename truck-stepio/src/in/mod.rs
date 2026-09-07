@@ -11,7 +11,10 @@ use ruststep::{
 };
 use serde::{Deserialize, Serialize};
 use std::result::Result;
-use std::{collections::HashMap, f64::consts::PI};
+use std::{
+    collections::{BTreeMap, HashMap},
+    f64::consts::PI,
+};
 use truck_assembly::assy::*;
 use truck_geometry::prelude as truck;
 use truck_topology::compress::*;
@@ -103,6 +106,10 @@ pub struct Table {
 
     // dummy
     pub dummy: HashMap<u64, DummyHolder>,
+
+    /// Entities whose record could not be deserialized, with the id and the error.
+    /// They are in no other field.
+    pub errors: Vec<(u64, String)>,
 }
 
 impl Table {
@@ -352,6 +359,7 @@ impl Table {
                                     context_of_items: match &params[2] {
                                         Parameter::Ref(x) => PlaceHolder::Ref(x.clone()),
                                         _ => PlaceHolder::Owned(DummyHolder {
+                                            name: String::new(),
                                             record: format!("{:?}", params[2]),
                                             is_simple: true,
                                         }),
@@ -435,6 +443,7 @@ impl Table {
                     self.dummy.insert(
                         *id,
                         DummyHolder {
+                            name: record.name.clone(),
                             record: format!("{record:?}"),
                             is_simple: true,
                         },
@@ -710,6 +719,7 @@ impl Table {
                             self.dummy.insert(
                                 *id,
                                 DummyHolder {
+                                    name: complex_name(records),
                                     record: format!("{records:?}"),
                                     is_simple: false,
                                 },
@@ -749,6 +759,7 @@ impl Table {
                             self.dummy.insert(
                                 *id,
                                 DummyHolder {
+                                    name: complex_name(records),
                                     record: format!("{records:?}"),
                                     is_simple: false,
                                 },
@@ -759,6 +770,7 @@ impl Table {
                     self.dummy.insert(
                         *id,
                         DummyHolder {
+                            name: complex_name(records),
                             record: format!("{records:?}"),
                             is_simple: false,
                         },
@@ -772,22 +784,55 @@ impl Table {
     pub fn from_data_section(data_section: &DataSection) -> Table {
         Table::from_iter(&data_section.entities)
     }
+    /// Parses a STEP file into a table of its first `DATA` section. `Err` says why it is not one.
+    /// Records that fail to deserialize are collected in `errors`, not returned here.
+    pub fn try_from_step(step_str: &str) -> Result<Table, ParseError> {
+        let exchange = ruststep::parser::parse(step_str)?;
+        let data = exchange.data.first().ok_or(ParseError::NoDataSection)?;
+        Ok(Table::from_data_section(data))
+    }
+    /// [`try_from_step`](Self::try_from_step) with the error dropped.
     #[inline(always)]
-    pub fn from_step(step_str: &str) -> Option<Table> {
-        let exchange = ruststep::parser::parse(step_str).ok()?;
-        Some(Table::from_data_section(&exchange.data[0]))
+    pub fn from_step(step_str: &str) -> Option<Table> { Table::try_from_step(step_str).ok() }
+    /// Type names of the entities in the file that this crate does not implement, with counts.
+    /// A complex entity is named by its constituent types, as `(A B C)`.
+    pub fn unsupported(&self) -> BTreeMap<String, usize> {
+        let mut res = BTreeMap::new();
+        for dummy in self.dummy.values() {
+            *res.entry(dummy.name.clone()).or_insert(0) += 1;
+        }
+        res
     }
 }
 
 impl<'a> FromIterator<&'a EntityInstance> for Table {
     fn from_iter<I: IntoIterator<Item = &'a EntityInstance>>(iter: I) -> Table {
         let mut res = Table::default();
-        iter.into_iter().for_each(|instance| {
-            res.push_instance(instance)
-                .unwrap_or_else(|e| eprintln!("{e}"))
-        });
+        for instance in iter {
+            if let Err(e) = res.push_instance(instance) {
+                let (EntityInstance::Simple { id, .. } | EntityInstance::Complex { id, .. }) =
+                    instance;
+                res.errors.push((*id, e.to_string()));
+            }
+        }
         res
     }
+}
+
+/// Why a string is not a readable STEP file.
+#[derive(Debug, derive_more::Display, derive_more::Error, derive_more::From)]
+pub enum ParseError {
+    /// the text is not an ISO 10303-21 exchange structure
+    #[display("{_0}")]
+    Syntax(ruststep::error::Error),
+    /// the file parses but has no `DATA` section
+    #[display("the STEP file has no DATA section")]
+    NoDataSection,
+}
+
+fn complex_name(records: &[ruststep::ast::Record]) -> String {
+    let names: Vec<&str> = records.iter().map(|r| r.name.as_str()).collect();
+    format!("({})", names.join(" "))
 }
 
 /// Undefined structures are parsed into this.
@@ -796,6 +841,8 @@ impl<'a> FromIterator<&'a EntityInstance> for Table {
 #[holder(field = dummy)]
 #[holder(generate_deserialize)]
 pub struct Dummy {
+    /// the entity type; a complex entity is named by its constituent types, as `(A B C)`
+    pub name: String,
     pub record: String,
     pub is_simple: bool,
 }
@@ -2557,10 +2604,12 @@ impl EdgeCurve {
                     Some(PcurveOrSurface::Pcurve(c)) => {
                         Self::sub_parse_curve3d(&CurveAny::Pcurve(c.clone()), p, q, true)?
                     }
-                    _ => return Err(format!(
+                    _ => {
+                        return Err(format!(
                         "The {pcurve_index}-indexed associated geometry is nothing or not PCURVE."
                     )
-                    .into()),
+                        .into())
+                    }
                 }
             }
         };
