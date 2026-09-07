@@ -23,6 +23,11 @@
 //! Fillets and chamfers can be applied to a single edge whose end vertices are each adjacent to exactly three faces.
 //! Fillets with a constant or varying radius can also be applied to a tangent-continuous chain of edges with `fillet_along_wire`,
 //! whose ends may be at vertices with any number of faces. Blending several fillets that meet at a vertex is unsupported.
+//!
+//! ## Local Operations
+//!
+//! `local::move_faces` moves a group of faces rigidly, such as a hole through a plate, when their boundary stays
+//! on the neighbouring surfaces. Operations that change a face's boundary against its neighbours are unsupported.
 
 #![cfg_attr(not(debug_assertions), deny(warnings))]
 #![deny(clippy::all, rust_2018_idioms)]
@@ -44,6 +49,7 @@ pub use healing::{RobustSplitClosedEdgesAndFaces, SplitClosedEdgesAndFaces};
 mod transversal;
 pub use transversal::{and, or, ShapeOpsCurve, ShapeOpsSurface};
 mod alternative;
+pub mod local;
 
 /// Attaching fillets and chamfers
 ///
