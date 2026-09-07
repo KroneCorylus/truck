@@ -28,6 +28,8 @@
 //!
 //! `local::move_faces` moves a group of faces rigidly, such as a hole through a plate, when their boundary stays
 //! on the neighbouring surfaces. Operations that change a face's boundary against its neighbours are unsupported.
+//! `local::intersect_surfaces` gives the curves where two surfaces meet over given parameter rectangles, exact for
+//! a plane against a plane, a cylinder or a cone normal to it, and lifted from the tessellations otherwise.
 
 #![cfg_attr(not(debug_assertions), deny(warnings))]
 #![deny(clippy::all, rust_2018_idioms)]

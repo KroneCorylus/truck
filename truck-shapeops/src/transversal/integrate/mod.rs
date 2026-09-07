@@ -80,7 +80,7 @@ fn altshell_to_shell<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
 /// The final curve projects this leader onto the intersection inside the plane normal to the
 /// leader's tangent, so the leader must follow the intersection smoothly: a wiggle of the size
 /// of the tolerance makes the projected points zigzag, or the projection fail.
-fn smooth_leader<S: ShapeOpsSurface>(
+pub(crate) fn smooth_leader<S: ShapeOpsSurface>(
     ic: &IntersectionCurve<PolylineCurve<Point3>, S, S>,
 ) -> Option<BSplineCurve<Point3>> {
     let (t0, t1) = ic.range_tuple();

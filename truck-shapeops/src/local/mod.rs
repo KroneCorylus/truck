@@ -1,5 +1,7 @@
 //! Local operations: editing a solid face by face, leaving the rest untouched.
 
+mod intersect;
+pub use intersect::{intersect_surfaces, parameter_domain, Domain};
 use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};
 use std::{fmt, result::Result};
 use truck_geometry::prelude::*;

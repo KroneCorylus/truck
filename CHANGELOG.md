@@ -4,6 +4,7 @@ The version is of the bottom crate `truck-rendimpl`.
 
 ## Unreleased
 
+- Add `local::intersect_surfaces` and `parameter_domain` to `truck-shapeops`: the curves where two surfaces meet, exact for planes against planes, cylinders and cones; `truck-shapeops` now depends on `truck-modeling`.
 - Add `local::move_faces` to `truck-shapeops`, moving a group of faces such as a hole through a plate rigidly along its neighbours.
 - Follow spline path edges in `builder::sweep_along_wire` by rotation-minimising frames and a loft through the profile copies; the sweep takes the tolerance of that division.
 - Add `builder::sweep_along_wire` and `sweep_wire_along_wire` to `truck-modeling`: a profile carried along a tangent-continuous path of lines and circular arcs, exact.
