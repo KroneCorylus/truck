@@ -1064,7 +1064,7 @@ fn skin(
     Ok((surfaces, rail_curves))
 }
 
-/// A path edge as the rigid motion it gives the profile.
+/// A path edge as the motion it gives the profile.
 enum Segment {
     Line(Vector3),
     Arc {
@@ -1074,45 +1074,73 @@ enum Segment {
         /// unit vector from the axis to the start of the arc
         outward: Vector3,
     },
+    /// any other curve, followed by rotation-minimising frames at its parameter division
+    Spline(Curve),
 }
 
 impl Segment {
     /// The motion of `curve`, with its unit tangents at the start and the end.
-    fn of(curve: &Curve) -> Option<(Self, Vector3, Vector3)> {
+    fn of(curve: &Curve) -> (Self, Vector3, Vector3) {
         let (t0, t1) = curve.range_tuple();
         let (der0, der1) = (curve.der(t0), curve.der(t1));
-        let segment = match curve {
-            Curve::Line(Line(p0, p1)) => Self::Line(p1 - p0),
-            Curve::Conic(conic) => {
-                let (origin, radius, _) = geometry::round_circle(conic)?;
+        let round = match curve {
+            Curve::Conic(conic) => geometry::round_circle(conic),
+            _ => None,
+        };
+        let segment = match (curve, round) {
+            (Curve::Line(Line(p0, p1)), _) => Self::Line(p1 - p0),
+            (_, Some((origin, radius, _))) => {
                 let outward = curve.subs(t0) - origin;
-                let axis = outward.cross(der0).normalize();
                 Self::Arc {
                     origin,
-                    axis,
+                    axis: outward.cross(der0).normalize(),
                     angle: Rad((t1 - t0) * der0.magnitude() / radius),
                     outward: outward.normalize(),
                 }
             }
-            _ => return None,
+            _ => Self::Spline(curve.clone()),
         };
-        Some((segment, der0.normalize(), der1.normalize()))
+        (segment, der0.normalize(), der1.normalize())
     }
-    fn matrix(&self) -> Matrix4 {
-        match self {
-            Self::Line(vector) => Matrix4::from_translation(*vector),
-            Self::Arc {
-                origin,
-                axis,
-                angle,
-                ..
-            } => {
-                Matrix4::from_translation(origin.to_vec())
-                    * Matrix4::from_axis_angle(*axis, *angle)
-                    * Matrix4::from_translation(-origin.to_vec())
-            }
-        }
+}
+
+/// The rigid motions from the frame at the start of `curve` to its rotation-minimising frames at
+/// the parameters of its division at `tol`, the start excluded, by double reflection; and those
+/// parameters. The motions do not depend on the choice of the first frame.
+fn rotation_minimising_motions(curve: &Curve, tol: f64) -> (Vec<f64>, Vec<Matrix4>) {
+    let (params, points) = curve.parameter_division(curve.range_tuple(), tol);
+    let tangents: Vec<Vector3> = params.iter().map(|&t| curve.der(t).normalize()).collect();
+    let frame = |x: Point3, t: Vector3, r: Vector3| {
+        Matrix4::from_cols(
+            r.extend(0.0),
+            t.cross(r).extend(0.0),
+            t.extend(0.0),
+            x.to_homogeneous(),
+        )
+    };
+    let t0 = tangents[0];
+    let helper = match t0.x.abs() < 0.9 {
+        true => Vector3::unit_x(),
+        false => Vector3::unit_y(),
+    };
+    let mut r = t0.cross(helper).normalize();
+    let start_inverse = frame(points[0], t0, r).invert().unwrap();
+    let mut motions = Vec::with_capacity(params.len() - 1);
+    for i in 0..params.len() - 1 {
+        let v1 = points[i + 1] - points[i];
+        let reflect1 = |v: Vector3| v - v1 * (2.0 * v1.dot(v) / v1.dot(v1));
+        let (r_l, t_l) = (reflect1(r), reflect1(tangents[i]));
+        let v2 = tangents[i + 1] - t_l;
+        let c2 = v2.dot(v2);
+        r = match c2.so_small() {
+            true => r_l,
+            false => r_l - v2 * (2.0 * v2.dot(r_l) / c2),
+        };
+        let t = tangents[i + 1];
+        r = (r - t * t.dot(r)).normalize();
+        motions.push(frame(points[i + 1], t, r) * start_inverse);
     }
+    (params, motions)
 }
 
 /// The segments of `path` and whether it is closed.
@@ -1124,9 +1152,8 @@ fn path_segments(path: &Wire<Curve>) -> Result<(Vec<Segment>, bool)> {
     let closed = path.is_closed();
     let mut segments = Vec::with_capacity(n);
     let mut tangents = Vec::with_capacity(n);
-    for (k, edge) in path.iter().enumerate() {
-        let (segment, start, end) =
-            Segment::of(&edge.oriented_curve()).ok_or(Error::PathEdgeNotSweepable(k))?;
+    for edge in path.iter() {
+        let (segment, start, end) = Segment::of(&edge.oriented_curve());
         segments.push(segment);
         tangents.push((start, end));
     }
@@ -1151,38 +1178,73 @@ struct SweptWire {
     motion: Matrix4,
 }
 
+/// Four points on every edge of `wire`, for checks against the path.
+fn samples(wire: &Wire<Curve>) -> impl Iterator<Item = Point3> + '_ {
+    wire.iter().flat_map(|edge| {
+        let curve = edge.curve();
+        let (t0, t1) = curve.range_tuple();
+        (0..4).map(move |i| curve.subs(t0 + (t1 - t0) * i as f64 / 4.0))
+    })
+}
+
+fn moved(wire: &Wire<Curve>, matrix: Matrix4) -> Wire<Curve> {
+    wire.mapped(
+        &GeometricMapping::<Point3>::mapping(matrix),
+        &GeometricMapping::<Curve>::mapping(matrix),
+    )
+}
+
 /// Sweeps `profile` along `segments`. On a closed path the last faces connect to `profile`
 /// itself, which the motion must bring back onto it.
-fn sweep_wire(profile: &Wire<Curve>, segments: &[Segment], closed: bool) -> Result<SweptWire> {
+fn sweep_wire(
+    profile: &Wire<Curve>,
+    segments: &[Segment],
+    closed: bool,
+    tol: f64,
+) -> Result<SweptWire> {
     let mut faces = Vec::new();
     let mut wire = profile.clone();
     let mut total = Matrix4::identity();
     for (k, segment) in segments.iter().enumerate() {
-        if let Segment::Arc {
-            origin,
-            axis,
-            outward,
-            ..
-        } = segment
-        {
-            let reaches_axis = wire.iter().any(|edge| {
-                let curve = edge.curve();
-                let (t0, t1) = curve.range_tuple();
-                (0..4).any(|i| {
-                    let p = curve.subs(t0 + (t1 - t0) * i as f64 / 4.0);
-                    geometry::radial(p, *origin, *axis).dot(*outward) <= TOLERANCE
-                })
-            });
-            if reaches_axis {
-                return Err(Error::PathTooTight(k));
+        // the motion of the whole segment, and the profile at the interior frames of a spline
+        let (matrix, interior) = match segment {
+            Segment::Line(vector) => (Matrix4::from_translation(*vector), Vec::new()),
+            Segment::Arc {
+                origin,
+                axis,
+                angle,
+                outward,
+            } => {
+                let reaches_axis = samples(&wire)
+                    .any(|p| geometry::radial(p, *origin, *axis).dot(*outward) <= TOLERANCE);
+                if reaches_axis {
+                    return Err(Error::PathTooTight(k));
+                }
+                let matrix = Matrix4::from_translation(origin.to_vec())
+                    * Matrix4::from_axis_angle(*axis, *angle)
+                    * Matrix4::from_translation(-origin.to_vec());
+                (matrix, Vec::new())
             }
-        }
-        let matrix = segment.matrix();
+            Segment::Spline(curve) => {
+                let (params, motions) = rotation_minimising_motions(curve, tol);
+                let start = curve.subs(params[0]);
+                let reach = samples(&wire)
+                    .map(|p| p.distance(start))
+                    .fold(0.0, f64::max);
+                let too_tight = params.iter().any(|&t| {
+                    let (der, der2) = (curve.der(t), curve.der2(t));
+                    der.cross(der2).magnitude() * reach > der.magnitude().powi(3)
+                });
+                if too_tight {
+                    return Err(Error::PathTooTight(k));
+                }
+                let (last, interior) = motions.split_last().unwrap();
+                let interior = interior.iter().map(|&m| moved(&wire, m)).collect();
+                (*last, interior)
+            }
+        };
         total = matrix * total;
-        let moved = wire.mapped(
-            &GeometricMapping::<Point3>::mapping(matrix),
-            &GeometricMapping::<Curve>::mapping(matrix),
-        );
+        let moved = moved(&wire, matrix);
         let last = closed && k + 1 == segments.len();
         let next = match last {
             true => {
@@ -1224,6 +1286,13 @@ fn sweep_wire(profile: &Wire<Curve>, segments: &[Segment], closed: bool) -> Resu
                 }
                 .connector(),
             )),
+            Segment::Spline(_) => {
+                let mut sections = Vec::with_capacity(interior.len() + 2);
+                sections.push(wire.clone());
+                sections.extend(interior);
+                sections.push(next.clone());
+                faces.extend(try_loft_shell::<Curve, Surface>(&sections)?);
+            }
         }
         wire = next;
     }
@@ -1234,24 +1303,30 @@ fn sweep_wire(profile: &Wire<Curve>, segments: &[Segment], closed: bool) -> Resu
     })
 }
 
-/// Sweeps `profile` along `path`, carrying it rigidly: each line of the path translates it and
-/// each circular arc revolves it about the arc's axis, so lines give `Surface::Extruded` faces
-/// and arcs `Surface::RevolutedCurve` faces, all exact. The path must be a continuous chain of
-/// lines and round arcs that is tangent continuous at its vertices, and the profile is taken to
-/// sit at its start. Consecutive segments share the moved profile, so the result is one shell
-/// with one face per profile edge and path edge, in path order. A closed path closes the shell
-/// onto the profile itself, which it must bring back to where it started: planar closed paths do.
+/// Sweeps `profile` along `path`, carrying it rigidly with the path's tangent. Each line of the
+/// path translates it and each circular arc revolves it about the arc's axis, so lines give
+/// `Surface::Extruded` faces and arcs `Surface::RevolutedCurve` faces, all exact. Any other path
+/// edge is followed by rotation-minimising frames at its parameter division at `tol`, the
+/// profile is copied to each frame and [`try_loft_shell`] skins through the copies, one NURBS face
+/// per profile edge; this is the only place `tol` enters. The path must be continuous and tangent
+/// continuous at its vertices, and the profile is taken to sit at its start. Consecutive segments
+/// share the moved profile, so the result is one shell with one face per profile edge and path
+/// edge, in path order. A closed path closes the shell onto the profile itself, which it must
+/// bring back to where it started: planar closed paths do. A closed path of a single spline edge
+/// is a closed loft and rejected as such.
 /// # Failures
-/// - [`Error::PathEdgeNotSweepable`] naming a path edge that is neither a line nor a round arc
 /// - [`Error::PathNotSmooth`] naming a path vertex with a gap or a corner
-/// - [`Error::PathTooTight`] naming an arc whose axis the profile reaches
+/// - [`Error::PathTooTight`] naming an arc whose axis the profile reaches, or a spline whose
+///   radius of curvature at a division point is less than the profile's reach from the path
 /// - [`Error::ClosedPathNotPlanar`] when the profile does not return to its start
+/// - those of [`try_loft_shell`] on a spline edge
 pub fn sweep_wire_along_wire(
     profile: &Wire<Curve>,
     path: &Wire<Curve>,
+    tol: f64,
 ) -> Result<Shell<Curve, Surface>> {
     let (segments, closed) = path_segments(path)?;
-    Ok(sweep_wire(profile, &segments, closed)?
+    Ok(sweep_wire(profile, &segments, closed, tol)?
         .faces
         .into_iter()
         .collect())
@@ -1277,19 +1352,20 @@ pub fn sweep_wire_along_wire(
 ///     builder::line(&v0, &v1),
 ///     builder::circle_arc(&v1, &v2, Point3::new(1.0 + f64::sqrt(0.5), 1.0 - f64::sqrt(0.5), 0.0)),
 /// ];
-/// let pipe = builder::sweep_along_wire(&disc, &path).unwrap();
+/// let pipe = builder::sweep_along_wire(&disc, &path, 0.01).unwrap();
 /// assert_eq!(pipe.boundaries()[0].len(), 8);
 /// ```
 pub fn sweep_along_wire(
     profile: &Face<Curve, Surface>,
     path: &Wire<Curve>,
+    tol: f64,
 ) -> Result<Solid<Curve, Surface>> {
     let (segments, closed) = path_segments(path)?;
     let mut shell = Shell::new();
     let mut far = Vec::new();
     let mut total = Matrix4::identity();
     for wire in profile.boundaries() {
-        let swept = sweep_wire(&wire, &segments, closed)?;
+        let swept = sweep_wire(&wire, &segments, closed, tol)?;
         shell.extend(swept.faces);
         far.push(swept.wire);
         total = swept.motion;

@@ -40,12 +40,26 @@ fn arc(
     builder::circle_arc(v0, &v1, rotate(angle / 2.0))
 }
 
-fn volume(solid: &MSolid) -> f64 {
+fn volume(solid: &MSolid) -> f64 { volume_at(solid, TOL) }
+
+fn volume_at(solid: &MSolid, tol: f64) -> f64 {
     use truck_meshalgo::prelude::*;
     from_modeling(solid)
-        .triangulation(TOL)
+        .triangulation(tol)
         .to_polygon()
         .volume()
+}
+
+/// Square of side `side` at the origin facing `+x`, counterclockwise about `+x`.
+fn square(side: f64) -> MFace {
+    let h = side / 2.0;
+    let v: Vec<_> = [(-h, -h), (h, -h), (h, h), (-h, h)]
+        .map(|(y, z)| builder::vertex(Point3::new(0.0, y, z)))
+        .into();
+    let wire: MWire = (0..4)
+        .map(|i| builder::line(&v[i], &v[(i + 1) % 4]))
+        .collect();
+    builder::try_attach_plane(&[wire]).unwrap()
 }
 
 #[test]
@@ -55,7 +69,7 @@ fn disc_along_a_segment_matches_tsweep() {
     let v0 = builder::vertex(Point3::origin());
     let v1 = builder::vertex(Point3::new(length, 0.0, 0.0));
     let path: MWire = vec![builder::line(&v0, &v1)].into();
-    let swept = builder::sweep_along_wire(&profile, &path).unwrap();
+    let swept = builder::sweep_along_wire(&profile, &path, TOL).unwrap();
     let extruded: MSolid = builder::tsweep(&profile, Vector3::unit_x() * length);
     assert_eq!(swept.boundaries()[0].len(), extruded.boundaries()[0].len());
     assert!((volume(&swept) - volume(&extruded)).abs() < 1e-9);
@@ -79,7 +93,7 @@ fn disc_along_an_arc_matches_rsweep() {
         angle,
     )]
     .into();
-    let swept = builder::sweep_along_wire(&profile, &path).unwrap();
+    let swept = builder::sweep_along_wire(&profile, &path, TOL).unwrap();
     let revolved: MSolid =
         builder::rsweep(&profile, Point3::origin(), Vector3::unit_z(), Rad(angle), 1);
     assert_eq!(swept.boundaries()[0].len(), revolved.boundaries()[0].len());
@@ -104,7 +118,7 @@ fn disc_along_line_arc_line() {
         builder::line(bend.back(), &v3),
     ]
     .into();
-    let swept = builder::sweep_along_wire(&profile, &path).unwrap();
+    let swept = builder::sweep_along_wire(&profile, &path, TOL).unwrap();
     assert_eq!(swept.boundaries()[0].len(), 3 * 3 + 2);
     let length = 1.0 + PI / 2.0 + 2.0;
     assert_solid(
@@ -124,7 +138,7 @@ fn closed_planar_path_gives_a_torus() {
     let vertex = builder::vertex(start);
     let path: MWire = builder::rsweep(&vertex, Point3::origin(), Vector3::unit_z(), Rad(7.0), 4);
     assert!(path.is_closed());
-    let swept = builder::sweep_along_wire(&profile, &path).unwrap();
+    let swept = builder::sweep_along_wire(&profile, &path, TOL).unwrap();
     assert_eq!(swept.boundaries()[0].len(), 4 * 3);
     let pappus = 2.0 * PI * big * PI * radius * radius;
     assert_solid(&from_modeling(&swept), pappus, &[1], TOL);
@@ -138,7 +152,7 @@ fn corners_and_tight_arcs_are_rejected() {
     let v2 = builder::vertex(Point3::new(1.0, 1.0, 0.0));
     let corner: MWire = vec![builder::line(&v0, &v1), builder::line(&v1, &v2)].into();
     assert_eq!(
-        builder::sweep_along_wire(&profile, &corner).unwrap_err(),
+        builder::sweep_along_wire(&profile, &corner, TOL).unwrap_err(),
         Error::PathNotSmooth(1)
     );
     let tight: MWire = vec![arc(
@@ -149,7 +163,44 @@ fn corners_and_tight_arcs_are_rejected() {
     )]
     .into();
     assert_eq!(
-        builder::sweep_along_wire(&profile, &tight).unwrap_err(),
+        builder::sweep_along_wire(&profile, &tight, TOL).unwrap_err(),
         Error::PathTooTight(0)
+    );
+}
+
+/// A straight B-spline path, with uneven speed, moves the square by translations, and the loft
+/// through the translated copies is the prism `tsweep` gives.
+#[test]
+fn square_along_a_straight_spline_matches_tsweep() {
+    let profile = square(0.4);
+    let v0 = builder::vertex(Point3::origin());
+    let v1 = builder::vertex(Point3::new(2.0, 0.0, 0.0));
+    let inner = vec![Point3::new(0.3, 0.0, 0.0), Point3::new(1.6, 0.0, 0.0)];
+    let path: MWire = vec![builder::bezier(&v0, &v1, inner)].into();
+    let swept = builder::sweep_along_wire(&profile, &path, TOL).unwrap();
+    let extruded: MSolid = builder::tsweep(&profile, Vector3::unit_x() * 2.0);
+    assert_eq!(swept.boundaries()[0].len(), extruded.boundaries()[0].len());
+    assert!((volume(&swept) - volume(&extruded)).abs() < 1e-9);
+    assert_solid(&from_modeling(&swept), 0.16 * 2.0, &[0], TOL);
+}
+
+/// The square along a B-spline that leaves its plane: a closed solid whose volume at the
+/// default division agrees with a division a hundred times finer.
+#[test]
+fn square_along_a_non_planar_spline() {
+    let profile = square(0.2);
+    let v0 = builder::vertex(Point3::origin());
+    let v1 = builder::vertex(Point3::new(2.0, 1.0, 1.0));
+    let inner = vec![Point3::new(1.0, 0.0, 0.0), Point3::new(1.0, 1.0, 0.5)];
+    let path: MWire = vec![builder::bezier(&v0, &v1, inner)].into();
+    let swept = builder::sweep_along_wire(&profile, &path, TOL).unwrap();
+    let solid = from_modeling(&swept);
+    assert_topology(&solid, &[0]);
+    assert_mesh_closed(&solid, TOL);
+    let fine = builder::sweep_along_wire(&profile, &path, TOL / 100.0).unwrap();
+    let (coarse, reference) = (volume_at(&swept, 1e-5), volume_at(&fine, 1e-5));
+    assert!(
+        (coarse - reference).abs() < 1e-4,
+        "volume {coarse} against the fine reference {reference}"
     );
 }
