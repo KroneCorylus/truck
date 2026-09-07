@@ -4,6 +4,22 @@ use std::collections::HashMap;
 /// Edges of a boundary loop after trimming: one entry per original edge, `None` to keep it.
 type LoopReplacement<C> = Vec<Option<Vec<Edge<Point3, C>>>>;
 
+/// The radius function of the wire restricted to chain edge `k`: `t ↦ R(k + (t − t0) · scale)`.
+#[derive(Clone, Debug)]
+struct EdgeRadius<R> {
+    radius: R,
+    k: f64,
+    t0: f64,
+    scale: f64,
+}
+
+impl<R: ScalarFunctionD1> ScalarFunctionD1 for EdgeRadius<R> {
+    fn der_n(&self, n: usize, t: f64) -> f64 {
+        let t = self.k + (t - self.t0) * self.scale;
+        self.radius.der_n(n, t) * self.scale.powi(n as i32)
+    }
+}
+
 /// A maximal sequence of chain edges met consecutively in one boundary loop of one face.
 struct Run {
     face: usize,
@@ -156,7 +172,12 @@ impl<C: Clone> Cuts<C> {
     }
 }
 
-/// Fillets a tangent-continuous chain of edges of `shell` with constant `radius`.
+/// Fillets a tangent-continuous chain of edges of `shell` with `radius`, a function of the wire
+/// parameter `t ∈ [0, n]`, where edge `k` of the `n` edges covers `[k, k + 1]` in its own
+/// parameter scaled to unit length. A constant `f64` is such a function. The rolling ball uses
+/// derivatives of the radius up to second order, so the function must supply them. At the open
+/// ends of a chain the fillet is extended to meet the end faces, and the radius is evaluated a
+/// little beyond `[0, n]`.
 ///
 /// `wire` must be continuous and simple, and consecutive edges must share their tangent at the
 /// common vertex. It may be closed. Every edge of the chain must be shared by two faces of the
@@ -170,15 +191,16 @@ impl<C: Clone> Cuts<C> {
 /// appended, in chain order. The fillet faces share their cross edges, so the blend is tangent
 /// continuous along the chain up to `tol`. Returns `None` if the chain does not satisfy the
 /// conditions above or if a contact curve cannot be found.
-pub fn fillet_along_wire<C, S>(
+pub fn fillet_along_wire<C, S, R>(
     shell: &Shell<Point3, C, S>,
     wire: &Wire<Point3, C>,
-    radius: f64,
+    radius: R,
     tol: f64,
 ) -> Option<Shell<Point3, C, S>>
 where
     C: FilletedCurve<S>,
     S: FilletedSurface<C>,
+    R: ScalarFunctionD1,
     PCurve<BSplineCurve<Point2>, S>: ToSameGeometry<C>,
     IntersectionCurve<C, S, S>: ToSameGeometry<C>,
     ApproxFilletSurface<S, S>: ToSameGeometry<S>,
@@ -244,11 +266,18 @@ where
 
     let rbfs: Vec<_> = (0..n)
         .map(|k| {
+            let curve = wire[k].oriented_curve();
+            let (t0, t1) = curve.range_tuple();
             RbfSurface::new(
-                wire[k].oriented_curve(),
+                curve,
                 shell[sides[k][0]].oriented_surface(),
                 shell[sides[k][1]].oriented_surface(),
-                radius,
+                EdgeRadius {
+                    radius: radius.clone(),
+                    k: k as f64,
+                    t0,
+                    scale: 1.0 / (t1 - t0),
+                },
             )
         })
         .collect();

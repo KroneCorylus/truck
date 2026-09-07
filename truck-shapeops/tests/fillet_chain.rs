@@ -242,3 +242,93 @@ fn fillet_along_wire_rejects_corner() {
     );
     assert!(fillet_along_wire(&shell, &wire, 0.2, TOL).is_none());
 }
+
+/// Prism of height `h` over the rectangle `[0, w] × [0, d]` with the side at `y = 0` split in two
+/// edges at `x = w / 2`.
+fn split_prism(w: f64, d: f64, h: f64) -> Solid {
+    use truck_modeling::{builder, Point3, Vector3, Wire};
+    let v: Vec<_> = [(0.0, 0.0), (w / 2.0, 0.0), (w, 0.0), (w, d), (0.0, d)]
+        .map(|(x, y)| builder::vertex(Point3::new(x, y, 0.0)))
+        .into();
+    let wire: Wire = (0..5)
+        .map(|i| builder::line(&v[i], &v[(i + 1) % 5]))
+        .collect::<Vec<_>>()
+        .into();
+    let face = builder::try_attach_plane(&[wire]).unwrap();
+    from_modeling(&builder::tsweep(&face, Vector3::unit_z() * h))
+}
+
+/// Radius growing linearly from `r0` to `r1` over the wire parameter `[0, 2]` of a two-edge chain.
+#[derive(Clone, Copy, Debug)]
+struct LinearRadius {
+    r0: f64,
+    r1: f64,
+}
+
+impl ScalarFunctionD1 for LinearRadius {
+    fn der_n(&self, n: usize, t: f64) -> f64 {
+        match n {
+            0 => self.r0 + (self.r1 - self.r0) * t / 2.0,
+            1 => (self.r1 - self.r0) / 2.0,
+            _ => 0.0,
+        }
+    }
+}
+
+/// Fillets the front top edge of a prism, split in two collinear edges, with a radius growing
+/// linearly along the chain. Each fillet is the rolling ball of the radius at its station: the
+/// contact edges lie at distance `R(t)` from the chain and the cross edge between the two fillet
+/// faces is an arc of radius `R(1)`.
+#[test]
+fn fillet_chain_with_varying_radius() {
+    let (w, d, h) = (4.0, 2.0, 1.5);
+    let radius = LinearRadius { r0: 0.2, r1: 0.5 };
+    let solid = split_prism(w, d, h);
+    let shell = solid.into_boundaries().pop().unwrap();
+    let wire = chain(
+        &shell,
+        &[
+            Point3::new(w / 4.0, 0.0, h),
+            Point3::new(3.0 * w / 4.0, 0.0, h),
+        ],
+    );
+    // the chain runs along `+x`, so `t = 2 x / w`
+    let wire = match wire.front_vertex().unwrap().point().x < w / 2.0 {
+        true => wire,
+        false => wire.inverse(),
+    };
+    let faces = shell.len();
+    let shell = fillet_along_wire(&shell, &wire, radius, TOL).unwrap();
+    assert_eq!(shell.len(), faces + 2);
+    assert_tangent_along_blends(&shell, faces..faces + 2);
+
+    let radius_at = |p: Point3| radius.subs(2.0 * p.x / w);
+    for k in faces..faces + 2 {
+        for edge in shell[k].edge_iter() {
+            let curve = edge.curve();
+            let (t0, t1) = curve.range_tuple();
+            for i in 0..5 {
+                let t = t0 + (t1 - t0) * (i as f64 + 0.5) / 5.0;
+                let p = curve.subs(t);
+                let measured = match &curve {
+                    Curve::Parametric(_) => f64::hypot(p.y, h - p.z),
+                    Curve::Nurbs(_) => {
+                        let (der, der2) = (curve.der(t), curve.der2(t));
+                        der.magnitude().powi(3) / der.cross(der2).magnitude()
+                    }
+                    Curve::Intersection(_) => continue,
+                    other => panic!("unexpected curve on a fillet face: {other:?}"),
+                };
+                assert!(
+                    (measured - radius_at(p)).abs() < 1e-9,
+                    "radius {measured} at {p:?}, expected {}",
+                    radius_at(p)
+                );
+            }
+        }
+    }
+
+    let (r0, r1) = (radius.r0, radius.r1);
+    let expected = w * d * h - (1.0 - PI / 4.0) * w * (r0 * r0 + r0 * r1 + r1 * r1) / 3.0;
+    assert_solid(&Solid::new(vec![shell]), expected, &[0], TOL);
+}

@@ -21,7 +21,7 @@
 //! ## Fillet and Chamfer
 //!
 //! Fillets and chamfers can be applied to a single edge whose end vertices are each adjacent to exactly three faces.
-//! Constant-radius fillets can also be applied to a tangent-continuous chain of edges with `fillet_along_wire`,
+//! Fillets with a constant or varying radius can also be applied to a tangent-continuous chain of edges with `fillet_along_wire`,
 //! whose ends may be at vertices with any number of faces. Blending several fillets that meet at a vertex is unsupported.
 
 #![cfg_attr(not(debug_assertions), deny(warnings))]
@@ -49,6 +49,6 @@ mod alternative;
 ///
 /// # Current Status
 /// Fillets and chamfers can be applied to a single edge whose end vertices are each adjacent to exactly three faces.
-/// Constant-radius fillets can also be applied to a tangent-continuous chain of edges with `fillet_along_wire`,
+/// Fillets with a constant or varying radius can also be applied to a tangent-continuous chain of edges with `fillet_along_wire`,
 /// whose ends may be at vertices with any number of faces. Blending several fillets that meet at a vertex is unsupported.
 pub mod fillet;

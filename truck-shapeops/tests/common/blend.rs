@@ -118,15 +118,16 @@ pub fn face_through(shell: &Shell, point: Point3) -> usize {
         .expect("no face through the point")
 }
 
-/// The edge of `shell` whose curve passes through `point`.
+/// The edge of `shell` that passes through `point`, within its parameter range.
 pub fn edge_through(shell: &Shell, point: Point3) -> Edge {
     shell
         .edge_iter()
         .find(|edge| {
             let curve = edge.curve();
+            let (t0, t1) = curve.range_tuple();
             curve
                 .search_nearest_parameter(point, None, 10)
-                .is_some_and(|t| curve.subs(t).near(&point))
+                .is_some_and(|t| t0 <= t && t <= t1 && curve.subs(t).near(&point))
         })
         .expect("no edge through the point")
 }
