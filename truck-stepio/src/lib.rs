@@ -5,6 +5,41 @@
 //! It is possible to output data modeled by truck-modeling, and to read STEP shapes into the
 //! reader's own geometry or, through `try_mapped`, into the enums of truck-modeling.
 //! Shapes created by set operations cannot be output yet.
+//!
+//! # Entity types in the test corpus that are not implemented
+//!
+//! Over the files in `resources/step/`, as `Table::unsupported` reports them. Units, product
+//! categories and presentation are not read; geometry arrives in the units of the file.
+//! `VERTEX_LOOP` bounds a degenerate face and is ignored on purpose. A test keeps this list
+//! equal to the corpus.
+//!
+//! - `(CONVERSION_BASED_UNIT LENGTH_UNIT NAMED_UNIT)`
+//! - `(GEOMETRIC_REPRESENTATION_CONTEXT GLOBAL_UNCERTAINTY_ASSIGNED_CONTEXT GLOBAL_UNIT_ASSIGNED_CONTEXT REPRESENTATION_CONTEXT)`
+//! - `(GEOMETRIC_REPRESENTATION_CONTEXT PARAMETRIC_REPRESENTATION_CONTEXT REPRESENTATION_CONTEXT)`
+//! - `(LENGTH_UNIT NAMED_UNIT SI_UNIT)`
+//! - `(NAMED_UNIT PLANE_ANGLE_UNIT SI_UNIT)`
+//! - `(NAMED_UNIT SI_UNIT SOLID_ANGLE_UNIT)`
+//! - `APPLICATION_PROTOCOL_DEFINITION`
+//! - `COLOUR_RGB`
+//! - `CURVE_STYLE`
+//! - `DESIGN_CONTEXT`
+//! - `DIMENSIONAL_EXPONENTS`
+//! - `DRAUGHTING_PRE_DEFINED_CURVE_FONT`
+//! - `FILL_AREA_STYLE`
+//! - `FILL_AREA_STYLE_COLOUR`
+//! - `LENGTH_MEASURE_WITH_UNIT`
+//! - `MECHANICAL_CONTEXT`
+//! - `MECHANICAL_DESIGN_GEOMETRIC_PRESENTATION_REPRESENTATION`
+//! - `PRESENTATION_STYLE_ASSIGNMENT`
+//! - `PRODUCT_CATEGORY`
+//! - `PRODUCT_CATEGORY_RELATIONSHIP`
+//! - `PRODUCT_RELATED_PRODUCT_CATEGORY`
+//! - `STYLED_ITEM`
+//! - `SURFACE_SIDE_STYLE`
+//! - `SURFACE_STYLE_FILL_AREA`
+//! - `SURFACE_STYLE_USAGE`
+//! - `UNCERTAINTY_MEASURE_WITH_UNIT`
+//! - `VERTEX_LOOP`
 
 #![cfg_attr(not(debug_assertions), deny(warnings))]
 #![deny(clippy::all, rust_2018_idioms)]

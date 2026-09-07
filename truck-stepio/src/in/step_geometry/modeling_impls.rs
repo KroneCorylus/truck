@@ -14,9 +14,9 @@
 //! ));
 //! let table = Table::from_step(step_string).unwrap();
 //! let step_solid = table.manifold_solid_brep.values().next().unwrap();
-//! let solid: CompressedSolid<Point3, Curve, Surface> = table
-//!     .to_compressed_solid(step_solid)
-//!     .unwrap()
+//! let (solid, skipped) = table.to_compressed_solid(step_solid).unwrap();
+//! assert!(skipped.is_empty());
+//! let solid: CompressedSolid<Point3, Curve, Surface> = solid
 //!     .try_mapped(|p| Some(*p), |c| c.try_into().ok(), |s| s.try_into().ok())
 //!     .unwrap();
 //! assert!(solid.boundaries[0]

@@ -1527,7 +1527,8 @@ fn step_import() {
         let step_string = std::fs::read_to_string(path).unwrap();
         let table = Table::from_step(&step_string).unwrap();
         table.shell.values().for_each(|step_shell| {
-            let mut cshell = table.to_compressed_shell(step_shell).unwrap();
+            let (mut cshell, skipped) = table.to_compressed_shell(step_shell).unwrap();
+            assert!(skipped.is_empty(), "{file_name}: {skipped:?}");
             cshell.robust_split_closed_edges_and_faces(0.05);
             truck_topology::Shell::extract(cshell).unwrap();
         });

@@ -1,7 +1,48 @@
 use super::*;
 use crate::common::PartAttrs;
+use ruststep::error::Error::UnknownEntity;
+use std::fmt;
+
+/// A face, edge or vertex that could not be converted and was left out of its shell.
+#[derive(Debug)]
+pub struct Skipped {
+    /// the id of the STEP entity, 0 when it was written inline instead of numbered
+    pub id: u64,
+    /// its entity type: `VERTEX_POINT`, `EDGE_CURVE` or `FACE_SURFACE`
+    pub entity: &'static str,
+    pub reason: StepConvertingError,
+}
+
+impl fmt::Display for Skipped {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "#{} {}: {}", self.id, self.entity, self.reason)
+    }
+}
+
+/// The result of a conversion, with what was left out of it.
+pub type Converted<T> = Result<(T, Vec<Skipped>), StepConvertingError>;
+
+fn ref_id<T>(place_holder: &PlaceHolder<T>) -> u64 {
+    match place_holder {
+        PlaceHolder::Ref(Name::Entity(idx)) => *idx,
+        _ => 0,
+    }
+}
 
 impl Table {
+    /// Turns a failed lookup into a reason naming the unimplemented or unreadable entity behind it.
+    fn reason(&self, e: ruststep::error::Error) -> StepConvertingError {
+        if let UnknownEntity(idx) = e {
+            if let Some(dummy) = self.dummy.get(&idx) {
+                return format!("#{idx} is {}, which is not implemented", dummy.name).into();
+            }
+            if let Some((_, message)) = self.errors.iter().find(|(id, _)| *id == idx) {
+                return format!("#{idx} could not be read: {message}").into();
+            }
+        }
+        e.into()
+    }
+
     fn place_holder_edge_any_to_index_and_edge_curve(
         &self,
         edge: &PlaceHolder<EdgeAnyHolder>,
@@ -37,150 +78,212 @@ impl Table {
         }
     }
 
-    fn shell_vertices(&self, shell: &ShellHolder) -> (Vec<Point3>, HashMap<u64, usize>) {
-        use PlaceHolder::Ref;
-        let mut vidx_map = HashMap::<u64, usize>::new();
-        let vertex_to_point = |v: PlaceHolder<VertexPointHolder>| {
-            if let Ref(Name::Entity(ref idx)) = v {
-                if !vidx_map.contains_key(idx) {
-                    let len = vidx_map.len();
-                    vidx_map.insert(*idx, len);
-                    let p = EntityTable::<VertexPointHolder>::get_owned(self, *idx)
-                        .map_err(|e| eprintln!("{e}"))
-                        .ok()?;
-                    return Some(Point3::from(&p.vertex_geometry));
-                }
-            }
-            None
-        };
-        let vertices: Vec<Point3> = shell
+    /// The edge curves reachable from the loops of `shell`, with repetition.
+    fn shell_edge_curves(&self, shell: &ShellHolder) -> Vec<(u64, EdgeCurveHolder)> {
+        shell
             .cfs_faces_holder(self)
             .filter_map(move |face| self.face_any_to_orientation_and_face(face))
             .flat_map(move |(_, face)| face.bounds_holder(self))
             .filter_map(move |bound| bound?.bound_holder(self))
             .flat_map(move |bound| bound.edge_list)
             .filter_map(move |edge| self.place_holder_edge_any_to_index_and_edge_curve(&edge))
-            .flat_map(move |(_, edge)| [edge.edge_start, edge.edge_end])
-            .filter_map(vertex_to_point)
-            .collect();
+            .collect()
+    }
+
+    fn shell_vertices(
+        &self,
+        shell: &ShellHolder,
+        skipped: &mut Vec<Skipped>,
+    ) -> (Vec<Point3>, HashMap<u64, usize>) {
+        let mut vertices = Vec::new();
+        let mut vidx_map = HashMap::<u64, usize>::new();
+        for (_, edge) in self.shell_edge_curves(shell) {
+            for vertex in [edge.edge_start, edge.edge_end] {
+                let idx = ref_id(&vertex);
+                if vidx_map.contains_key(&idx) || skipped.iter().any(|s| s.id == idx) {
+                    continue;
+                }
+                match EntityTable::<VertexPointHolder>::get_owned(self, idx) {
+                    Ok(p) => {
+                        vidx_map.insert(idx, vertices.len());
+                        vertices.push(Point3::from(&p.vertex_geometry));
+                    }
+                    Err(e) => skipped.push(Skipped {
+                        id: idx,
+                        entity: "VERTEX_POINT",
+                        reason: self.reason(e),
+                    }),
+                }
+            }
+        }
         (vertices, vidx_map)
+    }
+
+    fn compressed_edge(
+        &self,
+        edge: &EdgeCurveHolder,
+        vidx_map: &HashMap<u64, usize>,
+    ) -> Result<CompressedEdge<Curve3D>, StepConvertingError> {
+        let vertex = |v: &PlaceHolder<VertexPointHolder>| {
+            let idx = ref_id(v);
+            vidx_map
+                .get(&idx)
+                .copied()
+                .ok_or_else(|| format!("vertex #{idx} was skipped"))
+        };
+        let vertices = (vertex(&edge.edge_start)?, vertex(&edge.edge_end)?);
+        let curve = self.edge_curve_owned(edge)?.parse_curve3d()?;
+        Ok(CompressedEdge { vertices, curve })
+    }
+
+    /// The owned edge curve. A surface curve keeps only its 3D curve and, when it resolves, its
+    /// master pcurve, so that an unsupported neighbouring surface does not take the edge with it.
+    fn edge_curve_owned(&self, edge: &EdgeCurveHolder) -> Result<EdgeCurve, StepConvertingError> {
+        use PreferredSurfaceCurveRepresentation::*;
+        let mut edge = edge.clone();
+        if let Some(surface_curve) = self.surface_curve.get(&ref_id(&edge.edge_geometry)) {
+            let mut surface_curve = surface_curve.clone();
+            let master = match surface_curve.master_representation {
+                Curve3D => None,
+                PcurveS1 => surface_curve.associated_geometry.first(),
+                PcurveS2 => surface_curve.associated_geometry.get(1),
+            };
+            let master = master
+                .filter(|geometry| (*geometry).clone().into_owned(self).is_ok())
+                .cloned();
+            surface_curve.master_representation = match master {
+                Some(_) => PcurveS1,
+                None => Curve3D,
+            };
+            surface_curve.associated_geometry = master.into_iter().collect();
+            edge.edge_geometry =
+                PlaceHolder::Owned(CurveAnyHolder::SurfaceCurve(Box::new(surface_curve)));
+        }
+        edge.into_owned(self).map_err(|e| self.reason(e))
     }
 
     fn shell_edges(
         &self,
         shell: &ShellHolder,
         vidx_map: &HashMap<u64, usize>,
+        skipped: &mut Vec<Skipped>,
     ) -> (Vec<CompressedEdge<Curve3D>>, HashMap<u64, usize>) {
-        use PlaceHolder::Ref;
+        let mut edges = Vec::new();
         let mut eidx_map = HashMap::<u64, usize>::new();
-        let edge_curve_to_compressed_edge = |(idx, edge): (u64, EdgeCurveHolder)| {
-            if eidx_map.contains_key(&idx) {
-                return None;
+        for (idx, edge) in self.shell_edge_curves(shell) {
+            if eidx_map.contains_key(&idx) || skipped.iter().any(|s| s.id == idx) {
+                continue;
             }
-            let len = eidx_map.len();
-            eidx_map.insert(idx, len);
-            let edge_curve = edge
-                .clone()
-                .into_owned(self)
-                .map_err(|e| eprintln!("{e}"))
-                .ok()?;
-            let curve = edge_curve
-                .parse_curve3d()
-                .map_err(|e| eprintln!("{e}"))
-                .ok()?;
-            let Ref(Name::Entity(front_idx)) = edge.edge_start else {
-                return None;
-            };
-            let Ref(Name::Entity(back_idx)) = edge.edge_end else {
-                return None;
-            };
-            Some(CompressedEdge {
-                vertices: (*vidx_map.get(&front_idx)?, *vidx_map.get(&back_idx)?),
-                curve,
-            })
-        };
-        let edges: Vec<CompressedEdge<Curve3D>> = shell
-            .cfs_faces_holder(self)
-            .filter_map(move |face| self.face_any_to_orientation_and_face(face))
-            .flat_map(move |(_, face)| face.bounds_holder(self))
-            .filter_map(move |bound| bound?.bound_holder(self))
-            .flat_map(move |bound| bound.edge_list)
-            .filter_map(move |edge| self.place_holder_edge_any_to_index_and_edge_curve(&edge))
-            .filter_map(edge_curve_to_compressed_edge)
-            .collect();
+            match self.compressed_edge(&edge, vidx_map) {
+                Ok(edge) => {
+                    eidx_map.insert(idx, edges.len());
+                    edges.push(edge);
+                }
+                Err(reason) => skipped.push(Skipped {
+                    id: idx,
+                    entity: "EDGE_CURVE",
+                    reason,
+                }),
+            }
+        }
         (edges, eidx_map)
     }
+
+    /// `None` for a `VERTEX_LOOP`, which bounds a degenerate face with no edges.
     fn face_bound_to_edges(
         &self,
         bound: FaceBoundHolder,
         eidx_map: &HashMap<u64, usize>,
-    ) -> Option<Vec<CompressedEdgeIndex>> {
-        use PlaceHolder::Ref;
+    ) -> Result<Option<Vec<CompressedEdgeIndex>>, StepConvertingError> {
         let ori = bound.orientation;
-        let bound = bound.bound_holder(self)?;
-        let mut edges: Vec<CompressedEdgeIndex> = bound
-            .edge_list
-            .into_iter()
-            .filter_map(|edge| {
-                let Ref(Name::Entity(ref idx)) = edge else {
-                    return None;
-                };
-                let edge_idx = if let Some(oriented_edge) = self.oriented_edge.get(idx) {
-                    CompressedEdgeIndex {
-                        index: *eidx_map.get(&oriented_edge.edge_element_idx()?)?,
-                        orientation: oriented_edge.orientation == ori,
-                    }
-                } else {
-                    CompressedEdgeIndex {
-                        index: *eidx_map.get(idx)?,
-                        orientation: ori,
-                    }
-                };
-                Some(edge_idx)
-            })
-            .collect();
+        let Some(edge_loop) = bound.bound_holder(self) else {
+            let idx = ref_id(&bound.bound);
+            return match self.dummy.get(&idx) {
+                Some(dummy) if dummy.name == "VERTEX_LOOP" => Ok(None),
+                _ => Err(self.reason(UnknownEntity(idx))),
+            };
+        };
+        let mut edges = Vec::new();
+        for edge in edge_loop.edge_list {
+            let idx = ref_id(&edge);
+            let (edge_idx, orientation) = match self.oriented_edge.get(&idx) {
+                Some(oriented_edge) => (
+                    oriented_edge
+                        .edge_element_idx()
+                        .ok_or("an oriented edge does not reference its edge")?,
+                    oriented_edge.orientation == ori,
+                ),
+                None => (idx, ori),
+            };
+            let Some(&index) = eidx_map.get(&edge_idx) else {
+                return Err(match self.edge_curve.contains_key(&edge_idx) {
+                    true => format!("edge #{edge_idx} was skipped").into(),
+                    false => self.reason(UnknownEntity(edge_idx)),
+                });
+            };
+            edges.push(CompressedEdgeIndex { index, orientation });
+        }
         if !ori {
             edges.reverse();
         }
-        Some(edges)
+        Ok(Some(edges))
+    }
+
+    fn compressed_face(
+        &self,
+        id: u64,
+        face: Option<FaceAnyHolder>,
+        eidx_map: &HashMap<u64, usize>,
+    ) -> Result<CompressedFace<Surface>, StepConvertingError> {
+        let (orientation, face) = self
+            .face_any_to_orientation_and_face(face)
+            .ok_or_else(|| self.reason(UnknownEntity(id)))?;
+        let step_surface: SurfaceAny = face
+            .face_geometry
+            .clone()
+            .into_owned(self)
+            .map_err(|e| self.reason(e))?;
+        let mut surface = Surface::try_from(&step_surface)?;
+        if !face.same_sense {
+            surface.invert()
+        }
+        let mut boundaries = Vec::new();
+        for (place_holder, bound) in face.bounds.iter().zip(face.bounds_holder(self)) {
+            let bound = bound.ok_or_else(|| self.reason(UnknownEntity(ref_id(place_holder))))?;
+            if let Some(edges) = self.face_bound_to_edges(bound, eidx_map)? {
+                boundaries.push(edges);
+            }
+        }
+        Ok(CompressedFace {
+            surface,
+            boundaries,
+            orientation,
+        })
     }
 
     fn shell_faces(
         &self,
         shell: &ShellHolder,
         eidx_map: &HashMap<u64, usize>,
+        skipped: &mut Vec<Skipped>,
     ) -> Vec<CompressedFace<Surface>> {
-        shell
-            .cfs_faces_holder(self)
-            .filter_map(|face| self.face_any_to_orientation_and_face(face))
-            .filter_map(|(orientation, face)| {
-                let step_surface: SurfaceAny = face
-                    .face_geometry
-                    .clone()
-                    .into_owned(self)
-                    .map_err(|e| eprintln!("{e}"))
-                    .ok()?;
-                let mut surface = Surface::try_from(&step_surface)
-                    .map_err(|e| eprintln!("{e}"))
-                    .ok()?;
-                if !face.same_sense {
-                    surface.invert()
-                }
-                let boundaries: Vec<_> = face
-                    .bounds_holder(self)
-                    .into_iter()
-                    .filter_map(|bound| self.face_bound_to_edges(bound?, eidx_map))
-                    .collect();
-                Some(CompressedFace {
-                    surface,
-                    boundaries,
-                    orientation,
-                })
-            })
-            .collect()
+        let mut faces = Vec::new();
+        for (place_holder, face) in shell.cfs_faces.iter().zip(shell.cfs_faces_holder(self)) {
+            let id = ref_id(place_holder);
+            match self.compressed_face(id, face, eidx_map) {
+                Ok(face) => faces.push(face),
+                Err(reason) => skipped.push(Skipped {
+                    id,
+                    entity: "FACE_SURFACE",
+                    reason,
+                }),
+            }
+        }
+        faces
     }
 
-    /// Constructs `CompressedShell` of `truck` from `Shell` in STEP file
+    /// Constructs `CompressedShell` of `truck` from `Shell` in STEP file, with the faces, edges
+    /// and vertices that could not be converted. A face is left out with any edge of its loops.
     /// # Example
     /// ```
     /// use truck_stepio::r#in::{*, step_geometry::*};
@@ -194,14 +297,15 @@ impl Table {
     /// // take one shell (this is only one shell)
     /// let step_shell = table.shell.values().next().unwrap();
     /// // convert STEP shell to `CompressedShell`
-    /// let cshell = table.to_compressed_shell(step_shell).unwrap();
+    /// let (cshell, skipped) = table.to_compressed_shell(step_shell).unwrap();
     /// // The cube has 6 faces!
     /// assert_eq!(cshell.faces.len(), 6);
+    /// assert!(skipped.is_empty());
     /// ```
     pub fn to_compressed_shell(
         &self,
         shell: &impl StepShell,
-    ) -> Result<CompressedShell<Point3, Curve3D, Surface>, StepConvertingError> {
+    ) -> Converted<CompressedShell<Point3, Curve3D, Surface>> {
         shell.to_compressed_shell(self)
     }
 
@@ -209,21 +313,24 @@ impl Table {
     pub fn to_compressed_shells(
         &self,
         shells: &ShellBasedSurfaceModelHolder,
-    ) -> Result<Vec<CompressedShell<Point3, Curve3D, Surface>>, StepConvertingError> {
+    ) -> Converted<Vec<CompressedShell<Point3, Curve3D, Surface>>> {
         let mut res = Vec::new();
+        let mut skipped = Vec::new();
         for place_holder in &shells.sbsm_boundary {
             let PlaceHolder::Ref(Name::Entity(idx)) = place_holder else {
                 return Err("failed to reference an element of `sbsm_boundary`".into());
             };
-            if let Some(shell) = self.shell.get(idx) {
-                res.push(self.to_compressed_shell(shell)?);
+            let (shell, more) = if let Some(shell) = self.shell.get(idx) {
+                self.to_compressed_shell(shell)?
             } else if let Some(oriented_shell) = self.oriented_shell.get(idx) {
-                res.push(self.to_compressed_shell(oriented_shell)?);
+                self.to_compressed_shell(oriented_shell)?
             } else {
                 return Err("failed to reference an element of `sbsm_boundary`".into());
-            }
+            };
+            res.push(shell);
+            skipped.extend(more);
         }
-        Ok(res)
+        Ok((res, skipped))
     }
 
     /// Constructs `CompressedSolid` of `truck` from `ManifoldSolidBrep` in STEP file
@@ -241,7 +348,8 @@ impl Table {
     /// // take the solid
     /// let step_solid = table.manifold_solid_brep.values().next().unwrap();
     /// // convert STEP shell to `CompressedSolid`
-    /// let csolid = table.to_compressed_solid(step_solid).unwrap();
+    /// let (csolid, skipped) = table.to_compressed_solid(step_solid).unwrap();
+    /// assert!(skipped.is_empty());
     /// // Convert to truck `Solid`
     /// let solid = Solid::extract(csolid).unwrap();
     /// // The cube has 6 faces!
@@ -250,11 +358,11 @@ impl Table {
     pub fn to_compressed_solid(
         &self,
         solid: &ManifoldSolidBrepHolder,
-    ) -> Result<CompressedSolid<Point3, Curve3D, Surface>, StepConvertingError> {
+    ) -> Converted<CompressedSolid<Point3, Curve3D, Surface>> {
         let PlaceHolder::Ref(Name::Entity(outer_idx)) = &solid.outer else {
             return Err("failed to reference `solid.outer`".into());
         };
-        let outer_shell = if let Some(step_shell) = self.shell.get(outer_idx) {
+        let (outer_shell, mut skipped) = if let Some(step_shell) = self.shell.get(outer_idx) {
             self.to_compressed_shell(step_shell)
         } else if let Some(step_shell) = self.oriented_shell.get(outer_idx) {
             self.to_compressed_shell(step_shell)
@@ -269,9 +377,11 @@ impl Table {
             let Some(oriented_shell) = self.oriented_shell.get(outer_idx) else {
                 return Err("failed to reference an element of `solid.voids`".into());
             };
-            boundaries.push(self.to_compressed_shell(oriented_shell)?);
+            let (shell, more) = self.to_compressed_shell(oriented_shell)?;
+            boundaries.push(shell);
+            skipped.extend(more);
         }
-        Ok(CompressedSolid { boundaries })
+        Ok((CompressedSolid { boundaries }, skipped))
     }
 }
 
@@ -313,14 +423,16 @@ impl TryFrom<&NodeMatrix> for Matrix4 {
 }
 
 impl ProductShape {
-    pub fn try_from_index(idx: u64, table: &Table) -> Result<Self, StepConvertingError> {
+    pub fn try_from_index(idx: u64, table: &Table) -> Converted<Self> {
         if let Some(step_solid) = table.manifold_solid_brep.get(&idx) {
-            table.to_compressed_solid(step_solid).map(Into::into)
+            let (solid, skipped) = table.to_compressed_solid(step_solid)?;
+            Ok((solid.into(), skipped))
         } else if let Some(step_shells) = table.shell_based_surface_model.get(&idx) {
-            table.to_compressed_shells(step_shells).map(Into::into)
+            let (shells, skipped) = table.to_compressed_shells(step_shells)?;
+            Ok((shells.into(), skipped))
         } else if table.axis2_placement_3d.contains_key(&idx) {
             let axis = EntityTable::<Axis2Placement3dHolder>::get_owned(table, idx)?;
-            Ok(Matrix4::from(&axis).into())
+            Ok((Matrix4::from(&axis).into(), Vec::new()))
         } else {
             Err("Unknown Shape".into())
         }
@@ -332,6 +444,7 @@ impl Table {
         &self,
         pds_idx: u64,
         pd: &ProductDefinitionHolder,
+        skipped: &mut Vec<Skipped>,
     ) -> Result<ProductEntity, StepConvertingError> {
         let PlaceHolder::Ref(Name::Entity(pdf_idx)) = &pd.formation else {
             return Err("failed to reference `product_definition.formation`".into());
@@ -367,20 +480,17 @@ impl Table {
         let Some(sr) = self.shape_representation.get(sr_idx) else {
             return Err("failed to reference `shape_representation`".into());
         };
-        let Some(shape) = sr
-            .items
-            .iter()
-            .map(|place_holder| {
-                if let &PlaceHolder::Ref(Name::Entity(item_idx)) = place_holder {
-                    ProductShape::try_from_index(item_idx, self).ok()
-                } else {
-                    None
-                }
-            })
-            .collect::<Option<Vec<_>>>()
-        else {
-            return Err("failed to reference an element of `shape_representation.items`".into());
-        };
+        let mut shape = Vec::new();
+        for place_holder in &sr.items {
+            let &PlaceHolder::Ref(Name::Entity(item_idx)) = place_holder else {
+                return Err(
+                    "failed to reference an element of `shape_representation.items`".into(),
+                );
+            };
+            let (item, more) = ProductShape::try_from_index(item_idx, self)?;
+            shape.push(item);
+            skipped.extend(more);
+        }
 
         Ok(NodeEntity { shape, attrs })
     }
@@ -439,7 +549,10 @@ impl Table {
         Ok((entity, (parent_idx, child_idx)))
     }
 
-    pub fn step_assy(&self) -> Result<StepAssembly, StepConvertingError> {
+    /// Constructs the assembly of the file, with the faces, edges and vertices of every product
+    /// that could not be converted.
+    pub fn step_assy(&self) -> Converted<StepAssembly> {
+        let mut skipped = Vec::new();
         let mut product_entities = Vec::<ProductEntity>::new();
         let mut indices_map = HashMap::<u64, usize>::new();
         let mut assy_nodes = Vec::<(AssembleEntity, (u64, u64))>::new();
@@ -448,7 +561,7 @@ impl Table {
                 return Err("failed to reference `product_definition_shape.definition`".into());
             };
             if let Some(pd) = self.product_definition.get(&idx) {
-                product_entities.push(self.product_node_entity(pds_idx, pd)?);
+                product_entities.push(self.product_node_entity(pds_idx, pd, &mut skipped)?);
                 indices_map.insert(idx, product_entities.len() - 1);
             } else if let Some(next_assy) = self.next_assembly_usage_occurrence.get(&idx) {
                 assy_nodes.push(self.assy_node_entity(pds_idx, next_assy)?);
@@ -465,8 +578,9 @@ impl Table {
             .collect::<Option<Vec<_>>>()
             .ok_or::<StepConvertingError>("failed to reference `product_definiion_shape`".into())?;
 
-        StepAssembly::try_from_adjacency(product_entities, adjacency)
-            .ok_or("maybe the graph has a cycle.".into())
+        let assy = StepAssembly::try_from_adjacency(product_entities, adjacency)
+            .ok_or("maybe the graph has a cycle.")?;
+        Ok((assy, skipped))
     }
 }
 
@@ -474,21 +588,26 @@ pub trait StepShell {
     fn to_compressed_shell(
         &self,
         table: &Table,
-    ) -> Result<CompressedShell<Point3, Curve3D, Surface>, StepConvertingError>;
+    ) -> Converted<CompressedShell<Point3, Curve3D, Surface>>;
 }
 
 impl StepShell for ShellHolder {
     fn to_compressed_shell(
         &self,
         table: &Table,
-    ) -> Result<CompressedShell<Point3, Curve3D, Surface>, StepConvertingError> {
-        let (vertices, vidx_map) = table.shell_vertices(self);
-        let (edges, eidx_map) = table.shell_edges(self, &vidx_map);
-        Ok(CompressedShell {
-            vertices,
-            edges,
-            faces: table.shell_faces(self, &eidx_map),
-        })
+    ) -> Converted<CompressedShell<Point3, Curve3D, Surface>> {
+        let mut skipped = Vec::new();
+        let (vertices, vidx_map) = table.shell_vertices(self, &mut skipped);
+        let (edges, eidx_map) = table.shell_edges(self, &vidx_map, &mut skipped);
+        let faces = table.shell_faces(self, &eidx_map, &mut skipped);
+        Ok((
+            CompressedShell {
+                vertices,
+                edges,
+                faces,
+            },
+            skipped,
+        ))
     }
 }
 
@@ -496,20 +615,20 @@ impl StepShell for OrientedShellHolder {
     fn to_compressed_shell(
         &self,
         table: &Table,
-    ) -> Result<CompressedShell<Point3, Curve3D, Surface>, StepConvertingError> {
+    ) -> Converted<CompressedShell<Point3, Curve3D, Surface>> {
         let PlaceHolder::Ref(Name::Entity(idx)) = &self.shell_element else {
             return Err("failed to reference shell".into());
         };
         let Some(shell) = table.shell.get(idx) else {
             return Err("failed to reference shell".into());
         };
-        let mut res = shell.to_compressed_shell(table)?;
+        let (mut res, skipped) = shell.to_compressed_shell(table)?;
         if !self.orientation {
             for face in &mut res.faces {
                 face.orientation = !face.orientation;
             }
         }
-        Ok(res)
+        Ok((res, skipped))
     }
 }
 
@@ -517,7 +636,7 @@ impl StepShell for ShellAnyHolder {
     fn to_compressed_shell(
         &self,
         table: &Table,
-    ) -> Result<CompressedShell<Point3, Curve3D, Surface>, StepConvertingError> {
+    ) -> Converted<CompressedShell<Point3, Curve3D, Surface>> {
         match self {
             ShellAnyHolder::OrientedShell(shell) => shell.to_compressed_shell(table),
             ShellAnyHolder::Shell(shell) => shell.to_compressed_shell(table),

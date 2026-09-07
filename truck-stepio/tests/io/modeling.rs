@@ -16,7 +16,8 @@ fn to_step(solid: &CompressedSolid<Point3, Curve, Surface>) -> String {
 fn read_back_volume(step: &str) -> f64 {
     let table = Table::from_step(step).unwrap();
     let shell = table.shell.values().next().unwrap();
-    let shell = table.to_compressed_shell(shell).unwrap();
+    let (shell, skipped) = table.to_compressed_shell(shell).unwrap();
+    assert!(skipped.is_empty(), "{skipped:?}");
     shell.triangulation(0.001).to_polygon().volume()
 }
 
@@ -58,9 +59,9 @@ fn skewed_extrusion_stays_a_linear_extrusion() {
 fn read_back(step: &str) -> CompressedSolid<Point3, Curve, Surface> {
     let table = Table::from_step(step).unwrap();
     let step_solid = table.manifold_solid_brep.values().next().unwrap();
-    table
-        .to_compressed_solid(step_solid)
-        .unwrap()
+    let (solid, skipped) = table.to_compressed_solid(step_solid).unwrap();
+    assert!(skipped.is_empty(), "{skipped:?}");
+    solid
         .try_mapped(
             |p| Some(*p),
             |c| c.try_into().map_err(|e| eprintln!("{e}")).ok(),
@@ -124,7 +125,8 @@ fn occt_primitives_map_onto_modeling() {
         let step = std::fs::read_to_string(path).unwrap();
         let table = Table::from_step(&step).unwrap();
         let step_solid = table.manifold_solid_brep.values().next().unwrap();
-        let compressed = table.to_compressed_solid(step_solid).unwrap();
+        let (compressed, skipped) = table.to_compressed_solid(step_solid).unwrap();
+        assert!(skipped.is_empty(), "{name}: {skipped:?}");
         let expected = compressed.triangulation(0.01).to_polygon().volume();
 
         let solid = read_back(&step);

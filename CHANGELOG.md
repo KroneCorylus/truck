@@ -4,6 +4,7 @@ The version is of the bottom crate `truck-rendimpl`.
 
 ## Unreleased
 
+- Report the faces, edges and vertices the STEP reader of `truck-stepio` leaves out, with the entity that caused it, instead of dropping them silently.
 - Add `Table::try_from_step` and `Table::unsupported` to `truck-stepio`, reporting why a file is not STEP, which records failed and which entity types are not implemented.
 - Add an ignored benchmark of set operations on a plate with holes to `truck-shapeops`, reporting wall time per stage.
 - Document what the `tol` of `and` and `or` in `truck-shapeops` controls, and test that the result does not depend on it.

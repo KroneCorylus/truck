@@ -43,10 +43,13 @@ impl Table {
     /// get shape from indices
     pub fn get_shape(&self, idx: u64) -> Option<ShapeFromStep> {
         let stepshell = self.shell.get(&idx)?;
-        let shell = self
+        let (shell, skipped) = self
             .to_compressed_shell(stepshell)
             .map_err(|e| gloo::console::error!(format!("{e}")))
             .ok()?;
+        for skipped in skipped {
+            gloo::console::warn!(format!("{skipped}"));
+        }
         Some(SubShapeFromStep::Shell(shell).into())
     }
 }

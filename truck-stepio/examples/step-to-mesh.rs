@@ -53,7 +53,10 @@ fn main() {
 }
 
 fn step_to_mesh(table: &Table) -> Vec<MeshedCShell> {
-    let assy = table.step_assy().unwrap();
+    let (assy, skipped) = table.step_assy().unwrap();
+    for skipped in &skipped {
+        eprintln!("skipped {skipped}");
+    }
 
     let node_map = |ProductEntity { shape, attrs }: &ProductEntity| {
         let shape = shape
