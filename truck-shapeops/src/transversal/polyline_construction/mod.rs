@@ -3,6 +3,14 @@ use std::collections::VecDeque;
 use truck_base::{cgmath64::*, tolerance::*};
 use truck_meshalgo::prelude::PolylineCurve;
 
+/// Joins the segments of a mesh interference, given as `(start, end)` pairs in any order, into
+/// polylines.
+///
+/// Segment ends are identified by the cell of a grid `2 TOLERANCE` wide that contains them.
+/// The grid is absolute, not relative to the tessellation tolerance: the ends to be joined are
+/// the same point up to rounding, computed twice from neighbouring triangle pairs, and the
+/// identity has to agree with the `near` tests of the rest of the pipeline. A grid scaled to
+/// the tessellation would join distinct points of a coarse mesh.
 pub fn construct_polylines(lines: &[(Point3, Point3)]) -> Vec<PolylineCurve<Point3>> {
     let mut graph: Graph = lines.iter().collect();
     let mut res = Vec::new();
@@ -23,6 +31,7 @@ pub fn construct_polylines(lines: &[(Point3, Point3)]) -> Vec<PolylineCurve<Poin
     res
 }
 
+/// Cell of the snapping grid that contains a point.
 #[derive(Clone, Debug, Copy, Hash, PartialEq, Eq)]
 struct PointIndex([i64; 3]);
 

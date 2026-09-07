@@ -195,3 +195,39 @@ fn union_boxes_sharing_corner() {
     let union = truck_shapeops::or(&cube0, &cube1, TOL).unwrap();
     assert_solid(&union, 2.0, &[0, 0], TOL);
 }
+
+/// The tessellation tolerance only seeds the operation. Loosening it a hundredfold must not
+/// change the topology of the result, and the result stays exact since the cut edges are
+/// interpolated through points on both surfaces. The coarsest tolerance is still below the
+/// hole's radius; above it each half circle collapses to one chord and the operation fails.
+#[test]
+fn punched_cube_tolerance_stability() {
+    let hole = cylinder(Point3::new(0.5, 0.5, -0.5), Vector3::unit_z(), 0.25, 2.0);
+    let tol = 0.001;
+    for tol in [tol, 10.0 * tol, 100.0 * tol] {
+        let punched = subtract(&unit_cube(), &hole, tol).unwrap();
+        assert_counts(&punched, 12, 18, 8);
+        assert_solid(&punched, 1.0 - PI / 16.0, &[1], TOL);
+    }
+}
+
+/// The disk of the cylinder lies on the top of the cube. The circle is discretised far
+/// coarser than `TOLERANCE`, and both faces must be cut along the same polyline: no extra
+/// vertices on the circle and no extra edges on either face.
+#[test]
+fn union_cylinder_standing_on_cube() {
+    let cube = unit_cube();
+    let post = cylinder(Point3::new(0.5, 0.5, 1.0), Vector3::unit_z(), 0.25, 1.0);
+    let union = truck_shapeops::or(&cube, &post, TOL).unwrap();
+    assert_counts(&union, 12, 18, 9);
+    assert_solid(&union, 1.0 + cylinder_volume(0.25, 1.0), &[0], TOL);
+}
+
+/// Two boxes sharing part of a face, with the cuts landing exactly on the box vertices.
+#[test]
+fn union_offset_stacked_cubes_counts() {
+    let cube0 = unit_cube();
+    let cube1 = cuboid(Point3::new(0.5, 0.5, 1.0), Point3::new(1.5, 1.5, 2.0));
+    let union = truck_shapeops::or(&cube0, &cube1, TOL).unwrap();
+    assert_counts(&union, 18, 28, 12);
+}

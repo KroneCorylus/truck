@@ -160,6 +160,13 @@ fn classify_unknown<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     })
 }
 
+/// Cuts `shell0` and `shell1` against each other and sorts the pieces into those inside the
+/// other solid (`[0]`) and those outside (`[1]`).
+///
+/// `tol` does two jobs: both shells are triangulated at `tol`, which seeds the face pairing
+/// and the interference polylines, and the edges are sampled at `tol` when the faces are
+/// divided and the leftover pieces classified. Coincidence of points, vertex snapping and the
+/// bounding-box slack in `loops_store` and `polyline_construction` use the global `TOLERANCE`.
 fn process_one_pair_of_shells<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     shell0: &Shell<Point3, C, S>,
     shell1: &Shell<Point3, C, S>,
@@ -190,7 +197,20 @@ fn process_one_pair_of_shells<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     Some([altshell_to_shell(&and0)?, altshell_to_shell(&or0)?])
 }
 
-/// AND operation between two solids.
+/// Intersection of two solids.
+///
+/// `tol` is the chord error of the tessellation that seeds the operation, and does two jobs:
+/// the shells are meshed at `tol` to find which faces meet and where, and the edges are sampled
+/// at `tol` for dividing the faces and for the inside tests. The cut edges themselves are exact,
+/// interpolated through points on both surfaces, so `tol` does not enter the geometry of the
+/// result. Whether two points, or a point and a surface, coincide is decided by the global
+/// [`TOLERANCE`](truck_base::tolerance::TOLERANCE), the identity every geometry routine of
+/// truck uses; it is not a parameter of this function.
+///
+/// Loosening `tol` makes the operation faster and leaves the result unchanged as long as `tol`
+/// stays below the features of the faces: a `tol` above the radius of a circular edge collapses
+/// each of its arcs to one chord, the mesh degenerates, and the operation returns `None`.
+/// Tightening `tol` only adds triangles and time. `tol` must be positive.
 pub fn and<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     solid0: &Solid<Point3, C, S>,
     solid1: &Solid<Point3, C, S>,
@@ -213,7 +233,9 @@ pub fn and<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     Some(Solid::new(boundaries))
 }
 
-/// OR operation between two solids.
+/// Union of two solids.
+///
+/// `tol` is the chord error of the seeding tessellation, as for [`and`].
 pub fn or<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     solid0: &Solid<Point3, C, S>,
     solid1: &Solid<Point3, C, S>,

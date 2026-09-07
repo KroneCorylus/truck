@@ -178,3 +178,16 @@ pub mod modeling {
         Solid::new(vec![shell])
     }
 }
+
+/// Asserts the number of distinct vertices, edges and faces over all boundary shells of `solid`.
+/// A spurious split of a boundary shows up as extra vertices and edges with the same faces.
+pub fn assert_counts<P, C, S>(solid: &Solid<P, C, S>, vertices: usize, edges: usize, faces: usize) {
+    let vs: HashSet<_> = solid.vertex_iter().map(|v| v.id()).collect();
+    let es: HashSet<_> = solid.edge_iter().map(|e| e.id()).collect();
+    let fs: usize = solid.boundaries().iter().map(|shell| shell.len()).sum();
+    assert_eq!(
+        (vs.len(), es.len(), fs),
+        (vertices, edges, faces),
+        "(vertices, edges, faces)"
+    );
+}

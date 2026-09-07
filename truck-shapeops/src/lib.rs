@@ -10,6 +10,12 @@
 //! the outward normals agree and dropped when they oppose. Pieces of boundary that two coincident faces share
 //! must be discretized identically, which holds for planar faces and for shared curves.
 //! Faces that cross each other through a tangent point are not supported.
+//!
+//! The kernel works in absolute units: two points closer than the `TOLERANCE` of `truck-base`,
+//! `1e-6`, are the same point, and the `tol` of `and` and `or` is a chord error in the same
+//! units. Choose the units of a model so that its features are large against `TOLERANCE`, and
+//! `tol` below its smallest feature.
+//!
 //! Furthermore, performance optimization using BSP (Binary Space Partitioning) or similar methods remains a future task.
 //!
 //! ## Fillet and Chamfer

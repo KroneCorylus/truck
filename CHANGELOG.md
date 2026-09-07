@@ -4,6 +4,7 @@ The version is of the bottom crate `truck-rendimpl`.
 
 ## Unreleased
 
+- Document what the `tol` of `and` and `or` in `truck-shapeops` controls, and test that the result does not depend on it.
 - Write revolved cylinders, cones, spheres, tori and flat ends of `truck-modeling` as the elementary STEP surfaces, with the right `same_sense`.
 - Fix parameter searches on an inverted `Processor` surface reading the hint in the wrong parameter order.
 - Add `Surface::elementary` to `truck-modeling`, recognising planes, cylinders, cones, spheres and tori with their parameters.
