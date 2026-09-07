@@ -483,13 +483,13 @@ impl Elementary {
 }
 
 /// The component of `p - origin` perpendicular to the unit vector `axis`.
-fn radial(p: Point3, origin: Point3, axis: Vector3) -> Vector3 {
+pub(crate) fn radial(p: Point3, origin: Point3, axis: Vector3) -> Vector3 {
     let r = p - origin;
     r - axis * r.dot(axis)
 }
 
 /// The centre, radius and unit normal of a round conic, `None` for an ellipse.
-fn round_circle(
+pub(crate) fn round_circle(
     conic: &Processor<TrimmedCurve<UnitCircle<Point3>>, Matrix4>,
 ) -> Option<(Point3, f64, Vector3)> {
     let transform = *conic.transform();

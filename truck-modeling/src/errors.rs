@@ -30,6 +30,22 @@ pub enum Error {
     /// NURBS curve whose end weights differ.
     #[error("the curve has no NURBS form usable for lofting: an intersection curve, or unequal weights at its ends.")]
     NoNurbsForm,
+    /// an edge of a sweep path that is neither a line nor a circular arc.
+    /// cf. [`builder::sweep_along_wire`](../builder/fn.sweep_along_wire.html)
+    #[error("edge {0} of the path is neither a line nor a circular arc.")]
+    PathEdgeNotSweepable(usize),
+    /// a sweep path with a gap or a corner at a vertex.
+    /// cf. [`builder::sweep_along_wire`](../builder/fn.sweep_along_wire.html)
+    #[error("the path is not continuous and tangent continuous at vertex {0}.")]
+    PathNotSmooth(usize),
+    /// an arc of a sweep path whose axis the profile reaches, so the sweep would fold over.
+    /// cf. [`builder::sweep_along_wire`](../builder/fn.sweep_along_wire.html)
+    #[error("the profile reaches the axis of arc {0} of the path.")]
+    PathTooTight(usize),
+    /// a closed sweep path around which the profile does not return to where it started.
+    /// cf. [`builder::sweep_along_wire`](../builder/fn.sweep_along_wire.html)
+    #[error("the profile does not return to its start around the closed path; only planar closed paths are supported.")]
+    ClosedPathNotPlanar,
 }
 
 #[test]

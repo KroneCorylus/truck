@@ -4,6 +4,7 @@ The version is of the bottom crate `truck-rendimpl`.
 
 ## Unreleased
 
+- Add `builder::sweep_along_wire` and `sweep_wire_along_wire` to `truck-modeling`: a profile carried along a tangent-continuous path of lines and circular arcs, exact.
 - Add `builder::try_loft_shell`, `try_loft` and `align_sections` to `truck-modeling`: a NURBS skin through aligned sections whose iso-curves are the sections themselves.
 - Let `fillet_along_wire` in `truck-shapeops` take a radius that varies along the chain, as any `ScalarFunctionD1` of the wire parameter.
 - Report the faces, edges and vertices the STEP reader of `truck-stepio` leaves out, with the entity that caused it, instead of dropping them silently.
