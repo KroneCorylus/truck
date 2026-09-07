@@ -2,6 +2,35 @@ use proptest::{prelude::*, property_test};
 use truck_geometry::prelude::*;
 type PResult = std::result::Result<(), TestCaseError>;
 
+#[test]
+fn singular_curve_division_ignores_translation() {
+    let circle = TrimmedCurve::new(UnitCircle::<Point2>::new(), (0.0, std::f64::consts::TAU));
+    let transform = Matrix3::from_cols(
+        Vector3::new(3.0, 0.0, 0.0),
+        Vector3::new(4.0, 0.0, 0.0),
+        Vector3::unit_z(),
+    );
+    let arc = Processor::with_transform(circle, transform);
+    let shift = Vector2::new(1e6, -1e6);
+    let translated = arc.transformed(Matrix3::from_translation(shift));
+    let tol = 0.01;
+    let (params, points) = arc.parameter_division(arc.range_tuple(), tol);
+    let (shifted_params, shifted_points) =
+        translated.parameter_division(translated.range_tuple(), tol);
+    assert_eq!(params, shifted_params);
+    for (p, q) in points.iter().zip(shifted_points) {
+        assert_near!(*p + shift, q);
+    }
+    for (ts, ps) in params.windows(2).zip(points.windows(2)) {
+        for i in 1..10 {
+            let fraction = i as f64 / 10.0;
+            let exact = arc.subs(ts[0] + (ts[1] - ts[0]) * fraction);
+            let chord = ps[0] + (ps[1] - ps[0]) * fraction;
+            assert!(exact.distance(chord) < tol);
+        }
+    }
+}
+
 fn exec_compatible_with_bspcurve(ycoords: [f64; 7], mat: [f64; 9]) -> PResult {
     let knot_vec = KnotVec::uniform_knot(3, 4);
     let control_points: Vec<Point3> = ycoords

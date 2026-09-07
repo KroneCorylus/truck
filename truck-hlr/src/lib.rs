@@ -4,9 +4,8 @@
 //!
 //! # Current Status
 //!
-//! The edges of the solid are projected and classified. Silhouettes of curved faces, the
-//! outline of a cylinder or a sphere that is not an edge of the B-rep, are not extracted yet.
-//! Projection is parallel only.
+//! The edges of the solid and the silhouettes of its curved faces are projected, split at
+//! their crossings and classified. Projection is parallel only.
 
 #![cfg_attr(not(debug_assertions), deny(warnings))]
 #![deny(clippy::all, rust_2018_idioms)]
@@ -24,9 +23,10 @@
 mod crossing;
 mod occlusion;
 mod projection;
+mod silhouette;
 
 use itertools::Itertools;
-use std::collections::HashSet;
+use std::collections::HashMap;
 use truck_drafting::Curve as Curve2;
 use truck_meshalgo::prelude::*;
 use truck_modeling::*;
@@ -47,8 +47,8 @@ pub struct ProjectedView {
     pub curves: Vec<(Curve2, Visibility)>,
 }
 
-/// Projects the edges of `solid` onto `plane` in parallel along `direction` and classifies
-/// them as visible or hidden.
+/// Projects the edges and silhouettes of `solid` onto `plane` in parallel along `direction`
+/// and classifies them as visible or hidden.
 ///
 /// `direction` is the view direction, from the eye into the scene; a point of the body is
 /// hidden when the ray from it against `direction` meets the body. The 2D coordinates are
@@ -63,52 +63,122 @@ pub struct ProjectedView {
 /// `tol` and interpolated by a cubic B-spline over the same parameters. Edges whose projection
 /// fits in a circle of radius `tol`, such as those parallel to `direction`, are dropped.
 ///
+/// The silhouette of a face is where its normal is perpendicular to `direction`. It is traced
+/// over the face's tessellation at `tol`, which trims it to the face, with every crossing of a
+/// triangle edge refined on the exact normal; the rulings of cylinders and cones are then exact
+/// lines and the great circles of spheres exact arcs, anything else a cubic B-spline through
+/// the crossings. A face whose normal is perpendicular to `direction` everywhere, such as a
+/// cylinder wall seen along its axis, has no silhouette. A silhouette that coincides with an
+/// edge, a ruling on a seam, is kept as well as the edge.
+///
 /// Each projected curve is split where it crosses another, the crossings found from the
 /// polylines at `tol` and refined by Newton's method, and every piece is classified from the
-/// point of the edge at the middle parameter of the piece. Crossings within `tol` of an end
-/// of a piece do not split it. Pieces are not merged, so an edge crossed twice gives three
-/// curves even when all three have the same visibility. Two edges that project onto the same
-/// curve, such as the front and back edges of a box seen along a face normal, are both kept,
-/// one visible and one hidden.
+/// point of the curve at the middle parameter of the piece. A meeting with parallel tangents is
+/// not a crossing, so a silhouette touching the fold of an edge-on circle, or two edges that
+/// project onto the same curve, do not split each other. Crossings within `tol` of an end of a
+/// piece do not split it. Pieces are not merged, so an edge crossed twice gives three curves
+/// even when all three have the same visibility. Two edges that project onto the same curve,
+/// such as the front and back edges of a box seen along a face normal, are both kept, one
+/// visible and one hidden.
 ///
 /// The classification runs against the tessellation of `solid` at `tol`, so an occluder
-/// thinner than `tol` along the view direction may be missed. Two calls with the same inputs
-/// give the same output.
+/// thinner than `tol` along the view direction may be missed. A piece lying on a silhouette,
+/// every silhouette piece and every edge piece on a face the ray grazes, is decided by how that
+/// face bends along the ray: towards its outside, the ray is inside the body and the piece
+/// hidden; away, the ray is outside and the test point is moved by `2 tol` out of the body,
+/// past the tessellation sag, before testing the rest of the body; not at all, a plane or a
+/// ruling along the ray, the test point is moved by `2 tol` into the body, past the chord sag of
+/// the tessellation, and the far side of the body decides. So the far end circle of a cylinder
+/// seen along its axis is hidden behind the near one, and both end circles of a cylinder seen
+/// across its axis, edge-on, are visible. Two calls with the same inputs give the same output.
 ///
 /// # Panics
 ///
 /// `tol` must be at least `TOLERANCE`, and `direction` must not lie in the plane.
 pub fn project(solid: &Solid, plane: &Plane, direction: Vector3, tol: f64) -> ProjectedView {
     let projection = projection::Projection::new(plane, direction);
-    let mut seen = HashSet::new();
-    let mut edges: Vec<(Curve, Curve2)> = Vec::new();
-    for edge in solid.edge_iter() {
-        if !seen.insert(edge.id()) {
-            continue;
+    let faces: Vec<&Face> = solid.face_iter().collect();
+    let supports: Vec<(Surface, bool)> = faces
+        .iter()
+        .map(|face| (face.surface(), face.orientation()))
+        .collect();
+    let meshed = solid.triangulation(tol);
+    let mesh = meshed.to_polygon();
+
+    let mut items: Vec<Item> = Vec::new();
+    let mut seen: HashMap<EdgeID, Option<usize>> = HashMap::new();
+    for (i, face) in faces.iter().enumerate() {
+        for edge in face.boundaries().iter().flatten() {
+            match seen.get(&edge.id()) {
+                Some(Some(item)) => items[*item].faces.push(i),
+                Some(None) => {}
+                None => {
+                    let curve = edge.curve();
+                    let projected = projection.curve(&curve, tol);
+                    seen.insert(edge.id(), projected.as_ref().map(|_| items.len()));
+                    if let Some(projected) = projected {
+                        items.push(Item::new(curve, projected, i, false));
+                    }
+                }
+            }
         }
-        let curve = edge.curve();
-        if let Some(projected) = projection.curve(&curve, tol) {
-            edges.push((curve, projected));
+    }
+    for (i, meshed_face) in meshed.face_iter().enumerate() {
+        let Some(face_mesh) = meshed_face.surface() else {
+            continue;
+        };
+        for curve in silhouette::silhouettes(&supports[i].0, &face_mesh, direction, tol) {
+            if let Some(projected) = projection.curve(&curve, tol) {
+                items.push(Item::new(curve, projected, i, true));
+            }
         }
     }
 
-    let projected: Vec<&Curve2> = edges.iter().map(|(_, curve)| curve).collect();
+    let projected: Vec<&Curve2> = items.iter().map(|item| &item.projected).collect();
     let splits = crossing::split_parameters(&projected, tol);
-    let mesh = solid.triangulation(tol).to_polygon();
-    let toward_viewer = -direction;
+    let toward_viewer = -direction.normalize();
 
     let mut curves = Vec::new();
-    for ((curve, projected), splits) in edges.iter().zip(splits) {
-        let (t0, t1) = projected.range_tuple();
+    for (item, splits) in items.iter().zip(splits) {
+        let faces: Vec<occlusion::Support<'_>> = item
+            .faces
+            .iter()
+            .map(|&i| occlusion::Support {
+                surface: &supports[i].0,
+                orientation: supports[i].1,
+            })
+            .collect();
+        let (t0, t1) = item.projected.range_tuple();
         let bounds = std::iter::once(t0).chain(splits).chain(std::iter::once(t1));
         for (a, b) in bounds.tuple_windows() {
-            let point = curve.subs((a + b) / 2.0);
-            let visibility = match occlusion::blocked(&mesh, point, toward_viewer) {
+            let point = item.curve.subs((a + b) / 2.0);
+            let hidden =
+                occlusion::hidden(&mesh, point, toward_viewer, &faces, item.silhouette, tol);
+            let visibility = match hidden {
                 true => Visibility::Hidden,
                 false => Visibility::Visible,
             };
-            curves.push((crossing::piece(projected, a, b), visibility));
+            curves.push((crossing::piece(&item.projected, a, b), visibility));
         }
     }
     ProjectedView { curves }
+}
+
+/// A curve to draw: an edge or a silhouette, with the faces it lies on.
+struct Item {
+    curve: Curve,
+    projected: Curve2,
+    faces: Vec<usize>,
+    silhouette: bool,
+}
+
+impl Item {
+    fn new(curve: Curve, projected: Curve2, face: usize, silhouette: bool) -> Self {
+        Self {
+            curve,
+            projected,
+            faces: vec![face],
+            silhouette,
+        }
+    }
 }

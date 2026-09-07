@@ -341,12 +341,18 @@ where C: ParameterDivision1D<Point = Point2> + BoundedCurve<Point = Point2>
                 self.get_curve_parameter(range.0),
             ),
         };
-        let (_, k, _) = a
-            .iwasawa_decomposition()
-            .expect("transform matrix must be invertible!");
-        let n = f64::abs(k[0][0])
-            .max(f64::abs(k[1][1]))
-            .max(f64::abs(k[2][2]));
+        let n = match a.iwasawa_decomposition() {
+            Some((_, k, _)) => f64::abs(k[0][0])
+                .max(f64::abs(k[1][1]))
+                .max(f64::abs(k[2][2])),
+            // An edge-on ellipse has a singular transform. Bound its linear scaling by
+            // the Frobenius norm; translation does not change the division tolerance.
+            None => (0..2)
+                .flat_map(|i| (0..2).map(move |j| a[i][j] * a[i][j]))
+                .sum::<f64>()
+                .sqrt()
+                .max(1.0),
+        };
         let (mut params, mut points) = self.entity.parameter_division(range, tol / n);
         points
             .iter_mut()
