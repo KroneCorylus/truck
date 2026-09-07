@@ -102,3 +102,71 @@ fn collide_parabola() {
         assert_near!(pt.distance(Point3::origin()) * 0.5, f64::sqrt(0.5) * 0.5);
     }
 }
+
+/// Quadratic height graph a x^2 + 2 b xy + c y^2, with unequal parameter speeds.
+fn quadratic_graph(a: f64, b: f64, c: f64) -> BSplineSurface<Point3> {
+    let linear = [-1.0, 0.0, 1.0];
+    let square = [1.0, -1.0, 1.0];
+    let points = (0..3)
+        .map(|i| {
+            (0..3)
+                .map(|j| {
+                    Point3::new(
+                        2.0 * linear[i],
+                        3.0 * linear[j],
+                        4.0 * a * square[i]
+                            + 12.0 * b * linear[i] * linear[j]
+                            + 9.0 * c * square[j],
+                    )
+                })
+                .collect()
+        })
+        .collect();
+    BSplineSurface::new((KnotVec::bezier_knot(2), KnotVec::bezier_knot(2)), points)
+}
+
+#[test]
+fn tangent_curvature_classification() {
+    let plane = Plane::new(
+        Point3::origin(),
+        Point3::new(1.0, 0.0, 0.0),
+        Point3::new(0.0, 1.0, 0.0),
+    );
+    for (a, b, c, crossing) in [
+        (1.0, 0.0, -1.0, true),
+        (0.0, 1.0, 0.0, true),
+        (1.0, 0.0, 1.0, false),
+        (-1.0, 0.0, -1.0, false),
+        (1.0, 0.0, 0.0, false),
+        (0.0, 0.0, 0.0, false),
+    ] {
+        let graph = quadratic_graph(a, b, c);
+        for graph in [graph.clone(), graph.inverse()] {
+            for plane in [plane, plane.inverse()] {
+                assert_eq!(
+                    tangent_crossing_at(&graph, &plane, Point3::origin()),
+                    Some(crossing)
+                );
+                assert_eq!(
+                    tangent_crossing_at(&plane, &graph, Point3::origin()),
+                    Some(crossing)
+                );
+            }
+        }
+    }
+    let upper = Sphere::new(Point3::new(1.0, 0.0, 0.0), 1.0);
+    let lower = Sphere::new(Point3::new(-1.0, 0.0, 0.0), 1.0);
+    assert_eq!(
+        tangent_crossing_at(&upper, &lower, Point3::origin()),
+        Some(false)
+    );
+    let offset = Plane::new(
+        Point3::new(0.0, 0.0, 0.1),
+        Point3::new(1.0, 0.0, 0.1),
+        Point3::new(0.0, 1.0, 0.1),
+    );
+    assert_eq!(
+        tangent_crossing_at(&quadratic_graph(1.0, 0.0, -1.0), &offset, Point3::origin()),
+        Some(false)
+    );
+}

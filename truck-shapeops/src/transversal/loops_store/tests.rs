@@ -775,3 +775,50 @@ fn crossing_edges() {
         geom_loops_store0.display(wire_id_format)
     );
 }
+
+/// Four exact cut branches share a singular vertex. Every insertion order must produce
+/// the four triangular sectors of the diamond, each of area 1/2, without retraced edges.
+/// Parent 0f7747e1 produces two loops instead of four for order [0, 1, 3, 2].
+#[test]
+#[ignore = "Four-branch routing needs a loops-store change; order [0, 1, 3, 2] produces two loops"]
+fn four_branches_at_interior_vertex() {
+    use itertools::Itertools;
+    let vertices = [
+        Point3::new(1.0, 0.0, 0.0),
+        Point3::new(0.0, 1.0, 0.0),
+        Point3::new(-1.0, 0.0, 0.0),
+        Point3::new(0.0, -1.0, 0.0),
+    ]
+    .map(Vertex::new);
+    let center = Vertex::new(Point3::origin());
+    let edge = |a: &Vertex<Point3>, b: &Vertex<Point3>| Edge::new(a, b, Line(a.point(), b.point()));
+    let boundary: Wire<_, _> = (0..4)
+        .map(|i| edge(&vertices[i], &vertices[(i + 1) % 4]))
+        .collect();
+    for order in (0..4).permutations(4) {
+        let mut loops: Loops<_, _> = [BoundaryWire::new(boundary.clone(), ShapesOpStatus::Unknown)]
+            .into_iter()
+            .collect();
+        for &i in &order {
+            let status = if i % 2 == 0 {
+                ShapesOpStatus::And
+            } else {
+                ShapesOpStatus::Or
+            };
+            loops.add_edge(edge(&center, &vertices[i]), status);
+        }
+        assert_eq!(loops.len(), 4, "branch order {order:?}");
+        for wire in loops.iter() {
+            assert!(wire.is_closed(), "branch order {order:?}");
+            assert_eq!(wire.len(), 3, "branch order {order:?}");
+            let area: f64 = wire
+                .iter()
+                .map(|e| {
+                    let (a, b) = (e.front().point(), e.back().point());
+                    (a.x * b.y - a.y * b.x) / 2.0
+                })
+                .sum();
+            assert_near!(area, 0.5);
+        }
+    }
+}

@@ -160,6 +160,15 @@ where
 {
     let interferences = polygon0.extract_interference(polygon1);
     let polylines = super::polyline_construction::construct_polylines(&interferences);
+    // Four branches at a tangent crossing need angular routing in the loops store.
+    // Reject a detected crossing before either dropping its polyline or lifting it.
+    if polylines
+        .iter()
+        .flatten()
+        .any(|&point| tangent_crossing_at(&surface0, &surface1, point) == Some(true))
+    {
+        return None;
+    }
     polylines
         .into_iter()
         .filter(|polyline| !surfaces_graze_along(&surface0, &surface1, polyline))
@@ -174,6 +183,67 @@ where
             ))
         })
         .collect()
+}
+
+/// Whether the difference of the normal-curvature forms at a contact is indefinite.
+/// Both forms use the same unit normal and orthonormal tangent basis: opposite signs of
+/// the height difference in two directions imply four crossing branches. A semidefinite
+/// or zero difference is inconclusive beyond second order and is not rejected here.
+fn tangent_crossing_at<S0, S1>(surface0: &S0, surface1: &S1, point: Point3) -> Option<bool>
+where
+    S0: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>,
+    S1: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>, {
+    let uv0 = surface0.search_nearest_parameter(point, None, 100)?;
+    let uv1 = surface1.search_nearest_parameter(point, None, 100)?;
+    let n0 = surface0.normal(uv0.0, uv0.1);
+    let n1 = surface1.normal(uv1.0, uv1.1);
+    if !n0.magnitude2().is_finite()
+        || !n1.magnitude2().is_finite()
+        || n0.magnitude2() == 0.0
+        || n1.magnitude2() == 0.0
+    {
+        return None;
+    }
+    let normal = n0.normalize();
+    if !normal.cross(n1.normalize()).so_small()
+        || !surface0
+            .subs(uv0.0, uv0.1)
+            .near(&surface1.subs(uv1.0, uv1.1))
+    {
+        return Some(false);
+    }
+    let tangent = surface0.uder(uv0.0, uv0.1).normalize();
+    let bitangent = normal.cross(tangent);
+    let curvature0 = curvature_form(surface0, uv0, normal, tangent, bitangent)?;
+    let curvature1 = curvature_form(surface1, uv1, normal, tangent, bitangent)?;
+    let [a, b, c] = std::array::from_fn(|i| curvature0[i] - curvature1[i]);
+    let scale = a.abs().max(b.abs()).max(c.abs());
+    if !scale.is_finite() || scale == 0.0 {
+        return Some(false);
+    }
+    let (a, b, c) = (a / scale, b / scale, c / scale);
+    Some(a * c - b * b < -TOLERANCE)
+}
+
+fn curvature_form<S: ParametricSurface3D>(
+    surface: &S,
+    (u, v): (f64, f64),
+    normal: Vector3,
+    tangent: Vector3,
+    bitangent: Vector3,
+) -> Option<[f64; 3]> {
+    let derivatives = surface.ders(2, u, v);
+    let inverse = Matrix3::from_cols(derivatives[1][0], derivatives[0][1], normal).invert()?;
+    let x = inverse * tangent;
+    let y = inverse * bitangent;
+    let (uu, uv, vv) = (
+        normal.dot(derivatives[2][0]),
+        normal.dot(derivatives[1][1]),
+        normal.dot(derivatives[0][2]),
+    );
+    let form =
+        |a: Vector3, b: Vector3| uu * a.x * b.x + uv * (a.x * b.y + a.y * b.x) + vv * a.y * b.y;
+    Some([form(x, x), form(x, y), form(y, y)])
 }
 
 /// Whether the surfaces are tangent to each other at every vertex of `polyline`.

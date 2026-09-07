@@ -242,6 +242,7 @@ fn steinmetz_cylinders() -> (Solid, Solid) {
 
 /// Equal-radius perpendicular cylinders cross at two tangent points, with four branches each.
 /// Parent 2330028a panics in Solid::new: the output shell is not oriented and closed.
+/// Step 36 rejects the crossing with None; the volume target is still unmet.
 #[test]
 #[ignore = "Parent 2330028a panics in Solid::new: the output shell is not oriented and closed."]
 fn tangent_steinmetz_intersection() {
@@ -252,6 +253,7 @@ fn tangent_steinmetz_intersection() {
 
 /// The shared volume of two radius-one cylinders of length four is 16/3.
 /// Parent 2330028a panics in Solid::new: the output shell is not oriented and closed.
+/// Step 36 rejects the crossing with None; the volume target is still unmet.
 #[test]
 #[ignore = "Parent 2330028a panics in Solid::new: the output shell is not oriented and closed."]
 fn tangent_steinmetz_union() {
@@ -294,4 +296,12 @@ fn tangent_rod_in_equal_width_slot() {
     assert_solid(&slotted, 48.0, &[1], TOL);
     let result = subtract(&slotted, &rod, TOL).expect("rod in slot");
     assert_solid(&result, 48.0 - 2.0 * PI, &[3], TOL);
+}
+
+/// Detected tangent crossings must fail cleanly until four-branch loops are supported.
+#[test]
+fn tangent_steinmetz_returns_none() {
+    let (x, z) = steinmetz_cylinders();
+    assert!(truck_shapeops::and(&x, &z, TOL).is_none());
+    assert!(truck_shapeops::or(&x, &z, TOL).is_none());
 }

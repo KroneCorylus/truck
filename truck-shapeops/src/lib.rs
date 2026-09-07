@@ -9,7 +9,11 @@
 //! one shell per solid. Coincident faces are cut along each other's boundaries; their overlap is kept once when
 //! the outward normals agree and dropped when they oppose. Pieces of boundary that two coincident faces share
 //! must be discretized identically, which holds for planar faces and for shared curves.
-//! Faces that cross each other through a tangent point are not supported.
+//! Faces that cross each other through a tangent point are not supported. Detected second-order
+//! tangent crossings at interference vertices return `None` before curve lifting; four-branch
+//! routing is still unsupported. This does not detect singularities missed by the tessellation
+//! or resolve contact at degenerate surface parameters. Equal-radius sphere-in-bore subtraction
+//! and rod-in-slot subtraction also remain unsupported (respectively `None` and an open mesh).
 //!
 //! The kernel works in absolute units: two points closer than the `TOLERANCE` of `truck-base`,
 //! `1e-6`, are the same point, and the `tol` of `and` and `or` is a chord error in the same

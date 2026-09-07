@@ -4,6 +4,7 @@ The version is of the bottom crate `truck-rendimpl`.
 
 ## Unreleased
 
+- Reject detected second-order tangent crossings before boolean curve lifting, so the tested Steinmetz operations return `None` instead of panicking; record the four-branch loops-store limitation.
 - Record boolean failures at tangent crossings with analytic-volume tests for Steinmetz intersection and union, a sphere in an equal-radius bore and a rod in an equal-width slot.
 
 - Add silhouettes to `truck-hlr`: the outlines of curved faces, traced on their tessellation and exact for cylinders, cones and spheres, drawn and classified like edges, with pieces on a grazed face decided by how it bends; the curve division of a `Processor` in `truck-geometry` accepts a singular transform, an ellipse seen edge-on.
