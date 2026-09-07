@@ -133,3 +133,53 @@ pub fn shell(
         face: faces[0].id(),
     })
 }
+
+/// Thickens the open `shell` by `thickness` along the normals of its faces into a solid: the
+/// shell, its offset, and a wall along every free edge. This first version takes a planar
+/// shell, all faces planes with one normal, whose walls are exact extrusions of the free edges;
+/// a face of another kind, or in another plane, is [`LocalOpError::Unsupported`] naming it, so
+/// a bent shell with a concave interior edge is refused by the face beyond the bend. A
+/// thickness that is not positive is [`LocalOpError::NotInward`]. The input is not modified.
+/// # Examples
+/// ```
+/// use truck_modeling::*;
+/// use truck_shapeops::local::thicken;
+/// let v: Vec<Vertex> = [(0.0, 0.0), (2.0, 0.0), (2.0, 1.0), (1.0, 1.0), (1.0, 2.0), (0.0, 2.0)]
+///     .iter()
+///     .map(|&(x, y)| builder::vertex(Point3::new(x, y, 0.0)))
+///     .collect();
+/// let wire: Wire = (0..6).map(|i| builder::line(&v[i], &v[(i + 1) % 6])).collect();
+/// let plate: Shell = vec![builder::try_attach_plane(&[wire]).unwrap()].into();
+/// let slab = thicken(&plate, 0.5).unwrap();
+/// assert_eq!(slab.face_iter().count(), 8);
+/// ```
+pub fn thicken(shell: &Shell, thickness: f64) -> Result<Solid, LocalOpError<Surface>> {
+    if thickness <= 0.0 {
+        return Err(LocalOpError::NotInward);
+    }
+    let mut normal: Option<Vector3> = None;
+    for face in shell.face_iter() {
+        let unsupported = LocalOpError::Unsupported { face: face.id() };
+        let Surface::Plane(_) = face.surface() else {
+            return Err(unsupported);
+        };
+        let n = face.oriented_surface().normal(0.0, 0.0);
+        match normal {
+            Some(m) if !(n - m).so_small() => return Err(unsupported),
+            Some(_) => {}
+            None => normal = Some(n),
+        }
+    }
+    let Some(normal) = normal else {
+        return Err(LocalOpError::NotInward);
+    };
+    let solids: Vec<Result<Solid, truck_topology::errors::Error>> =
+        builder::tsweep(shell, normal * thickness);
+    let unsupported = LocalOpError::Unsupported {
+        face: shell.face_iter().next().unwrap().id(),
+    };
+    match <[_; 1]>::try_from(solids) {
+        Ok([Ok(solid)]) => Ok(solid),
+        _ => Err(unsupported),
+    }
+}

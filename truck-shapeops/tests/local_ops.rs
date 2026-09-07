@@ -11,7 +11,7 @@ use std::f64::consts::PI;
 use truck_geometry::prelude::*;
 use truck_modeling::{builder, Elementary, FaceID, Rad};
 use truck_shapeops::local::{
-    delete_face, draft, move_faces, offset_faces, replace_surfaces, shell, LocalOpError,
+    delete_face, draft, move_faces, offset_faces, replace_surfaces, shell, thicken, LocalOpError,
 };
 
 type MWire = truck_modeling::Wire;
@@ -587,4 +587,67 @@ fn concave_pocket_is_rejected() {
         shell(&block, &[], -0.1),
         Err(LocalOpError::NotInward)
     ));
+}
+
+/// A planar L-shaped shell thickened is a slab of its area times the thickness.
+#[test]
+fn planar_shell_thickened() {
+    let outline = polygon_at(
+        &[
+            (0.0, 0.0),
+            (2.0, 0.0),
+            (2.0, 1.0),
+            (1.0, 1.0),
+            (1.0, 2.0),
+            (0.0, 2.0),
+        ],
+        0.0,
+    );
+    let plate: truck_modeling::Shell = vec![builder::try_attach_plane(&[outline]).unwrap()].into();
+    let slab = thicken(&plate, 0.5).unwrap();
+    let harness = from_modeling(&slab);
+    assert_counts(&harness, 12, 18, 8);
+    assert_solid(&harness, 3.0 * 0.5, &[0], TOL);
+    assert!(matches!(thicken(&plate, 0.0), Err(LocalOpError::NotInward)));
+}
+
+/// A bent shell has an interior edge that is concave on one side; it is refused by the face
+/// beyond the bend.
+#[test]
+fn bent_shell_is_rejected() {
+    let v: Vec<_> = [
+        (0.0, 0.0, 0.0),
+        (1.0, 0.0, 0.0),
+        (1.0, 1.0, 0.0),
+        (0.0, 1.0, 0.0),
+        (1.0, 1.0, 1.0),
+        (0.0, 1.0, 1.0),
+    ]
+    .map(|(x, y, z)| builder::vertex(Point3::new(x, y, z)))
+    .into();
+    let floor: MWire = vec![
+        builder::line(&v[0], &v[1]),
+        builder::line(&v[1], &v[2]),
+        builder::line(&v[2], &v[3]),
+        builder::line(&v[3], &v[0]),
+    ]
+    .into();
+    let wall: MWire = vec![
+        floor[2].inverse(),
+        builder::line(&v[2], &v[4]),
+        builder::line(&v[4], &v[5]),
+        builder::line(&v[5], &v[3]),
+    ]
+    .into();
+    let bent: truck_modeling::Shell = vec![
+        builder::try_attach_plane(&[floor]).unwrap(),
+        builder::try_attach_plane(&[wall]).unwrap(),
+    ]
+    .into();
+    let second = bent[1].id();
+    let err = thicken(&bent, 0.1).unwrap_err();
+    assert!(
+        matches!(err, LocalOpError::Unsupported { face } if face == second),
+        "{err}"
+    );
 }

@@ -36,6 +36,7 @@
 //! restores the sharp edge.
 //! `local::draft` tilts planar and cylindrical faces about a neutral plane, cylinders becoming cones.
 //! `local::shell` hollows a convex-edged solid to walls of a thickness, with chosen faces opened.
+//! `local::thicken` makes a planar shell into a slab of a thickness.
 
 #![cfg_attr(not(debug_assertions), deny(warnings))]
 #![deny(clippy::all, rust_2018_idioms)]

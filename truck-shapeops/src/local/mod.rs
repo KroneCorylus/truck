@@ -10,7 +10,7 @@ pub use draft::draft;
 pub use intersect::{intersect_surfaces, parameter_domain, Domain};
 pub use replace::replace_surfaces;
 use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};
-pub use shell::shell;
+pub use shell::{shell, thicken};
 use std::{fmt, result::Result};
 use truck_geometry::prelude::*;
 use truck_meshalgo::prelude::*;

@@ -4,6 +4,7 @@ The version is of the bottom crate `truck-rendimpl`.
 
 ## Unreleased
 
+- Add `local::thicken` to `truck-shapeops`: a planar shell made into a slab of a thickness.
 - Add `local::shell` to `truck-shapeops`: a convex-edged solid hollowed inward to walls of a thickness, with chosen faces opened.
 - Let `local::move_faces` in `truck-shapeops` re-intersect the moved surfaces when the faces cannot move rigidly, and add `local::offset_faces`.
 - Add `Surface::offset` to `truck-modeling`: planes, extruded circles and revolved lines and circles offset within their own kind, so cylinders, cones, spheres and tori stay exact.
