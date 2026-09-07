@@ -1,6 +1,6 @@
 use super::{Result, *};
 use truck_geometry::prelude::*;
-use truck_modeling::{Curve as ModelingCurve, Surface as ModelingSurface};
+use truck_modeling::{Curve as ModelingCurve, Elementary, Surface as ModelingSurface};
 use truck_polymesh::PolylineCurve;
 
 impl DisplayByStep for Point2 {
@@ -803,95 +803,106 @@ impl<C, T: One> StepSurface for Processor<RevolutedCurve<C>, T> {
     fn same_sense(&self) -> bool { !self.orientation() }
 }
 
-/// A circle swept along its own axis, written as `CYLINDRICAL_SURFACE`. The STEP surface's
-/// normal points away from the axis whatever the direction of the circle or the sweep.
-#[derive(Clone, Copy, Debug)]
-struct Cylinder {
-    position: MatrixAsAxis<Matrix4>,
-    radius: f64,
-    /// whether the normal of the swept surface points away from the axis
-    outward: bool,
+/// Axis placement with `axis` as the z direction and any perpendicular unit vector as the
+/// reference direction.
+fn placement(origin: Point3, axis: Vector3) -> MatrixAsAxis<Matrix4> {
+    let seed = match axis.x.abs() < 0.9 {
+        true => Vector3::unit_x(),
+        false => Vector3::unit_y(),
+    };
+    let x = (seed - axis * seed.dot(axis)).normalize();
+    MatrixAsAxis(Matrix4::from_cols(
+        x.extend(0.0),
+        axis.cross(x).extend(0.0),
+        axis.extend(0.0),
+        origin.to_homogeneous(),
+    ))
 }
 
-impl Cylinder {
-    fn from_extruded(surface: &ExtrudedCurve<ModelingCurve, Vector3>) -> Option<Self> {
-        let ModelingCurve::Conic(circle) = surface.entity_curve() else {
-            return None;
-        };
-        let transform = *circle.transform();
-        let (x, y) = (transform[0].truncate(), transform[1].truncate());
-        let location = transform[3].to_point();
-        let (radius, y_radius) = (x.magnitude(), y.magnitude());
-        let axis = x.cross(y) / (radius * y_radius);
-        let vector = surface.extruding_vector();
-        let is_circle = radius.near(&y_radius) && (x.dot(y) / (radius * y_radius)).so_small();
-        let along_axis = (vector.cross(axis) / vector.magnitude()).so_small();
-        if !is_circle || !along_axis {
-            return None;
-        }
-        let (u, _) = circle.range_tuple();
-        let outward = surface.normal(u, 0.0).dot(surface.subs(u, 0.0) - location) > 0.0;
-        let position = Matrix4::from_cols(
-            (x / radius).extend(0.0),
-            (y / y_radius).extend(0.0),
-            axis.extend(0.0),
-            location.to_homogeneous(),
-        );
-        Some(Self {
-            position: MatrixAsAxis(position),
-            radius,
-            outward,
-        })
-    }
-}
-
-impl DisplayByStep for Cylinder {
+/// The elementary surfaces of `truck-modeling` as the STEP entities of the same name. The
+/// normal of each entity is the canonical normal of [`Elementary`].
+impl DisplayByStep for Elementary {
     fn fmt(&self, idx: usize, f: &mut Formatter<'_>) -> Result {
         let position_idx = idx + 1;
-        f.write_fmt(format_args!(
-            "#{idx} = CYLINDRICAL_SURFACE('', #{position_idx}, {radius});\n{position}",
-            radius = FloatDisplay(self.radius),
-            position = StepDataDisplay::new(self.position, position_idx),
-        ))
+        match *self {
+            Elementary::Plane(plane) => DisplayByStep::fmt(&plane, idx, f),
+            Elementary::Cylinder {
+                origin,
+                axis,
+                radius,
+            } => f.write_fmt(format_args!(
+                "#{idx} = CYLINDRICAL_SURFACE('', #{position_idx}, {radius});\n{position}",
+                radius = FloatDisplay(radius),
+                position = StepDataDisplay::new(placement(origin, axis), position_idx),
+            )),
+            Elementary::Cone {
+                apex,
+                axis,
+                half_angle,
+            } => f.write_fmt(format_args!(
+                "#{idx} = CONICAL_SURFACE('', #{position_idx}, 0.0, {semi_angle});\n{position}",
+                semi_angle = FloatDisplay(half_angle.0),
+                position = StepDataDisplay::new(placement(apex, axis), position_idx),
+            )),
+            Elementary::Sphere { center, radius } => {
+                DisplayByStep::fmt(&Sphere::new(center, radius), idx, f)
+            }
+            Elementary::Torus {
+                center,
+                axis,
+                major,
+                minor,
+            } => {
+                let torus = Torus::new(Point3::origin(), major, minor);
+                let placed = Processor::with_transform(torus, placement(center, axis).0);
+                DisplayByStep::fmt(&placed, idx, f)
+            }
+        }
     }
 }
-impl_const_step_length!(Cylinder, 1 + MatrixAsAxis::<Matrix4>::LENGTH);
+impl_const_step_length!(Elementary, 1 + MatrixAsAxis::<Matrix4>::LENGTH);
 
 impl DisplayByStep for ModelingSurface {
     fn fmt(&self, idx: usize, f: &mut Formatter<'_>) -> Result {
+        if let Some((elementary, _)) = self.elementary() {
+            return DisplayByStep::fmt(&elementary, idx, f);
+        }
         match self {
             ModelingSurface::Plane(x) => DisplayByStep::fmt(x, idx, f),
             ModelingSurface::BSplineSurface(x) => DisplayByStep::fmt(x, idx, f),
             ModelingSurface::NurbsSurface(x) => DisplayByStep::fmt(x, idx, f),
             ModelingSurface::RevolutedCurve(x) => DisplayByStep::fmt(x, idx, f),
-            ModelingSurface::Extruded(x) => match Cylinder::from_extruded(x) {
-                Some(cylinder) => DisplayByStep::fmt(&cylinder, idx, f),
-                None => DisplayByStep::fmt(x, idx, f),
-            },
+            ModelingSurface::Extruded(x) => DisplayByStep::fmt(x, idx, f),
         }
     }
 }
 
 impl StepLength for ModelingSurface {
     fn step_length(&self) -> usize {
+        if self.elementary().is_some() {
+            return Elementary::LENGTH;
+        }
         match self {
             ModelingSurface::Plane(_) => Plane::LENGTH,
             ModelingSurface::BSplineSurface(x) => x.step_length(),
             ModelingSurface::NurbsSurface(x) => x.step_length(),
-            ModelingSurface::RevolutedCurve(x) => x.entity().step_length(),
-            ModelingSurface::Extruded(x) => match Cylinder::from_extruded(x) {
-                Some(_) => Cylinder::LENGTH,
-                None => x.step_length(),
-            },
+            ModelingSurface::RevolutedCurve(x) => x.step_length(),
+            ModelingSurface::Extruded(x) => x.step_length(),
         }
     }
 }
 
 impl StepSurface for ModelingSurface {
+    /// Whether the face normal is the normal of the written entity: the canonical normal for
+    /// an elementary surface, otherwise the convention of the generic writer, which for a
+    /// revolved surface is the one the reader and OpenCASCADE use.
     fn same_sense(&self) -> bool {
-        match self {
-            ModelingSurface::Extruded(x) => Cylinder::from_extruded(x).is_none_or(|c| c.outward),
-            _ => true,
+        match self.elementary() {
+            Some((_, outward)) => outward,
+            None => match self {
+                ModelingSurface::RevolutedCurve(x) => StepSurface::same_sense(x),
+                _ => true,
+            },
         }
     }
 }
