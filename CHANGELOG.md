@@ -4,6 +4,8 @@ The version is of the bottom crate `truck-rendimpl`.
 
 ## Unreleased
 
+- Support two-edge fillets at orthogonal convex corners with exact cylindrical miter joins, and add `chamfer_solid_edges` / `try_chamfer_solid_edges` for equal-distance planar corner chamfers (R11). Preserve unselected edges, return face history, and distinguish unsupported junctions from sizes that do not fit. Regressions cover selection order, rigid transforms, analytical volumes, booleans through the corner, and prepared STEP round trips.
+
 - Make rolling-ball fillet approximation propagate failed adaptive contact solves and singular tangent frames without panicking (R10). Reject folded contact offsets and document the unsupported equal-radius sequential rim case; preserve smaller-radius sequential blends and face history.
 
 - Fix fine revolution meshes (R9): measure interior refinement against triangle planes so flat polar caps stay compact and closed. Weld attribute components directly from spatial buckets without storing a quadratic graph of equal normals, preserving the strict tolerance and transitive connections.

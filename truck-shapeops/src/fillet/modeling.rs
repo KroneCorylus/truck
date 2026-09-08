@@ -139,6 +139,57 @@ pub fn try_fillet_solid_edges(
     finish(solid, index, shell).map_err(|e| e.operation(operation))
 }
 
+/// Equal-distance chamfers on a set of straight edges of a convex planar modeling solid.
+///
+/// Each vertex must have three incident edges. Distances are measured on both adjacent
+/// faces, perpendicular to each selected edge. Bevel planes trim one another: two meet
+/// along a miter, shortening the unselected edge; three meet at a point, without an extra
+/// corner face. All distances are equal, so reversing selection order has no effect.
+/// Unequal distances and curved or concave boundaries are outside this API's scope.
+/// Sizes that remove an original face, an unselected edge, or a bevel contact are rejected.
+/// The selected boundary must not intersect another boundary of the solid.
+///
+/// Original face replacements precede the generated bevel faces in the history. Geometry
+/// consists of exact planes and lines; no tessellation or export fitting is used to model it.
+/// An empty selection returns the original solid and empty history. Failure leaves it unchanged.
+pub fn chamfer_solid_edges(
+    solid: &Solid,
+    edges: &[EdgeID],
+    distance: f64,
+    tol: f64,
+) -> Option<BlendResult> {
+    try_chamfer_solid_edges(solid, edges, distance, tol).ok()
+}
+
+/// Diagnostic variant of [`chamfer_solid_edges`]. Unsupported junctions return
+/// [`Code::UnsupportedTopology`]; distances that do not fit return [`Code::OutsideNeighbour`].
+pub fn try_chamfer_solid_edges(
+    solid: &Solid,
+    edges: &[EdgeID],
+    distance: f64,
+    tol: f64,
+) -> Result<BlendResult, Diagnostic> {
+    let operation = "chamfer_solid_edges";
+    validate_tolerance(tol, operation)?;
+    Solid::try_new(solid.boundaries().clone()).map_err(|e| {
+        Diagnostic::new(Code::InvalidInputTopology, operation, "validate_input")
+            .with_coded_source(e)
+    })?;
+    positive(distance, "distance", operation)?;
+    if edges.is_empty() {
+        return Ok(BlendResult {
+            solid: solid.clone(),
+            modified_faces: Vec::new(),
+            generated_faces: Vec::new(),
+        });
+    }
+    let index = validate_selection(solid, edges, operation)?;
+    let shell =
+        super::chamfer_edges::chamfer_edges(&solid.boundaries()[index], edges, distance, tol)
+            .map_err(|e| e.shell(index))?;
+    finish(solid, index, shell).map_err(|e| e.operation(operation))
+}
+
 /// Chamfers a closed tangent-continuous wire of a modeling solid.
 ///
 /// Distances and supported geometry are described by [`super::chamfer_along_wire`]. Reversing

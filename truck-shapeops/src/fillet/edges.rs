@@ -5,7 +5,10 @@ use truck_base::diagnostics::{validate_tolerance, Code, Diagnostic};
 
 /// Fillets selected straight edges of a closed convex planar shell at a common radius.
 /// Three selected edges at a vertex receive an exact spherical corner; one selected edge
-/// ends on the remaining plane. Collinear chain subdivisions are retained. Other junctions,
+/// ends on the remaining plane. Two selected edges at an orthogonal trihedral corner meet
+/// along an exact elliptical miter: the rounds are tangent to their supporting planes,
+/// but meet with a crease along the miter. The third edge is only shortened, never rounded.
+/// Collinear chain subdivisions are retained. Other junctions,
 /// curved faces, concave shells and radii that collapse an edge return `None`. Input topology
 /// and geometry are not modified. Planarity and straightness are checked at sampled points.
 ///
@@ -30,6 +33,9 @@ where
 }
 
 /// Equal-radius edge fillets with stable failure codes and face context.
+/// Unsupported junction valence returns [`Code::UnsupportedTopology`], nonorthogonal
+/// two-edge corners return [`Code::UnsupportedGeometry`], and radii that leave the
+/// available faces or collapse trimmed edges return [`Code::OutsideNeighbour`].
 pub fn try_fillet_edges<C, S>(
     shell: &Shell<Point3, C, S>,
     edges: &[EdgeID<C>],
@@ -66,129 +72,18 @@ where
     if edges.is_empty() {
         return Ok(shell.clone());
     }
-    let mut vertex_index = HashMap::default();
-    let mut vertices = Vec::new();
-    let mut edge_index = HashMap::default();
-    let mut original_edges = Vec::new();
-    let mut edge_faces: Vec<Vec<(usize, bool)>> = Vec::new();
-    let mut planes = Vec::new();
-    for (i, face) in shell.iter().enumerate() {
-        let boundaries = face.boundaries();
-        if boundaries.len() != 1 {
-            return Err(error(Code::UnsupportedTopology).face(i));
-        }
-        let surface = face.oriented_surface();
-        let point = boundaries[0].front_vertex().ok_or_else(failed)?.point();
-        let (u, v) = surface
-            .search_parameter(point, None, 100)
-            .ok_or_else(failed)?;
-        let normal = surface.normal(u, v).normalize();
-        let d = normal.dot(point.to_vec());
-        let planar = |u, v| {
-            let p = surface.subs(u, v);
-            (normal.dot(p.to_vec()) - d).abs() <= tol.min(TOLERANCE)
-                && surface.normal(u, v).normalize().near(&normal)
-        };
-        let interval = |(a, b): ParameterRange| {
-            use std::ops::Bound::*;
-            (
-                match a {
-                    Included(t) | Excluded(t) => t,
-                    Unbounded => -1.0,
-                },
-                match b {
-                    Included(t) | Excluded(t) => t,
-                    Unbounded => 1.0,
-                },
-            )
-        };
-        let (ur, vr) = surface.parameter_range();
-        let ((u0, u1), (v0, v1)) = (interval(ur), interval(vr));
-        for a in 0..3 {
-            for b in 0..3 {
-                if !planar(
-                    u0 + (u1 - u0) * a as f64 / 2.0,
-                    v0 + (v1 - v0) * b as f64 / 2.0,
-                ) {
-                    return Err(error(Code::NonPlanarFace).face(i));
-                }
-            }
-        }
-        planes.push((normal, d));
-        for edge in &boundaries[0] {
-            for vertex in [edge.front(), edge.back()] {
-                vertex_index.entry(vertex.id()).or_insert_with(|| {
-                    let index = vertices.len();
-                    vertices.push(vertex.clone());
-                    index
-                });
-            }
-            let k = *edge_index.entry(edge.id()).or_insert_with(|| {
-                let k = original_edges.len();
-                original_edges.push(edge.absolute_clone());
-                edge_faces.push(Vec::new());
-                k
-            });
-            edge_faces[k].push((i, edge.orientation()));
-            let curve = edge.curve();
-            let (a, b) = curve.range_tuple();
-            let start = edge.absolute_front().point();
-            let direction = edge.absolute_back().point() - start;
-            if direction.so_small() {
-                return Err(error(Code::DegenerateCurve).face(i));
-            }
-            for k in 0..=4 {
-                let point = curve.subs(a + (b - a) * k as f64 / 4.0);
-                if (point - start).cross(direction.normalize()).magnitude() > TOLERANCE {
-                    return Err(error(Code::UnsupportedGeometry).face(i));
-                }
-                let (u, v) = surface
-                    .search_parameter(point, None, 100)
-                    .ok_or_else(failed)?;
-                if !planar(u, v) {
-                    return Err(error(Code::NonPlanarFace).face(i));
-                }
-            }
-        }
-    }
-    if selected.iter().any(|id| !edge_index.contains_key(id)) {
-        return Err(error(Code::UnknownEdge));
-    }
-    if vertices.iter().any(|v| {
-        planes
-            .iter()
-            .any(|&(n, d)| n.dot(v.point().to_vec()) > d + TOLERANCE)
-    }) {
-        return Err(error(Code::UnsupportedGeometry));
-    }
-    let mut incident = vec![Vec::new(); vertices.len()];
-    let mut sides = Vec::new();
-    for (k, edge) in original_edges.iter().enumerate() {
-        let [(a, forward), (b, backward)] = edge_faces[k][..] else {
-            return Err(error(Code::UnsupportedTopology));
-        };
-        if forward == backward {
-            return Err(error(Code::UnsupportedTopology));
-        }
-        let pair = if forward { [a, b] } else { [b, a] };
-        if selected.contains(&edge.id()) {
-            let axis = edge.absolute_back().point() - edge.absolute_front().point();
-            if planes[pair[0]]
-                .0
-                .cross(planes[pair[1]].0)
-                .dot(axis.normalize())
-                <= TOLERANCE
-            {
-                return Err(error(Code::ConcaveEdge));
-            }
-        }
-        sides.push(pair);
-        for v in [edge.front(), edge.back()] {
-            incident[vertex_index[&v.id()]].push(k);
-        }
-    }
+    let convex::ConvexShell {
+        vertex_index,
+        vertices,
+        edge_index,
+        original_edges,
+        planes,
+        incident,
+        sides,
+    } = convex::validate(shell, &selected, tol, "fillet_edges")?;
     let mut centers = Vec::new();
     let mut contacts: Vec<HashMap<usize, Vertex<Point3>>> = Vec::new();
+    let mut miters = vec![None; vertices.len()];
     for (i, vertex) in vertices.iter().enumerate() {
         let chosen: Vec<_> = incident[i]
             .iter()
@@ -213,6 +108,25 @@ where
             .collect();
         match (chosen.len(), incident[i].len(), faces.len()) {
             (1, 3, 3) | (3, 3, 3) => {}
+            (2, 3, 3) => {
+                if faces
+                    .iter()
+                    .array_combinations()
+                    .any(|[&a, &b]| planes[a].0.dot(planes[b].0).abs() > TOLERANCE)
+                {
+                    return Err(error(Code::UnsupportedGeometry));
+                }
+                let away = |k: usize| {
+                    let e = &original_edges[k];
+                    (if e.front() == vertex {
+                        e.back().point() - vertex.point()
+                    } else {
+                        e.front().point() - vertex.point()
+                    })
+                    .normalize()
+                };
+                miters[i] = Some((away(chosen[0]) - away(chosen[1])).normalize());
+            }
             (2, 2, 2) => {
                 let away = |k: usize| {
                     let e = &original_edges[k];
@@ -244,7 +158,7 @@ where
                 radius
             };
             if n.dot(center.to_vec()) > d - offset + TOLERANCE {
-                return Err(failed().parameter("radius", radius));
+                return Err(error(Code::OutsideNeighbour).parameter("radius", radius));
             }
         }
         contacts.push(
@@ -253,6 +167,18 @@ where
                 .map(|f| (f, Vertex::new(center + radius * planes[f].0)))
                 .collect(),
         );
+        if miters[i].is_some() {
+            let shared = sides[chosen[0]]
+                .into_iter()
+                .find(|f| sides[chosen[1]].contains(f))
+                .ok_or_else(failed)?;
+            let tip = Vertex::new(vertex.point() - radius * planes[shared].0);
+            for &f in &faces {
+                if f != shared {
+                    contacts[i].insert(f, tip.clone());
+                }
+            }
+        }
         centers.push(center);
     }
     let mut trims: Vec<[Edge<Point3, C>; 2]> = Vec::new();
@@ -272,7 +198,7 @@ where
         let make_line = |p: &Vertex<Point3>, q: &Vertex<Point3>| {
             let direction = q.point() - p.point();
             if direction.dot(edge.back().point() - edge.front().point()) <= TOLERANCE2 {
-                return Err(failed().parameter("radius", radius));
+                return Err(error(Code::OutsideNeighbour).parameter("radius", radius));
             }
             Ok(Edge::new(
                 p,
@@ -294,32 +220,45 @@ where
         ];
         let line_a = make_line(&a0, &a1)?;
         let line_b = make_line(&b0, &b1)?;
-        let arc_curve = |center: Point3| {
+        let arc_curve = |v: usize| {
+            let center = centers[v];
             let (n, m) = (planes[a].0, planes[b].0);
             let w = ((1.0 + n.dot(m)) / 2.0).sqrt();
             let middle = center + radius * (n + m) / (1.0 + n.dot(m));
-            NurbsCurve::new(BSplineCurve::new(
+            let mut curve = NurbsCurve::new(BSplineCurve::new(
                 KnotVec::bezier_knot(2),
                 vec![
                     (center + radius * n).to_vec().extend(1.0),
                     middle.to_vec().extend(1.0) * w,
                     (center + radius * m).to_vec().extend(1.0),
                 ],
-            ))
-        };
-        let curve0 = arc_curve(centers[v0]);
-        let curve1 = arc_curve(centers[v1]);
-        let mut make_arc =
-            |v, front: &Vertex<Point3>, back: &Vertex<Point3>, curve: &NurbsCurve<Vector4>| {
-                let edge = arc_map
-                    .entry((v, a.min(b), a.max(b)))
-                    .or_insert_with(|| Edge::new(front, back, curve.to_same_geometry()));
-                if edge.front() == front {
-                    edge.clone()
-                } else {
-                    edge.inverse()
+            ));
+            if let Some(normal) = miters[v] {
+                let axis = (edge.back().point() - edge.front().point()).normalize();
+                // Project the circular section along its cylinder axis onto the miter plane.
+                for p in curve.control_points_mut() {
+                    let distance = normal.dot(p.truncate() - vertices[v].point().to_vec() * p.w);
+                    *p -= (axis * (distance / normal.dot(axis))).extend(0.0);
                 }
-            };
+            }
+            curve
+        };
+        let curve0 = arc_curve(v0);
+        let curve1 = arc_curve(v1);
+        let mut make_arc = |v: usize,
+                            front: &Vertex<Point3>,
+                            back: &Vertex<Point3>,
+                            curve: &NurbsCurve<Vector4>| {
+            let pair = miters[v].is_none().then_some((a.min(b), a.max(b)));
+            let edge = arc_map
+                .entry((v, pair))
+                .or_insert_with(|| Edge::new(front, back, curve.to_same_geometry()));
+            if edge.front() == front {
+                edge.clone()
+            } else {
+                edge.inverse()
+            }
+        };
         let arc0 = make_arc(v0, &a0, &b0, &curve0);
         let arc1 = make_arc(v1, &a1, &b1, &curve1);
         let surface = NurbsSurface::new(BSplineSurface::new(
@@ -396,7 +335,7 @@ where
     }
     result.extend(fillets);
     for (v, vertex) in vertices.iter().enumerate() {
-        if contacts[v].len() != 3 {
+        if contacts[v].len() != 3 || miters[v].is_some() {
             continue;
         }
         let mut remaining: Vec<_> = incident[v]

@@ -1,8 +1,10 @@
 //! Fillets and chamfers, including operations on [`truck_modeling::Solid`].
 //!
 //! Use [`crate::fillet::fillet_solid_along_wire`] for constant or variable radii on a tangent-continuous chain,
-//! [`crate::fillet::chamfer_solid_edge`] for a chamfer with two end faces, and [`crate::fillet::fillet_solid_edges`] for equal
-//! radii on convex planar shells, including three-edge spherical corners. The generic shell and
+//! [`crate::fillet::chamfer_solid_edge`] for a chamfer with two end faces,
+//! [`crate::fillet::chamfer_solid_edges`] for equal-distance planar corner chamfers, and
+//! [`crate::fillet::fillet_solid_edges`] for equal radii on convex planar shells, including
+//! two-edge orthogonal miters and three-edge spherical corners. The generic shell and
 //! face functions below also accept the modeling types directly; no representation conversion
 //! is necessary. Concave corners and unequal-radius junctions are outside this scope.
 //!
@@ -478,12 +480,14 @@ pub use along_wire::{fillet_along_wire, try_fillet_along_wire};
 mod chamfer;
 pub use chamfer::{chamfer_along_wire, chamfer_with_side, simple_chamfer, try_chamfer_along_wire};
 
+mod chamfer_edges;
+mod convex;
 mod edges;
 pub use edges::{fillet_edges, try_fillet_edges};
 
 mod modeling;
 pub use modeling::{
-    chamfer_solid_along_wire, chamfer_solid_edge, fillet_solid_along_wire, fillet_solid_edges,
-    try_chamfer_solid_along_wire, try_chamfer_solid_edge, try_fillet_solid_along_wire,
-    try_fillet_solid_edges, BlendResult,
+    chamfer_solid_along_wire, chamfer_solid_edge, chamfer_solid_edges, fillet_solid_along_wire,
+    fillet_solid_edges, try_chamfer_solid_along_wire, try_chamfer_solid_edge,
+    try_chamfer_solid_edges, try_fillet_solid_along_wire, try_fillet_solid_edges, BlendResult,
 };

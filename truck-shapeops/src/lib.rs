@@ -37,6 +37,9 @@
 //! Fillets with a constant or varying radius can also be applied to a tangent-continuous chain of edges with `fillet_along_wire`,
 //! whose ends may be at vertices with any number of faces. `fillet_edges` blends equal-radius straight-edge
 //! chains on closed convex planar shells, with exact spherical patches at three-edge corners.
+//! Two selected edges at an orthogonal corner meet along an elliptical miter seam.
+//! `fillet::chamfer_solid_edges` constructs equal-distance corner chamfers with intersecting
+//! bevel planes, including two- and three-edge selections, and returns modeling face history.
 //!
 //! ## Local Operations
 //!
@@ -85,4 +88,6 @@ pub mod local;
 /// Fillets with a constant or varying radius can also be applied to a tangent-continuous chain of edges with `fillet_along_wire`,
 /// whose ends may be at vertices with any number of faces. `fillet_edges` adds equal-radius spherical
 /// corners where three selected edges of a closed convex planar shell meet.
+/// Two-edge orthogonal corners use elliptical miters. `chamfer_solid_edges` adds equal-distance
+/// planar corner chamfers to modeling solids, preserving unselected edges along their remaining length.
 pub mod fillet;

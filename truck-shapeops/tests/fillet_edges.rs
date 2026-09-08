@@ -184,7 +184,7 @@ fn rejects_unsupported_selections_and_radius_without_changes() {
         edge_through(shell, Point3::new(1.0, 0.0, 0.0)).id(),
         edge_through(shell, Point3::new(0.0, 1.5, 0.0)).id(),
     ];
-    assert!(fillet_edges(shell, &pair, 0.2, TOL).is_none());
+    assert!(fillet_edges(shell, &pair, 0.2, TOL).is_some());
     assert!(fillet_edges(shell, &[ids[0], ids[0]], 0.2, TOL).is_none());
     let cylinder = from_modeling(&modeling::cylinder(
         Point3::origin(),
