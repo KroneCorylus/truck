@@ -101,7 +101,7 @@ fn find_runs<C: Clone, S>(
     Some(runs)
 }
 
-fn is_tangent_continuous<C: ParametricCurve3D + BoundedCurve + Invertible>(
+pub(super) fn is_tangent_continuous<C: ParametricCurve3D + BoundedCurve + Invertible>(
     wire: &Wire<Point3, C>,
     closed: bool,
 ) -> bool {
@@ -339,154 +339,21 @@ where
         )?);
     }
 
-    let mut cuts = Cuts {
-        vertices: vec![[None, None]; nv],
-        pieces: HashMap::new(),
-    };
-    let mut contacts: Vec<[Option<Edge<Point3, C>>; 2]> = vec![[None, None]; n];
-    let mut faces: Vec<Face<Point3, C, S>> = shell.iter().cloned().collect();
-    // Loops touched by runs, as a replacement list per original edge index.
-    let mut new_loops: HashMap<(usize, usize), LoopReplacement<C>> = HashMap::new();
-
-    for run in &runs {
-        let side = run.side;
-        let boundary = &boundaries[run.face][run.boundary];
-        let len = boundary.len();
-        let m = run.chain.len();
-        let whole = run.whole(len);
-        if !whole && len < m + 2 {
-            return None;
-        }
-        let mut curves: Vec<C> = run
-            .chain
-            .iter()
-            .map(|&k| match side {
-                0 => surfaces[k].side_pcurve0().to_same_geometry(),
-                _ => surfaces[k].side_pcurve1().to_same_geometry().inverse(),
-            })
-            .collect();
-        let (start_vertex, end_vertex) = run.ends(nv);
-
-        let mut piece_prev = None;
-        let mut piece_next = None;
-        if !whole {
-            let prev = &boundary[(run.start + len - 1) % len];
-            let next = &boundary[(run.start + m) % len];
-            piece_prev = Some(match cuts.vertices[start_vertex][side].clone() {
-                Some(vertex) => {
-                    let piece = cuts.piece(prev)?;
-                    (piece.back() == &vertex).then_some(())?;
-                    trim_to_point(&mut curves[0], vertex.point(), true)?;
-                    piece
-                }
-                None => {
-                    let (piece, _) = cut_at_front(&mut curves[0], prev)?;
-                    cuts.insert(prev, piece.clone())?;
-                    cuts.vertices[start_vertex][side] = Some(piece.back().clone());
-                    piece
-                }
-            });
-            piece_next = Some(match cuts.vertices[end_vertex][side].clone() {
-                Some(vertex) => {
-                    let piece = cuts.piece(next)?;
-                    (piece.front() == &vertex).then_some(())?;
-                    trim_to_point(&mut curves[m - 1], vertex.point(), false)?;
-                    piece
-                }
-                None => {
-                    let (piece, _) = cut_at_back(&mut curves[m - 1], next)?;
-                    cuts.insert(next, piece.clone())?;
-                    cuts.vertices[end_vertex][side] = Some(piece.front().clone());
-                    piece
-                }
-            });
-        }
-        // Interior junctions of the run.
-        let junctions = if whole { m } else { m - 1 };
-        for i in 0..junctions {
-            let (c0, c1) = (&curves[i], &curves[(i + 1) % m]);
-            let p0 = c0.subs(c0.range_tuple().1);
-            let p1 = c1.subs(c1.range_tuple().0);
-            let j = match side {
-                0 => (run.chain[i] + 1) % nv,
-                _ => run.chain[i],
-            };
-            if cuts.vertices[j][side]
-                .replace(Vertex::new(p0.midpoint(p1)))
-                .is_some()
-            {
-                return None;
-            }
-        }
-
-        let vertex_at = |i: usize, at_start: bool| -> Vertex<Point3> {
-            let k = run.chain[i];
-            let j = match (side, at_start) {
-                (0, true) | (1, false) => k,
-                _ => (k + 1) % nv,
-            };
-            cuts.vertices[j][side].clone().unwrap()
-        };
-        let mut loop_edges = Vec::with_capacity(m);
-        for (i, curve) in curves.into_iter().enumerate() {
-            let k = run.chain[i];
-            let (a, b) = (vertex_at(i, true), vertex_at(i, false));
-            let (contact, loop_edge) = match side {
-                0 => {
-                    let edge = Edge::new(&a, &b, curve);
-                    (edge.clone(), edge)
-                }
-                _ => {
-                    let edge = Edge::new(&b, &a, curve.inverse());
-                    (edge.clone(), edge.inverse())
-                }
-            };
-            contacts[k][side] = Some(contact);
-            loop_edges.push(loop_edge);
-        }
-
-        let replacement = new_loops
-            .entry((run.face, run.boundary))
-            .or_insert_with(|| vec![None; len]);
-        let mut set = |idx: usize, edges: Vec<Edge<Point3, C>>| -> Option<()> {
-            match replacement[idx % len].replace(edges) {
-                None => Some(()),
-                Some(_) => None,
-            }
-        };
-        if let Some(piece) = piece_prev {
-            set(run.start + len - 1, vec![piece])?;
-        }
-        set(run.start, loop_edges)?;
-        for i in 1..m {
-            set(run.start + i, Vec::new())?;
-        }
-        if let Some(piece) = piece_next {
-            set(run.start + m, vec![piece])?;
-        }
-    }
-
-    for ((face_idx, boundary_idx), replacement) in new_loops {
-        let mut loops = boundaries[face_idx].clone();
-        loops[boundary_idx] = replacement
-            .into_iter()
-            .enumerate()
-            .flat_map(|(idx, edges)| {
-                edges.unwrap_or_else(|| vec![boundaries[face_idx][boundary_idx][idx].clone()])
-            })
-            .collect();
-        faces[face_idx] = Face::new(loops, shell[face_idx].oriented_surface());
-    }
-
-    let contacts: Vec<[Edge<Point3, C>; 2]> = contacts
-        .into_iter()
-        .map(|[c0, c1]| Some([c0?, c1?]))
-        .collect::<Option<_>>()?;
-    let vertices: Vec<[Vertex<Point3>; 2]> = cuts
-        .vertices
+    let contact_curves = surfaces
         .iter()
-        .map(|[v0, v1]| Some([v0.clone()?, v1.clone()?]))
-        .collect::<Option<_>>()?;
+        .map(|surface| {
+            [
+                surface.side_pcurve0().to_same_geometry(),
+                surface.side_pcurve1().to_same_geometry(),
+            ]
+        })
+        .collect::<Vec<[C; 2]>>();
+    let TrimmedChain {
+        mut faces,
+        contacts,
+        vertices,
+        cuts,
+    } = trim_runs(shell, wire, &runs, &contact_curves)?;
     let blend_surfaces: Vec<S> = surfaces.iter().map(|af| af.to_same_geometry()).collect();
 
     let mut cross: Vec<Vec<Edge<Point3, C>>> = vec![Vec::new(); nv];
@@ -565,6 +432,206 @@ where
 
     faces.extend(blends);
     Some(faces.into())
+}
+
+pub(super) struct TrimmedChain<C, S> {
+    pub(super) faces: Vec<Face<Point3, C, S>>,
+    pub(super) contacts: Vec<[Edge<Point3, C>; 2]>,
+    pub(super) vertices: Vec<[Vertex<Point3>; 2]>,
+    cuts: Cuts<C>,
+}
+
+pub(super) fn trim_closed_chain<C, S>(
+    shell: &Shell<Point3, C, S>,
+    wire: &Wire<Point3, C>,
+    contact_curves: &[[C; 2]],
+) -> Option<TrimmedChain<C, S>>
+where
+    C: FilletedCurve<S>,
+    S: FilletedSurface<C>,
+{
+    let chain_index = wire.iter().enumerate().map(|(k, e)| (e.id(), k)).collect();
+    let runs = shell
+        .iter()
+        .enumerate()
+        .map(|(i, f)| find_runs(i, f, wire, &chain_index))
+        .collect::<Option<Vec<_>>>()?
+        .into_iter()
+        .flatten()
+        .collect::<Vec<_>>();
+    trim_runs(shell, wire, &runs, contact_curves)
+}
+
+fn trim_runs<C, S>(
+    shell: &Shell<Point3, C, S>,
+    wire: &Wire<Point3, C>,
+    runs: &[Run],
+    contact_curves: &[[C; 2]],
+) -> Option<TrimmedChain<C, S>>
+where
+    C: FilletedCurve<S>,
+    S: FilletedSurface<C>,
+{
+    let n = wire.len();
+    let nv = if wire.is_cyclic() { n } else { n + 1 };
+    let boundaries: Vec<_> = shell.iter().map(|face| face.boundaries()).collect();
+    let mut cuts = Cuts {
+        vertices: vec![[None, None]; nv],
+        pieces: HashMap::new(),
+    };
+    let mut contacts: Vec<[Option<Edge<Point3, C>>; 2]> = vec![[None, None]; n];
+    let mut faces: Vec<Face<Point3, C, S>> = shell.iter().cloned().collect();
+    // Loops touched by runs, as a replacement list per original edge index.
+    let mut new_loops: HashMap<(usize, usize), LoopReplacement<C>> = HashMap::new();
+
+    for run in runs {
+        let side = run.side;
+        let boundary = &boundaries[run.face][run.boundary];
+        let len = boundary.len();
+        let m = run.chain.len();
+        let whole = run.whole(len);
+        if !whole && len < m + 2 {
+            return None;
+        }
+        let mut curves: Vec<C> = run
+            .chain
+            .iter()
+            .map(|&k| match side {
+                0 => contact_curves[k][0].clone(),
+                _ => contact_curves[k][1].inverse(),
+            })
+            .collect();
+        let (start_vertex, end_vertex) = run.ends(nv);
+
+        let mut piece_prev = None;
+        let mut piece_next = None;
+        if !whole {
+            let prev = &boundary[(run.start + len - 1) % len];
+            let next = &boundary[(run.start + m) % len];
+            piece_prev = Some(match cuts.vertices[start_vertex][side].clone() {
+                Some(vertex) => {
+                    let piece = cuts.piece(prev)?;
+                    (piece.back() == &vertex).then_some(())?;
+                    trim_to_point(&mut curves[0], vertex.point(), true)?;
+                    piece
+                }
+                None => {
+                    let (piece, _) = cut_at_front(&mut curves[0], prev)?;
+                    cuts.insert(prev, piece.clone())?;
+                    cuts.vertices[start_vertex][side] = Some(piece.back().clone());
+                    piece
+                }
+            });
+            piece_next = Some(match cuts.vertices[end_vertex][side].clone() {
+                Some(vertex) => {
+                    let piece = cuts.piece(next)?;
+                    (piece.front() == &vertex).then_some(())?;
+                    trim_to_point(&mut curves[m - 1], vertex.point(), false)?;
+                    piece
+                }
+                None => {
+                    let (piece, _) = cut_at_back(&mut curves[m - 1], next)?;
+                    cuts.insert(next, piece.clone())?;
+                    cuts.vertices[end_vertex][side] = Some(piece.front().clone());
+                    piece
+                }
+            });
+        }
+        // Interior junctions of the run.
+        let junctions = if whole { m } else { m - 1 };
+        for i in 0..junctions {
+            let (c0, c1) = (&curves[i], &curves[(i + 1) % m]);
+            let p0 = c0.subs(c0.range_tuple().1);
+            let p1 = c1.subs(c1.range_tuple().0);
+            let j = match side {
+                0 => (run.chain[i] + 1) % nv,
+                _ => run.chain[i],
+            };
+            if !p0.near(&p1) {
+                return None;
+            }
+            if cuts.vertices[j][side]
+                .replace(Vertex::new(p0.midpoint(p1)))
+                .is_some()
+            {
+                return None;
+            }
+        }
+
+        let vertex_at = |i: usize, at_start: bool| -> Vertex<Point3> {
+            let k = run.chain[i];
+            let j = match (side, at_start) {
+                (0, true) | (1, false) => k,
+                _ => (k + 1) % nv,
+            };
+            cuts.vertices[j][side].clone().unwrap()
+        };
+        let mut loop_edges = Vec::with_capacity(m);
+        for (i, curve) in curves.into_iter().enumerate() {
+            let k = run.chain[i];
+            let (a, b) = (vertex_at(i, true), vertex_at(i, false));
+            let (contact, loop_edge) = match side {
+                0 => {
+                    let edge = Edge::new(&a, &b, curve);
+                    (edge.clone(), edge)
+                }
+                _ => {
+                    let edge = Edge::new(&b, &a, curve.inverse());
+                    (edge.clone(), edge.inverse())
+                }
+            };
+            contacts[k][side] = Some(contact);
+            loop_edges.push(loop_edge);
+        }
+
+        let replacement = new_loops
+            .entry((run.face, run.boundary))
+            .or_insert_with(|| vec![None; len]);
+        let mut set = |idx: usize, edges: Vec<Edge<Point3, C>>| -> Option<()> {
+            match replacement[idx % len].replace(edges) {
+                None => Some(()),
+                Some(_) => None,
+            }
+        };
+        if let Some(piece) = piece_prev {
+            set(run.start + len - 1, vec![piece])?;
+        }
+        set(run.start, loop_edges)?;
+        for i in 1..m {
+            set(run.start + i, Vec::new())?;
+        }
+        if let Some(piece) = piece_next {
+            set(run.start + m, vec![piece])?;
+        }
+    }
+
+    for ((face_idx, boundary_idx), replacement) in new_loops {
+        let mut loops = faces[face_idx].boundaries();
+        loops[boundary_idx] = replacement
+            .into_iter()
+            .enumerate()
+            .flat_map(|(idx, edges)| {
+                edges.unwrap_or_else(|| vec![boundaries[face_idx][boundary_idx][idx].clone()])
+            })
+            .collect();
+        faces[face_idx] = Face::new(loops, shell[face_idx].oriented_surface());
+    }
+
+    let contacts: Vec<[Edge<Point3, C>; 2]> = contacts
+        .into_iter()
+        .map(|[c0, c1]| Some([c0?, c1?]))
+        .collect::<Option<_>>()?;
+    let vertices: Vec<[Vertex<Point3>; 2]> = cuts
+        .vertices
+        .iter()
+        .map(|[v0, v1]| Some([v0.clone()?, v1.clone()?]))
+        .collect::<Option<_>>()?;
+    Some(TrimmedChain {
+        faces,
+        contacts,
+        vertices,
+        cuts,
+    })
 }
 
 /// The oriented curve of an edge next to the chain and the parameter of its end at `vertex`.

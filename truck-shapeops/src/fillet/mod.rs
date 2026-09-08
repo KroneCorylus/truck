@@ -480,10 +480,13 @@ where
 mod along_wire;
 pub use along_wire::fillet_along_wire;
 mod chamfer;
-pub use chamfer::{chamfer_with_side, simple_chamfer};
+pub use chamfer::{chamfer_along_wire, chamfer_with_side, simple_chamfer};
 
 mod edges;
 pub use edges::fillet_edges;
 
 mod modeling;
-pub use modeling::{chamfer_solid_edge, fillet_solid_along_wire, fillet_solid_edges, BlendResult};
+pub use modeling::{
+    chamfer_solid_along_wire, chamfer_solid_edge, fillet_solid_along_wire, fillet_solid_edges,
+    BlendResult,
+};

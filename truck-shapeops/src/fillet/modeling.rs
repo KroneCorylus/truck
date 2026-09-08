@@ -98,6 +98,23 @@ pub fn fillet_solid_edges(
     finish(solid, index, shell)
 }
 
+/// Chamfers a closed tangent-continuous wire of a modeling solid.
+///
+/// Distances and supported geometry are described by [`super::chamfer_along_wire`]. Reversing
+/// the wire exchanges the sides associated with `d0` and `d1`. Returns `None` on invalid input
+/// or failed construction without modifying the input solid.
+pub fn chamfer_solid_along_wire(
+    solid: &Solid,
+    wire: &Wire,
+    d0: f64,
+    d1: f64,
+    tol: f64,
+) -> Option<BlendResult> {
+    let index = shell_index(solid, wire.front()?.id())?;
+    let shell = super::chamfer_along_wire(&solid.boundaries()[index], wire, d0, d1, tol)?;
+    finish(solid, index, shell)
+}
+
 /// Chamfers a single edge of a modeling solid, trimming both end faces.
 ///
 /// The edge must have two adjacent faces and a distinct third face at each end. `d0` and `d1`
