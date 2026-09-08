@@ -586,9 +586,23 @@ fn refine_interior(
             .filter_map(|edge| {
                 let [a, b] = edge.vertices().map(|v| *v.as_ref());
                 let uv = Point2::new((a.x + b.x) / 2.0, (a.y + b.y) / 2.0);
-                let chord = surface.subs(a.x, a.y).midpoint(surface.subs(b.x, b.y));
-                (surface.subs(uv.x, uv.y).distance2(chord) > tol * tol && boundary.include(uv))
-                    .then_some(SPoint2::new(uv.x, uv.y))
+                let point = surface.subs(uv.x, uv.y);
+                let directed = edge.as_directed();
+                // Parameter speed can vary even on a plane (e.g. polar caps).
+                // Measure departure from the adjacent facets, not the chord midpoint.
+                let curved = [directed, directed.rev()].into_iter().any(|edge| {
+                    let Some(face) = edge.face().as_inner() else {
+                        return false;
+                    };
+                    let [p, q, r] = face.vertices().map(|v| {
+                        let uv = *v.as_ref();
+                        surface.subs(uv.x, uv.y)
+                    });
+                    let normal = (q - p).cross(r - p);
+                    let distance = (point - p).dot(normal);
+                    distance * distance > tol * tol * normal.magnitude2()
+                });
+                (curved && boundary.include(uv)).then_some(SPoint2::new(uv.x, uv.y))
             })
             .collect();
         if points.is_empty() {

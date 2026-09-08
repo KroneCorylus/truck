@@ -1,5 +1,5 @@
 use super::*;
-use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};
+use rustc_hash::FxHashMap as HashMap;
 use std::iter::Iterator;
 use std::ops::{Div, Mul};
 
@@ -218,13 +218,12 @@ impl<T> SameAttr for T where T: Copy + CastIntVector + MetricSpace<Metric = f64>
 
 fn sub_put_together_same_attrs<T: SameAttr>(attrs: &[T], tol: f64) -> Vec<usize> {
     let map = create_blocks(attrs, tol);
-    let adj = create_adjacency(map, attrs, tol);
-    let components = create_components(adj, attrs);
+    let components = create_components(map, attrs, tol);
     centralize(components, attrs)
 }
 
-type BlockMap<'a, T> = HashMap<<T as CastIntVector>::IntVector, Vec<usize>>;
-fn create_blocks<T: SameAttr>(attrs: &[T], tol: f64) -> BlockMap<'_, T> {
+type BlockMap<T> = HashMap<<T as CastIntVector>::IntVector, Vec<usize>>;
+fn create_blocks<T: SameAttr>(attrs: &[T], tol: f64) -> BlockMap<T> {
     let mut map = HashMap::default();
     attrs.iter().enumerate().for_each(|(i, attr)| {
         attr.round(tol).neighborhood().into_iter().for_each(|idx| {
@@ -234,41 +233,38 @@ fn create_blocks<T: SameAttr>(attrs: &[T], tol: f64) -> BlockMap<'_, T> {
     map
 }
 
-fn create_adjacency<T: SameAttr>(map: BlockMap<'_, T>, attrs: &[T], tol: f64) -> Vec<Vec<usize>> {
-    let mut adj = vec![HashSet::default(); attrs.len()];
-    map.into_iter().for_each(|(_, vec)| {
-        if vec.len() > 1 {
-            vec.iter().copied().enumerate().for_each(|(k, i)| {
-                vec[(k + 1)..].iter().copied().for_each(|j| {
-                    if attrs[i].distance2(attrs[j]) < tol * tol {
-                        adj[i].insert(j);
-                        adj[j].insert(i);
-                    }
-                });
-            });
-        }
-    });
-    adj.into_iter()
-        .map(|set| set.into_iter().collect())
-        .collect()
-}
-
 fn create_components<T: SameAttr>(
-    mut adj: Vec<Vec<usize>>,
+    mut blocks: BlockMap<T>,
     attrs: &[T],
-) -> impl Iterator<Item = Vec<usize>> {
+    tol: f64,
+) -> impl Iterator<Item = Vec<usize>> + '_ {
     let mut already = vec![false; attrs.len()];
-    (0..adj.len()).filter_map(move |i| {
+    (0..attrs.len()).filter_map(move |i| {
         if already[i] {
             return None;
         }
         let mut stack = vec![i];
+        already[i] = true;
         let mut component = Vec::new();
         while let Some(i) = stack.pop() {
-            if !already[i] {
-                component.push(i);
-                already[i] = true;
-                stack.append(&mut adj[i]);
+            component.push(i);
+            // Consume discovered neighbors instead of storing every matching pair.
+            // Each discovered attribute is still searched, preserving transitive welding.
+            for key in attrs[i].round(tol).neighborhood() {
+                let Some(candidates) = blocks.get_mut(&key) else {
+                    continue;
+                };
+                candidates.retain(|&j| {
+                    if already[j] {
+                        return false;
+                    }
+                    if attrs[i].distance2(attrs[j]) < tol * tol {
+                        already[j] = true;
+                        stack.push(j);
+                        return false;
+                    }
+                    true
+                });
             }
         }
         Some(component)
@@ -429,6 +425,56 @@ impl IntVector for [i64; 3] {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn large_equal_attribute_groups() {
+        let count = 100_000;
+        for mapping in [
+            sub_put_together_same_attrs(&vec![Point3::new(1.0, 2.0, 3.0); count], 1e-7),
+            sub_put_together_same_attrs(&vec![Vector2::new(0.0, 1.0); count], 1e-7),
+            sub_put_together_same_attrs(&vec![Vector3::unit_z(); count], 1e-7),
+        ] {
+            assert_eq!(mapping.len(), count);
+            assert!(mapping.iter().all(|&i| i == mapping[0]));
+        }
+    }
+
+    #[test]
+    fn welding_preserves_transitive_connections_and_strict_tolerance() {
+        let attrs = [0.0, 0.75, 1.5, 2.25, 3.25, -1.0].map(|x| Vector2::new(x, 0.0));
+        let mapping = sub_put_together_same_attrs(&attrs, 1.0);
+        assert!(mapping[..4].iter().all(|&i| i == mapping[0]));
+        assert!(mapping[0] == 1 || mapping[0] == 2);
+        assert_eq!(mapping[4], 4);
+        assert_eq!(mapping[5], 5);
+    }
+
+    proptest::proptest! {
+        #[test]
+        fn welding_matches_pairwise_components(
+            coords in proptest::collection::vec((-12i32..12, -12i32..12, -12i32..12), 0..80),
+        ) {
+            let attrs: Vec<_> = coords.into_iter()
+                .map(|(x, y, z)| Vector3::new(x as f64 / 4.0, y as f64 / 4.0, z as f64 / 4.0))
+                .collect();
+            let mapping = sub_put_together_same_attrs(&attrs, 1.0);
+            let mut expected: Vec<_> = (0..attrs.len()).collect();
+            for i in 0..attrs.len() {
+                for j in 0..i {
+                    if attrs[i].distance2(attrs[j]) < 1.0 {
+                        let old = expected[j];
+                        let new = expected[i];
+                        expected.iter_mut().filter(|id| **id == old).for_each(|id| *id = new);
+                    }
+                }
+            }
+            for i in 0..attrs.len() {
+                for j in 0..attrs.len() {
+                    proptest::prop_assert_eq!(mapping[i] == mapping[j], expected[i] == expected[j]);
+                }
+            }
+        }
+    }
 
     fn into_vertices(iter: &[usize]) -> Vec<Vertex> { iter.iter().map(|i| i.into()).collect() }
 
