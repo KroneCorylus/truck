@@ -135,7 +135,11 @@ impl MyApp {
                         let nurbs: NurbsCurve<Vector4> = curve.to_same_geometry();
                         nurbs.roughly_bounding_box()
                     }
-                    Curve::IntersectionCurve(_) => BoundingBox::new(),
+                    Curve::IntersectionCurve(_) | Curve::PCurve(_) => curve
+                        .parameter_division(curve.range_tuple(), 0.001)
+                        .1
+                        .into_iter()
+                        .collect(),
                 };
             });
         let (size, center) = (bdd_box.size(), bdd_box.center());

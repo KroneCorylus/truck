@@ -400,3 +400,6 @@ pub use geometry::MatrixAsAxis;
 pub use geometry::VectorAsDirection;
 
 use crate::common::PartAttrs;
+
+mod modeling;
+pub use modeling::prepare_for_step;

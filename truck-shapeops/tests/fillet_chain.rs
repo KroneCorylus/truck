@@ -50,7 +50,7 @@ fn assert_tangent_along_blends(shell: &Shell, blends: std::ops::Range<usize>) {
     };
     for k in blends.clone() {
         for edge in shell[k].edge_iter() {
-            if matches!(edge.curve(), Curve::Intersection(_)) {
+            if matches!(edge.curve(), Curve::IntersectionCurve(_)) {
                 continue;
             }
             let other = shell
@@ -311,12 +311,12 @@ fn fillet_chain_with_varying_radius() {
                 let t = t0 + (t1 - t0) * (i as f64 + 0.5) / 5.0;
                 let p = curve.subs(t);
                 let measured = match &curve {
-                    Curve::Parametric(_) => f64::hypot(p.y, h - p.z),
-                    Curve::Nurbs(_) => {
+                    Curve::PCurve(_) => f64::hypot(p.y, h - p.z),
+                    Curve::NurbsCurve(_) => {
                         let (der, der2) = (curve.der(t), curve.der2(t));
                         der.magnitude().powi(3) / der.cross(der2).magnitude()
                     }
-                    Curve::Intersection(_) => continue,
+                    Curve::IntersectionCurve(_) => continue,
                     other => panic!("unexpected curve on a fillet face: {other:?}"),
                 };
                 assert!(

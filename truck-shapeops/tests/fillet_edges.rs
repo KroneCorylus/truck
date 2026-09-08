@@ -25,15 +25,15 @@ fn assert_tangent(shell: &Shell) {
             else {
                 continue;
             };
-            if matches!(face.surface(), Surface::Modeling(_))
-                && matches!(other.surface(), Surface::Modeling(_))
+            if matches!(face.surface(), Surface::Plane(_))
+                && matches!(other.surface(), Surface::Plane(_))
             {
                 continue;
             }
             let curve = edge.curve();
-            if matches!(curve, Curve::Nurbs(_))
-                && (matches!(face.surface(), Surface::Modeling(_))
-                    || matches!(other.surface(), Surface::Modeling(_)))
+            if matches!(curve, Curve::NurbsCurve(_))
+                && (matches!(face.surface(), Surface::Plane(_))
+                    || matches!(other.surface(), Surface::Plane(_)))
             {
                 continue;
             }

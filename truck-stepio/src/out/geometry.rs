@@ -474,6 +474,7 @@ impl<C: StepCurve, S> StepCurve for PCurve<C, S> {
 impl DisplayByStep for ModelingCurve {
     fn fmt(&self, idx: usize, f: &mut Formatter<'_>) -> Result {
         match self {
+            ModelingCurve::PCurve(_) => ERR,
             ModelingCurve::Line(x) => DisplayByStep::fmt(x, idx, f),
             ModelingCurve::BSplineCurve(x) => DisplayByStep::fmt(x, idx, f),
             ModelingCurve::NurbsCurve(x) => DisplayByStep::fmt(x, idx, f),
@@ -486,6 +487,7 @@ impl DisplayByStep for ModelingCurve {
 impl StepLength for ModelingCurve {
     fn step_length(&self) -> usize {
         match self {
+            ModelingCurve::PCurve(_) => 0,
             ModelingCurve::Line(_) => Line::<Point3>::LENGTH,
             ModelingCurve::BSplineCurve(x) => x.step_length(),
             ModelingCurve::NurbsCurve(x) => x.step_length(),
@@ -864,10 +866,16 @@ impl_const_step_length!(Elementary, 1 + MatrixAsAxis::<Matrix4>::LENGTH);
 
 impl DisplayByStep for ModelingSurface {
     fn fmt(&self, idx: usize, f: &mut Formatter<'_>) -> Result {
+        // Preserve the patch placement so its poles and seam stay away from the trimming loops.
+        if let ModelingSurface::Sphere(x) = self {
+            return DisplayByStep::fmt(x, idx, f);
+        }
         if let Some((elementary, _)) = self.elementary() {
             return DisplayByStep::fmt(&elementary, idx, f);
         }
         match self {
+            ModelingSurface::Fillet(_) => ERR,
+            ModelingSurface::Sphere(x) => DisplayByStep::fmt(x, idx, f),
             ModelingSurface::Plane(x) => DisplayByStep::fmt(x, idx, f),
             ModelingSurface::BSplineSurface(x) => DisplayByStep::fmt(x, idx, f),
             ModelingSurface::NurbsSurface(x) => DisplayByStep::fmt(x, idx, f),
@@ -883,6 +891,8 @@ impl StepLength for ModelingSurface {
             return Elementary::LENGTH;
         }
         match self {
+            ModelingSurface::Fillet(_) => 0,
+            ModelingSurface::Sphere(x) => x.step_length(),
             ModelingSurface::Plane(_) => Plane::LENGTH,
             ModelingSurface::BSplineSurface(x) => x.step_length(),
             ModelingSurface::NurbsSurface(x) => x.step_length(),

@@ -30,6 +30,8 @@ pub enum Curve {
     NurbsCurve(NurbsCurve<Vector4>),
     /// circle, circular arc, ellipse or elliptical arc, kept exact
     Conic(Processor<TrimmedCurve<UnitCircle<Point3>>, Matrix4>),
+    /// Curve in the parameter space of a surface, including blend contact curves.
+    PCurve(PCurve<BSplineCurve<Point2>, Box<Surface>>),
     /// intersection curve
     IntersectionCurve(IntersectionCurve<Box<Curve>, Box<Surface>, Box<Surface>>),
 }
@@ -41,6 +43,7 @@ macro_rules! derive_curve_method {
             Curve::BSplineCurve(got) => $method(got, $($ver), *),
             Curve::NurbsCurve(got) => $method(got, $($ver), *),
             Curve::Conic(got) => $method(got, $($ver), *),
+            Curve::PCurve(got) => $method(got, $($ver), *),
             Curve::IntersectionCurve(got) => $method(got, $($ver), *),
         }
     };
@@ -53,6 +56,7 @@ macro_rules! derive_curve_self_method {
             Curve::BSplineCurve(got) => Curve::BSplineCurve($method(got, $($ver), *)),
             Curve::NurbsCurve(got) => Curve::NurbsCurve($method(got, $($ver), *)),
             Curve::Conic(got) => Curve::Conic($method(got, $($ver), *)),
+            Curve::PCurve(got) => Curve::PCurve($method(got, $($ver), *)),
             Curve::IntersectionCurve(got) => Curve::IntersectionCurve($method(got, $($ver), *)),
         }
     };
@@ -97,9 +101,10 @@ impl Curve {
     /// Into non-ratinalized 4-dimensional B-spline curve
     pub fn lift_up(&self) -> BSplineCurve<Vector4> {
         self.try_lift_up()
-            .expect("intersection curve cannot connect by homotopy")
+            .expect("curve has no NURBS form for homotopy")
     }
-    /// The non-rationalized 4-dimensional B-spline form, `None` for an intersection curve.
+    /// The non-rationalized 4-dimensional B-spline form.
+    /// Returns `None` for intersection curves and curves defined in surface parameter space.
     pub fn try_lift_up(&self) -> Option<BSplineCurve<Vector4>> {
         Some(match self {
             Curve::Line(curve) => Curve::BSplineCurve((*curve).into()).lift_up(),
@@ -113,7 +118,7 @@ impl Curve {
             ),
             Curve::NurbsCurve(curve) => curve.non_rationalized().clone(),
             Curve::Conic(curve) => conic_to_nurbs(curve).into_non_rationalized(),
-            Curve::IntersectionCurve(_) => return None,
+            Curve::IntersectionCurve(_) | Curve::PCurve(_) => return None,
         })
     }
 }
@@ -156,6 +161,10 @@ pub enum Surface {
     BSplineSurface(BSplineSurface<Point3>),
     /// 3-dimensional NURBS Surface
     NurbsSurface(NurbsSurface<Vector4>),
+    /// Spherical corner patch, with placement and orientation.
+    Sphere(Processor<Sphere, Matrix4>),
+    /// Rolling-ball blend, retaining its contact surfaces and parameter curves.
+    Fillet(Processor<ApproxFilletSurface<Box<Surface>, Box<Surface>>, Matrix4>),
     /// revoluted curve
     RevolutedCurve(Processor<RevolutedCurve<Curve>, Matrix4>),
     /// curve swept along a vector, kept exact
@@ -166,6 +175,8 @@ macro_rules! derive_surface_method {
     ($surface: expr, $method: expr, $($ver: ident),*) => {
         match $surface {
             Self::Plane(got) => $method(got, $($ver), *),
+            Self::Sphere(got) => $method(got, $($ver), *),
+            Self::Fillet(got) => $method(got, $($ver), *),
             Self::BSplineSurface(got) => $method(got, $($ver), *),
             Self::NurbsSurface(got) => $method(got, $($ver), *),
             Self::RevolutedCurve(got) => $method(got, $($ver), *),
@@ -178,6 +189,8 @@ macro_rules! derive_surface_self_method {
     ($surface: expr, $method: expr, $($ver: ident),*) => {
         match $surface {
             Self::Plane(got) => Self::Plane($method(got, $($ver), *)),
+            Self::Sphere(got) => Self::Sphere($method(got, $($ver), *)),
+            Self::Fillet(got) => Self::Fillet($method(got, $($ver), *)),
             Self::BSplineSurface(got) => Self::BSplineSurface($method(got, $($ver), *)),
             Self::NurbsSurface(got) => Self::NurbsSurface($method(got, $($ver), *)),
             Self::RevolutedCurve(got) => Self::RevolutedCurve($method(got, $($ver), *)),
@@ -206,6 +219,7 @@ impl IncludeCurve<Curve> for Surface {
     #[inline(always)]
     fn include(&self, curve: &Curve) -> bool {
         match self {
+            Surface::Sphere(_) | Surface::Fillet(_) => sampled_include(self, curve),
             Surface::Plane(surface) => include_curve(surface, curve),
             Surface::BSplineSurface(surface) => include_curve(surface, curve),
             Surface::NurbsSurface(surface) => include_curve(surface, curve),
@@ -226,22 +240,29 @@ impl IncludeCurve<Curve> for Surface {
                         let entity = conic_to_nurbs(entity);
                         include_curve(&RevolutedCurve::by_revolution(&entity, origin, axis), curve)
                     }
-                    Curve::IntersectionCurve(_) => unimplemented!(),
+                    Curve::IntersectionCurve(_) | Curve::PCurve(_) => {
+                        sampled_include(surface, curve)
+                    }
                 }
             }
-            Surface::Extruded(surface) => include_curve(&extruded_to_nurbs(surface), curve),
+            Surface::Extruded(surface) => match surface.entity_curve().try_lift_up() {
+                Some(_) => include_curve(&extruded_to_nurbs(surface), curve),
+                None => sampled_include(surface, curve),
+            },
         }
     }
 }
 
 fn include_curve<S>(surface: &S, curve: &Curve) -> bool
-where S: IncludeCurve<BSplineCurve<Point3>> + IncludeCurve<NurbsCurve<Vector4>> {
+where S: IncludeCurve<BSplineCurve<Point3>>
+        + IncludeCurve<NurbsCurve<Vector4>>
+        + SearchParameter<D2, Point = Point3> {
     match curve {
         &Curve::Line(curve) => surface.include(&BSplineCurve::from(curve)),
         Curve::BSplineCurve(curve) => surface.include(curve),
         Curve::NurbsCurve(curve) => surface.include(curve),
         Curve::Conic(curve) => surface.include(&conic_to_nurbs(curve)),
-        Curve::IntersectionCurve(_) => unimplemented!(),
+        Curve::IntersectionCurve(_) | Curve::PCurve(_) => sampled_include(surface, curve),
     }
 }
 
@@ -261,7 +282,10 @@ fn conic_to_nurbs(
 
 impl IncludeCurve<Curve> for Plane {
     fn include(&self, curve: &Curve) -> bool {
-        curve.lift_up().control_points().iter().all(|v| {
+        let Some(lifted) = curve.try_lift_up() else {
+            return sampled_include(self, curve);
+        };
+        lifted.control_points().iter().all(|v| {
             let p = v.to_point();
             self.search_parameter(p, None, 1).is_some()
         })
@@ -285,6 +309,8 @@ impl SearchNearestParameter<D2> for Surface {
         trials: usize,
     ) -> Option<(f64, f64)> {
         match self {
+            Surface::Sphere(surface) => surface.search_nearest_parameter(point, hint, trials),
+            Surface::Fillet(surface) => surface.search_nearest_parameter(point, hint, trials),
             Surface::Plane(plane) => plane.search_nearest_parameter(point, hint, trials),
             Surface::BSplineSurface(bspsurface) => {
                 bspsurface.search_nearest_parameter(point, hint, trials)
@@ -333,7 +359,7 @@ impl ToSameGeometry<Surface> for ExtrudedCurve<Curve, Vector3> {
                 .into()
             }
             (Curve::Conic(_), Curve::Conic(_)) => Surface::Extruded(self.clone()),
-            (Curve::IntersectionCurve(_), Curve::IntersectionCurve(_)) => unimplemented!(),
+            (Curve::IntersectionCurve(_) | Curve::PCurve(_), _) => Surface::Extruded(self.clone()),
             _ => unreachable!(),
         }
     }
@@ -390,13 +416,18 @@ impl Surface {
     /// The elementary surface this is, and whether the surface normal points the canonical
     /// way of [`Elementary`]. `None` for anything else.
     ///
-    /// Recognised: a plane; an extruded round circle along its own axis; a revolved line
+    /// Recognised: a plane; a stored sphere under a similarity transform; an extruded round circle along its own axis; a revolved line
     /// parallel to the axis (cylinder), perpendicular to it (plane) or meeting it (cone); a
     /// revolved round circle in a plane through the axis, centred on the axis (sphere) or off
     /// it (torus).
     pub fn elementary(&self) -> Option<(Elementary, bool)> {
         let elementary = match self {
             Surface::Plane(plane) => return Some((Elementary::Plane(*plane), true)),
+            Surface::Sphere(surface) => Elementary::Sphere {
+                center: surface.entity().center(),
+                radius: surface.entity().radius(),
+            }
+            .transformed(*surface.transform())?,
             Surface::Extruded(surface) => extruded_elementary(surface)?,
             Surface::RevolutedCurve(surface) => {
                 revolved_elementary(surface.entity())?.transformed(*surface.transform())?
@@ -679,5 +710,44 @@ fn revolved_circle(
             major: r.magnitude(),
             minor: radius,
         },
+    })
+}
+
+impl ToSameGeometry<Curve> for PCurve<BSplineCurve<Point2>, Surface> {
+    fn to_same_geometry(&self) -> Curve {
+        let (curve, surface) = self.clone().decompose();
+        Curve::PCurve(PCurve::new(curve, Box::new(surface)))
+    }
+}
+
+impl ToSameGeometry<Curve> for IntersectionCurve<Curve, Surface, Surface> {
+    fn to_same_geometry(&self) -> Curve {
+        let (surface0, surface1, leader) = self.clone().destruct();
+        Curve::IntersectionCurve(IntersectionCurve::new(
+            Box::new(surface0),
+            Box::new(surface1),
+            Box::new(leader),
+        ))
+    }
+}
+
+impl ToSameGeometry<Surface> for ApproxFilletSurface<Surface, Surface> {
+    fn to_same_geometry(&self) -> Surface { Surface::Fillet(Processor::new(self.clone().into())) }
+}
+
+impl ToSameGeometry<Surface> for Processor<Sphere, Matrix4> {
+    fn to_same_geometry(&self) -> Surface { Surface::Sphere(*self) }
+}
+
+impl ToSameGeometry<Surface> for BSplineSurface<Point3> {
+    fn to_same_geometry(&self) -> Surface { Surface::BSplineSurface(self.clone()) }
+}
+
+fn sampled_include<S: SearchParameter<D2, Point = Point3>>(surface: &S, curve: &Curve) -> bool {
+    let (a, b) = curve.range_tuple();
+    (0..=32).all(|i| {
+        surface
+            .search_parameter(curve.subs(a + (b - a) * i as f64 / 32.0), None, 100)
+            .is_some()
     })
 }

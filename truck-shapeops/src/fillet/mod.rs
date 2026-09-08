@@ -1,3 +1,46 @@
+//! Fillets and chamfers, including operations on [`truck_modeling::Solid`].
+//!
+//! Use [`fillet_solid_along_wire`] for constant or variable radii on a tangent-continuous chain,
+//! [`chamfer_solid_edge`] for a chamfer with two end faces, and [`fillet_solid_edges`] for equal
+//! radii on convex planar shells, including three-edge spherical corners. The generic shell and
+//! face functions below also accept the modeling types directly; no representation conversion
+//! is necessary. Concave corners and unequal-radius junctions are outside this scope.
+//!
+//! ```
+//! use truck_modeling::*;
+//! use truck_shapeops::fillet::fillet_solid_edges;
+//! let solid = primitive::cuboid(BoundingBox::from_iter([
+//!     Point3::origin(), Point3::new(2.0, 3.0, 4.0),
+//! ]));
+//! let mut seen = std::collections::HashSet::new();
+//! let edges: Vec<_> = solid.edge_iter().map(|e| e.id())
+//!     .filter(|id| seen.insert(*id)).collect();
+//! let blend = fillet_solid_edges(&solid, &edges, 0.2, 0.001).unwrap();
+//! let rounded: Solid = blend.solid;
+//! assert_eq!(blend.generated_faces.len(), 20); // twelve strips and eight corners
+//! # #[cfg(feature = "step-test")]
+//! # {
+//! use truck_stepio::out::*;
+//! let prepared = prepare_for_step(&rounded.compress(), 0.00001).unwrap();
+//! let design = StepDesign::from_model(StepModel::from(&prepared));
+//! let step = StepDisplay::new(Default::default(), design).to_string();
+//! # assert!(step.contains("SPHERICAL_SURFACE"));
+//! # }
+//! ```
+//!
+//! Results retain the modeling geometry needed by `truck_meshalgo::tessellation::MeshableShape`
+//! and [`crate::and`] / [`crate::or`]. [`BlendResult`] exposes modified and generated faces for
+//! application topology naming; its IDs are process-local, not persistent names. Use each face's
+//! edge and vertex iterators to name its boundaries. Failures return `None` without editing the
+//! input. The local blend must fit its neighbouring faces and avoid distant faces and cavities;
+//! these operations do not perform a global collision or self-intersection check.
+//!
+//! STEP has no native rolling-ball surface entity. Call `truck_stepio::out::prepare_for_step`
+//! with an explicit tolerance before formatting: it preserves compressed topology while fitting
+//! procedural geometry to splines. Keep the unconverted result for further modeling. When
+//! tessellating geometry read back from STEP, use `RobustMeshableShape::robust_triangulation`,
+//! which allows the approximation gap between a boundary curve and its supporting surface.
+
 use algo::curve::search_intersection_parameter;
 use itertools::Itertools;
 use truck_geometry::prelude::*;
@@ -441,3 +484,6 @@ pub use chamfer::{chamfer_with_side, simple_chamfer};
 
 mod edges;
 pub use edges::fillet_edges;
+
+mod modeling;
+pub use modeling::{chamfer_solid_edge, fillet_solid_along_wire, fillet_solid_edges, BlendResult};

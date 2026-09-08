@@ -72,7 +72,7 @@ impl Projection {
                 }
                 arc.into()
             }
-            Curve::IntersectionCurve(_) => interpolate(params, points).into(),
+            Curve::IntersectionCurve(_) | Curve::PCurve(_) => interpolate(params, points).into(),
         };
         Some(projected)
     }
