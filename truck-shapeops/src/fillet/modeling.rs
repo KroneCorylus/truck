@@ -51,6 +51,9 @@ fn finish(solid: &Solid, index: usize, shell: Shell) -> Option<BlendResult> {
 /// derivatives are checked at sampled stations. Intersecting distant faces or another boundary
 /// of the solid is outside the supported scope. Returns `None` on unsupported selections,
 /// invalid parameters, failed construction, or non-closed output. The input is never modified.
+/// Rounding the rim where an existing convex cylindrical fillet meets a perpendicular plane
+/// requires a smaller radius; collapsed contact curves (equal radii) and folded offsets
+/// (larger radii) are unsupported.
 pub fn fillet_solid_along_wire<R: ScalarFunctionD1>(
     solid: &Solid,
     wire: &Wire,

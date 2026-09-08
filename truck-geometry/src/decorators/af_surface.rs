@@ -350,6 +350,8 @@ where
     S1: ParametricSurface3D + SearchParameter<D2, Point = Point3>,
 {
     /// approx fillet by `ApproxFilletSurface`.
+    /// Returns `None` if a contact-circle solve or tangent frame fails, including at
+    /// adaptively inserted samples. Collapsed contact curves require a different patch topology.
     pub fn approx_rolling_ball_fillet<C, R>(
         fillet_surface: &RbfSurface<C, S0, S1, R>,
         edge_parameter_range: (f64, f64),
@@ -360,10 +362,19 @@ where
         R: ScalarFunctionD1,
     {
         let (v0, v1) = edge_parameter_range;
+        if !v0.is_finite() || !v1.is_finite() || v0 >= v1 || !tol.is_finite() || tol <= 0.0 {
+            return None;
+        }
+        let contact_circle = |v| {
+            let cc = fillet_surface.contact_circle(v)?;
+            (regular_contact(fillet_surface.surface0(), cc.contact_point0(), cc.center())
+                && regular_contact(fillet_surface.surface1(), cc.contact_point1(), cc.center()))
+            .then_some(cc)
+        };
         let v_5 = (v0 + v1) / 2.0;
-        let cc0 = fillet_surface.contact_circle(v0)?;
-        let cc_5 = fillet_surface.contact_circle(v_5)?;
-        let cc1 = fillet_surface.contact_circle(v1)?;
+        let cc0 = contact_circle(v0)?;
+        let cc_5 = contact_circle(v_5)?;
+        let cc1 = contact_circle(v1)?;
         let mut ccs = vec![(v0, cc0), (v_5, cc_5), (v1, cc1)];
 
         for _i in 0..16 {
@@ -374,7 +385,7 @@ where
                 ccs[1..n].windows(2).map(move |v| (v[0].0 + v[1].0) / 2.0)
             });
             vec.extend([v1, v1, v1]);
-            let knot_vec = KnotVec::try_from(vec).unwrap();
+            let knot_vec = KnotVec::try_from(vec).ok()?;
 
             let make_uv0 = move |&(v, cc): &(f64, ContactCircle)| (v, cc.contact_point0().uv);
             let uv0s = ccs.iter().map(make_uv0).collect::<Vec<_>>();
@@ -400,7 +411,10 @@ where
                 let n0 = fillet_surface.surface0.normal(uv0.x, uv0.y);
                 let handle0 = cder0.cross(n0);
                 let mat0 = Matrix3::from_cols(handle0, cder0, n0);
-                let vec0 = mat0.invert().unwrap() * der0;
+                let vec0 = mat0.invert()? * der0;
+                if (0..3).any(|i| !vec0[i].is_finite()) {
+                    return None;
+                }
                 raw_tangent_vecs0.push((v, vec0.truncate()));
 
                 let der1 = -nurbs.der(1.0);
@@ -409,7 +423,10 @@ where
                 let n1 = fillet_surface.surface1.normal(uv1.x, uv1.y);
                 let handle1 = cder1.cross(n1);
                 let mat1 = Matrix3::from_cols(handle1, cder1, n1);
-                let vec1 = mat1.invert().unwrap() * der1;
+                let vec1 = mat1.invert()? * der1;
+                if (0..3).any(|i| !vec1[i].is_finite()) {
+                    return None;
+                }
                 raw_tangent_vecs1.push((v, vec1.truncate()));
             }
 
@@ -429,18 +446,15 @@ where
                 tangent_vecs1: tangent_curve1.destruct().1,
                 weights,
             };
-            let added_ccs = ccs
-                .windows(2)
-                .filter_map(|v| {
-                    let v = (v[0].0 + v[1].0) / 2.0;
-                    let cc = fillet_surface.contact_circle(v).unwrap();
-                    let is_far = |t: f64| approx.subs(t, v).distance2(cc.subs(t)) < tol * tol;
-                    match [0.0, 0.5, 1.0].into_iter().all(is_far) {
-                        true => None,
-                        false => Some((v, cc)),
-                    }
-                })
-                .collect::<Vec<_>>();
+            let mut added_ccs = Vec::new();
+            for pair in ccs.windows(2) {
+                let v = (pair[0].0 + pair[1].0) / 2.0;
+                let cc = contact_circle(v)?;
+                let within_tolerance = |t: f64| approx.subs(t, v).distance2(cc.subs(t)) < tol * tol;
+                if ![0.0, 0.5, 1.0].into_iter().all(within_tolerance) {
+                    added_ccs.push((v, cc));
+                }
+            }
             if added_ccs.is_empty() {
                 return Some(Self {
                     knot_vec: approx.knot_vec,
@@ -461,10 +475,54 @@ where
     }
 }
 
+fn regular_contact(
+    surface: &impl ParametricSurface3D,
+    contact: ContactPoint,
+    center: Point3,
+) -> bool {
+    let (u, v) = contact.uv.into();
+    let radius = (center - contact.point).dot(surface.normal(u, v));
+    let (du, dv) = (surface.uder(u, v), surface.vder(u, v));
+    let offset_du = du + radius * surface.normal_uder(u, v);
+    let offset_dv = dv + radius * surface.normal_vder(u, v);
+    // Check the converged contact, not intermediate Newton iterates, which may cross a fold.
+    let orientation = offset_du.cross(offset_dv).dot(du.cross(dv));
+    orientation.is_finite() && orientation > 0.0
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use proptest::{prelude::*, property_test};
+
+    #[test]
+    fn adaptive_contact_failure_is_propagated() {
+        use std::f64::consts::PI;
+
+        #[derive(Clone)]
+        struct PinchingRadius;
+        impl ScalarFunctionD1 for PinchingRadius {
+            fn der_n(&self, n: usize, t: f64) -> f64 {
+                let frequency = 4.0 * PI;
+                let offset = if n == 0 { 0.2 } else { 0.0 };
+                offset
+                    + 0.2 * frequency.powi(n as i32) * (frequency * t + n as f64 * PI / 2.0).cos()
+            }
+        }
+        let fillet = RbfSurface::new(
+            Line(Point3::origin(), Point3::new(1.0, 0.0, 0.0)),
+            Plane::xy(),
+            Plane::zx(),
+            PinchingRadius,
+        );
+        for t in [0.0, 0.5, 1.0] {
+            assert!(fillet.contact_circle(t).is_some());
+        }
+        assert!(fillet.contact_circle(0.25).is_none());
+        assert!(
+            ApproxFilletSurface::approx_rolling_ball_fillet(&fillet, (0.0, 1.0), 0.001).is_none()
+        );
+    }
 
     #[property_test]
     fn plane_cylinder(#[strategy = 0.0..=1.0] u: f64, #[strategy = 0.0..=1.0] v: f64) {

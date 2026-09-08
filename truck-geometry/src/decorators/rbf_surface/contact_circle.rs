@@ -34,6 +34,12 @@ impl ContactCircle {
         radius: f64,
     ) -> Option<Self> {
         let (p, der) = point_on_curve;
+        if !t.is_finite()
+            || !radius.is_finite()
+            || (0..3).any(|i| !p[i].is_finite() || !der[i].is_finite())
+        {
+            return None;
+        }
         let (mut p0, mut p1) = (p, p);
         let (mut u0, mut v0) = surface0.search_parameter(p0, None, 100)?;
         let (mut u1, mut v1) = surface1.search_parameter(p1, None, 100)?;
@@ -42,22 +48,28 @@ impl ContactCircle {
             let sign = -f64::signum(n0.cross(n1).dot(der));
             sign * radius
         };
-        let center = (0..100).find_map(|_i| {
+        let mut center = None;
+        for _ in 0..100 {
             let (n0, n1) = (surface0.normal(u0, v0), surface1.normal(u1, v1));
-            let (c, q0, q1) = contact_points((p, der), (p0, n0), (p1, n1), signed_radius);
+            let (c, q0, q1) = contact_points((p, der), (p0, n0), (p1, n1), signed_radius)?;
             if p0.near(&q0) && p1.near(&q1) {
-                Some(c)
-            } else {
-                (p0, (u0, v0)) = next_point(surface0, (u0, v0), (p0, q0), signed_radius);
-                (p1, (u1, v1)) = next_point(surface1, (u1, v1), (p1, q1), signed_radius);
-                None
+                center = Some(c);
+                break;
             }
-        })?;
+            (p0, (u0, v0)) = next_point(surface0, (u0, v0), (p0, q0), signed_radius)?;
+            (p1, (u1, v1)) = next_point(surface1, (u1, v1), (p1, q1), signed_radius)?;
+        }
+        let center = center?;
         let (vec0, vec1) = (p0 - center, p1 - center);
+        let axis = vec0.cross(vec1).normalize();
+        let angle = vec0.angle(vec1);
+        if (0..3).any(|i| !axis[i].is_finite()) || !angle.0.is_finite() {
+            return None;
+        }
         Some(Self {
             center,
-            axis: vec0.cross(vec1).normalize(),
-            angle: vec0.angle(vec1),
+            axis,
+            angle,
             t,
             contact_point0: (p0, (u0, v0).into()).into(),
             contact_point1: (p1, (u1, v1).into()).into(),
@@ -117,7 +129,7 @@ fn contact_points(
     // origin and normal
     plane1: (Point3, Vector3),
     signed_radius: f64,
-) -> (Point3, Point3, Point3) {
+) -> Option<(Point3, Point3, Point3)> {
     let ((p, der), (p0, n0), (p1, n1)) = (point_on_curve, plane0, plane1);
     let mat = Matrix3::from_cols(der, n0, n1).transpose();
     let vec = Vector3::new(
@@ -125,10 +137,13 @@ fn contact_points(
         n0.dot(p0.to_vec()) + signed_radius,
         n1.dot(p1.to_vec()) + signed_radius,
     );
-    let center = Point3::from_vec(mat.invert().unwrap() * vec);
+    let center = Point3::from_vec(mat.invert()? * vec);
     let q0 = center - signed_radius * n0;
     let q1 = center - signed_radius * n1;
-    (center, q0, q1)
+    [center, q0, q1]
+        .iter()
+        .all(|p| (0..3).all(|i| p[i].is_finite()))
+        .then_some((center, q0, q1))
 }
 
 fn next_point(
@@ -136,7 +151,7 @@ fn next_point(
     (u, v): (f64, f64),
     (p, q): (Point3, Point3),
     signed_radius: f64,
-) -> (Point3, (f64, f64)) {
+) -> Option<(Point3, (f64, f64))> {
     let ders = surface.ders(1, u, v);
     let (uder, vder) = (ders[1][0], ders[0][1]);
     let n = uder.cross(vder);
@@ -144,8 +159,38 @@ fn next_point(
     let n_vder = signed_radius * surface.normal_vder(u, v);
     let mat = Matrix3::from_cols(uder + n_uder, vder + n_vder, n);
     let vec = q - p;
-    let del = mat.invert().unwrap() * vec;
-    debug_assert!(del.z.so_small(), "{del:?}");
+    let del = mat.invert()? * vec;
+    // A singular offset surface can yield an invalid step even when inversion succeeds.
+    if !del.x.is_finite() || !del.y.is_finite() || !del.z.so_small() {
+        return None;
+    }
     let (u, v) = (u + del.x, v + del.y);
-    (surface.subs(u, v), (u, v))
+    if !u.is_finite() || !v.is_finite() {
+        return None;
+    }
+    let point = surface.subs(u, v);
+    (0..3)
+        .all(|i| point[i].is_finite())
+        .then_some((point, (u, v)))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn singular_contact_planes_return_none() {
+        let line = Line(Point3::origin(), Point3::new(1.0, 0.0, 0.0));
+        let fillet = RbfSurface::new(line, Plane::xy(), Plane::xy(), 0.2);
+        assert!(fillet.contact_circle(0.5).is_none());
+    }
+
+    #[test]
+    fn invalid_contact_circles_return_none() {
+        let line = Line(Point3::origin(), Point3::new(1.0, 0.0, 0.0));
+        for radius in [0.0, f64::NAN, f64::INFINITY] {
+            let fillet = RbfSurface::new(line, Plane::xy(), Plane::zx(), radius);
+            assert!(fillet.contact_circle(0.5).is_none());
+        }
+    }
 }

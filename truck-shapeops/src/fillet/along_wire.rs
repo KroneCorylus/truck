@@ -187,6 +187,11 @@ impl<C: Clone> Cuts<C> {
 /// edges between those faces are cut where they meet the fillet. Blending several fillets that
 /// meet at a vertex is not supported.
 ///
+/// Contact curves must remain regular: rounding the rim where an existing convex cylindrical
+/// fillet meets a perpendicular plane requires a smaller radius. Equal radii collapse one
+/// contact curve to a point and require a spherical corner with different topology; larger
+/// radii fold the offset surface. These cases return `None`.
+///
 /// Returns the shell with the faces along the chain trimmed and one fillet face per chain edge
 /// appended, in chain order. The fillet faces share their cross edges, so the blend is tangent
 /// continuous along the chain up to `tol`. Returns `None` if the chain does not satisfy the

@@ -4,6 +4,8 @@ The version is of the bottom crate `truck-rendimpl`.
 
 ## Unreleased
 
+- Make rolling-ball fillet approximation propagate failed adaptive contact solves and singular tangent frames without panicking (R10). Reject folded contact offsets and document the unsupported equal-radius sequential rim case; preserve smaller-radius sequential blends and face history.
+
 - Fix fine revolution meshes (R9): measure interior refinement against triangle planes so flat polar caps stay compact and closed. Weld attribute components directly from spatial buckets without storing a quadratic graph of equal normals, preserving the strict tolerance and transitive connections.
 
 - Fix coplanar split-cut booleans by classifying overlap after all face cuts. Process each solid's full oriented boundary set, preserving disconnected bodies, cavities and nested islands regardless of shell order. Add `solid_components` for exterior/cavity grouping before STEP export and `subtract` for empty-safe subtraction. Reject detected invalid nesting, invalid result topology, invalid tolerances and unrepresentable whole-space results with `None`.
