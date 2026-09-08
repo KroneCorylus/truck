@@ -1,5 +1,7 @@
 use super::*;
 use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};
+use std::result::Result;
+use truck_base::diagnostics::{validate_tolerance, Code, Diagnostic};
 
 /// Fillets selected straight edges of a closed convex planar shell at a common radius.
 /// Three selected edges at a vertex receive an exact spherical corner; one selected edge
@@ -24,20 +26,45 @@ where
     NurbsSurface<Vector4>: ToSameGeometry<S>,
     Processor<Sphere, Matrix4>: ToSameGeometry<S>,
 {
-    if !radius.is_finite()
-        || radius <= 0.0
-        || !tol.is_finite()
-        || tol <= 0.0
-        || shell.shell_condition() != shell::ShellCondition::Closed
-    {
-        return None;
+    try_fillet_edges(shell, edges, radius, tol).ok()
+}
+
+/// Equal-radius edge fillets with stable failure codes and face context.
+pub fn try_fillet_edges<C, S>(
+    shell: &Shell<Point3, C, S>,
+    edges: &[EdgeID<C>],
+    radius: f64,
+    tol: f64,
+) -> Result<Shell<Point3, C, S>, Diagnostic>
+where
+    C: FilletedCurve<S>,
+    S: FilletedSurface<C>,
+    Line<Point3>: ToSameGeometry<C>,
+    NurbsCurve<Vector4>: ToSameGeometry<C>,
+    NurbsSurface<Vector4>: ToSameGeometry<S>,
+    Processor<Sphere, Matrix4>: ToSameGeometry<S>,
+{
+    validate_tolerance(tol, "fillet_edges")?;
+    let error = |code| Diagnostic::new(code, "fillet_edges", "validate_input");
+    let failed = || {
+        Diagnostic::new(
+            Code::BlendConstructionFailed,
+            "fillet_edges",
+            "construct_blend",
+        )
+    };
+    if !radius.is_finite() || radius <= 0.0 {
+        return Err(error(Code::InvalidParameter).parameter("radius", radius));
+    }
+    if shell.shell_condition() != shell::ShellCondition::Closed {
+        return Err(error(Code::InvalidInputTopology));
     }
     let selected: HashSet<_> = edges.iter().copied().collect();
     if selected.len() != edges.len() {
-        return None;
+        return Err(error(Code::DuplicateSelection));
     }
     if edges.is_empty() {
-        return Some(shell.clone());
+        return Ok(shell.clone());
     }
     let mut vertex_index = HashMap::default();
     let mut vertices = Vec::new();
@@ -48,11 +75,13 @@ where
     for (i, face) in shell.iter().enumerate() {
         let boundaries = face.boundaries();
         if boundaries.len() != 1 {
-            return None;
+            return Err(error(Code::UnsupportedTopology).face(i));
         }
         let surface = face.oriented_surface();
-        let point = boundaries[0].front_vertex()?.point();
-        let (u, v) = surface.search_parameter(point, None, 100)?;
+        let point = boundaries[0].front_vertex().ok_or_else(failed)?.point();
+        let (u, v) = surface
+            .search_parameter(point, None, 100)
+            .ok_or_else(failed)?;
         let normal = surface.normal(u, v).normalize();
         let d = normal.dot(point.to_vec());
         let planar = |u, v| {
@@ -81,7 +110,7 @@ where
                     u0 + (u1 - u0) * a as f64 / 2.0,
                     v0 + (v1 - v0) * b as f64 / 2.0,
                 ) {
-                    return None;
+                    return Err(error(Code::NonPlanarFace).face(i));
                 }
             }
         }
@@ -106,38 +135,40 @@ where
             let start = edge.absolute_front().point();
             let direction = edge.absolute_back().point() - start;
             if direction.so_small() {
-                return None;
+                return Err(error(Code::DegenerateCurve).face(i));
             }
             for k in 0..=4 {
                 let point = curve.subs(a + (b - a) * k as f64 / 4.0);
                 if (point - start).cross(direction.normalize()).magnitude() > TOLERANCE {
-                    return None;
+                    return Err(error(Code::UnsupportedGeometry).face(i));
                 }
-                let (u, v) = surface.search_parameter(point, None, 100)?;
+                let (u, v) = surface
+                    .search_parameter(point, None, 100)
+                    .ok_or_else(failed)?;
                 if !planar(u, v) {
-                    return None;
+                    return Err(error(Code::NonPlanarFace).face(i));
                 }
             }
         }
     }
     if selected.iter().any(|id| !edge_index.contains_key(id)) {
-        return None;
+        return Err(error(Code::UnknownEdge));
     }
     if vertices.iter().any(|v| {
         planes
             .iter()
             .any(|&(n, d)| n.dot(v.point().to_vec()) > d + TOLERANCE)
     }) {
-        return None;
+        return Err(error(Code::UnsupportedGeometry));
     }
     let mut incident = vec![Vec::new(); vertices.len()];
     let mut sides = Vec::new();
     for (k, edge) in original_edges.iter().enumerate() {
         let [(a, forward), (b, backward)] = edge_faces[k][..] else {
-            return None;
+            return Err(error(Code::UnsupportedTopology));
         };
         if forward == backward {
-            return None;
+            return Err(error(Code::UnsupportedTopology));
         }
         let pair = if forward { [a, b] } else { [b, a] };
         if selected.contains(&edge.id()) {
@@ -148,7 +179,7 @@ where
                 .dot(axis.normalize())
                 <= TOLERANCE
             {
-                return None;
+                return Err(error(Code::ConcaveEdge));
             }
         }
         sides.push(pair);
@@ -193,16 +224,17 @@ where
                 };
                 let axis = away(chosen[0]).normalize();
                 if !axis.near(&(-away(chosen[1]).normalize())) {
-                    return None;
+                    return Err(error(Code::UnsupportedTopology));
                 }
                 equations.push((axis, axis.dot(vertex.point().to_vec())));
             }
-            _ => return None,
+            _ => return Err(error(Code::UnsupportedTopology)),
         }
         let center = Point3::from_vec(
             Matrix3::from_cols(equations[0].0, equations[1].0, equations[2].0)
                 .transpose()
-                .invert()?
+                .invert()
+                .ok_or_else(failed)?
                 * Vector3::new(equations[0].1, equations[1].1, equations[2].1),
         );
         for (f, &(n, d)) in planes.iter().enumerate() {
@@ -212,7 +244,7 @@ where
                 radius
             };
             if n.dot(center.to_vec()) > d - offset + TOLERANCE {
-                return None;
+                return Err(failed().parameter("radius", radius));
             }
         }
         contacts.push(
@@ -240,9 +272,9 @@ where
         let make_line = |p: &Vertex<Point3>, q: &Vertex<Point3>| {
             let direction = q.point() - p.point();
             if direction.dot(edge.back().point() - edge.front().point()) <= TOLERANCE2 {
-                return None;
+                return Err(failed().parameter("radius", radius));
             }
-            Some(Edge::new(
+            Ok(Edge::new(
                 p,
                 q,
                 Line(p.point(), q.point()).to_same_geometry(),
@@ -313,7 +345,7 @@ where
     }
     let mut result = Shell::new();
     for (f, face) in shell.iter().enumerate() {
-        let boundary = face.boundaries().pop()?;
+        let boundary = face.boundaries().pop().ok_or_else(failed)?;
         let lines: Vec<_> = boundary
             .iter()
             .map(|edge| {
@@ -334,20 +366,33 @@ where
                 continue;
             }
             let v = vertex_index[&boundary[i].back().id()];
-            let k = *incident[v].iter().find(|&&k| arcs[k].is_some())?;
+            let k = *incident[v]
+                .iter()
+                .find(|&&k| arcs[k].is_some())
+                .ok_or_else(failed)?;
             let end = usize::from(original_edges[k].back() == &vertices[v]);
-            let arc = &arcs[k].as_ref()?[end];
+            let arc = &arcs[k].as_ref().ok_or_else(failed)?[end];
             let arc = if arc.front() == lines[i].back() {
                 arc.clone()
             } else {
                 arc.inverse()
             };
             if arc.back() != next.front() {
-                return None;
+                return Err(failed());
             }
             wire.push_back(arc);
         }
-        result.push(Face::try_new(vec![wire], face.oriented_surface()).ok()?);
+        result.push(
+            Face::try_new(vec![wire], face.oriented_surface()).map_err(|e| {
+                Diagnostic::new(
+                    Code::InvalidOutputTopology,
+                    "fillet_edges",
+                    "validate_output",
+                )
+                .face(f)
+                .with_coded_source(e)
+            })?,
+        );
     }
     result.extend(fillets);
     for (v, vertex) in vertices.iter().enumerate() {
@@ -366,17 +411,19 @@ where
                 }
             })
             .collect();
-        let mut boundary = wire![remaining.pop()?];
+        let mut boundary = wire![remaining.pop().ok_or_else(failed)?];
         while !remaining.is_empty() {
             let i = remaining
                 .iter()
-                .position(|edge| Some(edge.front()) == boundary.back_vertex())?;
+                .position(|edge| Some(edge.front()) == boundary.back_vertex())
+                .ok_or_else(failed)?;
             boundary.push_back(remaining.remove(i));
         }
         let normals: Vec<_> = contacts[v].keys().map(|&f| planes[f].0).collect();
         let y = (Matrix3::from_cols(normals[0], normals[1], normals[2])
             .transpose()
-            .invert()?
+            .invert()
+            .ok_or_else(failed)?
             * Vector3::new(1.0, 1.0, 1.0))
         .normalize();
         let z = normals[0].cross(y).normalize();
@@ -388,7 +435,24 @@ where
             centers[v].to_vec().extend(1.0),
         );
         let sphere = Processor::new(Sphere::new(Point3::origin(), radius)).transformed(transform);
-        result.push(Face::try_new(vec![boundary], sphere.to_same_geometry()).ok()?);
+        result.push(
+            Face::try_new(vec![boundary], sphere.to_same_geometry()).map_err(|e| {
+                Diagnostic::new(
+                    Code::InvalidOutputTopology,
+                    "fillet_edges",
+                    "validate_output",
+                )
+                .with_coded_source(e)
+            })?,
+        );
     }
-    (result.shell_condition() == shell::ShellCondition::Closed).then_some(result)
+    (result.shell_condition() == shell::ShellCondition::Closed)
+        .then_some(result)
+        .ok_or_else(|| {
+            Diagnostic::new(
+                Code::InvalidOutputTopology,
+                "fillet_edges",
+                "validate_output",
+            )
+        })
 }

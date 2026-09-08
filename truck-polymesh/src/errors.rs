@@ -96,3 +96,21 @@ impl From<std::num::ParseIntError> for Error {
         std::io::Error::new(std::io::ErrorKind::InvalidData, error).into()
     }
 }
+
+impl<V: std::fmt::Debug> Error<V> {
+    /// Stable external error code. Display messages are not a machine-readable contract.
+    pub fn code(&self) -> &'static str {
+        match self {
+            Self::OutOfRange(..) => "TRUCK_MESH_OUT_OF_RANGE",
+            Self::NoNormal => "TRUCK_MESH_NO_NORMAL",
+            Self::DifferentLengthArrays => "TRUCK_MESH_DIFFERENT_LENGTH_ARRAYS",
+            Self::IrregularArray => "TRUCK_MESH_IRREGULAR_ARRAY",
+            Self::UnsortedDivision => "TRUCK_MESH_UNSORTED_DIVISION",
+            Self::FromIO(..) => "TRUCK_MESH_FROM_IO",
+        }
+    }
+}
+
+impl<V: std::fmt::Debug> truck_base::diagnostics::CodedError for Error<V> {
+    fn code(&self) -> &'static str { self.code() }
+}

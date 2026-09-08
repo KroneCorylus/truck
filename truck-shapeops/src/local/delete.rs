@@ -2,12 +2,13 @@
 
 use super::{
     intersect::domain_on,
-    intersect_surfaces,
     replace::{rebuild_face, rebuild_solid, Incidence, MARGIN},
     LocalOpError,
 };
+use super::{locate_failure, Failure};
 use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};
 use std::result::Result;
+use truck_base::diagnostics::{Code, Diagnostic};
 use truck_geometry::prelude::*;
 use truck_modeling::*;
 
@@ -50,6 +51,17 @@ use truck_modeling::*;
 /// assert!(sharp.vertex_iter().any(|v| v.point().near(&Point3::new(2.0, 0.0, 1.0))));
 /// ```
 pub fn delete_face(solid: &Solid, face: FaceID) -> Result<Solid, LocalOpError<Surface>> {
+    delete_face_impl(solid, face).map_err(|e| e.legacy)
+}
+
+/// Diagnostic variant of [`delete_face`], with input-relative locations and retained causes.
+pub fn try_delete_face(solid: &Solid, face: FaceID) -> Result<Solid, Diagnostic> {
+    super::validate_solid(solid, "delete_face")?;
+    delete_face_impl(solid, face)
+        .map_err(|e| locate_failure(solid.face_iter(), &[face], "delete_face", e))
+}
+
+pub(super) fn delete_face_impl(solid: &Solid, face: FaceID) -> Result<Solid, Failure> {
     let Incidence {
         faces,
         index,
@@ -60,12 +72,20 @@ pub fn delete_face(solid: &Solid, face: FaceID) -> Result<Solid, LocalOpError<Su
     let unsupported = || LocalOpError::Unsupported { face };
     let boundaries = faces[removed].boundaries();
     let [wire] = boundaries.as_slice() else {
-        return Err(unsupported());
+        return Err(Failure::new(
+            unsupported(),
+            Code::UnsupportedTopology,
+            "validate_incidence",
+        ));
     };
     let loop_edges: Vec<Edge> = wire.iter().map(Edge::absolute_clone).collect();
     let loop_ids: HashSet<EdgeID> = loop_edges.iter().map(Edge::id).collect();
     if loop_edges.len() != 4 {
-        return Err(unsupported());
+        return Err(Failure::new(
+            unsupported(),
+            Code::UnsupportedTopology,
+            "validate_incidence",
+        ));
     }
     // the neighbour across each edge of the loop
     let neighbours: Vec<usize> = loop_edges
@@ -79,12 +99,18 @@ pub fn delete_face(solid: &Solid, face: FaceID) -> Result<Solid, LocalOpError<Su
             }
         })
         .collect::<Option<_>>()
-        .ok_or_else(unsupported)?;
+        .ok_or_else(|| {
+            Failure::new(
+                unsupported(),
+                Code::UnsupportedTopology,
+                "validate_incidence",
+            )
+        })?;
     if neighbours
         .iter()
         .any(|&n| !matches!(faces[n].surface(), Surface::Plane(_)))
     {
-        return Err(unsupported());
+        return Err(unsupported().into());
     }
     for edge in wire.iter() {
         let edges = &edges_of_vertex[&edge.front().id()];
@@ -93,29 +119,47 @@ pub fn delete_face(solid: &Solid, face: FaceID) -> Result<Solid, LocalOpError<Su
             .flat_map(|e| faces_of_edge[&e.id()].iter().copied())
             .collect();
         if edges.len() != 3 || faces_here.len() != 3 {
-            return Err(unsupported());
+            return Err(Failure::new(
+                unsupported(),
+                Code::UnsupportedTopology,
+                "validate_incidence",
+            ));
         }
     }
 
     // the opposite pair whose planes meet: their edges become one new edge, the other two vanish
-    let meet = |i: usize, j: usize| -> Option<Curve> {
+    let meet = |i: usize, j: usize| -> Result<Option<Curve>, Failure> {
         let (a, b) = (&faces[neighbours[i]], &faces[neighbours[j]]);
         let (sa, sb) = (a.surface(), b.surface());
-        let domain = |face: &Face, s: &Surface| domain_on(s, face, MARGIN);
-        let curves = intersect_surfaces(&sa, domain(a, &sa)?, &sb, domain(b, &sb)?, 0.01)?;
-        match curves.as_slice() {
+        let domain = |face: &Face, s: &Surface| {
+            domain_on(s, face, MARGIN).ok_or_else(|| {
+                Failure::new(
+                    unsupported(),
+                    Code::ProjectionFailed,
+                    "parameterize_boundary",
+                )
+            })
+        };
+        let curves =
+            super::try_intersect_surfaces(&sa, domain(a, &sa)?, &sb, domain(b, &sb)?, 0.01)
+                .map_err(|diagnostic| Failure {
+                    legacy: unsupported(),
+                    diagnostic,
+                })?;
+        Ok(match curves.as_slice() {
             [curve @ Curve::Line(_)] => Some(curve.clone()),
             _ => None,
-        }
+        })
     };
-    let (sides, line) = match (meet(1, 3), meet(0, 2)) {
+    let (sides, line) = match (meet(1, 3)?, meet(0, 2)?) {
         (Some(line), _) => ([1, 3], line),
         (None, Some(line)) => ([0, 2], line),
         (None, None) => {
             return Err(LocalOpError::NoIntersection {
                 face,
                 neighbour: faces[neighbours[1]].id(),
-            })
+            }
+            .into())
         }
     };
     let ends = [(sides[0] + 1) % 4, (sides[0] + 3) % 4];
@@ -142,10 +186,14 @@ pub fn delete_face(solid: &Solid, face: FaceID) -> Result<Solid, LocalOpError<Su
             _ => None,
         };
         let Some((t, _)) = met.filter(|&(t, s)| line.subs(t).near(&spoke.curve().subs(s))) else {
-            return Err(LocalOpError::NoIntersection {
-                face,
-                neighbour: faces[neighbours[k]].id(),
-            });
+            return Err(Failure::new(
+                LocalOpError::NoIntersection {
+                    face,
+                    neighbour: faces[neighbours[k]].id(),
+                },
+                Code::IntersectionFailed,
+                "find_vertex",
+            ));
         };
         let vertex = Vertex::new(line.subs(t));
         new_vertices.insert(v0.id(), vertex.clone());
@@ -193,10 +241,24 @@ pub fn delete_face(solid: &Solid, face: FaceID) -> Result<Solid, LocalOpError<Su
     let rebuilt: HashMap<usize, Face> = neighbours
         .iter()
         .map(|&n| {
-            let face = rebuild_face(&faces[n], &new_edges, faces[n].oriented_surface());
-            (n, face)
+            rebuild_face(&faces[n], &new_edges, faces[n].oriented_surface()).map(|face| (n, face))
         })
-        .collect();
+        .collect::<Result<_, _>>()
+        .map_err(|e| {
+            Failure::new(
+                unsupported(),
+                Code::InvalidOutputTopology,
+                "validate_output",
+            )
+            .source(e)
+        })?;
     let dropped = HashSet::from_iter([removed]);
-    rebuild_solid(solid, &rebuilt, &dropped).map_err(|_| unsupported())
+    rebuild_solid(solid, &rebuilt, &dropped).map_err(|e| {
+        Failure::new(
+            unsupported(),
+            Code::InvalidOutputTopology,
+            "validate_output",
+        )
+        .source(e)
+    })
 }

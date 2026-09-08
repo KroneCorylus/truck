@@ -1,5 +1,7 @@
 use super::*;
 use std::collections::HashMap;
+use std::result::Result;
+use truck_base::diagnostics::{validate_tolerance, Code, Diagnostic};
 
 /// Edges of a boundary loop after trimming: one entry per original edge, `None` to keep it.
 type LoopReplacement<C> = Vec<Option<Vec<Edge<Point3, C>>>>;
@@ -211,13 +213,64 @@ where
     ApproxFilletSurface<S, S>: ToSameGeometry<S>,
     NurbsCurve<Vector4>: ToSameGeometry<C>,
 {
+    try_fillet_along_wire(shell, wire, radius, tol).ok()
+}
+
+/// Chain fillets with selection, contact, fitting and trimming diagnostics.
+pub fn try_fillet_along_wire<C, S, R>(
+    shell: &Shell<Point3, C, S>,
+    wire: &Wire<Point3, C>,
+    radius: R,
+    tol: f64,
+) -> Result<Shell<Point3, C, S>, Diagnostic>
+where
+    C: FilletedCurve<S>,
+    S: FilletedSurface<C>,
+    R: ScalarFunctionD1,
+    PCurve<BSplineCurve<Point2>, S>: ToSameGeometry<C>,
+    IntersectionCurve<C, S, S>: ToSameGeometry<C>,
+    ApproxFilletSurface<S, S>: ToSameGeometry<S>,
+    NurbsCurve<Vector4>: ToSameGeometry<C>,
+{
+    let operation = "fillet_along_wire";
+    validate_tolerance(tol, operation)?;
+    let failed = || Diagnostic::new(Code::BlendConstructionFailed, operation, "construct_blend");
     let n = wire.len();
-    if n == 0 || !wire.is_continuous() || !wire.is_simple() {
-        return None;
+    if n == 0 {
+        return Err(Diagnostic::new(
+            Code::EmptySelection,
+            operation,
+            "validate_input",
+        ));
+    }
+    if !wire.is_continuous() || !wire.is_simple() {
+        return Err(Diagnostic::new(
+            Code::UnsupportedTopology,
+            operation,
+            "validate_wire",
+        ));
+    }
+    for i in 0..=n * 32 {
+        let t = i as f64 / 32.0;
+        for (name, value, positive) in [
+            ("radius", radius.subs(t), true),
+            ("radius_derivative", radius.der_n(1, t), false),
+            ("radius_second_derivative", radius.der_n(2, t), false),
+        ] {
+            if !value.is_finite() || (positive && value <= 0.0) {
+                let mut error =
+                    Diagnostic::new(Code::InvalidParameter, operation, "validate_input")
+                        .parameter(name, value);
+                error.context.station = Some(t);
+                return Err(error);
+            }
+        }
     }
     let closed = wire.is_cyclic();
     if !is_tangent_continuous(wire, closed) {
-        return None;
+        let mut error = Diagnostic::new(Code::UnsupportedGeometry, operation, "validate_wire");
+        error.message = "The selected wire is not tangent continuous.".into();
+        return Err(error);
     }
     let nv = if closed { n } else { n + 1 };
     let chain_index: HashMap<EdgeID<C>, usize> = wire
@@ -229,8 +282,12 @@ where
     let runs: Vec<Run> = shell
         .iter()
         .enumerate()
-        .map(|(idx, face)| find_runs(idx, face, wire, &chain_index))
-        .collect::<Option<Vec<_>>>()?
+        .map(|(idx, face)| {
+            find_runs(idx, face, wire, &chain_index).ok_or_else(|| {
+                Diagnostic::new(Code::UnsupportedTopology, operation, "validate_wire").face(idx)
+            })
+        })
+        .collect::<Result<Vec<_>, _>>()?
         .into_iter()
         .flatten()
         .collect();
@@ -238,14 +295,19 @@ where
     for run in &runs {
         for &k in &run.chain {
             if sides[k][run.side].replace(run.face).is_some() {
-                return None;
+                return Err(
+                    Diagnostic::new(Code::UnsupportedTopology, operation, "validate_wire")
+                        .selection(k)
+                        .face(run.face),
+                );
             }
         }
     }
     let sides: Vec<[usize; 2]> = sides
         .into_iter()
         .map(|[s0, s1]| Some([s0?, s1?]))
-        .collect::<Option<_>>()?;
+        .collect::<Option<_>>()
+        .ok_or_else(|| Diagnostic::new(Code::UnsupportedTopology, operation, "validate_wire"))?;
 
     let boundaries: Vec<Vec<Wire<Point3, C>>> =
         shell.iter().map(|face| face.boundaries()).collect();
@@ -296,25 +358,28 @@ where
     if !closed {
         for (which, j, k) in [(0, 0, 0), (1, n, n - 1)] {
             let vertex = if j == 0 {
-                wire.front_vertex()?
+                wire.front_vertex().ok_or_else(failed)?
             } else {
-                wire.back_vertex()?
+                wire.back_vertex().ok_or_else(failed)?
             };
             let mut walk = walk_around_vertex(
                 shell,
                 sides[k],
                 vertex,
-                adjacent_edge(j, 0)?,
-                &adjacent_edge(j, 1)?,
-            )?;
+                adjacent_edge(j, 0).ok_or_else(failed)?,
+                &adjacent_edge(j, 1).ok_or_else(failed)?,
+            )
+            .ok_or_else(failed)?;
             let rbf = &rbfs[k];
             let t = if j == 0 { ranges[k].0 } else { ranges[k].1 };
             let (curve0, hint0) = adjacent_hint(&walk.edges[0], vertex);
             let (curve1, hint1) = adjacent_hint(&walk.edges[walk.faces.len()], vertex);
-            let (_, _, v0, _) =
-                rbf.search_contact_curve0_cross_point_with_adjacent_edge(t, &curve0, hint0, 100)?;
-            let (_, _, v1, _) =
-                rbf.search_contact_curve1_cross_point_with_adjacent_edge(t, &curve1, hint1, 100)?;
+            let (_, _, v0, _) = rbf
+                .search_contact_curve0_cross_point_with_adjacent_edge(t, &curve0, hint0, 100)
+                .ok_or_else(|| failed().stage("find_contact").selection(k))?;
+            let (_, _, v1, _) = rbf
+                .search_contact_curve1_cross_point_with_adjacent_edge(t, &curve1, hint1, 100)
+                .ok_or_else(|| failed().stage("find_contact").selection(k))?;
             let mut vs = vec![v0, v1];
             for edge in &walk.edges[1..walk.faces.len()] {
                 let curve = edge.curve();
@@ -325,7 +390,8 @@ where
                     s1
                 };
                 let ((u, v), s) =
-                    algo::surface::search_intersection_parameter(rbf, (0.5, t), &curve, hint, 100)?;
+                    algo::surface::search_intersection_parameter(rbf, (0.5, t), &curve, hint, 100)
+                        .ok_or_else(failed)?;
                 walk.crossings.push((Vertex::new(curve.subs(s)), s, (u, v)));
                 vs.push(v);
             }
@@ -339,9 +405,10 @@ where
     }
     let mut surfaces = Vec::with_capacity(n);
     for k in 0..n {
-        surfaces.push(ApproxFilletSurface::approx_rolling_ball_fillet(
-            &rbfs[k], ranges[k], tol,
-        )?);
+        surfaces.push(
+            ApproxFilletSurface::approx_rolling_ball_fillet(&rbfs[k], ranges[k], tol)
+                .ok_or_else(|| failed().stage("approximate_surface").selection(k))?,
+        );
     }
 
     let contact_curves = surfaces
@@ -358,7 +425,8 @@ where
         contacts,
         vertices,
         cuts,
-    } = trim_runs(shell, wire, &runs, &contact_curves)?;
+    } = trim_runs(shell, wire, &runs, &contact_curves)
+        .ok_or_else(|| failed().stage("trim_faces"))?;
     let blend_surfaces: Vec<S> = surfaces.iter().map(|af| af.to_same_geometry()).collect();
 
     let mut cross: Vec<Vec<Edge<Point3, C>>> = vec![Vec::new(); nv];
@@ -373,11 +441,11 @@ where
 
     if !closed {
         for (which, j, k) in [(0, 0, 0), (1, n, n - 1)] {
-            let walk = ends[which].take()?;
+            let walk = ends[which].take().ok_or_else(failed)?;
             let vertex = if j == 0 {
-                wire.front_vertex()?
+                wire.front_vertex().ok_or_else(failed)?
             } else {
-                wire.back_vertex()?
+                wire.back_vertex().ok_or_else(failed)?
             };
             let m = walk.faces.len();
             let ((u0, u1), (v0, v1)) = surfaces[k].range_tuple();
@@ -385,16 +453,18 @@ where
             // Points of the cross edge from side 0 to side 1 with their parameters on the fillet,
             // and the kept piece of the edge leaving the chain at each of them.
             let mut points = vec![(vertices[j][0].clone(), (u0, v_end))];
-            let mut pieces = vec![cuts.piece(&walk.edges[0])?];
+            let mut pieces = vec![cuts.piece(&walk.edges[0]).ok_or_else(failed)?];
             for (i, (w, s, uv)) in walk.crossings.iter().enumerate() {
                 let edge = &walk.edges[i + 1];
-                let uv = surfaces[k].search_parameter(w.point(), Some(*uv), 100)?;
+                let uv = surfaces[k]
+                    .search_parameter(w.point(), Some(*uv), 100)
+                    .ok_or_else(failed)?;
                 points.push((w.clone(), uv));
-                let (front, back) = edge.cut_with_parameter(w, *s)?;
+                let (front, back) = edge.cut_with_parameter(w, *s).ok_or_else(failed)?;
                 pieces.push(if edge.back() == vertex { front } else { back });
             }
             points.push((vertices[j][1].clone(), (u1, v_end)));
-            pieces.push(cuts.piece(&walk.edges[m])?);
+            pieces.push(cuts.piece(&walk.edges[m]).ok_or_else(failed)?);
 
             let blend = &blend_surfaces[k];
             for i in 0..m {
@@ -402,9 +472,12 @@ where
                 let face_surface = shell[idx].oriented_surface();
                 let ((w0, uv0), (w1, uv1)) = (&points[i], &points[i + 1]);
                 let direction = w1.point() - w0.point();
-                let der0 = cross_tangent(blend, *uv0, &face_surface, w0.point(), direction)?;
-                let der1 = cross_tangent(blend, *uv1, &face_surface, w1.point(), direction)?;
-                let piece = create_pcurve_edge((w0, *uv0, der0), (w1, *uv1, der1), blend.clone())?;
+                let der0 = cross_tangent(blend, *uv0, &face_surface, w0.point(), direction)
+                    .ok_or_else(failed)?;
+                let der1 = cross_tangent(blend, *uv1, &face_surface, w1.point(), direction)
+                    .ok_or_else(failed)?;
+                let piece = create_pcurve_edge((w0, *uv0, der0), (w1, *uv1, der1), blend.clone())
+                    .ok_or_else(failed)?;
                 let (fillet_edge, left, right) = match j {
                     0 => (
                         piece.clone(),
@@ -418,7 +491,8 @@ where
                     ),
                 };
                 faces[idx] =
-                    create_new_side(&faces[idx], &fillet_edge, blend, vertex.id(), &left, &right)?;
+                    create_new_side(&faces[idx], &fillet_edge, blend, vertex.id(), &left, &right)
+                        .ok_or_else(failed)?;
                 cross[j].push(piece);
             }
         }
@@ -431,12 +505,16 @@ where
                 .chain(std::iter::once(contacts[k][1].clone()))
                 .chain(cross[(k + 1) % nv].iter().rev().map(Edge::inverse))
                 .collect();
-            Face::new(vec![boundary.into()], blend_surfaces[k].clone())
+            Face::try_new(vec![boundary.into()], blend_surfaces[k].clone()).map_err(|e| {
+                Diagnostic::new(Code::InvalidOutputTopology, operation, "validate_output")
+                    .selection(k)
+                    .with_coded_source(e)
+            })
         })
-        .collect();
+        .collect::<Result<_, _>>()?;
 
     faces.extend(blends);
-    Some(faces.into())
+    Ok(faces.into())
 }
 
 pub(super) struct TrimmedChain<C, S> {

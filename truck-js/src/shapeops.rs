@@ -24,3 +24,37 @@ pub fn not(solid: &Solid) -> Solid {
     solid.not();
     solid
 }
+
+/// Intersection; throws an Error with stable code, operation, stage and context on failure.
+#[wasm_bindgen]
+pub fn try_and(
+    solid0: &Solid,
+    solid1: &Solid,
+    tol: Option<f64>,
+) -> Result<Solid, wasm_bindgen::JsValue> {
+    shapeops::try_and(solid0, solid1, tol.unwrap_or(SHAPEOPS_TOLERANCE))
+        .map(IntoWasm::into_wasm)
+        .map_err(crate::diagnostics::js_error)
+}
+/// Union; throws a structured Error on failure.
+#[wasm_bindgen]
+pub fn try_or(
+    solid0: &Solid,
+    solid1: &Solid,
+    tol: Option<f64>,
+) -> Result<Solid, wasm_bindgen::JsValue> {
+    shapeops::try_or(solid0, solid1, tol.unwrap_or(SHAPEOPS_TOLERANCE))
+        .map(IntoWasm::into_wasm)
+        .map_err(crate::diagnostics::js_error)
+}
+/// Subtraction; empty and unchanged results are successful solids.
+#[wasm_bindgen]
+pub fn try_subtract(
+    solid0: &Solid,
+    solid1: &Solid,
+    tol: Option<f64>,
+) -> Result<Solid, wasm_bindgen::JsValue> {
+    shapeops::try_subtract(solid0, solid1, tol.unwrap_or(SHAPEOPS_TOLERANCE))
+        .map(IntoWasm::into_wasm)
+        .map_err(crate::diagnostics::js_error)
+}

@@ -1,5 +1,7 @@
 mod components;
-pub use components::solid_components;
+pub use components::{solid_components, try_solid_components};
+use std::result::Result;
+use truck_base::diagnostics::{Code, Diagnostic};
 
 use crate::alternative::Alternative;
 use crate::profile::{self, Stage};
@@ -60,13 +62,20 @@ type AltCurveFace<C, S> =
 
 fn altshell_to_shell<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     altshell: &AltCurveShell<C, S>,
-) -> Option<Shell<Point3, C, S>> {
-    altshell.try_mapped(
+) -> Result<Shell<Point3, C, S>, Diagnostic> {
+    let mut failure = None;
+    let result = altshell.try_mapped(
         |p| Some(*p),
         |c| match c {
             Alternative::FirstType(c) => Some(c.clone()),
             Alternative::SecondType(ic) => {
-                let leader = smooth_leader(ic)?;
+                let leader = match try_smooth_leader(ic) {
+                    Ok(leader) => leader,
+                    Err(error) => {
+                        failure = Some(error);
+                        return None;
+                    }
+                };
                 Some(
                     IntersectionCurve::new(ic.surface0().clone(), ic.surface1().clone(), leader)
                         .into(),
@@ -74,7 +83,11 @@ fn altshell_to_shell<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
             }
         },
         |s| Some(s.clone()),
-    )
+    );
+    result.ok_or_else(|| {
+        failure
+            .unwrap_or_else(|| Diagnostic::new(Code::CurveFittingFailed, "boolean", "fit_curves"))
+    })
 }
 
 /// A cubic B-spline through the exact intersection points at the vertices of the leading
@@ -83,9 +96,9 @@ fn altshell_to_shell<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
 /// The final curve projects this leader onto the intersection inside the plane normal to the
 /// leader's tangent, so the leader must follow the intersection smoothly: a wiggle of the size
 /// of the tolerance makes the projected points zigzag, or the projection fail.
-pub(crate) fn smooth_leader<S: ShapeOpsSurface>(
+pub(crate) fn try_smooth_leader<S: ShapeOpsSurface>(
     ic: &IntersectionCurve<PolylineCurve<Point3>, S, S>,
-) -> Option<BSplineCurve<Point3>> {
+) -> Result<BSplineCurve<Point3>, Diagnostic> {
     let (t0, t1) = ic.range_tuple();
     let mut params = vec![t0];
     let mut t = t0.floor() + 1.0;
@@ -98,14 +111,22 @@ pub(crate) fn smooth_leader<S: ShapeOpsSurface>(
     params.push(t1);
     let mut points: Vec<Point3> = Vec::with_capacity(params.len());
     for t in params {
-        let (p, _, _) = ic.search_triple(t, 100)?;
+        let (p, _, _) = ic.search_triple(t, 100).ok_or_else(|| {
+            let mut e = Diagnostic::new(Code::ProjectionFailed, "boolean", "fit_curves");
+            e.context.station = Some(t);
+            e
+        })?;
         if points.last().is_none_or(|q| !q.near(&p)) {
             points.push(p);
         }
     }
     let n = points.len();
     if n < 2 {
-        return None;
+        return Err(Diagnostic::new(
+            Code::DegenerateCurve,
+            "boolean",
+            "fit_curves",
+        ));
     }
     let mut chord = vec![0.0];
     for w in points.windows(2) {
@@ -116,7 +137,9 @@ pub(crate) fn smooth_leader<S: ShapeOpsSurface>(
     knots.extend((1..n - degree).map(|j| chord[j..j + degree].iter().sum::<f64>() / degree as f64));
     knots.extend(vec![chord[n - 1]; degree + 1]);
     let parameter_points: Vec<_> = chord.into_iter().zip(points).collect();
-    BSplineCurve::try_interpole(KnotVec::from(knots), parameter_points).ok()
+    BSplineCurve::try_interpole(KnotVec::from(knots), parameter_points).map_err(|e| {
+        Diagnostic::new(Code::CurveFittingFailed, "boolean", "fit_curves").with_coded_source(e)
+    })
 }
 
 /// A point inside `face`, away from its boundary: the centroid of a triangle of its mesh.
@@ -179,7 +202,7 @@ fn process_boundaries<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     poly_shells: [&Shell<Point3, PolylineCurve<Point3>, Option<PolygonMesh>>; 2],
     inverted: [bool; 2],
     intersection: bool,
-) -> Option<(Shell<Point3, C, S>, bool)> {
+) -> Result<(Shell<Point3, C, S>, bool), Diagnostic> {
     let [poly_shell0, poly_shell1] = poly_shells;
     let altshell0: AltCurveShell<C, S> =
         shell0.mapped(|x| *x, |c| Alternative::FirstType(c.clone()), Clone::clone);
@@ -187,7 +210,7 @@ fn process_boundaries<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
         shell1.mapped(|x| *x, |c| Alternative::FirstType(c.clone()), Clone::clone);
     let start = profile::now();
     let quadruple =
-        loops_store::create_loops_stores(&altshell0, poly_shell0, &altshell1, poly_shell1);
+        loops_store::try_create_loops_stores(&altshell0, poly_shell0, &altshell1, poly_shell1);
     profile::lap(Stage::LoopsStore, start);
     let loops_store::LoopsStoreQuadruple {
         geom_loops_store0: loops_store0,
@@ -195,17 +218,23 @@ fn process_boundaries<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
         ..
     } = quadruple?;
     let start = profile::now();
-    let mut cls0 = divide_face::divide_faces(&altshell0, &loops_store0, tol)?;
+    let mut cls0 =
+        divide_face::try_divide_faces(&altshell0, &loops_store0, tol).map_err(|e| e.operand(0))?;
     cls0.integrate_by_component();
-    let mut cls1 = divide_face::divide_faces(&altshell1, &loops_store1, tol)?;
+    let mut cls1 =
+        divide_face::try_divide_faces(&altshell1, &loops_store1, tol).map_err(|e| e.operand(1))?;
     cls1.integrate_by_component();
     profile::lap(Stage::Division, start);
     let start = profile::now();
     let [mut and0, mut or0, unknown0] = cls0.and_or_unknown();
     let outside0 = or0.len();
-    classify_unknown(unknown0, poly_shell1, &mut and0, &mut or0, tol, inverted[1])?;
+    classify_unknown(unknown0, poly_shell1, &mut and0, &mut or0, tol, inverted[1]).ok_or_else(
+        || Diagnostic::new(Code::ClassificationFailed, "boolean", "classify_faces").operand(0),
+    )?;
     let [mut and1, mut or1, unknown1] = cls1.and_or_unknown();
-    classify_unknown(unknown1, poly_shell0, &mut and1, &mut or1, tol, inverted[0])?;
+    classify_unknown(unknown1, poly_shell0, &mut and1, &mut or1, tol, inverted[0]).ok_or_else(
+        || Diagnostic::new(Code::ClassificationFailed, "boolean", "classify_faces").operand(1),
+    )?;
     profile::lap(Stage::Classification, start);
     // Against a complemented cutter, excluded target faces and cutter faces inside
     // the target witness material removal. A same-normal contact is `Both` on the
@@ -222,7 +251,7 @@ fn process_boundaries<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     let start = profile::now();
     let shell = altshell_to_shell(&shell)?;
     profile::lap(Stage::Fitting, start);
-    Some((shell, removed_material))
+    Ok((shell, removed_material))
 }
 
 /// Intersection of two solids.
@@ -260,7 +289,7 @@ pub fn and<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     solid1: &Solid<Point3, C, S>,
     tol: f64,
 ) -> Option<Solid<Point3, C, S>> {
-    boolean(solid0, solid1, tol, true).map(|(solid, _)| solid)
+    try_and(solid0, solid1, tol).ok()
 }
 
 /// Union of two solids.
@@ -271,7 +300,7 @@ pub fn or<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     solid1: &Solid<Point3, C, S>,
     tol: f64,
 ) -> Option<Solid<Point3, C, S>> {
-    boolean(solid0, solid1, tol, false).map(|(solid, _)| solid)
+    try_or(solid0, solid1, tol).ok()
 }
 
 fn boolean<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
@@ -279,13 +308,15 @@ fn boolean<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     solid1: &Solid<Point3, C, S>,
     tol: f64,
     intersection: bool,
-) -> Option<(Solid<Point3, C, S>, bool)> {
+) -> Result<(Solid<Point3, C, S>, bool), Diagnostic> {
     let start = profile::now();
-    let (poly0, nesting0) = components::triangulate_boundaries(solid0, tol)?;
-    let (poly1, nesting1) = components::triangulate_boundaries(solid1, tol)?;
+    let (poly0, nesting0) =
+        components::triangulate_boundaries(solid0, tol).map_err(|e| e.operand(0))?;
+    let (poly1, nesting1) =
+        components::triangulate_boundaries(solid1, tol).map_err(|e| e.operand(1))?;
     profile::lap(Stage::Triangulation, start);
     if solid0.boundaries().is_empty() || solid1.boundaries().is_empty() {
-        return Some((
+        return Ok((
             if intersection {
                 Solid::new(Vec::new())
             } else if solid0.boundaries().is_empty() {
@@ -312,10 +343,17 @@ fn boolean<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
         nesting0.inverted || nesting1.inverted
     };
     if shell.is_empty() && unbounded {
-        return None;
+        return Err(Diagnostic::new(
+            Code::UnboundedResult,
+            "boolean",
+            "validate_output",
+        ));
     }
-    Some((
-        Solid::try_new(shell.connected_components()).ok()?,
+    Ok((
+        Solid::try_new(shell.connected_components()).map_err(|e| {
+            Diagnostic::new(Code::InvalidOutputTopology, "boolean", "validate_output")
+                .with_coded_source(e)
+        })?,
         removed_material,
     ))
 }
@@ -329,7 +367,7 @@ pub fn subtract<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     solid1: &Solid<Point3, C, S>,
     tol: f64,
 ) -> Option<Solid<Point3, C, S>> {
-    subtract_with_effect(solid0, solid1, tol).map(|result| result.solid)
+    try_subtract(solid0, solid1, tol).ok()
 }
 
 /// A subtraction and whether the cutter removed any material.
@@ -352,16 +390,66 @@ pub fn subtract_with_effect<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     solid1: &Solid<Point3, C, S>,
     tol: f64,
 ) -> Option<SubtractionResult<C, S>> {
+    try_subtract_with_effect(solid0, solid1, tol).ok()
+}
+
+/// Intersection with stable diagnostics. Empty intersections are successful solids.
+pub fn try_and<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
+    solid0: &Solid<Point3, C, S>,
+    solid1: &Solid<Point3, C, S>,
+    tol: f64,
+) -> Result<Solid<Point3, C, S>, Diagnostic> {
+    boolean(solid0, solid1, tol, true)
+        .map(|(solid, _)| solid)
+        .map_err(|e| e.operation("and"))
+}
+
+/// Union with stable diagnostics.
+pub fn try_or<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
+    solid0: &Solid<Point3, C, S>,
+    solid1: &Solid<Point3, C, S>,
+    tol: f64,
+) -> Result<Solid<Point3, C, S>, Diagnostic> {
+    boolean(solid0, solid1, tol, false)
+        .map(|(solid, _)| solid)
+        .map_err(|e| e.operation("or"))
+}
+
+/// Subtraction with stable diagnostics, including empty operands.
+pub fn try_subtract<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
+    solid0: &Solid<Point3, C, S>,
+    solid1: &Solid<Point3, C, S>,
+    tol: f64,
+) -> Result<Solid<Point3, C, S>, Diagnostic> {
+    try_subtract_with_effect(solid0, solid1, tol)
+        .map(|result| result.solid)
+        .map_err(|e| e.operation("subtract"))
+}
+
+/// Subtraction with diagnostics and material-removal information from the same operation.
+pub fn try_subtract_with_effect<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
+    solid0: &Solid<Point3, C, S>,
+    solid1: &Solid<Point3, C, S>,
+    tol: f64,
+) -> Result<SubtractionResult<C, S>, Diagnostic> {
+    subtraction(solid0, solid1, tol).map_err(|e| e.operation("subtract_with_effect"))
+}
+
+fn subtraction<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
+    solid0: &Solid<Point3, C, S>,
+    solid1: &Solid<Point3, C, S>,
+    tol: f64,
+) -> Result<SubtractionResult<C, S>, Diagnostic> {
     if solid1.boundaries().is_empty() {
-        return Some(SubtractionResult {
-            solid: or(solid0, solid1, tol)?,
+        return Ok(SubtractionResult {
+            solid: try_or(solid0, solid1, tol)?,
             removed_material: false,
         });
     }
     let mut complement = solid1.clone();
     complement.not();
     let (solid, removed_material) = boolean(solid0, &complement, tol, true)?;
-    Some(SubtractionResult {
+    Ok(SubtractionResult {
         solid,
         removed_material,
     })

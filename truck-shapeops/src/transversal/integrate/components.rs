@@ -1,4 +1,5 @@
 use super::*;
+use truck_base::diagnostics::{validate_tolerance, Code, Diagnostic};
 
 type PolyShell = Shell<Point3, PolylineCurve<Point3>, Option<PolygonMesh>>;
 
@@ -29,9 +30,28 @@ pub fn solid_components<C: PolylineableCurve, S: MeshableSurface>(
     solid: &Solid<Point3, C, S>,
     tol: f64,
 ) -> Option<Vec<Solid<Point3, C, S>>> {
+    try_solid_components(solid, tol).ok()
+}
+
+/// Groups bodies with diagnostic errors. Empty input successfully returns no bodies.
+pub fn try_solid_components<C: PolylineableCurve, S: MeshableSurface>(
+    solid: &Solid<Point3, C, S>,
+    tol: f64,
+) -> Result<Vec<Solid<Point3, C, S>>, Diagnostic> {
+    components(solid, tol).map_err(|e| e.operation("solid_components"))
+}
+
+fn components<C: PolylineableCurve, S: MeshableSurface>(
+    solid: &Solid<Point3, C, S>,
+    tol: f64,
+) -> Result<Vec<Solid<Point3, C, S>>, Diagnostic> {
     let (_, nesting) = triangulate_boundaries(solid, tol)?;
     if nesting.inverted {
-        return None;
+        return Err(Diagnostic::new(
+            Code::UnboundedResult,
+            "solid_components",
+            "classify_shells",
+        ));
     }
     let mut bodies = Vec::new();
     for (i, shell) in solid.boundaries().iter().enumerate() {
@@ -51,38 +71,52 @@ pub fn solid_components<C: PolylineableCurve, S: MeshableSurface>(
                     .filter(|(j, _)| nesting.parent[*j] == Some(i))
                     .map(|(_, shell)| shell.clone()),
             );
-            bodies.push(Solid::try_new(boundaries).ok()?);
+            bodies.push(Solid::try_new(boundaries).map_err(|e| {
+                Diagnostic::new(
+                    Code::InvalidOutputTopology,
+                    "solid_components",
+                    "validate_output",
+                )
+                .shell(i)
+                .with_coded_source(e)
+            })?);
         }
     }
-    Some(bodies)
+    Ok(bodies)
 }
 
 pub(super) fn triangulate_boundaries<C: PolylineableCurve, S: MeshableSurface>(
     solid: &Solid<Point3, C, S>,
     tol: f64,
-) -> Option<(PolyShell, BoundaryNesting)> {
-    if !tol.is_finite() || tol <= 0.0 {
-        return None;
-    }
-    Solid::try_new(solid.boundaries().clone()).ok()?;
+) -> Result<(PolyShell, BoundaryNesting), Diagnostic> {
+    validate_tolerance(tol, "boolean")?;
+    Solid::try_new(solid.boundaries().clone()).map_err(|e| {
+        Diagnostic::new(Code::InvalidInputTopology, "boolean", "validate_input")
+            .with_coded_source(e)
+    })?;
     let mut poly_shell = PolyShell::default();
     let mut meshes = Vec::new();
-    for shell in solid.boundaries() {
+    for (shell_index, shell) in solid.boundaries().iter().enumerate() {
         let mut poly = shell.triangulation(tol);
-        if poly.iter().any(|face| face.surface().is_none()) {
-            return None;
+        if let Some(face) = poly.iter().position(|face| face.surface().is_none()) {
+            return Err(
+                Diagnostic::new(Code::TessellationFailed, "boolean", "tessellate")
+                    .shell(shell_index)
+                    .face(face),
+            );
         }
         meshes.push(poly.to_polygon());
         poly_shell.append(&mut poly);
     }
     let nesting = boundary_nesting(&meshes)?;
-    Some((poly_shell, nesting))
+    Ok((poly_shell, nesting))
 }
 
-fn boundary_nesting(meshes: &[PolygonMesh]) -> Option<BoundaryNesting> {
+fn boundary_nesting(meshes: &[PolygonMesh]) -> Result<BoundaryNesting, Diagnostic> {
+    let error = |code| Diagnostic::new(code, "boolean", "classify_shells");
     let volumes: Vec<_> = meshes.iter().map(|mesh| mesh.volume()).collect();
-    if volumes.iter().any(|v| !v.is_finite() || *v == 0.0) {
-        return None;
+    if let Some(i) = volumes.iter().position(|v| !v.is_finite() || *v == 0.0) {
+        return Err(error(Code::DegenerateMesh).shell(i));
     }
     let boxes: Vec<_> = meshes.iter().map(|mesh| mesh.bounding_box()).collect();
     let mut parent = vec![None; meshes.len()];
@@ -95,12 +129,14 @@ fn boundary_nesting(meshes: &[PolygonMesh]) -> Option<BoundaryNesting> {
                 continue;
             }
             if meshes[i].collide_with(&meshes[j]).is_some() {
-                return None;
+                return Err(error(Code::ShellsIntersect).shell(i).related(j));
             }
-            let i_in_j = contains_shell(&meshes[j], &meshes[i])?;
-            let j_in_i = contains_shell(&meshes[i], &meshes[j])?;
+            let i_in_j = contains_shell(&meshes[j], &meshes[i])
+                .ok_or_else(|| error(Code::ClassificationFailed).shell(i).related(j))?;
+            let j_in_i = contains_shell(&meshes[i], &meshes[j])
+                .ok_or_else(|| error(Code::ClassificationFailed).shell(j).related(i))?;
             if i_in_j && j_in_i {
-                return None;
+                return Err(error(Code::InconsistentNesting).shell(i).related(j));
             }
             let (child, container) = match (i_in_j, j_in_i) {
                 (true, false) => (i, j),
@@ -108,7 +144,7 @@ fn boundary_nesting(meshes: &[PolygonMesh]) -> Option<BoundaryNesting> {
                 _ => continue,
             };
             if volumes[child].abs() >= volumes[container].abs() {
-                return None;
+                return Err(error(Code::InconsistentNesting).shell(i).related(j));
             }
             if parent[child].is_none_or(|old: usize| volumes[container].abs() < volumes[old].abs())
             {
@@ -123,10 +159,10 @@ fn boundary_nesting(meshes: &[PolygonMesh]) -> Option<BoundaryNesting> {
     for (i, p) in parent.iter().enumerate() {
         let expected_negative = p.map_or(inverted, |j| volumes[j] > 0.0);
         if (volumes[i] < 0.0) != expected_negative {
-            return None;
+            return Err(error(Code::InconsistentOrientation).shell(i));
         }
     }
-    Some(BoundaryNesting { parent, inverted })
+    Ok(BoundaryNesting { parent, inverted })
 }
 
 fn contains_shell(container: &PolygonMesh, shell: &PolygonMesh) -> Option<bool> {

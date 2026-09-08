@@ -74,3 +74,27 @@ fn print_messages() {
     )
     .unwrap();
 }
+
+impl Error {
+    /// Stable external error code. Display messages are not a machine-readable contract.
+    pub fn code(&self) -> &'static str {
+        match self {
+            Self::FromTopology(error) => error.code(),
+            Self::WireNotInOnePlane => "TRUCK_MODELING_WIRE_NOT_IN_ONE_PLANE",
+            Self::NotSameNumberOfEdges => "TRUCK_MODELING_NOT_SAME_NUMBER_OF_EDGES",
+            Self::TooFewLoftSections => "TRUCK_MODELING_TOO_FEW_LOFT_SECTIONS",
+            Self::LoftSectionsMismatch(..) => "TRUCK_MODELING_LOFT_SECTIONS_MISMATCH",
+            Self::LoftSectionsCoincide(..) => "TRUCK_MODELING_LOFT_SECTIONS_COINCIDE",
+            Self::NoNurbsForm => "TRUCK_MODELING_NO_NURBS_FORM",
+            Self::PathNotSmooth(..) => "TRUCK_MODELING_PATH_NOT_SMOOTH",
+            Self::PathTooTight(..) => "TRUCK_MODELING_PATH_TOO_TIGHT",
+            Self::ClosedPathNotPlanar => "TRUCK_MODELING_CLOSED_PATH_NOT_PLANAR",
+            Self::OffsetRadiusNotPositive => "TRUCK_MODELING_OFFSET_RADIUS_NOT_POSITIVE",
+            Self::NoTypedOffset => "TRUCK_MODELING_NO_TYPED_OFFSET",
+        }
+    }
+}
+
+impl truck_base::diagnostics::CodedError for Error {
+    fn code(&self) -> &'static str { self.code() }
+}

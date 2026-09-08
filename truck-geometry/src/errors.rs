@@ -210,3 +210,26 @@ fn print_messages() {
     writeln!(stderr, "{}\n", Error::IrregularControlPoints).unwrap();
     writeln!(stderr, "*******************************************************").unwrap();
 }
+
+impl Error {
+    /// Stable external error code. Display messages are not a machine-readable contract.
+    pub fn code(&self) -> &'static str {
+        match self {
+            Self::ZeroRange => "TRUCK_GEOMETRY_ZERO_RANGE",
+            Self::DifferentBackFront(..) => "TRUCK_GEOMETRY_DIFFERENT_BACK_FRONT",
+            Self::NotClampedKnotVector => "TRUCK_GEOMETRY_NOT_CLAMPED_KNOT_VECTOR",
+            Self::NotSortedVector => "TRUCK_GEOMETRY_NOT_SORTED_VECTOR",
+            Self::TooLargeDegree(..) => "TRUCK_GEOMETRY_TOO_LARGE_DEGREE",
+            Self::CannotRemoveKnot(..) => "TRUCK_GEOMETRY_CANNOT_REMOVE_KNOT",
+            Self::EmptyControlPoints => "TRUCK_GEOMETRY_EMPTY_CONTROL_POINTS",
+            Self::TooShortKnotVector(..) => "TRUCK_GEOMETRY_TOO_SHORT_KNOT_VECTOR",
+            Self::IrregularControlPoints => "TRUCK_GEOMETRY_IRREGULAR_CONTROL_POINTS",
+            Self::DifferentLength => "TRUCK_GEOMETRY_DIFFERENT_LENGTH",
+            Self::GaussianEliminationFailure => "TRUCK_GEOMETRY_GAUSSIAN_ELIMINATION_FAILURE",
+        }
+    }
+}
+
+impl truck_base::diagnostics::CodedError for Error {
+    fn code(&self) -> &'static str { self.code() }
+}

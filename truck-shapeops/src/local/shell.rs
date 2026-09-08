@@ -1,14 +1,16 @@
 //! Hollowing a solid.
 
-use super::{replace::Incidence, replace_surfaces, LocalOpError};
+use super::{locate_failure, Failure};
+use super::{replace::Incidence, LocalOpError};
 use rustc_hash::FxHashSet as HashSet;
 use std::result::Result;
+use truck_base::diagnostics::{Code, Diagnostic};
 use truck_geometry::prelude::*;
 use truck_modeling::*;
 
 /// Hollows `solid` to walls of `thickness`, with the faces in `removed` opened. Every kept face
 /// is offset inward with [`Surface::offset`](truck_modeling::Surface::offset) and the offsets
-/// are re-intersected with each other through [`replace_surfaces`], which gives the cavity; a
+/// are re-intersected with each other through [`super::replace_surfaces`], which gives the cavity; a
 /// removed face is the opening, kept as an annulus around the cavity's mouth. With nothing
 /// removed the cavity is a second, inner shell of the result. The input is not modified.
 ///
@@ -21,7 +23,7 @@ use truck_modeling::*;
 /// - [`LocalOpError::NotInward`] for a thickness that is not positive
 /// - [`LocalOpError::Concave`] naming the faces of a concave edge
 /// - [`LocalOpError::NoOffset`] naming a face whose surface cannot be offset that far
-/// - those of [`replace_surfaces`]
+/// - those of [`super::replace_surfaces`]
 /// # Examples
 /// ```
 /// use truck_modeling::*;
@@ -39,8 +41,29 @@ pub fn shell(
     removed: &[FaceID],
     thickness: f64,
 ) -> Result<Solid, LocalOpError<Surface>> {
-    if thickness <= 0.0 {
-        return Err(LocalOpError::NotInward);
+    shell_impl(solid, removed, thickness).map_err(|e| e.legacy)
+}
+
+/// Diagnostic variant of [`shell()`], with input-relative locations and retained causes.
+pub fn try_shell(solid: &Solid, removed: &[FaceID], thickness: f64) -> Result<Solid, Diagnostic> {
+    super::validate_solid(solid, "shell")?;
+    if !thickness.is_finite() || thickness <= 0.0 {
+        return Err(
+            Diagnostic::new(Code::InvalidParameter, "shell", "validate_input")
+                .parameter("thickness", thickness),
+        );
+    }
+    shell_impl(solid, removed, thickness)
+        .map_err(|e| locate_failure(solid.face_iter(), removed, "shell", e))
+}
+
+pub(super) fn shell_impl(
+    solid: &Solid,
+    removed: &[FaceID],
+    thickness: f64,
+) -> Result<Solid, Failure> {
+    if !thickness.is_finite() || thickness <= 0.0 {
+        return Err(LocalOpError::NotInward.into());
     }
     let Incidence {
         faces,
@@ -61,7 +84,11 @@ pub fn shell(
         let surface = face.oriented_surface();
         for edge in face.edge_iter() {
             let &[a, b] = &faces_of_edge[&edge.id()][..] else {
-                return Err(LocalOpError::Unsupported { face: face.id() });
+                return Err(Failure::new(
+                    LocalOpError::Unsupported { face: face.id() },
+                    Code::UnsupportedTopology,
+                    "validate_incidence",
+                ));
             };
             let other = if a == i { b } else { a };
             let curve = edge.oriented_curve();
@@ -76,14 +103,19 @@ pub fn shell(
                 normal_of(&surface),
                 normal_of(&faces[other].oriented_surface()),
             ) else {
-                return Err(LocalOpError::Unsupported { face: face.id() });
+                return Err(Failure::new(
+                    LocalOpError::Unsupported { face: face.id() },
+                    Code::ProjectionFailed,
+                    "evaluate_normal",
+                ));
             };
             let turn = n.cross(m).dot(tangent);
             if turn < -TOLERANCE {
                 return Err(LocalOpError::Concave {
                     face: face.id(),
                     neighbour: faces[other].id(),
-                });
+                }
+                .into());
             }
         }
     }
@@ -95,15 +127,19 @@ pub fn shell(
         .map(|(i, face)| {
             let surface = match opened.contains(&i) {
                 true => face.oriented_surface(),
-                false => face
-                    .oriented_surface()
-                    .offset(-thickness)
-                    .map_err(|_| LocalOpError::NoOffset { face: face.id() })?,
+                false => face.oriented_surface().offset(-thickness).map_err(|e| {
+                    Failure::new(
+                        LocalOpError::NoOffset { face: face.id() },
+                        Code::NoOffset,
+                        "offset_surface",
+                    )
+                    .source(e)
+                })?,
             };
             Ok((face.id(), surface))
         })
-        .collect::<Result<Vec<_>, _>>()?;
-    let cavity = replace_surfaces(solid, &replacements)?;
+        .collect::<Result<Vec<_>, Failure>>()?;
+    let cavity = super::replace::replace_surfaces_impl(solid, &replacements)?;
     let cavity_faces: Vec<&Face> = cavity.face_iter().collect();
 
     let mut outer: Shell = Shell::new();
@@ -114,7 +150,14 @@ pub fn shell(
                 // the opening: the face with the cavity's mouth as a hole
                 let mut loops = face.boundaries();
                 loops.extend(cavity_faces[i].boundaries().iter().map(Wire::inverse));
-                outer.push(Face::new(loops, face.oriented_surface()));
+                outer.push(Face::try_new(loops, face.oriented_surface()).map_err(|e| {
+                    Failure::new(
+                        LocalOpError::Unsupported { face: face.id() },
+                        Code::InvalidOutputTopology,
+                        "validate_output",
+                    )
+                    .source(e)
+                })?);
             }
             false => {
                 outer.push(face.clone());
@@ -129,8 +172,15 @@ pub fn shell(
             vec![outer]
         }
     };
-    Solid::try_new(shells).map_err(|_| LocalOpError::Unsupported {
-        face: faces[0].id(),
+    Solid::try_new(shells).map_err(|e| {
+        Failure::new(
+            LocalOpError::Unsupported {
+                face: faces[0].id(),
+            },
+            Code::InvalidOutputTopology,
+            "validate_output",
+        )
+        .source(e)
     })
 }
 
@@ -154,24 +204,46 @@ pub fn shell(
 /// assert_eq!(slab.face_iter().count(), 8);
 /// ```
 pub fn thicken(shell: &Shell, thickness: f64) -> Result<Solid, LocalOpError<Surface>> {
-    if thickness <= 0.0 {
-        return Err(LocalOpError::NotInward);
+    thicken_impl(shell, thickness).map_err(|e| e.legacy)
+}
+
+/// Diagnostic variant of [`thicken`], with input-relative locations and retained causes.
+pub fn try_thicken(shell: &Shell, thickness: f64) -> Result<Solid, Diagnostic> {
+    if !thickness.is_finite() || thickness <= 0.0 {
+        return Err(
+            Diagnostic::new(Code::InvalidParameter, "thicken", "validate_input")
+                .parameter("thickness", thickness),
+        );
+    }
+    if shell.is_empty() {
+        return Err(Diagnostic::new(
+            Code::EmptySelection,
+            "thicken",
+            "validate_input",
+        ));
+    }
+    thicken_impl(shell, thickness).map_err(|e| locate_failure(shell.face_iter(), &[], "thicken", e))
+}
+
+pub(super) fn thicken_impl(shell: &Shell, thickness: f64) -> Result<Solid, Failure> {
+    if !thickness.is_finite() || thickness <= 0.0 {
+        return Err(LocalOpError::NotInward.into());
     }
     let mut normal: Option<Vector3> = None;
     for face in shell.face_iter() {
         let unsupported = LocalOpError::Unsupported { face: face.id() };
         let Surface::Plane(_) = face.surface() else {
-            return Err(unsupported);
+            return Err(unsupported.into());
         };
         let n = face.oriented_surface().normal(0.0, 0.0);
         match normal {
-            Some(m) if !(n - m).so_small() => return Err(unsupported),
+            Some(m) if !(n - m).so_small() => return Err(unsupported.into()),
             Some(_) => {}
             None => normal = Some(n),
         }
     }
     let Some(normal) = normal else {
-        return Err(LocalOpError::NotInward);
+        return Err(LocalOpError::NotInward.into());
     };
     let solids: Vec<Result<Solid, truck_topology::errors::Error>> =
         builder::tsweep(shell, normal * thickness);
@@ -180,6 +252,9 @@ pub fn thicken(shell: &Shell, thickness: f64) -> Result<Solid, LocalOpError<Surf
     };
     match <[_; 1]>::try_from(solids) {
         Ok([Ok(solid)]) => Ok(solid),
-        _ => Err(unsupported),
+        Ok([Err(e)]) => {
+            Err(Failure::new(unsupported, Code::InvalidOutputTopology, "validate_output").source(e))
+        }
+        _ => Err(unsupported.into()),
     }
 }

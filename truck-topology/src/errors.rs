@@ -138,3 +138,24 @@ fn print_messages() {
     )
     .unwrap();
 }
+
+impl Error {
+    /// Stable external error code. Display messages are not a machine-readable contract.
+    pub fn code(&self) -> &'static str {
+        match self {
+            Self::SameVertex => "TRUCK_TOPOLOGY_SAME_VERTEX",
+            Self::EmptyWire => "TRUCK_TOPOLOGY_EMPTY_WIRE",
+            Self::NotClosedWire => "TRUCK_TOPOLOGY_NOT_CLOSED_WIRE",
+            Self::NotSimpleWire => "TRUCK_TOPOLOGY_NOT_SIMPLE_WIRE",
+            Self::NotDisjointWires => "TRUCK_TOPOLOGY_NOT_DISJOINT_WIRES",
+            Self::EmptyShell => "TRUCK_TOPOLOGY_EMPTY_SHELL",
+            Self::NotConnected => "TRUCK_TOPOLOGY_NOT_CONNECTED",
+            Self::NotClosedShell => "TRUCK_TOPOLOGY_NOT_CLOSED_SHELL",
+            Self::NotManifold => "TRUCK_TOPOLOGY_NOT_MANIFOLD",
+        }
+    }
+}
+
+impl truck_base::diagnostics::CodedError for Error {
+    fn code(&self) -> &'static str { self.code() }
+}

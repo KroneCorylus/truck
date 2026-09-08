@@ -151,6 +151,22 @@ macro_rules! impl_shape {
             pub fn to_polygon(&self, tol: f64) -> PolygonMesh {
                 self.triangulation(tol).to_polygon().into_wasm()
             }
+            /// Strict meshing; throws a structured error if any face is omitted.
+            pub fn try_to_polygon(&self, tol: f64) -> Result<PolygonMesh, JsValue> {
+                truck_meshalgo::tessellation::try_triangulation(&self.0, tol)
+                    .map(|shape| shape.to_polygon().into_wasm()).map_err(diagnostics::js_error)
+            }
+            /// Meshing with all omitted faces reported beside the partial mesh.
+            pub fn to_polygon_with_diagnostics(&self, tol: f64) -> Result<MeshReport, JsValue> {
+                let report = truck_meshalgo::tessellation::triangulation_with_diagnostics(&self.0, tol).map_err(diagnostics::js_error)?;
+                Ok(MeshReport { mesh: report.value.to_polygon().into_wasm(), diagnostics: report.diagnostics })
+            }
+            /// Reads JSON; throws a structured error on invalid data.
+            pub fn try_from_json(data: &[u8]) -> Result<$type, JsValue> {
+                use truck_base::diagnostics::{Code, Diagnostic};
+                serde_json::from_slice::<truck_modeling::$type>(data).map(IntoWasm::into_wasm)
+                    .map_err(|e| diagnostics::js_error(Diagnostic::new(Code::InvalidJson, "from_json", "parse").with_source(e)))
+            }
             /// read shape from json
             pub fn from_json(data: &[u8]) -> Option<$type> {
                 serde_json::from_reader::<_, truck_modeling::$type>(data)
@@ -181,6 +197,18 @@ impl_shape!(Shell, Solid);
 
 #[wasm_bindgen]
 impl Shell {
+    /// Creates a solid or throws a structured topology error.
+    pub fn try_into_solid(self) -> Result<Solid, JsValue> {
+        use truck_base::diagnostics::{Code, Diagnostic};
+        truck_modeling::Solid::try_new(vec![self.0])
+            .map(IntoWasm::into_wasm)
+            .map_err(|e| {
+                diagnostics::js_error(
+                    Diagnostic::new(Code::InvalidInputTopology, "into_solid", "validate_input")
+                        .with_coded_source(e),
+                )
+            })
+    }
     /// Creates Solid if `self` is a closed shell.
     pub fn into_solid(self) -> Option<Solid> {
         truck_modeling::Solid::try_new(vec![self.0])

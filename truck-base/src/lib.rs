@@ -30,3 +30,5 @@ pub mod id;
 pub mod newton;
 /// Setting Tolerance
 pub mod tolerance;
+
+pub mod diagnostics;

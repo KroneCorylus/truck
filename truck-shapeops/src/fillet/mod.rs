@@ -1,7 +1,7 @@
 //! Fillets and chamfers, including operations on [`truck_modeling::Solid`].
 //!
-//! Use [`fillet_solid_along_wire`] for constant or variable radii on a tangent-continuous chain,
-//! [`chamfer_solid_edge`] for a chamfer with two end faces, and [`fillet_solid_edges`] for equal
+//! Use [`crate::fillet::fillet_solid_along_wire`] for constant or variable radii on a tangent-continuous chain,
+//! [`crate::fillet::chamfer_solid_edge`] for a chamfer with two end faces, and [`crate::fillet::fillet_solid_edges`] for equal
 //! radii on convex planar shells, including three-edge spherical corners. The generic shell and
 //! face functions below also accept the modeling types directly; no representation conversion
 //! is necessary. Concave corners and unequal-radius junctions are outside this scope.
@@ -29,7 +29,7 @@
 //! ```
 //!
 //! Results retain the modeling geometry needed by `truck_meshalgo::tessellation::MeshableShape`
-//! and [`crate::and`] / [`crate::or`]. [`BlendResult`] exposes modified and generated faces for
+//! and [`crate::and`] / [`crate::or`]. [`crate::fillet::BlendResult`] exposes modified and generated faces for
 //! application topology naming; its IDs are process-local, not persistent names. Use each face's
 //! edge and vertex iterators to name its boundaries. Failures return `None` without editing the
 //! input. The local blend must fit its neighbouring faces and avoid distant faces and cavities;
@@ -211,14 +211,14 @@ where
     let uder0 = fillet_surface.uder(uv0.x, uv0.y);
     let vder0 = fillet_surface.vder(uv0.x, uv0.y);
     let n0 = uder0.cross(vder0);
-    let uvder0 = Matrix3::from_cols(uder0, vder0, n0).invert().unwrap() * der0;
+    let uvder0 = Matrix3::from_cols(uder0, vder0, n0).invert()? * der0;
     //debug_assert!(uvder0.z.so_small(), "{:?}", uvder0);
     let cp1 = uv0 + dist / 3.0 * uvder0.truncate().normalize();
 
     let uder1 = fillet_surface.uder(uv1.x, uv1.y);
     let vder1 = fillet_surface.vder(uv1.x, uv1.y);
     let n1 = uder1.cross(vder1).normalize();
-    let uvder1 = Matrix3::from_cols(uder1, vder1, n1).invert().unwrap() * der1;
+    let uvder1 = Matrix3::from_cols(uder1, vder1, n1).invert()? * der1;
     //debug_assert!(uvder1.z.so_small(), "{:?}", uvder1);
     let cp2 = uv1 - dist / 3.0 * uvder1.truncate().normalize();
 
@@ -271,28 +271,24 @@ where
         let curve00 = front_edge0.oriented_curve();
         let (_, s00_hint) = curve00.range_tuple();
         let (_, _, v00, _) = strict_surface
-            .search_contact_curve0_cross_point_with_adjacent_edge(t0, &curve00, s00_hint, 100)
-            .unwrap();
+            .search_contact_curve0_cross_point_with_adjacent_edge(t0, &curve00, s00_hint, 100)?;
 
         let curve10 = back_edge0.oriented_curve();
         let (s10_hint, _) = curve10.range_tuple();
         let (_, _, v10, _) = strict_surface
-            .search_contact_curve0_cross_point_with_adjacent_edge(t1, &curve10, s10_hint, 100)
-            .unwrap();
+            .search_contact_curve0_cross_point_with_adjacent_edge(t1, &curve10, s10_hint, 100)?;
 
         let (front_edge1, back_edge1) = find_adjacent_edge(face1, filleted_edge_id)?;
 
         let curve11 = front_edge1.oriented_curve();
         let (_, s11_hint) = curve11.range_tuple();
         let (_, _, v11, _) = strict_surface
-            .search_contact_curve1_cross_point_with_adjacent_edge(t1, &curve11, s11_hint, 100)
-            .unwrap();
+            .search_contact_curve1_cross_point_with_adjacent_edge(t1, &curve11, s11_hint, 100)?;
 
         let curve01 = back_edge1.oriented_curve();
         let (s01_hint, _) = curve01.range_tuple();
         let (_, _, v01, _) = strict_surface
-            .search_contact_curve1_cross_point_with_adjacent_edge(t0, &curve01, s01_hint, 100)
-            .unwrap();
+            .search_contact_curve1_cross_point_with_adjacent_edge(t0, &curve01, s01_hint, 100)?;
 
         (v00.min(v01), v10.max(v11))
     };
@@ -478,15 +474,16 @@ where
 }
 
 mod along_wire;
-pub use along_wire::fillet_along_wire;
+pub use along_wire::{fillet_along_wire, try_fillet_along_wire};
 mod chamfer;
-pub use chamfer::{chamfer_along_wire, chamfer_with_side, simple_chamfer};
+pub use chamfer::{chamfer_along_wire, chamfer_with_side, simple_chamfer, try_chamfer_along_wire};
 
 mod edges;
-pub use edges::fillet_edges;
+pub use edges::{fillet_edges, try_fillet_edges};
 
 mod modeling;
 pub use modeling::{
     chamfer_solid_along_wire, chamfer_solid_edge, fillet_solid_along_wire, fillet_solid_edges,
-    BlendResult,
+    try_chamfer_solid_along_wire, try_chamfer_solid_edge, try_fillet_solid_along_wire,
+    try_fillet_solid_edges, BlendResult,
 };

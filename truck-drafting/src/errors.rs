@@ -46,10 +46,10 @@ pub enum Error {
     NonContinuousWire,
     /// error from `truck_geometry::errors::Error`.
     #[error("{0}")]
-    GeometricError(truck_geometry::errors::Error),
+    GeometricError(#[source] truck_geometry::errors::Error),
     /// error from `truck_topology::errors::Error`.
     #[error("{0}")]
-    TopologicalError(truck_topology::errors::Error),
+    TopologicalError(#[source] truck_topology::errors::Error),
 }
 
 impl From<truck_geometry::errors::Error> for Error {
@@ -58,4 +58,31 @@ impl From<truck_geometry::errors::Error> for Error {
 
 impl From<truck_topology::errors::Error> for Error {
     fn from(value: truck_topology::errors::Error) -> Self { Self::TopologicalError(value) }
+}
+
+impl Error {
+    /// Stable external error code. Display messages are not a machine-readable contract.
+    pub fn code(&self) -> &'static str {
+        match self {
+            Self::CollinearArcPoints => "TRUCK_DRAFTING_COLLINEAR_ARC_POINTS",
+            Self::ParallelArcTangent => "TRUCK_DRAFTING_PARALLEL_ARC_TANGENT",
+            Self::NonPositiveRadius => "TRUCK_DRAFTING_NON_POSITIVE_RADIUS",
+            Self::DegenerateTangent => "TRUCK_DRAFTING_DEGENERATE_TANGENT",
+            Self::ParallelLineDirections => "TRUCK_DRAFTING_PARALLEL_LINE_DIRECTIONS",
+            Self::DegenerateConnectionCorner => "TRUCK_DRAFTING_DEGENERATE_CONNECTION_CORNER",
+            Self::NoConnection => "TRUCK_DRAFTING_NO_CONNECTION",
+            Self::DegenerateCorner => "TRUCK_DRAFTING_DEGENERATE_CORNER",
+            Self::DegenerateFilletJacobian(..) => "TRUCK_DRAFTING_DEGENERATE_FILLET_JACOBIAN",
+            Self::FilletNewtonNotConverged(..) => "TRUCK_DRAFTING_FILLET_NEWTON_NOT_CONVERGED",
+            Self::NonPositiveChamferDistance => "TRUCK_DRAFTING_NON_POSITIVE_CHAMFER_DISTANCE",
+            Self::CurveLengthOutOfRange => "TRUCK_DRAFTING_CURVE_LENGTH_OUT_OF_RANGE",
+            Self::NonContinuousWire => "TRUCK_DRAFTING_NON_CONTINUOUS_WIRE",
+            Self::GeometricError(error) => error.code(),
+            Self::TopologicalError(error) => error.code(),
+        }
+    }
+}
+
+impl truck_base::diagnostics::CodedError for Error {
+    fn code(&self) -> &'static str { self.code() }
 }

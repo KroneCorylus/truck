@@ -20,6 +20,7 @@ use truck_geometry::prelude as truck;
 use truck_topology::compress::*;
 
 pub mod convert;
+pub mod diagnostics;
 /// Geometry parsed from STEP that can be handled by truck
 pub mod step_geometry;
 use step_geometry::*;

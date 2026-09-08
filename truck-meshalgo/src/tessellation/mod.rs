@@ -358,3 +358,6 @@ impl<C: PolylineableCurve, S: RobustMeshableSurface> RobustMeshableShape
 }
 
 mod triangulation;
+
+mod diagnostics;
+pub use diagnostics::*;

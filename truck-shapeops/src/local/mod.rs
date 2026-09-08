@@ -5,13 +5,14 @@ mod draft;
 mod intersect;
 mod replace;
 mod shell;
-pub use delete::delete_face;
-pub use draft::draft;
-pub use intersect::{intersect_surfaces, parameter_domain, Domain};
-pub use replace::replace_surfaces;
+pub use delete::{delete_face, try_delete_face};
+pub use draft::{draft, try_draft};
+pub use intersect::{intersect_surfaces, parameter_domain, try_intersect_surfaces, Domain};
+pub use replace::{replace_surfaces, try_replace_surfaces};
 use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};
-pub use shell::{shell, thicken};
+pub use shell::{shell, thicken, try_shell, try_thicken};
 use std::{fmt, result::Result};
+use truck_base::diagnostics::{Code, Diagnostic};
 use truck_geometry::prelude::*;
 use truck_meshalgo::prelude::*;
 use truck_topology::*;
@@ -67,7 +68,7 @@ impl<S> fmt::Display for LocalOpError<S> {
             Self::UnknownFace { face } => write!(f, "{face:?} is not a face of the solid"),
             Self::Unsupported { face } => write!(
                 f,
-                "moving {face:?} needs its boundary re-intersected with its neighbours"
+                "the operation does not support the geometry or boundary reconstruction at {face:?}"
             ),
             Self::OutsideNeighbour { face, neighbour } => {
                 write!(f, "the moved boundary of {face:?} leaves {neighbour:?}")
@@ -133,6 +134,31 @@ pub fn move_faces(
     faces: &[truck_modeling::FaceID],
     translation: Vector3,
 ) -> Result<truck_modeling::Solid, LocalOpError<truck_modeling::Surface>> {
+    move_faces_impl(solid, faces, translation).map_err(|e| e.legacy)
+}
+
+/// Diagnostic variant of [`move_faces`], with input-relative locations and retained causes.
+pub fn try_move_faces(
+    solid: &truck_modeling::Solid,
+    faces: &[truck_modeling::FaceID],
+    translation: Vector3,
+) -> Result<truck_modeling::Solid, Diagnostic> {
+    validate_solid(solid, "move_faces")?;
+    if !translation.x.is_finite() || !translation.y.is_finite() || !translation.z.is_finite() {
+        return Err(
+            Diagnostic::new(Code::InvalidParameter, "move_faces", "validate_input")
+                .parameter("translation", format!("{translation:?}")),
+        );
+    }
+    move_faces_impl(solid, faces, translation)
+        .map_err(|e| locate_failure(solid.face_iter(), faces, "move_faces", e))
+}
+
+pub(super) fn move_faces_impl(
+    solid: &truck_modeling::Solid,
+    faces: &[truck_modeling::FaceID],
+    translation: Vector3,
+) -> Result<truck_modeling::Solid, Failure> {
     match move_faces_rigidly(solid, faces, translation) {
         Err(LocalOpError::Unsupported { .. }) => {
             let matrix = Matrix4::from_translation(translation);
@@ -145,10 +171,10 @@ pub fn move_faces(
                         .ok_or(LocalOpError::UnknownFace { face: id })?;
                     Ok((id, face.surface().transformed(matrix)))
                 })
-                .collect::<Result<Vec<_>, _>>()?;
-            replace_surfaces(solid, &replacements)
+                .collect::<Result<Vec<_>, Failure>>()?;
+            replace::replace_surfaces_impl(solid, &replacements)
         }
-        other => other,
+        other => other.map_err(Failure::from),
     }
 }
 
@@ -161,6 +187,31 @@ pub fn offset_faces(
     faces: &[truck_modeling::FaceID],
     distance: f64,
 ) -> Result<truck_modeling::Solid, LocalOpError<truck_modeling::Surface>> {
+    offset_faces_impl(solid, faces, distance).map_err(|e| e.legacy)
+}
+
+/// Diagnostic variant of [`offset_faces`], with input-relative locations and retained causes.
+pub fn try_offset_faces(
+    solid: &truck_modeling::Solid,
+    faces: &[truck_modeling::FaceID],
+    distance: f64,
+) -> Result<truck_modeling::Solid, Diagnostic> {
+    validate_solid(solid, "offset_faces")?;
+    if !distance.is_finite() {
+        return Err(
+            Diagnostic::new(Code::InvalidParameter, "offset_faces", "validate_input")
+                .parameter("distance", distance),
+        );
+    }
+    offset_faces_impl(solid, faces, distance)
+        .map_err(|e| locate_failure(solid.face_iter(), faces, "offset_faces", e))
+}
+
+pub(super) fn offset_faces_impl(
+    solid: &truck_modeling::Solid,
+    faces: &[truck_modeling::FaceID],
+    distance: f64,
+) -> Result<truck_modeling::Solid, Failure> {
     let replacements = faces
         .iter()
         .map(|&id| {
@@ -168,14 +219,18 @@ pub fn offset_faces(
                 .face_iter()
                 .find(|face| face.id() == id)
                 .ok_or(LocalOpError::UnknownFace { face: id })?;
-            let surface = face
-                .oriented_surface()
-                .offset(distance)
-                .map_err(|_| LocalOpError::NoOffset { face: id })?;
+            let surface = face.oriented_surface().offset(distance).map_err(|e| {
+                Failure::new(
+                    LocalOpError::NoOffset { face: id },
+                    Code::NoOffset,
+                    "offset_surface",
+                )
+                .source(e)
+            })?;
             Ok((id, surface))
         })
-        .collect::<Result<Vec<_>, _>>()?;
-    replace_surfaces(solid, &replacements)
+        .collect::<Result<Vec<_>, Failure>>()?;
+    replace::replace_surfaces_impl(solid, &replacements)
 }
 
 /// The rigid move of [`move_faces`].
@@ -345,4 +400,96 @@ fn crosses(a: &PolylineCurve<Point2>, b: &PolylineCurve<Point2>) -> bool {
             side(p0, p1, q0) * side(p0, p1, q1) < 0.0 && side(q0, q1, p0) * side(q0, q1, p1) < 0.0
         })
     })
+}
+
+impl<S: fmt::Debug> truck_base::diagnostics::CodedError for LocalOpError<S> {
+    fn code(&self) -> &'static str { local_code(self).as_str() }
+}
+fn local_code<S>(error: &LocalOpError<S>) -> Code {
+    match error {
+        LocalOpError::UnknownFace { .. } => Code::UnknownFace,
+        LocalOpError::Unsupported { .. } => Code::UnsupportedGeometry,
+        LocalOpError::OutsideNeighbour { .. } => Code::OutsideNeighbour,
+        LocalOpError::NoIntersection { .. } => Code::NoIntersection,
+        LocalOpError::NoOffset { .. } => Code::NoOffset,
+        LocalOpError::Concave { .. } => Code::ConcaveEdge,
+        LocalOpError::NotInward => Code::InvalidParameter,
+    }
+}
+
+#[derive(Debug)]
+pub(super) struct Failure {
+    legacy: LocalOpError<truck_modeling::Surface>,
+    diagnostic: Diagnostic,
+}
+impl Failure {
+    fn new(legacy: LocalOpError<truck_modeling::Surface>, code: Code, stage: &'static str) -> Self {
+        Self {
+            legacy,
+            diagnostic: Diagnostic::new(code, "local", stage),
+        }
+    }
+    fn source(mut self, error: impl truck_base::diagnostics::CodedError + 'static) -> Self {
+        self.diagnostic = self.diagnostic.with_coded_source(error);
+        self
+    }
+}
+impl From<LocalOpError<truck_modeling::Surface>> for Failure {
+    fn from(error: LocalOpError<truck_modeling::Surface>) -> Self {
+        let code = local_code(&error);
+        let stage = match code {
+            Code::UnknownFace | Code::InvalidParameter => "validate_input",
+            Code::NoOffset => "offset_surface",
+            Code::NoIntersection => "intersect_surfaces",
+            Code::OutsideNeighbour => "validate_boundary",
+            _ => "rebuild_boundaries",
+        };
+        let mut result = Self::new(error.clone(), code, stage);
+        result.diagnostic = result.diagnostic.with_coded_source(error);
+        result.diagnostic.message = code.message().into();
+        result
+    }
+}
+fn locate_failure<'a>(
+    faces: impl Iterator<Item = &'a truck_modeling::Face>,
+    selection: &[truck_modeling::FaceID],
+    operation: &'static str,
+    failure: Failure,
+) -> Diagnostic {
+    let Failure {
+        legacy,
+        mut diagnostic,
+    } = failure;
+    let (face, neighbour) = match &legacy {
+        LocalOpError::UnknownFace { face }
+        | LocalOpError::Unsupported { face }
+        | LocalOpError::NoOffset { face } => (Some(*face), None),
+        LocalOpError::OutsideNeighbour { face, neighbour }
+        | LocalOpError::NoIntersection { face, neighbour }
+        | LocalOpError::Concave { face, neighbour } => (Some(*face), Some(*neighbour)),
+        LocalOpError::NotInward => (None, None),
+    };
+    diagnostic.operation = operation;
+    diagnostic.context.selection_index = selection.iter().position(|id| Some(*id) == face);
+    for (i, f) in faces.enumerate() {
+        if Some(f.id()) == face && diagnostic.context.face_index.is_none() {
+            diagnostic.context.face_index = Some(i);
+        }
+        if Some(f.id()) == neighbour {
+            diagnostic.context.related_index = Some(i);
+        }
+    }
+    diagnostic
+}
+
+fn validate_solid(
+    solid: &truck_modeling::Solid,
+    operation: &'static str,
+) -> Result<(), Diagnostic> {
+    truck_modeling::Solid::try_new(solid.boundaries().clone())
+        .map(|_| ())
+        .map_err(|e| {
+            Diagnostic::new(Code::InvalidInputTopology, operation, "validate_input")
+                .with_coded_source(e)
+        })
 }

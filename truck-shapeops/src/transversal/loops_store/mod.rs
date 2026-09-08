@@ -1,4 +1,6 @@
 #![allow(clippy::many_single_char_names)]
+use std::result::Result;
+use truck_base::diagnostics::{Code, Diagnostic};
 
 use super::*;
 use crate::profile::{self, Stage};
@@ -517,6 +519,7 @@ pub struct LoopsStoreQuadruple<C> {
     pub poly_loops_store1: LoopsStore<Point3, PolylineCurve>,
 }
 
+#[cfg(test)]
 pub fn create_loops_stores<C, S>(
     geom_shell0: &Shell<Point3, C, S>,
     poly_shell0: &Shell<Point3, PolylineCurve, Option<PolygonMesh>>,
@@ -530,6 +533,30 @@ where
         + From<IntersectionCurve<PolylineCurve, S, S>>,
     S: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>,
 {
+    try_create_loops_stores(geom_shell0, poly_shell0, geom_shell1, poly_shell1).ok()
+}
+
+pub fn try_create_loops_stores<C, S>(
+    geom_shell0: &Shell<Point3, C, S>,
+    poly_shell0: &Shell<Point3, PolylineCurve, Option<PolygonMesh>>,
+    geom_shell1: &Shell<Point3, C, S>,
+    poly_shell1: &Shell<Point3, PolylineCurve, Option<PolygonMesh>>,
+) -> Result<LoopsStoreQuadruple<C>, Diagnostic>
+where
+    C: SearchNearestParameter<D1, Point = Point3>
+        + SearchParameter<D1, Point = Point3>
+        + Cut<Point = Point3, Vector = Vector3>
+        + From<IntersectionCurve<PolylineCurve, S, S>>,
+    S: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>,
+{
+    let pair_error = |code, i, j| {
+        let mut error = Diagnostic::new(code, "boolean", "intersect_faces")
+            .operand(0)
+            .face(i)
+            .related(j);
+        error.context.related_operand = Some(1);
+        error
+    };
     let mut geom_loops_store0: LoopsStore<_, _> = geom_shell0.face_iter().collect();
     let mut poly_loops_store0: LoopsStore<_, _> = poly_shell0.face_iter().collect();
     let mut geom_loops_store1: LoopsStore<_, _> = geom_shell1.face_iter().collect();
@@ -546,10 +573,16 @@ where
         .flat_map(move |i| (0..store1_len).map(move |j| (i, j)))
         .try_for_each(|(face_index0, face_index1)| {
             let (Some(bbox0), Some(bbox1)) = (&bboxes0[face_index0], &bboxes1[face_index1]) else {
-                return None;
+                return Err(Diagnostic::new(
+                    Code::TessellationFailed,
+                    "boolean",
+                    "intersect_faces",
+                )
+                .face(face_index0)
+                .related(face_index1));
             };
             if !bounding_boxes_overlap(bbox0, bbox1) {
-                return Some(());
+                return Ok(());
             }
             overlapping += 1;
             let start = profile::now();
@@ -695,10 +728,10 @@ where
                 })
             })();
             profile::lap(Stage::Interference, start);
-            result
+            result.ok_or_else(|| pair_error(Code::IntersectionFailed, face_index0, face_index1))
         })?;
     profile::pairs(store0_len * store1_len, overlapping);
-    Some(LoopsStoreQuadruple {
+    Ok(LoopsStoreQuadruple {
         geom_loops_store0,
         poly_loops_store0,
         geom_loops_store1,

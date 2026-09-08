@@ -4,6 +4,8 @@ use super::faces_classification::FacesClassification;
 use super::loops_store::*;
 use rustc_hash::FxHashMap as HashMap;
 use std::ops::Deref;
+use std::result::Result;
+use truck_base::diagnostics::{Code, Diagnostic};
 use truck_meshalgo::prelude::*;
 use truck_topology::*;
 
@@ -65,7 +67,7 @@ fn divide_one_face<C, S>(
     face: &Face<Point3, C, S>,
     loops: &Loops<Point3, C>,
     tol: f64,
-) -> Option<Vec<FaceWithShapesOpStatus<C, S>>>
+) -> Result<Vec<FaceWithShapesOpStatus<C, S>>, Diagnostic>
 where
     C: BoundedCurve<Point = Point3> + ParameterDivision1D<Point = Point3>,
     S: ParametricSurface3D + SearchParameter<D2, Point = Point3>,
@@ -73,18 +75,22 @@ where
     let (mut pre_faces, mut negative_wires) = (Vec::new(), Vec::new());
     let mut map = HashMap::default();
     loops.iter().try_for_each(|wire| {
-        let poly = create_parameter_boundary(face, wire, &mut map, tol)?;
+        let poly = create_parameter_boundary(face, wire, &mut map, tol)
+            .ok_or_else(|| Diagnostic::new(Code::ProjectionFailed, "boolean", "divide_faces"))?;
         match poly.area() > 0.0 {
             true => pre_faces.push(vec![WireChunk { poly, wire }]),
             false => negative_wires.push(WireChunk { poly, wire }),
         }
-        Some(())
+        Ok(())
     })?;
     negative_wires.into_iter().try_for_each(|chunk| {
         let pt = chunk.poly.front();
-        let op = pre_faces.iter_mut().find(|face| face[0].poly.include(pt))?;
+        let op = pre_faces
+            .iter_mut()
+            .find(|face| face[0].poly.include(pt))
+            .ok_or_else(|| Diagnostic::new(Code::FaceDivisionFailed, "boolean", "divide_faces"))?;
         op.push(chunk);
-        Some(())
+        Ok(())
     })?;
     pre_faces
         .into_iter()
@@ -101,15 +107,19 @@ where
                 .into_iter()
                 .map(|chunk| chunk.wire.deref().clone())
                 .collect();
-            let mut new_face = Face::try_new(wires, surface).ok()?;
+            let mut new_face = Face::try_new(wires, surface).map_err(|e| {
+                Diagnostic::new(Code::InvalidOutputTopology, "boolean", "divide_faces")
+                    .with_coded_source(e)
+            })?;
             if !face.orientation() {
                 new_face.invert();
             }
-            Some((new_face, status))
+            Ok((new_face, status))
         })
         .collect()
 }
 
+#[cfg(test)]
 pub fn divide_faces<C, S>(
     shell: &Shell<Point3, C, S>,
     loops_store: &LoopsStore<Point3, C>,
@@ -119,30 +129,47 @@ where
     C: BoundedCurve<Point = Point3> + ParameterDivision1D<Point = Point3>,
     S: ParametricSurface3D + SearchParameter<D2, Point = Point3>,
 {
+    try_divide_faces(shell, loops_store, tol).ok()
+}
+
+pub fn try_divide_faces<C, S>(
+    shell: &Shell<Point3, C, S>,
+    loops_store: &LoopsStore<Point3, C>,
+    tol: f64,
+) -> Result<FacesClassification<Point3, C, S>, Diagnostic>
+where
+    C: BoundedCurve<Point = Point3> + ParameterDivision1D<Point = Point3>,
+    S: ParametricSurface3D + SearchParameter<D2, Point = Point3>,
+{
     let mut res = FacesClassification::<Point3, C, S>::default();
     shell
         .iter()
         .zip(loops_store)
-        .try_for_each(|(face, loops)| {
+        .enumerate()
+        .try_for_each(|(index, (face, loops))| {
             if loops
                 .iter()
                 .all(|wire| wire.status() == ShapesOpStatus::Unknown)
             {
                 // The loops carry the edges as split and merged by the cuts of other faces.
                 let wires = loops.iter().map(|wire| wire.deref().clone()).collect();
-                let mut new_face = Face::try_new(wires, face.surface()).ok()?;
+                let mut new_face = Face::try_new(wires, face.surface()).map_err(|e| {
+                    Diagnostic::new(Code::InvalidOutputTopology, "boolean", "divide_faces")
+                        .face(index)
+                        .with_coded_source(e)
+                })?;
                 if !face.orientation() {
                     new_face.invert();
                 }
                 res.push(new_face, ShapesOpStatus::Unknown);
             } else {
-                let vec = divide_one_face(face, loops, tol)?;
+                let vec = divide_one_face(face, loops, tol).map_err(|e| e.face(index))?;
                 vec.into_iter()
                     .for_each(|(face, status)| res.push(face, status));
             }
-            Some(())
+            Ok(())
         })?;
-    Some(res)
+    Ok(res)
 }
 
 #[cfg(test)]

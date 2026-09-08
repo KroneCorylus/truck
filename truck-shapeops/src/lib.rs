@@ -71,7 +71,8 @@ pub mod profile;
 pub use healing::{RobustSplitClosedEdgesAndFaces, SplitClosedEdgesAndFaces};
 mod transversal;
 pub use transversal::{
-    and, or, solid_components, subtract, subtract_with_effect, ShapeOpsCurve, ShapeOpsSurface,
+    and, or, solid_components, subtract, subtract_with_effect, try_and, try_or,
+    try_solid_components, try_subtract, try_subtract_with_effect, ShapeOpsCurve, ShapeOpsSurface,
     SubtractionResult,
 };
 mod alternative;

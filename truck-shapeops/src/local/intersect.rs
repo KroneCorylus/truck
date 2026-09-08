@@ -1,6 +1,6 @@
 //! The curves where two surfaces meet, on their own.
 
-use crate::transversal::{intersection_curve::intersection_curves, smooth_leader};
+use crate::transversal::intersection_curve::intersection_curves;
 use std::f64::consts::PI;
 use truck_geometry::prelude::*;
 use truck_meshalgo::prelude::*;
@@ -122,22 +122,44 @@ pub fn intersect_surfaces(
     domain1: Domain,
     tol: f64,
 ) -> Option<Vec<Curve>> {
+    try_intersect_surfaces(surface0, domain0, surface1, domain1, tol).ok()
+}
+
+/// Surface intersections with calculation failures distinguished from an empty intersection.
+pub fn try_intersect_surfaces(
+    surface0: &Surface,
+    domain0: Domain,
+    surface1: &Surface,
+    domain1: Domain,
+    tol: f64,
+) -> std::result::Result<Vec<Curve>, truck_base::diagnostics::Diagnostic> {
+    use truck_base::diagnostics::{validate_tolerance, Code, Diagnostic};
+    validate_tolerance(tol, "intersect_surfaces")?;
+
     if let Some(curves) = exact(surface0, domain0, surface1, domain1) {
-        return Some(curves);
+        return Ok(curves);
     }
     if let Some(curves) = exact(surface1, domain1, surface0, domain0) {
-        return Some(curves);
+        return Ok(curves);
     }
     let polygon0 = StructuredMesh::from_surface(surface0, domain0, tol).destruct();
     let polygon1 = StructuredMesh::from_surface(surface1, domain1, tol).destruct();
-    let curves = intersection_curves(surface0.clone(), &polygon0, surface1.clone(), &polygon1)?;
+    let curves = intersection_curves(surface0.clone(), &polygon0, surface1.clone(), &polygon1)
+        .ok_or_else(|| {
+            Diagnostic::new(
+                Code::IntersectionFailed,
+                "intersect_surfaces",
+                "lift_intersection",
+            )
+        })?;
     curves
         .into_iter()
         .map(|(_, ic)| {
             let ic: IntersectionCurve<PolylineCurve<Point3>, Surface, Surface> = ic.into();
-            let leader = smooth_leader(&ic)?;
+            let leader = crate::transversal::try_smooth_leader(&ic)
+                .map_err(|e| e.operation("intersect_surfaces"))?;
             let (surface0, surface1, _) = ic.destruct();
-            Some(IntersectionCurve::new(surface0, surface1, leader).into())
+            Ok(IntersectionCurve::new(surface0, surface1, leader).into())
         })
         .collect()
 }

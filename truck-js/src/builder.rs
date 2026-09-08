@@ -149,3 +149,220 @@ pub fn rsweep(
     intopt!(Point3, origin, Vector3, axis);
     derive_all_sweepable!(shape, builder::rsweep, (origin, axis, Rad(angle), division))
 }
+
+fn checked_vector(
+    values: &[f64],
+    parameter: &'static str,
+    operation: &'static str,
+) -> std::result::Result<Vector3, wasm_bindgen::JsValue> {
+    if values.len() != 3 || values.iter().any(|x| !x.is_finite()) {
+        return Err(invalid_parameter(
+            operation,
+            parameter,
+            format!("{values:?}"),
+        ));
+    }
+    Ok(Vector3::new(values[0], values[1], values[2]))
+}
+fn invalid_parameter(
+    operation: &'static str,
+    parameter: &'static str,
+    value: impl std::fmt::Display,
+) -> wasm_bindgen::JsValue {
+    use truck_base::diagnostics::{Code, Diagnostic};
+    crate::diagnostics::js_error(
+        Diagnostic::new(Code::InvalidParameter, operation, "validate_input")
+            .parameter(parameter, value),
+    )
+}
+
+/// Translates with finite 3D-vector validation and structured errors.
+#[wasm_bindgen]
+pub fn try_translated(
+    shape: &AbstractShape,
+    vector: &[f64],
+) -> std::result::Result<AbstractShape, wasm_bindgen::JsValue> {
+    checked_vector(vector, "vector", "translated")?;
+    Ok(translated(shape, vector))
+}
+/// Rotates with finite parameter and unit-axis validation.
+#[wasm_bindgen]
+pub fn try_rotated(
+    shape: &AbstractShape,
+    origin: &[f64],
+    axis: &[f64],
+    angle: f64,
+) -> std::result::Result<AbstractShape, wasm_bindgen::JsValue> {
+    checked_vector(origin, "origin", "rotated")?;
+    let direction = checked_vector(axis, "axis", "rotated")?;
+    if !direction.magnitude2().near(&1.0) {
+        return Err(invalid_parameter(
+            "rotated",
+            "axis",
+            "expected a unit vector",
+        ));
+    }
+    if !angle.is_finite() {
+        return Err(invalid_parameter("rotated", "angle", angle));
+    }
+    Ok(rotated(shape, origin, axis, angle))
+}
+/// Scales with finite origin and nonzero scalar validation.
+#[wasm_bindgen]
+pub fn try_scaled(
+    shape: &AbstractShape,
+    origin: &[f64],
+    scalars: &[f64],
+) -> std::result::Result<AbstractShape, wasm_bindgen::JsValue> {
+    checked_vector(origin, "origin", "scaled")?;
+    if !matches!(scalars.len(), 1 | 3) || scalars.iter().any(|x| !x.is_finite() || *x == 0.0) {
+        return Err(invalid_parameter(
+            "scaled",
+            "scalars",
+            format!("{scalars:?}"),
+        ));
+    }
+    Ok(scaled(shape, origin, scalars))
+}
+/// Attaches a plane, preserving the modeling error in a structured exception.
+#[wasm_bindgen]
+pub fn attach_plane_with_diagnostics(
+    wire: &Wire,
+) -> std::result::Result<Face, wasm_bindgen::JsValue> {
+    use truck_base::diagnostics::{Code, Diagnostic};
+    builder::try_attach_plane(&[wire.as_ref().clone()])
+        .map(IntoWasm::into_wasm)
+        .map_err(|e| {
+            crate::diagnostics::js_error(
+                Diagnostic::new(Code::UnsupportedGeometry, "attach_plane", "construct_face")
+                    .with_coded_source(e),
+            )
+        })
+}
+/// Creates an edge, preserving topology errors instead of panicking on identical vertices.
+#[wasm_bindgen]
+pub fn try_line(
+    vertex0: &Vertex,
+    vertex1: &Vertex,
+) -> std::result::Result<Edge, wasm_bindgen::JsValue> {
+    use truck_base::diagnostics::{Code, Diagnostic};
+    truck_modeling::Edge::try_new(
+        vertex0,
+        vertex1,
+        Curve::Line(Line(vertex0.point(), vertex1.point())),
+    )
+    .map(IntoWasm::into_wasm)
+    .map_err(|e| {
+        crate::diagnostics::js_error(
+            Diagnostic::new(Code::InvalidInputTopology, "line", "validate_input")
+                .with_coded_source(e),
+        )
+    })
+}
+/// Creates a Bezier edge after validating its point array and endpoints.
+#[wasm_bindgen]
+pub fn try_bezier(
+    vertex0: &Vertex,
+    vertex1: &Vertex,
+    inter_points: &[f64],
+) -> std::result::Result<Edge, wasm_bindgen::JsValue> {
+    if !inter_points.len().is_multiple_of(3) || inter_points.iter().any(|x| !x.is_finite()) {
+        return Err(invalid_parameter(
+            "bezier",
+            "inter_points",
+            format!("{inter_points:?}"),
+        ));
+    }
+    if vertex0.id() == vertex1.id() {
+        return Err(invalid_parameter(
+            "bezier",
+            "vertices",
+            "endpoints must be distinct vertices",
+        ));
+    }
+    Ok(bezier(vertex0, vertex1, inter_points))
+}
+/// Creates a circle arc after checking its transit point and non-collinear endpoints.
+#[wasm_bindgen]
+pub fn try_circle_arc(
+    vertex0: &Vertex,
+    vertex1: &Vertex,
+    transit: &[f64],
+) -> std::result::Result<Edge, wasm_bindgen::JsValue> {
+    let point = Point3::from_vec(checked_vector(transit, "transit", "circle_arc")?);
+    let chord = vertex1.point() - vertex0.point();
+    if vertex0.id() == vertex1.id()
+        || !chord.magnitude2().is_finite()
+        || chord.cross(point - vertex0.point()).so_small()
+    {
+        return Err(invalid_parameter(
+            "circle_arc",
+            "points",
+            "points must be finite and non-collinear",
+        ));
+    }
+    Ok(circle_arc(vertex0, vertex1, transit))
+}
+fn check_sweep_shape(
+    shape: &AbstractShape,
+    operation: &'static str,
+) -> std::result::Result<(), wasm_bindgen::JsValue> {
+    if shape.as_shell().is_some() || shape.as_solid().is_some() {
+        use truck_base::diagnostics::{Code, Diagnostic};
+        return Err(crate::diagnostics::js_error(Diagnostic::new(
+            Code::UnsupportedTopology,
+            operation,
+            "validate_input",
+        )));
+    }
+    Ok(())
+}
+/// Translational sweep with vector and shape-kind validation.
+#[wasm_bindgen]
+pub fn try_tsweep(
+    shape: &AbstractShape,
+    vector: &[f64],
+) -> std::result::Result<AbstractShape, wasm_bindgen::JsValue> {
+    let vector3 = checked_vector(vector, "vector", "tsweep")?;
+    if vector3.so_small() {
+        return Err(invalid_parameter(
+            "tsweep",
+            "vector",
+            "sweep vector must be nonzero",
+        ));
+    }
+    check_sweep_shape(shape, "tsweep")?;
+    Ok(tsweep(shape, vector))
+}
+/// Rotational sweep with axis, angle, subdivision and shape-kind validation.
+#[wasm_bindgen]
+pub fn try_rsweep(
+    shape: &AbstractShape,
+    origin: &[f64],
+    axis: &[f64],
+    angle: f64,
+    division: usize,
+) -> std::result::Result<AbstractShape, wasm_bindgen::JsValue> {
+    checked_vector(origin, "origin", "rsweep")?;
+    let direction = checked_vector(axis, "axis", "rsweep")?;
+    if !direction.magnitude2().near(&1.0) {
+        return Err(invalid_parameter(
+            "rsweep",
+            "axis",
+            "expected a unit vector",
+        ));
+    }
+    if !angle.is_finite() || angle == 0.0 {
+        return Err(invalid_parameter("rsweep", "angle", angle));
+    }
+    let minimum = if angle.abs() >= 2.0 * std::f64::consts::PI {
+        2
+    } else {
+        1
+    };
+    if division < minimum {
+        return Err(invalid_parameter("rsweep", "division", division));
+    }
+    check_sweep_shape(shape, "rsweep")?;
+    Ok(rsweep(shape, origin, axis, angle, division))
+}

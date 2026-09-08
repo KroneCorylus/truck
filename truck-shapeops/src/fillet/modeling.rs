@@ -1,5 +1,6 @@
 //! Blend operations on modeling solids.
 
+use truck_base::diagnostics::{validate_tolerance, Code, Diagnostic};
 use truck_modeling::{EdgeID, Face, FaceID, ScalarFunctionD1, Shell, Solid, Wire};
 
 /// A modeling solid after a blend, with face correspondence for downstream naming.
@@ -25,7 +26,7 @@ fn shell_index(solid: &Solid, edge: EdgeID) -> Option<usize> {
         .position(|s| s.edge_iter().any(|e| e.id() == edge))
 }
 
-fn finish(solid: &Solid, index: usize, shell: Shell) -> Option<BlendResult> {
+fn finish(solid: &Solid, index: usize, shell: Shell) -> Result<BlendResult, Diagnostic> {
     let original = &solid.boundaries()[index];
     let modified_faces = original
         .iter()
@@ -36,8 +37,12 @@ fn finish(solid: &Solid, index: usize, shell: Shell) -> Option<BlendResult> {
     let generated_faces = shell.iter().skip(original.len()).cloned().collect();
     let mut boundaries = solid.boundaries().clone();
     boundaries[index] = shell;
-    Some(BlendResult {
-        solid: Solid::try_new(boundaries).ok()?,
+    Ok(BlendResult {
+        solid: Solid::try_new(boundaries).map_err(|e| {
+            Diagnostic::new(Code::InvalidOutputTopology, "blend", "validate_output")
+                .shell(index)
+                .with_coded_source(e)
+        })?,
         modified_faces,
         generated_faces,
     })
@@ -60,18 +65,35 @@ pub fn fillet_solid_along_wire<R: ScalarFunctionD1>(
     radius: R,
     tol: f64,
 ) -> Option<BlendResult> {
-    if !tol.is_finite() || tol <= 0.0 {
-        return None;
+    try_fillet_solid_along_wire(solid, wire, radius, tol).ok()
+}
+
+/// Diagnostic variant of [`fillet_solid_along_wire`], preserving the input on failure.
+pub fn try_fillet_solid_along_wire<R: ScalarFunctionD1>(
+    solid: &Solid,
+    wire: &Wire,
+    radius: R,
+    tol: f64,
+) -> Result<BlendResult, Diagnostic> {
+    let operation = "fillet_solid_along_wire";
+    validate_tolerance(tol, operation)?;
+    Solid::try_new(solid.boundaries().clone()).map_err(|e| {
+        Diagnostic::new(Code::InvalidInputTopology, operation, "validate_input")
+            .with_coded_source(e)
+    })?;
+
+    let selected: Vec<_> = wire.iter().map(|e| e.id()).collect();
+    let index = validate_selection(solid, &selected, operation)?;
+    if !wire.is_continuous() {
+        return Err(Diagnostic::new(
+            Code::UnsupportedTopology,
+            operation,
+            "validate_input",
+        ));
     }
-    let index = shell_index(solid, wire.front()?.id())?;
-    for i in 0..=wire.len() * 32 {
-        let t = i as f64 / 32.0;
-        if radius.subs(t) <= 0.0 || (0..=2).any(|n| !radius.der_n(n, t).is_finite()) {
-            return None;
-        }
-    }
-    let shell = super::fillet_along_wire(&solid.boundaries()[index], wire, radius, tol)?;
-    finish(solid, index, shell)
+    let shell = super::try_fillet_along_wire(&solid.boundaries()[index], wire, radius, tol)
+        .map_err(|e| e.operation(operation).shell(index))?;
+    finish(solid, index, shell).map_err(|e| e.operation(operation))
 }
 
 /// Equal-radius blends on selected edges of a modeling solid, including spherical corners.
@@ -86,19 +108,35 @@ pub fn fillet_solid_edges(
     radius: f64,
     tol: f64,
 ) -> Option<BlendResult> {
-    if !radius.is_finite() || radius <= 0.0 || !tol.is_finite() || tol <= 0.0 {
-        return None;
-    }
-    let Some(&edge) = edges.first() else {
-        return Some(BlendResult {
+    try_fillet_solid_edges(solid, edges, radius, tol).ok()
+}
+
+/// Diagnostic variant of [`fillet_solid_edges`], preserving the input on failure.
+pub fn try_fillet_solid_edges(
+    solid: &Solid,
+    edges: &[EdgeID],
+    radius: f64,
+    tol: f64,
+) -> Result<BlendResult, Diagnostic> {
+    let operation = "fillet_solid_edges";
+    validate_tolerance(tol, operation)?;
+    Solid::try_new(solid.boundaries().clone()).map_err(|e| {
+        Diagnostic::new(Code::InvalidInputTopology, operation, "validate_input")
+            .with_coded_source(e)
+    })?;
+    positive(radius, "radius", operation)?;
+
+    let Some(_) = edges.first() else {
+        return Ok(BlendResult {
             solid: solid.clone(),
             modified_faces: Vec::new(),
             generated_faces: Vec::new(),
         });
     };
-    let index = shell_index(solid, edge)?;
-    let shell = super::fillet_edges(&solid.boundaries()[index], edges, radius, tol)?;
-    finish(solid, index, shell)
+    let index = validate_selection(solid, edges, operation)?;
+    let shell = super::try_fillet_edges(&solid.boundaries()[index], edges, radius, tol)
+        .map_err(|e| e.operation(operation).shell(index))?;
+    finish(solid, index, shell).map_err(|e| e.operation(operation))
 }
 
 /// Chamfers a closed tangent-continuous wire of a modeling solid.
@@ -113,9 +151,38 @@ pub fn chamfer_solid_along_wire(
     d1: f64,
     tol: f64,
 ) -> Option<BlendResult> {
-    let index = shell_index(solid, wire.front()?.id())?;
-    let shell = super::chamfer_along_wire(&solid.boundaries()[index], wire, d0, d1, tol)?;
-    finish(solid, index, shell)
+    try_chamfer_solid_along_wire(solid, wire, d0, d1, tol).ok()
+}
+
+/// Diagnostic variant of [`chamfer_solid_along_wire`], preserving the input on failure.
+pub fn try_chamfer_solid_along_wire(
+    solid: &Solid,
+    wire: &Wire,
+    d0: f64,
+    d1: f64,
+    tol: f64,
+) -> Result<BlendResult, Diagnostic> {
+    let operation = "chamfer_solid_along_wire";
+    validate_tolerance(tol, operation)?;
+    Solid::try_new(solid.boundaries().clone()).map_err(|e| {
+        Diagnostic::new(Code::InvalidInputTopology, operation, "validate_input")
+            .with_coded_source(e)
+    })?;
+    positive(d0, "d0", operation)?;
+    positive(d1, "d1", operation)?;
+
+    let selected: Vec<_> = wire.iter().map(|e| e.id()).collect();
+    let index = validate_selection(solid, &selected, operation)?;
+    if !wire.is_continuous() {
+        return Err(Diagnostic::new(
+            Code::UnsupportedTopology,
+            operation,
+            "validate_input",
+        ));
+    }
+    let shell = super::try_chamfer_along_wire(&solid.boundaries()[index], wire, d0, d1, tol)
+        .map_err(|e| e.operation(operation).shell(index))?;
+    finish(solid, index, shell).map_err(|e| e.operation(operation))
 }
 
 /// Chamfers a single edge of a modeling solid, trimming both end faces.
@@ -132,10 +199,28 @@ pub fn chamfer_solid_edge(
     d1: f64,
     tol: f64,
 ) -> Option<BlendResult> {
-    if [d0, d1, tol].iter().any(|x| !x.is_finite() || *x <= 0.0) {
-        return None;
-    }
-    let index = shell_index(solid, edge)?;
+    try_chamfer_solid_edge(solid, edge, d0, d1, tol).ok()
+}
+
+/// Diagnostic variant of [`chamfer_solid_edge`], preserving the input on failure.
+pub fn try_chamfer_solid_edge(
+    solid: &Solid,
+    edge: EdgeID,
+    d0: f64,
+    d1: f64,
+    tol: f64,
+) -> Result<BlendResult, Diagnostic> {
+    let operation = "chamfer_solid_edge";
+    validate_tolerance(tol, operation)?;
+    Solid::try_new(solid.boundaries().clone()).map_err(|e| {
+        Diagnostic::new(Code::InvalidInputTopology, operation, "validate_input")
+            .with_coded_source(e)
+    })?;
+    let failed = || Diagnostic::new(Code::BlendConstructionFailed, operation, "construct_blend");
+    positive(d0, "d0", operation)?;
+    positive(d1, "d1", operation)?;
+
+    let index = validate_selection(solid, &[edge], operation)?;
     let shell = &solid.boundaries()[index];
     let adjacent: Vec<_> = shell
         .iter()
@@ -144,9 +229,14 @@ pub fn chamfer_solid_edge(
         .map(|(i, _)| i)
         .collect();
     let [a, b] = adjacent.as_slice() else {
-        return None;
+        return Err(
+            Diagnostic::new(Code::UnsupportedTopology, operation, "validate_input").shell(index),
+        );
     };
-    let oriented = shell[*a].edge_iter().find(|e| e.id() == edge)?;
+    let oriented = shell[*a]
+        .edge_iter()
+        .find(|e| e.id() == edge)
+        .ok_or_else(failed)?;
     let mut ends = Vec::new();
     for vertex in [oriented.front(), oriented.back()] {
         let faces: Vec<_> = shell
@@ -156,12 +246,17 @@ pub fn chamfer_solid_edge(
             .map(|(i, _)| i)
             .collect();
         if faces.len() != 1 {
-            return None;
+            return Err(
+                Diagnostic::new(Code::UnsupportedTopology, operation, "validate_input")
+                    .shell(index),
+            );
         }
         ends.push(faces[0]);
     }
     if ends[0] == ends[1] {
-        return None;
+        return Err(
+            Diagnostic::new(Code::UnsupportedTopology, operation, "validate_input").shell(index),
+        );
     }
     let blend = super::chamfer_with_side(
         &shell[*a],
@@ -172,12 +267,56 @@ pub fn chamfer_solid_edge(
         d0,
         d1,
         tol,
-    )?;
+    )
+    .ok_or_else(failed)?;
     let mut result = shell.clone();
     result[*a] = blend.simple_fillet.face0;
     result[*b] = blend.simple_fillet.face1;
-    result[ends[0]] = blend.side0?;
-    result[ends[1]] = blend.side1?;
+    result[ends[0]] = blend.side0.ok_or_else(failed)?;
+    result[ends[1]] = blend.side1.ok_or_else(failed)?;
     result.push(blend.simple_fillet.fillet);
-    finish(solid, index, result)
+    finish(solid, index, result).map_err(|e| e.operation(operation))
+}
+
+fn positive(
+    value: f64,
+    parameter: &'static str,
+    operation: &'static str,
+) -> Result<(), Diagnostic> {
+    if !value.is_finite() || value <= 0.0 {
+        Err(
+            Diagnostic::new(Code::InvalidParameter, operation, "validate_input")
+                .parameter(parameter, value),
+        )
+    } else {
+        Ok(())
+    }
+}
+
+fn validate_selection(
+    solid: &Solid,
+    edges: &[EdgeID],
+    operation: &'static str,
+) -> Result<usize, Diagnostic> {
+    let mut seen = std::collections::HashSet::new();
+    let mut shell = None;
+    for (i, &edge) in edges.iter().enumerate() {
+        if !seen.insert(edge) {
+            return Err(
+                Diagnostic::new(Code::DuplicateSelection, operation, "validate_input").selection(i),
+            );
+        }
+        let index = shell_index(solid, edge).ok_or_else(|| {
+            Diagnostic::new(Code::UnknownEdge, operation, "validate_input").selection(i)
+        })?;
+        if shell.is_some_and(|s| s != index) {
+            return Err(
+                Diagnostic::new(Code::MultipleShells, operation, "validate_input")
+                    .selection(i)
+                    .shell(index),
+            );
+        }
+        shell = Some(index);
+    }
+    shell.ok_or_else(|| Diagnostic::new(Code::EmptySelection, operation, "validate_input"))
 }

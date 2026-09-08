@@ -1,5 +1,7 @@
 use super::*;
+use std::result::Result;
 use truck_base::cgmath64::control_point::ControlPoint;
+use truck_base::diagnostics::{validate_tolerance, Code, Diagnostic};
 
 /// Number of samples along the edge is at least this, so a cubic interpolation is always possible.
 const MIN_SAMPLES: usize = 4;
@@ -211,33 +213,80 @@ where
     PCurve<BSplineCurve<Point2>, S>: ToSameGeometry<C>,
     BSplineSurface<Point3>: ToSameGeometry<S>,
 {
-    if [d0, d1, tol].iter().any(|x| !x.is_finite() || *x <= 0.0)
-        || wire.is_empty()
-        || !wire.is_cyclic()
-        || !wire.is_continuous()
-        || !wire.is_simple()
-        || !along_wire::is_tangent_continuous(wire, true)
-    {
-        return None;
+    try_chamfer_along_wire(shell, wire, d0, d1, tol).ok()
+}
+
+/// Closed-chain chamfers with validation, contact and trimming diagnostics.
+pub fn try_chamfer_along_wire<C, S>(
+    shell: &Shell<Point3, C, S>,
+    wire: &Wire<Point3, C>,
+    d0: f64,
+    d1: f64,
+    tol: f64,
+) -> Result<Shell<Point3, C, S>, Diagnostic>
+where
+    C: FilletedCurve<S> + ParameterDivision1D<Point = Point3>,
+    S: FilletedSurface<C> + SearchNearestParameter<D2, Point = Point3>,
+    PCurve<BSplineCurve<Point2>, S>: ToSameGeometry<C>,
+    BSplineSurface<Point3>: ToSameGeometry<S>,
+{
+    let operation = "chamfer_along_wire";
+    validate_tolerance(tol, operation)?;
+    let failed = || Diagnostic::new(Code::BlendConstructionFailed, operation, "construct_blend");
+    for (name, value) in [("d0", d0), ("d1", d1)] {
+        if !value.is_finite() || value <= 0.0 {
+            return Err(
+                Diagnostic::new(Code::InvalidParameter, operation, "validate_input")
+                    .parameter(name, value),
+            );
+        }
+    }
+    if wire.is_empty() {
+        return Err(Diagnostic::new(
+            Code::EmptySelection,
+            operation,
+            "validate_input",
+        ));
+    }
+    if !wire.is_cyclic() || !wire.is_continuous() || !wire.is_simple() {
+        return Err(Diagnostic::new(
+            Code::UnsupportedTopology,
+            operation,
+            "validate_wire",
+        ));
+    }
+    if !along_wire::is_tangent_continuous(wire, true) {
+        let mut error = Diagnostic::new(Code::UnsupportedGeometry, operation, "validate_wire");
+        error.message = "The selected wire is not tangent continuous.".into();
+        return Err(error);
     }
     let mut contacts = Vec::new();
     let mut surfaces = Vec::new();
     let mut sides = Vec::new();
-    for edge in wire {
+    for (index, edge) in wire.iter().enumerate() {
         let mut adjacent = [None, None];
         for face in shell {
             if let Some(found) = face.edge_iter().find(|e| e.id() == edge.id()) {
                 let side = usize::from(found.front() != edge.front());
                 if adjacent[side].replace(face.oriented_surface()).is_some() {
-                    return None;
+                    return Err(Diagnostic::new(
+                        Code::UnsupportedTopology,
+                        operation,
+                        "validate_wire",
+                    )
+                    .selection(index));
                 }
             }
         }
         let [Some(s0), Some(s1)] = adjacent else {
-            return None;
+            return Err(
+                Diagnostic::new(Code::UnsupportedTopology, operation, "validate_wire")
+                    .selection(index),
+            );
         };
         let curve = edge.oriented_curve();
-        let (params, samples) = sample_contact_points(&curve, &s0, &s1, (d0, d1), tol)?;
+        let (params, samples) = sample_contact_points(&curve, &s0, &s1, (d0, d1), tol)
+            .ok_or_else(|| failed().stage("find_contact").selection(index))?;
         let contact: [C; 2] = [
             PCurve::new(
                 interpolate(&params, samples[0].iter().map(|s| s.0)),
@@ -262,9 +311,11 @@ where
                 for (side, support, spline, distance, sign) in
                     [(0, &s0, &c0, d0, 1.0), (1, &s1, &c1, d1, -1.0)]
                 {
-                    let uv = support.search_parameter(p, None, 100)?;
+                    let uv = support.search_parameter(p, None, 100).ok_or_else(failed)?;
                     let target = p + support.normal(uv.0, uv.1).cross(tangent) * (distance * sign);
-                    let uv = support.search_nearest_parameter(target, Some(uv), 100)?;
+                    let uv = support
+                        .search_nearest_parameter(target, Some(uv), 100)
+                        .ok_or_else(failed)?;
                     let q = contact[side].subs(t);
                     let advance = contact[side].der(t).dot(tangent);
                     if !advance.is_finite()
@@ -272,7 +323,7 @@ where
                         || q.distance(support.subs(uv.0, uv.1)) > tol
                         || q.distance(spline.subs(t)) > tol
                     {
-                        return None;
+                        return Err(failed().stage("validate_contact").selection(index));
                     }
                 }
             }
@@ -280,8 +331,8 @@ where
         contacts.push(contact);
         let t = (params[0] + params[params.len() - 1]) / 2.0;
         let p = curve.subs(t);
-        let uv0 = s0.search_parameter(p, None, 100)?;
-        let uv1 = s1.search_parameter(p, None, 100)?;
+        let uv0 = s0.search_parameter(p, None, 100).ok_or_else(failed)?;
+        let uv1 = s1.search_parameter(p, None, 100).ok_or_else(failed)?;
         let outward = s0.normal(uv0.0, uv0.1) + s1.normal(uv1.0, uv1.1);
         let mut surface = BSplineSurface::homotopy(c0.clone(), c1.clone());
         let swap = surface.normal(t, 0.5).dot(outward) < 0.0;
@@ -291,19 +342,19 @@ where
         sides.push(if swap { (1.0, 0.0) } else { (0.0, 1.0) });
         surfaces.push(surface);
     }
-    let trimmed = along_wire::trim_closed_chain(shell, wire, &contacts)?;
+    let trimmed = along_wire::trim_closed_chain(shell, wire, &contacts)
+        .ok_or_else(|| failed().stage("trim_faces"))?;
     let n = wire.len();
     let mut cross = Vec::new();
     for k in 0..n {
-        for side in 0..2 {
-            let curve = &contacts[k][side];
+        for (side, curve) in contacts[k].iter().enumerate() {
             let (t0, t1) = curve.range_tuple();
             if !curve.subs(t0).near(&trimmed.vertices[k][side].point())
                 || !curve
                     .subs(t1)
                     .near(&trimmed.vertices[(k + 1) % n][side].point())
             {
-                return None;
+                return Err(failed().stage("trim_faces").selection(k));
             }
         }
         let t = surfaces[k].range_tuple().0 .0;
@@ -321,10 +372,13 @@ where
             trimmed.contacts[k][1].clone(),
             cross[(k + 1) % n].inverse(),
         ];
-        faces.push(Face::new(
-            vec![boundary.into()],
-            surfaces[k].to_same_geometry(),
-        ));
+        faces.push(
+            Face::try_new(vec![boundary.into()], surfaces[k].to_same_geometry()).map_err(|e| {
+                Diagnostic::new(Code::InvalidOutputTopology, operation, "validate_output")
+                    .selection(k)
+                    .with_coded_source(e)
+            })?,
+        );
     }
-    Some(faces.into())
+    Ok(faces.into())
 }

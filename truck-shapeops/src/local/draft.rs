@@ -1,13 +1,15 @@
 //! Tilting faces about a neutral plane.
 
-use super::{intersect::radial, replace_surfaces, LocalOpError};
+use super::{intersect::radial, LocalOpError};
+use super::{locate_failure, Failure};
 use std::result::Result;
+use truck_base::diagnostics::{Code, Diagnostic};
 use truck_geometry::prelude::*;
 use truck_modeling::*;
 
 /// Tilts `faces` of `solid` by `angle` about their traces on `neutral`, so that nothing on
 /// that plane moves, and re-intersects them with their neighbours through
-/// [`replace_surfaces`]. A positive angle tilts each face's outward normal `n` away from
+/// [`super::replace_surfaces`]. A positive angle tilts each face's outward normal `n` away from
 /// `pull`: it becomes `n cos α − p sin α` with `p` the unit component of `pull` normal to `n`,
 /// so a boss widens and a hole narrows along `pull`. A planar face becomes a rotated plane and
 /// a cylindrical face whose axis is along `pull` becomes a cone; any other face, a face normal
@@ -36,6 +38,35 @@ pub fn draft(
     pull: Vector3,
     angle: Rad<f64>,
 ) -> Result<Solid, LocalOpError<Surface>> {
+    draft_impl(solid, faces, neutral, pull, angle).map_err(|e| e.legacy)
+}
+
+/// Diagnostic variant of [`draft`], with input-relative locations and retained causes.
+pub fn try_draft(
+    solid: &Solid,
+    faces: &[FaceID],
+    neutral: &Plane,
+    pull: Vector3,
+    angle: Rad<f64>,
+) -> Result<Solid, Diagnostic> {
+    super::validate_solid(solid, "draft")?;
+    if !angle.0.is_finite() || !pull.magnitude2().is_finite() || pull.so_small() {
+        return Err(
+            Diagnostic::new(Code::InvalidParameter, "draft", "validate_input")
+                .parameter("angle/pull", format!("{angle:?}/{pull:?}")),
+        );
+    }
+    draft_impl(solid, faces, neutral, pull, angle)
+        .map_err(|e| locate_failure(solid.face_iter(), faces, "draft", e))
+}
+
+pub(super) fn draft_impl(
+    solid: &Solid,
+    faces: &[FaceID],
+    neutral: &Plane,
+    pull: Vector3,
+    angle: Rad<f64>,
+) -> Result<Solid, Failure> {
     let pull = pull.normalize();
     let (sin, cos) = angle.0.sin_cos();
     let mut replacements = Vec::with_capacity(faces.len());
@@ -52,7 +83,7 @@ pub fn draft(
                 let trace = n.cross(neutral.normal());
                 let p = pull - n * pull.dot(n);
                 if trace.so_small() || p.so_small() {
-                    return Err(unsupported);
+                    return Err(unsupported.into());
                 }
                 let tilted = n * cos - p.normalize() * sin;
                 // a point of the trace: from the face's origin, within the face, to the neutral plane
@@ -78,14 +109,14 @@ pub fn draft(
                     _,
                 )) = oriented.elementary()
                 else {
-                    return Err(unsupported);
+                    return Err(unsupported.into());
                 };
                 let along = axis * axis.dot(pull).signum();
                 if along.cross(pull).so_small() && neutral.normal().cross(along).so_small() {
                     // the generator at the start of the face's arc, tilted so that the radius
                     // changes with the outward normal turned away from pull
                     let (Some((u0, _)), _) = oriented.try_range_tuple() else {
-                        return Err(unsupported);
+                        return Err(unsupported.into());
                     };
                     let start = oriented.subs(u0, 0.0);
                     let outward_radial = radial(start, origin, along).normalize();
@@ -118,12 +149,12 @@ pub fn draft(
                     let generator = Curve::Line(Line(at(span.0), at(span.1)));
                     RevolutedCurve::by_revolution(generator, on_axis, along).to_same_geometry()
                 } else {
-                    return Err(unsupported);
+                    return Err(unsupported.into());
                 }
             }
-            _ => return Err(unsupported),
+            _ => return Err(unsupported.into()),
         };
         replacements.push((id, surface));
     }
-    replace_surfaces(solid, &replacements)
+    super::replace::replace_surfaces_impl(solid, &replacements)
 }

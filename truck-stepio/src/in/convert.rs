@@ -1,3 +1,4 @@
+use super::diagnostics::ConversionError;
 use super::*;
 use crate::common::PartAttrs;
 use ruststep::error::Error::UnknownEntity;
@@ -34,11 +35,20 @@ impl Table {
     fn reason(&self, e: ruststep::error::Error) -> StepConvertingError {
         if let UnknownEntity(idx) = e {
             if let Some(dummy) = self.dummy.get(&idx) {
-                return format!("#{idx} is {}, which is not implemented", dummy.name).into();
+                return ConversionError::Unsupported {
+                    id: idx,
+                    entity: dummy.name.clone(),
+                }
+                .into();
             }
             if let Some((_, message)) = self.errors.iter().find(|(id, _)| *id == idx) {
-                return format!("#{idx} could not be read: {message}").into();
+                return ConversionError::Unreadable {
+                    id: idx,
+                    message: message.clone(),
+                }
+                .into();
             }
+            return ConversionError::Missing { id: idx }.into();
         }
         e.into()
     }
@@ -129,7 +139,10 @@ impl Table {
             vidx_map
                 .get(&idx)
                 .copied()
-                .ok_or_else(|| format!("vertex #{idx} was skipped"))
+                .ok_or(ConversionError::SkippedDependency {
+                    id: idx,
+                    entity: "vertex",
+                })
         };
         let vertices = (vertex(&edge.edge_start)?, vertex(&edge.edge_end)?);
         let curve = self.edge_curve_owned(edge)?.parse_curve3d()?;
@@ -210,14 +223,20 @@ impl Table {
                 Some(oriented_edge) => (
                     oriented_edge
                         .edge_element_idx()
-                        .ok_or("an oriented edge does not reference its edge")?,
+                        .ok_or_else(|| ConversionError::Reference {
+                            message: "an oriented edge does not reference its edge".into(),
+                        })?,
                     oriented_edge.orientation == ori,
                 ),
                 None => (idx, ori),
             };
             let Some(&index) = eidx_map.get(&edge_idx) else {
                 return Err(match self.edge_curve.contains_key(&edge_idx) {
-                    true => format!("edge #{edge_idx} was skipped").into(),
+                    true => ConversionError::SkippedDependency {
+                        id: edge_idx,
+                        entity: "edge",
+                    }
+                    .into(),
                     false => self.reason(UnknownEntity(edge_idx)),
                 });
             };
@@ -318,14 +337,20 @@ impl Table {
         let mut skipped = Vec::new();
         for place_holder in &shells.sbsm_boundary {
             let PlaceHolder::Ref(Name::Entity(idx)) = place_holder else {
-                return Err("failed to reference an element of `sbsm_boundary`".into());
+                return Err(ConversionError::Reference {
+                    message: "failed to reference an element of `sbsm_boundary`".into(),
+                }
+                .into());
             };
             let (shell, more) = if let Some(shell) = self.shell.get(idx) {
                 self.to_compressed_shell(shell)?
             } else if let Some(oriented_shell) = self.oriented_shell.get(idx) {
                 self.to_compressed_shell(oriented_shell)?
             } else {
-                return Err("failed to reference an element of `sbsm_boundary`".into());
+                return Err(ConversionError::Reference {
+                    message: "failed to reference an element of `sbsm_boundary`".into(),
+                }
+                .into());
             };
             res.push(shell);
             skipped.extend(more);
@@ -360,22 +385,34 @@ impl Table {
         solid: &ManifoldSolidBrepHolder,
     ) -> Converted<CompressedSolid<Point3, Curve3D, Surface>> {
         let PlaceHolder::Ref(Name::Entity(outer_idx)) = &solid.outer else {
-            return Err("failed to reference `solid.outer`".into());
+            return Err(ConversionError::Reference {
+                message: "failed to reference `solid.outer`".into(),
+            }
+            .into());
         };
         let (outer_shell, mut skipped) = if let Some(step_shell) = self.shell.get(outer_idx) {
             self.to_compressed_shell(step_shell)
         } else if let Some(step_shell) = self.oriented_shell.get(outer_idx) {
             self.to_compressed_shell(step_shell)
         } else {
-            Err("failed to reference `solid.outer`".into())
+            Err(ConversionError::Reference {
+                message: "failed to reference `solid.outer`".into(),
+            }
+            .into())
         }?;
         let mut boundaries = vec![outer_shell];
         for shell in &solid.voids {
             let PlaceHolder::Ref(Name::Entity(outer_idx)) = shell else {
-                return Err("failed to reference an element of `solid.voids`".into());
+                return Err(ConversionError::Reference {
+                    message: "failed to reference an element of `solid.voids`".into(),
+                }
+                .into());
             };
             let Some(oriented_shell) = self.oriented_shell.get(outer_idx) else {
-                return Err("failed to reference an element of `solid.voids`".into());
+                return Err(ConversionError::Reference {
+                    message: "failed to reference an element of `solid.voids`".into(),
+                }
+                .into());
             };
             let (shell, more) = self.to_compressed_shell(oriented_shell)?;
             boundaries.push(shell);
@@ -447,16 +484,28 @@ impl Table {
         skipped: &mut Vec<Skipped>,
     ) -> Result<ProductEntity, StepConvertingError> {
         let PlaceHolder::Ref(Name::Entity(pdf_idx)) = &pd.formation else {
-            return Err("failed to reference `product_definition.formation`".into());
+            return Err(ConversionError::Reference {
+                message: "failed to reference `product_definition.formation`".into(),
+            }
+            .into());
         };
         let Some(pdf) = self.product_definition_formation.get(pdf_idx) else {
-            return Err("failed to reference `prouct_definition_formation`".into());
+            return Err(ConversionError::Reference {
+                message: "failed to reference `prouct_definition_formation`".into(),
+            }
+            .into());
         };
         let PlaceHolder::Ref(Name::Entity(p_idx)) = &pdf.of_product else {
-            return Err("failed to reference `product_definition_formation.of_product`".into());
+            return Err(ConversionError::Reference {
+                message: "failed to reference `product_definition_formation.of_product`".into(),
+            }
+            .into());
         };
         let Some(product) = self.product.get(p_idx) else {
-            return Err("failed to reference `product`".into());
+            return Err(ConversionError::Reference {
+                message: "failed to reference `product`".into(),
+            }
+            .into());
         };
         let attrs = PartAttrs {
             id: product.id.clone(),
@@ -470,7 +519,7 @@ impl Table {
             };
             pds_idx == idx
         }) else {
-            return Err("failed to find `shape_definition_representation` corresp. to `product_definition_shape`".into());
+            return Err(ConversionError::Reference { message: "failed to find `shape_definition_representation` corresp. to `product_definition_shape`".into() }.into());
         };
         let PlaceHolder::Ref(Name::Entity(sr_idx)) = &sdr.used_representation else {
             return Err(
@@ -478,7 +527,10 @@ impl Table {
             );
         };
         let Some(sr) = self.shape_representation.get(sr_idx) else {
-            return Err("failed to reference `shape_representation`".into());
+            return Err(ConversionError::Reference {
+                message: "failed to reference `shape_representation`".into(),
+            }
+            .into());
         };
         let mut shape = Vec::new();
         for place_holder in &sr.items {
@@ -502,11 +554,17 @@ impl Table {
     ) -> Result<(AssembleEntity, (u64, u64)), StepConvertingError> {
         let &PlaceHolder::Ref(Name::Entity(parent_idx)) = &next_assy.relating_product_definition
         else {
-            return Err("failed to reference the parent node".into());
+            return Err(ConversionError::Reference {
+                message: "failed to reference the parent node".into(),
+            }
+            .into());
         };
         let &PlaceHolder::Ref(Name::Entity(child_idx)) = &next_assy.related_product_definition
         else {
-            return Err("failed to reference the child node".into());
+            return Err(ConversionError::Reference {
+                message: "failed to reference the child node".into(),
+            }
+            .into());
         };
 
         let attrs = PartAttrs {
@@ -530,14 +588,17 @@ impl Table {
         };
 
         let PlaceHolder::Ref(Name::Entity(srrwt_idx)) = &cdsr.representation_relation else {
-            return Err("failed to reference `context_dependent_shape_representation.representation_relation`".into());
+            return Err(ConversionError::Reference { message: "failed to reference `context_dependent_shape_representation.representation_relation`".into() }.into());
         };
 
         let Some(srrwt) = self
             .shape_representation_relationship_with_transformation
             .get(srrwt_idx)
         else {
-            return Err("failed to reference `shape_representation_relationship`".into());
+            return Err(ConversionError::Reference {
+                message: "failed to reference `shape_representation_relationship`".into(),
+            }
+            .into());
         };
         let idtf = srrwt.transformation_operator.clone().into_owned(self)?;
 
@@ -558,7 +619,10 @@ impl Table {
         let mut assy_nodes = Vec::<(AssembleEntity, (u64, u64))>::new();
         for (&pds_idx, pds) in &self.product_definition_shape {
             let &PlaceHolder::Ref(Name::Entity(idx)) = &pds.definition else {
-                return Err("failed to reference `product_definition_shape.definition`".into());
+                return Err(ConversionError::Reference {
+                    message: "failed to reference `product_definition_shape.definition`".into(),
+                }
+                .into());
             };
             if let Some(pd) = self.product_definition.get(&idx) {
                 product_entities.push(self.product_node_entity(pds_idx, pd, &mut skipped)?);
@@ -617,10 +681,16 @@ impl StepShell for OrientedShellHolder {
         table: &Table,
     ) -> Converted<CompressedShell<Point3, Curve3D, Surface>> {
         let PlaceHolder::Ref(Name::Entity(idx)) = &self.shell_element else {
-            return Err("failed to reference shell".into());
+            return Err(ConversionError::Reference {
+                message: "failed to reference shell".into(),
+            }
+            .into());
         };
         let Some(shell) = table.shell.get(idx) else {
-            return Err("failed to reference shell".into());
+            return Err(ConversionError::Reference {
+                message: "failed to reference shell".into(),
+            }
+            .into());
         };
         let (mut res, skipped) = shell.to_compressed_shell(table)?;
         if !self.orientation {

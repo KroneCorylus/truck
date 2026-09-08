@@ -1,4 +1,5 @@
 use crate::*;
+use std::result::Result;
 use truck_meshalgo::prelude::*;
 
 /// Wasm wrapper by Polygonmesh
@@ -81,6 +82,30 @@ impl PolygonMesh {
             .ok()?;
         Some(res)
     }
+    /// Reads OBJ or throws a structured mesh-input error.
+    pub fn try_from_obj(data: &[u8]) -> Result<PolygonMesh, JsValue> {
+        obj::read::<&[u8]>(data)
+            .map(IntoWasm::into_wasm)
+            .map_err(|e| io_error(e, "from_obj"))
+    }
+    /// Reads STL or throws a structured mesh-input error.
+    pub fn try_from_stl(data: &[u8], stl_type: StlType) -> Result<PolygonMesh, JsValue> {
+        stl::read::<&[u8]>(data, stl_type.into())
+            .map(IntoWasm::into_wasm)
+            .map_err(|e| io_error(e, "from_stl"))
+    }
+    /// Writes OBJ or throws a structured mesh-output error.
+    pub fn try_to_obj(&self) -> Result<Vec<u8>, JsValue> {
+        let mut data = Vec::new();
+        obj::write(&self.0, &mut data).map_err(|e| io_error(e, "to_obj"))?;
+        Ok(data)
+    }
+    /// Writes STL or throws a structured mesh-output error.
+    pub fn try_to_stl(&self, stl_type: StlType) -> Result<Vec<u8>, JsValue> {
+        let mut data = Vec::new();
+        stl::write(&self.0, &mut data, stl_type.into()).map_err(|e| io_error(e, "to_stl"))?;
+        Ok(data)
+    }
     /// Returns polygon buffer
     pub fn to_buffer(&self) -> PolygonBuffer {
         let exp = self.0.expands(|attr| {
@@ -133,4 +158,14 @@ impl PolygonBuffer {
     pub fn index_buffer(&self) -> Vec<u32> { self.indices.clone() }
     /// the length (bytes) of index buffer. (Num of triangles) * 3 vertices * 4 bytes.
     pub fn index_buffer_size(&self) -> usize { self.indices.len() * 4 }
+}
+
+fn io_error(
+    error: impl truck_base::diagnostics::CodedError + 'static,
+    operation: &'static str,
+) -> JsValue {
+    use truck_base::diagnostics::{Code, Diagnostic};
+    diagnostics::js_error(
+        Diagnostic::new(Code::MeshIo, operation, "mesh_io").with_coded_source(error),
+    )
 }

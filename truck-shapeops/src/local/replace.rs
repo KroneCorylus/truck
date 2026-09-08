@@ -2,10 +2,12 @@
 
 use super::{
     intersect::{domain_on, project},
-    intersect_surfaces, LocalOpError,
+    LocalOpError,
 };
+use super::{locate_failure, Failure};
 use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};
 use std::result::Result;
+use truck_base::diagnostics::{Code, Diagnostic};
 use truck_geometry::prelude::*;
 use truck_modeling::*;
 
@@ -55,7 +57,7 @@ pub(super) fn rebuild_face(
     face: &Face,
     new_edges: &HashMap<EdgeID, Option<Edge>>,
     surface: Surface,
-) -> Face {
+) -> Result<Face, truck_topology::errors::Error> {
     let loops: Vec<Wire> = face
         .boundaries()
         .into_iter()
@@ -70,7 +72,7 @@ pub(super) fn rebuild_face(
                 .collect()
         })
         .collect();
-    Face::new(loops, surface)
+    Face::try_new(loops, surface)
 }
 
 /// `solid` with the faces in `rebuilt` replaced by index and the faces in `dropped` left out.
@@ -136,6 +138,29 @@ pub fn replace_surfaces(
     solid: &Solid,
     replacements: &[(FaceID, Surface)],
 ) -> Result<Solid, LocalOpError<Surface>> {
+    replace_surfaces_impl(solid, replacements).map_err(|e| e.legacy)
+}
+
+/// Diagnostic variant of [`super::replace_surfaces`], with input-relative locations and retained causes.
+pub fn try_replace_surfaces(
+    solid: &Solid,
+    replacements: &[(FaceID, Surface)],
+) -> Result<Solid, Diagnostic> {
+    super::validate_solid(solid, "replace_surfaces")?;
+    replace_surfaces_impl(solid, replacements).map_err(|e| {
+        locate_failure(
+            solid.face_iter(),
+            &replacements.iter().map(|(id, _)| *id).collect::<Vec<_>>(),
+            "replace_surfaces",
+            e,
+        )
+    })
+}
+
+pub(super) fn replace_surfaces_impl(
+    solid: &Solid,
+    replacements: &[(FaceID, Surface)],
+) -> Result<Solid, Failure> {
     let Incidence {
         faces,
         index,
@@ -207,7 +232,13 @@ pub fn replace_surfaces(
                 .flat_map(|e| faces_of_edge[&e.id()].clone())
                 .find(|j| new_surface.contains_key(j));
             let first = index[&replacements[0].0];
-            return Err(unsupported(next_to.unwrap_or(first)));
+            let mut failure = Failure::new(
+                unsupported(next_to.unwrap_or(first)),
+                Code::UnsupportedGeometry,
+                "validate_surfaces",
+            );
+            failure.diagnostic.context.face_index = Some(i);
+            return Err(failure);
         }
     }
 
@@ -218,7 +249,11 @@ pub fn replace_surfaces(
     for edge in &touched_edges {
         let across = &faces_of_edge[&edge.id()];
         let [f0, f1] = across[..] else {
-            return Err(unsupported(replaced_at(edge)));
+            return Err(Failure::new(
+                unsupported(replaced_at(edge)),
+                Code::UnsupportedTopology,
+                "validate_incidence",
+            ));
         };
         if !new_surface.contains_key(&f0) && !new_surface.contains_key(&f1) {
             new_curves.insert(edge.id(), edge.curve());
@@ -227,17 +262,34 @@ pub fn replace_surfaces(
         let (s0, s1) = (effective(f0), effective(f1));
         if coincide(&s0, &s1) {
             let Curve::Line(Line(p, q)) = edge.curve() else {
-                return Err(unsupported(replaced_at(edge)));
+                return Err(Failure::new(
+                    unsupported(replaced_at(edge)),
+                    Code::UnsupportedGeometry,
+                    "rebuild_seam",
+                ));
             };
             let (p, q) = (project(&s0, p), project(&s0, q));
             let (Some(p), Some(q)) = (p, q) else {
-                return Err(unsupported(replaced_at(edge)));
+                return Err(Failure::new(
+                    unsupported(replaced_at(edge)),
+                    Code::ProjectionFailed,
+                    "rebuild_seam",
+                ));
             };
             new_curves.insert(edge.id(), Curve::Line(Line(p, q)));
             continue;
         }
-        let domain = |i: usize, s: &Surface| domain_on(s, &faces[i], MARGIN).ok_or(unsupported(i));
-        let curves = intersect_surfaces(&s0, domain(f0, &s0)?, &s1, domain(f1, &s1)?, 0.01);
+        let domain = |i: usize, s: &Surface| {
+            domain_on(s, &faces[i], MARGIN).ok_or_else(|| {
+                Failure::new(
+                    unsupported(i),
+                    Code::ProjectionFailed,
+                    "parameterize_boundary",
+                )
+            })
+        };
+        let curves =
+            super::try_intersect_surfaces(&s0, domain(f0, &s0)?, &s1, domain(f1, &s1)?, 0.01);
         let (face, neighbour) = match new_surface.contains_key(&f0) {
             true => (f0, f1),
             false => (f1, f0),
@@ -246,10 +298,22 @@ pub fn replace_surfaces(
             face: faces[face].id(),
             neighbour: faces[neighbour].id(),
         };
-        match curves.as_deref() {
-            Some([curve]) => new_curves.insert(edge.id(), curve.clone()),
-            Some([]) | None => return Err(no_intersection),
-            Some(_) => return Err(unsupported(face)),
+        match curves {
+            Ok(curves) if curves.len() == 1 => new_curves.insert(edge.id(), curves[0].clone()),
+            Ok(curves) if curves.is_empty() => return Err(no_intersection.into()),
+            Err(diagnostic) => {
+                return Err(Failure {
+                    legacy: no_intersection,
+                    diagnostic,
+                })
+            }
+            Ok(_) => {
+                return Err(Failure::new(
+                    unsupported(face),
+                    Code::UnsupportedGeometry,
+                    "intersect_surfaces",
+                ))
+            }
         };
     }
 
@@ -261,7 +325,11 @@ pub fn replace_surfaces(
             .flat_map(|e| faces_of_edge[&e.id()].iter().copied())
             .collect();
         if faces_here.len() != 3 || edges.len() != 3 {
-            return Err(unsupported(replaced_at(&edges[0])));
+            return Err(Failure::new(
+                unsupported(replaced_at(&edges[0])),
+                Code::UnsupportedTopology,
+                "validate_incidence",
+            ));
         }
         // the pair of new curves crossing most squarely at the old vertex: two arcs of one
         // circle, as at the seam of a cylinder, meet in no isolated point
@@ -284,7 +352,11 @@ pub fn replace_surfaces(
             }
         }
         let Some((i, j, _)) = best else {
-            return Err(unsupported(replaced_at(&edges[0])));
+            return Err(Failure::new(
+                unsupported(replaced_at(&edges[0])),
+                Code::ProjectionFailed,
+                "find_vertex",
+            ));
         };
         let (e0, e1) = (&edges[i], &edges[j]);
         let (c0, c1) = (&new_curves[&e0.id()], &new_curves[&e1.id()]);
@@ -306,10 +378,14 @@ pub fn replace_surfaces(
                 .copied()
                 .find(|&i| i != face)
                 .unwrap_or(across[0]);
-            return Err(LocalOpError::NoIntersection {
-                face: faces[face].id(),
-                neighbour: faces[neighbour].id(),
-            });
+            return Err(Failure::new(
+                LocalOpError::NoIntersection {
+                    face: faces[face].id(),
+                    neighbour: faces[neighbour].id(),
+                },
+                Code::IntersectionFailed,
+                "find_vertex",
+            ));
         };
         // a vertex that does not move stays the same object, bit for bit
         let point = c0.subs(t0);
@@ -330,13 +406,19 @@ pub fn replace_surfaces(
                     .unwrap_or_else(|| v.clone())
             };
             let (front, back) = (end(edge.front()), end(edge.back()));
-            let curve = trimmed(&new_curves[&edge.id()], front.point(), back.point())
-                .ok_or(unsupported(replaced_at(edge)))?;
+            let curve =
+                trimmed(&new_curves[&edge.id()], front.point(), back.point()).ok_or_else(|| {
+                    Failure::new(
+                        unsupported(replaced_at(edge)),
+                        Code::ProjectionFailed,
+                        "trim_edges",
+                    )
+                })?;
             Ok((edge.id(), Some(Edge::new(&front, &back, curve))))
         })
-        .collect::<Result<_, _>>()?;
+        .collect::<Result<_, Failure>>()?;
 
-    let rebuilt = |i: usize| -> Face {
+    let rebuilt = |i: usize| -> Result<Face, truck_topology::errors::Error> {
         match new_surface.get(&i) {
             None => rebuild_face(&faces[i], &new_edges, faces[i].oriented_surface()),
             Some(&surface) => {
@@ -345,21 +427,40 @@ pub fn replace_surfaces(
                 let (u, v) = old.try_range_tuple();
                 let mid = |r: Option<(f64, f64)>| r.map_or(0.5, |(a, b)| (a + b) / 2.0);
                 let outward = old.normal(mid(u), mid(v));
-                let face = rebuild_face(&faces[i], &new_edges, surface.clone());
+                let face = rebuild_face(&faces[i], &new_edges, surface.clone())?;
                 match surface.normal(0.0, 0.0).dot(outward) > 0.0 {
-                    true => face,
+                    true => Ok(face),
                     false => {
                         let loops = face.boundaries().iter().map(Wire::inverse).collect();
-                        Face::new(loops, surface.clone()).inverse()
+                        Ok(Face::try_new(loops, surface.clone())?.inverse())
                     }
                 }
             }
         }
     };
-    let rebuilt: HashMap<usize, Face> = touched_faces.iter().map(|&i| (i, rebuilt(i))).collect();
+    let rebuilt: HashMap<usize, Face> = touched_faces
+        .iter()
+        .map(|&i| {
+            rebuilt(i).map(|face| (i, face)).map_err(|e| {
+                Failure::new(
+                    unsupported(i),
+                    Code::InvalidOutputTopology,
+                    "validate_output",
+                )
+                .source(e)
+            })
+        })
+        .collect::<Result<_, Failure>>()?;
     let first = replacements.first().map(|(face, _)| *face);
-    rebuild_solid(solid, &rebuilt, &HashSet::default()).map_err(|_| LocalOpError::Unsupported {
-        face: first.unwrap_or_else(|| faces[0].id()),
+    rebuild_solid(solid, &rebuilt, &HashSet::default()).map_err(|e| {
+        Failure::new(
+            LocalOpError::Unsupported {
+                face: first.unwrap_or_else(|| faces[0].id()),
+            },
+            Code::InvalidOutputTopology,
+            "validate_output",
+        )
+        .source(e)
     })
 }
 
