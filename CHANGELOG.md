@@ -4,6 +4,8 @@ The version is of the bottom crate `truck-rendimpl`.
 
 ## Unreleased
 
+- Fix coplanar split-cut booleans by classifying overlap after all face cuts. Process each solid's full oriented boundary set, preserving disconnected bodies, cavities and nested islands regardless of shell order. Add `solid_components` for exterior/cavity grouping before STEP export and `subtract` for empty-safe subtraction. Reject detected invalid nesting, invalid result topology, invalid tolerances and unrepresentable whole-space results with `None`.
+
 - Point the resources submodule at its published commit and keep the STEP fixture provenance in truck-stepio, fixing fresh dependency fetches.
 
 - Reuse intersection-curve parameter divisions across unchanged clones and boolean calls, reducing the 100-hole plate benchmark from 81.0 s to 11.3 s with identical geometry.

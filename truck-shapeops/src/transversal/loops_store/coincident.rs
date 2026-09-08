@@ -73,8 +73,10 @@ where
     merge_shared_pieces(a, b, same_normal);
     let region_a = parameter_boundaries(poly_faces[0], surface, true)?;
     let region_b = parameter_boundaries(poly_faces[1], surface, same_normal)?;
-    add_cut_edges(a, b, surface, &region_a, same_normal, overlap[0])?;
-    add_cut_edges(b, a, surface, &region_b, same_normal, overlap[1])?;
+    // A partial cut can enclose more than the overlap. Classify only after every boundary
+    // piece has been inserted, so a later cut cannot inherit a premature overlap status.
+    add_cut_edges(a, b, surface, &region_a, same_normal)?;
+    add_cut_edges(b, a, surface, &region_b, same_normal)?;
     mark_overlap(a, b, same_normal, overlap[0]);
     mark_overlap(b, a, same_normal, overlap[1]);
     Some(())
@@ -260,7 +262,6 @@ fn add_cut_edges<C: Clone, S>(
     surface: &S,
     region: &[Boundary2D],
     same_normal: bool,
-    overlap: ShapesOpStatus,
 ) -> Option<()>
 where
     S: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>,
@@ -289,8 +290,9 @@ where
             poly.invert();
             geom.invert();
         }
-        let positions = into.poly[into.index].add_edge(poly, overlap, normal_at(surface))?;
-        into.geom[into.index].add_edge_at(geom, overlap, positions);
+        let positions =
+            into.poly[into.index].add_edge(poly, ShapesOpStatus::Unknown, normal_at(surface))?;
+        into.geom[into.index].add_edge_at(geom, ShapesOpStatus::Unknown, positions);
     }
     Some(())
 }

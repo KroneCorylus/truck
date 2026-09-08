@@ -15,6 +15,12 @@
 //! equal-radius blind bore, and a rod subtracted through an equal-width slot are supported.
 //! Singularities missed by the mesh and higher-order contacts remain outside this support.
 //!
+//! A solid may contain disconnected exteriors, cavities, and islands inside cavities. Shell
+//! orientation and nesting define material; shell order does not. [`solid_components`] groups
+//! bounded results into bodies, each with its exterior first and its cavities afterward for
+//! STEP export. [`subtract`] handles empty cutters; empty inputs also compose with [`and`] and
+//! [`or`]. Detected invalid shell sets and invalid result topology return `None`.
+//!
 //! The kernel works in absolute units: two points closer than the `TOLERANCE` of `truck-base`,
 //! `1e-6`, are the same point, and the `tol` of `and` and `or` is a chord error in the same
 //! units. Choose the units of a model so that its features are large against `TOLERANCE`, and
@@ -64,7 +70,7 @@ mod healing;
 pub mod profile;
 pub use healing::{RobustSplitClosedEdgesAndFaces, SplitClosedEdgesAndFaces};
 mod transversal;
-pub use transversal::{and, or, ShapeOpsCurve, ShapeOpsSurface};
+pub use transversal::{and, or, solid_components, subtract, ShapeOpsCurve, ShapeOpsSurface};
 mod alternative;
 pub mod local;
 

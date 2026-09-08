@@ -19,7 +19,7 @@ where
     S: ParametricSurface<Point = P> + SearchParameter<D2, Point = P>,
 {
     let surface = face.surface();
-    let pt = wire.front_vertex().unwrap().point();
+    let pt = wire.front_vertex()?.point();
     let p: Point2 = surface.search_parameter(pt, None, 100)?.into();
     let vec = wire.edge_iter().try_fold(vec![p], |mut vec, edge| {
         let poly = polys.entry(edge.id()).or_insert_with(|| {
@@ -86,7 +86,7 @@ where
         op.push(chunk);
         Some(())
     })?;
-    let vec: Vec<_> = pre_faces
+    pre_faces
         .into_iter()
         .map(|pre_face| {
             let surface = face.surface();
@@ -101,14 +101,13 @@ where
                 .into_iter()
                 .map(|chunk| chunk.wire.deref().clone())
                 .collect();
-            let mut new_face = Face::debug_new(wires, surface);
+            let mut new_face = Face::try_new(wires, surface).ok()?;
             if !face.orientation() {
                 new_face.invert();
             }
-            (new_face, status)
+            Some((new_face, status))
         })
-        .collect();
-    Some(vec)
+        .collect()
 }
 
 pub fn divide_faces<C, S>(
@@ -131,7 +130,7 @@ where
             {
                 // The loops carry the edges as split and merged by the cuts of other faces.
                 let wires = loops.iter().map(|wire| wire.deref().clone()).collect();
-                let mut new_face = Face::debug_new(wires, face.surface());
+                let mut new_face = Face::try_new(wires, face.surface()).ok()?;
                 if !face.orientation() {
                     new_face.invert();
                 }

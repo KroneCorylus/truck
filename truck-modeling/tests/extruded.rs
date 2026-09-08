@@ -51,7 +51,9 @@ fn tsweep_of_disk_keeps_extruded_conic() {
                     "extruded curve is not the arc: {:?}",
                     surface.entity_curve()
                 );
-                assert!(surface.extruding_vector().near(&(Vector3::unit_z() * height)));
+                assert!(surface
+                    .extruding_vector()
+                    .near(&(Vector3::unit_z() * height)));
                 volume += side_flux(face, 256);
             }
             surface => panic!("unexpected surface: {surface:?}"),

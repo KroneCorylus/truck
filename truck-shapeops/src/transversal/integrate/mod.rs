@@ -1,3 +1,6 @@
+mod components;
+pub use components::solid_components;
+
 use crate::alternative::Alternative;
 use crate::profile::{self, Stage};
 
@@ -139,16 +142,17 @@ fn interior_point<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
 ///
 /// The signed crossing count of a ray from a point inside a closed mesh is 1. An inverted mesh,
 /// the complement of a solid, has its interior where the count is 0, and −1 inside the
-/// original solid; its orientation shows in the sign of its volume.
+/// original solid. The nesting of the operand boundaries determines which case applies.
 fn classify_unknown<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     unknown: AltCurveShell<C, S>,
     other: &Shell<Point3, PolylineCurve<Point3>, Option<PolygonMesh>>,
     and: &mut AltCurveShell<C, S>,
     or: &mut AltCurveShell<C, S>,
     tol: f64,
+    inverted: bool,
 ) -> Option<()> {
     let mesh = other.to_polygon();
-    let inside_count = if mesh.volume() < 0.0 { 0 } else { 1 };
+    let inside_count = if inverted { 0 } else { 1 };
     unknown.into_iter().try_for_each(|face| {
         let pt = interior_point(&face, tol)?;
         let dir = hash::take_one_unit(pt);
@@ -161,30 +165,28 @@ fn classify_unknown<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     })
 }
 
-/// Cuts `shell0` and `shell1` against each other and sorts the pieces into those inside the
+/// Cuts the complete boundaries `shell0` and `shell1` against each other and sorts the pieces into those inside the
 /// other solid (`[0]`) and those outside (`[1]`).
 ///
 /// `tol` does two jobs: both shells are triangulated at `tol`, which seeds the face pairing
 /// and the interference polylines, and the edges are sampled at `tol` when the faces are
 /// divided and the leftover pieces classified. Coincidence of points, vertex snapping and the
 /// bounding-box slack in `loops_store` and `polyline_construction` use the global `TOLERANCE`.
-fn process_one_pair_of_shells<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
+fn process_boundaries<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     shell0: &Shell<Point3, C, S>,
     shell1: &Shell<Point3, C, S>,
     tol: f64,
+    poly_shells: [&Shell<Point3, PolylineCurve<Point3>, Option<PolygonMesh>>; 2],
+    inverted: [bool; 2],
 ) -> Option<[Shell<Point3, C, S>; 2]> {
-    nonpositive_tolerance!(tol);
-    let start = profile::now();
-    let poly_shell0 = shell0.triangulation(tol);
-    let poly_shell1 = shell1.triangulation(tol);
-    profile::lap(Stage::Triangulation, start);
+    let [poly_shell0, poly_shell1] = poly_shells;
     let altshell0: AltCurveShell<C, S> =
         shell0.mapped(|x| *x, |c| Alternative::FirstType(c.clone()), Clone::clone);
     let altshell1: AltCurveShell<C, S> =
         shell1.mapped(|x| *x, |c| Alternative::FirstType(c.clone()), Clone::clone);
     let start = profile::now();
     let quadruple =
-        loops_store::create_loops_stores(&altshell0, &poly_shell0, &altshell1, &poly_shell1);
+        loops_store::create_loops_stores(&altshell0, poly_shell0, &altshell1, poly_shell1);
     profile::lap(Stage::LoopsStore, start);
     let loops_store::LoopsStoreQuadruple {
         geom_loops_store0: loops_store0,
@@ -199,9 +201,9 @@ fn process_one_pair_of_shells<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     profile::lap(Stage::Division, start);
     let start = profile::now();
     let [mut and0, mut or0, unknown0] = cls0.and_or_unknown();
-    classify_unknown(unknown0, &poly_shell1, &mut and0, &mut or0, tol)?;
+    classify_unknown(unknown0, poly_shell1, &mut and0, &mut or0, tol, inverted[1])?;
     let [mut and1, mut or1, unknown1] = cls1.and_or_unknown();
-    classify_unknown(unknown1, &poly_shell0, &mut and1, &mut or1, tol)?;
+    classify_unknown(unknown1, poly_shell0, &mut and1, &mut or1, tol, inverted[0])?;
     profile::lap(Stage::Classification, start);
     and0.append(&mut and1);
     or0.append(&mut or1);
@@ -212,6 +214,21 @@ fn process_one_pair_of_shells<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
 }
 
 /// Intersection of two solids.
+///
+/// Each operand is a set of oriented, embedded boundary shells. Disconnected exteriors point
+/// outward, cavity boundaries point inward, and orientation alternates at each nesting level.
+/// Shell order is immaterial. Inverting every shell represents the complement of a nonempty
+/// bounded solid. See [`solid_components`] for the supported separation between shells and for
+/// grouping a result into bodies with their cavities before STEP export.
+///
+/// Zero shells always represent the empty set. Intersection with empty is empty, and union
+/// with empty is the other operand. The whole space has no representation: an operation that
+/// would produce it returns `None`. Use [`subtract`] for subtraction with possibly empty cutters.
+///
+/// Returns `None` for detected invalid shell nesting or topology, failed tessellation, or
+/// unsupported division/fitting. In particular, an invalid result is not constructed as a
+/// successful `Solid`. Inputs must satisfy the geometric contracts of their curves and
+/// surfaces; tessellation is not an exact check for arbitrary self-intersections.
 ///
 /// `tol` is the chord error of the tessellation that seeds the operation, and does two jobs:
 /// the shells are meshed at `tol` to find which faces meet and where, and the edges are sampled
@@ -224,50 +241,80 @@ fn process_one_pair_of_shells<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
 /// Loosening `tol` makes the operation faster and leaves the result unchanged as long as `tol`
 /// stays below the features of the faces: a `tol` above the radius of a circular edge collapses
 /// each of its arcs to one chord, the mesh degenerates, and the operation returns `None`.
-/// Tightening `tol` only adds triangles and time. `tol` must be positive.
+/// Tightening `tol` only adds triangles and time. `tol` must be finite and positive; invalid
+/// tolerances return `None`. It must also resolve gaps used to classify nested shells.
 pub fn and<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     solid0: &Solid<Point3, C, S>,
     solid1: &Solid<Point3, C, S>,
     tol: f64,
 ) -> Option<Solid<Point3, C, S>> {
-    let mut iter0 = solid0.boundaries().iter();
-    let mut iter1 = solid1.boundaries().iter();
-    let shell0 = iter0.next().unwrap();
-    let shell1 = iter1.next().unwrap();
-    let [mut and_shell, _] = process_one_pair_of_shells(shell0, shell1, tol)?;
-    for shell in iter0 {
-        let [res, _] = process_one_pair_of_shells(&and_shell, shell, tol)?;
-        and_shell = res;
-    }
-    for shell in iter1 {
-        let [res, _] = process_one_pair_of_shells(&and_shell, shell, tol)?;
-        and_shell = res;
-    }
-    let boundaries = and_shell.connected_components();
-    Some(Solid::new(boundaries))
+    boolean(solid0, solid1, tol, true)
 }
 
 /// Union of two solids.
 ///
-/// `tol` is the chord error of the seeding tessellation, as for [`and`].
+/// Uses the same shell representation, failure contract, and tolerance as [`and`].
 pub fn or<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     solid0: &Solid<Point3, C, S>,
     solid1: &Solid<Point3, C, S>,
     tol: f64,
 ) -> Option<Solid<Point3, C, S>> {
-    let mut iter0 = solid0.boundaries().iter();
-    let mut iter1 = solid1.boundaries().iter();
-    let shell0 = iter0.next().unwrap();
-    let shell1 = iter1.next().unwrap();
-    let [_, mut or_shell] = process_one_pair_of_shells(shell0, shell1, tol)?;
-    for shell in iter0 {
-        let [_, res] = process_one_pair_of_shells(&or_shell, shell, tol)?;
-        or_shell = res;
+    boolean(solid0, solid1, tol, false)
+}
+
+fn boolean<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
+    solid0: &Solid<Point3, C, S>,
+    solid1: &Solid<Point3, C, S>,
+    tol: f64,
+    intersection: bool,
+) -> Option<Solid<Point3, C, S>> {
+    let start = profile::now();
+    let (poly0, nesting0) = components::triangulate_boundaries(solid0, tol)?;
+    let (poly1, nesting1) = components::triangulate_boundaries(solid1, tol)?;
+    profile::lap(Stage::Triangulation, start);
+    if solid0.boundaries().is_empty() || solid1.boundaries().is_empty() {
+        return Some(if intersection {
+            Solid::new(Vec::new())
+        } else if solid0.boundaries().is_empty() {
+            solid1.clone()
+        } else {
+            solid0.clone()
+        });
     }
-    for shell in iter1 {
-        let [_, res] = process_one_pair_of_shells(&or_shell, shell, tol)?;
-        or_shell = res;
+    let shell0 = solid0.face_iter().cloned().collect();
+    let shell1 = solid1.face_iter().cloned().collect();
+    let [and, or] = process_boundaries(
+        &shell0,
+        &shell1,
+        tol,
+        [&poly0, &poly1],
+        [nesting0.inverted, nesting1.inverted],
+    )?;
+    let shell = if intersection { and } else { or };
+    let unbounded = if intersection {
+        nesting0.inverted && nesting1.inverted
+    } else {
+        nesting0.inverted || nesting1.inverted
+    };
+    if shell.is_empty() && unbounded {
+        return None;
     }
-    let boundaries = or_shell.connected_components();
-    Some(Solid::new(boundaries))
+    Solid::try_new(shell.connected_components()).ok()
+}
+
+/// Subtracts `solid1` from `solid0`, including empty operands.
+///
+/// Uses the same shell contract and tolerance as [`and`]. Prefer this over manually inverting
+/// the cutter: `Solid::not` cannot distinguish the complement of an empty solid from empty.
+pub fn subtract<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
+    solid0: &Solid<Point3, C, S>,
+    solid1: &Solid<Point3, C, S>,
+    tol: f64,
+) -> Option<Solid<Point3, C, S>> {
+    if solid1.boundaries().is_empty() {
+        return or(solid0, solid1, tol);
+    }
+    let mut complement = solid1.clone();
+    complement.not();
+    and(solid0, &complement, tol)
 }
