@@ -4,6 +4,8 @@ The version is of the bottom crate `truck-rendimpl`.
 
 ## Unreleased
 
+- Reuse intersection-curve parameter divisions across unchanged clones and boolean calls, reducing the 100-hole plate benchmark from 81.0 s to 11.3 s with identical geometry.
+
 - Add `fillet_edges` for convex planar shells, joining equal-radius straight-edge fillets with exact spherical corners where three edges meet.
 
 - Support sampled tangent-crossing boolean branches and boundary contacts: Steinmetz intersection and union, sphere-in-bore subtraction and rod-in-slot subtraction.

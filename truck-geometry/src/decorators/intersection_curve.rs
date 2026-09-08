@@ -55,6 +55,7 @@ impl<C, S0, S1> IntersectionCurve<C, S0, S1> {
             surface0,
             surface1,
             leader,
+            division: Default::default(),
         }
     }
     /// This curve is a part of intersection of `self.surface0()` and `self.surface1()`.
@@ -68,13 +69,22 @@ impl<C, S0, S1> IntersectionCurve<C, S0, S1> {
     pub fn leader(&self) -> &C { &self.leader }
     /// This curve is a part of intersection of `self.surface0()` and `self.surface1()`.
     #[inline(always)]
-    pub fn surface0_mut(&mut self) -> &mut S0 { &mut self.surface0 }
+    pub fn surface0_mut(&mut self) -> &mut S0 {
+        self.division = Default::default();
+        &mut self.surface0
+    }
     /// This curve is a part of intersection of `self.surface0()` and `self.surface1()`.
     #[inline(always)]
-    pub fn surface1_mut(&mut self) -> &mut S1 { &mut self.surface1 }
+    pub fn surface1_mut(&mut self) -> &mut S1 {
+        self.division = Default::default();
+        &mut self.surface1
+    }
     /// Returns the curve leading this curve.
     #[inline(always)]
-    pub fn leader_mut(&mut self) -> &mut C { &mut self.leader }
+    pub fn leader_mut(&mut self) -> &mut C {
+        self.division = Default::default();
+        &mut self.leader
+    }
     /// destruct `self`.
     #[inline(always)]
     pub fn destruct(self) -> (S0, S1, C) { (self.surface0, self.surface1, self.leader) }
@@ -234,6 +244,7 @@ where
             surface0,
             surface1,
             leader,
+            ..
         } = self;
         let [l, l_der, l_der2] = leader.ders(2, t).to_array::<3>();
         let (c, uv0, uv1) = self.search_triple(t, 100).unwrap();
@@ -284,6 +295,7 @@ where
             surface0,
             surface1,
             leader,
+            ..
         } = self;
         let info = DerRoutineImmutableArgs {
             s0ders: surface0.ders(n, uv0.x, uv0.y),
@@ -316,7 +328,19 @@ where
     type Point = Point3;
     #[inline(always)]
     fn parameter_division(&self, range: (f64, f64), tol: f64) -> (Vec<f64>, Vec<Point3>) {
-        algo::curve::parameter_division(self, range, tol)
+        let key = [range.0.to_bits(), range.1.to_bits(), tol.to_bits()];
+        let mut cached = self.division.lock().unwrap();
+        if let Some(division) = &*cached {
+            if division.key == key {
+                return division.samples.clone();
+            }
+        }
+        let samples = algo::curve::parameter_division(self, range, tol);
+        *cached = Some(Division {
+            key,
+            samples: samples.clone(),
+        });
+        samples
     }
 }
 
@@ -328,16 +352,21 @@ where
 {
     #[inline(always)]
     fn cut(&mut self, t: f64) -> Self {
+        self.division = Default::default();
         Self {
             surface0: self.surface0.clone(),
             surface1: self.surface1.clone(),
             leader: self.leader.cut(t),
+            division: Default::default(),
         }
     }
 }
 
 impl<C: Invertible, S0: Clone, S1: Clone> Invertible for IntersectionCurve<C, S0, S1> {
-    fn invert(&mut self) { self.leader.invert(); }
+    fn invert(&mut self) {
+        self.division = Default::default();
+        self.leader.invert();
+    }
 }
 
 impl<C, S0, S1> SearchParameter<D1> for IntersectionCurve<C, S0, S1>
@@ -390,6 +419,7 @@ where
     S1: Transformed<Matrix4>,
 {
     fn transform_by(&mut self, trans: Matrix4) {
+        self.division = Default::default();
         self.surface0.transform_by(trans);
         self.surface1.transform_by(trans);
         self.leader.transform_by(trans);
@@ -508,5 +538,20 @@ fn intersection_branch_at_a_tangent_endpoint() {
             assert_near!(curve.der(t), curve.leader().der(t));
             assert_near!(curve.der2(t), Vector3::zero());
         }
+    }
+}
+
+/// One range/tolerance entry, shared by unchanged clones and detached before mutation.
+#[derive(Debug)]
+pub(super) struct Division {
+    key: [u64; 3],
+    samples: (Vec<f64>, Vec<Point3>),
+}
+
+impl<C: PartialEq, S0: PartialEq, S1: PartialEq> PartialEq for IntersectionCurve<C, S0, S1> {
+    fn eq(&self, other: &Self) -> bool {
+        self.leader == other.leader
+            && self.surface0 == other.surface0
+            && self.surface1 == other.surface1
     }
 }

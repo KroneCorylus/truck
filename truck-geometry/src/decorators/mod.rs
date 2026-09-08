@@ -235,6 +235,10 @@ pub struct EdgeBlendSurface<C0, S0, F0, C1, S1, F1> {
 
 /// Intersection curve between two surfaces.
 ///
+/// The most recent parameter division is cached by its exact range and tolerance. Unchanged
+/// clones share the samples; mutable geometry access, cutting, inversion and transformation
+/// detach the cache. Cached samples do not affect equality or serialized geometry.
+///
 /// # Examples
 /// ```
 /// use std::f64::consts::PI;
@@ -273,11 +277,13 @@ pub struct EdgeBlendSurface<C0, S0, F0, C1, S1, F1> {
 /// let length = sum / 100.0 / 2.0;
 /// assert!(f64::abs(length - PI) < 1.0e-4 * PI);
 /// ```
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, SelfSameGeometry)]
+#[derive(Debug, Clone, Serialize, Deserialize, SelfSameGeometry)]
 pub struct IntersectionCurve<C, S0, S1> {
     surface0: S0,
     surface1: S1,
     leader: C,
+    #[serde(skip)]
+    division: std::sync::Arc<std::sync::Mutex<Option<intersection_curve::Division>>>,
 }
 
 /// trimmed curve for parametric curve
