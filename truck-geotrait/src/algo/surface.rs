@@ -33,6 +33,78 @@ where
     res
 }
 
+/// The affine parameter of a ruled surface.
+#[derive(Clone, Copy, Debug)]
+pub enum LinearAxis {
+    /// Rulings have constant `v`.
+    U,
+    /// Rulings have constant `u`.
+    V,
+}
+
+/// Seeds a search by projecting onto sampled rulings, then falls back to the grid if
+/// the range or all rulings are degenerate. The caller must ensure the selected
+/// parameter is affine throughout `range`. This is a seed, not a nearest-point solver.
+pub fn presearch_linear<S>(
+    surface: &S,
+    point: S::Point,
+    range: ((f64, f64), (f64, f64)),
+    division: usize,
+    axis: LinearAxis,
+) -> (f64, f64)
+where
+    S: ParametricSurface,
+    S::Point: EuclideanSpace<Scalar = f64, Diff = S::Vector> + MetricSpace<Metric = f64>,
+    S::Vector: InnerSpace<Scalar = f64>,
+{
+    let ruling = |t| match axis {
+        LinearAxis::U => [surface.subs(range.0 .0, t), surface.subs(range.0 .1, t)],
+        LinearAxis::V => [surface.subs(t, range.1 .0), surface.subs(t, range.1 .1)],
+    };
+    presearch_rulings(point, range, division, axis, ruling)
+        .unwrap_or_else(|| presearch(surface, point, range, division))
+}
+
+/// Seeds a ruled-surface search using a specialized ruling evaluator.
+/// `ruling(t)` returns the two endpoints over the linear parameter range at the
+/// nonlinear parameter `t`. Returns `None` for invalid ranges or degenerate rulings.
+pub fn presearch_rulings<P>(
+    point: P,
+    range: ((f64, f64), (f64, f64)),
+    division: usize,
+    axis: LinearAxis,
+    mut ruling: impl FnMut(f64) -> [P; 2],
+) -> Option<(f64, f64)>
+where
+    P: EuclideanSpace<Scalar = f64> + MetricSpace<Metric = f64>,
+    P::Diff: InnerSpace<Scalar = f64>,
+{
+    let swap = matches!(axis, LinearAxis::U);
+    let ((a, b), (c, d)) = if swap { (range.1, range.0) } else { range };
+    let uv = |u, v| if swap { (v, u) } else { (u, v) };
+    let mut best = None;
+    let mut distance = f64::INFINITY;
+    if division > 0 && [a, b, c, d].iter().all(|x| x.is_finite()) {
+        for i in 0..=division {
+            let t = i as f64 / division as f64;
+            let u = a * (1.0 - t) + b * t;
+            let [start, end] = ruling(u);
+            let direction = end - start;
+            let norm = direction.magnitude2();
+            if !norm.is_finite() || norm <= TOLERANCE * TOLERANCE {
+                continue;
+            }
+            let t = ((point - start).dot(direction) / norm).clamp(0.0, 1.0);
+            let dist = (start + direction * t).distance2(point);
+            if dist < distance {
+                distance = dist;
+                best = Some(uv(u, c * (1.0 - t) + d * t));
+            }
+        }
+    }
+    best
+}
+
 /// Vectors whose points returned by the surface that can be the target of [`search_nearest_parameter`].
 pub trait SsnpVector: InnerSpace<Scalar = f64> + Tolerance {
     #[doc(hidden)]

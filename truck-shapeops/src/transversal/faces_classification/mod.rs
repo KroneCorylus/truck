@@ -41,6 +41,12 @@ impl<P, C, S> FacesClassification<P, C, S> {
         ]
     }
 
+    pub fn excludes_first_material(&self) -> bool {
+        self.status
+            .values()
+            .any(|status| matches!(status, ShapesOpStatus::Or | ShapesOpStatus::Neither))
+    }
+
     /// Gives each connected component of undecided faces the status of a decided face it
     /// shares an edge with. Overlaps of coincident faces decide nothing about their neighbours.
     pub fn integrate_by_component(&mut self) {

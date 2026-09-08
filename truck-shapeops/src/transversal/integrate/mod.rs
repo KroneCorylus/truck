@@ -178,7 +178,8 @@ fn process_boundaries<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     tol: f64,
     poly_shells: [&Shell<Point3, PolylineCurve<Point3>, Option<PolygonMesh>>; 2],
     inverted: [bool; 2],
-) -> Option<[Shell<Point3, C, S>; 2]> {
+    intersection: bool,
+) -> Option<(Shell<Point3, C, S>, bool)> {
     let [poly_shell0, poly_shell1] = poly_shells;
     let altshell0: AltCurveShell<C, S> =
         shell0.mapped(|x| *x, |c| Alternative::FirstType(c.clone()), Clone::clone);
@@ -201,16 +202,27 @@ fn process_boundaries<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     profile::lap(Stage::Division, start);
     let start = profile::now();
     let [mut and0, mut or0, unknown0] = cls0.and_or_unknown();
+    let outside0 = or0.len();
     classify_unknown(unknown0, poly_shell1, &mut and0, &mut or0, tol, inverted[1])?;
     let [mut and1, mut or1, unknown1] = cls1.and_or_unknown();
     classify_unknown(unknown1, poly_shell0, &mut and1, &mut or1, tol, inverted[0])?;
     profile::lap(Stage::Classification, start);
-    and0.append(&mut and1);
-    or0.append(&mut or1);
+    // Against a complemented cutter, excluded target faces and cutter faces inside
+    // the target witness material removal. A same-normal contact is `Both` on the
+    // target and its duplicate is `Neither` on the cutter, so neither counts here.
+    let removed_material =
+        cls0.excludes_first_material() || or0.len() > outside0 || !and1.is_empty();
+    let shell = if intersection {
+        and0.append(&mut and1);
+        and0
+    } else {
+        or0.append(&mut or1);
+        or0
+    };
     let start = profile::now();
-    let shells = [altshell_to_shell(&and0)?, altshell_to_shell(&or0)?];
+    let shell = altshell_to_shell(&shell)?;
     profile::lap(Stage::Fitting, start);
-    Some(shells)
+    Some((shell, removed_material))
 }
 
 /// Intersection of two solids.
@@ -248,7 +260,7 @@ pub fn and<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     solid1: &Solid<Point3, C, S>,
     tol: f64,
 ) -> Option<Solid<Point3, C, S>> {
-    boolean(solid0, solid1, tol, true)
+    boolean(solid0, solid1, tol, true).map(|(solid, _)| solid)
 }
 
 /// Union of two solids.
@@ -259,7 +271,7 @@ pub fn or<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     solid1: &Solid<Point3, C, S>,
     tol: f64,
 ) -> Option<Solid<Point3, C, S>> {
-    boolean(solid0, solid1, tol, false)
+    boolean(solid0, solid1, tol, false).map(|(solid, _)| solid)
 }
 
 fn boolean<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
@@ -267,30 +279,33 @@ fn boolean<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     solid1: &Solid<Point3, C, S>,
     tol: f64,
     intersection: bool,
-) -> Option<Solid<Point3, C, S>> {
+) -> Option<(Solid<Point3, C, S>, bool)> {
     let start = profile::now();
     let (poly0, nesting0) = components::triangulate_boundaries(solid0, tol)?;
     let (poly1, nesting1) = components::triangulate_boundaries(solid1, tol)?;
     profile::lap(Stage::Triangulation, start);
     if solid0.boundaries().is_empty() || solid1.boundaries().is_empty() {
-        return Some(if intersection {
-            Solid::new(Vec::new())
-        } else if solid0.boundaries().is_empty() {
-            solid1.clone()
-        } else {
-            solid0.clone()
-        });
+        return Some((
+            if intersection {
+                Solid::new(Vec::new())
+            } else if solid0.boundaries().is_empty() {
+                solid1.clone()
+            } else {
+                solid0.clone()
+            },
+            false,
+        ));
     }
     let shell0 = solid0.face_iter().cloned().collect();
     let shell1 = solid1.face_iter().cloned().collect();
-    let [and, or] = process_boundaries(
+    let (shell, removed_material) = process_boundaries(
         &shell0,
         &shell1,
         tol,
         [&poly0, &poly1],
         [nesting0.inverted, nesting1.inverted],
+        intersection,
     )?;
-    let shell = if intersection { and } else { or };
     let unbounded = if intersection {
         nesting0.inverted && nesting1.inverted
     } else {
@@ -299,7 +314,10 @@ fn boolean<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     if shell.is_empty() && unbounded {
         return None;
     }
-    Solid::try_new(shell.connected_components()).ok()
+    Some((
+        Solid::try_new(shell.connected_components()).ok()?,
+        removed_material,
+    ))
 }
 
 /// Subtracts `solid1` from `solid0`, including empty operands.
@@ -311,10 +329,40 @@ pub fn subtract<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     solid1: &Solid<Point3, C, S>,
     tol: f64,
 ) -> Option<Solid<Point3, C, S>> {
+    subtract_with_effect(solid0, solid1, tol).map(|result| result.solid)
+}
+
+/// A subtraction and whether the cutter removed any material.
+#[derive(Clone, Debug)]
+pub struct SubtractionResult<C, S> {
+    /// The target after subtraction.
+    pub solid: Solid<Point3, C, S>,
+    /// True for partial cuts, complete consumption, and newly created cavities.
+    /// False for disjoint or contact-only cutters and either empty operand.
+    pub removed_material: bool,
+}
+
+/// Subtracts and reports material removal using the same face classification.
+///
+/// Uses the same tolerance, nonmutation, and failure contract as [`subtract`]. No
+/// second boolean or mesh-volume comparison is performed. Shells may be disconnected
+/// or nested, including cavity boundaries, as described in [`and`].
+pub fn subtract_with_effect<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
+    solid0: &Solid<Point3, C, S>,
+    solid1: &Solid<Point3, C, S>,
+    tol: f64,
+) -> Option<SubtractionResult<C, S>> {
     if solid1.boundaries().is_empty() {
-        return or(solid0, solid1, tol);
+        return Some(SubtractionResult {
+            solid: or(solid0, solid1, tol)?,
+            removed_material: false,
+        });
     }
     let mut complement = solid1.clone();
     complement.not();
-    and(solid0, &complement, tol)
+    let (solid, removed_material) = boolean(solid0, &complement, tol, true)?;
+    Some(SubtractionResult {
+        solid,
+        removed_material,
+    })
 }

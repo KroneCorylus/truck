@@ -1703,6 +1703,51 @@ impl<V: Clone> Invertible for BSplineSurface<V> {
     fn invert(&mut self) { self.swap_axes(); }
 }
 
+impl<P> BSplineSurface<P> {
+    pub(super) fn linear_axes(&self) -> [bool; 2] {
+        let clamped = |knots: &KnotVec, count| {
+            count == 2
+                && knots.len() == 4
+                && knots[0] == knots[1]
+                && knots[2] == knots[3]
+                && knots[0] < knots[3]
+        };
+        [
+            clamped(&self.knot_vecs.0, self.control_points.len()),
+            clamped(&self.knot_vecs.1, self.control_points[0].len()),
+        ]
+    }
+}
+
+impl<P> BSplineSurface<P>
+where
+    P: ControlPoint<f64>
+        + EuclideanSpace<Scalar = f64, Diff = <P as ControlPoint<f64>>::Diff>
+        + MetricSpace<Metric = f64>,
+    <P as ControlPoint<f64>>::Diff: InnerSpace<Scalar = f64>,
+{
+    fn presearch(&self, point: P, range: ((f64, f64), (f64, f64))) -> (f64, f64) {
+        use algo::surface::LinearAxis;
+        let axis = match self.linear_axes() {
+            [_, true] => Some(LinearAxis::V),
+            [true, _] => Some(LinearAxis::U),
+            _ => None,
+        };
+        match axis {
+            Some(axis) => presearch_ruled(
+                self,
+                point,
+                range,
+                axis,
+                EuclideanSpace::to_vec,
+                <P as EuclideanSpace>::from_vec,
+            )
+            .unwrap_or_else(|| algo::surface::presearch(self, point, range, PRESEARCH_DIVISION)),
+            None => algo::surface::presearch(self, point, range, PRESEARCH_DIVISION),
+        }
+    }
+}
+
 impl<P, V> SearchParameter<D2> for BSplineSurface<P>
 where
     P: ControlPoint<f64, Diff = V>
@@ -1720,12 +1765,8 @@ where
     ) -> Option<(f64, f64)> {
         let hint = match hint.into() {
             SPHint2D::Parameter(x, y) => (x, y),
-            SPHint2D::Range(range0, range1) => {
-                algo::surface::presearch(self, point, (range0, range1), PRESEARCH_DIVISION)
-            }
-            SPHint2D::None => {
-                algo::surface::presearch(self, point, self.range_tuple(), PRESEARCH_DIVISION)
-            }
+            SPHint2D::Range(range0, range1) => self.presearch(point, (range0, range1)),
+            SPHint2D::None => self.presearch(point, self.range_tuple()),
         };
         algo::surface::search_parameter(self, point, hint, trials)
     }
@@ -1747,12 +1788,8 @@ where
     ) -> Option<(f64, f64)> {
         let hint = match hint.into() {
             SPHint2D::Parameter(x, y) => (x, y),
-            SPHint2D::Range(range0, range1) => {
-                algo::surface::presearch(self, point, (range0, range1), PRESEARCH_DIVISION)
-            }
-            SPHint2D::None => {
-                algo::surface::presearch(self, point, self.range_tuple(), PRESEARCH_DIVISION)
-            }
+            SPHint2D::Range(range0, range1) => self.presearch(point, (range0, range1)),
+            SPHint2D::None => self.presearch(point, self.range_tuple()),
         };
         algo::surface::search_nearest_parameter(self, point, hint, trials)
     }

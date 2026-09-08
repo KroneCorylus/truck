@@ -197,3 +197,28 @@ fn inverted_processor_swaps_search_hints() {
         assert_near!(v, colatitude);
     }
 }
+
+#[test]
+fn reversed_curve_divisions_keep_parameters_and_points_together() {
+    let range = (0.2, 1.3);
+    let arc2 = Processor::with_transform(
+        TrimmedCurve::new(UnitCircle::<Point2>::new(), range),
+        Matrix3::from_nonuniform_scale(2.0, 0.7),
+    )
+    .inverse();
+    let arc3 = Processor::with_transform(
+        TrimmedCurve::new(UnitCircle::<Point3>::new(), range),
+        Matrix4::from_nonuniform_scale(2.0, 0.7, 1.0),
+    )
+    .inverse();
+    let (params, points) = arc2.parameter_division((0.3, 1.1), 0.01);
+    assert!(params.windows(2).all(|w| w[0] < w[1]));
+    for (t, p) in params.into_iter().zip(points) {
+        assert_near!(arc2.subs(t), p);
+    }
+    let (params, points) = arc3.parameter_division((0.3, 1.1), 0.01);
+    assert!(params.windows(2).all(|w| w[0] < w[1]));
+    for (t, p) in params.into_iter().zip(points) {
+        assert_near!(arc3.subs(t), p);
+    }
+}

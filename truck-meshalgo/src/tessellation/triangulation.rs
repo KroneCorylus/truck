@@ -554,7 +554,9 @@ where S: PreMeshableSurface {
     let mut triangulation = Cdt::new();
     let mut boundary_map = HashMap::<FixedVertexHandle, Point3>::default();
     polyboundary.insert_to(&mut triangulation, &mut boundary_map);
-    insert_surface(&mut triangulation, surface, polyboundary, tol);
+    if insert_surface(&mut triangulation, surface, polyboundary, tol) {
+        refine_interior(&mut triangulation, surface, polyboundary, tol);
+    }
     let mut mesh = triangulation_into_polymesh(
         triangulation.vertices(),
         triangulation.inner_faces(),
@@ -566,13 +568,49 @@ where S: PreMeshableSurface {
     mesh
 }
 
-/// Inserts parameter divisions into triangulation.
+/// A grid subdivided in only one direction can lose whole rulings to trimming,
+/// leaving long diagonals across curved patches.
+/// Refine those diagonals while preserving the shared, already sampled boundary edges.
+fn refine_interior(
+    triangulation: &mut Cdt,
+    surface: &impl PreMeshableSurface,
+    boundary: &PolyBoundary,
+    tol: f64,
+) {
+    for _ in 0..20 {
+        let points: Vec<_> = triangulation
+            .undirected_edges()
+            .filter(|edge| {
+                !edge.is_constraint_edge() && !edge.as_directed().is_part_of_convex_hull()
+            })
+            .filter_map(|edge| {
+                let [a, b] = edge.vertices().map(|v| *v.as_ref());
+                let uv = Point2::new((a.x + b.x) / 2.0, (a.y + b.y) / 2.0);
+                let chord = surface.subs(a.x, a.y).midpoint(surface.subs(b.x, b.y));
+                (surface.subs(uv.x, uv.y).distance2(chord) > tol * tol && boundary.include(uv))
+                    .then_some(SPoint2::new(uv.x, uv.y))
+            })
+            .collect();
+        if points.is_empty() {
+            break;
+        }
+        let previous_len = triangulation.num_vertices();
+        for point in points {
+            let _ = triangulation.insert(point);
+        }
+        if triangulation.num_vertices() == previous_len {
+            break;
+        }
+    }
+}
+
+/// Inserts parameter divisions and reports whether only one axis was subdivided.
 fn insert_surface(
     triangulation: &mut Cdt,
     surface: impl PreMeshableSurface,
     polyline: &PolyBoundary,
     tol: f64,
-) {
+) -> bool {
     let bdb: BoundingBox<Point2> = polyline
         .0
         .iter()
@@ -581,6 +619,8 @@ fn insert_surface(
         .collect();
     let range = ((bdb.min()[0], bdb.max()[0]), (bdb.min()[1], bdb.max()[1]));
     let (udiv, vdiv) = surface.parameter_division(range, tol);
+    let single_direction =
+        (udiv.len() > 2 && vdiv.len() == 2) || (udiv.len() == 2 && vdiv.len() > 2);
     let insert_res: Vec<Vec<Option<_>>> = udiv
         .into_iter()
         .map(|u| {
@@ -614,6 +654,7 @@ fn insert_surface(
             }
         }
     });
+    single_direction
 }
 
 /// Converts triangulation into `PolygonMesh`.

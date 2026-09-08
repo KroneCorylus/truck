@@ -481,6 +481,40 @@ impl<V: Homogeneous<Scalar = f64> + ControlPoint<f64, Diff = V> + Tolerance> Nur
     pub fn boundary(&self) -> NurbsCurve<V> { NurbsCurve::new(self.0.boundary()) }
 }
 
+impl<V: Homogeneous<Scalar = f64>> NurbsSurface<V>
+where
+    Self: ParametricSurface<Point = V::Point, Vector = <V::Point as EuclideanSpace>::Diff>,
+    V::Point: EuclideanSpace<Scalar = f64> + MetricSpace<Metric = f64>,
+    <V::Point as EuclideanSpace>::Diff: InnerSpace<Scalar = f64>,
+{
+    fn presearch(&self, point: V::Point, range: ((f64, f64), (f64, f64))) -> (f64, f64) {
+        use algo::surface::LinearAxis;
+        let [u, v] = self.0.linear_axes();
+        let points = &self.0.control_points;
+        let paired =
+            |a: V, b: V| a.weight().is_finite() && a.weight() > 0.0 && a.weight() == b.weight();
+        let axis = if v && points.iter().all(|row| paired(row[0], row[1])) {
+            Some(LinearAxis::V)
+        } else if u
+            && points[0]
+                .iter()
+                .zip(&points[1])
+                .all(|(&a, &b)| paired(a, b))
+        {
+            Some(LinearAxis::U)
+        } else {
+            None
+        };
+        match axis {
+            Some(axis) => presearch_ruled(&self.0, point, range, axis, |p| p, V::to_point)
+                .unwrap_or_else(|| {
+                    algo::surface::presearch(self, point, range, PRESEARCH_DIVISION)
+                }),
+            None => algo::surface::presearch(self, point, range, PRESEARCH_DIVISION),
+        }
+    }
+}
+
 impl<V: Homogeneous<Scalar = f64>> SearchNearestParameter<D2> for NurbsSurface<V>
 where
     Self: ParametricSurface<Point = V::Point, Vector = <V::Point as EuclideanSpace>::Diff>,
@@ -517,12 +551,8 @@ where
     ) -> Option<(f64, f64)> {
         let hint = match hint.into() {
             SPHint2D::Parameter(x, y) => (x, y),
-            SPHint2D::Range(range0, range1) => {
-                algo::surface::presearch(self, point, (range0, range1), PRESEARCH_DIVISION)
-            }
-            SPHint2D::None => {
-                algo::surface::presearch(self, point, self.range_tuple(), PRESEARCH_DIVISION)
-            }
+            SPHint2D::Range(range0, range1) => self.presearch(point, (range0, range1)),
+            SPHint2D::None => self.presearch(point, self.range_tuple()),
         };
         algo::surface::search_nearest_parameter(self, point, hint, trials)
     }
@@ -782,12 +812,8 @@ where
     ) -> Option<(f64, f64)> {
         let hint = match hint.into() {
             SPHint2D::Parameter(x, y) => (x, y),
-            SPHint2D::Range(range0, range1) => {
-                algo::surface::presearch(self, point, (range0, range1), PRESEARCH_DIVISION)
-            }
-            SPHint2D::None => {
-                algo::surface::presearch(self, point, self.range_tuple(), PRESEARCH_DIVISION)
-            }
+            SPHint2D::Range(range0, range1) => self.presearch(point, (range0, range1)),
+            SPHint2D::None => self.presearch(point, self.range_tuple()),
         };
         algo::surface::search_parameter(self, point, hint, trials)
     }

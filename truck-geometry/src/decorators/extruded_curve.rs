@@ -102,12 +102,20 @@ where
     ) -> Option<(f64, f64)> {
         let hint = match hint.into() {
             SPHint2D::Parameter(x, y) => (x, y),
-            SPHint2D::Range(range0, range1) => {
-                algo::surface::presearch(self, point, (range0, range1), PRESEARCH_DIVISION)
-            }
-            SPHint2D::None => {
-                algo::surface::presearch(self, point, self.range_tuple(), PRESEARCH_DIVISION)
-            }
+            SPHint2D::Range(range0, range1) => algo::surface::presearch_linear(
+                self,
+                point,
+                (range0, range1),
+                PRESEARCH_DIVISION,
+                algo::surface::LinearAxis::V,
+            ),
+            SPHint2D::None => algo::surface::presearch_linear(
+                self,
+                point,
+                self.range_tuple(),
+                PRESEARCH_DIVISION,
+                algo::surface::LinearAxis::V,
+            ),
         };
         algo::surface::search_parameter(self, point, hint, trials)
     }
@@ -124,12 +132,20 @@ impl<C: ParametricCurve3D + BoundedCurve> SearchNearestParameter<D2> for Extrude
     ) -> Option<(f64, f64)> {
         let hint = match hint.into() {
             SPHint2D::Parameter(x, y) => (x, y),
-            SPHint2D::Range(range0, range1) => {
-                algo::surface::presearch(self, point, (range0, range1), PRESEARCH_DIVISION)
-            }
-            SPHint2D::None => {
-                algo::surface::presearch(self, point, self.range_tuple(), PRESEARCH_DIVISION)
-            }
+            SPHint2D::Range(range0, range1) => algo::surface::presearch_linear(
+                self,
+                point,
+                (range0, range1),
+                PRESEARCH_DIVISION,
+                algo::surface::LinearAxis::V,
+            ),
+            SPHint2D::None => algo::surface::presearch_linear(
+                self,
+                point,
+                self.range_tuple(),
+                PRESEARCH_DIVISION,
+                algo::surface::LinearAxis::V,
+            ),
         };
         algo::surface::search_nearest_parameter(self, point, hint, trials)
     }

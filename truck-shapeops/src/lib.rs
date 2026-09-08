@@ -70,7 +70,10 @@ mod healing;
 pub mod profile;
 pub use healing::{RobustSplitClosedEdgesAndFaces, SplitClosedEdgesAndFaces};
 mod transversal;
-pub use transversal::{and, or, solid_components, subtract, ShapeOpsCurve, ShapeOpsSurface};
+pub use transversal::{
+    and, or, solid_components, subtract, subtract_with_effect, ShapeOpsCurve, ShapeOpsSurface,
+    SubtractionResult,
+};
 mod alternative;
 pub mod local;
 

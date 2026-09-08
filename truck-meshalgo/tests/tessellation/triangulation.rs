@@ -165,3 +165,54 @@ fn robust_closed() {
         .remove_unused_attrs();
     assert_eq!(mesh.shell_condition(), ShellCondition::Closed);
 }
+
+#[test]
+fn stepped_extrusion_refines_interior_diagonals() {
+    for direction in [-1.0, 1.0] {
+        let arc = Processor::with_transform(
+            TrimmedCurve::new(UnitCircle::<Point3>::new(), (0.0, 1.5)),
+            Matrix4::from_scale(25.0),
+        );
+        let surface = ExtrudedCurve::by_extrusion(arc, Vector3::unit_z() * 15.0 * direction);
+        let uv = [
+            (0.0, 0.0),
+            (1.5, 0.0),
+            (1.5, 1.0),
+            (0.7, 1.0),
+            (0.7, 0.6),
+            (0.0, 0.6),
+        ];
+        let vertices: Vec<_> = uv
+            .iter()
+            .map(|&(u, v)| builder::vertex(surface.subs(u, v)))
+            .collect();
+        let wire = (0..uv.len())
+            .map(|i| {
+                let j = (i + 1) % uv.len();
+                truck_topology::Edge::new(
+                    &vertices[i],
+                    &vertices[j],
+                    PCurve::new(Line(uv[i].into(), uv[j].into()), surface),
+                )
+            })
+            .collect();
+        let face = truck_topology::Face::new(vec![wire], surface);
+        let shell: truck_topology::Shell<_, _, _> = vec![face].into();
+        let tol = 0.001;
+        let mesh = shell.triangulation(tol).to_polygon();
+        for tri in mesh.faces().tri_faces() {
+            let points = tri.map(|v| mesh.positions()[v.pos]);
+            let params = tri.map(|v| mesh.uv_coords()[v.uv.unwrap()]);
+            for i in 0..3 {
+                let j = (i + 1) % 3;
+                let uv = (params[i] + params[j]) / 2.0;
+                assert!(
+                    surface
+                        .subs(uv.x, uv.y)
+                        .distance(points[i].midpoint(points[j]))
+                        <= tol * 1.01
+                );
+            }
+        }
+    }
+}

@@ -361,6 +361,7 @@ where C: ParameterDivision1D<Point = Point2> + BoundedCurve<Point = Point2>
             params
                 .iter_mut()
                 .for_each(|t| *t = self.get_curve_parameter(*t));
+            params.reverse();
             points.reverse();
         }
         (params, points)
@@ -395,6 +396,7 @@ where C: ParameterDivision1D<Point = Point3> + BoundedCurve<Point = Point3>
             params
                 .iter_mut()
                 .for_each(|t| *t = self.get_curve_parameter(*t));
+            params.reverse();
             points.reverse();
         }
         (params, points)

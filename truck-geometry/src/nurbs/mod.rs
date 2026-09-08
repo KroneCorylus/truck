@@ -249,3 +249,56 @@ mod gaussian_elimination {
         }
     }
 }
+
+// Collapse the affine parameter once per search and reuse the nonlinear basis for
+// both ends of every ruling. Rational surfaces supply homogeneous coefficients.
+fn presearch_ruled<P: Copy, Q, V>(
+    surface: &BSplineSurface<P>,
+    point: Q,
+    range: ((f64, f64), (f64, f64)),
+    axis: algo::surface::LinearAxis,
+    to_vec: impl Fn(P) -> V,
+    project: impl Fn(V) -> Q,
+) -> Option<(f64, f64)>
+where
+    Q: EuclideanSpace<Scalar = f64> + MetricSpace<Metric = f64>,
+    Q::Diff: InnerSpace<Scalar = f64>,
+    V: VectorSpace<Scalar = f64>,
+{
+    use algo::surface::LinearAxis;
+    let points = &surface.control_points;
+    let (knots, linear_knots, linear_range) = match axis {
+        LinearAxis::U => (&surface.knot_vecs.1, &surface.knot_vecs.0, range.0),
+        LinearAxis::V => (&surface.knot_vecs.0, &surface.knot_vecs.1, range.1),
+    };
+    let (a, b) = (linear_knots[0], linear_knots[3]);
+    if !(a..=b).contains(&linear_range.0) || !(a..=b).contains(&linear_range.1) {
+        return None;
+    }
+    let fractions = [
+        (linear_range.0 - a) / (b - a),
+        (linear_range.1 - a) / (b - a),
+    ];
+    let pair = |p, q| {
+        let (p, q) = (to_vec(p), to_vec(q));
+        fractions.map(|t| p * (1.0 - t) + q * t)
+    };
+    let coefficients: Vec<_> = match axis {
+        LinearAxis::U => points[0]
+            .iter()
+            .zip(&points[1])
+            .map(|(&p, &q)| pair(p, q))
+            .collect(),
+        LinearAxis::V => points.iter().map(|row| pair(row[0], row[1])).collect(),
+    };
+    let degree = knots.len() - coefficients.len() - 1;
+    algo::surface::presearch_rulings(point, range, PRESEARCH_DIVISION, axis, |t| {
+        let basis = knots.bspline_basis_functions(degree, 0, t);
+        let mut sum = [V::zero(); 2];
+        for (pair, b) in coefficients[basis.base..].iter().zip(basis.as_slice()) {
+            sum[0] = sum[0] + pair[0] * *b;
+            sum[1] = sum[1] + pair[1] * *b;
+        }
+        sum.map(&project)
+    })
+}
