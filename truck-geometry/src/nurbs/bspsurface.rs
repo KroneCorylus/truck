@@ -1690,7 +1690,31 @@ where P: EuclideanSpace<Scalar = f64, Diff = <P as ControlPoint<f64>>::Diff>
         range: ((f64, f64), (f64, f64)),
         tol: f64,
     ) -> (Vec<f64>, Vec<f64>) {
-        algo::surface::parameter_division(self, range, tol)
+        let merge = |mut first: Vec<f64>, second: Vec<f64>| {
+            first.extend(second);
+            first.sort_by(f64::total_cmp);
+            first.dedup_by(|a, b| (*a).near(&*b));
+            first
+        };
+        match self.linear_axes() {
+            [_, true] => {
+                let first = self.row_curve(0).parameter_division(range.0, tol).0;
+                let second = self
+                    .row_curve(self.control_points[0].len() - 1)
+                    .parameter_division(range.0, tol)
+                    .0;
+                (merge(first, second), vec![range.1.0, range.1.1])
+            }
+            [true, _] => {
+                let first = self.column_curve(0).parameter_division(range.1, tol).0;
+                let second = self
+                    .column_curve(self.control_points.len() - 1)
+                    .parameter_division(range.1, tol)
+                    .0;
+                (vec![range.0.0, range.0.1], merge(first, second))
+            }
+            _ => algo::surface::parameter_division(self, range, tol),
+        }
     }
 }
 

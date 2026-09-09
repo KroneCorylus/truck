@@ -46,6 +46,43 @@ where S: ParametricSurface3D
     );
 }
 
+/// `parameter_division` promises that every cell stays within `tol` of the bilinear
+/// interpolation of its four corners. `algo::surface` checks one pseudo-random point per
+/// cell; skipping the affine axis is only sound if the promise holds across the whole cell,
+/// so this sweeps each cell instead of sampling it once.
+fn check_division_tolerance<S>(surface: &S, tol: f64)
+where S: ParametricSurface<Point = Point3> + BoundedSurface + ParameterDivision2D {
+    let range = surface.range_tuple();
+    let (udiv, vdiv) = surface.parameter_division(range, tol);
+    assert_eq!((udiv[0], *udiv.last().unwrap()), range.0);
+    assert_eq!((vdiv[0], *vdiv.last().unwrap()), range.1);
+    for u in udiv.windows(2) {
+        for v in vdiv.windows(2) {
+            let pt00 = surface.subs(u[0], v[0]).to_vec();
+            let pt01 = surface.subs(u[0], v[1]).to_vec();
+            let pt10 = surface.subs(u[1], v[0]).to_vec();
+            let pt11 = surface.subs(u[1], v[1]).to_vec();
+            for i in 0..=8 {
+                for j in 0..=8 {
+                    let (p, q) = (f64::from(i) / 8.0, f64::from(j) / 8.0);
+                    let bilinear = Point3::from_vec(
+                        pt00 * (1.0 - p) * (1.0 - q)
+                            + pt01 * (1.0 - p) * q
+                            + pt10 * p * (1.0 - q)
+                            + pt11 * p * q,
+                    );
+                    let exact = surface.subs(
+                        u[0] * (1.0 - p) + u[1] * p,
+                        v[0] * (1.0 - q) + v[1] * q,
+                    );
+                    let dist = exact.distance(bilinear);
+                    assert!(dist <= tol, "cell ({u:?}, {v:?}) at ({p}, {q}) is off by {dist}");
+                }
+            }
+        }
+    }
+}
+
 fn rational_extrusion() -> NurbsSurface<Vector4> {
     let w = 0.5_f64.sqrt();
     let points = [
@@ -79,6 +116,26 @@ fn rational_circles_ellipses_and_swapped_parameters() {
 }
 
 #[test]
+fn rational_ruled_surface_division_skips_the_affine_axis() {
+    let surface = rational_extrusion();
+    let range = surface.range_tuple();
+    let (u, v) = surface.parameter_division(range, 0.01);
+    assert!(u.len() > 2);
+    assert_eq!(v, vec![range.1.0, range.1.1]);
+
+    let inverse = surface.inverse();
+    let range = inverse.range_tuple();
+    let (u, v) = inverse.parameter_division(range, 0.01);
+    assert_eq!(u, vec![range.0.0, range.0.1]);
+    assert!(v.len() > 2);
+
+    for tol in [0.05, 0.01, 0.001] {
+        check_division_tolerance(&surface, tol);
+        check_division_tolerance(&inverse, tol);
+    }
+}
+
+#[test]
 fn native_conics_with_oblique_positive_and_negative_extrusion() {
     for scale in [1.0, 2.0] {
         let arc = Processor::with_transform(
@@ -106,6 +163,19 @@ fn bspline_ruled_and_general_surfaces() {
     );
     check(&s);
     check(&s.inverse());
+    let range = s.range_tuple();
+    let (u, v) = s.parameter_division(range, 0.01);
+    assert!(u.len() > 2);
+    assert_eq!(v, vec![range.1.0, range.1.1]);
+    let inverse = s.inverse();
+    let range = inverse.range_tuple();
+    let (u, v) = inverse.parameter_division(range, 0.01);
+    assert_eq!(u, vec![range.0.0, range.0.1]);
+    assert!(v.len() > 2);
+    for tol in [0.05, 0.01, 0.001] {
+        check_division_tolerance(&s, tol);
+        check_division_tolerance(&inverse, tol);
+    }
     let general = BSplineSurface::new(
         (KnotVec::bezier_knot(2), KnotVec::bezier_knot(2)),
         (0..3)
@@ -117,6 +187,11 @@ fn bspline_ruled_and_general_surfaces() {
             .collect(),
     );
     check(&general);
+    assert_eq!(
+        general.parameter_division(general.range_tuple(), 0.01),
+        algo::surface::parameter_division(&general, general.range_tuple(), 0.01)
+    );
+    check_division_tolerance(&general, 0.01);
 }
 
 #[test]
@@ -138,6 +213,11 @@ fn unequal_ruling_weights_use_grid_seed() {
         s.search_nearest_parameter(p, None, 3),
         algo::surface::search_nearest_parameter(&s, p, seed, 3)
     );
+    assert_eq!(
+        s.parameter_division(s.range_tuple(), 0.01),
+        algo::surface::parameter_division(&s, s.range_tuple(), 0.01)
+    );
+    check_division_tolerance(&s, 0.01);
 }
 
 #[test]

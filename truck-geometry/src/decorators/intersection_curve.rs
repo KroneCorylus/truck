@@ -108,11 +108,22 @@ where
     /// - the uv coordinate on `self.surface1()`
     #[inline(always)]
     pub fn search_triple(&self, t: f64, trials: usize) -> Option<(Point3, Point2, Point2)> {
+        self.search_triple_with_hints(t, None, None, trials)
+    }
+    /// Search triple value using optional surface-parameter hints.
+    #[inline(always)]
+    pub fn search_triple_with_hints(
+        &self,
+        t: f64,
+        hint0: Option<(f64, f64)>,
+        hint1: Option<(f64, f64)>,
+        trials: usize,
+    ) -> Option<(Point3, Point2, Point2)> {
         double_projection(
             self.surface0(),
-            None,
+            hint0,
             self.surface1(),
-            None,
+            hint1,
             self.leader.subs(t),
             self.leader.der(t),
             trials,

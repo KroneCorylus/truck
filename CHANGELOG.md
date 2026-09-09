@@ -4,6 +4,8 @@ The version is of the bottom crate `truck-rendimpl`.
 
 ## Unreleased
 
+- Divide affine B-spline and NURBS rulings only along their nonlinear boundary curves, and seed each intersection-curve sample from the previous one instead of a presearch grid (R7). This makes exact extruded-surface booleans interactive without changing geometry or tolerance: the reference NURBS cut drops from a 106.8 ms to a 29.7 ms median. A seeded projection is accepted only if it lands on the sample, stays inside both surfaces' ranges, and is named by its own parameters; otherwise the unseeded search still runs, so results at periodic seams and near-singular solves are unchanged.
+
 - Support two-edge fillets at orthogonal convex corners with exact cylindrical miter joins, and add `chamfer_solid_edges` / `try_chamfer_solid_edges` for equal-distance planar corner chamfers (R11). Preserve unselected edges, return face history, and distinguish unsupported junctions from sizes that do not fit. Regressions cover selection order, rigid transforms, analytical volumes, booleans through the corner, and prepared STEP round trips.
 
 - Make rolling-ball fillet approximation propagate failed adaptive contact solves and singular tangent frames without panicking (R10). Reject folded contact offsets and document the unsupported equal-radius sequential rim case; preserve smaller-radius sequential blends and face history.

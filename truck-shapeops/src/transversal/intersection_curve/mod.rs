@@ -1,3 +1,4 @@
+use std::ops::RangeBounds;
 use truck_base::cgmath64::*;
 use truck_geometry::prelude::*;
 use truck_meshalgo::prelude::*;
@@ -23,22 +24,55 @@ where
     S0: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>,
     S1: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>,
 {
-    pub fn try_new(surface0: S0, surface1: S1, poly: PolylineCurve<Point3>) -> Option<Self> {
+    pub fn try_new(
+        surface0: S0,
+        surface1: S1,
+        poly: PolylineCurve<Point3>,
+        tol: f64,
+    ) -> Option<Self> {
         let ic = IntersectionCurve::new(&surface0, &surface1, poly);
         let poly = ic.leader();
         let len = poly.len();
         let mut polyline = PolylineCurve(Vec::new());
         let mut params0 = PolylineCurve(Vec::new());
         let mut params1 = PolylineCurve(Vec::new());
+        let mut hints: Option<(Point2, Point2)> = None;
+        // Seeding each sample with the previous one skips the presearch grid, but the seeded
+        // solve has to be checked before it is trusted. It can stall on a singular Jacobian and
+        // report a step it never took, and on a periodic surface it can continue straight past
+        // the seam, which gives the right point at a parameter a full period outside the range.
+        // Neither is visible in the point alone, so the parameters are checked too and anything
+        // suspect falls back to the unseeded search.
+        let ranges = (surface0.parameter_range(), surface1.parameter_range());
+        let accept = |&(point, p0, p1): &(Point3, Point2, Point2), t: f64| {
+            let in_range = |p: Point2, (ur, vr): (ParameterRange, ParameterRange)| {
+                ur.contains(&p.x) && vr.contains(&p.y)
+            };
+            point.distance(poly.subs(t)) <= tol
+                && in_range(p0, ranges.0)
+                && in_range(p1, ranges.1)
+                && surface0.subs(p0.x, p0.y).distance(point) <= tol
+                && surface1.subs(p1.x, p1.y).distance(point) <= tol
+        };
+        let search = |t, hints: Option<(Point2, Point2)>| {
+            hints
+                .and_then(|(h0, h1)| {
+                    ic.search_triple_with_hints(t, Some((h0.x, h0.y)), Some((h1.x, h1.y)), 100)
+                        .filter(|triple| accept(triple, t))
+                })
+                .or_else(|| ic.search_triple(t, 100))
+        };
         for i in 0..len - 1 {
-            let (q, p0, p1) = ic.search_triple(i as f64, 100)?;
+            let t = i as f64;
+            let (q, p0, p1) = search(t, hints)?;
             polyline.push(q);
             params0.push(p0);
             params1.push(p1);
+            hints = Some((p0, p1));
         }
         let (q, p0, p1) = match poly[0].near(&poly[len - 1]) {
             true => (polyline[0], params0[0], params1[0]),
-            false => ic.search_triple((len - 1) as f64, 100)?,
+            false => search((len - 1) as f64, hints)?,
         };
         polyline.push(q);
         params0.push(p0);
@@ -148,11 +182,15 @@ type IntersectionTuple<S0, S1> = (
     PolylineCurve<Point3>,
     IntersectionCurveWithParameters<S0, S1>,
 );
+/// `tol` is the chord error of `polygon0` and `polygon1`, which bounds how far the polylines
+/// they intersect in may sit from the true intersection, and so how far a projected sample may
+/// sit from its polyline vertex before it is treated as a bad solve.
 pub fn intersection_curves<S0, S1>(
     surface0: S0,
     polygon0: &PolygonMesh,
     surface1: S1,
     polygon1: &PolygonMesh,
+    tol: f64,
 ) -> Option<Vec<IntersectionTuple<S0, S1>>>
 where
     S0: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>,
@@ -171,6 +209,7 @@ where
                     surface0.clone(),
                     surface1.clone(),
                     polyline,
+                    tol,
                 )?,
             ))
         })

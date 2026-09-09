@@ -481,19 +481,14 @@ impl<V: Homogeneous<Scalar = f64> + ControlPoint<f64, Diff = V> + Tolerance> Nur
     pub fn boundary(&self) -> NurbsCurve<V> { NurbsCurve::new(self.0.boundary()) }
 }
 
-impl<V: Homogeneous<Scalar = f64>> NurbsSurface<V>
-where
-    Self: ParametricSurface<Point = V::Point, Vector = <V::Point as EuclideanSpace>::Diff>,
-    V::Point: EuclideanSpace<Scalar = f64> + MetricSpace<Metric = f64>,
-    <V::Point as EuclideanSpace>::Diff: InnerSpace<Scalar = f64>,
-{
-    fn presearch(&self, point: V::Point, range: ((f64, f64), (f64, f64))) -> (f64, f64) {
+impl<V: Homogeneous<Scalar = f64>> NurbsSurface<V> {
+    fn affine_axis(&self) -> Option<algo::surface::LinearAxis> {
         use algo::surface::LinearAxis;
         let [u, v] = self.0.linear_axes();
         let points = &self.0.control_points;
         let paired =
             |a: V, b: V| a.weight().is_finite() && a.weight() > 0.0 && a.weight() == b.weight();
-        let axis = if v && points.iter().all(|row| paired(row[0], row[1])) {
+        if v && points.iter().all(|row| paired(row[0], row[1])) {
             Some(LinearAxis::V)
         } else if u
             && points[0]
@@ -504,8 +499,18 @@ where
             Some(LinearAxis::U)
         } else {
             None
-        };
-        match axis {
+        }
+    }
+}
+
+impl<V: Homogeneous<Scalar = f64>> NurbsSurface<V>
+where
+    Self: ParametricSurface<Point = V::Point, Vector = <V::Point as EuclideanSpace>::Diff>,
+    V::Point: EuclideanSpace<Scalar = f64> + MetricSpace<Metric = f64>,
+    <V::Point as EuclideanSpace>::Diff: InnerSpace<Scalar = f64>,
+{
+    fn presearch(&self, point: V::Point, range: ((f64, f64), (f64, f64))) -> (f64, f64) {
+        match self.affine_axis() {
             Some(axis) => presearch_ruled(&self.0, point, range, axis, |p| p, V::to_point)
                 .unwrap_or_else(|| {
                     algo::surface::presearch(self, point, range, PRESEARCH_DIVISION)
@@ -652,7 +657,33 @@ where V::Point: MetricSpace<Metric = f64> + HashGen<f64>
         range: ((f64, f64), (f64, f64)),
         tol: f64,
     ) -> (Vec<f64>, Vec<f64>) {
-        algo::surface::parameter_division(self, range, tol)
+        use algo::surface::LinearAxis;
+        let points = self.0.control_points();
+        let merge = |mut first: Vec<f64>, second: Vec<f64>| {
+            first.extend(second);
+            first.sort_by(f64::total_cmp);
+            first.dedup_by(|a, b| (*a).near(&*b));
+            first
+        };
+        match self.affine_axis() {
+            Some(LinearAxis::V) => {
+                let first = self.row_curve(0).parameter_division(range.0, tol).0;
+                let second = self
+                    .row_curve(points[0].len() - 1)
+                    .parameter_division(range.0, tol)
+                    .0;
+                (merge(first, second), vec![range.1.0, range.1.1])
+            }
+            Some(LinearAxis::U) => {
+                let first = self.column_curve(0).parameter_division(range.1, tol).0;
+                let second = self
+                    .column_curve(points.len() - 1)
+                    .parameter_division(range.1, tol)
+                    .0;
+                (vec![range.0.0, range.0.1], merge(first, second))
+            }
+            None => algo::surface::parameter_division(self, range, tol),
+        }
     }
 }
 

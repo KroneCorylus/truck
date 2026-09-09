@@ -209,8 +209,13 @@ fn process_boundaries<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     let altshell1: AltCurveShell<C, S> =
         shell1.mapped(|x| *x, |c| Alternative::FirstType(c.clone()), Clone::clone);
     let start = profile::now();
-    let quadruple =
-        loops_store::try_create_loops_stores(&altshell0, poly_shell0, &altshell1, poly_shell1);
+    let quadruple = loops_store::try_create_loops_stores(
+        &altshell0,
+        poly_shell0,
+        &altshell1,
+        poly_shell1,
+        tol,
+    );
     profile::lap(Stage::LoopsStore, start);
     let loops_store::LoopsStoreQuadruple {
         geom_loops_store0: loops_store0,

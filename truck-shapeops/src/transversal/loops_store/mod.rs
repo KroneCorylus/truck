@@ -525,6 +525,7 @@ pub fn create_loops_stores<C, S>(
     poly_shell0: &Shell<Point3, PolylineCurve, Option<PolygonMesh>>,
     geom_shell1: &Shell<Point3, C, S>,
     poly_shell1: &Shell<Point3, PolylineCurve, Option<PolygonMesh>>,
+    tol: f64,
 ) -> Option<LoopsStoreQuadruple<C>>
 where
     C: SearchNearestParameter<D1, Point = Point3>
@@ -533,14 +534,17 @@ where
         + From<IntersectionCurve<PolylineCurve, S, S>>,
     S: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>,
 {
-    try_create_loops_stores(geom_shell0, poly_shell0, geom_shell1, poly_shell1).ok()
+    try_create_loops_stores(geom_shell0, poly_shell0, geom_shell1, poly_shell1, tol).ok()
 }
 
+/// `tol` is the chord error the polygonal shells were built at. The intersection polylines
+/// inherit it, so it is also how far a projected sample may sit from its polyline vertex.
 pub fn try_create_loops_stores<C, S>(
     geom_shell0: &Shell<Point3, C, S>,
     poly_shell0: &Shell<Point3, PolylineCurve, Option<PolygonMesh>>,
     geom_shell1: &Shell<Point3, C, S>,
     poly_shell1: &Shell<Point3, PolylineCurve, Option<PolygonMesh>>,
+    tol: f64,
 ) -> Result<LoopsStoreQuadruple<C>, Diagnostic>
 where
     C: SearchNearestParameter<D1, Point = Point3>
@@ -633,6 +637,7 @@ where
                     polygon0,
                     surface1.clone(),
                     polygon1,
+                    tol,
                 )?
                 .into_iter()
                 .flat_map(|(mut polyline, mut curve)| {

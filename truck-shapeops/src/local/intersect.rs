@@ -144,7 +144,7 @@ pub fn try_intersect_surfaces(
     }
     let polygon0 = StructuredMesh::from_surface(surface0, domain0, tol).destruct();
     let polygon1 = StructuredMesh::from_surface(surface1, domain1, tol).destruct();
-    let curves = intersection_curves(surface0.clone(), &polygon0, surface1.clone(), &polygon1)
+    let curves = intersection_curves(surface0.clone(), &polygon0, surface1.clone(), &polygon1, tol)
         .ok_or_else(|| {
             Diagnostic::new(
                 Code::IntersectionFailed,

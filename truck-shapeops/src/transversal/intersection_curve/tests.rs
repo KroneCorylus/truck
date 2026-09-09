@@ -13,7 +13,7 @@ fn intersection_curve_sphere_case() {
         })
         .collect::<PolylineCurve<_>>();
     let curve: IntersectionCurve<_, _, _> =
-        IntersectionCurveWithParameters::try_new(sphere0, sphere1, polyline)
+        IntersectionCurveWithParameters::try_new(sphere0, sphere1, polyline, 0.3)
             .unwrap()
             .into();
 
@@ -87,7 +87,7 @@ fn collide_parabola() {
     println!("Meshing Surfaces: {}s", instant.elapsed().as_secs_f64());
     // extract intersection curves
     let instant = std::time::Instant::now();
-    let curves = intersection_curves(surface0, &polygon0, surface1, &polygon1).unwrap();
+    let curves = intersection_curves(surface0, &polygon0, surface1, &polygon1, TOL).unwrap();
     println!(
         "Extracting Intersection: {}s",
         instant.elapsed().as_secs_f64()
@@ -182,4 +182,38 @@ fn tangent_contact_refines_a_mesh_seed() {
     let contact = tangent_contact(&graph, &plane, Point3::new(0.01, -0.02, 0.003)).unwrap();
     assert_near!(contact, Point3::origin());
     assert_eq!(tangent_crossing_at(&graph, &plane, contact), Some(true));
+}
+
+/// Seeding each sample with the previous one must not change what the samples mean. A seeded
+/// solve can stall on a singular Jacobian and report a step it never took, and near a periodic
+/// seam it can continue past the end of the range; the point still looks right in both cases,
+/// so only the parameters expose it. Face division cuts with these parameters, so each one has
+/// to name the point the curve reports. The seam sweep below crosses the sphere seam at four
+/// different offsets.
+#[test]
+fn samples_crossing_a_periodic_seam_still_name_their_points() {
+    let sphere0 = Sphere::new(Point3::new(0.0, 0.0, 1.0), f64::sqrt(2.0));
+    let sphere1 = Sphere::new(Point3::new(0.0, 0.0, -1.0), f64::sqrt(2.0));
+    const M: usize = 24;
+    for offset in [0.0, -0.5, 0.5, 2.0] {
+        let polyline = (0..=M)
+            .map(|i| {
+                let t = offset + 2.0 * PI * i as f64 / M as f64;
+                Point3::new(0.8 * f64::cos(t), 0.8 * f64::sin(t), 0.0)
+            })
+            .collect::<PolylineCurve<_>>();
+        let curve = IntersectionCurveWithParameters::try_new(sphere0, sphere1, polyline, 0.3)
+            .unwrap_or_else(|| panic!("offset {offset}"));
+        let leader = curve.ic.leader();
+        for (i, p) in curve.params0.iter().enumerate() {
+            assert_near!(sphere0.subs(p.x, p.y), leader[i]);
+        }
+        for (i, p) in curve.params1.iter().enumerate() {
+            assert_near!(sphere1.subs(p.x, p.y), leader[i]);
+        }
+        // Every sample lies on the circle the two spheres actually meet in.
+        leader
+            .iter()
+            .for_each(|p| assert_near!(p.to_vec().magnitude(), 1.0));
+    }
 }
