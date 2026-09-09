@@ -1231,3 +1231,317 @@ WebAssembly check
     Checking truck-meshalgo v0.4.0 (/home/krone/Development/git/truck/truck-meshalgo)
     Checking truck-shapeops v0.4.0 (/home/krone/Development/git/truck/truck-shapeops)
     Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.63s
+
+
+Circle inverse precision follow-up, 2026-09-09
+============================================
+The two previously reported circle failures are resolved.
+The inverse now uses atan2 and normalizes the computed angle to (0, TAU].
+The earlier STEP regression was caused by incorrectly adding TAU for y = +0 at x < 0,
+which changed pi to 3*pi. Normalizing by the angle's sign fixes this signed-zero case.
+No tolerances were weakened; no STEP importer or meshing changes were needed.
+
+Final release suite: 642 passed, 0 failed, 5 pre-existing ignored.
+All 64 benchmark smoke cases passed. Release Clippy, formatting, WebAssembly and diff checks passed.
+
+Commands:
+cargo test --release -p truck-geometry --test circle
+cargo test --release --no-fail-fast -p truck-geometry -p truck-modeling -p truck-shapeops -p truck-meshalgo -p truck-hlr -p truck-stepio
+RAYON_NUM_THREADS=1 cargo bench -p truck-benchmarks --bench actions -- --test
+cargo clippy --release -p truck-geometry --all-targets
+cargo check --target wasm32-unknown-unknown -p truck-modeling -p truck-shapeops --no-default-features
+cargo +nightly fmt -p truck-geometry -- --check
+git diff --check
+
+Circle tests
+------------
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/git/truck/truck-geometry)
+    Finished `release` profile [optimized] target(s) in 2.41s
+     Running tests/circle.rs (target/release/deps/circle-bb4828f022fe1d46)
+
+running 10 tests
+test inverse_axes_and_signed_zero_stay_in_one_revolution ... ok
+test inverse_near_axes_preserves_parameter_precision ... ok
+test parameter_division ... ok
+test search_parameter ... ok
+test search_nearest_parameter_with_parameter_hint ... ok
+test search_nearest_parameter_with_range ... ok
+test search_parameter_with_parameter_hint ... ok
+test search_nearest_parameter ... ok
+test search_parameter_with_range ... ok
+test to_nurbs ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+Release suite per-target summaries
+---------------------------------
+     Running unittests src/lib.rs (target/release/deps/truck_geometry-7fc4c6be0495de55)
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running tests/af_surface.rs (target/release/deps/af_surface-839fe62785730781)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+     Running tests/bspcurve.rs (target/release/deps/bspcurve-53916fb8fa99b633)
+test result: ok. 9 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running tests/bspsurface.rs (target/release/deps/bspsurface-ce6ebc7be77faf61)
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+     Running tests/circle.rs (target/release/deps/circle-fb1fbad639691d91)
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/edge_blend.rs (target/release/deps/edge_blend-9120cc4241f80149)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running tests/hyperbola.rs (target/release/deps/hyperbola-e9570f792fb0f4ef)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/intersection_cache.rs (target/release/deps/intersection_cache-0ca0b9113c27a013)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/intersection_curve.rs (target/release/deps/intersection_curve-337825c56e9fbfbd)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running tests/nurbscurve.rs (target/release/deps/nurbscurve-b379e5ebef9616bd)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running tests/nurbssurface.rs (target/release/deps/nurbssurface-3a519f3e33285c32)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+     Running tests/offset.rs (target/release/deps/offset-f5c73c2a27dcb181)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/pcurve.rs (target/release/deps/pcurve-071b9eda2eb2cd5c)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/plane.rs (target/release/deps/plane-0f13ad4fbf67623b)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/processor.rs (target/release/deps/processor-a267f228c47fd4f2)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+     Running tests/rbf_surface.rs (target/release/deps/rbf_surface-bee4deef8198284b)
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running tests/revolved_curve.rs (target/release/deps/revolved_curve-9179abe264d6cced)
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/ruled_search.rs (target/release/deps/ruled_search-2643c99913d40d84)
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+     Running tests/sphere.rs (target/release/deps/sphere-fbd976f20edb96fe)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/torus.rs (target/release/deps/torus-01ec7f66ecbc7c52)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/trimmed_curve.rs (target/release/deps/trimmed_curve-94c827aba26e240f)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/lib.rs (target/release/deps/truck_hlr-1324708c1844e8ad)
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/project.rs (target/release/deps/project-cc820e18196b1066)
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+     Running unittests src/lib.rs (target/release/deps/truck_meshalgo-810285925a532b9a)
+test result: ok. 12 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.10s
+     Running tests/R9-revolve-fine-tessellation.rs (target/release/deps/R9_revolve_fine_tessellation-36791b9e937515bd)
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running tests/analyzers/main.rs (target/release/deps/analyzers-6391ec64e0b10b98)
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+     Running tests/filters/main.rs (target/release/deps/filters-3be80998958da3c4)
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/tessellation/main.rs (target/release/deps/tessellation-a425381fbb6d35df)
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+     Running tests/vtk.rs (target/release/deps/vtk-264acff53730c3cf)
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/lib.rs (target/release/deps/truck_modeling-693b85c98b79a865)
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running tests/conic.rs (target/release/deps/conic-7800aeddeffedd8e)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/cylinder_search.rs (target/release/deps/cylinder_search-991fefec2efd931a)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running tests/elementary.rs (target/release/deps/elementary-81b147874ef142bf)
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/extruded.rs (target/release/deps/extruded-994c8db4a5d7618e)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running tests/offset.rs (target/release/deps/offset-073ca2a30f10f56c)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/topo_traits.rs (target/release/deps/topo_traits-a3dfba4391fc37e0)
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/lib.rs (target/release/deps/truck_shapeops-1cdec6c58c3cc280)
+test result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s
+     Running tests/R10-sequential-fillet.rs (target/release/deps/R10_sequential_fillet-e818bac3ff85488f)
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 11.69s
+     Running tests/R7-R8-extrude-remove.rs (target/release/deps/R7_R8_extrude_remove-496fcc9518d9118a)
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.18s
+     Running tests/bench_plate.rs (target/release/deps/bench_plate-5e2e32902a26adeb)
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/boolean.rs (target/release/deps/boolean-cb9d6f45d88ef780)
+test result: ok. 27 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.78s
+     Running tests/boolean_cache.rs (target/release/deps/boolean_cache-5c0432e2645b2411)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+     Running tests/chamfer.rs (target/release/deps/chamfer-1db0913e092a789d)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/diagnostics.rs (target/release/deps/diagnostics-816be399842a7c9e)
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running tests/fillet.rs (target/release/deps/fillet-ec54b3976e6b0da7)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+     Running tests/fillet_chain.rs (target/release/deps/fillet_chain-6af4c7d7c42d4a34)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+     Running tests/fillet_edges.rs (target/release/deps/fillet_edges-5cd2df31e36a588a)
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+     Running tests/intersect.rs (target/release/deps/intersect-cba4112335ac6568)
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/local_ops.rs (target/release/deps/local_ops-2029872592b8ecb5)
+test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+     Running tests/loft.rs (target/release/deps/loft-7e3eb280b1b148ac)
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.24s
+     Running tests/modeling_blends.rs (target/release/deps/modeling_blends-49f81752f5d5db7f)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.89s
+     Running tests/r11_corners.rs (target/release/deps/r11_corners-acccb17b9ea0cd1f)
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.85s
+     Running tests/r4_boolean.rs (target/release/deps/r4_boolean-286cf4d67bc62c27)
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.42s
+     Running tests/r5_chamfer_after_fillet.rs (target/release/deps/r5_chamfer_after_fillet-39446434026618a9)
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.41s
+     Running tests/subtract_effect.rs (target/release/deps/subtract_effect-f8431a14a8a74394)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+     Running tests/sweep.rs (target/release/deps/sweep-414b9775201b31fb)
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.43s
+     Running unittests src/lib.rs (target/release/deps/truck_stepio-41306d56147e8189)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/input/main.rs (target/release/deps/input-b527b35df7aaaec9)
+test result: ok. 46 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.35s
+     Running tests/io/main.rs (target/release/deps/io-128a8bf284e39a58)
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+     Running tests/output/main.rs (target/release/deps/output-dcdd0eb87b85f2d2)
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+   Doc-tests truck_geometry
+test result: ok. 139 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.80s
+   Doc-tests truck_hlr
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+   Doc-tests truck_meshalgo
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.79s
+   Doc-tests truck_modeling
+test result: ok. 27 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.40s
+   Doc-tests truck_shapeops
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.34s
+   Doc-tests truck_stepio
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s
+
+Benchmark smoke run
+-------------------
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/git/truck/truck-geometry)
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/git/truck/truck-modeling)
+   Compiling truck-meshalgo v0.4.0 (/home/krone/Development/git/truck/truck-meshalgo)
+   Compiling truck-drafting v0.1.0 (/home/krone/Development/git/truck/truck-drafting)
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/git/truck/truck-stepio)
+   Compiling truck-hlr v0.1.0 (/home/krone/Development/git/truck/truck-hlr)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/git/truck/truck-shapeops)
+   Compiling truck-benchmarks v0.1.0 (/home/krone/Development/git/truck/truck-benchmarks)
+    Finished `bench` profile [optimized] target(s) in 11.52s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running benches/actions.rs (target/release/deps/actions-62c012380e689677)
+actions
+├─ boolean
+│  ├─ intersect_cylinders
+│  │  ├─ 0.001
+│  │  ├─ 0.01
+│  │  ╰─ 0.1
+│  ├─ intersect_nurbs_cylinders
+│  │  ├─ 0.001
+│  │  ├─ 0.01
+│  │  ╰─ 0.1
+│  ├─ subtract_batch
+│  │  ├─ 1
+│  │  ├─ 10
+│  │  ├─ 30
+│  │  ╰─ 100
+│  ├─ subtract_sequential
+│  │  ├─ 1
+│  │  ├─ 10
+│  │  ├─ 30
+│  │  ╰─ 100
+│  ╰─ union_cylinders
+│     ├─ 0.001
+│     ├─ 0.01
+│     ╰─ 0.1
+├─ local
+│  ├─ chamfer
+│  │  ├─ 1
+│  │  ╰─ 12
+│  ├─ draft_box
+│  │  ├─ 1
+│  │  ╰─ 4
+│  ├─ fillet
+│  │  ├─ 1
+│  │  ╰─ 12
+│  ╰─ shell_box
+├─ modeling
+│  ├─ extrude
+│  │  ├─ 4
+│  │  ├─ 32
+│  │  ╰─ 128
+│  ├─ loft
+│  │  ├─ 2
+│  │  ├─ 8
+│  │  ╰─ 32
+│  ├─ revolve
+│  │  ├─ 4
+│  │  ├─ 32
+│  │  ╰─ 128
+│  ├─ sweep_path
+│  │  ├─ 1
+│  │  ├─ 8
+│  │  ╰─ 32
+│  ╰─ transform
+│     ├─ 1
+│     ├─ 10
+│     ╰─ 30
+├─ projection
+│  ╰─ hidden_lines
+│     ├─ 1
+│     ├─ 10
+│     ╰─ 30
+├─ step
+│  ├─ convert
+│  │  ├─ 1
+│  │  ├─ 10
+│  │  ╰─ 30
+│  ├─ export
+│  │  ├─ 1
+│  │  ├─ 10
+│  │  ╰─ 30
+│  ├─ import
+│  │  ├─ 1
+│  │  ├─ 10
+│  │  ╰─ 30
+│  ╰─ parse
+│     ├─ 1
+│     ├─ 10
+│     ╰─ 30
+╰─ tessellation
+   ├─ cylinder_tolerance
+   │  ├─ 0.001
+   │  ├─ 0.01
+   │  ╰─ 0.1
+   ├─ mesh_to_polygon
+   │  ├─ 1
+   │  ├─ 10
+   │  ╰─ 30
+   ╰─ plate
+      ├─ 1
+      ├─ 10
+      ├─ 30
+      ╰─ 100
+
+
+Release Clippy
+--------------
+    Checking libc v0.2.189
+   Compiling truck-derivers v0.1.0 (/home/krone/Development/git/truck/truck-derivers)
+    Checking matext4cgmath v0.1.0
+    Checking truck-base v0.5.0 (/home/krone/Development/git/truck/truck-base)
+    Checking getrandom v0.4.3
+    Checking getrandom v0.3.4
+    Checking wait-timeout v0.2.1
+    Checking rand_core v0.9.5
+    Checking tempfile v3.27.0
+    Checking rand v0.10.2
+    Checking rand v0.9.5
+    Checking rand_chacha v0.9.0
+    Checking rand_xorshift v0.4.0
+    Checking rusty-fork v0.3.1
+    Checking truck-geotrait v0.4.0 (/home/krone/Development/git/truck/truck-geotrait)
+    Checking proptest v1.11.0
+    Checking truck-geometry v0.5.0 (/home/krone/Development/git/truck/truck-geometry)
+    Finished `release` profile [optimized] target(s) in 2.49s
+
+WebAssembly check
+-----------------
+    Checking truck-geometry v0.5.0 (/home/krone/Development/git/truck/truck-geometry)
+    Checking truck-meshalgo v0.4.0 (/home/krone/Development/git/truck/truck-meshalgo)
+    Checking truck-modeling v0.6.0 (/home/krone/Development/git/truck/truck-modeling)
+    Checking truck-shapeops v0.4.0 (/home/krone/Development/git/truck/truck-shapeops)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.61s

@@ -89,11 +89,11 @@ impl SearchNearestParameter<D1> for UnitCircle<Point2> {
         if v.magnitude().so_small() {
             return None;
         }
-        let v = v.normalize();
-        let theta = f64::acos(f64::clamp(v.x, -1.0, 1.0));
-        let theta = match v.y > 0.0 {
+        // Preserve the (0, TAU] convention, including signed zero on either axis.
+        let theta = v.y.atan2(v.x);
+        let theta = match theta > 0.0 {
             true => theta,
-            false => TAU - theta,
+            false => TAU + theta,
         };
         Some(round_theta(theta, hint.into()))
     }
@@ -106,11 +106,10 @@ impl SearchParameter<D1> for UnitCircle<Point2> {
         if !v.magnitude().near(&1.0) {
             return None;
         }
-        let v = v.normalize();
-        let theta = f64::acos(f64::clamp(v.x, -1.0, 1.0));
-        let theta = match v.y > 0.0 {
+        let theta = v.y.atan2(v.x);
+        let theta = match theta > 0.0 {
             true => theta,
-            false => TAU - theta,
+            false => TAU + theta,
         };
         Some(round_theta(theta, hint.into()))
     }

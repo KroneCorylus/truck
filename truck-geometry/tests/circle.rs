@@ -95,3 +95,61 @@ fn parameter_division() {
         assert!(p.to_vec().magnitude() > 0.95);
     }
 }
+
+#[test]
+fn inverse_near_axes_preserves_parameter_precision() {
+    let circle = UnitCircle::<Point2>::new();
+    for t in [
+        31.41596780328447,
+        -31.41596780328447,
+        1.0e-10,
+        -1.0e-10,
+        PI - 1.0e-10,
+        PI + 1.0e-10,
+        TAU - 1.0e-10,
+        TAU + 1.0e-10,
+    ] {
+        let point = circle.subs(t);
+        for hint in [
+            SPHint1D::Parameter(t),
+            SPHint1D::Parameter(t - 0.1),
+            SPHint1D::Parameter(t + 0.1),
+            SPHint1D::Range(t - 0.1, t + 0.1),
+        ] {
+            assert_near2!(circle.search_parameter(point, hint, 1).unwrap(), t);
+            for radius in [0.1, 1.0, 5.0] {
+                let parameter = circle
+                    .search_nearest_parameter(point * radius, hint, 1)
+                    .unwrap();
+                assert_near2!(parameter, t);
+            }
+        }
+    }
+}
+
+#[test]
+fn inverse_axes_and_signed_zero_stay_in_one_revolution() {
+    let circle = UnitCircle::<Point2>::new();
+    for zero in [0.0, -0.0] {
+        for (point, expected) in [
+            (Point2::new(1.0, zero), TAU),
+            (Point2::new(-1.0, zero), PI),
+            (Point2::new(zero, 1.0), PI / 2.0),
+            (Point2::new(zero, -1.0), 3.0 * PI / 2.0),
+        ] {
+            assert_eq!(circle.search_parameter(point, None, 1), Some(expected));
+            assert_eq!(
+                circle.search_nearest_parameter(point, None, 1),
+                Some(expected)
+            );
+            for turn in [-2.0, 0.0, 2.0] {
+                let hint = expected + turn * TAU;
+                assert_near2!(circle.search_parameter(point, hint, 1).unwrap(), hint);
+                assert_near2!(
+                    circle.search_nearest_parameter(point, hint, 1).unwrap(),
+                    hint
+                );
+            }
+        }
+    }
+}

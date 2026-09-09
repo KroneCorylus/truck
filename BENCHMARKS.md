@@ -298,7 +298,7 @@ numbers are separate single runs. Sequential calls rebuild the growing result re
 removing that scaling cost would require reuse across operations or combining compatible
 cuts. More worker threads alone do not remove it.
 
-Validation of the final source:
+Validation at the end of that performance pass:
 
 - All 64 benchmark cases completed all 20 samples and their preflight checks.
 - The release suite across geometry, modeling, shape operations, meshing, hidden-line
@@ -317,5 +317,22 @@ Validation of the final source:
   Release Clippy, formatting, and WebAssembly build checks passed.
 
 The [validation log](truck-benchmarks/deep-validation.txt) records the commands, full final
-suite output, matching pre-existing failures, and build checks. The two existing precision
-failures mean the full suite is **not** reported as green.
+suite output, matching pre-existing failures, and build checks. That historical run was not green; the follow-up below resolves both precision failures.
+
+## Circle inverse precision fix (2026-09-09)
+
+The two circle precision failures are now fixed. Both inverse searches use `atan2` instead
+of normalizing the vector and applying `acos`, retaining accuracy near the coordinate axes.
+Angle normalization preserves the existing (0, 2π] convention and parameter/range hints.
+
+The earlier STEP regression came from an error in the first `atan2` replacement: testing
+the sign of the input y coordinate added 2π at (-1, +0), changing π to 3π. Imported
+half-circle edges became one-and-a-half-turn arcs. Testing the sign of the computed angle
+handles both signs of zero correctly. No STEP importer or meshing changes were necessary.
+
+Added deterministic tests cover the original failing angle, offsets near the axes and
+periodic seam, scaled points, parameter/range hints, and signed zero on all four axes.
+The release regression suite now passes **642 tests with zero failures** (five existing
+ignored tests), including the STEP import and round-trip mesh-closure checks. All 64
+benchmark smoke cases, release Clippy, formatting, and WebAssembly checks also pass.
+The follow-up results are appended to the [validation log](truck-benchmarks/deep-validation.txt).

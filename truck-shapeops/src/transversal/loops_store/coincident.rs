@@ -117,6 +117,19 @@ where C: Cut<Point = Point3, Vector = Vector3> + SearchNearestParameter<D1, Poin
     let mut points: Vec<Point3> = Vec::new();
     for edge_a in a.poly[a.index].iter().flat_map(|wire| wire.iter()) {
         for edge_b in b.poly[b.index].iter().flat_map(|wire| wire.iter()) {
+            // Shared curves meet at every tessellation vertex. Their overlap is handled by
+            // merge_shared_pieces; an intersection solve between them is singular.
+            let same_ends = (edge_a.front() == edge_b.front() && edge_a.back() == edge_b.back())
+                || (edge_a.front() == edge_b.back() && edge_a.back() == edge_b.front());
+            if same_ends {
+                let (a, b) = (edge_a.oriented_curve(), edge_b.oriented_curve());
+                if a.len() == b.len()
+                    && (a.iter().zip(b.iter()).all(|(p, q)| p.near(q))
+                        || a.iter().zip(b.iter().rev()).all(|(p, q)| p.near(q)))
+                {
+                    continue;
+                }
+            }
             let ends = [edge_a.front(), edge_a.back(), edge_b.front(), edge_b.back()];
             for seg_a in edge_a.curve().windows(2) {
                 for seg_b in edge_b.curve().windows(2) {
