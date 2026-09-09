@@ -1,6 +1,7 @@
 use super::*;
 use derive_more::{From, TryInto};
 use serde::{Deserialize, Serialize};
+use std::f64::consts::TAU;
 #[doc(hidden)]
 pub use truck_geometry::prelude::{algo, inv_or_zero};
 pub use truck_geometry::{decorators::*, nurbs::*, specifieds::*};
@@ -152,7 +153,6 @@ impl ToSameGeometry<Surface> for NurbsSurface<Vector4> {
     ParametricSurface,
     ParameterDivision2D,
     Invertible,
-    SearchParameterD2,
 )]
 pub enum Surface {
     /// Plane
@@ -300,6 +300,39 @@ impl ToSameGeometry<Surface> for RevolutedCurve<Curve> {
     fn to_same_geometry(&self) -> Surface { Surface::RevolutedCurve(Processor::new(self.clone())) }
 }
 
+impl SearchParameter<D2> for Surface {
+    type Point = Point3;
+    fn search_parameter<H: Into<SPHint2D>>(
+        &self,
+        point: Point3,
+        hint: H,
+        trials: usize,
+    ) -> Option<(f64, f64)> {
+        let hint = hint.into();
+        if let Surface::Extruded(surface) = self {
+            let reference = match hint {
+                SPHint2D::None => Some(None),
+                SPHint2D::Parameter(u, _) => Some(Some(u)),
+                SPHint2D::Range(_, _) => None,
+            };
+            if let Some(reference) = reference {
+                if let Some((u, v)) = cylinder_search_hint(surface, point, reference) {
+                    if surface.subs(u, v).near(&point) {
+                        return Some((u, v));
+                    }
+                }
+            }
+        }
+        derive_surface_method!(
+            self,
+            SearchParameter::<D2>::search_parameter,
+            point,
+            hint,
+            trials
+        )
+    }
+}
+
 impl SearchNearestParameter<D2> for Surface {
     type Point = Point3;
     fn search_nearest_parameter<H: Into<SPHint2D>>(
@@ -326,9 +359,65 @@ impl SearchNearestParameter<D2> for Surface {
                 };
                 algo::surface::search_nearest_parameter(rotted, point, hint, trials)
             }
-            Surface::Extruded(surface) => surface.search_nearest_parameter(point, hint, trials),
+            Surface::Extruded(surface) => {
+                let hint = hint.into();
+                if matches!(hint, SPHint2D::None) {
+                    if let Some(seed) = cylinder_search_hint(surface, point, None) {
+                        if let Some(parameter) =
+                            algo::surface::search_nearest_parameter(surface, point, seed, trials)
+                        {
+                            return Some(parameter);
+                        }
+                    }
+                }
+                surface.search_nearest_parameter(point, hint, trials)
+            }
         }
     }
+}
+
+/// An analytic seed for a circular cylinder; other extrusions retain the general search.
+fn cylinder_search_hint(
+    surface: &ExtrudedCurve<Curve, Vector3>,
+    point: Point3,
+    reference: Option<f64>,
+) -> Option<(f64, f64)> {
+    let Curve::Conic(circle) = surface.entity_curve() else {
+        return None;
+    };
+    let matrix = circle.transform();
+    let weight = matrix.w.w;
+    if matrix.x.w != 0.0 || matrix.y.w != 0.0 || !weight.is_finite() || weight == 0.0 {
+        return None;
+    }
+    let x = matrix.x.truncate() / weight;
+    let y = matrix.y.truncate() / weight;
+    let axis = surface.extruding_vector();
+    let (xx, yy, aa) = (x.magnitude2(), y.magnitude2(), axis.magnitude2());
+    if ![xx, yy, aa].iter().all(|v| v.is_finite() && *v > 0.0)
+        || (xx - yy).abs() > 1.0e-12 * xx.max(yy)
+        || x.dot(y).abs() > 1.0e-12 * xx.sqrt() * yy.sqrt()
+        || x.dot(axis).abs() > 1.0e-12 * xx.sqrt() * aa.sqrt()
+        || y.dot(axis).abs() > 1.0e-12 * yy.sqrt() * aa.sqrt()
+    {
+        return None;
+    }
+    let delta = point - Point3::from_vec(matrix.w.truncate() / weight);
+    let (px, py) = (delta.dot(x), delta.dot(y));
+    if !px.is_finite() || !py.is_finite() || (px == 0.0 && py == 0.0) {
+        return None;
+    }
+    let (a, b) = circle.range_tuple();
+    let mut u = py.atan2(px);
+    if !circle.orientation() {
+        u = a + b - u;
+    }
+    u += ((reference.unwrap_or_else(|| a.midpoint(b)) - u) / TAU).round() * TAU;
+    if !(a..=b).contains(&u) {
+        return None;
+    }
+    let v = delta.dot(axis) / aa;
+    v.is_finite().then_some((u, v))
 }
 
 impl ToSameGeometry<Surface> for HomotopySurface<Curve, Curve> {

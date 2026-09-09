@@ -1,6 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
+	"truck-benchmarks",
 	"truck-assembly",
 	"truck-base",
 	"truck-derivers",

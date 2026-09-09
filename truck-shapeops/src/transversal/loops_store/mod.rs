@@ -563,11 +563,20 @@ where
     let mut poly_loops_store1: LoopsStore<_, _> = poly_shell1.face_iter().collect();
     let store0_len = geom_loops_store0.len();
     let store1_len = geom_loops_store1.len();
-    let bounding_box = |face: &Face<Point3, PolylineCurve, Option<PolygonMesh>>| {
-        face.surface().map(|mesh| mesh.bounding_box())
+    let polygons0: Vec<_> = poly_shell0.iter().map(Face::surface).collect();
+    let polygons1: Vec<_> = poly_shell1.iter().map(Face::surface).collect();
+    let bounding_box = |mesh: &Option<PolygonMesh>| mesh.as_ref().map(PolygonMesh::bounding_box);
+    let bboxes0: Vec<_> = polygons0.iter().map(bounding_box).collect();
+    let bboxes1: Vec<_> = polygons1.iter().map(bounding_box).collect();
+    let boundaries = |face: &Face<Point3, PolylineCurve, Option<PolygonMesh>>| {
+        face.absolute_boundaries()
+            .iter()
+            .flat_map(|wire| wire.iter())
+            .map(|edge| BoundaryPolyline::new(edge.curve()))
+            .collect::<Vec<_>>()
     };
-    let bboxes0: Vec<_> = poly_shell0.iter().map(bounding_box).collect();
-    let bboxes1: Vec<_> = poly_shell1.iter().map(bounding_box).collect();
+    let boundaries0: Vec<_> = poly_shell0.iter().map(boundaries).collect();
+    let boundaries1: Vec<_> = poly_shell1.iter().map(boundaries).collect();
     let mut overlapping = 0;
     (0..store0_len)
         .flat_map(move |i| (0..store1_len).map(move |j| (i, j)))
@@ -591,10 +600,10 @@ where
                 let ori1 = geom_shell1[face_index1].orientation();
                 let surface0 = geom_shell0[face_index0].surface();
                 let surface1 = geom_shell1[face_index1].surface();
-                let polygon0 = poly_shell0[face_index0].surface()?;
-                let polygon1 = poly_shell1[face_index1].surface()?;
+                let polygon0 = polygons0[face_index0].as_ref()?;
+                let polygon1 = polygons1[face_index1].as_ref()?;
                 if let Some(same_normal) =
-                    coincident::coincidence(&surface0, &polygon0, &surface1, &polygon1)
+                    coincident::coincidence(&surface0, polygon0, &surface1, polygon1)
                 {
                     let overlap0 = match same_normal == (ori0 == ori1) {
                         true => ShapesOpStatus::Both,
@@ -621,20 +630,22 @@ where
                 }
                 intersection_curve::intersection_curves(
                     surface0.clone(),
-                    &polygon0,
+                    polygon0,
                     surface1.clone(),
-                    &polygon1,
+                    polygon1,
                 )?
                 .into_iter()
                 .flat_map(|(mut polyline, mut curve)| {
                     let mut pieces = Vec::new();
                     {
                         let on_boundary = |point| {
-                            [&poly_shell0[face_index0], &poly_shell1[face_index1]]
-                                .into_iter()
-                                .flat_map(|face| face.absolute_boundaries().iter())
-                                .flat_map(|wire| wire.iter())
-                                .any(|edge| edge.curve().search_parameter(point, None, 1).is_some())
+                            boundaries0[face_index0]
+                                .iter()
+                                .chain(&boundaries1[face_index1])
+                                .any(|edge| {
+                                    edge.bounds.contains(point)
+                                        && edge.curve.search_parameter(point, None, 1).is_some()
+                                })
                         };
                         let cuts: Vec<_> = (1..polyline.len() - 1)
                             .filter(|&i| on_boundary(polyline[i]))
@@ -648,8 +659,8 @@ where
                     pieces
                 })
                 .filter(|(polyline, _)| {
-                    !runs_along_boundary(polyline, &poly_shell0[face_index0])
-                        && !runs_along_boundary(polyline, &poly_shell1[face_index1])
+                    !runs_along_boundary(polyline, &boundaries0[face_index0])
+                        && !runs_along_boundary(polyline, &boundaries1[face_index1])
                 })
                 .try_for_each(|(polyline, intersection_curve)| {
                     let mut intersection_curve = intersection_curve.into();
@@ -751,17 +762,30 @@ fn bounding_boxes_overlap(bbox0: &BoundingBox<Point3>, bbox1: &BoundingBox<Point
     })
 }
 
-/// Whether every segment of `polyline` lies on the boundary of `face`. Faces meeting along a
+struct BoundaryPolyline {
+    curve: PolylineCurve,
+    bounds: BoundingBox<Point3>,
+}
+
+impl BoundaryPolyline {
+    fn new(curve: PolylineCurve) -> Self {
+        let bounds: BoundingBox<Point3> = curve.iter().collect();
+        let padding = Vector3::new(TOLERANCE, TOLERANCE, TOLERANCE);
+        let bounds = BoundingBox::from_iter([bounds.min() - padding, bounds.max() + padding]);
+        Self { curve, bounds }
+    }
+}
+
+/// Whether every segment of `polyline` lies on the boundary of the face. Faces meeting along a
 /// common edge interfere along that edge; that is contact, not a cut.
-fn runs_along_boundary(
-    polyline: &PolylineCurve,
-    face: &Face<Point3, PolylineCurve, Option<PolygonMesh>>,
-) -> bool {
+fn runs_along_boundary(polyline: &PolylineCurve, boundary: &[BoundaryPolyline]) -> bool {
     let on_boundary = |p: Point3| {
-        face.edge_iter().any(|edge| {
-            edge.curve()
-                .windows(2)
-                .any(|seg| distance_to_segment(p, seg[0], seg[1]) < TOLERANCE)
+        boundary.iter().any(|edge| {
+            edge.bounds.contains(p)
+                && edge
+                    .curve
+                    .windows(2)
+                    .any(|seg| distance_to_segment(p, seg[0], seg[1]) < TOLERANCE)
         })
     };
     polyline

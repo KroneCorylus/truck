@@ -825,3 +825,36 @@ fn four_branches_at_interior_vertex() {
         }
     }
 }
+
+#[test]
+fn boundary_boxes_preserve_near_edge_contacts() {
+    for scale in [1.0e-8, 1.0, 1.0e6] {
+        let edge = BoundaryPolyline::new(PolylineCurve::from(vec![
+            Point3::new(0.0, 0.0, 0.0),
+            Point3::new(scale, 0.0, 0.0),
+            Point3::new(scale, scale, scale),
+            Point3::new(scale, scale, scale),
+        ]));
+        for segment in edge.curve.windows(2) {
+            for t in [-0.001, 0.0, 0.25, 0.5, 1.0, 1.001] {
+                for offset in [-2.0, -1.0, -0.5, 0.0, 0.5, 1.0, 2.0] {
+                    for axis in [Vector3::unit_x(), Vector3::unit_y(), Vector3::unit_z()] {
+                        let p =
+                            segment[0] + (segment[1] - segment[0]) * t + axis * offset * TOLERANCE;
+                        let general_search = edge.curve.search_parameter(p, None, 1).is_some();
+                        assert_eq!(general_search, edge.bounds.contains(p) && general_search);
+                        let along = edge
+                            .curve
+                            .windows(2)
+                            .any(|seg| distance_to_segment(p, seg[0], seg[1]) < TOLERANCE);
+                        let probe = PolylineCurve::from(vec![p, p]);
+                        assert_eq!(
+                            along,
+                            runs_along_boundary(&probe, std::slice::from_ref(&edge))
+                        );
+                    }
+                }
+            }
+        }
+    }
+}

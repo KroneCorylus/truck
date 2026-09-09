@@ -1,0 +1,139 @@
+Optimization measured: 2026-09-09
+Kernel revision before: 0af8c67aaa947d4ad23eda65bff8d1838fa2c02c + benchmark suite
+Change: skip trimming loops outside their tolerance-expanded parameter-space bounding boxes.
+CPU: AMD Ryzen 9 7950X3D, powersave governor, boost enabled, no affinity pinning
+Rust: 1.98.1; native release/bench profile; RAYON_NUM_THREADS=1; allocation instrumentation disabled
+
+Before command:
+RAYON_NUM_THREADS=1 cargo bench -p truck-benchmarks --bench actions -- --sample-count 30 --max-time 20
+
+Timer precision: 10 ns
+actions                    fastest       │ slowest       │ median        │ mean          │ samples │ iters
+├─ boolean                               │               │               │               │         │
+│  ├─ intersect_cylinders                │               │               │               │         │
+│  │  ├─ 0.001             8.196 ms      │ 9.5 ms        │ 8.458 ms      │ 8.536 ms      │ 30      │ 30
+│  │  ├─ 0.01              2.957 ms      │ 3.334 ms      │ 3.195 ms      │ 3.149 ms      │ 30      │ 30
+│  │  ╰─ 0.1               1.075 ms      │ 1.156 ms      │ 1.087 ms      │ 1.098 ms      │ 30      │ 30
+│  ├─ subtract_batch                     │               │               │               │         │
+│  │  ├─ 1                 3.953 ms      │ 4.479 ms      │ 4.381 ms      │ 4.307 ms      │ 30      │ 30
+│  │  ├─ 10                37.71 ms      │ 43.59 ms      │ 39.58 ms      │ 39.59 ms      │ 30      │ 30
+│  │  ╰─ 30                113.9 ms      │ 122.6 ms      │ 116.4 ms      │ 116.7 ms      │ 30      │ 30
+│  ├─ subtract_sequential                │               │               │               │         │
+│  │  ├─ 1                 4.012 ms      │ 4.631 ms      │ 4.23 ms       │ 4.208 ms      │ 30      │ 30
+│  │  ├─ 10                62.42 ms      │ 69.56 ms      │ 68.19 ms      │ 67.16 ms      │ 30      │ 30
+│  │  ╰─ 30                338.2 ms      │ 373.1 ms      │ 355.7 ms      │ 354.8 ms      │ 30      │ 30
+│  ╰─ union_cylinders                    │               │               │               │         │
+│     ├─ 0.001             8.168 ms      │ 9.208 ms      │ 8.526 ms      │ 8.53 ms       │ 30      │ 30
+│     ├─ 0.01              3.112 ms      │ 4.269 ms      │ 3.212 ms      │ 3.277 ms      │ 30      │ 30
+│     ╰─ 0.1               1.135 ms      │ 1.53 ms       │ 1.153 ms      │ 1.17 ms       │ 30      │ 30
+├─ local                                 │               │               │               │         │
+│  ├─ chamfer                            │               │               │               │         │
+│  │  ├─ 1                 25.91 µs      │ 31.25 µs      │ 26.46 µs      │ 26.7 µs       │ 30      │ 30
+│  │  ╰─ 12                76.11 µs      │ 89.14 µs      │ 77.58 µs      │ 78.55 µs      │ 30      │ 30
+│  ├─ draft_box                          │               │               │               │         │
+│  │  ├─ 1                 16.31 µs      │ 22.51 µs      │ 16.58 µs      │ 17.08 µs      │ 30      │ 30
+│  │  ╰─ 4                 20.65 µs      │ 27.05 µs      │ 21.36 µs      │ 21.63 µs      │ 30      │ 30
+│  ├─ fillet                             │               │               │               │         │
+│  │  ├─ 1                 25.12 µs      │ 31.16 µs      │ 25.63 µs      │ 25.99 µs      │ 30      │ 30
+│  │  ╰─ 12                52.69 µs      │ 61.36 µs      │ 53.92 µs      │ 54.7 µs       │ 30      │ 30
+│  ╰─ shell_box            35.27 µs      │ 41.56 µs      │ 35.91 µs      │ 36.39 µs      │ 30      │ 30
+├─ modeling                              │               │               │               │         │
+│  ├─ extrude                            │               │               │               │         │
+│  │  ├─ 4                 1.311 µs      │ 1.913 µs      │ 1.387 µs      │ 1.41 µs       │ 30      │ 30
+│  │  ├─ 32                10.36 µs      │ 13.18 µs      │ 10.63 µs      │ 10.8 µs       │ 30      │ 30
+│  │  ╰─ 128               42.4 µs       │ 48.66 µs      │ 43.19 µs      │ 43.75 µs      │ 30      │ 30
+│  ├─ loft                               │               │               │               │         │
+│  │  ├─ 2                 27.43 µs      │ 33.88 µs      │ 27.99 µs      │ 28.44 µs      │ 30      │ 30
+│  │  ├─ 8                 81.12 µs      │ 91.69 µs      │ 84.35 µs      │ 84.66 µs      │ 30      │ 30
+│  │  ╰─ 32                425.9 µs      │ 450.5 µs      │ 441.3 µs      │ 441 µs        │ 30      │ 30
+│  ├─ revolve                            │               │               │               │         │
+│  │  ├─ 4                 2.854 µs      │ 4.267 µs      │ 2.925 µs      │ 2.997 µs      │ 30      │ 30
+│  │  ├─ 32                24.06 µs      │ 31.02 µs      │ 24.5 µs       │ 25.12 µs      │ 30      │ 30
+│  │  ╰─ 128               96.22 µs      │ 128.3 µs      │ 98.37 µs      │ 100.7 µs      │ 30      │ 30
+│  ├─ sweep_path                         │               │               │               │         │
+│  │  ├─ 1                 2.424 µs      │ 4.007 µs      │ 2.484 µs      │ 2.559 µs      │ 30      │ 30
+│  │  ├─ 8                 14.2 µs       │ 21.77 µs      │ 14.68 µs      │ 15.31 µs      │ 30      │ 30
+│  │  ╰─ 32                56.9 µs       │ 94.58 µs      │ 57.98 µs      │ 62.15 µs      │ 30      │ 30
+│  ╰─ transform                          │               │               │               │         │
+│     ├─ 1                 2.353 µs      │ 3.526 µs      │ 2.474 µs      │ 2.5 µs        │ 30      │ 30
+│     ├─ 10                13.78 µs      │ 26.44 µs      │ 14.41 µs      │ 15.14 µs      │ 30      │ 30
+│     ╰─ 30                24.34 µs      │ 54.68 µs      │ 30.53 µs      │ 35.45 µs      │ 30      │ 30
+├─ projection                            │               │               │               │         │
+│  ╰─ hidden_lines                       │               │               │               │         │
+│     ├─ 1                 357.3 µs      │ 409.4 µs      │ 362.3 µs      │ 364.7 µs      │ 30      │ 30
+│     ├─ 10                4.224 ms      │ 5.2 ms        │ 4.58 ms       │ 4.586 ms      │ 30      │ 30
+│     ╰─ 30                19.36 ms      │ 20.07 ms      │ 19.55 ms      │ 19.64 ms      │ 30      │ 30
+├─ step                                  │               │               │               │         │
+│  ├─ convert                            │               │               │               │         │
+│  │  ├─ 1                 18.33 µs      │ 23 µs         │ 18.64 µs      │ 19.11 µs      │ 30      │ 30
+│  │  ├─ 10                76.18 µs      │ 86.89 µs      │ 77.39 µs      │ 77.85 µs      │ 30      │ 30
+│  │  ╰─ 30                211 µs        │ 221.4 µs      │ 213.2 µs      │ 214.4 µs      │ 30      │ 30
+│  ├─ export                             │               │               │               │         │
+│  │  ├─ 1                 21.39 µs      │ 27.11 µs      │ 21.73 µs      │ 22.26 µs      │ 30      │ 30
+│  │  ├─ 10                85.78 µs      │ 97.1 µs       │ 86.14 µs      │ 87.23 µs      │ 30      │ 30
+│  │  ╰─ 30                234.9 µs      │ 260.6 µs      │ 236.3 µs      │ 238.2 µs      │ 30      │ 30
+│  ├─ import                             │               │               │               │         │
+│  │  ├─ 1                 744.6 µs      │ 802.5 µs      │ 771.5 µs      │ 770.8 µs      │ 30      │ 30
+│  │  ├─ 10                2.902 ms      │ 3.011 ms      │ 2.944 ms      │ 2.948 ms      │ 30      │ 30
+│  │  ╰─ 30                7.507 ms      │ 7.986 ms      │ 7.716 ms      │ 7.72 ms       │ 30      │ 30
+│  ╰─ parse                              │               │               │               │         │
+│     ├─ 1                 737.1 µs      │ 761 µs        │ 746.4 µs      │ 747.3 µs      │ 30      │ 30
+│     ├─ 10                2.75 ms       │ 2.995 ms      │ 2.815 ms      │ 2.823 ms      │ 30      │ 30
+│     ╰─ 30                7.174 ms      │ 7.757 ms      │ 7.227 ms      │ 7.266 ms      │ 30      │ 30
+╰─ tessellation                          │               │               │               │         │
+   ├─ cylinder_tolerance                 │               │               │               │         │
+   │  ├─ 0.001             428.6 µs      │ 655.7 µs      │ 437.5 µs      │ 450 µs        │ 30      │ 30
+   │  ├─ 0.01              141.8 µs      │ 158.5 µs      │ 148.3 µs      │ 148.6 µs      │ 30      │ 30
+   │  ╰─ 0.1               66.5 µs       │ 73.43 µs      │ 67.66 µs      │ 68.18 µs      │ 30      │ 30
+   ├─ mesh_to_polygon                    │               │               │               │         │
+   │  ├─ 1                 2.795 µs      │ 3.506 µs      │ 2.854 µs      │ 2.887 µs      │ 30      │ 30
+   │  ├─ 10                16.51 µs      │ 17.87 µs      │ 16.64 µs      │ 16.68 µs      │ 30      │ 30
+   │  ╰─ 30                52.03 µs      │ 86.89 µs      │ 52.92 µs      │ 63.73 µs      │ 30      │ 30
+   ╰─ plate                              │               │               │               │         │
+      ├─ 1                 199 µs        │ 269.9 µs      │ 202.1 µs      │ 205.2 µs      │ 30      │ 30
+      ├─ 10                2.13 ms       │ 2.179 ms      │ 2.151 ms      │ 2.152 ms      │ 30      │ 30
+      ╰─ 30                10.2 ms       │ 11.77 ms      │ 10.4 ms       │ 10.55 ms      │ 30      │ 30
+
+
+After command (confirmation of affected actions):
+RAYON_NUM_THREADS=1 cargo bench -p truck-benchmarks --bench actions -- 'subtract_sequential|hidden_lines|tessellation::plate' --sample-count 30 --max-time 20
+
+Timer precision: 10 ns
+actions                    fastest       │ slowest       │ median        │ mean          │ samples │ iters
+├─ boolean                               │               │               │               │         │
+│  ╰─ subtract_sequential                │               │               │               │         │
+│     ├─ 1                 4.737 ms      │ 5.15 ms       │ 4.874 ms      │ 4.891 ms      │ 30      │ 30
+│     ├─ 10                62.18 ms      │ 65.71 ms      │ 63.84 ms      │ 63.96 ms      │ 30      │ 30
+│     ╰─ 30                246.9 ms      │ 270 ms        │ 258.2 ms      │ 257 ms        │ 30      │ 30
+├─ projection                            │               │               │               │         │
+│  ╰─ hidden_lines                       │               │               │               │         │
+│     ├─ 1                 360.4 µs      │ 757.3 µs      │ 394.9 µs      │ 418.9 µs      │ 30      │ 30
+│     ├─ 10                3.292 ms      │ 4.146 ms      │ 3.43 ms       │ 3.504 ms      │ 30      │ 30
+│     ╰─ 30                13.92 ms      │ 15.46 ms      │ 14.5 ms       │ 14.54 ms      │ 30      │ 30
+╰─ tessellation                          │               │               │               │         │
+   ╰─ plate                              │               │               │               │         │
+      ├─ 1                 206.2 µs      │ 221.8 µs      │ 208.4 µs      │ 210.3 µs      │ 30      │ 30
+      ├─ 10                1.338 ms      │ 1.414 ms      │ 1.362 ms      │ 1.364 ms      │ 30      │ 30
+      ╰─ 30                4.282 ms      │ 4.507 ms      │ 4.357 ms      │ 4.362 ms      │ 30      │ 30
+
+
+Stage diagnostic command (single run on each revision):
+RAYON_NUM_THREADS=1 cargo test --release -p truck-shapeops --test bench_plate -- --ignored --nocapture
+
+Before:
+   n mode          total ms   triang.   pairing   interf.  division  classif.   fitting   scanned   overlap
+  10 one boolean       44.0       2.8       0.0      12.9      23.7       0.2       4.2       240        40
+  10 one by one        69.2      23.7       0.1      16.7      23.0       0.2       4.9       600        40
+  30 one boolean      121.1       5.8       0.0      37.0      65.7       0.3      11.8       720       120
+  30 one by one       362.0     205.1       0.7      64.6      70.3       1.1      15.4      4200       120
+ 100 one boolean      424.8      19.0       0.1     138.4     225.6       1.4      38.9      2400       400
+ 100 one by one      5395.4    4616.8       6.4     357.3     288.2      10.6      61.0     42000       400
+
+After:
+   n mode          total ms   triang.   pairing   interf.  division  classif.   fitting   scanned   overlap
+  10 one boolean       44.5       3.2       0.0      13.2      23.5       0.2       4.2       240        40
+  10 one by one        64.2      18.7       0.1      16.3      23.3       0.3       5.0       600        40
+  30 one boolean      126.9       6.2       0.0      38.5      69.0       0.4      12.4       720       120
+  30 one by one       256.3     101.4       0.7      62.5      70.6       1.0      15.6      4200       120
+ 100 one boolean      431.6      18.1       0.1     136.2     233.4       1.4      40.9      2400       400
+ 100 one by one      1946.8    1168.5       6.1     358.9     292.6      11.0      61.4     42000       400

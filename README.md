@@ -49,6 +49,11 @@ cargo run --example rotate-objects
 See [DIAGNOSTICS.md](DIAGNOSTICS.md) for stable error codes, diagnostic Rust and JavaScript APIs,
 partial-result handling, and migration from legacy `Option` APIs.
 
+## Performance benchmarks
+
+Run `cargo bench -p truck-benchmarks --bench actions` to measure CPU action latency.
+See [BENCHMARKS.md](BENCHMARKS.md) for workloads, allocation profiling, and baseline results.
+
 ## crates
 
 ### truck-base  [![Crates.io](https://img.shields.io/crates/v/truck-base.svg)](https://crates.io/crates/truck-base) [![Docs.rs](https://docs.rs/truck-base/badge.svg)](https://docs.rs/truck-base)

@@ -1,0 +1,494 @@
+Deep optimization measurements, 2026-09-09
+CPU: AMD Ryzen 9 7950X3D, 16 cores / 32 logical CPUs
+Compiler: rustc 1.98.1 (48a229cea 2026-09-01)
+Base revision: 0af8c67aaa947d4ad23eda65bff8d1838fa2c02c
+Before: base revision plus the preceding loop-bounding-box tessellation optimization and benchmark suite.
+After: working tree with cylinder inverse/search, direct intersection derivatives,
+       per-pass polygon/boundary reuse and culling, and refinement vertex-position reuse.
+System allocator; release/bench defaults; powersave governor with boost; no CPU affinity.
+Measurements ran sequentially, without competing builds or tests.
+Comparison order: before/1, after/1, after/4, before/4, before/4, after/4, after/1, before/1.
+Each comparison: 30 samples, 1 operation/sample. New 100-hole cases measured separately.
+
+before executable SHA-256: db87ac212c91e4f637cf326848355cfcf9829f172a6d4ec02c98b0df953fdcdc
+after executable SHA-256: bfb435cf0690490e41536a06c53055f84edfc56a2cd63dea0cad19869a2d9148
+
+
+Before, one worker
+==================
+
+RAYON_NUM_THREADS=1 target/actions-before-deep --bench 'subtract_(batch|sequential)::(1|10|30)$|tessellation::plate::(1|10|30)$|projection::hidden_lines' --sample-count 30 --sample-size 1 --max-time 120
+Timer precision: 10 ns
+actions                    fastest       │ slowest       │ median        │ mean          │ samples │ iters
+├─ boolean                               │               │               │               │         │
+│  ├─ subtract_batch                     │               │               │               │         │
+│  │  ├─ 1                 4.741 ms      │ 5.419 ms      │ 4.859 ms      │ 4.899 ms      │ 30      │ 30
+│  │  ├─ 10                37.81 ms      │ 46 ms         │ 41.97 ms      │ 42.1 ms       │ 30      │ 30
+│  │  ╰─ 30                115.4 ms      │ 125.1 ms      │ 119.6 ms      │ 120.1 ms      │ 30      │ 30
+│  ╰─ subtract_sequential                │               │               │               │         │
+│     ├─ 1                 4.153 ms      │ 4.368 ms      │ 4.293 ms      │ 4.275 ms      │ 30      │ 30
+│     ├─ 10                58.36 ms      │ 65.07 ms      │ 62.18 ms      │ 62.06 ms      │ 30      │ 30
+│     ╰─ 30                241.5 ms      │ 262.9 ms      │ 253.6 ms      │ 253 ms        │ 30      │ 30
+├─ projection                            │               │               │               │         │
+│  ╰─ hidden_lines                       │               │               │               │         │
+│     ├─ 1                 378.8 µs      │ 651.6 µs      │ 393.2 µs      │ 413.2 µs      │ 30      │ 30
+│     ├─ 10                3.267 ms      │ 4.28 ms       │ 3.576 ms      │ 3.657 ms      │ 30      │ 30
+│     ╰─ 30                13.84 ms      │ 14.77 ms      │ 14.14 ms      │ 14.22 ms      │ 30      │ 30
+╰─ tessellation                          │               │               │               │         │
+   ╰─ plate                              │               │               │               │         │
+      ├─ 1                 193.7 µs      │ 215.4 µs      │ 196.8 µs      │ 198.6 µs      │ 30      │ 30
+      ├─ 10                1.258 ms      │ 1.355 ms      │ 1.294 ms      │ 1.302 ms      │ 30      │ 30
+      ╰─ 30                4.123 ms      │ 4.531 ms      │ 4.201 ms      │ 4.21 ms       │ 30      │ 30
+
+
+RAYON_NUM_THREADS=1 target/actions-before-deep --bench 'subtract_(batch|sequential)::(1|10|30)$|tessellation::plate::(1|10|30)$|projection::hidden_lines' --sample-count 30 --sample-size 1 --max-time 120
+Timer precision: 10 ns
+actions                    fastest       │ slowest       │ median        │ mean          │ samples │ iters
+├─ boolean                               │               │               │               │         │
+│  ├─ subtract_batch                     │               │               │               │         │
+│  │  ├─ 1                 4.241 ms      │ 4.721 ms      │ 4.412 ms      │ 4.42 ms       │ 30      │ 30
+│  │  ├─ 10                38.79 ms      │ 41.79 ms      │ 39.87 ms      │ 40.12 ms      │ 30      │ 30
+│  │  ╰─ 30                117.3 ms      │ 127.7 ms      │ 119.4 ms      │ 120.2 ms      │ 30      │ 30
+│  ╰─ subtract_sequential                │               │               │               │         │
+│     ├─ 1                 4.028 ms      │ 4.842 ms      │ 4.175 ms      │ 4.176 ms      │ 30      │ 30
+│     ├─ 10                58.94 ms      │ 65.35 ms      │ 61.71 ms      │ 61.71 ms      │ 30      │ 30
+│     ╰─ 30                246 ms        │ 266.6 ms      │ 257.7 ms      │ 256.8 ms      │ 30      │ 30
+├─ projection                            │               │               │               │         │
+│  ╰─ hidden_lines                       │               │               │               │         │
+│     ├─ 1                 355.5 µs      │ 441.6 µs      │ 361.7 µs      │ 366.7 µs      │ 30      │ 30
+│     ├─ 10                3.312 ms      │ 3.936 ms      │ 3.42 ms       │ 3.482 ms      │ 30      │ 30
+│     ╰─ 30                13.54 ms      │ 13.9 ms       │ 13.6 ms       │ 13.61 ms      │ 30      │ 30
+╰─ tessellation                          │               │               │               │         │
+   ╰─ plate                              │               │               │               │         │
+      ├─ 1                 197.3 µs      │ 235.4 µs      │ 209.9 µs      │ 210.4 µs      │ 30      │ 30
+      ├─ 10                1.312 ms      │ 1.366 ms      │ 1.325 ms      │ 1.327 ms      │ 30      │ 30
+      ╰─ 30                4.16 ms       │ 5.063 ms      │ 4.173 ms      │ 4.208 ms      │ 30      │ 30
+
+
+
+After, one worker
+=================
+
+RAYON_NUM_THREADS=1 target/actions-after-deep --bench 'subtract_(batch|sequential)::(1|10|30)$|tessellation::plate::(1|10|30)$|projection::hidden_lines' --sample-count 30 --sample-size 1 --max-time 120
+Timer precision: 10 ns
+actions                    fastest       │ slowest       │ median        │ mean          │ samples │ iters
+├─ boolean                               │               │               │               │         │
+│  ├─ subtract_batch                     │               │               │               │         │
+│  │  ├─ 1                 907.7 µs      │ 1.205 ms      │ 965 µs        │ 983.5 µs      │ 30      │ 30
+│  │  ├─ 10                8.26 ms       │ 8.73 ms       │ 8.505 ms      │ 8.512 ms      │ 30      │ 30
+│  │  ╰─ 30                25.82 ms      │ 29.54 ms      │ 26.44 ms      │ 26.66 ms      │ 30      │ 30
+│  ╰─ subtract_sequential                │               │               │               │         │
+│     ├─ 1                 868.8 µs      │ 1.159 ms      │ 896.5 µs      │ 919.8 µs      │ 30      │ 30
+│     ├─ 10                19.02 ms      │ 22.69 ms      │ 19.72 ms      │ 19.75 ms      │ 30      │ 30
+│     ╰─ 30                109.3 ms      │ 120.4 ms      │ 116.7 ms      │ 115.9 ms      │ 30      │ 30
+├─ projection                            │               │               │               │         │
+│  ╰─ hidden_lines                       │               │               │               │         │
+│     ├─ 1                 272.2 µs      │ 457.5 µs      │ 279.4 µs      │ 288.7 µs      │ 30      │ 30
+│     ├─ 10                2.461 ms      │ 3.588 ms      │ 2.585 ms      │ 2.775 ms      │ 30      │ 30
+│     ╰─ 30                11.45 ms      │ 12.67 ms      │ 11.98 ms      │ 12 ms         │ 30      │ 30
+╰─ tessellation                          │               │               │               │         │
+   ╰─ plate                              │               │               │               │         │
+      ├─ 1                 175.1 µs      │ 228.7 µs      │ 181.8 µs      │ 185.2 µs      │ 30      │ 30
+      ├─ 10                1.03 ms       │ 1.145 ms      │ 1.046 ms      │ 1.055 ms      │ 30      │ 30
+      ╰─ 30                3.503 ms      │ 4.076 ms      │ 3.563 ms      │ 3.598 ms      │ 30      │ 30
+
+
+RAYON_NUM_THREADS=1 target/actions-after-deep --bench 'subtract_(batch|sequential)::(1|10|30)$|tessellation::plate::(1|10|30)$|projection::hidden_lines' --sample-count 30 --sample-size 1 --max-time 120
+Timer precision: 20 ns
+actions                    fastest       │ slowest       │ median        │ mean          │ samples │ iters
+├─ boolean                               │               │               │               │         │
+│  ├─ subtract_batch                     │               │               │               │         │
+│  │  ├─ 1                 899.8 µs      │ 1.248 ms      │ 950.7 µs      │ 967 µs        │ 30      │ 30
+│  │  ├─ 10                8.452 ms      │ 8.891 ms      │ 8.679 ms      │ 8.682 ms      │ 30      │ 30
+│  │  ╰─ 30                25.7 ms       │ 27.47 ms      │ 26.5 ms       │ 26.52 ms      │ 30      │ 30
+│  ╰─ subtract_sequential                │               │               │               │         │
+│     ├─ 1                 874.7 µs      │ 1.111 ms      │ 950.3 µs      │ 935.5 µs      │ 30      │ 30
+│     ├─ 10                19.03 ms      │ 20.74 ms      │ 19.57 ms      │ 19.63 ms      │ 30      │ 30
+│     ╰─ 30                110.9 ms      │ 127 ms        │ 116.7 ms      │ 117 ms        │ 30      │ 30
+├─ projection                            │               │               │               │         │
+│  ╰─ hidden_lines                       │               │               │               │         │
+│     ├─ 1                 287.5 µs      │ 481.3 µs      │ 300.4 µs      │ 323.1 µs      │ 30      │ 30
+│     ├─ 10                2.606 ms      │ 3.539 ms      │ 2.801 ms      │ 2.854 ms      │ 30      │ 30
+│     ╰─ 30                11.74 ms      │ 14.02 ms      │ 11.94 ms      │ 12.2 ms       │ 30      │ 30
+╰─ tessellation                          │               │               │               │         │
+   ╰─ plate                              │               │               │               │         │
+      ├─ 1                 188.6 µs      │ 222.8 µs      │ 202.2 µs      │ 202.2 µs      │ 30      │ 30
+      ├─ 10                1.105 ms      │ 1.292 ms      │ 1.178 ms      │ 1.176 ms      │ 30      │ 30
+      ╰─ 30                3.682 ms      │ 4.092 ms      │ 3.762 ms      │ 3.773 ms      │ 30      │ 30
+
+
+
+Before, four workers
+====================
+
+RAYON_NUM_THREADS=4 target/actions-before-deep --bench 'subtract_(batch|sequential)::(1|10|30)$|tessellation::plate::(1|10|30)$|projection::hidden_lines' --sample-count 30 --sample-size 1 --max-time 120
+Timer precision: 10 ns
+actions                    fastest       │ slowest       │ median        │ mean          │ samples │ iters
+├─ boolean                               │               │               │               │         │
+│  ├─ subtract_batch                     │               │               │               │         │
+│  │  ├─ 1                 4.169 ms      │ 4.458 ms      │ 4.251 ms      │ 4.257 ms      │ 30      │ 30
+│  │  ├─ 10                37.47 ms      │ 40.52 ms      │ 38.54 ms      │ 38.72 ms      │ 30      │ 30
+│  │  ╰─ 30                113.3 ms      │ 123.1 ms      │ 116 ms        │ 116.3 ms      │ 30      │ 30
+│  ╰─ subtract_sequential                │               │               │               │         │
+│     ├─ 1                 3.94 ms       │ 4.411 ms      │ 4.07 ms       │ 4.061 ms      │ 30      │ 30
+│     ├─ 10                50 ms         │ 53.29 ms      │ 50.9 ms       │ 51.05 ms      │ 30      │ 30
+│     ╰─ 30                192.2 ms      │ 207.6 ms      │ 196.8 ms      │ 197.5 ms      │ 30      │ 30
+├─ projection                            │               │               │               │         │
+│  ╰─ hidden_lines                       │               │               │               │         │
+│     ├─ 1                 262.7 µs      │ 344.9 µs      │ 289.2 µs      │ 291 µs        │ 30      │ 30
+│     ├─ 10                2.565 ms      │ 3.396 ms      │ 2.669 ms      │ 2.729 ms      │ 30      │ 30
+│     ╰─ 30                11.06 ms      │ 12.53 ms      │ 11.32 ms      │ 11.42 ms      │ 30      │ 30
+╰─ tessellation                          │               │               │               │         │
+   ╰─ plate                              │               │               │               │         │
+      ├─ 1                 91.13 µs      │ 156.7 µs      │ 101.3 µs      │ 104.8 µs      │ 30      │ 30
+      ├─ 10                580.4 µs      │ 677.7 µs      │ 623.4 µs      │ 624.9 µs      │ 30      │ 30
+      ╰─ 30                1.459 ms      │ 1.986 ms      │ 1.797 ms      │ 1.803 ms      │ 30      │ 30
+
+
+RAYON_NUM_THREADS=4 target/actions-before-deep --bench 'subtract_(batch|sequential)::(1|10|30)$|tessellation::plate::(1|10|30)$|projection::hidden_lines' --sample-count 30 --sample-size 1 --max-time 120
+Timer precision: 10 ns
+actions                    fastest       │ slowest       │ median        │ mean          │ samples │ iters
+├─ boolean                               │               │               │               │         │
+│  ├─ subtract_batch                     │               │               │               │         │
+│  │  ├─ 1                 4.112 ms      │ 4.286 ms      │ 4.193 ms      │ 4.189 ms      │ 30      │ 30
+│  │  ├─ 10                37.57 ms      │ 40.56 ms      │ 38.25 ms      │ 38.53 ms      │ 30      │ 30
+│  │  ╰─ 30                115.2 ms      │ 122.1 ms      │ 116.7 ms      │ 117.3 ms      │ 30      │ 30
+│  ╰─ subtract_sequential                │               │               │               │         │
+│     ├─ 1                 4.068 ms      │ 5.268 ms      │ 4.153 ms      │ 4.255 ms      │ 30      │ 30
+│     ├─ 10                49.92 ms      │ 54.42 ms      │ 50.95 ms      │ 51.34 ms      │ 30      │ 30
+│     ╰─ 30                191.1 ms      │ 203.7 ms      │ 197 ms        │ 196.7 ms      │ 30      │ 30
+├─ projection                            │               │               │               │         │
+│  ╰─ hidden_lines                       │               │               │               │         │
+│     ├─ 1                 252.7 µs      │ 459.6 µs      │ 277.9 µs      │ 284.2 µs      │ 30      │ 30
+│     ├─ 10                2.528 ms      │ 3.314 ms      │ 2.925 ms      │ 2.925 ms      │ 30      │ 30
+│     ╰─ 30                10.95 ms      │ 12.6 ms       │ 11.86 ms      │ 11.84 ms      │ 30      │ 30
+╰─ tessellation                          │               │               │               │         │
+   ╰─ plate                              │               │               │               │         │
+      ├─ 1                 81.65 µs      │ 174.6 µs      │ 90.84 µs      │ 101.3 µs      │ 30      │ 30
+      ├─ 10                499.5 µs      │ 681.9 µs      │ 615.4 µs      │ 608.6 µs      │ 30      │ 30
+      ╰─ 30                1.459 ms      │ 2.05 ms       │ 1.816 ms      │ 1.798 ms      │ 30      │ 30
+
+
+
+After, four workers
+===================
+
+RAYON_NUM_THREADS=4 target/actions-after-deep --bench 'subtract_(batch|sequential)::(1|10|30)$|tessellation::plate::(1|10|30)$|projection::hidden_lines' --sample-count 30 --sample-size 1 --max-time 120
+Timer precision: 20 ns
+actions                    fastest       │ slowest       │ median        │ mean          │ samples │ iters
+├─ boolean                               │               │               │               │         │
+│  ├─ subtract_batch                     │               │               │               │         │
+│  │  ├─ 1                 839.7 µs      │ 1.257 ms      │ 884.3 µs      │ 917.7 µs      │ 30      │ 30
+│  │  ├─ 10                7.652 ms      │ 8.121 ms      │ 7.895 ms      │ 7.891 ms      │ 30      │ 30
+│  │  ╰─ 30                23.71 ms      │ 26.11 ms      │ 24.62 ms      │ 24.6 ms       │ 30      │ 30
+│  ╰─ subtract_sequential                │               │               │               │         │
+│     ├─ 1                 798.6 µs      │ 1.007 ms      │ 837.1 µs      │ 849 µs        │ 30      │ 30
+│     ├─ 10                14.29 ms      │ 15.92 ms      │ 14.98 ms      │ 15.02 ms      │ 30      │ 30
+│     ╰─ 30                76.64 ms      │ 84.68 ms      │ 77.84 ms      │ 78.31 ms      │ 30      │ 30
+├─ projection                            │               │               │               │         │
+│  ╰─ hidden_lines                       │               │               │               │         │
+│     ├─ 1                 193.7 µs      │ 329.9 µs      │ 208.7 µs      │ 216.3 µs      │ 30      │ 30
+│     ├─ 10                1.894 ms      │ 2.297 ms      │ 2.085 ms      │ 2.073 ms      │ 30      │ 30
+│     ╰─ 30                9.347 ms      │ 10.08 ms      │ 9.671 ms      │ 9.691 ms      │ 30      │ 30
+╰─ tessellation                          │               │               │               │         │
+   ╰─ plate                              │               │               │               │         │
+      ├─ 1                 93.94 µs      │ 158 µs        │ 100 µs        │ 107.9 µs      │ 30      │ 30
+      ├─ 10                512.3 µs      │ 611 µs        │ 560.9 µs      │ 558.9 µs      │ 30      │ 30
+      ╰─ 30                1.405 ms      │ 1.838 ms      │ 1.659 ms      │ 1.659 ms      │ 30      │ 30
+
+
+RAYON_NUM_THREADS=4 target/actions-after-deep --bench 'subtract_(batch|sequential)::(1|10|30)$|tessellation::plate::(1|10|30)$|projection::hidden_lines' --sample-count 30 --sample-size 1 --max-time 120
+Timer precision: 10 ns
+actions                    fastest       │ slowest       │ median        │ mean          │ samples │ iters
+├─ boolean                               │               │               │               │         │
+│  ├─ subtract_batch                     │               │               │               │         │
+│  │  ├─ 1                 798.7 µs      │ 1.036 ms      │ 895.4 µs      │ 894.1 µs      │ 30      │ 30
+│  │  ├─ 10                7.626 ms      │ 8.292 ms      │ 7.845 ms      │ 7.856 ms      │ 30      │ 30
+│  │  ╰─ 30                23.71 ms      │ 26.45 ms      │ 24.22 ms      │ 24.51 ms      │ 30      │ 30
+│  ╰─ subtract_sequential                │               │               │               │         │
+│     ├─ 1                 808.1 µs      │ 878 µs        │ 842.4 µs      │ 840.1 µs      │ 30      │ 30
+│     ├─ 10                14.2 ms       │ 16.16 ms      │ 15.06 ms      │ 15.15 ms      │ 30      │ 30
+│     ╰─ 30                76.41 ms      │ 82.13 ms      │ 77.87 ms      │ 78.36 ms      │ 30      │ 30
+├─ projection                            │               │               │               │         │
+│  ╰─ hidden_lines                       │               │               │               │         │
+│     ├─ 1                 188.8 µs      │ 263 µs        │ 199 µs        │ 208.2 µs      │ 30      │ 30
+│     ├─ 10                1.87 ms       │ 2.379 ms      │ 1.964 ms      │ 2.016 ms      │ 30      │ 30
+│     ╰─ 30                9.333 ms      │ 10.5 ms       │ 9.662 ms      │ 9.714 ms      │ 30      │ 30
+╰─ tessellation                          │               │               │               │         │
+   ╰─ plate                              │               │               │               │         │
+      ├─ 1                 84.16 µs      │ 152.4 µs      │ 101.3 µs      │ 107.5 µs      │ 30      │ 30
+      ├─ 10                469.2 µs      │ 639.3 µs      │ 538.3 µs      │ 536.2 µs      │ 30      │ 30
+      ╰─ 30                1.338 ms      │ 1.959 ms      │ 1.59 ms       │ 1.604 ms      │ 30      │ 30
+
+
+
+Additional worker counts
+========================
+
+RAYON_NUM_THREADS=2 target/actions-after-deep --bench 'subtract_(batch|sequential)::30$|tessellation::plate::30$' --sample-count 30 --sample-size 1 --max-time 120
+Timer precision: 10 ns
+actions                    fastest       │ slowest       │ median        │ mean          │ samples │ iters
+├─ boolean                               │               │               │               │         │
+│  ├─ subtract_batch                     │               │               │               │         │
+│  │  ╰─ 30                23.87 ms      │ 29.07 ms      │ 28.23 ms      │ 27.35 ms      │ 30      │ 30
+│  ╰─ subtract_sequential                │               │               │               │         │
+│     ╰─ 30                85.66 ms      │ 92.45 ms      │ 88.85 ms      │ 88.99 ms      │ 30      │ 30
+╰─ tessellation                          │               │               │               │         │
+   ╰─ plate                              │               │               │               │         │
+      ╰─ 30                1.962 ms      │ 2.156 ms      │ 2.028 ms      │ 2.036 ms      │ 30      │ 30
+
+
+RAYON_NUM_THREADS=8 target/actions-after-deep --bench 'subtract_(batch|sequential)::30$|tessellation::plate::30$' --sample-count 30 --sample-size 1 --max-time 120
+Timer precision: 10 ns
+actions                    fastest       │ slowest       │ median        │ mean          │ samples │ iters
+├─ boolean                               │               │               │               │         │
+│  ├─ subtract_batch                     │               │               │               │         │
+│  │  ╰─ 30                24.04 ms      │ 27.41 ms      │ 24.68 ms      │ 24.87 ms      │ 30      │ 30
+│  ╰─ subtract_sequential                │               │               │               │         │
+│     ╰─ 30                73.65 ms      │ 81.57 ms      │ 76.18 ms      │ 76.75 ms      │ 30      │ 30
+╰─ tessellation                          │               │               │               │         │
+   ╰─ plate                              │               │               │               │         │
+      ╰─ 30                1.361 ms      │ 1.611 ms      │ 1.449 ms      │ 1.452 ms      │ 30      │ 30
+
+
+RAYON_NUM_THREADS=16 target/actions-after-deep --bench 'subtract_(batch|sequential)::30$|tessellation::plate::30$' --sample-count 30 --sample-size 1 --max-time 120
+Timer precision: 20 ns
+actions                    fastest       │ slowest       │ median        │ mean          │ samples │ iters
+├─ boolean                               │               │               │               │         │
+│  ├─ subtract_batch                     │               │               │               │         │
+│  │  ╰─ 30                25.03 ms      │ 30.96 ms      │ 26.98 ms      │ 27.26 ms      │ 30      │ 30
+│  ╰─ subtract_sequential                │               │               │               │         │
+│     ╰─ 30                81.87 ms      │ 91.99 ms      │ 85.42 ms      │ 86.04 ms      │ 30      │ 30
+╰─ tessellation                          │               │               │               │         │
+   ╰─ plate                              │               │               │               │         │
+      ╰─ 30                1.472 ms      │ 1.868 ms      │ 1.677 ms      │ 1.634 ms      │ 30      │ 30
+
+
+RAYON_NUM_THREADS=16 target/actions-after-deep --bench 'subtract_(batch|sequential)::30$|tessellation::plate::30$' --sample-count 30 --sample-size 1 --max-time 120
+Timer precision: 10 ns
+actions                    fastest       │ slowest       │ median        │ mean          │ samples │ iters
+├─ boolean                               │               │               │               │         │
+│  ├─ subtract_batch                     │               │               │               │         │
+│  │  ╰─ 30                26.1 ms       │ 29.45 ms      │ 27.1 ms       │ 27.48 ms      │ 30      │ 30
+│  ╰─ subtract_sequential                │               │               │               │         │
+│     ╰─ 30                80.81 ms      │ 87.03 ms      │ 84.09 ms      │ 83.85 ms      │ 30      │ 30
+╰─ tessellation                          │               │               │               │         │
+   ╰─ plate                              │               │               │               │         │
+      ╰─ 30                1.42 ms       │ 1.893 ms      │ 1.575 ms      │ 1.594 ms      │ 30      │ 30
+
+
+RAYON_NUM_THREADS=8 target/actions-after-deep --bench 'subtract_(batch|sequential)::30$|tessellation::plate::30$' --sample-count 30 --sample-size 1 --max-time 120
+Timer precision: 10 ns
+actions                    fastest       │ slowest       │ median        │ mean          │ samples │ iters
+├─ boolean                               │               │               │               │         │
+│  ├─ subtract_batch                     │               │               │               │         │
+│  │  ╰─ 30                24.11 ms      │ 26.98 ms      │ 25.23 ms      │ 25.29 ms      │ 30      │ 30
+│  ╰─ subtract_sequential                │               │               │               │         │
+│     ╰─ 30                73.7 ms       │ 80.7 ms       │ 75.75 ms      │ 76.21 ms      │ 30      │ 30
+╰─ tessellation                          │               │               │               │         │
+   ╰─ plate                              │               │               │               │         │
+      ╰─ 30                1.333 ms      │ 1.691 ms      │ 1.509 ms      │ 1.518 ms      │ 30      │ 30
+
+
+RAYON_NUM_THREADS=2 target/actions-after-deep --bench 'subtract_(batch|sequential)::30$|tessellation::plate::30$' --sample-count 30 --sample-size 1 --max-time 120
+Timer precision: 10 ns
+actions                    fastest       │ slowest       │ median        │ mean          │ samples │ iters
+├─ boolean                               │               │               │               │         │
+│  ├─ subtract_batch                     │               │               │               │         │
+│  │  ╰─ 30                24.28 ms      │ 26.32 ms      │ 25.17 ms      │ 25.21 ms      │ 30      │ 30
+│  ╰─ subtract_sequential                │               │               │               │         │
+│     ╰─ 30                84.6 ms       │ 97.38 ms      │ 87.51 ms      │ 88.21 ms      │ 30      │ 30
+╰─ tessellation                          │               │               │               │         │
+   ╰─ plate                              │               │               │               │         │
+      ╰─ 30                1.919 ms      │ 1.975 ms      │ 1.959 ms      │ 1.955 ms      │ 30      │ 30
+
+
+
+All 64 final benchmarks, one worker
+===================================
+RAYON_NUM_THREADS=1 target/actions-after-deep --bench --sample-count 20 --sample-size 1 --max-time 120
+Timer precision: 10 ns
+actions                          fastest       │ slowest       │ median        │ mean          │ samples │ iters
+├─ boolean                                     │               │               │               │         │
+│  ├─ intersect_cylinders                      │               │               │               │         │
+│  │  ├─ 0.001                   3.284 ms      │ 3.817 ms      │ 3.493 ms      │ 3.512 ms      │ 20      │ 20
+│  │  ├─ 0.01                    824.1 µs      │ 1.061 ms      │ 914 µs        │ 923.9 µs      │ 20      │ 20
+│  │  ╰─ 0.1                     345.1 µs      │ 391.6 µs      │ 352.6 µs      │ 355.9 µs      │ 20      │ 20
+│  ├─ intersect_nurbs_cylinders                │               │               │               │         │
+│  │  ├─ 0.001                   200.9 ms      │ 210.1 ms      │ 203.6 ms      │ 204.7 ms      │ 20      │ 20
+│  │  ├─ 0.01                    15.25 ms      │ 15.49 ms      │ 15.33 ms      │ 15.34 ms      │ 20      │ 20
+│  │  ╰─ 0.1                     5.121 ms      │ 6.158 ms      │ 5.461 ms      │ 5.449 ms      │ 20      │ 20
+│  ├─ subtract_batch                           │               │               │               │         │
+│  │  ├─ 1                       909.4 µs      │ 1.452 ms      │ 938.1 µs      │ 985.3 µs      │ 20      │ 20
+│  │  ├─ 10                      8.364 ms      │ 9.287 ms      │ 8.661 ms      │ 8.697 ms      │ 20      │ 20
+│  │  ├─ 30                      25.58 ms      │ 26.81 ms      │ 25.95 ms      │ 26.01 ms      │ 20      │ 20
+│  │  ╰─ 100                     105.1 ms      │ 110.6 ms      │ 107.2 ms      │ 107.4 ms      │ 20      │ 20
+│  ├─ subtract_sequential                      │               │               │               │         │
+│  │  ├─ 1                       855.3 µs      │ 939.4 µs      │ 872.7 µs      │ 877.1 µs      │ 20      │ 20
+│  │  ├─ 10                      18.77 ms      │ 20.39 ms      │ 19.44 ms      │ 19.48 ms      │ 20      │ 20
+│  │  ├─ 30                      113.7 ms      │ 123.4 ms      │ 116 ms        │ 116.5 ms      │ 20      │ 20
+│  │  ╰─ 100                     1.239 s       │ 1.297 s       │ 1.269 s       │ 1.267 s       │ 20      │ 20
+│  ╰─ union_cylinders                          │               │               │               │         │
+│     ├─ 0.001                   2.948 ms      │ 3.63 ms       │ 3.166 ms      │ 3.276 ms      │ 20      │ 20
+│     ├─ 0.01                    774.7 µs      │ 851.5 µs      │ 795.7 µs      │ 797.3 µs      │ 20      │ 20
+│     ╰─ 0.1                     328.9 µs      │ 377.6 µs      │ 336.4 µs      │ 340.5 µs      │ 20      │ 20
+├─ local                                       │               │               │               │         │
+│  ├─ chamfer                                  │               │               │               │         │
+│  │  ├─ 1                       24.93 µs      │ 32.44 µs      │ 25.59 µs      │ 26.23 µs      │ 20      │ 20
+│  │  ╰─ 12                      73.07 µs      │ 87.02 µs      │ 74.02 µs      │ 75.66 µs      │ 20      │ 20
+│  ├─ draft_box                                │               │               │               │         │
+│  │  ├─ 1                       15.58 µs      │ 18.64 µs      │ 16.03 µs      │ 16.25 µs      │ 20      │ 20
+│  │  ╰─ 4                       20.5 µs       │ 26.81 µs      │ 21.34 µs      │ 22.23 µs      │ 20      │ 20
+│  ├─ fillet                                   │               │               │               │         │
+│  │  ├─ 1                       24.55 µs      │ 32.04 µs      │ 25.23 µs      │ 25.76 µs      │ 20      │ 20
+│  │  ╰─ 12                      51.46 µs      │ 103 µs        │ 52.43 µs      │ 63.44 µs      │ 20      │ 20
+│  ╰─ shell_box                  35.04 µs      │ 41.69 µs      │ 35.71 µs      │ 36.39 µs      │ 20      │ 20
+├─ modeling                                    │               │               │               │         │
+│  ├─ extrude                                  │               │               │               │         │
+│  │  ├─ 4                       1.312 µs      │ 2.113 µs      │ 1.402 µs      │ 1.431 µs      │ 20      │ 20
+│  │  ├─ 32                      10.37 µs      │ 12.8 µs       │ 10.77 µs      │ 10.88 µs      │ 20      │ 20
+│  │  ╰─ 128                     42.43 µs      │ 48.59 µs      │ 43.2 µs       │ 43.96 µs      │ 20      │ 20
+│  ├─ loft                                     │               │               │               │         │
+│  │  ├─ 2                       26.87 µs      │ 41.48 µs      │ 27.92 µs      │ 30.37 µs      │ 20      │ 20
+│  │  ├─ 8                       81.49 µs      │ 91.64 µs      │ 83.87 µs      │ 84.51 µs      │ 20      │ 20
+│  │  ╰─ 32                      403.9 µs      │ 442.4 µs      │ 418.5 µs      │ 419.3 µs      │ 20      │ 20
+│  ├─ revolve                                  │               │               │               │         │
+│  │  ├─ 4                       2.784 µs      │ 7.253 µs      │ 2.925 µs      │ 3.205 µs      │ 20      │ 20
+│  │  ├─ 32                      24.67 µs      │ 53.29 µs      │ 44.35 µs      │ 40.85 µs      │ 20      │ 20
+│  │  ╰─ 128                     97.48 µs      │ 120.8 µs      │ 102.7 µs      │ 104.2 µs      │ 20      │ 20
+│  ├─ sweep_path                               │               │               │               │         │
+│  │  ├─ 1                       2.283 µs      │ 4.007 µs      │ 2.439 µs      │ 2.528 µs      │ 20      │ 20
+│  │  ├─ 8                       14.67 µs      │ 18.36 µs      │ 15.22 µs      │ 15.5 µs       │ 20      │ 20
+│  │  ╰─ 32                      56.43 µs      │ 69.08 µs      │ 58.6 µs       │ 60.41 µs      │ 20      │ 20
+│  ╰─ transform                                │               │               │               │         │
+│     ├─ 1                       2.353 µs      │ 3.536 µs      │ 2.454 µs      │ 2.515 µs      │ 20      │ 20
+│     ├─ 10                      9.027 µs      │ 12.8 µs       │ 9.603 µs      │ 9.76 µs       │ 20      │ 20
+│     ╰─ 30                      24.29 µs      │ 53.72 µs      │ 44.22 µs      │ 40.46 µs      │ 20      │ 20
+├─ projection                                  │               │               │               │         │
+│  ╰─ hidden_lines                             │               │               │               │         │
+│     ├─ 1                       276 µs        │ 342.5 µs      │ 284.7 µs      │ 291.4 µs      │ 20      │ 20
+│     ├─ 10                      2.452 ms      │ 2.982 ms      │ 2.562 ms      │ 2.65 ms       │ 20      │ 20
+│     ╰─ 30                      11.35 ms      │ 12.48 ms      │ 11.9 ms       │ 11.86 ms      │ 20      │ 20
+├─ step                                        │               │               │               │         │
+│  ├─ convert                                  │               │               │               │         │
+│  │  ├─ 1                       19.54 µs      │ 22.13 µs      │ 19.94 µs      │ 20.19 µs      │ 20      │ 20
+│  │  ├─ 10                      82.06 µs      │ 89.33 µs      │ 82.85 µs      │ 83.46 µs      │ 20      │ 20
+│  │  ╰─ 30                      222.2 µs      │ 233.2 µs      │ 223.9 µs      │ 225.8 µs      │ 20      │ 20
+│  ├─ export                                   │               │               │               │         │
+│  │  ├─ 1                       21.09 µs      │ 26.79 µs      │ 21.3 µs       │ 21.66 µs      │ 20      │ 20
+│  │  ├─ 10                      86.46 µs      │ 97.89 µs      │ 86.86 µs      │ 88.15 µs      │ 20      │ 20
+│  │  ╰─ 30                      232 µs        │ 250.6 µs      │ 234.2 µs      │ 236.3 µs      │ 20      │ 20
+│  ├─ import                                   │               │               │               │         │
+│  │  ├─ 1                       763.1 µs      │ 802.7 µs      │ 777.4 µs      │ 780.2 µs      │ 20      │ 20
+│  │  ├─ 10                      2.907 ms      │ 2.974 ms      │ 2.931 ms      │ 2.932 ms      │ 20      │ 20
+│  │  ╰─ 30                      7.579 ms      │ 7.816 ms      │ 7.605 ms      │ 7.623 ms      │ 20      │ 20
+│  ╰─ parse                                    │               │               │               │         │
+│     ├─ 1                       737.9 µs      │ 755 µs        │ 749 µs        │ 747.5 µs      │ 20      │ 20
+│     ├─ 10                      2.771 ms      │ 2.852 ms      │ 2.795 ms      │ 2.798 ms      │ 20      │ 20
+│     ╰─ 30                      7.261 ms      │ 7.323 ms      │ 7.294 ms      │ 7.292 ms      │ 20      │ 20
+╰─ tessellation                                │               │               │               │         │
+   ├─ cylinder_tolerance                       │               │               │               │         │
+   │  ├─ 0.001                   399.9 µs      │ 523.8 µs      │ 416.8 µs      │ 424.5 µs      │ 20      │ 20
+   │  ├─ 0.01                    120.9 µs      │ 136 µs        │ 125.4 µs      │ 126.7 µs      │ 20      │ 20
+   │  ╰─ 0.1                     59.83 µs      │ 70.53 µs      │ 61.35 µs      │ 62.17 µs      │ 20      │ 20
+   ├─ mesh_to_polygon                          │               │               │               │         │
+   │  ├─ 1                       2.805 µs      │ 4.448 µs      │ 2.86 µs       │ 2.947 µs      │ 20      │ 20
+   │  ├─ 10                      17.69 µs      │ 22.12 µs      │ 17.83 µs      │ 18.36 µs      │ 20      │ 20
+   │  ╰─ 30                      52.52 µs      │ 58.8 µs       │ 52.81 µs      │ 53.35 µs      │ 20      │ 20
+   ╰─ plate                                    │               │               │               │         │
+      ├─ 1                       181.3 µs      │ 229.3 µs      │ 195.9 µs      │ 195.1 µs      │ 20      │ 20
+      ├─ 10                      1.045 ms      │ 1.13 ms       │ 1.058 ms      │ 1.068 ms      │ 20      │ 20
+      ├─ 30                      3.489 ms      │ 3.98 ms       │ 3.669 ms      │ 3.694 ms      │ 20      │ 20
+      ╰─ 100                     16.08 ms      │ 17.6 ms       │ 16.7 ms       │ 16.73 ms      │ 20      │ 20
+
+
+
+NURBS control: bulk derivative tables
+=====================================
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/git/truck/truck-geometry)
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/git/truck/truck-modeling)
+   Compiling truck-meshalgo v0.4.0 (/home/krone/Development/git/truck/truck-meshalgo)
+   Compiling truck-drafting v0.1.0 (/home/krone/Development/git/truck/truck-drafting)
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/git/truck/truck-stepio)
+   Compiling truck-hlr v0.1.0 (/home/krone/Development/git/truck/truck-hlr)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/git/truck/truck-shapeops)
+   Compiling truck-benchmarks v0.1.0 (/home/krone/Development/git/truck/truck-benchmarks)
+    Finished `bench` profile [optimized] target(s) in 11.17s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running benches/actions.rs (target/release/deps/actions-62c012380e689677)
+Timer precision: 10 ns
+actions                          fastest       │ slowest       │ median        │ mean          │ samples │ iters
+╰─ boolean                                     │               │               │               │         │
+   ╰─ intersect_nurbs_cylinders                │               │               │               │         │
+      ├─ 0.001                   202.5 ms      │ 221.1 ms      │ 210.5 ms      │ 210.8 ms      │ 50      │ 50
+      ├─ 0.01                    15.57 ms      │ 17.4 ms       │ 16.11 ms      │ 16.18 ms      │ 50      │ 50
+      ╰─ 0.1                     5.121 ms      │ 5.84 ms       │ 5.404 ms      │ 5.454 ms      │ 50      │ 50
+
+
+
+NURBS control: direct derivatives
+=================================
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/git/truck/truck-geometry)
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/git/truck/truck-modeling)
+   Compiling truck-meshalgo v0.4.0 (/home/krone/Development/git/truck/truck-meshalgo)
+   Compiling truck-drafting v0.1.0 (/home/krone/Development/git/truck/truck-drafting)
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/git/truck/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/git/truck/truck-shapeops)
+   Compiling truck-hlr v0.1.0 (/home/krone/Development/git/truck/truck-hlr)
+   Compiling truck-benchmarks v0.1.0 (/home/krone/Development/git/truck/truck-benchmarks)
+    Finished `bench` profile [optimized] target(s) in 11.14s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running benches/actions.rs (target/release/deps/actions-62c012380e689677)
+Timer precision: 10 ns
+actions                          fastest       │ slowest       │ median        │ mean          │ samples │ iters
+╰─ boolean                                     │               │               │               │         │
+   ╰─ intersect_nurbs_cylinders                │               │               │               │         │
+      ├─ 0.001                   202.6 ms      │ 213.7 ms      │ 207.2 ms      │ 207.2 ms      │ 50      │ 50
+      ├─ 0.01                    14.48 ms      │ 15.85 ms      │ 14.72 ms      │ 14.94 ms      │ 50      │ 50
+      ╰─ 0.1                     4.754 ms      │ 6.108 ms      │ 5.042 ms      │ 5.039 ms      │ 50      │ 50
+
+
+
+Final single-run stages, one worker
+===================================
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/git/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 4.13s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/bench_plate.rs (target/release/deps/bench_plate-4ba14a1c7f7f44d8)
+
+running 1 test
+   n mode          total ms   triang.   pairing   interf.  division  classif.   fitting   scanned   overlap
+  10 one boolean       10.9       2.7       0.1       2.3       4.6       0.2       0.8       240        40
+  10 one by one        22.5      11.2       0.2       4.2       4.9       0.2       1.2       600        40
+  30 one boolean       29.5       5.4       0.1       7.6      13.6       0.2       2.3       720       120
+  30 one by one       121.7      71.2       1.4      22.2      17.0       1.0       4.1      4200       120
+ 100 one boolean      114.0      16.1       0.3      38.6      49.5       0.9       7.4      2400       400
+ 100 one by one      1358.0     999.7      12.4     164.3     105.1      10.1      19.8     42000       400
+test plate_with_holes ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.90s
+
+
+
+Final single-run stages, four workers
+=====================================
+    Finished `release` profile [optimized] target(s) in 0.07s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/bench_plate.rs (target/release/deps/bench_plate-4ba14a1c7f7f44d8)
+
+running 1 test
+   n mode          total ms   triang.   pairing   interf.  division  classif.   fitting   scanned   overlap
+  10 one boolean       10.6       1.8       0.2       2.7       4.7       0.2       0.9       240        40
+  10 one by one        18.5       6.3       0.3       4.3       5.1       0.2       1.3       600        40
+  30 one boolean       27.4       2.8       0.1       7.8      13.6       0.3       2.4       720       120
+  30 one by one        84.1      33.4       1.3      21.5      17.9       1.1       4.2      4200       120
+ 100 one boolean      108.2       8.0       0.4      39.5      50.8       0.7       7.6      2400       400
+ 100 one by one      1000.4     634.8      13.2     166.6     107.1      10.2      20.4     42000       400
+test plate_with_holes ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.44s
+

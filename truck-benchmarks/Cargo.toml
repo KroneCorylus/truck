@@ -1,0 +1,21 @@
+[package]
+name = "truck-benchmarks"
+version = "0.1.0"
+edition = "2021"
+publish = false
+autobenches = false
+
+[features]
+allocations = []
+
+[dev-dependencies]
+divan = "0.1.21"
+truck-modeling = { path = "../truck-modeling" }
+truck-shapeops = { path = "../truck-shapeops", default-features = false }
+truck-meshalgo = { path = "../truck-meshalgo" }
+truck-stepio = { path = "../truck-stepio" }
+truck-hlr = { path = "../truck-hlr" }
+
+[[bench]]
+name = "actions"
+harness = false

@@ -319,7 +319,10 @@ fn get_mindiff(u: f64, u0: f64, up: f64) -> f64 {
 }
 
 #[derive(Debug, Default, Clone)]
-struct PolyBoundary(Vec<Vec<SurfacePoint>>);
+struct PolyBoundary {
+    loops: Vec<Vec<SurfacePoint>>,
+    bounds: Vec<BoundingBox<Point2>>,
+}
 
 fn normalize_range(curve: &mut Vec<SurfacePoint>, compidx: usize, (u0, u1): (f64, f64)) {
     let p = curve[0];
@@ -459,16 +462,32 @@ impl PolyBoundary {
                 closed.push(connect_edges([vec0, vec1, vec2, vec3]));
             }
         }
-        Self(closed)
+        Self::from_loops(closed)
+    }
+
+    fn from_loops(loops: Vec<Vec<SurfacePoint>>) -> Self {
+        let padding = Vector2::new(TOLERANCE, TOLERANCE);
+        let bounds = loops
+            .iter()
+            .map(|points| {
+                let bounds: BoundingBox<Point2> = points.iter().map(|p| p.uv).collect();
+                // A nearby edge must still run the tolerance-sensitive boundary test.
+                BoundingBox::from_iter([bounds.min() - padding, bounds.max() + padding])
+            })
+            .collect();
+        Self { loops, bounds }
     }
 
     /// whether `c` is included in the domain with boundary = `self`.
     fn include(&self, c: Point2) -> bool {
         let t = 2.0 * std::f64::consts::PI * HashGen::hash1(c);
         let r = Vector2::new(f64::cos(t), f64::sin(t));
-        self.0
+        self.loops
             .iter()
-            .flat_map(|vec| vec.iter().circular_tuple_windows())
+            .zip(&self.bounds)
+            // A closed loop has zero winding outside its bounding box.
+            .filter(|(_, bounds)| bounds.contains(c))
+            .flat_map(|(vec, _)| vec.iter().circular_tuple_windows())
             .try_fold(0_i32, move |counter, (p0, p1)| {
                 let a = **p0 - c;
                 let b = **p1 - c;
@@ -497,7 +516,7 @@ impl PolyBoundary {
         boundary_map: &mut HashMap<FixedVertexHandle, Point3>,
     ) {
         let poly2tri: Vec<_> = self
-            .0
+            .loops
             .iter()
             .flatten()
             .map(|pt| {
@@ -513,7 +532,7 @@ impl PolyBoundary {
             .collect();
         let mut prev: Option<usize> = None;
         let mut counter = 0;
-        self.0
+        self.loops
             .iter()
             .map(Vec::len)
             .flat_map(|len| {
@@ -578,6 +597,11 @@ fn refine_interior(
     tol: f64,
 ) {
     for _ in 0..20 {
+        let mut positions = vec![Point3::origin(); triangulation.num_vertices()];
+        for vertex in triangulation.vertices() {
+            let uv = vertex.as_ref();
+            positions[vertex.index()] = surface.subs(uv.x, uv.y);
+        }
         let points: Vec<_> = triangulation
             .undirected_edges()
             .filter(|edge| {
@@ -594,10 +618,7 @@ fn refine_interior(
                     let Some(face) = edge.face().as_inner() else {
                         return false;
                     };
-                    let [p, q, r] = face.vertices().map(|v| {
-                        let uv = *v.as_ref();
-                        surface.subs(uv.x, uv.y)
-                    });
+                    let [p, q, r] = face.vertices().map(|v| positions[v.index()]);
                     let normal = (q - p).cross(r - p);
                     let distance = (point - p).dot(normal);
                     distance * distance > tol * tol * normal.magnitude2()
@@ -626,7 +647,7 @@ fn insert_surface(
     tol: f64,
 ) -> bool {
     let bdb: BoundingBox<Point2> = polyline
-        .0
+        .loops
         .iter()
         .flatten()
         .map(std::ops::Deref::deref)
@@ -765,3 +786,6 @@ fn par_bench() {
     });
     println!("{}ms", instant.elapsed().as_millis());
 }
+
+#[cfg(test)]
+mod tests;

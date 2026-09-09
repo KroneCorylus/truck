@@ -15,10 +15,16 @@ where
     S1: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>,
 {
     let function = move |Vector4 { x, y, z, w }| {
-        let ders0 = surface0.ders(1, x, y);
-        let (pt0, uder0, vder0) = (ders0[0][0], ders0[1][0], ders0[0][1]);
-        let ders1 = surface1.ders(1, z, w);
-        let (pt1, uder1, vder1) = (ders1[0][0], ders1[1][0], ders1[0][1]);
+        let (pt0, uder0, vder0) = (
+            surface0.subs(x, y).to_vec(),
+            surface0.uder(x, y),
+            surface0.vder(x, y),
+        );
+        let (pt1, uder1, vder1) = (
+            surface1.subs(z, w).to_vec(),
+            surface1.uder(z, w),
+            surface1.vder(z, w),
+        );
         CalcOutput {
             value: (pt0 - pt1).extend(plane_normal.dot((pt0 + pt1) / 2.0 - plane_point.to_vec())),
             derivation: Matrix4::from_cols(
