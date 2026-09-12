@@ -177,8 +177,10 @@ impl<P, C, S> Shell<P, C, S> {
             })
             .collect();
         let mut res = Vec::new();
+        // Entries are only removed, so no vertex the cursor has passed gets one back.
+        let mut vertices = self.vertex_iter();
         while !vemap.is_empty() {
-            let edge = self.vertex_iter().find_map(|v| vemap.get(&v.id())).unwrap();
+            let edge = vertices.find_map(|v| vemap.get(&v.id())).unwrap();
             if let Some(mut cursor) = vemap.remove(&edge.front().id()) {
                 let mut wire = Wire::from(vec![cursor.clone()]);
                 loop {
@@ -1249,6 +1251,41 @@ mod tests {
     }
 
     fn ids(shell: &Shell<(), (), ()>) -> Vec<FaceID<()>> { shell.iter().map(Face::id).collect() }
+
+    #[test]
+    fn extract_boundaries_follow_vertex_order() {
+        // The side of a triangular prism: bottom ring b0 b1 b2, top ring t0 t1 t2.
+        let v = Vertex::news([(); 6]);
+        let bottom: Vec<_> = (0..3)
+            .map(|i| Edge::new(&v[i], &v[(i + 1) % 3], ()))
+            .collect();
+        let top: Vec<_> = (0..3)
+            .map(|i| Edge::new(&v[3 + (i + 1) % 3], &v[3 + i], ()))
+            .collect();
+        let side: Vec<_> = (0..3).map(|i| Edge::new(&v[i], &v[3 + i], ())).collect();
+        let shell: Shell<_, _, _> = (0..3)
+            .map(|i| {
+                let wire = Wire::from(vec![
+                    bottom[i].clone(),
+                    side[(i + 1) % 3].clone(),
+                    top[i].clone(),
+                    side[i].inverse(),
+                ]);
+                Face::new(vec![wire], ())
+            })
+            .collect();
+        assert_eq!(
+            shell.extract_boundaries(),
+            vec![
+                Wire::from(vec![
+                    bottom[0].clone(),
+                    bottom[1].clone(),
+                    bottom[2].clone()
+                ]),
+                Wire::from(vec![top[0].clone(), top[2].clone(), top[1].clone()]),
+            ],
+        );
+    }
 
     #[test]
     fn connected_components_keep_face_order() {

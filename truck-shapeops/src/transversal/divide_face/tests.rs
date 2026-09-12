@@ -1,21 +1,22 @@
 use super::*;
+use crate::alternative::Alternative;
 use shell::ShellCondition;
+use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::Arc;
 use truck_geometry::prelude::*;
 use truck_topology::Vertex;
 const TOL: f64 = 0.05;
 
-fn line(v0: &Vertex<Point3>, v1: &Vertex<Point3>) -> Edge<Point3, BSplineCurve<Point3>> {
+type Curve<S> = AltCurve<BSplineCurve<Point3>, S>;
+
+fn line<S>(v0: &Vertex<Point3>, v1: &Vertex<Point3>) -> Edge<Point3, Curve<S>> {
     let curve = BSplineCurve::new(KnotVec::bezier_knot(1), vec![v0.point(), v1.point()]);
-    Edge::new(v0, v1, curve)
+    Edge::new(v0, v1, Alternative::FirstType(curve))
 }
 
-fn parabola(
-    v0: &Vertex<Point3>,
-    v1: &Vertex<Point3>,
-    pt: Point3,
-) -> Edge<Point3, BSplineCurve<Point3>> {
+fn parabola<S>(v0: &Vertex<Point3>, v1: &Vertex<Point3>, pt: Point3) -> Edge<Point3, Curve<S>> {
     let curve = BSplineCurve::new(KnotVec::bezier_knot(2), vec![v0.point(), pt, v1.point()]);
-    Edge::new(v0, v1, curve)
+    Edge::new(v0, v1, Alternative::FirstType(curve))
 }
 
 #[test]
@@ -28,7 +29,7 @@ fn divide_plane_test() {
         Point3::new(1.0, 1.0, 0.0),
         Point3::new(1.0, 3.0, 0.0),
     ]);
-    let edge = [
+    let edge: [Edge<Point3, Curve<Plane>>; 7] = [
         parabola(&v[0], &v[1], Point3::new(-4.0, 2.0, 0.0)),
         parabola(&v[0], &v[1], Point3::new(4.0, 2.0, 0.0)),
         line(&v[0], &v[1]),
@@ -87,11 +88,11 @@ fn divide_plane_test() {
     }
 }
 
-type AlternativeIntersection = crate::alternative::Alternative<
+type AlternativeIntersection = Alternative<
     NurbsCurve<Vector4>,
     IntersectionCurve<PolylineCurve<Point3>, AlternativeSurface, AlternativeSurface>,
 >;
-type AlternativeSurface = crate::alternative::Alternative<BSplineSurface<Point3>, Plane>;
+type AlternativeSurface = Alternative<BSplineSurface<Point3>, Plane>;
 
 crate::impl_from!(
     NurbsCurve<Vector4>,
@@ -223,4 +224,126 @@ fn independent_intersection() {
 
     let and_shell: Shell<_, _, _> = vec![and0[0].clone(), and1[0].clone()].into();
     assert_eq!(and_shell.shell_condition(), ShellCondition::Closed);
+}
+
+/// A plane counting its nearest-point searches, which every exact intersection-curve
+/// evaluation starts with.
+#[derive(Clone, Debug)]
+struct CountedPlane {
+    plane: Plane,
+    nearest: Arc<AtomicUsize>,
+}
+
+impl ParametricSurface for CountedPlane {
+    type Point = Point3;
+    type Vector = Vector3;
+    fn subs(&self, u: f64, v: f64) -> Point3 { self.plane.subs(u, v) }
+    fn uder(&self, u: f64, v: f64) -> Vector3 { self.plane.uder(u, v) }
+    fn vder(&self, u: f64, v: f64) -> Vector3 { self.plane.vder(u, v) }
+    fn uuder(&self, u: f64, v: f64) -> Vector3 { self.plane.uuder(u, v) }
+    fn uvder(&self, u: f64, v: f64) -> Vector3 { self.plane.uvder(u, v) }
+    fn vvder(&self, u: f64, v: f64) -> Vector3 { self.plane.vvder(u, v) }
+    fn der_mn(&self, m: usize, n: usize, u: f64, v: f64) -> Vector3 {
+        self.plane.der_mn(m, n, u, v)
+    }
+}
+impl ParametricSurface3D for CountedPlane {}
+impl Invertible for CountedPlane {
+    fn invert(&mut self) { self.plane.invert() }
+}
+impl SearchParameter<D2> for CountedPlane {
+    type Point = Point3;
+    fn search_parameter<H: Into<SPHint2D>>(
+        &self,
+        point: Point3,
+        hint: H,
+        trials: usize,
+    ) -> Option<(f64, f64)> {
+        self.plane.search_parameter(point, hint, trials)
+    }
+}
+impl SearchNearestParameter<D2> for CountedPlane {
+    type Point = Point3;
+    fn search_nearest_parameter<H: Into<SPHint2D>>(
+        &self,
+        point: Point3,
+        hint: H,
+        trials: usize,
+    ) -> Option<(f64, f64)> {
+        self.nearest.fetch_add(1, Ordering::Relaxed);
+        self.plane.search_nearest_parameter(point, hint, trials)
+    }
+}
+
+#[test]
+fn division_traces_cut_edges_without_solving_them() {
+    let nearest = Arc::new(AtomicUsize::new(0));
+    let counted = |plane| CountedPlane {
+        plane,
+        nearest: nearest.clone(),
+    };
+    let floor = counted(Plane::new(
+        Point3::origin(),
+        Point3::new(1.0, 0.0, 0.0),
+        Point3::new(0.0, 1.0, 0.0),
+    ));
+    let wall = counted(Plane::new(
+        Point3::new(1.0, 0.0, 0.0),
+        Point3::new(1.0, 1.0, 0.0),
+        Point3::new(1.0, 0.0, 1.0),
+    ));
+    let v = Vertex::news([
+        Point3::new(0.0, 0.0, 0.0),
+        Point3::new(1.0, 0.0, 0.0),
+        Point3::new(2.0, 0.0, 0.0),
+        Point3::new(2.0, 1.0, 0.0),
+        Point3::new(1.0, 1.0, 0.0),
+        Point3::new(0.0, 1.0, 0.0),
+    ]);
+    let edge: Vec<_> = (0..6).map(|i| line(&v[i], &v[(i + 1) % 6])).collect();
+    let leader = PolylineCurve(vec![
+        Point3::new(1.0, 0.0, 0.0),
+        Point3::new(1.0, 0.5, 0.0),
+        Point3::new(1.0, 1.0, 0.0),
+    ]);
+    let cut = Edge::new(
+        &v[1],
+        &v[4],
+        Alternative::SecondType(IntersectionCurve::new(floor.clone(), wall, leader)),
+    );
+    let face = Face::new(vec![edge.iter().cloned().collect()], floor);
+    let left = wire![
+        edge[0].clone(),
+        cut.clone(),
+        edge[4].clone(),
+        edge[5].clone()
+    ];
+    let right = wire![
+        edge[1].clone(),
+        edge[2].clone(),
+        edge[3].clone(),
+        cut.inverse()
+    ];
+    let loops: Loops<_, _> = vec![
+        BoundaryWire::new(left.clone(), ShapesOpStatus::And),
+        BoundaryWire::new(right.clone(), ShapesOpStatus::Or),
+    ]
+    .into_iter()
+    .collect();
+
+    let res = divide_one_face(&face, &loops, 0.01).unwrap();
+
+    assert_eq!(nearest.load(Ordering::Relaxed), 0);
+    assert_eq!(res.len(), 2);
+    for (face, status) in res {
+        let expected = match status {
+            ShapesOpStatus::And => &left,
+            ShapesOpStatus::Or => &right,
+            _ => panic!("every piece is decided by its cut"),
+        };
+        assert_eq!(
+            &face.absolute_boundaries()[..],
+            std::slice::from_ref(expected)
+        );
+    }
 }

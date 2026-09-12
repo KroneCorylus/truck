@@ -197,8 +197,10 @@ fn classify_unknown<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
 ///
 /// `tol` does two jobs: both shells are triangulated at `tol`, which seeds the face pairing
 /// and the interference polylines, and the edges are sampled at `tol` when the faces are
-/// divided and the leftover pieces classified. Coincidence of points, vertex snapping and the
-/// bounding-box slack in `loops_store` and `polyline_construction` use the global `TOLERANCE`.
+/// divided and the leftover pieces classified. Division traces the new cut edges through the
+/// intersection points their polylines already hold instead. Coincidence of points, vertex
+/// snapping and the bounding-box slack in `loops_store` and `polyline_construction` use the
+/// global `TOLERANCE`.
 fn process_boundaries<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     shell0: &Shell<Point3, C, S>,
     shell1: &Shell<Point3, C, S>,

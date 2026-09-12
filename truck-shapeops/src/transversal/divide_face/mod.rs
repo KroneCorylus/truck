@@ -2,35 +2,52 @@
 
 use super::faces_classification::FacesClassification;
 use super::loops_store::*;
+use crate::alternative::Alternative;
 use rustc_hash::FxHashMap as HashMap;
 use std::ops::Deref;
 use std::result::Result;
 use truck_base::diagnostics::{Code, Diagnostic};
+use truck_geometry::prelude::IntersectionCurve;
 use truck_meshalgo::prelude::*;
 use truck_topology::*;
 
-fn create_parameter_boundary<P, C, S>(
-    face: &Face<P, C, S>,
-    wire: &Wire<P, C>,
-    polys: &mut HashMap<EdgeID<C>, PolylineCurve<P>>,
+/// The curves of a boolean: the operands' own, and the edges cut by this operation.
+type AltCurve<C, S> = Alternative<C, IntersectionCurve<PolylineCurve<Point3>, S, S>>;
+
+fn create_parameter_boundary<C, S>(
+    face: &Face<Point3, AltCurve<C, S>, S>,
+    wire: &Wire<Point3, AltCurve<C, S>>,
+    polys: &mut HashMap<EdgeID<AltCurve<C, S>>, PolylineCurve<Point3>>,
     tol: f64,
 ) -> Option<PolylineCurve<Point2>>
 where
-    P: Copy,
-    C: BoundedCurve<Point = P> + ParameterDivision1D<Point = P>,
-    S: ParametricSurface<Point = P> + SearchParameter<D2, Point = P>,
+    C: BoundedCurve<Point = Point3> + ParameterDivision1D<Point = Point3>,
+    S: ParametricSurface<Point = Point3> + SearchParameter<D2, Point = Point3>,
 {
     let surface = face.surface();
     let pt = wire.front_vertex()?.point();
     let p: Point2 = surface.search_parameter(pt, None, 100)?.into();
     let vec = wire.edge_iter().try_fold(vec![p], |mut vec, edge| {
-        let poly = polys.entry(edge.id()).or_insert_with(|| {
-            let curve = edge.curve();
-            let div = curve.parameter_division(curve.range_tuple(), tol).1;
-            PolylineCurve(div)
-        });
+        let poly = polys
+            .entry(edge.id())
+            .or_insert_with(|| match edge.curve() {
+                Alternative::FirstType(curve) => {
+                    PolylineCurve(curve.parameter_division(curve.range_tuple(), tol).1)
+                }
+                // A cut edge's leader already runs through solved intersection points, as densely
+                // as the `tol` meshes it was found in. Cuts may have interpolated its ends, so the
+                // edge's vertices replace them.
+                Alternative::SecondType(curve) => {
+                    let leader = curve.leader();
+                    let inner = leader.iter().skip(1).take(leader.len().saturating_sub(2));
+                    let mut points = vec![edge.absolute_front().point()];
+                    points.extend(inner);
+                    points.push(edge.absolute_back().point());
+                    PolylineCurve(points)
+                }
+            });
         let mut p = *vec.last().unwrap();
-        let closure = |q: &P| -> Option<Point2> {
+        let closure = |q: &Point3| -> Option<Point2> {
             let mut next: Point2 = surface
                 .search_parameter(*q, Some(p.into()), 100)
                 .or_else(|| surface.search_parameter(*q, None, 100))?
@@ -62,10 +79,10 @@ struct WireChunk<'a, C> {
     wire: &'a BoundaryWire<Point3, C>,
 }
 
-type FaceWithShapesOpStatus<C, S> = (Face<Point3, C, S>, ShapesOpStatus);
+type FaceWithShapesOpStatus<C, S> = (Face<Point3, AltCurve<C, S>, S>, ShapesOpStatus);
 fn divide_one_face<C, S>(
-    face: &Face<Point3, C, S>,
-    loops: &Loops<Point3, C>,
+    face: &Face<Point3, AltCurve<C, S>, S>,
+    loops: &Loops<Point3, AltCurve<C, S>>,
     tol: f64,
 ) -> Result<Vec<FaceWithShapesOpStatus<C, S>>, Diagnostic>
 where
@@ -103,7 +120,7 @@ where
                 Some(chunk) => chunk.wire.status(),
                 None => ShapesOpStatus::Unknown,
             };
-            let wires: Vec<Wire<Point3, C>> = pre_face
+            let wires: Vec<Wire<Point3, AltCurve<C, S>>> = pre_face
                 .into_iter()
                 .map(|chunk| chunk.wire.deref().clone())
                 .collect();
@@ -121,10 +138,10 @@ where
 
 #[cfg(test)]
 pub fn divide_faces<C, S>(
-    shell: &Shell<Point3, C, S>,
-    loops_store: &LoopsStore<Point3, C>,
+    shell: &Shell<Point3, AltCurve<C, S>, S>,
+    loops_store: &LoopsStore<Point3, AltCurve<C, S>>,
     tol: f64,
-) -> Option<FacesClassification<Point3, C, S>>
+) -> Option<FacesClassification<Point3, AltCurve<C, S>, S>>
 where
     C: BoundedCurve<Point = Point3> + ParameterDivision1D<Point = Point3>,
     S: ParametricSurface3D + SearchParameter<D2, Point = Point3>,
@@ -133,15 +150,15 @@ where
 }
 
 pub fn try_divide_faces<C, S>(
-    shell: &Shell<Point3, C, S>,
-    loops_store: &LoopsStore<Point3, C>,
+    shell: &Shell<Point3, AltCurve<C, S>, S>,
+    loops_store: &LoopsStore<Point3, AltCurve<C, S>>,
     tol: f64,
-) -> Result<FacesClassification<Point3, C, S>, Diagnostic>
+) -> Result<FacesClassification<Point3, AltCurve<C, S>, S>, Diagnostic>
 where
     C: BoundedCurve<Point = Point3> + ParameterDivision1D<Point = Point3>,
     S: ParametricSurface3D + SearchParameter<D2, Point = Point3>,
 {
-    let mut res = FacesClassification::<Point3, C, S>::default();
+    let mut res = FacesClassification::default();
     shell
         .iter()
         .zip(loops_store)

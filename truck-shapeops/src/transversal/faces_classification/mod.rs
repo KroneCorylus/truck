@@ -1,5 +1,5 @@
 use super::loops_store::ShapesOpStatus;
-use rustc_hash::FxHashMap as HashMap;
+use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};
 use truck_topology::*;
 
 #[derive(Clone, Debug)]
@@ -50,12 +50,16 @@ impl<P, C, S> FacesClassification<P, C, S> {
     /// Gives each connected component of undecided faces the status of a decided face it
     /// shares an edge with. Overlaps of coincident faces decide nothing about their neighbours.
     pub fn integrate_by_component(&mut self) {
-        let and_boundary = self
-            .faces_where(|status| status == ShapesOpStatus::And)
-            .extract_boundaries();
-        let or_boundary = self
-            .faces_where(|status| status == ShapesOpStatus::Or)
-            .extract_boundaries();
+        let boundary_edges = |status| -> HashSet<EdgeID<C>> {
+            self.faces_where(|s| s == status)
+                .extract_boundaries()
+                .iter()
+                .flatten()
+                .map(Edge::id)
+                .collect()
+        };
+        let and_boundary = boundary_edges(ShapesOpStatus::And);
+        let or_boundary = boundary_edges(ShapesOpStatus::Or);
         let unknown = self.faces_where(|status| status == ShapesOpStatus::Unknown);
         let components = unknown.connected_components();
         for comp in components {
@@ -63,19 +67,11 @@ impl<P, C, S> FacesClassification<P, C, S> {
             let Some(first) = boundary.iter().flatten().next() else {
                 continue;
             };
-            if and_boundary
-                .iter()
-                .flatten()
-                .any(|edge| edge.id() == first.id())
-            {
+            if and_boundary.contains(&first.id()) {
                 comp.iter().for_each(|face| {
                     *self.status.get_mut(&face.id()).unwrap() = ShapesOpStatus::And;
                 })
-            } else if or_boundary
-                .iter()
-                .flatten()
-                .any(|edge| edge.id() == first.id())
-            {
+            } else if or_boundary.contains(&first.id()) {
                 comp.iter().for_each(|face| {
                     *self.status.get_mut(&face.id()).unwrap() = ShapesOpStatus::Or;
                 })
