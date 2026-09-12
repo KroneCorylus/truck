@@ -137,6 +137,7 @@ pub fn project(solid: &Solid, plane: &Plane, direction: Vector3, tol: f64) -> Pr
     let projected: Vec<&Curve2> = items.iter().map(|item| &item.projected).collect();
     let splits = crossing::split_parameters(&projected, tol);
     let toward_viewer = -direction.normalize();
+    let occluders = occlusion::Occluders::new(&mesh, toward_viewer);
 
     let mut curves = Vec::new();
     for (item, splits) in items.iter().zip(splits) {
@@ -152,8 +153,14 @@ pub fn project(solid: &Solid, plane: &Plane, direction: Vector3, tol: f64) -> Pr
         let bounds = std::iter::once(t0).chain(splits).chain(std::iter::once(t1));
         for (a, b) in bounds.tuple_windows() {
             let point = item.curve.subs((a + b) / 2.0);
-            let hidden =
-                occlusion::hidden(&mesh, point, toward_viewer, &faces, item.silhouette, tol);
+            let hidden = occlusion::hidden(
+                &occluders,
+                point,
+                toward_viewer,
+                &faces,
+                item.silhouette,
+                tol,
+            );
             let visibility = match hidden {
                 true => Visibility::Hidden,
                 false => Visibility::Visible,

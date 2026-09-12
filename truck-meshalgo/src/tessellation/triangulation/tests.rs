@@ -1,6 +1,39 @@
 use super::*;
 use proptest::prelude::*;
 
+#[test]
+#[cfg(not(target_arch = "wasm32"))]
+fn one_worker_and_parallel_tessellation_are_identical() {
+    use truck_modeling::{builder, primitive, Face, Solid};
+    let circle = builder::rsweep(
+        &builder::vertex(Point3::new(1.0, 0.0, 0.0)),
+        Point3::origin(),
+        Vector3::unit_z(),
+        Rad(std::f64::consts::TAU),
+        2,
+    );
+    let face: Face = builder::try_attach_plane(vec![circle]).unwrap();
+    let cylinder: Solid = builder::tsweep(&face, Vector3::unit_z() * 2.0);
+    let cube: Solid = primitive::cuboid(BoundingBox::from_iter([
+        Point3::origin(),
+        Point3::new(2.0, 2.0, 2.0),
+    ]));
+    let serial = rayon::ThreadPoolBuilder::new()
+        .num_threads(1)
+        .build()
+        .unwrap();
+    let parallel = rayon::ThreadPoolBuilder::new()
+        .num_threads(4)
+        .build()
+        .unwrap();
+    for solid in [cube, cylinder] {
+        for tol in [0.1, 0.01, 0.001] {
+            let run = || solid.triangulation(tol).to_polygon();
+            assert_eq!(serial.install(run), parallel.install(run));
+        }
+    }
+}
+
 fn polygon(points: &[[f64; 2]]) -> Vec<SurfacePoint> {
     points
         .iter()

@@ -25,7 +25,7 @@ pub(crate) struct Support<'a> {
 /// answers. A silhouette point is first put back onto its surface, since its curve is only
 /// fitted.
 pub(crate) fn hidden(
-    mesh: &PolygonMesh,
+    mesh: &Occluders,
     point: Point3,
     toward: Vector3,
     faces: &[Support<'_>],
@@ -55,7 +55,7 @@ pub(crate) fn hidden(
         let outward = if bend < -FLAT { 1.0 } else { -1.0 };
         nudge += normal * (outward * 2.0 * tol);
     }
-    blocked(mesh, origin + nudge, toward)
+    mesh.blocked(origin + nudge)
 }
 
 /// The second derivative of the surface along the tangent direction `e` at `(u, v)`, signed
@@ -79,20 +79,118 @@ fn bending(surface: &Surface, u: f64, v: f64, normal: Vector3, e: Vector3) -> f6
 /// Triangles the ray only grazes, lying in a plane through the ray, do not count. A hit on the
 /// edge or vertex of a triangle does, so a ray leaving a box exactly along the border of a face
 /// is still blocked.
-pub(crate) fn blocked(mesh: &PolygonMesh, point: Point3, toward: Vector3) -> bool {
-    const SLACK: f64 = 1.0e-9;
-    let positions = mesh.positions();
-    mesh.faces().triangle_iter().any(|triangle| {
-        let [p0, p1, p2] = [
-            positions[triangle[0].pos],
-            positions[triangle[1].pos],
-            positions[triangle[2].pos],
-        ];
-        let matrix = Matrix3::from_cols(p1 - p0, p2 - p0, -toward);
-        if matrix.determinant().so_small() {
-            return false;
+pub(crate) struct Occluders {
+    triangles: Vec<(Point3, Matrix3, [Point2; 2])>,
+    axes: [Vector3; 2],
+}
+
+impl Occluders {
+    pub(crate) fn new(mesh: &PolygonMesh, toward: Vector3) -> Self {
+        let helper = if toward.x.abs() < 0.9 {
+            Vector3::unit_x()
+        } else {
+            Vector3::unit_y()
+        };
+        let u = helper.cross(toward).normalize();
+        let axes = [u, toward.cross(u)];
+        let positions = mesh.positions();
+        let triangles = mesh
+            .faces()
+            .triangle_iter()
+            .filter_map(|triangle| {
+                let [p0, p1, p2] = triangle.map(|vertex| positions[vertex.pos]);
+                let matrix = Matrix3::from_cols(p1 - p0, p2 - p0, -toward);
+                if matrix.determinant().so_small() {
+                    return None;
+                }
+                let points = [p0, p1, p2].map(|point| {
+                    Point2::new(axes[0].dot(point.to_vec()), axes[1].dot(point.to_vec()))
+                });
+                let bounds: BoundingBox<Point2> = points.into_iter().collect();
+                // Include the barycentric slack and roundoff in the projected bounding box.
+                let extent = (p1 - p0).magnitude() + (p2 - p0).magnitude();
+                let roundoff = points
+                    .iter()
+                    .flat_map(|point| [point.x.abs(), point.y.abs()])
+                    .fold(1.0, f64::max)
+                    * (32.0 * f64::EPSILON);
+                let pad = Vector2::new(1.0, 1.0) * (extent * 2.0e-9 + roundoff);
+                Some((
+                    p0,
+                    matrix.invert().unwrap(),
+                    [bounds.min() - pad, bounds.max() + pad],
+                ))
+            })
+            .collect();
+        Self { triangles, axes }
+    }
+
+    pub(crate) fn blocked(&self, point: Point3) -> bool {
+        const SLACK: f64 = 1.0e-9;
+        let projected = Point2::new(
+            self.axes[0].dot(point.to_vec()),
+            self.axes[1].dot(point.to_vec()),
+        );
+        self.triangles.iter().any(|(origin, inverse, [min, max])| {
+            if projected.x < min.x
+                || projected.y < min.y
+                || projected.x > max.x
+                || projected.y > max.y
+            {
+                return false;
+            }
+            let uvt = inverse * (point - origin);
+            uvt.x >= -SLACK && uvt.y >= -SLACK && uvt.x + uvt.y <= 1.0 + SLACK && uvt.z > TOLERANCE
+        })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn reference(mesh: &PolygonMesh, point: Point3, toward: Vector3) -> bool {
+        mesh.faces().triangle_iter().any(|triangle| {
+            let [p0, p1, p2] = triangle.map(|vertex| mesh.positions()[vertex.pos]);
+            let matrix = Matrix3::from_cols(p1 - p0, p2 - p0, -toward);
+            if matrix.determinant().so_small() {
+                return false;
+            }
+            let uvt = matrix.invert().unwrap() * (point - p0);
+            uvt.x >= -1.0e-9
+                && uvt.y >= -1.0e-9
+                && uvt.x + uvt.y <= 1.0 + 1.0e-9
+                && uvt.z > TOLERANCE
+        })
+    }
+
+    #[test]
+    fn prepared_rays_match_direct_tests_at_interiors_edges_and_grazing_angles() {
+        let solid: Solid = primitive::cuboid(BoundingBox::from_iter([
+            Point3::origin(),
+            Point3::new(2.0, 2.0, 2.0),
+        ]));
+        let mesh = solid.triangulation(0.01).to_polygon();
+        for toward in [
+            Vector3::unit_x(),
+            Vector3::unit_y(),
+            Vector3::unit_z(),
+            Vector3::new(1.0, 2.0, 3.0).normalize(),
+            Vector3::new(1.0, 1.0e-8, 0.0).normalize(),
+        ] {
+            let prepared = Occluders::new(&mesh, toward);
+            for x in [-1.0, 0.0, 1.0e-10, 1.0, 2.0, 3.0] {
+                for y in [-1.0, 0.0, 1.0, 2.0, 3.0] {
+                    for z in [-1.0, 0.0, 1.0, 2.0, 3.0] {
+                        let point = Point3::new(x, y, z);
+                        assert_eq!(
+                            prepared.blocked(point),
+                            reference(&mesh, point, toward),
+                            "{point:?} {toward:?}"
+                        );
+                    }
+                }
+            }
         }
-        let uvt = matrix.invert().unwrap() * (point - p0);
-        uvt.x >= -SLACK && uvt.y >= -SLACK && uvt.x + uvt.y <= 1.0 + SLACK && uvt.z > TOLERANCE
-    })
+    }
 }

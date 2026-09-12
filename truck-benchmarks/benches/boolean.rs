@@ -2,6 +2,24 @@ use super::fixtures::*;
 use divan::{black_box, Bencher};
 use truck_modeling::*;
 
+#[divan::bench(sample_count = 20, sample_size = 1)]
+fn circle_remove(bencher: Bencher) {
+    let plate = cuboid(Point3::origin(), Point3::new(60.0, 60.0, 10.0));
+    let disc: Face =
+        builder::try_attach_plane(vec![circle(Point3::new(30.0, 30.0, 5.0), 33.0)]).unwrap();
+    let cutter: Solid = builder::tsweep(&disc, Vector3::unit_z() * 5.0);
+    let run = || {
+        truck_shapeops::try_subtract(black_box(&plate), black_box(&cutter), TOL).expect("pocket")
+    };
+    let segment =
+        33.0_f64.powi(2) * (30.0_f64 / 33.0).acos() - 30.0 * (33.0_f64.powi(2) - 900.0).sqrt();
+    check_volume(
+        &run(),
+        36000.0 - 5.0 * (std::f64::consts::PI * 33.0_f64.powi(2) - 4.0 * segment),
+    );
+    bencher.bench(run);
+}
+
 #[divan::bench(args = [1, 10, 30, 100], sample_count = 20, sample_size = 1, max_time = 10)]
 fn subtract_batch(bencher: Bencher, holes: usize) {
     let (plate, cutters) = plate_and_cutters(holes);

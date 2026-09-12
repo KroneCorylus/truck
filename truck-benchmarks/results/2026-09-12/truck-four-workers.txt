@@ -1,0 +1,13 @@
+actions                    fastest       │ slowest       │ median        │ mean          │ samples │ iters
+├─ boolean                               │               │               │               │         │
+│  ╰─ subtract_sequential                │               │               │               │         │
+│     ├─ 1                 541.7 µs      │ 883.6 µs      │ 593 µs        │ 631.4 µs      │ 20      │ 20
+│     ├─ 10                10 ms         │ 12.23 ms      │ 11.2 ms       │ 11.17 ms      │ 20      │ 20
+│     ├─ 30                56.73 ms      │ 67.05 ms      │ 61.95 ms      │ 61.53 ms      │ 20      │ 20
+│     ╰─ 100               751.7 ms      │ 842.7 ms      │ 784 ms        │ 789.8 ms      │ 20      │ 20
+╰─ projection                            │               │               │               │         │
+   ╰─ hidden_lines                       │               │               │               │         │
+      ├─ 1                 185.8 µs      │ 318.1 µs      │ 217.8 µs      │ 231.5 µs      │ 20      │ 20
+      ├─ 10                1.228 ms      │ 1.541 ms      │ 1.317 ms      │ 1.325 ms      │ 20      │ 20
+      ╰─ 30                3.713 ms      │ 4.652 ms      │ 4.063 ms      │ 4.094 ms      │ 20      │ 20
+

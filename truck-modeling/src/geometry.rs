@@ -309,6 +309,13 @@ impl SearchParameter<D2> for Surface {
         trials: usize,
     ) -> Option<(f64, f64)> {
         let hint = hint.into();
+        if matches!(hint, SPHint2D::None) {
+            if let Surface::RevolutedCurve(surface) = self {
+                if let Some(parameter) = revolved_cylinder_parameter(surface, point) {
+                    return parameter;
+                }
+            }
+        }
         if let Surface::Extruded(surface) = self {
             let reference = match hint {
                 SPHint2D::None => Some(None),
@@ -333,6 +340,48 @@ impl SearchParameter<D2> for Surface {
     }
 }
 
+/// A revolved axial line admits an exact inverse, including an immediate off-surface test.
+/// The outer option distinguishes other surfaces, which still need the general search.
+fn revolved_cylinder_parameter(
+    surface: &Processor<RevolutedCurve<Curve>, Matrix4>,
+    point: Point3,
+) -> Option<Option<(f64, f64)>> {
+    let revolved = surface.entity();
+    let Curve::Line(Line(start, end)) = revolved.entity_curve() else {
+        return None;
+    };
+    let axis = revolved.axis();
+    let direction = end - start;
+    if direction.cross(axis) != Vector3::zero() {
+        return None;
+    }
+    let length = direction.dot(axis);
+    if !length.is_finite() || length == 0.0 {
+        return None;
+    }
+    let local = surface.transform().invert()?.transform_point(point);
+    let radial = |p: Point3| {
+        let delta = p - revolved.origin();
+        delta - axis * delta.dot(axis)
+    };
+    let (a, b) = (radial(*start), radial(local));
+    if a.magnitude2() == 0.0 || b.magnitude2() == 0.0 {
+        return None;
+    }
+    let u = (local - start).dot(axis) / length;
+    let v = axis.dot(a.cross(b)).atan2(a.dot(b)).rem_euclid(TAU);
+    Some(
+        revolved
+            .subs(u, v)
+            .near(&local)
+            .then_some(if surface.orientation() {
+                (u, v)
+            } else {
+                (v, u)
+            }),
+    )
+}
+
 impl SearchNearestParameter<D2> for Surface {
     type Point = Point3;
     fn search_nearest_parameter<H: Into<SPHint2D>>(
@@ -350,7 +399,15 @@ impl SearchNearestParameter<D2> for Surface {
             }
             Surface::NurbsSurface(surface) => surface.search_nearest_parameter(point, hint, trials),
             Surface::RevolutedCurve(rotted) => {
-                let hint = match hint.into() {
+                let hint = hint.into();
+                // A surface of revolution reduces nearest search to its meridian curve.
+                // Preserve the world-space grid for affine distortions and range hints.
+                if matches!(hint, SPHint2D::None) && similarity(rotted.transform()) {
+                    if let Some(parameter) = rotted.search_nearest_parameter(point, hint, trials) {
+                        return Some(parameter);
+                    }
+                }
+                let hint = match hint {
                     SPHint2D::Parameter(hint0, hint1) => (hint0, hint1),
                     SPHint2D::Range(x, y) => algo::surface::presearch(rotted, point, (x, y), 100),
                     SPHint2D::None => {
@@ -374,6 +431,27 @@ impl SearchNearestParameter<D2> for Surface {
             }
         }
     }
+}
+
+fn similarity(transform: &Matrix4) -> bool {
+    let columns = [
+        transform.x.truncate(),
+        transform.y.truncate(),
+        transform.z.truncate(),
+    ];
+    let scale2 = columns[0].magnitude2();
+    scale2.is_finite()
+        && scale2 > 0.0
+        && transform.x.w == 0.0
+        && transform.y.w == 0.0
+        && transform.z.w == 0.0
+        && transform.w.w == 1.0
+        && columns
+            .iter()
+            .all(|column| (column.magnitude2() - scale2).abs() <= scale2 * 1.0e-12)
+        && [(0, 1), (0, 2), (1, 2)]
+            .iter()
+            .all(|&(i, j)| columns[i].dot(columns[j]).abs() <= scale2 * 1.0e-12)
 }
 
 /// An analytic seed for a circular cylinder; other extrusions retain the general search.

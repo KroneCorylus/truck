@@ -52,7 +52,7 @@ where
 /// Tessellates faces
 #[cfg(not(target_arch = "wasm32"))]
 pub(super) fn shell_tessellation<'a, C, S>(
-    shell: &Shell<Point3, C, S>,
+    shell: &'a Shell<Point3, C, S>,
     tol: f64,
     sp: impl SP<S>,
 ) -> MeshedShell
@@ -60,6 +60,9 @@ where
     C: PolylineableCurve + 'a,
     S: PreMeshableSurface + 'a,
 {
+    if rayon::current_num_threads() == 1 {
+        return shell_tessellation_single_thread(shell, tol, sp);
+    }
     let vmap: HashMap<_, _> = shell
         .vertex_par_iter()
         .map(|v| (v.id(), v.mapped(Point3::clone)))
@@ -96,7 +99,6 @@ where
 }
 
 /// Tessellates faces
-#[cfg(any(target_arch = "wasm32", test))]
 pub(super) fn shell_tessellation_single_thread<'a, C, S>(
     shell: &'a Shell<Point3, C, S>,
     tol: f64,

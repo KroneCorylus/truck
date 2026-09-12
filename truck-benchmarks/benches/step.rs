@@ -70,3 +70,40 @@ fn import(bencher: Bencher, holes: usize) {
     assert_eq!(solid.boundaries[0].faces.len(), 6 + 2 * holes);
     bencher.bench(run);
 }
+
+fn comparison_path(name: &str) -> std::path::PathBuf {
+    let directory = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../target/comparison");
+    std::fs::create_dir_all(&directory).unwrap();
+    directory.join(name)
+}
+
+#[divan::bench(args = HOLES)]
+fn export_file(bencher: Bencher, holes: usize) {
+    let solid = perforated_plate(holes);
+    let path = comparison_path(&format!("truck-output-{holes}.step"));
+    let run = || {
+        let compressed = black_box(&solid).compress();
+        let design = StepDesign::from_model(StepModel::from(&compressed));
+        let text = StepDisplay::new(Default::default(), design).to_string();
+        std::fs::write(&path, text).unwrap();
+    };
+    run();
+    assert!(Table::try_from_step(&std::fs::read_to_string(&path).unwrap()).is_ok());
+    bencher.bench(run);
+}
+
+#[divan::bench(args = HOLES)]
+fn import_file(bencher: Bencher, holes: usize) {
+    let path = comparison_path(&format!("shared-{holes}.step"));
+    std::fs::write(&path, fixture(holes)).unwrap();
+    let run = || {
+        let text = std::fs::read_to_string(&path).unwrap();
+        let table = Table::try_from_step(&text).expect("parse STEP");
+        let entity = table.manifold_solid_brep.values().next().unwrap();
+        table.to_compressed_solid(entity).expect("convert STEP")
+    };
+    let (solid, skipped) = run();
+    assert!(skipped.is_empty());
+    assert_eq!(solid.boundaries[0].faces.len(), 6 + 2 * holes);
+    bencher.bench(run);
+}

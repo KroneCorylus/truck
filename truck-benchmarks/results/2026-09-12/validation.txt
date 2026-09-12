@@ -1,0 +1,31 @@
+Validation commands and outcomes (2026-09-12)
+
+cargo test --release -p truck-modeling -p truck-hlr -p truck-meshalgo -p truck-shapeops
+  PASS: 342 tests/doctests, existing ignored tests remain ignored.
+cargo test --release -p cad-core (PiezaCAD)
+  PASS: 253 tests/doctests, including all 39 corpus models.
+cargo check --workspace (PiezaCAD)
+  PASS: cad-core and cad-app with the sibling Truck checkout.
+cargo clippy -p truck-modeling -p truck-hlr -p truck-meshalgo -p truck-benchmarks --all-targets
+  PASS. Existing shared test fixture cfg(step-test) warnings in truck-hlr remain.
+cargo clippy -p cad-core --all-targets (PiezaCAD)
+  PASS. Existing nom/quick-xml future-compatibility notices remain.
+bash -n PiezaCAD/run.sh; git diff --check in both repositories
+  PASS.
+
+New tests compare prepared HLR ray tests with direct triangle tests, serial/parallel
+meshes byte-for-byte, and native revolution searches with the original grid/direct
+solver under rotations, reflections and nonuniform transforms. The planar blend
+regression fails with the original app blend adapter (see planar-blend-parent-test.txt).
+Existing corpus expectations were not changed. The batch/sequential test now samples
+at 0.0001 mm instead of 0.001 mm to resolve the existing 1e-9 relative volume criterion
+for 100 holes; the error limit and all topology/naming assertions are unchanged.
+
+Independent FreeCAD check of the additional app 100-hole STEP export:
+  isValid(): true; solids: 1; faces: 406
+  Volume: 2571.6814473497184 mm^3
+  Analytic volume: 2571.6814692820412 mm^3
+  check(True): FAIL, BOPAlgo_InvalidCurveOnSurface on several edges/faces.
+This strict STEP check remains unresolved. It is not counted as a clean export result.
+The standard shared plate STEP fixtures load as valid solids with matching analytic
+volumes; these do not use the app's revolved-hole/intersection-curve export path.

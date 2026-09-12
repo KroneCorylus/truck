@@ -1,5 +1,9 @@
 # CPU action benchmarks
 
+The [2026-09-12 comparison](truck-benchmarks/results/2026-09-12/REPORT.md) records PiezaCad
+and Truck before/after measurements against installed FreeCAD 1.1.3, including remaining
+losses and differences in the APIs being timed.
+
 The `truck-benchmarks` workspace package measures public CAD operations without changing
 the production crates. It uses [Divan](https://docs.rs/divan/0.1.21/divan/) for repeated
 measurements, compiler barriers, and optional allocation counts. Fixtures are generated
@@ -72,6 +76,45 @@ caches. Transform measures geometry reconstruction, not a shallow `Solid::clone`
 STEP export includes topology compression and string generation. Full import includes
 parsing and conversion to compressed STEP geometry; it excludes disk I/O, conversion into
 the modeling enums, and tessellation. Parse and convert isolate those import stages.
+
+`step::export_file` adds file writing to export. `step::import_file` reads and converts a
+shared STEP fixture, also read by FreeCAD. These fixtures are generated outside timing in
+`target/comparison/shared-{1,10,30}.step`. Truck's import returns compressed topology;
+FreeCAD additionally creates and heals its native B-rep. Keep that distinction in comparisons.
+
+## Comparing with FreeCAD and the app
+
+```bash
+mkdir -p target/comparison
+RAYON_NUM_THREADS=1 cargo bench -p truck-benchmarks --bench actions -- \
+  --sample-count 20 --sample-size 1 --max-time 60 > target/comparison/truck-final.txt
+RAYON_NUM_THREADS=1 cargo run --release --manifest-path ../PiezaCAD/Cargo.toml \
+  -p cad-core --example bench_features > target/comparison/app-final.jsonl
+timeout 300 flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
+  "$PWD/truck-benchmarks/scripts/compare_freecad.py" > target/comparison/freecad-final.txt 2>&1
+```
+
+The script also runs under another installation's `FreeCADCmd`; only the launch command
+changes. Keep the scripts and data outside `/tmp` when using Flatpak. The FreeCAD log must
+contain `COMPLETE` and no `FAILED`. Its `BENCH` lines are JSON; startup and console chatter
+are outside timing. `CAD_BENCH_FILTER` optionally selects a FreeCAD action prefix (pass it
+with Flatpak's `--env` option).
+
+Run engines sequentially, after compilation finishes. Capture the original results as
+`truck-before.txt` and `app-before.jsonl`, then run
+`python3 truck-benchmarks/scripts/report_comparison.py target/comparison` to produce tables.
+Repeat the final run and also test the production worker count. The app launcher defaults
+to four workers, while the primary kernel comparison fixes one worker.
+
+FreeCAD uses its native primitives and exact HLR. Its meshes are rebuilt from a copy without
+cached triangulation using `MeshPart.meshFromShape`, absolute linear deflection and a loose
+angular cap of π. Geometry and chord tolerance match the fixtures, but tessellation and
+boolean tolerance policies are not identical. Loft interpolation, NURBS conversion and STEP
+import have additional contract differences marked in the tables. Internal parsing,
+conversion and mesh-merging stages have no matched FreeCAD public operation. The app's
+corpus benchmark additionally covers sketches, constraints, targets, patterns, mirrors,
+datums, feature references and supported failures, including full display-mesh construction.
+These are workload comparisons, not a claim that every feature or input has equal coverage.
 
 ## Choosing optimization work
 
