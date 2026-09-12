@@ -414,6 +414,10 @@ impl<P, C, S> Shell<P, C, S> {
     }
 
     /// Returns a vector consisting of shells of each connected components.
+    ///
+    /// Faces sharing an edge are in the same component. Every face of `self` appears once, and
+    /// faces and components keep the order of `self`: a component comes where its first face
+    /// does.
     /// # Examples
     /// ```
     /// use truck_topology::Shell;
@@ -445,12 +449,25 @@ impl<P, C, S> Shell<P, C, S> {
     /// assert_eq!(shell.connected_components().len(), 2);
     /// ```
     pub fn connected_components(&self) -> Vec<Shell<P, C, S>> {
-        let mut adjacency = self.face_adjacency();
-        let components = create_components(&mut adjacency);
+        let mut parent: Vec<usize> = (0..self.len()).collect();
+        let mut owner = HashMap::<EdgeID<C>, usize>::default();
+        for (i, face) in self.iter().enumerate() {
+            for edge in face.absolute_boundaries().iter().flatten() {
+                let j = *owner.entry(edge.id()).or_insert(i);
+                let (a, b) = (root(&mut parent, i), root(&mut parent, j));
+                parent[a.max(b)] = a.min(b);
+            }
+        }
+        let mut slot = vec![None; self.len()];
+        let mut components: Vec<Shell<P, C, S>> = Vec::new();
+        for (i, face) in self.iter().enumerate() {
+            let k = *slot[root(&mut parent, i)].get_or_insert_with(|| {
+                components.push(Shell::new());
+                components.len() - 1
+            });
+            components[k].push(face.clone());
+        }
         components
-            .into_iter()
-            .map(|vec| vec.into_iter().cloned().collect())
-            .collect()
     }
 
     /// Returns the vector of all singular vertices.
@@ -1132,19 +1149,14 @@ where T: Eq + Clone + Hash {
     adjacency.is_empty()
 }
 
-fn create_components<T, U>(adjacency: &mut HashMap<T, Vec<U>>) -> Vec<Vec<T>>
-where
-    T: Eq + Clone + Hash,
-    U: As<T>, {
-    let mut res = Vec::new();
-    loop {
-        let component = create_one_component(adjacency);
-        match component.is_empty() {
-            true => break,
-            false => res.push(component),
-        }
+/// The root of `i` in a union-find forest whose roots are the smallest index of their tree,
+/// halving the path on the way.
+fn root(parent: &mut [usize], mut i: usize) -> usize {
+    while parent[i] != i {
+        parent[i] = parent[parent[i]];
+        i = parent[i];
     }
-    res
+    i
 }
 
 fn create_one_component<T, U>(adjacency: &mut HashMap<T, Vec<U>>) -> Vec<T>
@@ -1220,5 +1232,58 @@ impl<P: Send, C: Send, S: Send> ParallelExtend<Face<P, C, S>> for Shell<P, C, S>
     fn par_extend<I>(&mut self, par_iter: I)
     where I: IntoParallelIterator<Item = Face<P, C, S>> {
         self.face_list.par_extend(par_iter)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn triangle(v: &[Vertex<()>]) -> Face<(), (), ()> {
+        let wire = Wire::from(vec![
+            Edge::new(&v[0], &v[1], ()),
+            Edge::new(&v[1], &v[2], ()),
+            Edge::new(&v[2], &v[0], ()),
+        ]);
+        Face::new(vec![wire], ())
+    }
+
+    fn ids(shell: &Shell<(), (), ()>) -> Vec<FaceID<()>> { shell.iter().map(Face::id).collect() }
+
+    #[test]
+    fn connected_components_keep_face_order() {
+        let faces: Vec<_> = (0..40).map(|_| triangle(&Vertex::news([(); 3]))).collect();
+        let shell: Shell<_, _, _> = faces.iter().cloned().collect();
+        let components = shell.connected_components();
+        assert_eq!(components.len(), faces.len());
+        for (component, face) in components.iter().zip(&faces) {
+            assert_eq!(ids(component), vec![face.id()]);
+        }
+    }
+
+    #[test]
+    fn connected_components_group_faces_sharing_an_edge() {
+        let v = Vertex::news([(); 7]);
+        let shared = Edge::new(&v[1], &v[2], ());
+        let a = Face::new(
+            vec![Wire::from(vec![
+                Edge::new(&v[0], &v[1], ()),
+                shared.clone(),
+                Edge::new(&v[2], &v[0], ()),
+            ])],
+            (),
+        );
+        let b = Face::new(
+            vec![Wire::from(vec![
+                Edge::new(&v[3], &v[1], ()),
+                shared,
+                Edge::new(&v[2], &v[3], ()),
+            ])],
+            (),
+        );
+        let c = triangle(&v[4..7]);
+        let shell = Shell::from(vec![a.clone(), c.clone(), b.clone()]);
+        let components: Vec<_> = shell.connected_components().iter().map(ids).collect();
+        assert_eq!(components, vec![vec![a.id(), b.id()], vec![c.id()]]);
     }
 }

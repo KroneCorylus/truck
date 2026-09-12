@@ -1,9 +1,9 @@
 # Operation diagnostics
 
-Use the diagnostic APIs when a caller needs to distinguish failure conditions. Existing
-`Option` APIs remain available and intentionally discard diagnostics. Existing modeling,
-topology, geometry, drafting and mesh error enums retain their variants and now expose
-`code()`. Import `truck_base::diagnostics::CodedError` for a common error-code interface.
+Use the diagnostic APIs when a caller needs to distinguish failure conditions. Most
+operations also have a form without `try_` that returns `Option` and discards the
+diagnostic. The modeling, topology, geometry, drafting and mesh error enums expose `code()`.
+Import `truck_base::diagnostics::CodedError` for a common error-code interface.
 
 ## Rust
 
@@ -37,7 +37,8 @@ Original underlying Rust errors are retained through `Error::source()` where ava
 Third-party errors without a stable code still retain their explanation and Rust source.
 
 Codes are explicit constants, independent of enum ordinals, display text and debug output.
-Existing code meanings must not be reassigned. New codes and context fields can be added;
+The app matches on them, so changing what a code means is a breaking change (see
+[AGENTS.md](AGENTS.md)). New codes and context fields can be added;
 `Code` is non-exhaustive, and consumers must provide a fallback. Stages describe implementation
 progress and may become more precise; branch on codes and relevant typed context instead.
 
@@ -69,9 +70,9 @@ with the first failed face. Use the report API to inspect all omitted faces.
 
 Keep STEP parsing diagnostics and conversion diagnostics: an unreadable record anywhere in
 the table and an omitted face in a selected shell are different observations. Unsupported
-entity counts remain available through `Table::unsupported()`. Legacy `Table::errors`,
-`Converted<T>` and `Skipped` are retained; `Skipped::code()` and `into_diagnostic()` expose
-coded reasons without matching text.
+entity counts remain available through `Table::unsupported()`. `Table::errors`,
+`Converted<T>` and `Skipped` carry the same observations without codes; `Skipped::code()` and
+`into_diagnostic()` expose coded reasons without matching text.
 
 An empty intersection is success. A disjoint or contact-only subtraction can succeed with
 `removed_material: false`. An empty surface-intersection list is also success. Calculation
@@ -80,8 +81,8 @@ operation, repairs geometry, or replaces a failed result with the input.
 
 ## JavaScript / WebAssembly
 
-New `try_*` bindings return the usual value on success and throw a native JavaScript `Error`
-with the diagnostic fields on failure. Existing bindings retain their signatures.
+The `try_*` bindings return the usual value on success and throw a native JavaScript `Error`
+with the diagnostic fields on failure.
 
 ```js
 try {
@@ -126,8 +127,8 @@ its stage rather than claiming an unproven mathematical cause. For example, fail
 an intersection is not reported as proof that surfaces do not meet. Only diagnostics with
 an identified source include a `cause`.
 
-Low-level optional queries, explicitly panicking constructors, and legacy convenience APIs
-keep their existing contracts. Application callbacks and custom curve/surface implementations
+Low-level optional queries, explicitly panicking constructors and the `Option` forms of
+operations have their own documented contracts. Application callbacks and custom curve/surface implementations
 must still satisfy their documented contracts; diagnostic APIs do not catch arbitrary panics.
 
 ## Operation code catalog

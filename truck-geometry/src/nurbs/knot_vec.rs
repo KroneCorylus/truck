@@ -60,7 +60,9 @@ impl KnotVec {
     /// assert_eq!(idx, 2);
     /// ```
     #[inline(always)]
-    pub fn floor(&self, x: f64) -> Option<usize> { self.iter().rposition(|t| *t <= x) }
+    pub fn floor(&self, x: f64) -> Option<usize> {
+        self.partition_point(|t| *t <= x).checked_sub(1)
+    }
 
     /// Returns the multiplicity of the `i`th knot
     /// # Examples
@@ -524,10 +526,8 @@ impl KnotVec {
     /// assert_eq!(knot_vec, KnotVec::from(vec![0.0, 0.0, 0.0, 1.0, 2.0, 2.0, 2.0, 2.0, 3.0, 3.0]));
     /// ```
     pub fn from_single_multi(knots: Vec<f64>, mults: Vec<usize>) -> Result<KnotVec> {
-        for i in 1..knots.len() {
-            if knots[i - 1] > knots[i] {
-                return Err(Error::NotSortedVector);
-            }
+        if !is_sorted(&knots) {
+            return Err(Error::NotSortedVector);
         }
 
         let mut vec = Vec::new();
@@ -540,12 +540,10 @@ impl KnotVec {
     }
     /// Constructs from `Vec<f64>`. do not sort, only check sorted.
     pub fn try_from(vec: Vec<f64>) -> Result<KnotVec> {
-        for i in 1..vec.len() {
-            if vec[i - 1] > vec[i] {
-                return Err(Error::NotSortedVector);
-            }
+        match is_sorted(&vec) {
+            true => Ok(KnotVec(vec)),
+            false => Err(Error::NotSortedVector),
         }
-        Ok(KnotVec(vec))
     }
 
     /// Constructs the knot vector for the bezier spline.
@@ -714,4 +712,38 @@ impl BasisWindow {
 impl AsRef<[f64]> for BasisWindow {
     #[inline(always)]
     fn as_ref(&self) -> &[f64] { self.as_slice() }
+}
+
+/// Whether `knots` is sorted and free of NaN, which is out of order with every value.
+fn is_sorted(knots: &[f64]) -> bool {
+    knots.iter().all(|knot| !knot.is_nan()) && knots.windows(2).all(|pair| pair[0] <= pair[1])
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn floor_is_the_last_knot_not_above() {
+        let knot_vec = KnotVec::from(vec![-1.0, 0.0, 0.0, 0.0, 0.5, 1.0, 1.0, 2.0, 3.0, 3.0]);
+        let linear = |x: f64| knot_vec.iter().rposition(|t| *t <= x);
+        let mut samples = vec![-2.0, 4.0, f64::NEG_INFINITY, f64::INFINITY, f64::NAN];
+        samples.extend(knot_vec.iter().copied());
+        samples.extend((0..=100).map(|i| -1.5 + 5.0 * i as f64 / 100.0));
+        for x in samples {
+            assert_eq!(knot_vec.floor(x), linear(x), "x = {x}");
+        }
+        assert_eq!(KnotVec::new().floor(0.0), None);
+    }
+
+    #[test]
+    fn nan_knots_are_rejected() {
+        let not_sorted = |result: Result<KnotVec>| matches!(result, Err(Error::NotSortedVector));
+        assert!(not_sorted(KnotVec::try_from(vec![0.0, f64::NAN, 1.0])));
+        assert!(not_sorted(KnotVec::try_from(vec![f64::NAN])));
+        assert!(not_sorted(KnotVec::from_single_multi(
+            vec![0.0, f64::NAN],
+            vec![1, 1]
+        )));
+    }
 }

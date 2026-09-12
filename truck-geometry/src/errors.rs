@@ -48,7 +48,8 @@ the front of the second knot vector: {1}")]
     /// ```
     #[error("This knot vector is not clamped.")]
     NotClampedKnotVector,
-    /// Creating a knot vector by `KnotVec::try_from()` is failed if the given vector is not sorted.
+    /// Creating a knot vector by `KnotVec::try_from()` is failed if the given vector is not sorted
+    /// or contains NaN.
     /// `<KnotVec as From<Vec<f64>>>::from()` does not panic by this error because sorts the given
     /// vector before creating the knot vector. So, `KnotVec::try_from()` is more efficient than
     /// `<KnotVec as From<Vec<f64>>>::from()`.

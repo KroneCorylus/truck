@@ -45,7 +45,7 @@ fn components<C: PolylineableCurve, S: MeshableSurface>(
     solid: &Solid<Point3, C, S>,
     tol: f64,
 ) -> Result<Vec<Solid<Point3, C, S>>, Diagnostic> {
-    let (_, nesting) = triangulate_boundaries(solid, tol)?;
+    let (_, _, nesting) = triangulate_boundaries(solid, tol)?;
     if nesting.inverted {
         return Err(Diagnostic::new(
             Code::UnboundedResult,
@@ -88,7 +88,7 @@ fn components<C: PolylineableCurve, S: MeshableSurface>(
 pub(super) fn triangulate_boundaries<C: PolylineableCurve, S: MeshableSurface>(
     solid: &Solid<Point3, C, S>,
     tol: f64,
-) -> Result<(PolyShell, BoundaryNesting), Diagnostic> {
+) -> Result<(PolyShell, Vec<PolygonMesh>, BoundaryNesting), Diagnostic> {
     validate_tolerance(tol, "boolean")?;
     Solid::try_new(solid.boundaries().clone()).map_err(|e| {
         Diagnostic::new(Code::InvalidInputTopology, "boolean", "validate_input")
@@ -109,7 +109,7 @@ pub(super) fn triangulate_boundaries<C: PolylineableCurve, S: MeshableSurface>(
         poly_shell.append(&mut poly);
     }
     let nesting = boundary_nesting(&meshes)?;
-    Ok((poly_shell, nesting))
+    Ok((poly_shell, meshes, nesting))
 }
 
 fn boundary_nesting(meshes: &[PolygonMesh]) -> Result<BoundaryNesting, Diagnostic> {

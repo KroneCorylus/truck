@@ -19,7 +19,6 @@ members = [
 	"truck-stepio",
 	"truck-topology",
 	"example-pages-generator",
-	"readme-generator",
 ]
 
 [profile.release.package.truck-js]

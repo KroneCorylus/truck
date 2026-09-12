@@ -161,25 +161,29 @@ fn interior_point<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
 }
 
 /// Sorts the faces whose status the cuts left undecided into `and` (inside the other solid) or
-/// `or` (outside), by ray casting from an interior point against the other solid's mesh.
+/// `or` (outside), by ray casting from an interior point against the meshes of the other
+/// solid's boundary shells.
 ///
 /// The signed crossing count of a ray from a point inside a closed mesh is 1. An inverted mesh,
 /// the complement of a solid, has its interior where the count is 0, and −1 inside the
 /// original solid. The nesting of the operand boundaries determines which case applies.
 fn classify_unknown<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     unknown: AltCurveShell<C, S>,
-    other: &Shell<Point3, PolylineCurve<Point3>, Option<PolygonMesh>>,
+    other: &[PolygonMesh],
     and: &mut AltCurveShell<C, S>,
     or: &mut AltCurveShell<C, S>,
     tol: f64,
     inverted: bool,
 ) -> Option<()> {
-    let mesh = other.to_polygon();
     let inside_count = if inverted { 0 } else { 1 };
     unknown.into_iter().try_for_each(|face| {
         let pt = interior_point(&face, tol)?;
         let dir = hash::take_one_unit(pt);
-        if mesh.signed_crossing_faces(pt, dir) >= inside_count {
+        let crossings: isize = other
+            .iter()
+            .map(|mesh| mesh.signed_crossing_faces(pt, dir))
+            .sum();
+        if crossings >= inside_count {
             and.push(face);
         } else {
             or.push(face);
@@ -200,22 +204,19 @@ fn process_boundaries<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     shell1: &Shell<Point3, C, S>,
     tol: f64,
     poly_shells: [&Shell<Point3, PolylineCurve<Point3>, Option<PolygonMesh>>; 2],
+    meshes: [&[PolygonMesh]; 2],
     inverted: [bool; 2],
     intersection: bool,
 ) -> Result<(Shell<Point3, C, S>, bool), Diagnostic> {
     let [poly_shell0, poly_shell1] = poly_shells;
+    let [meshes0, meshes1] = meshes;
     let altshell0: AltCurveShell<C, S> =
         shell0.mapped(|x| *x, |c| Alternative::FirstType(c.clone()), Clone::clone);
     let altshell1: AltCurveShell<C, S> =
         shell1.mapped(|x| *x, |c| Alternative::FirstType(c.clone()), Clone::clone);
     let start = profile::now();
-    let quadruple = loops_store::try_create_loops_stores(
-        &altshell0,
-        poly_shell0,
-        &altshell1,
-        poly_shell1,
-        tol,
-    );
+    let quadruple =
+        loops_store::try_create_loops_stores(&altshell0, poly_shell0, &altshell1, poly_shell1, tol);
     profile::lap(Stage::LoopsStore, start);
     let loops_store::LoopsStoreQuadruple {
         geom_loops_store0: loops_store0,
@@ -233,11 +234,11 @@ fn process_boundaries<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     let start = profile::now();
     let [mut and0, mut or0, unknown0] = cls0.and_or_unknown();
     let outside0 = or0.len();
-    classify_unknown(unknown0, poly_shell1, &mut and0, &mut or0, tol, inverted[1]).ok_or_else(
+    classify_unknown(unknown0, meshes1, &mut and0, &mut or0, tol, inverted[1]).ok_or_else(
         || Diagnostic::new(Code::ClassificationFailed, "boolean", "classify_faces").operand(0),
     )?;
     let [mut and1, mut or1, unknown1] = cls1.and_or_unknown();
-    classify_unknown(unknown1, poly_shell0, &mut and1, &mut or1, tol, inverted[0]).ok_or_else(
+    classify_unknown(unknown1, meshes0, &mut and1, &mut or1, tol, inverted[0]).ok_or_else(
         || Diagnostic::new(Code::ClassificationFailed, "boolean", "classify_faces").operand(1),
     )?;
     profile::lap(Stage::Classification, start);
@@ -315,9 +316,9 @@ fn boolean<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     intersection: bool,
 ) -> Result<(Solid<Point3, C, S>, bool), Diagnostic> {
     let start = profile::now();
-    let (poly0, nesting0) =
+    let (poly0, meshes0, nesting0) =
         components::triangulate_boundaries(solid0, tol).map_err(|e| e.operand(0))?;
-    let (poly1, nesting1) =
+    let (poly1, meshes1, nesting1) =
         components::triangulate_boundaries(solid1, tol).map_err(|e| e.operand(1))?;
     profile::lap(Stage::Triangulation, start);
     if solid0.boundaries().is_empty() || solid1.boundaries().is_empty() {
@@ -339,6 +340,7 @@ fn boolean<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
         &shell1,
         tol,
         [&poly0, &poly1],
+        [meshes0.as_slice(), meshes1.as_slice()],
         [nesting0.inverted, nesting1.inverted],
         intersection,
     )?;

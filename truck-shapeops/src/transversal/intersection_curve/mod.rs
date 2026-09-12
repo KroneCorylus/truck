@@ -201,8 +201,8 @@ where
     polylines
         .into_iter()
         .flat_map(|polyline| split_at_tangencies(&surface0, &surface1, polyline))
-        .filter(|polyline| !surfaces_graze_along(&surface0, &surface1, polyline))
-        .map(|polyline| {
+        .filter(|(_, grazes)| !grazes)
+        .map(|(polyline, _)| {
             Some((
                 polyline.clone(),
                 IntersectionCurveWithParameters::try_new(
@@ -216,6 +216,22 @@ where
         .collect()
 }
 
+/// The parameters of the points of `surface0` and `surface1` nearest to `point`.
+fn nearest_parameters<S0, S1>(
+    surface0: &S0,
+    surface1: &S1,
+    point: Point3,
+) -> Option<[(f64, f64); 2]>
+where
+    S0: SearchNearestParameter<D2, Point = Point3>,
+    S1: SearchNearestParameter<D2, Point = Point3>,
+{
+    Some([
+        surface0.search_nearest_parameter(point, None, 100)?,
+        surface1.search_nearest_parameter(point, None, 100)?,
+    ])
+}
+
 /// Refines a mesh seed to coincidence with parallel normals. The six residuals constrain
 /// four parameters; a small diagonal regularization leaves a contact curve's free direction
 /// close to its seed instead of requiring an invertible coincidence-only Newton system.
@@ -223,8 +239,23 @@ fn tangent_contact<S0, S1>(surface0: &S0, surface1: &S1, point: Point3) -> Optio
 where
     S0: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>,
     S1: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>, {
-    let (u, v) = surface0.search_nearest_parameter(point, None, 100)?;
-    let (s, t) = surface1.search_nearest_parameter(point, None, 100)?;
+    contact_from(
+        surface0,
+        surface1,
+        nearest_parameters(surface0, surface1, point)?,
+    )
+}
+
+/// [`tangent_contact`] from the parameters nearest to the seed.
+fn contact_from<S0, S1>(
+    surface0: &S0,
+    surface1: &S1,
+    [(u, v), (s, t)]: [(f64, f64); 2],
+) -> Option<Point3>
+where
+    S0: ParametricSurface3D,
+    S1: ParametricSurface3D,
+{
     let mut parameters = Vector4::new(u, v, s, t);
     let normal0 = surface0.normal(u, v);
     let normal1 = surface1.normal(s, t);
@@ -290,38 +321,88 @@ where
     None
 }
 
+/// A vertex of an interference polyline, moved onto a tangent crossing if one lies within
+/// `TOLERANCE`.
+#[derive(Clone, Copy)]
+struct Sample {
+    point: Point3,
+    /// Whether the surfaces cross tangentially at `point`.
+    singular: bool,
+    /// [`grazes_at`] at `point`, if already known.
+    grazes: Option<bool>,
+}
+
+/// The tangency tests of one polyline vertex. They start from the same nearest parameters,
+/// which are searched once.
+fn sample<S0, S1>(surface0: &S0, surface1: &S1, point: Point3) -> Sample
+where
+    S0: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>,
+    S1: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>, {
+    let parameters = nearest_parameters(surface0, surface1, point);
+    let contact = parameters.and_then(|parameters| contact_from(surface0, surface1, parameters));
+    let crossing = contact.map(|contact| tangent_crossing_at(surface0, surface1, contact));
+    match contact {
+        Some(contact) if crossing == Some(Some(true)) && contact.distance(point) < TOLERANCE => {
+            Sample {
+                point: contact,
+                singular: true,
+                grazes: None,
+            }
+        }
+        _ => Sample {
+            point,
+            singular: parameters
+                .and_then(|parameters| crossing_from(surface0, surface1, parameters))
+                == Some(true),
+            grazes: Some(crossing == Some(Some(false))),
+        },
+    }
+}
+
+/// Whether the mesh interference at `point` refines to contact without crossing branches.
+fn grazes_at<S0, S1>(surface0: &S0, surface1: &S1, point: Point3) -> bool
+where
+    S0: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>,
+    S1: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>, {
+    tangent_contact(surface0, surface1, point)
+        .is_some_and(|contact| tangent_crossing_at(surface0, surface1, contact) == Some(false))
+}
+
+/// Splits `polyline` at its tangent crossings, each piece with whether the surfaces graze
+/// along all of it. Different chord errors can make touching surfaces appear to cross in small
+/// loops; coincidence plus parallel normals places those seeds back on the contact curve.
 fn split_at_tangencies<S0, S1>(
     surface0: &S0,
     surface1: &S1,
-    mut polyline: PolylineCurve<Point3>,
-) -> Vec<PolylineCurve<Point3>>
+    polyline: PolylineCurve<Point3>,
+) -> Vec<(PolylineCurve<Point3>, bool)>
 where
     S0: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>,
     S1: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>,
 {
-    for p in polyline.iter_mut() {
-        if let Some(contact) = tangent_contact(surface0, surface1, *p) {
-            if tangent_crossing_at(surface0, surface1, contact) == Some(true)
-                && contact.distance(*p) < TOLERANCE
-            {
-                *p = contact;
-            }
-        }
-    }
-    let singular = |p| tangent_crossing_at(surface0, surface1, p) == Some(true);
-    if polyline.front().near(&polyline.back()) {
-        if let Some(i) = polyline.iter().position(|&p| singular(p)) {
-            polyline.pop();
-            polyline.rotate_left(i);
-            let front = polyline[0];
-            polyline.push(front);
+    let mut samples: Vec<Sample> = polyline
+        .iter()
+        .map(|&point| sample(surface0, surface1, point))
+        .collect();
+    if samples[0].point.near(&samples[samples.len() - 1].point) {
+        if let Some(i) = samples.iter().position(|sample| sample.singular) {
+            samples.pop();
+            samples.rotate_left(i);
+            samples.push(samples[0]);
         }
     }
     let mut pieces = Vec::new();
     let mut start = 0;
-    for i in 1..polyline.len() {
-        if singular(polyline[i]) || i == polyline.len() - 1 {
-            pieces.push(PolylineCurve(polyline[start..=i].to_vec()));
+    for i in 1..samples.len() {
+        if samples[i].singular || i == samples.len() - 1 {
+            let piece = &samples[start..=i];
+            let grazes = piece.iter().all(|sample| {
+                sample
+                    .grazes
+                    .unwrap_or_else(|| grazes_at(surface0, surface1, sample.point))
+            });
+            let points = piece.iter().map(|sample| sample.point).collect();
+            pieces.push((PolylineCurve(points), grazes));
             start = i;
         }
     }
@@ -336,8 +417,23 @@ fn tangent_crossing_at<S0, S1>(surface0: &S0, surface1: &S1, point: Point3) -> O
 where
     S0: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>,
     S1: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>, {
-    let uv0 = surface0.search_nearest_parameter(point, None, 100)?;
-    let uv1 = surface1.search_nearest_parameter(point, None, 100)?;
+    crossing_from(
+        surface0,
+        surface1,
+        nearest_parameters(surface0, surface1, point)?,
+    )
+}
+
+/// [`tangent_crossing_at`] from the parameters nearest to the point.
+fn crossing_from<S0, S1>(
+    surface0: &S0,
+    surface1: &S1,
+    [uv0, uv1]: [(f64, f64); 2],
+) -> Option<bool>
+where
+    S0: ParametricSurface3D,
+    S1: ParametricSurface3D,
+{
     let n0 = surface0.normal(uv0.0, uv0.1);
     let n1 = surface1.normal(uv1.0, uv1.1);
     if !n0.magnitude2().is_finite()
@@ -387,24 +483,6 @@ fn curvature_form<S: ParametricSurface3D>(
     let form =
         |a: Vector3, b: Vector3| uu * a.x * b.x + uv * (a.x * b.y + a.y * b.x) + vv * a.y * b.y;
     Some([form(x, x), form(x, y), form(y, y)])
-}
-
-/// Whether the mesh interference refines entirely to contact without crossing branches.
-/// Different chord errors can make touching surfaces appear to cross in small loops;
-/// coincidence plus parallel normals places those seeds back on the contact curve.
-fn surfaces_graze_along<S0, S1>(
-    surface0: &S0,
-    surface1: &S1,
-    polyline: &PolylineCurve<Point3>,
-) -> bool
-where
-    S0: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>,
-    S1: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>,
-{
-    polyline.iter().all(|&p| {
-        tangent_contact(surface0, surface1, p)
-            .is_some_and(|contact| tangent_crossing_at(surface0, surface1, contact) == Some(false))
-    })
 }
 
 #[cfg(test)]
