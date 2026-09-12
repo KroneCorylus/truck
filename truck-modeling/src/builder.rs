@@ -1378,6 +1378,113 @@ pub fn sweep_along_wire(
     Ok(Solid::try_new(vec![shell])?)
 }
 
+/// Translates a planar profile along an open path without rotating it. Exact tensor-product
+/// NURBS surfaces retain the profile and path curves. The path must advance along the profile
+/// normal; sampled tangent reversals or tangencies are rejected as local folds.
+///
+/// # Errors
+/// Returns an error for invalid tolerance, nonplanar profiles, discontinuous paths, local
+/// folds or curves without an exact NURBS form. This is not a global collision test.
+pub fn sweep_along_wire_fixed(
+    profile: &Face<Curve, Surface>,
+    path: &Wire<Curve>,
+    tol: f64,
+) -> Result<Solid<Curve, Surface>> {
+    if !tol.is_finite() || tol < TOLERANCE {
+        return Err(Error::InvalidSweepTolerance);
+    }
+    let (_, closed) = path_segments(path)?;
+    if closed {
+        return Err(Error::FixedSweepFold(0));
+    }
+    let Some((crate::Elementary::Plane(plane), orientation)) =
+        profile.oriented_surface().elementary()
+    else {
+        return Err(Error::WireNotInOnePlane);
+    };
+    let normal = plane.normal() * if orientation { 1.0 } else { -1.0 };
+    let mut shell = Shell::new();
+    let mut far = Vec::new();
+    let mut total = Vector3::zero();
+    for boundary in profile.boundaries() {
+        let mut wire = boundary;
+        total = Vector3::zero();
+        for (index, edge) in path.iter().enumerate() {
+            let curve = edge.oriented_curve();
+            let (a, b) = curve.range_tuple();
+            let mut parameters = curve.parameter_division((a, b), tol).0;
+            parameters.extend((0..=64).map(|i| a + (b - a) * i as f64 / 64.0));
+            if parameters
+                .iter()
+                .any(|&t| curve.der(t).dot(normal) <= TOLERANCE)
+            {
+                return Err(Error::FixedSweepFold(index));
+            }
+            let start = curve.subs(a);
+            let offset = curve.subs(b) - start;
+            let next = moved(&wire, Matrix4::from_translation(offset));
+            let rails = wire
+                .iter()
+                .zip(&next)
+                .map(|(edge, end)| {
+                    Edge::new(
+                        edge.front(),
+                        end.front(),
+                        curve.transformed(Matrix4::from_translation(edge.front().point() - start)),
+                    )
+                })
+                .collect::<Vec<_>>();
+            let path_curve = curve.try_lift_up().ok_or(Error::NoNurbsForm)?;
+            for i in 0..wire.len() {
+                let profile_curve = wire[i]
+                    .oriented_curve()
+                    .try_lift_up()
+                    .ok_or(Error::NoNurbsForm)?;
+                let control = profile_curve
+                    .control_points()
+                    .iter()
+                    .map(|p| {
+                        path_curve
+                            .control_points()
+                            .iter()
+                            .map(|q| {
+                                let point =
+                                    p.truncate() / p.w + q.truncate() / q.w - start.to_vec();
+                                point.extend(1.0) * (p.w * q.w)
+                            })
+                            .collect()
+                    })
+                    .collect();
+                let surface = NurbsSurface::new(BSplineSurface::new(
+                    (
+                        profile_curve.knot_vec().clone(),
+                        path_curve.knot_vec().clone(),
+                    ),
+                    control,
+                ));
+                let sides = wire![
+                    wire[i].clone(),
+                    rails[(i + 1) % wire.len()].clone(),
+                    next[i].inverse(),
+                    rails[i].inverse()
+                ];
+                shell.push(Face::try_new(vec![sides], Surface::NurbsSurface(surface))?);
+            }
+            total += offset;
+            wire = next;
+        }
+        far.push(wire);
+    }
+    shell.push(profile.inverse());
+    shell.push(Face::new(
+        far,
+        profile
+            .oriented_surface()
+            .transformed(Matrix4::from_translation(total)),
+    ));
+    Ok(Solid::try_new(vec![shell])?)
+}
+
 #[cfg(test)]
 mod partial_torus {
     use crate::*;

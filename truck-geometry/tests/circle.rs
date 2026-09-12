@@ -153,3 +153,19 @@ fn inverse_axes_and_signed_zero_stay_in_one_revolution() {
         }
     }
 }
+
+#[test]
+fn scaled_circle_accepts_submicron_local_chord_tolerance() {
+    let curve = Processor::with_transform(
+        TrimmedCurve::new(UnitCircle::<Point3>::new(), (0.0, PI / 2.0)),
+        Matrix4::from_scale(100.0),
+    );
+    let (parameters, points) = curve.parameter_division((0.0, PI / 2.0), 1e-6);
+    assert!(parameters.len() > 100);
+    for (ts, ps) in parameters.windows(2).zip(points.windows(2)) {
+        let middle = curve.subs((ts[0] + ts[1]) / 2.0);
+        assert!(middle.distance(ps[0].midpoint(ps[1])) <= 1e-6);
+    }
+    assert_near!(points[0], Point3::new(100.0, 0.0, 0.0));
+    assert_near!(*points.last().unwrap(), Point3::new(0.0, 100.0, 0.0));
+}

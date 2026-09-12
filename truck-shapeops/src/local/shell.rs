@@ -57,10 +57,38 @@ pub fn try_shell(solid: &Solid, removed: &[FaceID], thickness: f64) -> Result<So
         .map_err(|e| locate_failure(solid.face_iter(), removed, "shell", e))
 }
 
+/// Hollows outward: the input is the cavity and kept faces grow outward by `thickness`.
+/// Openings remain on their original planes. Geometry and incidence limits are those of
+/// [`try_shell`]; thickness is positive and the input is unchanged.
+pub fn try_shell_outward(
+    solid: &Solid,
+    removed: &[FaceID],
+    thickness: f64,
+) -> Result<Solid, Diagnostic> {
+    super::validate_solid(solid, "shell_outward")?;
+    if !thickness.is_finite() || thickness <= 0.0 {
+        return Err(
+            Diagnostic::new(Code::InvalidParameter, "shell_outward", "validate_input")
+                .parameter("thickness", thickness),
+        );
+    }
+    shell_direction(solid, removed, thickness, true)
+        .map_err(|e| locate_failure(solid.face_iter(), removed, "shell_outward", e))
+}
+
 pub(super) fn shell_impl(
     solid: &Solid,
     removed: &[FaceID],
     thickness: f64,
+) -> Result<Solid, Failure> {
+    shell_direction(solid, removed, thickness, false)
+}
+
+fn shell_direction(
+    solid: &Solid,
+    removed: &[FaceID],
+    thickness: f64,
+    outward: bool,
 ) -> Result<Solid, Failure> {
     if !thickness.is_finite() || thickness <= 0.0 {
         return Err(LocalOpError::NotInward.into());
@@ -127,14 +155,17 @@ pub(super) fn shell_impl(
         .map(|(i, face)| {
             let surface = match opened.contains(&i) {
                 true => face.oriented_surface(),
-                false => face.oriented_surface().offset(-thickness).map_err(|e| {
-                    Failure::new(
-                        LocalOpError::NoOffset { face: face.id() },
-                        Code::NoOffset,
-                        "offset_surface",
-                    )
-                    .source(e)
-                })?,
+                false => face
+                    .oriented_surface()
+                    .offset(if outward { thickness } else { -thickness })
+                    .map_err(|e| {
+                        Failure::new(
+                            LocalOpError::NoOffset { face: face.id() },
+                            Code::NoOffset,
+                            "offset_surface",
+                        )
+                        .source(e)
+                    })?,
             };
             Ok((face.id(), surface))
         })
@@ -144,12 +175,17 @@ pub(super) fn shell_impl(
 
     let mut outer: Shell = Shell::new();
     let mut inner: Shell = Shell::new();
-    for (i, face) in faces.iter().enumerate() {
+    for (i, source) in faces.iter().enumerate() {
+        let (face, cavity_face) = if outward {
+            (cavity_faces[i], source)
+        } else {
+            (source, cavity_faces[i])
+        };
         match opened.contains(&i) {
             true => {
                 // the opening: the face with the cavity's mouth as a hole
                 let mut loops = face.boundaries();
-                loops.extend(cavity_faces[i].boundaries().iter().map(Wire::inverse));
+                loops.extend(cavity_face.boundaries().iter().map(Wire::inverse));
                 outer.push(Face::try_new(loops, face.oriented_surface()).map_err(|e| {
                     Failure::new(
                         LocalOpError::Unsupported { face: face.id() },
@@ -161,7 +197,7 @@ pub(super) fn shell_impl(
             }
             false => {
                 outer.push(face.clone());
-                inner.push(cavity_faces[i].inverse());
+                inner.push(cavity_face.inverse());
             }
         }
     }

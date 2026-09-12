@@ -6,6 +6,23 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- STEP preparation retains exact circular intersections of perpendicular planes and cylinders instead of fitting splines. This removes OpenCASCADE curve-on-surface errors on the application's counterbored part while preserving its vertices, topology and analytic surfaces.
+
+- Preserve smooth seam intersections in Boolean cuts, reusing their exact boundary edges. Corner-centered holes now divide the adjoining box walls. Project exact curve points onto coincident surfaces before Newton refinement, allowing a revolved sphere to cut an equal-radius blind bore. Both application-derived regressions pass topology, closed-mesh and analytic-volume checks.
+
+- Add `sew_shell` for tolerance-bounded vertex and opposite boundary-edge welding. It preserves surface geometry and open boundaries; closed analytic shells can use `local::replace_surfaces` to reconstruct consistent intersections after sewing. Tests cover a near-coincident seam, immutable inputs, tolerance limits, and an unrepaired missing face.
+- Escape apostrophes and reverse solidi in STEP assembly product and occurrence labels. Protect escaped string characters during ruststep 0.4 parsing and restore their original labels after parsing. Quoted labels, backslashes, comments and shared assembly geometry round-trip.
+
+
+- `builder::sweep_along_wire_fixed` translates planar profiles along exact NURBS paths without rotating their normals, with closed-solid and section/volume regressions. Paths must advance along the profile normal; sampled folds are rejected.
+- Breaking: `truck_modeling::errors::Error` adds `InvalidSweepTolerance` and `FixedSweepFold`. Exhaustive Rust matches must handle these variants; the CAD adapter uses the error display and requires no migration.
+
+- Circle subdivision accepts positive local chord tolerances below 1e-6, fixing STEP import of scaled analytic circles; stable half-angle evaluation preserves the requested chord error.
+
+- Breaking: `local::parameter_domain` now derives plane domains from trimmed face loops instead of the plane basis unit square. Its signature is unchanged; callers depending on the old unit-square values should supply explicit domains. This fixes drafting larger parts whose new unit-length plane bases placed intersections outside the artificial search range. The app has no direct calls; its Draft adapter uses the corrected reconstruction.
+
+- Add `local::try_shell_outward` for convex plane/cylinder/cone solids. The original body becomes the cavity, kept surfaces grow outward, and opening planes stay fixed. Positive thickness and the existing inward API keep their contracts. Box and cylinder regressions check closed topology, tessellation, analytic volume and unchanged input.
+
 - Accelerate revolution searches using the meridian solver for similarity transforms and an exact inverse for axial-line cylinders. Keep the grid fallback for other transforms and range hints. Reuse triangle inverses and projected bounds during hidden-line classification, and avoid Rayon scheduling when tessellating with one worker. Add a reproducible FreeCAD feature comparison and STEP file benchmarks. See `truck-benchmarks/results/2026-09-12/REPORT.md` for measured medians, correctness checks and limitations. No public API or production tolerance changes.
 
 - Speed up boolean face division without changing results. Division divided every new cut edge's exact intersection curve again, although those samples only decide which loops bound which face; it now follows the intersection points the edge's leading polyline already holds, between the edge's vertices. `Shell::extract_boundaries` no longer rescans the shell's vertices for every boundary wire, and grouping undecided faces looks edges up in sets. Medians of two alternating runs with one Rayon worker: batch subtraction 41–43% faster (100 holes: 111.6 to 65.4 ms), sequential subtraction of 10, 30 and 100 holes 22%, 11% and 5% (1.252 to 1.188 s), NURBS cylinder intersection 20–55%, cylinder union and intersection 8–40%; the R7 NURBS cut drops from 29.2 to 18.4 ms. In the stage diagnostic at 100 holes, division drops from 49.3 to 4.4 ms in one boolean and from 107.7 to 38.4 ms cut one by one. The 18-case boolean dump is bytewise identical to the parent.

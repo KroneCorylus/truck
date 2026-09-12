@@ -1,7 +1,7 @@
 //! Preparing procedural modeling geometry for STEP.
 
 use truck_geometry::prelude::*;
-use truck_modeling::{Curve, Surface};
+use truck_modeling::{Curve, Elementary, Surface};
 use truck_topology::compress::CompressedSolid;
 
 /// Prepares a modeling solid for [`super::StepModel`] at the given geometric tolerance.
@@ -35,6 +35,11 @@ pub fn prepare_for_step(
 
 fn prepare_curve(curve: &Curve, tol: f64) -> Option<Curve> {
     if let Curve::IntersectionCurve(intersection) = curve {
+        if let Some(circle) =
+            circular_intersection(curve, intersection.surface0(), intersection.surface1())
+        {
+            return Some(circle);
+        }
         let leader = intersection.leader();
         let (a, b) = curve.range_tuple();
         if (0..=64).all(|i| {
@@ -81,6 +86,80 @@ fn prepare_curve(curve: &Curve, tol: f64) -> Option<Curve> {
         }
         _ => Some(curve.clone()),
     }
+}
+
+fn circular_intersection(curve: &Curve, a: &Surface, b: &Surface) -> Option<Curve> {
+    let (plane, origin, axis, radius) = match (a.elementary()?.0, b.elementary()?.0) {
+        (
+            Elementary::Plane(plane),
+            Elementary::Cylinder {
+                origin,
+                axis,
+                radius,
+            },
+        )
+        | (
+            Elementary::Cylinder {
+                origin,
+                axis,
+                radius,
+            },
+            Elementary::Plane(plane),
+        ) => (plane, origin, axis, radius),
+        _ => return None,
+    };
+    if !radius.is_finite()
+        || radius <= TOLERANCE
+        || !axis.magnitude2().is_finite()
+        || axis.so_small()
+    {
+        return None;
+    }
+    let axis = axis.normalize();
+    if !plane.normal().cross(axis).so_small() {
+        return None;
+    }
+    let center = origin + axis * (plane.subs(0.0, 0.0) - origin).dot(axis);
+    let (start, end) = curve.range_tuple();
+    if !start.is_finite() || !end.is_finite() || start >= end {
+        return None;
+    }
+    let x = (curve.subs(start) - center).normalize();
+    let mut y = axis.cross(x);
+    if curve.der(start).dot(y) < 0.0 {
+        y = -y;
+    }
+    let mut previous = 0.0;
+    for i in 0..=64 {
+        let t = start + (end - start) * i as f64 / 64.0;
+        let radial = curve.subs(t) - center;
+        if !radial.magnitude().is_finite()
+            || radial.dot(axis).abs() > TOLERANCE
+            || (radial.magnitude() - radius).abs() > TOLERANCE
+        {
+            return None;
+        }
+        let mut angle = radial.dot(y).atan2(radial.dot(x));
+        while angle < previous - std::f64::consts::PI {
+            angle += std::f64::consts::TAU;
+        }
+        if !angle.is_finite() || angle < previous - TOLERANCE {
+            return None;
+        }
+        previous = angle;
+    }
+    if previous <= 0.0 || previous > std::f64::consts::TAU + TOLERANCE {
+        return None;
+    }
+    Some(Curve::Conic(Processor::with_transform(
+        TrimmedCurve::new(UnitCircle::new(), (0.0, previous)),
+        Matrix4::from_cols(
+            (x * radius).extend(0.0),
+            (y * radius).extend(0.0),
+            x.cross(y).extend(0.0),
+            center.to_homogeneous(),
+        ),
+    )))
 }
 
 fn prepare_surface(surface: &Surface, tol: f64) -> Option<Surface> {

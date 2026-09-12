@@ -117,3 +117,13 @@ versions, revisions and settings. Baseline Truck is 2ed10470; baseline PiezaCad 
 and pins b115af07. The app therefore also benefits from the already-present 2ed10470 face
 division improvement when switching to the sibling kernel. The final source changes are
 uncommitted; no commits, pushes or PRs were made.
+
+## Later roadmap integration check
+
+The v0.7 working tree retains the 100-hole acceptance target: 398.68 ms median with one
+worker and 361.76 ms with four (seven warmed complete rebuilds each). These results include
+the later exact analytic geometry and feature integration and are not a speedup claim
+over this report's earlier baseline. STEP preparation now retains exact plane/cylinder
+intersection circles; FreeCAD 1.1.3 strict BOP checking passes both the counterbored plate
+and 100-hole export. The earlier curve-on-surface export limitation is resolved. See
+`PiezaCAD/VALIDATION-v0.7.md` in the sibling project for the complete final verification.

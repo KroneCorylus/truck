@@ -28,3 +28,5 @@ kernel-issues/
 !truck-shapeops/tests/R7-extrude-remove-inputs.json
 !truck-shapeops/tests/R8-conic-remove-inputs.json
 !truck-shapeops/tests/R12-face-extrude-round-operands.json
+!truck-shapeops/tests/contact-bored-block.json
+!truck-shapeops/tests/contact-revolved-sphere.json

@@ -68,6 +68,8 @@
     unused_qualifications
 )]
 
+mod sewing;
+pub use sewing::sew_shell;
 mod healing;
 #[doc(hidden)]
 pub mod profile;

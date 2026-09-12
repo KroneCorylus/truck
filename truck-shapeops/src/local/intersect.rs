@@ -10,7 +10,8 @@ use truck_modeling::{Curve, Elementary, Face, Surface};
 pub type Domain = ((f64, f64), (f64, f64));
 
 /// The parameter rectangle of `face` on its surface, each side enlarged by `margin` times the
-/// rectangle's diagonal: a side the surface bounds itself is that bound, a side it leaves open
+/// rectangle's diagonal: planes use their trimmed loops, a bounded curved side uses its bound,
+/// and a side left open
 /// is the range of the projected loops. An angular side is never extended past a turn. `None`
 /// when a boundary point cannot be projected.
 pub fn parameter_domain(face: &Face, margin: f64) -> Option<Domain> {
@@ -24,7 +25,11 @@ pub fn parameter_domain(face: &Face, margin: f64) -> Option<Domain> {
 /// what is left is found by projecting the loops.
 pub(super) fn domain_on(surface: &Surface, face: &Face, margin: f64) -> Option<Domain> {
     let angular = angular(surface);
-    let own = surface.try_range_tuple();
+    // Plane's unit square describes its basis, not the extent of the trimmed face.
+    let own = match surface {
+        Surface::Plane(_) => (None, None),
+        _ => surface.try_range_tuple(),
+    };
     let mut range: [Option<(f64, f64)>; 2] = [None, None];
     for (side, own) in [own.0, own.1].into_iter().enumerate() {
         range[side] = match angular == Some(side) {
@@ -144,14 +149,20 @@ pub fn try_intersect_surfaces(
     }
     let polygon0 = StructuredMesh::from_surface(surface0, domain0, tol).destruct();
     let polygon1 = StructuredMesh::from_surface(surface1, domain1, tol).destruct();
-    let curves = intersection_curves(surface0.clone(), &polygon0, surface1.clone(), &polygon1, tol)
-        .ok_or_else(|| {
-            Diagnostic::new(
-                Code::IntersectionFailed,
-                "intersect_surfaces",
-                "lift_intersection",
-            )
-        })?;
+    let curves = intersection_curves(
+        surface0.clone(),
+        &polygon0,
+        surface1.clone(),
+        &polygon1,
+        tol,
+    )
+    .ok_or_else(|| {
+        Diagnostic::new(
+            Code::IntersectionFailed,
+            "intersect_surfaces",
+            "lift_intersection",
+        )
+    })?;
     curves
         .into_iter()
         .map(|(_, ic)| {

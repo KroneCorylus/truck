@@ -651,3 +651,59 @@ fn bent_shell_is_rejected() {
         "{err}"
     );
 }
+
+#[test]
+fn outward_shell_preserves_the_cavity_and_expands_the_exterior() {
+    use truck_shapeops::local::try_shell_outward;
+    let (a, b, c, t) = (2.0, 3.0, 1.0, 0.2);
+    let solid = abc_box(a, b, c);
+    let top = face_id_at(&solid, Point3::new(a / 2.0, b / 2.0, c));
+    let open = try_shell_outward(&solid, &[top], t).unwrap();
+    assert_solid(
+        &from_modeling(&open),
+        (a + 2.0 * t) * (b + 2.0 * t) * (c + t) - a * b * c,
+        &[0],
+        TOL,
+    );
+    let closed = try_shell_outward(&solid, &[], t).unwrap();
+    assert_solid(
+        &from_modeling(&closed),
+        (a + 2.0 * t) * (b + 2.0 * t) * (c + 2.0 * t) - a * b * c,
+        &[0, 0],
+        TOL,
+    );
+    assert_solid(&from_modeling(&solid), a * b * c, &[0], TOL);
+    for thickness in [0.0, -1.0, f64::NAN, f64::INFINITY] {
+        assert!(try_shell_outward(&solid, &[top], thickness).is_err());
+    }
+}
+
+#[test]
+fn outward_cylinder_shell_has_exact_offset_radius() {
+    let (r, h, t) = (1.0, 2.0, 0.2);
+    let solid = cylinder(Point3::origin(), Vector3::unit_z(), r, h);
+    let top = face_id_at(&solid, Point3::new(0.0, 0.0, h));
+    let cup = truck_shapeops::local::try_shell_outward(&solid, &[top], t).unwrap();
+    assert_solid(
+        &from_modeling(&cup),
+        PI * ((r + t) * (r + t) * (h + t) - r * r * h),
+        &[0],
+        TOL,
+    );
+}
+
+#[test]
+fn drafting_large_box_uses_the_trimmed_face_domains() {
+    let (a, b, c) = (60.0, 40.0, 10.0);
+    let solid = abc_box(a, b, c);
+    let sides = side_faces(&solid, Vector3::unit_z());
+    let angle = Rad(3.0_f64.to_radians());
+    let tapered = draft(&solid, &sides, &bottom_plane(), Vector3::unit_z(), angle).unwrap();
+    let t = angle.0.tan();
+    assert_solid(
+        &from_modeling(&tapered),
+        a * b * c + (a + b) * t * c * c + 4.0 * t * t * c * c * c / 3.0,
+        &[0],
+        TOL,
+    );
+}

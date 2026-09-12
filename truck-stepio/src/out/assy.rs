@@ -96,6 +96,7 @@ where
         }
 
         let shape_indices = IndexSliceDisplay(shape_indices);
+        let (id, name, description) = (quote(id), quote(name), quote(description));
         f.write_fmt(format_args!(
             "#{sdr_idx} = SHAPE_DEFINITION_REPRESENTATION(#{pds_idx}, #{sr_idx});
 #{pds_idx} = PRODUCT_DEFINITION_SHAPE('', '', #{pd_idx});
@@ -178,6 +179,7 @@ impl<'a> DisplayByStep for EdgeDisplay<'a> {
             id,
             description,
         } = &self.attrs;
+        let (id, name, description) = (quote(id), quote(name), quote(description));
 
         f.write_fmt(format_args!(
             "#{cdsr_idx} = CONTEXT_DEPENDENT_SHAPE_REPRESENTATION(#{rr_idx}, #{pds_idx});
@@ -298,3 +300,5 @@ impl<Model> StepDesign<Model, Option<Model>, Matrix4> {
         Self::new(assy)
     }
 }
+
+fn quote(value: &str) -> String { value.replace('\\', "\\\\").replace('\'', "''") }

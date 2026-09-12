@@ -788,8 +788,23 @@ impl Table {
     /// Parses a STEP file into a table of its first `DATA` section. `Err` says why it is not one.
     /// Records that fail to deserialize are collected in `errors`, not returned here.
     pub fn try_from_step(step_str: &str) -> Result<Table, ParseError> {
-        let exchange = ruststep::parser::parse(step_str)?;
-        let data = exchange.data.first().ok_or(ParseError::NoDataSection)?;
+        let (input, marker) = protect_string_escapes(step_str);
+        let mut exchange = ruststep::parser::parse(&input)?;
+        let data = exchange.data.first_mut().ok_or(ParseError::NoDataSection)?;
+        if let Some(marker) = marker {
+            for entity in &mut data.entities {
+                match entity {
+                    EntityInstance::Simple { record, .. } => {
+                        restore_string_escapes(&mut record.parameter, &marker)
+                    }
+                    EntityInstance::Complex { subsuper, .. } => {
+                        for record in &mut subsuper.0 {
+                            restore_string_escapes(&mut record.parameter, &marker);
+                        }
+                    }
+                }
+            }
+        }
         Ok(Table::from_data_section(data))
     }
     /// [`try_from_step`](Self::try_from_step) with the error dropped.
@@ -803,6 +818,65 @@ impl Table {
             *res.entry(dummy.name.clone()).or_insert(0) += 1;
         }
         res
+    }
+}
+
+// ruststep 0.4 terminates strings at doubled apostrophes. Protect escaped characters
+// before parsing and restore only string parameters, leaving STEP syntax untouched.
+fn protect_string_escapes(input: &str) -> (std::borrow::Cow<'_, str>, Option<String>) {
+    let bytes = input.as_bytes();
+    let mut positions = Vec::new();
+    let (mut index, mut quoted) = (0, false);
+    while index < bytes.len() {
+        if !quoted && bytes[index..].starts_with(b"/*") {
+            index += 2;
+            while index < bytes.len() && !bytes[index..].starts_with(b"*/") {
+                index += 1;
+            }
+            index = (index + 2).min(bytes.len());
+            continue;
+        }
+        if quoted && (bytes[index..].starts_with(b"''") || bytes[index..].starts_with(b"\\\\")) {
+            positions.push((index, bytes[index]));
+            index += 2;
+        } else {
+            if bytes[index] == b'\'' {
+                quoted = !quoted;
+            }
+            index += 1;
+        }
+    }
+    if positions.is_empty() {
+        return (input.into(), None);
+    }
+    let mut marker = "PIEZA_STEP_ESCAPE_".to_string();
+    while input.contains(&marker) {
+        marker.push('_');
+    }
+    let mut output = String::with_capacity(input.len());
+    let mut start = 0;
+    for (position, kind) in positions {
+        output.push_str(&input[start..position]);
+        output.push_str(&marker);
+        output.push(if kind == b'\'' { 'Q' } else { 'B' });
+        start = position + 2;
+    }
+    output.push_str(&input[start..]);
+    (output.into(), Some(marker))
+}
+
+fn restore_string_escapes(parameter: &mut Parameter, marker: &str) {
+    match parameter {
+        Parameter::String(value) => {
+            *value = value
+                .replace(&format!("{marker}Q"), "'")
+                .replace(&format!("{marker}B"), "\\")
+        }
+        Parameter::List(values) => values
+            .iter_mut()
+            .for_each(|value| restore_string_escapes(value, marker)),
+        Parameter::Typed { parameter, .. } => restore_string_escapes(parameter, marker),
+        _ => {}
     }
 }
 

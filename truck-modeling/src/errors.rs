@@ -3,6 +3,12 @@ use thiserror::Error;
 /// Modeling errors
 #[derive(Debug, PartialEq, Eq, Error)]
 pub enum Error {
+    /// Sweep tolerance must be finite and at least the kernel coincidence tolerance.
+    #[error("sweep tolerance must be finite and at least 1e-6")]
+    InvalidSweepTolerance,
+    /// A fixed-normal sweep path stops advancing along the profile normal.
+    #[error("fixed-normal sweep folds or becomes tangent to the profile at path edge {0}")]
+    FixedSweepFold(usize),
     /// wrapper of topological error
     #[error(transparent)]
     FromTopology(#[from] truck_topology::errors::Error),
@@ -79,6 +85,8 @@ impl Error {
     /// Stable external error code. Display messages are not a machine-readable contract.
     pub fn code(&self) -> &'static str {
         match self {
+            Self::InvalidSweepTolerance => "TRUCK_MODELING_INVALID_SWEEP_TOLERANCE",
+            Self::FixedSweepFold(..) => "TRUCK_MODELING_FIXED_SWEEP_FOLD",
             Self::FromTopology(error) => error.code(),
             Self::WireNotInOnePlane => "TRUCK_MODELING_WIRE_NOT_IN_ONE_PLANE",
             Self::NotSameNumberOfEdges => "TRUCK_MODELING_NOT_SAME_NUMBER_OF_EDGES",
