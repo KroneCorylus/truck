@@ -12,16 +12,20 @@ pub(super) fn chamfer_edges(
 ) -> Result<Shell, Diagnostic> {
     let error = |code| Diagnostic::new(code, "chamfer_solid_edges", "construct_blend");
     let selected: HashSet<_> = edges.iter().copied().collect();
+    let data = convex::validate(shell, &selected, tol, "chamfer_solid_edges");
+    let data = match data {
+        Ok(data) if data.incident.iter().all(|edges| edges.len() == 3) => data,
+        _ => {
+            let distances = selected.iter().map(|&id| (id, [distance; 2])).collect();
+            return super::chamfer_miter::chamfer(shell, &selected, &distances, tol);
+        }
+    };
     let convex::ConvexShell {
         original_edges,
         mut planes,
-        incident,
         sides,
         ..
-    } = convex::validate(shell, &selected, tol, "chamfer_solid_edges")?;
-    if incident.iter().any(|edges| edges.len() != 3) {
-        return Err(error(Code::UnsupportedTopology));
-    }
+    } = data;
     let mut bevels = Vec::new();
     for (k, edge) in original_edges.iter().enumerate() {
         if !selected.contains(&edge.id()) {

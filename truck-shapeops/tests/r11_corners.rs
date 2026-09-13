@@ -334,7 +334,7 @@ fn sequential_chamfers_reproduce_kernel_gap() {
             let error =
                 try_chamfer_solid_edge(&first.solid, edge_at(&first.solid, axes[1]), 0.2, 0.2, TOL)
                     .unwrap_err();
-            assert_eq!(error.code, Code::BlendConstructionFailed);
+            assert_eq!(error.code, Code::OutsideNeighbour);
             assert_eq!(before, snapshot(&first.solid));
         }
     }
@@ -475,12 +475,13 @@ fn unsupported_junctions_have_distinct_diagnostics() {
     let skew = builder::transformed(&fixture(), transform);
     let ids = selection_at(&skew, transform);
     let before = snapshot(&skew);
-    assert_eq!(
-        try_fillet_solid_edges(&skew, &ids[..2], 1.0, TOL)
-            .unwrap_err()
-            .code,
-        Code::UnsupportedGeometry
-    );
+    let result = try_fillet_solid_edges(&skew, &ids[..2], 1.0, TOL).unwrap();
+    let pi = std::f64::consts::PI;
+    let length = 10. * (1. + 1.04_f64.sqrt());
+    let expected = 1000. - length * (1. - pi / 4.) + (5. / 3. - pi / 2.) * 1.04_f64.sqrt();
+    assert!(result.solid.is_geometric_consistent());
+    common::assert_solid(&result.solid, expected, &[0], TOL);
+    common::blend::assert_step(&result.solid, expected, TOL);
     assert_eq!(before, snapshot(&skew));
 }
 

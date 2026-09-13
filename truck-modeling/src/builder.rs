@@ -911,7 +911,12 @@ pub fn align_sections<C: Invertible>(sections: &[Wire<C>]) -> Vec<Wire<C>> {
     let points = |wire: &Wire<C>| -> Vec<Point3> {
         wire.iter()
             .map(|edge| edge.front().point())
-            .chain(wire.back().map(|edge| edge.back().point()))
+            // Closed wires already include their last endpoint as the first vertex.
+            .chain(
+                wire.back()
+                    .filter(|_| !wire.is_closed())
+                    .map(|edge| edge.back().point()),
+            )
             .collect()
     };
     let rotations = |wire: Wire<C>| -> Vec<Wire<C>> {

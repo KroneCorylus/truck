@@ -28,6 +28,20 @@ fn shell_index(solid: &Solid, edge: EdgeID) -> Option<usize> {
 
 fn finish(solid: &Solid, index: usize, shell: Shell) -> Result<BlendResult, Diagnostic> {
     let original = &solid.boundaries()[index];
+    for (i, face) in shell.iter().enumerate() {
+        if original.get(i).is_some_and(|old| old.id() == face.id()) {
+            continue;
+        }
+        if !face.is_geometric_consistent() {
+            return Err(Diagnostic::new(
+                Code::BlendConstructionFailed,
+                "blend",
+                "validate_geometry",
+            )
+            .shell(index)
+            .face(i));
+        }
+    }
     let modified_faces = original
         .iter()
         .zip(&shell)
@@ -98,10 +112,17 @@ pub fn try_fillet_solid_along_wire<R: ScalarFunctionD1>(
 
 /// Equal-radius blends on selected edges of a modeling solid, including spherical corners.
 ///
-/// All selected edges must belong to one closed convex planar boundary. See
-/// [`super::fillet_edges`] for the supported junctions and geometric restrictions. The operation
-/// must not intersect another boundary. Returns `None` on unsupported input without modifying
-/// it. An empty selection returns the original solid and empty history.
+/// The convex planar construction is described by [`super::fillet_edges`]. Nonconvex
+/// boundaries also support orthogonal planar neighborhoods with three edges per touched
+/// vertex, retaining unrelated curves and holes. Two convex or two concave edges meet at
+/// an elliptical miter. Three edges of the same sense have a spherical corner; two convex
+/// edges meeting a concave edge have a tangent toroidal corner. Other mixed junctions are
+/// unsupported. Contacts must fit the adjacent faces and avoid holes within twice `tol`.
+/// A single straight edge between planar faces can also terminate on curved faces, with
+/// exact surface-intersection ends and extension along straight cylindrical rulings.
+/// The operation must not intersect distant faces or another boundary. Returns `None` on
+/// unsupported input without modifying it. An empty selection returns the original solid
+/// and empty history.
 pub fn fillet_solid_edges(
     solid: &Solid,
     edges: &[EdgeID],
@@ -135,22 +156,66 @@ pub fn try_fillet_solid_edges(
     };
     let index = validate_selection(solid, edges, operation)?;
     let shell = super::try_fillet_edges(&solid.boundaries()[index], edges, radius, tol)
+        .or_else(|error| match error.code {
+            Code::UnsupportedGeometry | Code::UnsupportedTopology | Code::NonPlanarFace => {
+                super::planar_fillet::fillet(
+                    &solid.boundaries()[index],
+                    &edges.iter().copied().collect(),
+                    radius,
+                    tol,
+                )
+                .or_else(|local| {
+                    if edges.len() == 1
+                        && matches!(
+                            local.code,
+                            Code::NonPlanarFace
+                                | Code::UnsupportedGeometry
+                                | Code::UnsupportedTopology
+                        )
+                    {
+                        super::planar_edge::blend(
+                            &solid.boundaries()[index],
+                            edges[0],
+                            super::planar_edge::Blend::Fillet(radius),
+                            tol,
+                        )
+                    } else {
+                        Err(local)
+                    }
+                })
+                .map_err(|local| match local.code {
+                    Code::UnsupportedGeometry | Code::UnsupportedTopology | Code::NonPlanarFace => {
+                        error
+                    }
+                    _ => local,
+                })
+            }
+            _ => Err(error),
+        })
         .map_err(|e| e.operation(operation).shell(index))?;
     finish(solid, index, shell).map_err(|e| e.operation(operation))
 }
 
-/// Equal-distance chamfers on a set of straight edges of a convex planar modeling solid.
+/// Equal-distance chamfers on straight sharp edges with planar adjacent and end faces.
 ///
-/// Each vertex must have three incident edges. Distances are measured on both adjacent
+/// Each touched vertex must have three incident edges. Distances are measured on both adjacent
 /// faces, perpendicular to each selected edge. Bevel planes trim one another: two meet
-/// along a miter, shortening the unselected edge; three meet at a point, without an extra
-/// corner face. All distances are equal, so reversing selection order has no effect.
-/// Unequal distances and curved or concave boundaries are outside this API's scope.
+/// along a miter, shortening the unselected edge. Three meet at a point, except where two
+/// convex edges meet a concave edge: a planar transition joins the common face to the
+/// inside bevel. Reversing selection order has no effect.
+/// Nonconvex shells and one-, two- and three-edge junctions are supported. Two-edge bevels
+/// use a triangular transition when their contacts on the unselected edge differ.
+/// Unrelated curved faces, curved boundary segments and inner loops are preserved. Contact
+/// boundaries that approach a hole within twice `tol` are rejected. Convex chamfers remove
+/// material; concave chamfers add material between the support faces. Curved geometry at a
+/// touched vertex is outside this API's scope. Use
+/// [`try_chamfer_solid_edges_with_distances`] for unequal distances.
 /// Sizes that remove an original face, an unselected edge, or a bevel contact are rejected.
-/// The selected boundary must not intersect another boundary of the solid.
+/// The chamfers must not intersect distant faces or another boundary of the solid.
 ///
 /// Original face replacements precede the generated bevel faces in the history. Geometry
-/// consists of exact planes and lines; no tessellation or export fitting is used to model it.
+/// added by this operation consists of exact planes and lines; boundary sampling is used
+/// only for validation, never for modeling or replacing existing curves.
 /// An empty selection returns the original solid and empty history. Failure leaves it unchanged.
 pub fn chamfer_solid_edges(
     solid: &Solid,
@@ -186,6 +251,46 @@ pub fn try_chamfer_solid_edges(
     let index = validate_selection(solid, edges, operation)?;
     let shell =
         super::chamfer_edges::chamfer_edges(&solid.boundaries()[index], edges, distance, tol)
+            .map_err(|e| e.shell(index))?;
+    finish(solid, index, shell).map_err(|e| e.operation(operation))
+}
+
+/// Chamfers selected straight edges with separate distances on their two adjacent faces.
+///
+/// Each tuple contains an edge ID and distances in shell face order. All selected edges
+/// must lie in one shell and have planar support and end faces with three edges per touched
+/// vertex. Unrelated curved faces and inner boundary loops are preserved. Two-edge bevels
+/// use a triangular transition when their contacts on the unselected edge differ. Mixed three-edge corners use a
+/// transition when the convex bevels have matching setbacks on their common face;
+/// otherwise they use a three-plane miter. Other restrictions are those of
+/// [`chamfer_solid_edges`]. The input remains unchanged on failure.
+pub fn try_chamfer_solid_edges_with_distances(
+    solid: &Solid,
+    edges: &[(EdgeID, [f64; 2])],
+    tol: f64,
+) -> Result<BlendResult, Diagnostic> {
+    let operation = "chamfer_solid_edges";
+    validate_tolerance(tol, operation)?;
+    for (_, distances) in edges {
+        positive(distances[0], "d0", operation)?;
+        positive(distances[1], "d1", operation)?;
+    }
+    if edges.is_empty() {
+        return try_chamfer_solid_edges(solid, &[], 1.0, tol);
+    }
+    let ids: Vec<_> = edges.iter().map(|&(id, _)| id).collect();
+    if edges.iter().all(|(_, d)| *d == [edges[0].1[0]; 2]) {
+        return try_chamfer_solid_edges(solid, &ids, edges[0].1[0], tol);
+    }
+    Solid::try_new(solid.boundaries().clone()).map_err(|e| {
+        Diagnostic::new(Code::InvalidInputTopology, operation, "validate_input")
+            .with_coded_source(e)
+    })?;
+    let index = validate_selection(solid, &ids, operation)?;
+    let distances = edges.iter().copied().collect();
+    let selected = ids.into_iter().collect();
+    let shell =
+        super::chamfer_miter::chamfer(&solid.boundaries()[index], &selected, &distances, tol)
             .map_err(|e| e.shell(index))?;
     finish(solid, index, shell).map_err(|e| e.operation(operation))
 }
@@ -240,6 +345,8 @@ pub fn try_chamfer_solid_along_wire(
 ///
 /// The edge must have two adjacent faces and a distinct third face at each end. `d0` and `d1`
 /// are positive distances on the adjacent faces, ordered by their occurrence in the shell.
+/// Straight edges between planar faces support curved terminations, including extension
+/// along cylindrical rulings; their end curves remain exact surface intersections.
 /// Distances have the meaning described by [`super::simple_chamfer`]. The chamfer must fit within
 /// those faces and must not intersect distant faces or another shell. Returns `None` for invalid
 /// parameters, unsupported topology or failed construction, without modifying the input.
@@ -271,8 +378,28 @@ pub fn try_chamfer_solid_edge(
     positive(d0, "d0", operation)?;
     positive(d1, "d1", operation)?;
 
+    match try_chamfer_solid_edges_with_distances(solid, &[(edge, [d0, d1])], tol) {
+        Ok(result) => return Ok(result),
+        Err(error)
+            if matches!(
+                error.code,
+                Code::NonPlanarFace | Code::UnsupportedGeometry | Code::UnsupportedTopology
+            ) => {}
+        Err(error) => return Err(error.operation(operation)),
+    }
+
     let index = validate_selection(solid, &[edge], operation)?;
     let shell = &solid.boundaries()[index];
+    match super::planar_edge::blend(
+        shell,
+        edge,
+        super::planar_edge::Blend::Chamfer([d0, d1]),
+        tol,
+    ) {
+        Ok(result) => return finish(solid, index, result),
+        Err(error) if error.code == Code::OutsideNeighbour => return Err(error),
+        Err(_) => {}
+    }
     let adjacent: Vec<_> = shell
         .iter()
         .enumerate()
@@ -370,4 +497,29 @@ fn validate_selection(
         shell = Some(index);
     }
     shell.ok_or_else(|| Diagnostic::new(Code::EmptySelection, operation, "validate_input"))
+}
+
+#[cfg(test)]
+mod output_tests {
+    use super::*;
+    use truck_modeling::*;
+
+    #[test]
+    fn topological_closure_does_not_accept_off_surface_boundaries() {
+        let input: Solid = primitive::cuboid(BoundingBox::from_iter([
+            Point3::origin(),
+            Point3::new(10., 10., 10.),
+        ]));
+        let before = serde_json::to_string(&input.compress()).unwrap();
+        let mut shell = input.boundaries()[0].clone();
+        let surface = shell[0]
+            .oriented_surface()
+            .transformed(Matrix4::from_translation(Vector3::new(1., 1., 1.)));
+        shell[0] = Face::new(shell[0].boundaries(), surface);
+        assert_eq!(shell.shell_condition(), ShellCondition::Closed);
+        assert!(!shell.is_geometric_consistent());
+        let error = finish(&input, 0, shell).unwrap_err();
+        assert_eq!(error.code, Code::BlendConstructionFailed);
+        assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
+    }
 }

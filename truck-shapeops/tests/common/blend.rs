@@ -67,7 +67,8 @@ pub fn assert_step(solid: &Solid, expected: f64, tol: f64) {
         .unwrap();
     let read = Solid::extract(read).unwrap();
     use truck_meshalgo::prelude::*;
-    super::assert_topology(&read, &[0]);
+    let genera: Vec<_> = solid.boundaries().iter().map(super::shell_genus).collect();
+    super::assert_topology(&read, &genera);
     let mut mesh = read.robust_triangulation(tol).to_polygon();
     mesh.put_together_same_attrs(TOLERANCE)
         .remove_degenerate_faces()

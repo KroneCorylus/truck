@@ -2,6 +2,7 @@
 
 use super::{intersect::radial, LocalOpError};
 use super::{locate_failure, Failure};
+use rustc_hash::FxHashSet as HashSet;
 use std::result::Result;
 use truck_base::diagnostics::{Code, Diagnostic};
 use truck_geometry::prelude::*;
@@ -12,7 +13,9 @@ use truck_modeling::*;
 /// [`super::replace_surfaces`]. A positive angle tilts each face's outward normal `n` away from
 /// `pull`: it becomes `n cos α − p sin α` with `p` the unit component of `pull` normal to `n`,
 /// so a boss widens and a hole narrows along `pull`. A planar face becomes a rotated plane and
-/// a cylindrical face whose axis is along `pull` becomes a cone; any other face, a face normal
+/// a cylindrical face whose axis is along `pull` becomes a cone. Selection propagates across
+/// tangent joins to planar walls parallel to `pull` and cylinders whose axes are parallel to
+/// both `pull` and the neutral-plane normal; it stops at non-tangent joins. Any other face, a face normal
 /// to `pull`, or a neutral plane that is not normal to a cylinder's axis, is
 /// [`LocalOpError::Unsupported`] naming the face, found before anything is built.
 /// # Examples
@@ -69,8 +72,58 @@ pub(super) fn draft_impl(
 ) -> Result<Solid, Failure> {
     let pull = pull.normalize();
     let (sin, cos) = angle.0.sin_cos();
-    let mut replacements = Vec::with_capacity(faces.len());
-    for &id in faces {
+    let incidence = super::replace::Incidence::new(solid);
+    let mut selected: HashSet<_> = faces.iter().copied().collect();
+    let mut targets = faces.to_vec();
+    let compatible = |surface: &Surface| match surface.elementary() {
+        Some((Elementary::Plane(plane), _)) => plane.normal().dot(pull).abs() < TOLERANCE,
+        Some((Elementary::Cylinder { axis, .. }, _)) => {
+            axis.cross(pull).so_small() && neutral.normal().cross(axis).so_small()
+        }
+        _ => false,
+    };
+    let mut cursor = 0;
+    while cursor < targets.len() {
+        let id = targets[cursor];
+        cursor += 1;
+        let &index = incidence
+            .index
+            .get(&id)
+            .ok_or(LocalOpError::UnknownFace { face: id })?;
+        let face = &incidence.faces[index];
+        let surface = face.oriented_surface();
+        for edge in face.edge_iter() {
+            for &other in &incidence.faces_of_edge[&edge.id()] {
+                let neighbor = &incidence.faces[other];
+                if selected.contains(&neighbor.id()) {
+                    continue;
+                }
+                let next = neighbor.oriented_surface();
+                if !compatible(&next) {
+                    continue;
+                }
+                let curve = edge.curve();
+                let (a, b) = curve.range_tuple();
+                let tangent = [0.2, 0.5, 0.8].into_iter().all(|t| {
+                    let p = curve.subs(a + t * (b - a));
+                    let normal = |s: &Surface| {
+                        let (u, v) = s.search_parameter(p, None, 100)?;
+                        Some(s.normal(u, v).normalize())
+                    };
+                    match (normal(&surface), normal(&next)) {
+                        (Some(n), Some(m)) => n.dot(m) > 1. - 1e-8,
+                        _ => false,
+                    }
+                });
+                if tangent {
+                    selected.insert(neighbor.id());
+                    targets.push(neighbor.id());
+                }
+            }
+        }
+    }
+    let mut replacements = Vec::with_capacity(targets.len());
+    for id in targets {
         let face = solid
             .face_iter()
             .find(|face| face.id() == id)
@@ -99,7 +152,11 @@ pub(super) fn draft_impl(
                     point + tilted.cross(trace),
                 ))
             }
-            Surface::Extruded(_) => {
+            _ if matches!(
+                oriented.elementary(),
+                Some((Elementary::Cylinder { .. }, _))
+            ) =>
+            {
                 let Some((
                     Elementary::Cylinder {
                         origin,

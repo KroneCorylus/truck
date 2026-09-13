@@ -14,8 +14,8 @@ use truck_modeling::*;
 /// removed face is the opening, kept as an annulus around the cavity's mouth. With nothing
 /// removed the cavity is a second, inner shell of the result. The input is not modified.
 ///
-/// This first version takes a positive thickness, going inward, and convex edges only: an
-/// offset across a concave edge leaves a gap that needs a blend. The faces must be planes,
+/// This operation takes positive thickness. Concave joins between planes are rebuilt by
+/// intersecting their offsets; curved concave joins still need a transition. Faces must be planes,
 /// cylinders or cones as `replace_surfaces` accepts, meeting three at every vertex. Faces that
 /// were not neighbours and come to interfere are not checked; a wall thinner than the solid's
 /// features is the caller's to avoid.
@@ -106,8 +106,7 @@ fn shell_direction(
             .ok_or(LocalOpError::UnknownFace { face: id })?;
         opened.insert(i);
     }
-    // every edge convex: the outward normals turn the right way about the edge as its face
-    // traverses it
+    // Planar concave joins close by re-intersection; curved ones need an offset transition.
     for (i, face) in faces.iter().enumerate() {
         let surface = face.oriented_surface();
         for edge in face.edge_iter() {
@@ -138,7 +137,9 @@ fn shell_direction(
                 ));
             };
             let turn = n.cross(m).dot(tangent);
-            if turn < -TOLERANCE {
+            let planar_join = matches!(surface, Surface::Plane(_))
+                && matches!(faces[other].surface(), Surface::Plane(_));
+            if turn < -TOLERANCE && !planar_join {
                 return Err(LocalOpError::Concave {
                     face: face.id(),
                     neighbour: faces[other].id(),
@@ -172,6 +173,22 @@ fn shell_direction(
         .collect::<Result<Vec<_>, Failure>>()?;
     let cavity = super::replace::replace_surfaces_impl(solid, &replacements)?;
     let cavity_faces: Vec<&Face> = cavity.face_iter().collect();
+    for (source, offset) in faces.iter().zip(&cavity_faces) {
+        if let Surface::Plane(plane) = offset.oriented_surface() {
+            if !crate::fillet::planar::valid_boundaries(
+                source,
+                &offset.boundaries(),
+                plane.normal().normalize(),
+                TOLERANCE,
+            ) {
+                return Err(Failure::new(
+                    LocalOpError::Unsupported { face: source.id() },
+                    Code::OutsideNeighbour,
+                    "validate_offset_boundaries",
+                ));
+            }
+        }
+    }
 
     let mut outer: Shell = Shell::new();
     let mut inner: Shell = Shell::new();

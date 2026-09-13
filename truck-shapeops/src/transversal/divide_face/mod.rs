@@ -104,7 +104,15 @@ where
         let pt = chunk.poly.front();
         let op = pre_faces
             .iter_mut()
-            .find(|face| face[0].poly.include(pt))
+            .filter(|face| {
+                face[0].poly.include(pt)
+                    && face[0]
+                        .wire
+                        .vertex_iter()
+                        .all(|vertex| chunk.wire.vertex_iter().all(|other| vertex != other))
+            })
+            // Nested cut loops can enclose the same hole; its parent is the innermost.
+            .min_by(|a, b| a[0].poly.area().total_cmp(&b[0].poly.area()))
             .ok_or_else(|| Diagnostic::new(Code::FaceDivisionFailed, "boolean", "divide_faces"))?;
         op.push(chunk);
         Ok(())

@@ -546,9 +546,9 @@ fn box_shelled_closed_has_two_shells() {
     assert_solid(&harness, volume, &[0, 0], TOL);
 }
 
-/// A block with a pocket has concave edges around the pocket's floor and walls.
+/// A U-shaped extrusion has concave joins between its planar walls.
 #[test]
-fn concave_pocket_is_rejected() {
+fn planar_concave_pocket_supports_closed_shelling() {
     let base = polygon_at(
         &[
             (0.0, 0.0),
@@ -564,25 +564,12 @@ fn concave_pocket_is_rejected() {
     );
     let face = builder::try_attach_plane(&[base]).unwrap();
     let block: MSolid = builder::tsweep(&face, Vector3::unit_z());
-    let err = shell(&block, &[], 0.1).unwrap_err();
-    let LocalOpError::Concave { face, neighbour } = err else {
-        panic!("{err}");
-    };
-    let normals: Vec<Vector3> = [face, neighbour]
-        .iter()
-        .map(|id| {
-            block
-                .face_iter()
-                .find(|f| f.id() == *id)
-                .unwrap()
-                .oriented_surface()
-                .normal(0.0, 0.0)
-        })
-        .collect();
-    assert!(
-        normals[0].cross(normals[1]).magnitude() > 0.5,
-        "{normals:?}"
-    );
+    let before = serde_json::to_string(&block.compress()).unwrap();
+    let result = shell(&block, &[], 0.1).unwrap();
+    assert_solid(&result, 7.0 - (7.0 - 16.0*0.1 + 4.0*0.01)*0.8, &[0,0], TOL);
+    assert!(result.is_geometric_consistent());
+    assert_step(&result, 2.648, TOL);
+    assert_eq!(before,serde_json::to_string(&block.compress()).unwrap());
     assert!(matches!(
         shell(&block, &[], -0.1),
         Err(LocalOpError::NotInward)

@@ -114,7 +114,12 @@ where
             self.subs(t).to_vec()
         } else {
             let t = self.get_curve_parameter(t);
-            self.transform.transform_vector(self.entity.der_n(n, t))
+            let sign = if n.is_multiple_of(2) {
+                1.0
+            } else {
+                self.sign()
+            };
+            self.transform.transform_vector(self.entity.der_n(n, t)) * sign
         }
     }
     #[inline(always)]

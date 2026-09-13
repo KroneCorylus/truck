@@ -269,10 +269,23 @@ impl DisplayByStep for Processor<TrimmedCurve<UnitCircle<Point3>>, Matrix4> {
         let axis_idx = idx + 3;
         let ref_direction_idx = idx + 4;
         let location = transform[3].to_point();
-        let axis = VectorAsDirection(transform[2].truncate().normalize());
-        let r0 = transform[0].magnitude();
-        let r1 = transform[1].magnitude();
-        let ref_direction = VectorAsDirection(transform[0].truncate() / r0);
+        let (mut a, mut b) = (transform[0].truncate(), transform[1].truncate());
+        let axis =
+            VectorAsDirection(
+                a.cross(b)
+                    .normalize()
+                    .map(|value| if value == 0.0 { 0.0 } else { value }),
+            );
+        // A shear preserves a conic but not its orthogonal axes. Diagonalizing their
+        // Gram matrix recovers the exact ellipse without changing its handedness.
+        if a.dot(b).abs() > 1e-12 * a.magnitude() * b.magnitude() {
+            let angle = 0.5 * (2.0 * a.dot(b)).atan2(a.magnitude2() - b.magnitude2());
+            let (sin, cos) = angle.sin_cos();
+            (a, b) = (a * cos + b * sin, b * cos - a * sin);
+        }
+        let r0 = a.magnitude();
+        let r1 = b.magnitude();
+        let ref_direction = VectorAsDirection(a / r0);
         if r0.near(&r1) {
             let r = FloatDisplay(r0);
             f.write_fmt(format_args!("#{idx} = CIRCLE('', #{position_idx}, {r});\n"))?;

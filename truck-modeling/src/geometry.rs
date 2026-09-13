@@ -586,7 +586,7 @@ impl Surface {
     /// Recognised: a plane; a stored sphere under a similarity transform; an extruded round circle along its own axis; a revolved line
     /// parallel to the axis (cylinder), perpendicular to it (plane) or meeting it (cone); a
     /// revolved round circle in a plane through the axis, centred on the axis (sphere) or off
-    /// it (torus).
+    /// it (torus); and a clamped rational quadratic patch ruled along a circular section.
     pub fn elementary(&self) -> Option<(Elementary, bool)> {
         let elementary = match self {
             Surface::Plane(plane) => return Some((Elementary::Plane(*plane), true)),
@@ -596,6 +596,7 @@ impl Surface {
             }
             .transformed(*surface.transform())?,
             Surface::Extruded(surface) => extruded_elementary(surface)?,
+            Surface::NurbsSurface(surface) => nurbs_cylinder(surface)?,
             Surface::RevolutedCurve(surface) => {
                 revolved_elementary(surface.entity())?.transformed(*surface.transform())?
             }
@@ -681,14 +682,16 @@ impl Elementary {
 }
 
 impl Surface {
-    /// The surface moved by `distance` along its normal, of the same kind: a plane stays a
+    /// The surface moved by `distance` along its normal, preserving its elementary kind: a plane stays a
     /// plane; an extruded circle keeps its axis and changes its radius, so a cylinder stays a
     /// cylinder; a revolved line or circle is shifted within its meridian plane, so cylinders,
     /// cones, spheres and tori stay what they are, with the apex of a cone moving along its
-    /// axis. A negative `distance` moves the surface against its normal.
+    /// axis. Exact rational ruled cylinder patches become native extruded circular arcs.
+    /// A negative `distance` moves the surface against its normal.
     /// # Failures
     /// - [`Error::OffsetRadiusNotPositive`] when a radius would vanish or turn over
-    /// - [`Error::NoTypedOffset`] for a spline surface, an extruded or revolved curve that is
+    /// - [`Error::NoTypedOffset`] for a spline surface other than an exact rational ruled
+    ///   cylinder, an extruded or revolved curve that is
     ///   not a line or round circle in the right position, or a revolved surface under a
     ///   transform that is not a rigid motion
     pub fn offset(&self, distance: f64) -> Result<Surface> {
@@ -699,7 +702,11 @@ impl Surface {
             let mut transform = *conic.transform();
             transform[0] *= k;
             transform[1] *= k;
-            Processor::with_transform(*conic.entity(), transform)
+            let mut scaled = Processor::with_transform(*conic.entity(), transform);
+            if !conic.orientation() {
+                scaled.invert();
+            }
+            scaled
         };
         match self {
             Surface::Plane(plane) => {
@@ -709,6 +716,58 @@ impl Surface {
                     plane.origin() + plane.u_axis() + shift,
                     plane.origin() + plane.v_axis() + shift,
                 )))
+            }
+            Surface::NurbsSurface(surface) => {
+                let Some((
+                    Elementary::Cylinder {
+                        origin,
+                        axis,
+                        radius,
+                    },
+                    outward,
+                )) = self.elementary()
+                else {
+                    return Err(no_typed_offset);
+                };
+                let new_radius = radius + if outward { distance } else { -distance };
+                if new_radius <= TOLERANCE {
+                    return Err(not_positive);
+                }
+                let points: Vec<_> = surface
+                    .control_points()
+                    .iter()
+                    .flatten()
+                    .map(|p| p.to_point())
+                    .collect();
+                let (lo, hi) = points
+                    .iter()
+                    .map(|p| (*p - origin).dot(axis))
+                    .fold((f64::INFINITY, f64::NEG_INFINITY), |(lo, hi), t| {
+                        (lo.min(t), hi.max(t))
+                    });
+                let x = radial(points[0], origin, axis).normalize();
+                let y = axis.cross(x);
+                let angles = points.iter().map(|p| {
+                    let r = radial(*p, origin, axis);
+                    r.dot(y).atan2(r.dot(x))
+                });
+                let arc = angles.fold((0.0_f64, 0.0_f64), |(lo, hi), a| (lo.min(a), hi.max(a)));
+                let transform = Matrix4::from_cols(
+                    (x * new_radius).extend(0.),
+                    (y * new_radius).extend(0.),
+                    axis.extend(0.),
+                    (origin + lo * axis).to_homogeneous(),
+                );
+                let circle = Curve::Conic(Processor::with_transform(
+                    TrimmedCurve::new(UnitCircle::<Point3>::new(), arc),
+                    transform,
+                ));
+                let mut cylinder: Surface =
+                    ExtrudedCurve::by_extrusion(circle, axis * (hi - lo)).into();
+                if !outward {
+                    cylinder.invert();
+                }
+                Ok(cylinder)
             }
             Surface::Extruded(extruded) => {
                 let (Curve::Conic(conic), Some((Elementary::Cylinder { .. }, _))) =
@@ -784,6 +843,82 @@ impl Surface {
             _ => Err(no_typed_offset),
         }
     }
+}
+
+fn nurbs_cylinder(surface: &NurbsSurface<Vector4>) -> Option<Elementary> {
+    let transpose = match surface.degrees() {
+        (2, 1) => false,
+        (1, 2) => true,
+        _ => return None,
+    };
+    let degrees = surface.degrees();
+    for (knots, degree) in [
+        (surface.uknot_vec(), degrees.0),
+        (surface.vknot_vec(), degrees.1),
+    ] {
+        if knots.iter().take(degree + 1).any(|t| !t.near(&knots[0]))
+            || knots
+                .iter()
+                .skip(degree + 1)
+                .any(|t| !t.near(&knots[knots.len() - 1]))
+        {
+            return None;
+        }
+    }
+    let points = surface.control_points();
+    if (!transpose && (points.len() != 3 || points.iter().any(|p| p.len() != 2)))
+        || (transpose && (points.len() != 2 || points.iter().any(|p| p.len() != 3)))
+    {
+        return None;
+    }
+    let control = |i: usize, j: usize| {
+        if transpose {
+            points[j][i]
+        } else {
+            points[i][j]
+        }
+    };
+    let row: [Vector4; 3] = std::array::from_fn(|i| control(i, 0));
+    if row.iter().any(|p| !p.w.is_finite() || p.w.so_small()) {
+        return None;
+    }
+    let start = row[0].to_point();
+    let ruling = control(0, 1).to_point() - start;
+    if ruling.so_small() {
+        return None;
+    }
+    let axis = ruling.normalize();
+    for (i, start) in row.iter().enumerate() {
+        let end = control(i, 1);
+        if !end.w.near(&start.w) || !(end.to_point() - start.to_point()).cross(axis).so_small() {
+            return None;
+        }
+    }
+    let [p, q, r] = row.map(|p| p.to_point() - axis * (p.to_point() - start).dot(axis));
+    let chord = r - p;
+    let normal = axis.cross(q - p);
+    let denominator = 2. * normal.dot(chord);
+    if denominator.so_small() {
+        return None;
+    }
+    let center = p + normal * (chord.magnitude2() / denominator);
+    let radius = p.distance(center);
+    let cosine = (p - center).dot(r - center) / (radius * radius);
+    if !row[2].w.near(&row[0].w) || 1. + cosine <= TOLERANCE {
+        return None;
+    }
+    let weight = ((1. + cosine) / 2.).sqrt();
+    // Equality of the rational quadratic control points and weights proves a circular
+    // section; all other control points differ only along the cylinder's ruling.
+    let middle = center + ((p - center) + (r - center)) / (1. + cosine);
+    if !(row[1].w / row[0].w).near(&weight) || !middle.near(&q) {
+        return None;
+    }
+    Some(Elementary::Cylinder {
+        origin: center,
+        axis,
+        radius,
+    })
 }
 
 /// The component of `p - origin` perpendicular to the unit vector `axis`.

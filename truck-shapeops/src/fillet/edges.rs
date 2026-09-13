@@ -5,8 +5,9 @@ use truck_base::diagnostics::{validate_tolerance, Code, Diagnostic};
 
 /// Fillets selected straight edges of a closed convex planar shell at a common radius.
 /// Three selected edges at a vertex receive an exact spherical corner; one selected edge
-/// ends on the remaining plane. Two selected edges at an orthogonal trihedral corner meet
-/// along an exact elliptical miter: the rounds are tangent to their supporting planes,
+/// ends on the remaining plane with an exact elliptical intersection. Two selected
+/// right-angle edges sharing a plane meet along an exact elliptical miter, including
+/// oblique outline corners: the rounds are tangent to their supporting planes,
 /// but meet with a crease along the miter. The third edge is only shortened, never rounded.
 /// Collinear chain subdivisions are retained. Other junctions,
 /// curved faces, concave shells and radii that collapse an edge return `None`. Input topology
@@ -33,8 +34,8 @@ where
 }
 
 /// Equal-radius edge fillets with stable failure codes and face context.
-/// Unsupported junction valence returns [`Code::UnsupportedTopology`], nonorthogonal
-/// two-edge corners return [`Code::UnsupportedGeometry`], and radii that leave the
+/// Unsupported junction valence returns [`Code::UnsupportedTopology`], two-edge corners
+/// without right-angle supports return [`Code::UnsupportedGeometry`], and radii that leave the
 /// available faces or collapse trimmed edges return [`Code::OutsideNeighbour`].
 pub fn try_fillet_edges<C, S>(
     shell: &Shell<Point3, C, S>,
@@ -84,6 +85,7 @@ where
     let mut centers = Vec::new();
     let mut contacts: Vec<HashMap<usize, Vertex<Point3>>> = Vec::new();
     let mut miters = vec![None; vertices.len()];
+    let mut terminations = vec![None; vertices.len()];
     for (i, vertex) in vertices.iter().enumerate() {
         let chosen: Vec<_> = incident[i]
             .iter()
@@ -107,12 +109,22 @@ where
             })
             .collect();
         match (chosen.len(), incident[i].len(), faces.len()) {
-            (1, 3, 3) | (3, 3, 3) => {}
+            (1, 3, 3) => {
+                let face = *faces
+                    .iter()
+                    .find(|f| !touched.contains(f))
+                    .ok_or_else(failed)?;
+                terminations[i] = Some(planes[face]);
+            }
+            (3, 3, 3) => {}
             (2, 3, 3) => {
+                let shared = sides[chosen[0]]
+                    .into_iter()
+                    .find(|f| sides[chosen[1]].contains(f))
+                    .ok_or_else(failed)?;
                 if faces
                     .iter()
-                    .array_combinations()
-                    .any(|[&a, &b]| planes[a].0.dot(planes[b].0).abs() > TOLERANCE)
+                    .any(|&f| f != shared && planes[f].0.dot(planes[shared].0).abs() > TOLERANCE)
                 {
                     return Err(error(Code::UnsupportedGeometry));
                 }
@@ -164,7 +176,16 @@ where
         contacts.push(
             touched
                 .into_iter()
-                .map(|f| (f, Vertex::new(center + radius * planes[f].0)))
+                .map(|f| {
+                    let mut point = center + radius * planes[f].0;
+                    if let Some((normal, distance)) = terminations[i] {
+                        let edge = &original_edges[chosen[0]];
+                        let axis = (edge.back().point() - edge.front().point()).normalize();
+                        point -=
+                            axis * ((normal.dot(point.to_vec()) - distance) / normal.dot(axis));
+                    }
+                    (f, Vertex::new(point))
+                })
                 .collect(),
         );
         if miters[i].is_some() {
@@ -233,12 +254,14 @@ where
                     (center + radius * m).to_vec().extend(1.0),
                 ],
             ));
-            if let Some(normal) = miters[v] {
+            let end_plane = terminations[v]
+                .or_else(|| miters[v].map(|n| (n, n.dot(vertices[v].point().to_vec()))));
+            if let Some((normal, distance)) = end_plane {
                 let axis = (edge.back().point() - edge.front().point()).normalize();
-                // Project the circular section along its cylinder axis onto the miter plane.
+                // Axial projection gives the exact ellipse where a cylinder meets an end plane.
                 for p in curve.control_points_mut() {
-                    let distance = normal.dot(p.truncate() - vertices[v].point().to_vec() * p.w);
-                    *p -= (axis * (distance / normal.dot(axis))).extend(0.0);
+                    let offset = normal.dot(p.truncate()) - distance * p.w;
+                    *p -= (axis * (offset / normal.dot(axis))).extend(0.0);
                 }
             }
             curve

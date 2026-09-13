@@ -82,12 +82,13 @@ fn angular_range(surface: &Surface, face: &Face) -> Option<(f64, f64)> {
     };
     let (u0, v0) = surface.try_range_tuple();
     let mid = |r: Option<(f64, f64)>| r.map_or(0.0, |(a, b)| (a + b) / 2.0);
-    let start = match angular(surface)? {
-        0 => surface.subs(0.0, mid(v0)),
-        _ => surface.subs(mid(u0), 0.0),
+    let (start, tangent) = match angular(surface)? {
+        0 => (surface.subs(0.0, mid(v0)), surface.uder(0.0, mid(v0))),
+        _ => (surface.subs(mid(u0), 0.0), surface.vder(mid(u0), 0.0)),
     };
     let x = radial(start, origin, axis).normalize();
     let y = axis.cross(x);
+    let y = y * y.dot(tangent).signum();
     let mut range = (f64::MAX, f64::MIN);
     let mut last = 0.0;
     for p in loop_samples(face) {
@@ -109,7 +110,7 @@ fn angular(surface: &Surface) -> Option<usize> {
         Surface::Extruded(extruded) => {
             matches!(extruded.entity_curve(), Curve::Conic(_)).then_some(0)
         }
-        Surface::RevolutedCurve(_) => Some(1),
+        Surface::RevolutedCurve(surface) => Some(usize::from(surface.orientation())),
         _ => None,
     }
 }
@@ -226,6 +227,59 @@ fn exact(
                 Elementary::Cone { apex, axis, .. } => (*axis, *apex),
                 _ => return None,
             };
+            let tangent_line = match &elementary {
+                Elementary::Cylinder { radius, .. } if normal.dot(axis).abs() < TOLERANCE => {
+                    let distance = normal.dot(on_axis - origin);
+                    ((distance.abs() - radius).abs() < TOLERANCE)
+                        .then_some((on_axis - distance * normal, axis))
+                }
+                Elementary::Cone { half_angle, .. }
+                    if normal.dot(on_axis - origin).abs() < TOLERANCE
+                        && (normal.dot(axis).abs() - half_angle.0.sin()).abs() < TOLERANCE =>
+                {
+                    let radial =
+                        (normal - axis * normal.dot(axis)).normalize() * -normal.dot(axis).signum();
+                    let direction = axis + half_angle.0.tan() * radial;
+                    let sample = surface1.subs(
+                        (domain1.0 .0 + domain1.0 .1) / 2.,
+                        (domain1.1 .0 + domain1.1 .1) / 2.,
+                    );
+                    let height = (sample - on_axis).dot(axis);
+                    Some((on_axis + height * direction, direction.normalize()))
+                }
+                _ => None,
+            };
+            if let Some((point, direction)) = tangent_line {
+                let interval = |surface: &Surface, domain: Domain| {
+                    let (u, v) = surface.search_nearest_parameter(point, None, 100)?;
+                    let (du, dv) =
+                        surface.search_nearest_parameter(point + direction, Some((u, v)), 100)?;
+                    let mut start = [u, v];
+                    let mut next = [du, dv];
+                    if let Some(side) = angular(surface) {
+                        let (a, b) = [domain.0, domain.1][side];
+                        let turn = 2. * PI;
+                        start[side] -= turn * ((start[side] - (a + b) / 2.) / turn).round();
+                        next[side] -= turn * ((next[side] - start[side]) / turn).round();
+                    }
+                    clip(
+                        (start[0], start[1]),
+                        (next[0] - start[0], next[1] - start[1]),
+                        domain,
+                    )
+                };
+                let (a0, b0) = interval(surface0, domain0)?;
+                let (a1, b1) = interval(surface1, domain1)?;
+                let (a, b) = (a0.max(a1), b0.min(b1));
+                return Some(if a < b {
+                    vec![Curve::Line(Line(
+                        point + a * direction,
+                        point + b * direction,
+                    ))]
+                } else {
+                    Vec::new()
+                });
+            }
             if !normal.cross(axis).so_small() {
                 return None;
             }
@@ -260,23 +314,20 @@ fn exact(
             let start = at(a0);
             let x = radial(start, center, axis).normalize();
             let y = axis.cross(x);
+            // A cone's canonical axis points into its nappe, which may oppose the
+            // surface's increasing angular parameter (for example, a narrowing hole).
+            let tangent = match angle {
+                0 => surface1.uder(a0, other),
+                _ => surface1.vder(other, a0),
+            };
+            let y = y * y.dot(tangent).signum();
             let matrix = Matrix4::from_cols(
                 (x * radius).extend(0.0),
                 (y * radius).extend(0.0),
-                axis.extend(0.0),
+                x.cross(y).extend(0.0),
                 center.to_homogeneous(),
             );
-            let range = if at(a1).near(&start) {
-                2.0 * PI
-            } else {
-                let end = radial(at(a1), center, axis).normalize();
-                let angle = x.angle(end).0;
-                match y.dot(end) >= 0.0 {
-                    true => angle,
-                    false => 2.0 * PI - angle,
-                }
-            };
-            let circle = TrimmedCurve::new(UnitCircle::<Point3>::new(), (0.0, range));
+            let circle = TrimmedCurve::new(UnitCircle::<Point3>::new(), (0.0, a1 - a0));
             Some(vec![Curve::Conic(Processor::with_transform(
                 circle, matrix,
             ))])

@@ -63,6 +63,27 @@ where
     if rayon::current_num_threads() == 1 {
         return shell_tessellation_single_thread(shell, tol, sp);
     }
+    refine_winding(
+        tol,
+        |tol| shell_tessellation_once(shell, tol, &sp),
+        |shell| {
+            shell
+                .face_iter()
+                .all(|f| f.surface().as_ref().is_none_or(consistent_winding))
+        },
+    )
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+fn shell_tessellation_once<'a, C, S>(
+    shell: &'a Shell<Point3, C, S>,
+    tol: f64,
+    sp: impl SP<S>,
+) -> MeshedShell
+where
+    C: PolylineableCurve + 'a,
+    S: PreMeshableSurface + 'a,
+{
     let vmap: HashMap<_, _> = shell
         .vertex_par_iter()
         .map(|v| (v.id(), v.mapped(Point3::clone)))
@@ -100,6 +121,26 @@ where
 
 /// Tessellates faces
 pub(super) fn shell_tessellation_single_thread<'a, C, S>(
+    shell: &'a Shell<Point3, C, S>,
+    tol: f64,
+    sp: impl SP<S>,
+) -> MeshedShell
+where
+    C: PolylineableCurve + 'a,
+    S: PreMeshableSurface + 'a,
+{
+    refine_winding(
+        tol,
+        |tol| shell_tessellation_single_thread_once(shell, tol, &sp),
+        |shell| {
+            shell
+                .face_iter()
+                .all(|f| f.surface().as_ref().is_none_or(consistent_winding))
+        },
+    )
+}
+
+fn shell_tessellation_single_thread_once<'a, C, S>(
     shell: &'a Shell<Point3, C, S>,
     tol: f64,
     sp: impl SP<S>,
@@ -157,6 +198,27 @@ where
     C: PolylineableCurve + 'a,
     S: PreMeshableSurface + 'a,
 {
+    refine_winding(
+        tol,
+        |tol| cshell_tessellation_once(shell, tol, &sp),
+        |shell| {
+            shell
+                .faces
+                .iter()
+                .all(|f| f.surface.as_ref().is_none_or(consistent_winding))
+        },
+    )
+}
+
+fn cshell_tessellation_once<'a, C, S>(
+    shell: &CompressedShell<Point3, C, S>,
+    tol: f64,
+    sp: impl SP<S>,
+) -> MeshedCShell
+where
+    C: PolylineableCurve + 'a,
+    S: PreMeshableSurface + 'a,
+{
     let vertices = shell.vertices.clone();
     let tessellate_edge = |edge: &CompressedEdge<C>| {
         let curve = &edge.curve;
@@ -200,6 +262,31 @@ where
         edges,
         faces,
     }
+}
+
+// Spatial normal correction reverses a triangle's UV winding when its chords fold.
+// Refine the whole shell so adjacent faces continue to share boundary samples.
+fn consistent_winding(mesh: &PolygonMesh) -> bool {
+    mesh.tri_faces().iter().all(|tri| {
+        let [a, b, c] = tri.map(|vertex| mesh.uv_coords()[vertex.uv.unwrap()]);
+        (b - a).perp_dot(c - a) >= 0.
+    })
+}
+
+fn refine_winding<T>(
+    mut tol: f64,
+    tessellate: impl Fn(f64) -> T,
+    consistent: impl Fn(&T) -> bool,
+) -> T {
+    let mut result = tessellate(tol);
+    for _ in 0..7 {
+        if consistent(&result) {
+            return result;
+        }
+        tol /= 2.;
+        result = tessellate(tol);
+    }
+    result
 }
 
 fn shell_create_polygon<S: PreMeshableSurface>(
@@ -261,7 +348,12 @@ impl PolyBoundaryPiece {
         let mut vec = bdry3d
             .into_iter()
             .flat_map(|pt| {
-                let (mut u, mut v) = match sp(surface, pt, previous) {
+                // A pole has no unique parameter along its collapsed direction.
+                // Reusing that hint can jump into an extension of the trimmed surface.
+                let hint = previous.filter(|&(u, v)| {
+                    !surface.uder(u, v).so_small() && !surface.vder(u, v).so_small()
+                });
+                let (mut u, mut v) = match sp(surface, pt, hint) {
                     Some(hint) => hint,
                     None => return vec![None],
                 };
@@ -275,12 +367,12 @@ impl PolyBoundaryPiece {
                     if let Some((u0, v0)) = previous {
                         if !u0.near(&u) && surface.uder(u0, v0).so_small() {
                             return vec![
-                                Some((Point2::new(u, v0), pt).into()),
+                                Some((Point2::new(u, v0), surface.subs(u, v0)).into()),
                                 Some((Point2::new(u, v), pt).into()),
                             ];
                         } else if !v0.near(&v) && surface.vder(u0, v0).so_small() {
                             return vec![
-                                Some((Point2::new(u0, v), pt).into()),
+                                Some((Point2::new(u0, v), surface.subs(u0, v)).into()),
                                 Some((Point2::new(u, v), pt).into()),
                             ];
                         }
@@ -658,13 +750,34 @@ fn insert_surface(
     let (udiv, vdiv) = surface.parameter_division(range, tol);
     let single_direction =
         (udiv.len() > 2 && vdiv.len() == 2) || (udiv.len() == 2 && vdiv.len() > 2);
+    let crosses_boundary_chord = |uv: Point2| {
+        let point = surface.subs(uv.x, uv.y);
+        polyline.loops.iter().any(|boundary| {
+            boundary.iter().circular_tuple_windows().any(|(a, b)| {
+                let axis = b.point - a.point;
+                let parameter = ((point - a.point).dot(axis) / axis.magnitude2()).clamp(0., 1.);
+                if point.distance2(a.point + parameter * axis) >= tol * tol {
+                    return false;
+                }
+                let side_uv = (b.uv - a.uv).perp_dot(uv - a.uv);
+                let side_space = axis.cross(point - a.point).dot(surface.normal(uv.x, uv.y));
+                side_uv * side_space < 0.
+            })
+        })
+    };
     let insert_res: Vec<Vec<Option<_>>> = udiv
         .into_iter()
         .map(|u| {
             vdiv.iter()
-                .map(|v| match polyline.include(Point2::new(u, *v)) {
-                    true => triangulation.insert(SPoint2::new(u, *v)).ok(),
-                    false => None,
+                // Near a trim chord, a valid UV point can map across the spatial chord.
+                // Excluding these points prevents inverted slivers without changing shared edges.
+                .map(|v| {
+                    match polyline.include(Point2::new(u, *v))
+                        && !crosses_boundary_chord(Point2::new(u, *v))
+                    {
+                        true => triangulation.insert(SPoint2::new(u, *v)).ok(),
+                        false => None,
+                    }
                 })
                 .collect()
         })

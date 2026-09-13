@@ -72,6 +72,31 @@ pub(super) fn rebuild_face(
                 .collect()
         })
         .collect();
+    let surface = match &surface {
+        Surface::Extruded(extruded)
+            if matches!(surface.elementary(), Some((Elementary::Cylinder { .. }, _))) =>
+        {
+            let vector = extruded.extruding_vector();
+            let origin = extruded.entity_curve().front();
+            let mut span = (0.0_f64, 1.0_f64);
+            for edge in loops.iter().flat_map(|wire| wire.iter()) {
+                if let Some(curve) = edge.curve().try_lift_up() {
+                    // Positive rational weights put the boundary within its control hull.
+                    if curve.control_points().iter().all(|p| p.w > 0.0) {
+                        for point in curve.control_points() {
+                            let t = (point.to_point() - origin).dot(vector) / vector.magnitude2();
+                            span = (span.0.min(t), span.1.max(t));
+                        }
+                    }
+                }
+            }
+            let generator = extruded
+                .entity_curve()
+                .transformed(Matrix4::from_translation(span.0 * vector));
+            ExtrudedCurve::by_extrusion(generator, (span.1 - span.0) * vector).into()
+        }
+        _ => surface,
+    };
     Face::try_new(loops, surface)
 }
 
@@ -432,7 +457,7 @@ pub(super) fn replace_surfaces_impl(
                     true => Ok(face),
                     false => {
                         let loops = face.boundaries().iter().map(Wire::inverse).collect();
-                        Ok(Face::try_new(loops, surface.clone())?.inverse())
+                        Ok(Face::try_new(loops, face.surface())?.inverse())
                     }
                 }
             }
@@ -475,13 +500,18 @@ fn trimmed(curve: &Curve, front: Point3, back: Point3) -> Option<Curve> {
             .filter(|&t| c.subs(t).near(&p))
     };
     let mut curve = curve.clone();
-    let (mut t0, mut t1) = (param(&curve, front)?, param(&curve, back)?);
+    let (mut t0, t1) = (param(&curve, front)?, param(&curve, back)?);
     if t0 > t1 {
         curve.invert();
-        (t0, t1) = (param(&curve, front)?, param(&curve, back)?);
+        t0 = param(&curve, front)?;
     }
     let mut tail = curve.cut(t0);
-    tail.cut(t1);
+    // Reversed processors rebase their parameter mapping when the range is cut.
+    let end = param(&tail, back)?;
+    tail.cut(end);
+    if !tail.front().near(&front) || !tail.back().near(&back) {
+        return None;
+    }
     Some(tail)
 }
 
