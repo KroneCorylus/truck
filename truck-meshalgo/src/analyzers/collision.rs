@@ -117,10 +117,16 @@ fn collide_seg_triangle(seg: [Point3; 2], tri: [Point3; 3]) -> Option<Point3> {
     let aq = seg[1] - tri[0];
     let dotapnor = ap.dot(nor);
     let dotaqnor = aq.dot(nor);
-    if dotapnor * dotaqnor > 0.0 {
-        return None;
-    }
-    let h = seg[0] + dotapnor / (dotapnor - dotaqnor) * (seg[1] - seg[0]);
+    // A shared edge may land just off the other triangle's plane through rounding.
+    // Classify its endpoints by distance before rejecting a same-side segment.
+    let tolerance = TOLERANCE * nor.magnitude();
+    let h = match (dotapnor.abs() < tolerance, dotaqnor.abs() < tolerance) {
+        (true, true) => return None,
+        (true, false) => seg[0],
+        (false, true) => seg[1],
+        (false, false) if dotapnor * dotaqnor > 0.0 => return None,
+        (false, false) => seg[0] + dotapnor / (dotapnor - dotaqnor) * (seg[1] - seg[0]),
+    };
     if f64::signum(ab.cross(nor).dot(h - tri[0]) + TOLERANCE2)
         + f64::signum(bc.cross(nor).dot(h - tri[1]) + TOLERANCE2)
         + f64::signum(ca.cross(nor).dot(h - tri[2]) + TOLERANCE2)
@@ -259,6 +265,31 @@ fn are_colliding(poly0: &PolygonMesh, poly1: &PolygonMesh) -> Option<(Point3, Po
         }
     });
     line
+}
+
+#[test]
+fn triangle_seams_survive_roundoff_without_turning_coplanar_faces_into_crossings() {
+    for scale in [0.1, 1.0, 1000.0] {
+        let plane = [
+            Point3::new(0.0, 0.0, 10.0),
+            Point3::new(scale, 0.0, 10.0),
+            Point3::new(0.0, scale, 10.0),
+        ];
+        for offset in [-1.0e-14, 0.0, 1.0e-14] {
+            let seam = [
+                Point3::new(0.0, 0.0, 10.0 + offset),
+                Point3::new(scale, 0.0, 10.0 + offset),
+                Point3::new(0.0, 0.0, 10.0 + scale),
+            ];
+            for (first, second) in [(plane, seam), (seam, plane)] {
+                let (a, b) = collide_triangles(first, second).unwrap();
+                assert!((a.distance(b) - scale).abs() < TOLERANCE);
+            }
+        }
+        assert!(collide_triangles(plane, plane).is_none());
+        let above = plane.map(|p| p + Vector3::unit_z() * (2.0 * TOLERANCE));
+        assert!(collide_triangles(plane, above).is_none());
+    }
 }
 
 #[test]

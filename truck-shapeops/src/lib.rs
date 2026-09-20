@@ -68,6 +68,7 @@
     unused_qualifications
 )]
 
+pub mod thread;
 mod sewing;
 pub use sewing::sew_shell;
 mod healing;

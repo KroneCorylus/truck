@@ -248,7 +248,18 @@ where
     P::Diff: SspVector<Point = P>,
     S: ParametricSurface<Point = P, Vector = P::Diff>,
 {
-    let function = move |param: Vector2| SspVector::subs(surface, point, param);
+    let function = move |param: Vector2| {
+        // Thin patches amplify roundoff into parameter changes. An already exact
+        // geometric residual must not fail because those changes keep oscillating.
+        if surface.subs(param.x, param.y).near2(&point) {
+            CalcOutput {
+                value: Vector2::zero(),
+                derivation: Matrix2::identity(),
+            }
+        } else {
+            SspVector::subs(surface, point, param)
+        }
+    };
     let res = newton::solve(function, hint.into(), trials);
     res.ok().and_then(
         |Vector2 { x: u, y: v }| match surface.subs(u, v).near(&point) {

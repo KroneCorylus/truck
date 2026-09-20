@@ -118,8 +118,10 @@ pub fn try_fillet_solid_along_wire<R: ScalarFunctionD1>(
 /// an elliptical miter. Three edges of the same sense have a spherical corner; two convex
 /// edges meeting a concave edge have a tangent toroidal corner. Other mixed junctions are
 /// unsupported. Contacts must fit the adjacent faces and avoid holes within twice `tol`.
-/// A single straight edge between planar faces can also terminate on curved faces, with
-/// exact surface-intersection ends and extension along straight cylindrical rulings.
+/// Straight edges between planes or a plane and an axial cylindrical ruling also support
+/// curved end faces. Connected channel rims meet at exact intersections of the blend
+/// surfaces, including elliptical miters between equal-radius cylinders. Contacts may
+/// extend across adjacent end-face patches while preserving the original support surfaces.
 /// The operation must not intersect distant faces or another boundary. Returns `None` on
 /// unsupported input without modifying it. An empty selection returns the original solid
 /// and empty history.
@@ -165,18 +167,16 @@ pub fn try_fillet_solid_edges(
                     tol,
                 )
                 .or_else(|local| {
-                    if edges.len() == 1
-                        && matches!(
-                            local.code,
-                            Code::NonPlanarFace
-                                | Code::UnsupportedGeometry
-                                | Code::UnsupportedTopology
-                        )
-                    {
-                        super::planar_edge::blend(
+                    if matches!(
+                        local.code,
+                        Code::NonPlanarFace | Code::UnsupportedGeometry | Code::UnsupportedTopology
+                    ) {
+                        super::planar_edge::blend_edges(
                             &solid.boundaries()[index],
-                            edges[0],
-                            super::planar_edge::Blend::Fillet(radius),
+                            &edges
+                                .iter()
+                                .map(|&id| (id, super::planar_edge::Blend::Fillet(radius)))
+                                .collect::<Vec<_>>(),
                             tol,
                         )
                     } else {
@@ -196,7 +196,7 @@ pub fn try_fillet_solid_edges(
     finish(solid, index, shell).map_err(|e| e.operation(operation))
 }
 
-/// Equal-distance chamfers on straight sharp edges with planar adjacent and end faces.
+/// Equal-distance chamfers on straight sharp edges with planar or cylindrical support.
 ///
 /// Each touched vertex must have three incident edges. Distances are measured on both adjacent
 /// faces, perpendicular to each selected edge. Bevel planes trim one another: two meet
@@ -208,14 +208,15 @@ pub fn try_fillet_solid_edges(
 /// Unrelated curved faces, curved boundary segments and inner loops are preserved. Contact
 /// boundaries that approach a hole within twice `tol` are rejected. Convex chamfers remove
 /// material; concave chamfers add material between the support faces. Curved geometry at a
-/// touched vertex is outside this API's scope. Use
+/// touched vertex is supported for straight plane/cylinder lips and their planar rim edges.
+/// These bevels meet at exact surface intersections. Use
 /// [`try_chamfer_solid_edges_with_distances`] for unequal distances.
 /// Sizes that remove an original face, an unselected edge, or a bevel contact are rejected.
 /// The chamfers must not intersect distant faces or another boundary of the solid.
 ///
 /// Original face replacements precede the generated bevel faces in the history. Geometry
-/// added by this operation consists of exact planes and lines; boundary sampling is used
-/// only for validation, never for modeling or replacing existing curves.
+/// added by this operation consists of exact planes and intersection curves. Boundary sampling
+/// is used only for validation, never for modeling or replacing existing curves.
 /// An empty selection returns the original solid and empty history. Failure leaves it unchanged.
 pub fn chamfer_solid_edges(
     solid: &Solid,
@@ -251,6 +252,23 @@ pub fn try_chamfer_solid_edges(
     let index = validate_selection(solid, edges, operation)?;
     let shell =
         super::chamfer_edges::chamfer_edges(&solid.boundaries()[index], edges, distance, tol)
+            .or_else(|error| {
+                if matches!(
+                    error.code,
+                    Code::NonPlanarFace | Code::UnsupportedGeometry | Code::UnsupportedTopology
+                ) {
+                    super::planar_edge::blend_edges(
+                        &solid.boundaries()[index],
+                        &edges
+                            .iter()
+                            .map(|&id| (id, super::planar_edge::Blend::Chamfer([distance; 2])))
+                            .collect::<Vec<_>>(),
+                        tol,
+                    )
+                } else {
+                    Err(error)
+                }
+            })
             .map_err(|e| e.shell(index))?;
     finish(solid, index, shell).map_err(|e| e.operation(operation))
 }
@@ -258,8 +276,10 @@ pub fn try_chamfer_solid_edges(
 /// Chamfers selected straight edges with separate distances on their two adjacent faces.
 ///
 /// Each tuple contains an edge ID and distances in shell face order. All selected edges
-/// must lie in one shell and have planar support and end faces with three edges per touched
-/// vertex. Unrelated curved faces and inner boundary loops are preserved. Two-edge bevels
+/// must lie in one shell. Planar neighborhoods have three edges per touched vertex;
+/// straight plane/cylinder lips and connected planar rim edges are also supported.
+/// On cylindrical supports, distances use the nearest point to the perpendicular tangent
+/// offset. Unrelated curved faces and inner boundary loops are preserved. Two-edge bevels
 /// use a triangular transition when their contacts on the unselected edge differ. Mixed three-edge corners use a
 /// transition when the convex bevels have matching setbacks on their common face;
 /// otherwise they use a three-plane miter. Other restrictions are those of
@@ -291,6 +311,23 @@ pub fn try_chamfer_solid_edges_with_distances(
     let selected = ids.into_iter().collect();
     let shell =
         super::chamfer_miter::chamfer(&solid.boundaries()[index], &selected, &distances, tol)
+            .or_else(|error| {
+                if matches!(
+                    error.code,
+                    Code::NonPlanarFace | Code::UnsupportedGeometry | Code::UnsupportedTopology
+                ) {
+                    super::planar_edge::blend_edges(
+                        &solid.boundaries()[index],
+                        &edges
+                            .iter()
+                            .map(|&(id, d)| (id, super::planar_edge::Blend::Chamfer(d)))
+                            .collect::<Vec<_>>(),
+                        tol,
+                    )
+                } else {
+                    Err(error)
+                }
+            })
             .map_err(|e| e.shell(index))?;
     finish(solid, index, shell).map_err(|e| e.operation(operation))
 }

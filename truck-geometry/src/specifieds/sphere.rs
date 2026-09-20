@@ -136,7 +136,8 @@ impl ParameterDivision2D for Sphere {
             tol < self.radius,
             "Tolerance is larger than the radius of sphere."
         );
-        let delta = 2.0 * f64::acos(1.0 - tol / self.radius);
+        // A mesh diagonal changes both angles; each direction gets half the chord budget.
+        let delta = 2.0 * f64::acos(1.0 - tol / (2.0 * self.radius));
         let u_div = 1 + ((urange.1 - urange.0) / delta).floor() as usize;
         let v_div = 1 + ((vrange.1 - vrange.0) / delta).floor() as usize;
         (

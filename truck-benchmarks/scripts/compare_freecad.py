@@ -14,6 +14,8 @@ import MeshPart
 def measure(name, run, expected=None, samples=20, validate=None):
     if os.environ.get("CAD_BENCH_FILTER") and not name.startswith(os.environ["CAD_BENCH_FILTER"]):
         return
+    samples = int(os.environ.get("CAD_BENCH_SAMPLES", samples))
+    assert samples > 0
     result = run()
     if validate is None:
         assert result.isValid() and len(result.Solids) == 1, name
@@ -27,8 +29,15 @@ def measure(name, run, expected=None, samples=20, validate=None):
         next_result = run()
         times.append((time.perf_counter() - start) * 1000)
         result = next_result
+    if validate is None:
+        assert result.isValid() and len(result.Solids) == 1, name
+        if expected is not None:
+            assert abs(result.Volume - expected) < max(1e-6, expected * 1e-8), name
+    else:
+        assert validate(result), name
     print("BENCH " + json.dumps(dict(name=name, median_ms=statistics.median(times),
           min_ms=min(times), max_ms=max(times), samples=samples,
+          samples_ms=times, p90_ms=sorted(times)[math.ceil(samples * 0.9) - 1],
           volume=getattr(result, "Volume", None), facets=getattr(result, "CountFacets", None),
           faces=len(result.Faces) if hasattr(result, "Faces") else None)), flush=True)
 

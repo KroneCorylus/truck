@@ -104,6 +104,7 @@ mod closed_sweep;
 /// declare errors
 pub mod errors;
 mod geom_impls;
+mod ruled_intersection;
 mod mapped;
 mod multi_sweep;
 /// primitive shapes

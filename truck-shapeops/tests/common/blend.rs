@@ -5,7 +5,9 @@ use truck_geometry::prelude::*;
 pub use truck_modeling::{shell, wire, Curve, Edge, Face, Shell, Solid, Surface, Vertex, Wire};
 
 /// Keeps the modeling solid and its topology IDs.
-pub fn from_modeling(solid: &truck_modeling::Solid) -> Solid { solid.clone() }
+pub fn from_modeling(solid: &truck_modeling::Solid) -> Solid {
+    solid.clone()
+}
 
 /// Index of the face of `shell` whose surface passes through `point`.
 pub fn face_through(shell: &Shell, point: Point3) -> usize {

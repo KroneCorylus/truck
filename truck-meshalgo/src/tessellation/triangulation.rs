@@ -49,6 +49,18 @@ where
         .or_else(|| surface.search_nearest_parameter(point, None, 100))
 }
 
+fn edge_polyline<C: PolylineableCurve>(curve: &C, front: Point3, back: Point3, tol: f64) -> PolylineCurve {
+    let mut poly = PolylineCurve::from_curve(curve, curve.range_tuple(), tol);
+    // Close fitted-curve seams with shared vertices, preserving roundoff at singular poles.
+    if let Some(point) = poly.first_mut().filter(|p| p.distance(front) > TOLERANCE2) {
+        *point = front;
+    }
+    if let Some(point) = poly.last_mut().filter(|p| p.distance(back) > TOLERANCE2) {
+        *point = back;
+    }
+    poly
+}
+
 /// Tessellates faces
 #[cfg(not(target_arch = "wasm32"))]
 pub(super) fn shell_tessellation<'a, C, S>(
@@ -95,7 +107,7 @@ where
             let v0 = vmap.get(&edge.absolute_front().id()).unwrap();
             let v1 = vmap.get(&edge.absolute_back().id()).unwrap();
             let curve = edge.curve();
-            let poly = PolylineCurve::from_curve(&curve, curve.range_tuple(), tol);
+            let poly = edge_polyline(&curve, v0.point(), v1.point(), tol);
             (id, Edge::debug_new(v0, v1, poly))
         })
         .collect();
@@ -163,7 +175,7 @@ where
             let vb = edge.absolute_back();
             let v1 = vmap.entry_or_insert(vb).clone();
             let curve = edge.curve();
-            let poly = PolylineCurve::from_curve(&curve, curve.range_tuple(), tol);
+            let poly = edge_polyline(&curve, v0.point(), v1.point(), tol);
             Edge::debug_new(&v0, &v1, poly)
         },
     );
@@ -224,7 +236,7 @@ where
         let curve = &edge.curve;
         CompressedEdge {
             vertices: edge.vertices,
-            curve: PolylineCurve::from_curve(curve, curve.range_tuple(), tol),
+            curve: edge_polyline(curve, vertices[edge.vertices.0], vertices[edge.vertices.1], tol),
         }
     };
     #[cfg(not(target_arch = "wasm32"))]
@@ -573,7 +585,9 @@ impl PolyBoundary {
     }
 
     /// whether `c` is included in the domain with boundary = `self`.
-    fn include(&self, c: Point2) -> bool {
+    fn include(&self, c: Point2) -> bool { self.include_with_tolerance(c, TOLERANCE) }
+
+    fn include_with_tolerance(&self, c: Point2, tolerance: f64) -> bool {
         let t = 2.0 * std::f64::consts::PI * HashGen::hash1(c);
         let r = Vector2::new(f64::cos(t), f64::sin(t));
         self.loops
@@ -589,7 +603,7 @@ impl PolyBoundary {
                 let s1 = r.x * b.y - r.y * b.x; // v times b
                 let s2 = a.x * b.y - a.y * b.x; // a times b
                 let x = s2 / (s1 - s0);
-                if x.so_small() && s0 * s1 < 0.0 {
+                if x.abs() <= tolerance && s0 * s1 < 0.0 {
                     None
                 } else if x > 0.0 && s0 <= 0.0 && s1 > 0.0 {
                     Some(counter + 1)
@@ -841,7 +855,16 @@ fn triangulation_into_polymesh<'a>(
             let (a, b) = (tri[1] - tri[0], tri[2] - tri[0]);
             let c = tri[0] + (a + b) / 3.0;
             let area = a.x * b.y - a.y * b.x;
-            polyline.include(c) && !area.so_small2()
+            let scale = tri
+                .iter()
+                .flat_map(|p| [p.x.abs(), p.y.abs()])
+                .fold(0.0, f64::max);
+            // Scale the parameter-search error into area units to remove seam slivers
+            // without imposing an absolute minimum size on valid triangles.
+            let roundoff = TOLERANCE2 * scale * (a.magnitude() + b.magnitude());
+            // Constraints already separate inside from outside. A tolerance band here
+            // deletes valid triangles on narrow faces, including entire small faces.
+            polyline.include_with_tolerance(c, 0.0) && area > roundoff
         })
         .map(|tri| {
             let idcs = array![i => vmap[&tri[i].fix()]; 3];

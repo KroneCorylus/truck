@@ -650,17 +650,19 @@ where
                     .flat_map(|(mut polyline, mut curve)| {
                         let mut pieces = Vec::new();
                         {
-                            let on_boundary = |point| {
-                                boundaries0[face_index0]
-                                    .iter()
-                                    .chain(&boundaries1[face_index1])
-                                    .any(|edge| {
-                                        edge.bounds.contains(point)
-                                            && edge.curve.search_parameter(point, None, 1).is_some()
-                                    })
-                            };
                             let cuts: Vec<_> = (1..polyline.len() - 1)
-                                .filter(|&i| on_boundary(polyline[i]))
+                                .filter(|&i| {
+                                    boundaries0[face_index0]
+                                        .iter()
+                                        .chain(&boundaries1[face_index1])
+                                        .any(|edge| {
+                                            edge.splits_at(
+                                                polyline[i - 1],
+                                                polyline[i],
+                                                polyline[i + 1],
+                                            )
+                                        })
+                                })
                                 .collect();
                             for i in cuts.into_iter().rev() {
                                 pieces.push((polyline.cut(i as f64), curve.cut(i as f64)));
@@ -829,6 +831,18 @@ impl BoundaryPolyline {
         let padding = Vector3::new(TOLERANCE, TOLERANCE, TOLERANCE);
         let bounds = BoundingBox::from_iter([bounds.min() - padding, bounds.max() + padding]);
         Self { curve, bounds }
+    }
+
+    fn splits_at(&self, before: Point3, point: Point3, after: Point3) -> bool {
+        let contains =
+            |p| self.bounds.contains(p) && self.curve.search_parameter(p, None, 1).is_some();
+        // Samples along one boundary edge are not new vertices. Keep its endpoints and
+        // contacts where the intersection enters, leaves or crosses that edge.
+        contains(point)
+            && (point.near(&self.curve.front())
+                || point.near(&self.curve.back())
+                || !contains(before.midpoint(point))
+                || !contains(point.midpoint(after)))
     }
 }
 

@@ -6,6 +6,25 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Add `truck_shapeops::thread::thread_groove` for single-start internal/external,
+  right/left-handed 60-degree helical B-rep cutters with validated pitch, depth,
+  turn count, and sampled helix accuracy. Exact rational radial sections preserve
+  cylindrical contacts; cutters participate in ordinary booleans and STEP export.
+- Tessellation anchors sampled edge endpoints to their shared topology vertices,
+  closing numerical seams at fitted intersections in both ordinary and compressed solids.
+- Preserve exact rational plane sections and constant-parameter sections of ruled
+  NURBS during boolean intersection conversion. This avoids oscillating fitted
+  boundaries on helical flanks and allows closed fine meshes and STEP round trips.
+
+
+- Accept near-limit all-edge fillets and miter chamfers on boxes without discarding their tiny remaining faces. Stop surface inversion on an exact physical residual, distinguish half-space roundoff from modeling tolerance, retain small tessellation triangles, and budget sphere chord error across both parameters. STEP export retains exact circular arcs and aligns spherical octant parameters to their boundaries. Regressions cover analytic volume, closed meshes, rigid transforms, reversed selections, unchanged input, and strict FreeCAD STEP validation through the consumer's test script.
+
+- Support straight plane/cylinder lips and connected channel rims in both fillet and chamfer, including unequal chamfer distances. Preserve analytic supports, traverse adjacent end-face patches, and join blend surfaces with exact conic projections and cylindrical miters; tangent contacts and selection ordering remain stable under rigid transforms and scale changes. Regressions check independent section/volume expectations, closed meshes, STEP round trips, and unchanged input on rejected sizes.
+
+- Validate exact cylindrical extrusion boundaries through analytic cylinder parameters while retaining knot-span sampling, physical-space tolerance and finite-domain checks. This avoids false geometry failures on small or transformed conic strips and rejects curves whose initial endpoint lies outside the extrusion. Clamp analytic angular endpoint roundoff only when the evaluated point remains within geometric tolerance.
+
+- Keep Boolean intersection samples along one face-boundary edge inside a single edge, while retaining boundary crossings, contacts and topological endpoints. Triangle intersections now recognize seam endpoints within geometric tolerance before rejecting same-side segments, so adjoining patches report the complete seam despite roundoff. Circular channel cuts no longer turn mesh samples into extra rim edges and vertices; regressions cover face order, exact volume, closed meshes and the application's later fillet references.
+
 - Correct odd derivatives of reversed `Processor` curves. Fillets on Boolean-created hole rims now retain consistent exact surfaces and outward normals. Regressions pair Boolean and extruded holes, through and blind cuts, reversed wires, analytic volumes, closed meshes, STEP, upstream edits and saved documents.
 - Support oblique planar fillet ends and convex/concave two-edge fillet transitions; construct exact elliptical trims and toroidal patches while preserving the remaining sharp edge. Mixed two-edge chamfers with different end contacts now use a shared triangular transition, including unequal distances and transitions at both ends.
 - Keep tessellation grid points out of narrow curved-boundary regions where a UV chord and its spatial chord disagree about sidedness. Boundary sampling and surface normals remain unchanged; regressions require closed, consistently oriented meshes for the affected fillets.

@@ -46,6 +46,10 @@ pub(super) fn chamfer_edges(
     // The convex result is the intersection of the original and bevel half-spaces.
     // Enumerate plane triples so junctions share vertices independently of selection order.
     let epsilon = tol.min(TOLERANCE);
+    // Plane membership needs roundoff allowance, not a geometric band that can
+    // include vertices from the opposite side of a narrow retained face.
+    let plane_epsilon =
+        64.0 * f64::EPSILON * planes.iter().map(|(_, d)| d.abs()).fold(1.0, f64::max);
     let mut vertices: Vec<Vertex> = Vec::new();
     for a in 0..planes.len() {
         for b in a + 1..planes.len() {
@@ -59,7 +63,10 @@ pub(super) fn chamfer_edges(
                     continue;
                 };
                 let p = Point3::from_vec(inverse * Vector3::new(d, e, f));
-                if planes.iter().any(|&(n, d)| n.dot(p.to_vec()) > d + epsilon) {
+                if planes
+                    .iter()
+                    .any(|&(n, d)| n.dot(p.to_vec()) > d + plane_epsilon)
+                {
                     continue;
                 }
                 if !vertices.iter().any(|v| v.point().distance(p) <= epsilon) {
@@ -75,7 +82,7 @@ pub(super) fn chamfer_edges(
         let mut polygon: Vec<_> = vertices
             .iter()
             .enumerate()
-            .filter(|(_, v)| (normal.dot(v.point().to_vec()) - d).abs() <= epsilon)
+            .filter(|(_, v)| (normal.dot(v.point().to_vec()) - d).abs() <= plane_epsilon)
             .map(|(i, _)| i)
             .collect();
         if polygon.len() < 3 {

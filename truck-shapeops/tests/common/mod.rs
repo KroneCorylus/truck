@@ -42,7 +42,8 @@ pub fn assert_topology<P, C, S>(solid: &Solid<P, C, S>, expected_genera: &[usize
 pub fn assert_mesh_closed<C, S>(solid: &Solid<Point3, C, S>, tol: f64)
 where
     C: PolylineableCurve,
-    S: MeshableSurface, {
+    S: MeshableSurface,
+{
     for (i, shell) in solid.boundaries().iter().enumerate() {
         let mut mesh = shell.triangulation(tol).to_polygon();
         mesh.put_together_same_attrs(TOLERANCE)
@@ -62,7 +63,8 @@ where
 pub fn assert_volume<C, S>(solid: &Solid<Point3, C, S>, expected: f64, tol: f64)
 where
     C: PolylineableCurve,
-    S: MeshableSurface, {
+    S: MeshableSurface,
+{
     let meshed = solid.triangulation(tol);
     let volume = meshed.to_polygon().volume();
     let curved_area: f64 = meshed
@@ -136,10 +138,14 @@ fn shell_genus<P, C, S>(shell: &Shell<P, C, S>) -> usize {
 }
 
 /// Volume of a cylinder.
-pub fn cylinder_volume(radius: f64, height: f64) -> f64 { PI * radius * radius * height }
+pub fn cylinder_volume(radius: f64, height: f64) -> f64 {
+    PI * radius * radius * height
+}
 
 /// Volume of a sphere.
-pub fn sphere_volume(radius: f64) -> f64 { 4.0 / 3.0 * PI * radius * radius * radius }
+pub fn sphere_volume(radius: f64) -> f64 {
+    4.0 / 3.0 * PI * radius * radius * radius
+}
 
 /// Volume removed by a constant-radius fillet of length `length` on a right-angle edge.
 pub fn fillet_removed_volume(radius: f64, length: f64) -> f64 {

@@ -82,3 +82,16 @@ fn sphere_derivation_test() {
         }
     }
 }
+#[test]
+fn parameter_grid_diagonals_respect_chord_tolerance() {
+    use truck_geometry::prelude::*;
+    let sphere = Sphere::new(Point3::origin(), 5.0);
+    let tol = 0.001;
+    let (us, vs) = sphere.parameter_division(((1.0, 2.0), (0.0, 1.0)), tol);
+    for u in us.windows(2) {
+        for v in vs.windows(2) {
+            let midpoint = sphere.subs(u[0], v[0]).midpoint(sphere.subs(u[1], v[1]));
+            assert!(5.0 - midpoint.to_vec().magnitude() <= tol);
+        }
+    }
+}

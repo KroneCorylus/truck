@@ -7,8 +7,9 @@ use truck_topology::compress::CompressedSolid;
 /// Prepares a modeling solid for [`super::StepModel`] at the given geometric tolerance.
 ///
 /// Contact and intersection curves become spatial splines (exact forms are retained when
-/// available); rolling-ball surfaces become rational B-spline surfaces. Other geometry stays
-/// exact. Topology, indices, face order and
+/// available); rolling-ball surfaces become rational B-spline surfaces. Exact circular
+/// quadratic splines become circles, and spherical octants align their parameter axes with
+/// their circular boundaries. Other geometry stays exact. Topology, indices, face order and
 /// orientation are preserved, and the input is not modified. Use this before exporting a blend:
 /// the STEP formatter cannot directly represent [`Surface::Fillet`] or [`Curve::PCurve`].
 ///
@@ -26,14 +27,80 @@ pub fn prepare_for_step(
     if !tol.is_finite() || tol <= 0.0 {
         return None;
     }
-    solid.try_mapped(
+    let mut prepared = solid.try_mapped(
         |p| Some(*p),
         |c| prepare_curve(c, tol),
         |s| prepare_surface(s, tol),
-    )
+    )?;
+    for shell in &mut prepared.boundaries {
+        for face in &mut shell.faces {
+            let [boundary] = face.boundaries.as_slice() else {
+                continue;
+            };
+            let [a, b, c] = boundary.as_slice() else {
+                continue;
+            };
+            if let Some(surface) = spherical_octant(
+                &face.surface,
+                [a, b, c].map(|edge| &shell.edges[edge.index].curve),
+            ) {
+                face.surface = surface;
+            }
+        }
+    }
+    Some(prepared)
+}
+
+fn spherical_octant(surface: &Surface, curves: [&Curve; 3]) -> Option<Surface> {
+    let (Elementary::Sphere { center, radius }, same_sense) = surface.elementary()? else {
+        return None;
+    };
+    let mut normals = [Vector3::zero(); 3];
+    for (normal, curve) in normals.iter_mut().zip(curves) {
+        let Curve::Conic(circle) = curve else {
+            return None;
+        };
+        let transform = circle.transform();
+        let x = transform[0].truncate();
+        let y = transform[1].truncate();
+        if !transform[3].to_point().near2(&center)
+            || !x.magnitude().near2(&radius)
+            || !y.magnitude().near2(&radius)
+            || !x.dot(y).so_small2()
+        {
+            return None;
+        }
+        *normal = x.cross(y).normalize();
+    }
+    if (0..3).any(|i| !normals[i].dot(normals[(i + 1) % 3]).so_small2()) {
+        return None;
+    }
+    // Align great-circle trims with meridians and the equator. Otherwise STEP readers
+    // must fit curved sphere pcurves, whose error can exceed a near-limit face's width.
+    let x = normals[1];
+    let z = normals[0];
+    let y = z.cross(x);
+    let mut sphere = Processor::with_transform(
+        Sphere::new(Point3::origin(), radius),
+        Matrix4::from_cols(
+            x.extend(0.0),
+            y.extend(0.0),
+            z.extend(0.0),
+            center.to_homogeneous(),
+        ),
+    );
+    if !same_sense {
+        sphere.invert();
+    }
+    Some(Surface::Sphere(sphere))
 }
 
 fn prepare_curve(curve: &Curve, tol: f64) -> Option<Curve> {
+    if let Curve::NurbsCurve(spline) = curve {
+        if let Some(circle) = circular_bezier(spline) {
+            return Some(circle);
+        }
+    }
     if let Curve::IntersectionCurve(intersection) = curve {
         if let Some(circle) =
             circular_intersection(curve, intersection.surface0(), intersection.surface1())
@@ -86,6 +153,51 @@ fn prepare_curve(curve: &Curve, tol: f64) -> Option<Curve> {
         }
         _ => Some(curve.clone()),
     }
+}
+
+fn circular_bezier(curve: &NurbsCurve<Vector4>) -> Option<Curve> {
+    let [a, b, c] = curve.control_points().as_slice() else {
+        return None;
+    };
+    if curve.degree() != 2 || a.w != c.w || a.w <= 0.0 || b.w <= 0.0 {
+        return None;
+    }
+    let (knots, mults) = curve.knot_vec().to_single_multi();
+    if knots.len() != 2 || mults != [3, 3] {
+        return None;
+    }
+    let weight = b.w / a.w;
+    if !(0.0..1.0).contains(&weight) {
+        return None;
+    }
+    let [p, q, r] = [a, b, c].map(|p| p.to_point());
+    // A circular rational quadratic has equal endpoint weights. Its tangent
+    // intersection and chord midpoint determine the center algebraically.
+    let center = Point3::from_vec(
+        (p.midpoint(r).to_vec() - weight * weight * q.to_vec()) / (1.0 - weight * weight),
+    );
+    let x = p - center;
+    let normal = (q - p).cross(r - q).normalize();
+    let y = normal.cross(x);
+    let angle = 2.0 * weight.acos();
+    let end = center + angle.cos() * x + angle.sin() * y;
+    if !x.magnitude2().is_finite()
+        || x.magnitude2() <= TOLERANCE2
+        || !normal.x.is_finite()
+        || !end.near2(&r)
+        || x.dot(q - p).abs() > TOLERANCE2
+    {
+        return None;
+    }
+    Some(Curve::Conic(Processor::with_transform(
+        TrimmedCurve::new(UnitCircle::new(), (0.0, angle)),
+        Matrix4::from_cols(
+            x.extend(0.0),
+            y.extend(0.0),
+            normal.extend(0.0),
+            center.to_homogeneous(),
+        ),
+    )))
 }
 
 fn circular_intersection(curve: &Curve, a: &Surface, b: &Surface) -> Option<Curve> {
@@ -252,4 +364,29 @@ fn fillet_to_nurbs(
         }
     }
     None
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn noncircular_quadratics_remain_splines() {
+        for (height, weight) in [(2.0, std::f64::consts::FRAC_1_SQRT_2), (1.0, 0.6)] {
+            let spline = NurbsCurve::new(BSplineCurve::new(
+                KnotVec::bezier_knot(2),
+                vec![
+                    Vector4::new(1., 0., 0., 1.),
+                    Vector4::new(weight, height * weight, 0., weight),
+                    Vector4::new(0., height, 0., 1.),
+                ],
+            ));
+            let original = Curve::NurbsCurve(spline);
+            let prepared = prepare_curve(&original, 0.00005).unwrap();
+            assert!(matches!(prepared, Curve::NurbsCurve(_)));
+            for i in 0..=16 {
+                assert_eq!(original.subs(i as f64 / 16.), prepared.subs(i as f64 / 16.));
+            }
+        }
+    }
 }

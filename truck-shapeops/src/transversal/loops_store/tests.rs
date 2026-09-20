@@ -858,3 +858,23 @@ fn boundary_boxes_preserve_near_edge_contacts() {
         }
     }
 }
+
+#[test]
+fn boundary_splits_keep_contacts_and_endpoints_but_not_samples_along_an_edge() {
+    let p = |x, y| Point3::new(x, y, 0.0);
+    let boundary = BoundaryPolyline::new(PolylineCurve::from(vec![
+        p(0.0, 0.0),
+        p(3.25, 0.0),
+        p(10.0, 0.0),
+    ]));
+    for x in [0.75, 3.25, 6.75, 9.25] {
+        assert!(!boundary.splits_at(p(0.0, 0.0), p(x, 0.0), p(10.0, 0.0)));
+        assert!(boundary.splits_at(p(x, -1.0), p(x, 0.0), p(x, 1.0)));
+        assert!(boundary.splits_at(p(x, 1.0), p(x, 0.0), p(10.0, 0.0)));
+        assert!(boundary.splits_at(p(0.0, 0.0), p(x, 0.0), p(x, 1.0)));
+        assert!(boundary.splits_at(p(x - 0.5, 1.0), p(x, 0.0), p(x + 0.5, 1.0)));
+        assert!(!boundary.splits_at(p(0.0, 1.0), p(x, 1.0), p(10.0, 1.0)));
+    }
+    assert!(boundary.splits_at(p(-1.0, 0.0), p(0.0, 0.0), p(1.0, 0.0)));
+    assert!(boundary.splits_at(p(9.0, 0.0), p(10.0, 0.0), p(11.0, 0.0)));
+}

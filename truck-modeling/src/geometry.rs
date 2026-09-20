@@ -75,6 +75,9 @@ impl Transformed<Matrix4> for Curve {
 impl From<IntersectionCurve<BSplineCurve<Point3>, Surface, Surface>> for Curve {
     fn from(c: IntersectionCurve<BSplineCurve<Point3>, Surface, Surface>) -> Curve {
         let (surface0, surface1, leader) = c.destruct();
+        if let Some(curve) = ruled_intersection::exact(&surface0, &surface1, &leader) {
+            return curve;
+        }
         Curve::IntersectionCurve(IntersectionCurve::new(
             Box::new(surface0),
             Box::new(surface1),
@@ -244,6 +247,9 @@ impl IncludeCurve<Curve> for Surface {
                         sampled_include(surface, curve)
                     }
                 }
+            }
+            Surface::Extruded(surface) if cylinder_inclusion_supported(surface) => {
+                cylinder_include(surface, curve)
             }
             Surface::Extruded(surface) => match surface.entity_curve().try_lift_up() {
                 Some(_) => include_curve(&extruded_to_nurbs(surface), curve),
@@ -491,11 +497,41 @@ fn cylinder_search_hint(
         u = a + b - u;
     }
     u += ((reference.unwrap_or_else(|| a.midpoint(b)) - u) / TAU).round() * TAU;
-    if !(a..=b).contains(&u) {
+    if u < a - TOLERANCE || u > b + TOLERANCE {
         return None;
     }
+    u = u.clamp(a, b);
     let v = delta.dot(axis) / aa;
     v.is_finite().then_some((u, v))
+}
+
+fn cylinder_inclusion_supported(surface: &ExtrudedCurve<Curve, Vector3>) -> bool {
+    let (a, b) = surface.entity_curve().range_tuple();
+    cylinder_search_hint(surface, surface.subs(a.midpoint(b), 0.5), None).is_some()
+}
+
+fn cylinder_include(surface: &ExtrudedCurve<Curve, Vector3>, curve: &Curve) -> bool {
+    let includes = |point| {
+        cylinder_search_hint(surface, point, None).is_some_and(|(u, v)| {
+            (-TOLERANCE..=1.0 + TOLERANCE).contains(&v) && surface.subs(u, v).near(&point)
+        })
+    };
+    if let Some(lifted) = curve.try_lift_up() {
+        // Keep the NURBS inclusion test's knot-span sampling, but evaluate the
+        // exact cylinder directly to avoid an ill-conditioned surface solve.
+        let (knots, _) = lifted.knot_vec().to_single_multi();
+        let degree = lifted.degree().max(1) * 6;
+        includes(lifted.front().to_point())
+            && knots.windows(2).all(|span| {
+                (1..=degree).all(|i| {
+                    let t = span[0] + (span[1] - span[0]) * i as f64 / degree as f64;
+                    includes(lifted.subs(t).to_point())
+                })
+            })
+    } else {
+        let (a, b) = curve.range_tuple();
+        (0..=32).all(|i| includes(curve.subs(a + (b - a) * i as f64 / 32.0)))
+    }
 }
 
 impl ToSameGeometry<Surface> for HomotopySurface<Curve, Curve> {

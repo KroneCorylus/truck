@@ -10,6 +10,63 @@ pub(super) enum Blend {
     Chamfer([f64; 2]),
 }
 
+pub(super) fn blend_edges(
+    shell: &Shell,
+    selected: &[(EdgeID, Blend)],
+    tol: f64,
+) -> Result<Shell, Diagnostic> {
+    let error = |code| Diagnostic::new(code, "blend", "intersect_straight_blends");
+    let mut work = Vec::new();
+    for &(id, kind) in selected {
+        let faces: Vec<_> = shell
+            .iter()
+            .enumerate()
+            .filter(|(_, f)| f.edge_iter().any(|e| e.id() == id))
+            .map(|(i, _)| i)
+            .collect();
+        let [a, b] = *faces.as_slice() else {
+            return Err(error(Code::UnsupportedTopology));
+        };
+        let (index, edge) = shell[a]
+            .edge_iter()
+            .enumerate()
+            .find(|(_, e)| e.id() == id)
+            .unwrap();
+        let axis = (edge.back().point() - edge.front().point()).normalize();
+        if !edge
+            .curve()
+            .parameter_division(edge.curve().range_tuple(), tol)
+            .1
+            .iter()
+            .all(|p| (*p - edge.front().point()).cross(axis).magnitude() <= TOLERANCE)
+        {
+            return Err(error(Code::UnsupportedGeometry));
+        }
+        let curved = [a, b]
+            .iter()
+            .any(|&i| !matches!(shell[i].oriented_surface(), Surface::Plane(_)));
+        work.push((!curved, a, b, index, edge.front().point(), axis, kind));
+    }
+    work.sort_by_key(|&(planar, a, b, index, _, _, _)| (planar, a, b, index));
+    let mut result = shell.clone();
+    for (_, a, b, _, point, axis, kind) in work {
+        let candidates: Vec<_> = result[a]
+            .edge_iter()
+            .filter(|e| {
+                result[b].edge_iter().any(|other| e.id() == other.id())
+                    && [e.front().point(), e.back().point()]
+                        .iter()
+                        .all(|p| (*p - point).cross(axis).magnitude() <= TOLERANCE)
+            })
+            .collect();
+        let [edge] = candidates.as_slice() else {
+            return Err(error(Code::UnsupportedTopology));
+        };
+        result = blend(&result, edge.id(), kind, tol)?;
+    }
+    Ok(result)
+}
+
 pub(super) fn blend(
     shell: &Shell,
     id: EdgeID,
@@ -30,13 +87,6 @@ pub(super) fn blend(
     let [a, b] = *sides.as_slice() else {
         return Err(error(Code::UnsupportedTopology));
     };
-    let planes = [a, b].map(|f| match shell[f].oriented_surface() {
-        Surface::Plane(p) => Some(p),
-        _ => None,
-    });
-    let [Some(pa), Some(pb)] = planes else {
-        return Err(error(Code::NonPlanarFace));
-    };
     let edge = shell[a].edge_iter().find(|e| e.id() == id).unwrap();
     let (start, finish) = (edge.front(), edge.back());
     let delta = finish.point() - start.point();
@@ -45,23 +95,9 @@ pub(super) fn blend(
         return Err(error(Code::DegenerateCurve));
     }
     let axis = delta / length;
-    let n = pa.normal().normalize();
-    let m = pb.normal().normalize();
-    let sense = n.cross(m).dot(axis).signum();
-    if (1. + n.dot(m)).abs() <= TOLERANCE || n.cross(m).magnitude() <= TOLERANCE {
-        return Err(error(Code::UnsupportedGeometry));
-    }
-    let (p, q, center) = match blend {
-        Blend::Chamfer([a, b]) => (
-            start.point() + a * n.cross(axis),
-            start.point() - b * m.cross(axis),
-            None,
-        ),
-        Blend::Fillet(r) => {
-            let c = start.point() - sense * r * (n + m) / (1. + n.dot(m));
-            (c + sense * r * n, c + sense * r * m, Some(c))
-        }
-    };
+    let surfaces = [shell[a].oriented_surface(), shell[b].oriented_surface()];
+    let ([n, m], [p, q], center) = section(&surfaces, start.point(), axis, blend)
+        .ok_or_else(|| error(Code::UnsupportedGeometry))?;
     if !p.to_vec().magnitude2().is_finite()
         || !q.to_vec().magnitude2().is_finite()
         || p.distance(q) <= TOLERANCE
@@ -71,6 +107,8 @@ pub(super) fn blend(
     let mut contact: Vec<[Vertex; 2]> = Vec::new();
     let mut end_faces = Vec::new();
     let mut replacements = HashMap::default();
+    let mut removed = rustc_hash::FxHashSet::default();
+    let mut transitions = Vec::new();
     let mut range = (0_f64, length);
     for vertex in [start, finish] {
         let ends: Vec<_> = shell
@@ -84,72 +122,29 @@ pub(super) fn blend(
         let [end] = *ends.as_slice() else {
             return Err(error(Code::UnsupportedTopology));
         };
-        let surface = shell[end].oriented_surface();
-        let hint = surface
-            .search_parameter(vertex.point(), None, 100)
-            .ok_or_else(|| error(Code::UnsupportedGeometry))?;
         let mut points = Vec::new();
+        let mut paths = Vec::new();
         for (side, origin) in [(a, p), (b, q)] {
             let line = Line(origin, origin + axis);
-            let (_, t) = algo::surface::search_intersection_parameter(
-                &surface,
-                hint,
+            let (point, path) = trim_contact(
+                shell,
+                side,
+                id,
+                vertex,
+                end,
                 &line,
-                (vertex.point() - start.point()).dot(axis),
-                100,
+                tol,
+                &mut replacements,
+                &mut removed,
             )
             .ok_or_else(|| error(Code::OutsideNeighbour))?;
-            if !t.is_finite() {
-                return Err(error(Code::OutsideNeighbour));
-            }
+            let t = (point.point() - origin).dot(axis);
             range.0 = range.0.min(t);
             range.1 = range.1.max(t);
-            let point = Vertex::new(line.subs(t));
-            let adjacent: Vec<_> = shell[side]
-                .edge_iter()
-                .filter(|e| e.id() != id && (e.front() == vertex || e.back() == vertex))
-                .collect();
-            let [old] = adjacent.as_slice() else {
-                return Err(error(Code::UnsupportedTopology));
-            };
-            let curve = old.curve();
-            let (t0, t1) = curve.range_tuple();
-            let absolute = old.absolute_clone();
-            let front = absolute.front() == vertex;
-            let parameter = curve.search_parameter(point.point(), if front { t0 } else { t1 }, 100);
-            let piece = parameter
-                .and_then(|t| absolute.cut_with_parameter(&point, t))
-                .map(|(a, b)| if front { b } else { a });
-            let piece = if let Some(piece) = piece {
-                piece
-            } else {
-                // A new contact can lie beyond the old endpoint on a cylindrical ruling.
-                let other = if front {
-                    absolute.back()
-                } else {
-                    absolute.front()
-                };
-                let direction = vertex.point() - other.point();
-                let straight = matches!(curve, Curve::Line(_))
-                    || matches!(surface.elementary(),Some((Elementary::Cylinder{axis,..},_)) if axis.cross(direction.normalize()).magnitude()<=TOLERANCE);
-                if !straight
-                    || (point.point() - other.point()).dot(direction.normalize()) <= TOLERANCE
-                    || (point.point() - other.point())
-                        .cross(direction.normalize())
-                        .magnitude()
-                        > TOLERANCE
-                {
-                    return Err(error(Code::OutsideNeighbour));
-                }
-                if front {
-                    builder::line(&point, other)
-                } else {
-                    builder::line(other, &point)
-                }
-            };
-            replacements.insert(old.id(), piece);
             points.push(point);
+            paths.push(path);
         }
+        transitions.push(paths);
         contact.push([points[0].clone(), points[1].clone()]);
         end_faces.push(end);
     }
@@ -189,47 +184,130 @@ pub(super) fn blend(
     let mut cross = Vec::new();
     let mut connectors = HashMap::default();
     for end in 0..2 {
-        let wall = shell[end_faces[end]].oriented_surface();
-        let [v0, v1] = &contact[end];
-        let direction = v1.point() - v0.point();
-        let parameters = |v: &Vertex| {
-            surface
-                .search_parameter(v.point(), None, 100)
-                .ok_or_else(|| error(Code::BlendConstructionFailed))
-        };
-        let [uv0, uv1] = [parameters(v0)?, parameters(v1)?];
-        let tangent = |v: &Vertex, (u, w): (f64, f64)| {
-            let (a, b) = wall.search_parameter(v.point(), None, 100)?;
-            let mut tangent = surface.normal(u, w).cross(wall.normal(a, b));
-            if tangent.dot(direction) < 0. {
-                tangent = -tangent;
+        let mut points = vec![contact[end][0].clone()];
+        let paths = &transitions[end];
+        let initial = end_faces[end];
+        let mut walls = Vec::new();
+        let mut current = paths[0]
+            .last()
+            .map_or(initial, |step: &(Edge, Vertex, usize)| step.2);
+        for (edge, vertex, next) in paths[0]
+            .iter()
+            .enumerate()
+            .rev()
+            .map(|(i, (e, v, _))| (e, v, if i == 0 { initial } else { paths[0][i - 1].2 }))
+            .chain(paths[1].iter().map(|(e, v, f)| (e, v, *f)))
+        {
+            let direction = edge.back().point() - edge.front().point();
+            let curve = edge.curve();
+            if !curve
+                .parameter_division(curve.range_tuple(), tol)
+                .1
+                .iter()
+                .all(|p| {
+                    (*p - edge.front().point())
+                        .cross(direction.normalize())
+                        .magnitude()
+                        <= TOLERANCE
+                })
+            {
+                return Err(error(Code::UnsupportedGeometry));
             }
-            (!tangent.so_small()).then_some(tangent)
-        };
-        let edge: Edge = super::create_pcurve_edge(
-            (
-                v0,
-                uv0,
-                tangent(v0, uv0).ok_or_else(|| error(Code::UnsupportedGeometry))?,
-            ),
-            (
-                v1,
-                uv1,
-                tangent(v1, uv1).ok_or_else(|| error(Code::UnsupportedGeometry))?,
-            ),
-            surface.clone(),
-        )
-        .ok_or_else(|| error(Code::BlendConstructionFailed))?;
-        let leader = edge.curve();
-        // The cubic guides intersection searches; the two exact surfaces define the curve.
-        edge.set_curve(Curve::IntersectionCurve(IntersectionCurve::new(
-            Box::new(wall),
-            Box::new(surface.clone()),
-            Box::new(leader),
-        )));
-        connectors.insert((v0.id(), v1.id()), edge.clone());
-        connectors.insert((v1.id(), v0.id()), edge.inverse());
-        cross.push(edge);
+            let line = Line(vertex.point(), vertex.point() + direction.normalize());
+            let point = Vertex::new(
+                line_intersection(&surface, &line, vertex.point())
+                    .ok_or_else(|| error(Code::BlendConstructionFailed))?,
+            );
+            let piece = trim_edge(edge, vertex, &point, tol)
+                .ok_or_else(|| error(Code::OutsideNeighbour))?;
+            replacements.insert(edge.id(), piece);
+            points.push(point);
+            walls.push(current);
+            current = next;
+        }
+        points.push(contact[end][1].clone());
+        walls.push(current);
+        let mut boundary = Wire::new();
+        for (vertices, wall) in points.windows(2).zip(walls) {
+            let wall = shell[wall].oriented_surface();
+            let [v0, v1] = [&vertices[0], &vertices[1]];
+            let direction = v1.point() - v0.point();
+            let exact = match (&wall, &surface) {
+                (Surface::Plane(_), Surface::Plane(_)) => {
+                    Some(Curve::Line(Line(v0.point(), v1.point())))
+                }
+                (Surface::Plane(plane), _) => super::projected_section::projected_section(
+                    &surface,
+                    *plane,
+                    v0.point(),
+                    v1.point(),
+                ),
+                (_, Surface::Plane(plane)) => super::projected_section::projected_section(
+                    &wall,
+                    *plane,
+                    v0.point(),
+                    v1.point(),
+                ),
+                _ => cylinder_miter(&wall, &surface, [v0.point(), v1.point()]).and_then(|plane| {
+                    super::projected_section::projected_section(
+                        &surface,
+                        plane,
+                        v0.point(),
+                        v1.point(),
+                    )
+                }),
+            };
+            let edge = if let Some(curve) = exact {
+                Edge::new(v0, v1, curve)
+            } else {
+                let parameters = |v: &Vertex| {
+                    surface
+                        .search_parameter(v.point(), None, 100)
+                        .ok_or_else(|| error(Code::BlendConstructionFailed))
+                };
+                let [uv0, uv1] = [parameters(v0)?, parameters(v1)?];
+                let tangent = |v: &Vertex, (u, w): (f64, f64)| {
+                    let (a, b) = wall.search_parameter(v.point(), None, 100)?;
+                    let normal = surface.normal(u, w).normalize();
+                    let mut tangent = normal.cross(wall.normal(a, b));
+                    if tangent.so_small() {
+                        tangent = direction - normal * direction.dot(normal);
+                    }
+                    if tangent.dot(direction) < 0. {
+                        tangent = -tangent;
+                    }
+                    (!tangent.so_small()).then_some(tangent)
+                };
+                let edge: Edge = super::create_pcurve_edge(
+                    (
+                        v0,
+                        uv0,
+                        tangent(v0, uv0).ok_or_else(|| error(Code::UnsupportedGeometry))?,
+                    ),
+                    (
+                        v1,
+                        uv1,
+                        tangent(v1, uv1).ok_or_else(|| error(Code::UnsupportedGeometry))?,
+                    ),
+                    surface.clone(),
+                )
+                .ok_or_else(|| {
+                    Diagnostic::new(Code::BlendConstructionFailed, operation, "leader")
+                })?;
+                let leader = edge.curve();
+                // The cubic guides intersection searches; the two exact surfaces define the curve.
+                edge.set_curve(Curve::IntersectionCurve(IntersectionCurve::new(
+                    Box::new(wall),
+                    Box::new(surface.clone()),
+                    Box::new(leader),
+                )));
+                edge
+            };
+            connectors.insert((v0.id(), v1.id()), edge.clone());
+            connectors.insert((v1.id(), v0.id()), edge.inverse());
+            boundary.push_back(edge);
+        }
+        cross.push(boundary);
     }
     let mut result = Shell::new();
     for (f, face) in shell.iter().enumerate() {
@@ -237,6 +315,9 @@ pub(super) fn blend(
         for boundary in face.boundaries() {
             let mut pieces = Vec::new();
             for old in boundary {
+                if removed.contains(&old.id()) {
+                    continue;
+                }
                 let piece = if old.id() == id {
                     if f == a {
                         lines[0].clone()
@@ -286,15 +367,15 @@ pub(super) fn blend(
             .map_err(|e| error(Code::InvalidOutputTopology).with_coded_source(e))?,
         );
     }
+    let mut boundary = Wire::new();
+    boundary.push_back(lines[0].inverse());
+    boundary.extend(cross[0].clone());
+    boundary.push_back(lines[1].clone());
+    boundary.extend(cross[1].inverse());
     result.push(
         Face::try_new(
-            vec![wire![
-                lines[0].inverse(),
-                cross[0].clone(),
-                lines[1].clone(),
-                cross[1].inverse()
-            ]],
-            surface,
+            vec![boundary.clone()],
+            extend_surface(surface, &[boundary], tol),
         )
         .map_err(|e| error(Code::InvalidOutputTopology).with_coded_source(e))?,
     );
@@ -302,6 +383,49 @@ pub(super) fn blend(
         return Err(error(Code::InvalidOutputTopology));
     }
     Ok(result)
+}
+
+fn cylinder_miter(a: &Surface, b: &Surface, endpoints: [Point3; 2]) -> Option<Plane> {
+    let Elementary::Cylinder {
+        origin: p,
+        axis: u,
+        radius: r,
+    } = a.elementary()?.0
+    else {
+        return None;
+    };
+    let Elementary::Cylinder {
+        origin: q,
+        axis: v,
+        radius: s,
+    } = b.elementary()?.0
+    else {
+        return None;
+    };
+    if (r - s).abs() > TOLERANCE {
+        return None;
+    }
+    let dot = u.dot(v);
+    let denominator = 1. - dot * dot;
+    if denominator <= TOLERANCE {
+        return None;
+    }
+    let delta = q - p;
+    let origin = p + u * ((delta.dot(u) - dot * delta.dot(v)) / denominator);
+    if (origin - q).cross(v).magnitude() > TOLERANCE {
+        return None;
+    }
+    // Equal-radius cylinders meeting at intersecting axes share two planar ellipse branches.
+    let normal = [u + v, u - v]
+        .into_iter()
+        .map(|n| n.normalize())
+        .find(|n| {
+            endpoints
+                .iter()
+                .all(|point| (*point - origin).dot(*n).abs() <= TOLERANCE)
+        })?;
+    let x = u.cross(normal).normalize();
+    Some(Plane::new(origin, origin + x, origin + normal.cross(x)))
 }
 
 fn extend_surface(surface: Surface, boundaries: &[Wire], tol: f64) -> Surface {
@@ -351,9 +475,243 @@ fn extend_surface(surface: Surface, boundaries: &[Wire], tol: f64) -> Surface {
     if start == 0. && end == 1. {
         return surface;
     }
+    // Boundary samples bound the analytic curve only up to their tessellation tolerance.
+    let margin = tol / vector.magnitude();
+    start -= margin;
+    end += margin;
     ExtrudedCurve::by_extrusion(
         curve.transformed(Matrix4::from_translation(vector * start)),
         vector * (end - start),
     )
     .into()
+}
+
+fn section(
+    surfaces: &[Surface; 2],
+    start: Point3,
+    axis: Vector3,
+    blend: Blend,
+) -> Option<([Vector3; 2], [Point3; 2], Option<Point3>)> {
+    let mut normals = [Vector3::zero(); 2];
+    let mut cylinders = [None; 2];
+    for i in 0..2 {
+        let uv = surfaces[i].search_parameter(start, None, 100)?;
+        normals[i] = surfaces[i].normal(uv.0, uv.1).normalize();
+        match surfaces[i].elementary()?.0 {
+            Elementary::Plane(_) => {}
+            Elementary::Cylinder {
+                origin,
+                axis: cylinder_axis,
+                radius,
+            } => {
+                if cylinder_axis.cross(axis).magnitude() > TOLERANCE {
+                    return None;
+                }
+                let center = origin + cylinder_axis * (start - origin).dot(cylinder_axis);
+                cylinders[i] = Some((center, radius));
+            }
+            _ => return None,
+        }
+    }
+    let [n, m] = normals;
+    let sense = n.cross(m).dot(axis).signum();
+    if (1. + n.dot(m)).abs() <= TOLERANCE || n.cross(m).magnitude() <= TOLERANCE {
+        return None;
+    }
+    if let Blend::Chamfer(distances) = blend {
+        let mut contacts = [
+            start + distances[0] * n.cross(axis),
+            start - distances[1] * m.cross(axis),
+        ];
+        for i in 0..2 {
+            if let Some((center, radius)) = cylinders[i] {
+                contacts[i] = center + (contacts[i] - center).normalize() * radius;
+            }
+        }
+        return Some((normals, contacts, None));
+    }
+    let Blend::Fillet(radius) = blend else {
+        unreachable!()
+    };
+    let center = match cylinders {
+        [None, None] => start - sense * radius * (n + m) / (1. + n.dot(m)),
+        [Some(_), Some(_)] => return None,
+        _ => {
+            let i = usize::from(cylinders[0].is_none());
+            let (origin, cylinder_radius) = cylinders[i]?;
+            let normal = normals[1 - i];
+            let radial = start - origin;
+            let offset_radius =
+                cylinder_radius - sense * radius * normals[i].dot(radial.normalize());
+            let height = radial.dot(normal) - sense * radius;
+            let lateral = radial - normal * radial.dot(normal);
+            let square = offset_radius * offset_radius - height * height;
+            if offset_radius <= TOLERANCE || square <= TOLERANCE || lateral.so_small() {
+                return None;
+            }
+            origin + normal * height + lateral.normalize() * square.sqrt()
+        }
+    };
+    let mut contacts = [center + sense * radius * n, center + sense * radius * m];
+    for i in 0..2 {
+        if let Some((origin, radius)) = cylinders[i] {
+            contacts[i] = origin + (center - origin).normalize() * radius;
+        }
+    }
+    Some((normals, contacts, Some(center)))
+}
+
+fn trim_edge(old: &Edge, vertex: &Vertex, point: &Vertex, tol: f64) -> Option<Edge> {
+    let absolute = old.absolute_clone();
+    let curve = absolute.curve();
+    let front = absolute.front() == vertex;
+    let (t0, t1) = curve.range_tuple();
+    if let Some((a, b)) = curve
+        .search_parameter(point.point(), if front { t0 } else { t1 }, 100)
+        .and_then(|t| absolute.cut_with_parameter(point, t))
+    {
+        return Some(if front { b } else { a });
+    }
+    let other = if front {
+        absolute.back()
+    } else {
+        absolute.front()
+    };
+    let direction = (vertex.point() - other.point()).normalize();
+    let straight = curve
+        .parameter_division((t0, t1), tol)
+        .1
+        .iter()
+        .all(|p| (*p - other.point()).cross(direction).magnitude() <= TOLERANCE);
+    if !straight
+        || (point.point() - other.point()).dot(direction) <= TOLERANCE
+        || (point.point() - other.point()).cross(direction).magnitude() > TOLERANCE
+    {
+        return None;
+    }
+    Some(if front {
+        builder::line(point, other)
+    } else {
+        builder::line(other, point)
+    })
+}
+
+#[allow(clippy::too_many_arguments, clippy::type_complexity)]
+fn trim_contact(
+    shell: &Shell,
+    side: usize,
+    selected: EdgeID,
+    vertex: &Vertex,
+    end: usize,
+    line: &Line<Point3>,
+    tol: f64,
+    replacements: &mut HashMap<EdgeID, Edge>,
+    removed: &mut rustc_hash::FxHashSet<EdgeID>,
+) -> Option<(Vertex, Vec<(Edge, Vertex, usize)>)> {
+    let mut current = vertex.clone();
+    let mut previous = selected;
+    let mut end = end;
+    let mut path = Vec::new();
+    for _ in 0..shell[side].edge_iter().count() {
+        let adjacent: Vec<_> = shell[side]
+            .edge_iter()
+            .filter(|e| e.id() != previous && (e.front() == &current || e.back() == &current))
+            .collect();
+        let [old] = adjacent.as_slice() else {
+            return None;
+        };
+        let surface = shell[end].oriented_surface();
+        if let Some(point) = line_intersection(&surface, line, current.point()) {
+            let point = Vertex::new(point);
+            if let Some(piece) = trim_edge(old, &current, &point, tol) {
+                replacements.insert(old.id(), piece);
+                return Some((point, path));
+            }
+        }
+        removed.insert(old.id());
+        let next = if old.front() == &current {
+            old.back()
+        } else {
+            old.front()
+        };
+        let boundary: Vec<_> = shell[side]
+            .edge_iter()
+            .filter(|e| e.id() != old.id() && (e.front() == next || e.back() == next))
+            .collect();
+        let [boundary] = boundary.as_slice() else {
+            return None;
+        };
+        let next_face = shell
+            .iter()
+            .enumerate()
+            .find(|(i, f)| *i != side && f.edge_iter().any(|e| e.id() == boundary.id()))?
+            .0;
+        let shared: Vec<_> = shell[end]
+            .edge_iter()
+            .filter(|e| {
+                (e.front() == next || e.back() == next)
+                    && shell[next_face]
+                        .edge_iter()
+                        .any(|other| other.id() == e.id())
+            })
+            .collect();
+        let [shared] = shared.as_slice() else {
+            return None;
+        };
+        path.push(((*shared).clone(), next.clone(), next_face));
+        current = next.clone();
+        previous = old.id();
+        end = next_face;
+    }
+    None
+}
+
+fn line_intersection(surface: &Surface, line: &Line<Point3>, near: Point3) -> Option<Point3> {
+    let direction = line.1 - line.0;
+    match surface.elementary().map(|(s, _)| s) {
+        Some(Elementary::Plane(plane)) => {
+            let n = plane.normal();
+            let denominator = n.dot(direction);
+            if denominator.abs() <= TOLERANCE {
+                return None;
+            }
+            Some(line.subs(n.dot(plane.origin() - line.0) / denominator))
+        }
+        Some(Elementary::Cylinder {
+            origin,
+            axis,
+            radius,
+        }) => {
+            let radial = line.0 - origin;
+            let radial = radial - axis * radial.dot(axis);
+            let transverse = direction - axis * direction.dot(axis);
+            let a = transverse.magnitude2();
+            if a <= TOLERANCE * TOLERANCE {
+                return None;
+            }
+            let b = radial.dot(transverse);
+            let c = radial.magnitude2() - radius * radius;
+            let discriminant = b * b - a * c;
+            if discriminant < -TOLERANCE * a {
+                return None;
+            }
+            let root = if discriminant.abs() <= TOLERANCE * TOLERANCE * a {
+                0.
+            } else {
+                discriminant.max(0.).sqrt()
+            };
+            let points = [line.subs((-b - root) / a), line.subs((-b + root) / a)];
+            Some(if points[0].distance2(near) <= points[1].distance2(near) {
+                points[0]
+            } else {
+                points[1]
+            })
+        }
+        _ => {
+            let hint = surface.search_nearest_parameter(near, None, 100)?;
+            let t = (near - line.0).dot(direction) / direction.magnitude2();
+            let (_, t) = algo::surface::search_intersection_parameter(surface, hint, line, t, 100)?;
+            t.is_finite().then(|| line.subs(t))
+        }
+    }
 }

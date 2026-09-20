@@ -2,11 +2,11 @@
 //!
 //! Use [`crate::fillet::fillet_solid_along_wire`] for constant or variable radii on a tangent-continuous chain,
 //! [`crate::fillet::chamfer_solid_edge`] for a chamfer with two end faces,
-//! [`crate::fillet::chamfer_solid_edges`] for equal-distance planar corner chamfers, and
-//! [`crate::fillet::fillet_solid_edges`] for equal radii on convex planar shells, including
-//! two-edge orthogonal miters and three-edge spherical corners. The generic shell and
-//! face functions below also accept the modeling types directly; no representation conversion
-//! is necessary. Concave corners and unequal-radius junctions are outside this scope.
+//! [`crate::fillet::chamfer_solid_edges`] for equal-distance corner and channel-rim chamfers, and
+//! [`crate::fillet::fillet_solid_edges`] for equal radii on planar neighborhoods and straight
+//! cylinder lips, including orthogonal miters, spherical corners, and mixed toroidal corners.
+//! The generic shell and face functions below also accept the modeling types directly;
+//! no representation conversion is necessary. Each operation documents its supported junctions.
 //!
 //! ```
 //! use truck_modeling::*;
@@ -487,6 +487,7 @@ mod edges;
 pub(crate) mod planar;
 mod planar_edge;
 mod planar_fillet;
+mod projected_section;
 pub use edges::{fillet_edges, try_fillet_edges};
 
 mod modeling;

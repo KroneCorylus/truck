@@ -2,6 +2,31 @@ use super::*;
 use proptest::prelude::*;
 
 #[test]
+fn thin_planar_faces_keep_all_nonzero_triangles() {
+    let plane = truck_geometry::prelude::Plane::new(
+        Point3::origin(),
+        Point3::new(1.0, 0.0, 0.0),
+        Point3::new(0.0, 1.0, 0.0),
+    );
+    for (width, height) in [(2e-7, 1.0), (2e-7, 2e-7)] {
+        let boundary = PolyBoundary::from_loops(vec![rectangle(0.0, 0.0, width, height)]);
+        let mesh = trimming_tessellation(&plane, &boundary, 0.001);
+        let area: f64 = mesh
+            .faces()
+            .triangle_iter()
+            .map(|tri| {
+                let [a, b, c] = [0, 1, 2].map(|i| mesh.positions()[tri[i].pos]);
+                (b - a).cross(c - a).magnitude() / 2.0
+            })
+            .sum();
+        assert!(
+            (area - width * height).abs() <= width * height * 1e-9,
+            "{area}"
+        );
+    }
+}
+
+#[test]
 #[cfg(not(target_arch = "wasm32"))]
 fn one_worker_and_parallel_tessellation_are_identical() {
     use truck_modeling::{builder, primitive, Face, Solid};
@@ -141,5 +166,29 @@ proptest! {
         let boundary = PolyBoundary::from_loops(loops);
         let point = Point2::new(x, y);
         prop_assert_eq!(boundary.include(point), without_culling(&boundary).include(point));
+    }
+}
+
+#[test]
+fn fitted_edge_endpoints_use_shared_topology_vertices() {
+    use crate::analyzers::Topology;
+    use crate::filters::OptimizingFilter;
+    use truck_modeling::{primitive, Curve, Matrix4, Solid};
+    let solid: Solid = primitive::cuboid(BoundingBox::from_iter([
+        Point3::origin(), Point3::new(2.0, 3.0, 4.0),
+    ]));
+    let solid = solid.mapped(
+        |p| *p,
+        |c: &Curve| c.transformed(Matrix4::from_translation((c.back() - c.front()) * 1e-7)),
+        Clone::clone,
+    );
+    for compressed in [false, true] {
+        let mut mesh = if compressed {
+            solid.compress().robust_triangulation(0.001).to_polygon()
+        } else {
+            solid.robust_triangulation(0.001).to_polygon()
+        };
+        mesh.put_together_same_attrs(1e-9).remove_degenerate_faces();
+        assert_eq!(mesh.shell_condition(), shell::ShellCondition::Closed);
     }
 }
