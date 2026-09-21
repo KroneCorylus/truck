@@ -223,15 +223,20 @@ fn process_boundaries<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     let loops_store::LoopsStoreQuadruple {
         geom_loops_store0: loops_store0,
         geom_loops_store1: loops_store1,
+        crosses_seam,
         ..
     } = quadruple?;
     let start = profile::now();
     let mut cls0 =
         divide_face::try_divide_faces(&altshell0, &loops_store0, tol).map_err(|e| e.operand(0))?;
-    cls0.integrate_by_component();
+    if !crosses_seam {
+        cls0.integrate_by_component();
+    }
     let mut cls1 =
         divide_face::try_divide_faces(&altshell1, &loops_store1, tol).map_err(|e| e.operand(1))?;
-    cls1.integrate_by_component();
+    if !crosses_seam {
+        cls1.integrate_by_component();
+    }
     profile::lap(Stage::Division, start);
     let start = profile::now();
     let [mut and0, mut or0, unknown0] = cls0.and_or_unknown();
@@ -358,6 +363,7 @@ fn boolean<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
             "validate_output",
         ));
     }
+
     Ok((
         Solid::try_new(shell.connected_components()).map_err(|e| {
             Diagnostic::new(Code::InvalidOutputTopology, "boolean", "validate_output")

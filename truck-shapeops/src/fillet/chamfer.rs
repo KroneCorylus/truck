@@ -192,13 +192,14 @@ where
     attach_sides(face0, chamfered_edge_id, side0, side1, simple)
 }
 
-/// Chamfers a closed tangent-continuous wire, with distances on the faces oriented along
+/// Chamfers a tangent-continuous wire, with distances on the faces oriented along
 /// (`d0`) and against (`d1`) the wire. Each junction must have matching contact points;
 /// seams between consecutive supporting faces must meet those points without extending the
 /// contact curves. This includes the rim of a prism with filleted vertical edges.
 ///
-/// The chamfer must fit inside its supporting faces and avoid distant faces. Open wires,
-/// branching selections and non-tangent corners are unsupported. Original faces retain their
+/// Open ends must terminate on a single face at the contact endpoints. The chamfer must fit
+/// inside its supporting faces and avoid distant faces. Branching selections and non-tangent
+/// corners are unsupported. Original faces retain their
 /// order, followed by one ruled chamfer face per wire edge. Returns `None` on failed construction.
 pub fn chamfer_along_wire<C, S>(
     shell: &Shell<Point3, C, S>,
@@ -216,7 +217,7 @@ where
     try_chamfer_along_wire(shell, wire, d0, d1, tol).ok()
 }
 
-/// Closed-chain chamfers with validation, contact and trimming diagnostics.
+/// Tangent-chain chamfers with validation, contact and trimming diagnostics.
 pub fn try_chamfer_along_wire<C, S>(
     shell: &Shell<Point3, C, S>,
     wire: &Wire<Point3, C>,
@@ -248,14 +249,15 @@ where
             "validate_input",
         ));
     }
-    if !wire.is_cyclic() || !wire.is_continuous() || !wire.is_simple() {
+    if !wire.is_continuous() || !wire.is_simple() {
         return Err(Diagnostic::new(
             Code::UnsupportedTopology,
             operation,
             "validate_wire",
         ));
     }
-    if !along_wire::is_tangent_continuous(wire, true) {
+    let closed = wire.is_cyclic();
+    if !along_wire::is_tangent_continuous(wire, closed) {
         let mut error = Diagnostic::new(Code::UnsupportedGeometry, operation, "validate_wire");
         error.message = "The selected wire is not tangent continuous.".into();
         return Err(error);
@@ -342,9 +344,10 @@ where
         sides.push(if swap { (1.0, 0.0) } else { (0.0, 1.0) });
         surfaces.push(surface);
     }
-    let trimmed = along_wire::trim_closed_chain(shell, wire, &contacts)
+    let mut trimmed = along_wire::trim_closed_chain(shell, wire, &contacts)
         .ok_or_else(|| failed().stage("trim_faces"))?;
     let n = wire.len();
+    let nv = if closed { n } else { n + 1 };
     let mut cross = Vec::new();
     for k in 0..n {
         for (side, curve) in contacts[k].iter().enumerate() {
@@ -352,7 +355,7 @@ where
             if !curve.subs(t0).near(&trimmed.vertices[k][side].point())
                 || !curve
                     .subs(t1)
-                    .near(&trimmed.vertices[(k + 1) % n][side].point())
+                    .near(&trimmed.vertices[(k + 1) % nv][side].point())
             {
                 return Err(failed().stage("trim_faces").selection(k));
             }
@@ -364,13 +367,64 @@ where
             surfaces[k].to_same_geometry(),
         ));
     }
+    if !closed {
+        let k = n - 1;
+        let t = surfaces[k].range_tuple().0 .1;
+        cross.push(ruling_edge(
+            (&trimmed.vertices[n][0], Point2::new(t, sides[k].0)),
+            (&trimmed.vertices[n][1], Point2::new(t, sides[k].1)),
+            surfaces[k].to_same_geometry(),
+        ));
+        for j in [0, n] {
+            let vertex = if j == 0 {
+                wire.front_vertex().unwrap()
+            } else {
+                wire.back_vertex().unwrap()
+            };
+            let candidates: Vec<_> = shell
+                .iter()
+                .enumerate()
+                .filter(|(_, f)| {
+                    f.vertex_iter().any(|v| v.id() == vertex.id())
+                        && !f.edge_iter().any(|e| wire.iter().any(|w| w.id() == e.id()))
+                })
+                .collect();
+            let [(index, face)] = candidates.as_slice() else {
+                return Err(failed().stage("trim_end_faces"));
+            };
+            let mut loops = Vec::new();
+            for boundary in face.boundaries() {
+                let mut pieces = Vec::new();
+                for edge in boundary {
+                    pieces.extend(trimmed.cuts.piece(&edge).unwrap_or(Some(edge)));
+                }
+                let mut boundary = Wire::new();
+                for i in 0..pieces.len() {
+                    boundary.push_back(pieces[i].clone());
+                    let (a, b) = (pieces[i].back(), pieces[(i + 1) % pieces.len()].front());
+                    if a != b {
+                        if cross[j].front() == a && cross[j].back() == b {
+                            boundary.push_back(cross[j].clone());
+                        } else if cross[j].back() == a && cross[j].front() == b {
+                            boundary.push_back(cross[j].inverse());
+                        } else {
+                            return Err(failed().stage("trim_end_faces"));
+                        }
+                    }
+                }
+                loops.push(boundary);
+            }
+            trimmed.faces[*index] = Face::try_new(loops, face.oriented_surface())
+                .map_err(|_| failed().stage("trim_end_faces"))?;
+        }
+    }
     let mut faces = trimmed.faces;
     for k in 0..n {
         let boundary = [
             trimmed.contacts[k][0].inverse(),
             cross[k].clone(),
             trimmed.contacts[k][1].clone(),
-            cross[(k + 1) % n].inverse(),
+            cross[(k + 1) % nv].inverse(),
         ];
         faces.push(
             Face::try_new(vec![boundary.into()], surfaces[k].to_same_geometry()).map_err(|e| {

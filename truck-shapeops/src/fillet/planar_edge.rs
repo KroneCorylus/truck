@@ -45,7 +45,15 @@ pub(super) fn blend_edges(
         let curved = [a, b]
             .iter()
             .any(|&i| !matches!(shell[i].oriented_surface(), Surface::Plane(_)));
-        work.push((!curved, a, b, index, edge.front().point(), axis, kind));
+        work.push((
+            !curved,
+            a,
+            b,
+            index,
+            edge.front().point() + (edge.back().point() - edge.front().point()) / 2.,
+            axis,
+            kind,
+        ));
     }
     work.sort_by_key(|&(planar, a, b, index, _, _, _)| (planar, a, b, index));
     let mut result = shell.clone();
@@ -59,9 +67,18 @@ pub(super) fn blend_edges(
                         .all(|p| (*p - point).cross(axis).magnitude() <= TOLERANCE)
             })
             .collect();
-        let [edge] = candidates.as_slice() else {
-            return Err(error(Code::UnsupportedTopology));
-        };
+        let edge = candidates
+            .into_iter()
+            .min_by(|a, b| {
+                let distance = |e: &Edge| {
+                    let p = e.front().point();
+                    let d = e.back().point() - p;
+                    let t = ((point - p).dot(d) / d.magnitude2()).clamp(0., 1.);
+                    (p + t * d).distance2(point)
+                };
+                distance(a).total_cmp(&distance(b))
+            })
+            .ok_or_else(|| error(Code::UnsupportedTopology))?;
         result = blend(&result, edge.id(), kind, tol)?;
     }
     Ok(result)
@@ -214,13 +231,29 @@ pub(super) fn blend(
                 return Err(error(Code::UnsupportedGeometry));
             }
             let line = Line(vertex.point(), vertex.point() + direction.normalize());
-            let point = Vertex::new(
-                line_intersection(&surface, &line, vertex.point())
-                    .ok_or_else(|| error(Code::BlendConstructionFailed))?,
-            );
-            let piece = trim_edge(edge, vertex, &point, tol)
-                .ok_or_else(|| error(Code::OutsideNeighbour))?;
-            replacements.insert(edge.id(), piece);
+            let position = line_intersection(&surface, &line, vertex.point())
+                .ok_or_else(|| error(Code::BlendConstructionFailed))?;
+            let other = if edge.front() == vertex {
+                edge.back()
+            } else {
+                edge.front()
+            };
+            let point = if position.near(&other.point()) {
+                removed.insert(edge.id());
+                other.clone()
+            } else {
+                let point = contact
+                    .iter()
+                    .flatten()
+                    .find(|v| v.point().near(&position))
+                    .cloned()
+                    .or_else(|| shell.vertex_iter().find(|v| v.point().near(&position)))
+                    .unwrap_or_else(|| Vertex::new(position));
+                let piece = trim_edge(edge, vertex, &point, tol)
+                    .ok_or_else(|| error(Code::OutsideNeighbour))?;
+                replacements.insert(edge.id(), piece);
+                point
+            };
             points.push(point);
             walls.push(current);
             current = next;
@@ -231,6 +264,9 @@ pub(super) fn blend(
         for (vertices, wall) in points.windows(2).zip(walls) {
             let wall = shell[wall].oriented_surface();
             let [v0, v1] = [&vertices[0], &vertices[1]];
+            if v0 == v1 {
+                continue;
+            }
             let direction = v1.point() - v0.point();
             let exact = match (&wall, &surface) {
                 (Surface::Plane(_), Surface::Plane(_)) => {
@@ -622,6 +658,15 @@ fn trim_contact(
         };
         let surface = shell[end].oriented_surface();
         if let Some(point) = line_intersection(&surface, line, current.point()) {
+            let other = if old.front() == &current {
+                old.back()
+            } else {
+                old.front()
+            };
+            if point.near(&other.point()) {
+                removed.insert(old.id());
+                return Some((other.clone(), path));
+            }
             let point = Vertex::new(point);
             if let Some(piece) = trim_edge(old, &current, &point, tol) {
                 replacements.insert(old.id(), piece);

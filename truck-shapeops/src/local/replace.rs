@@ -73,6 +73,46 @@ pub(super) fn rebuild_face(
         })
         .collect();
     let surface = match &surface {
+        Surface::RevolutedCurve(processor)
+            if processor.transform().invert().is_some()
+                && matches!(
+                    surface.elementary(),
+                    Some((Elementary::Cylinder { .. } | Elementary::Cone { .. }, _))
+                ) =>
+        {
+            let revolution = processor.entity();
+            let axis = revolution.axis();
+            let origin = revolution.origin();
+            let inverse = processor.transform().invert().unwrap();
+            let radial = |p: Point3| {
+                let v = p - origin;
+                v - axis * v.dot(axis)
+            };
+            let middle = loops
+                .iter()
+                .flat_map(|w| w.vertex_iter())
+                .map(|v| radial(inverse.transform_point(v.point())))
+                .sum::<Vector3>();
+            if middle.so_small() {
+                surface
+            } else {
+                let generator = revolution.entity_curve();
+                let (a, b) = generator.range_tuple();
+                let from = radial(generator.subs((a + b) / 2.)).normalize();
+                let to = -middle.normalize();
+                let angle = Rad(axis.dot(from.cross(to)).atan2(from.dot(to)));
+                let rotation = Matrix4::from_translation(origin.to_vec())
+                    * Matrix4::from_axis_angle(axis, angle)
+                    * Matrix4::from_translation(-origin.to_vec());
+                Surface::RevolutedCurve(processor.map_ref(|r| {
+                    RevolutedCurve::by_revolution(
+                        r.entity_curve().transformed(rotation),
+                        origin,
+                        axis,
+                    )
+                }))
+            }
+        }
         Surface::Extruded(extruded)
             if matches!(surface.elementary(), Some((Elementary::Cylinder { .. }, _))) =>
         {
@@ -90,9 +130,15 @@ pub(super) fn rebuild_face(
                     }
                 }
             }
-            let generator = extruded
-                .entity_curve()
-                .transformed(Matrix4::from_translation(span.0 * vector));
+            let generator = super::intersect::extend_conic(
+                extruded.entity_curve(),
+                loops.iter().flat_map(|w| w.iter()).flat_map(|e| {
+                    let c = e.oriented_curve();
+                    let (a, b) = c.range_tuple();
+                    (0..=16).map(move |i| c.subs(a + (b - a) * i as f64 / 16.))
+                }),
+            )
+            .transformed(Matrix4::from_translation(span.0 * vector));
             ExtrudedCurve::by_extrusion(generator, (span.1 - span.0) * vector).into()
         }
         _ => surface,
@@ -332,12 +378,19 @@ pub(super) fn replace_surfaces_impl(
                     diagnostic,
                 })
             }
-            Ok(_) => {
-                return Err(Failure::new(
-                    unsupported(face),
-                    Code::UnsupportedGeometry,
-                    "intersect_surfaces",
-                ))
+            Ok(curves) => {
+                let original = edge.curve();
+                let (a, b) = original.range_tuple();
+                let point = original.subs((a + b) / 2.);
+                let nearest = curves
+                    .into_iter()
+                    .filter_map(|curve| {
+                        let t = curve.search_nearest_parameter(point, None, 100)?;
+                        Some((curve.subs(t).distance2(point), curve))
+                    })
+                    .min_by(|(a, _), (b, _)| a.total_cmp(b))
+                    .ok_or(no_intersection)?;
+                new_curves.insert(edge.id(), nearest.1)
             }
         };
     }
@@ -443,22 +496,32 @@ pub(super) fn replace_surfaces_impl(
         })
         .collect::<Result<_, Failure>>()?;
 
+    let orientation: HashMap<usize, bool> = new_surface
+        .iter()
+        .map(|(&i, surface)| {
+            let old = faces[i].oriented_surface();
+            let (u, v) = old.try_range_tuple();
+            let mid = |r: Option<(f64, f64)>| r.map_or(0.5, |(a, b)| (a + b) / 2.0);
+            let outward = old.normal(mid(u), mid(v));
+            let point = old.subs(mid(u), mid(v));
+            let (u, v) = surface
+                .search_nearest_parameter(point, None, 100)
+                .ok_or_else(|| {
+                    Failure::new(unsupported(i), Code::ProjectionFailed, "orient_face")
+                })?;
+            Ok((i, surface.normal(u, v).dot(outward) > 0.0))
+        })
+        .collect::<Result<_, Failure>>()?;
     let rebuilt = |i: usize| -> Result<Face, truck_topology::errors::Error> {
         match new_surface.get(&i) {
             None => rebuild_face(&faces[i], &new_edges, faces[i].oriented_surface()),
             Some(&surface) => {
-                // the loops run counterclockwise about the old outward normal
-                let old = faces[i].oriented_surface();
-                let (u, v) = old.try_range_tuple();
-                let mid = |r: Option<(f64, f64)>| r.map_or(0.5, |(a, b)| (a + b) / 2.0);
-                let outward = old.normal(mid(u), mid(v));
                 let face = rebuild_face(&faces[i], &new_edges, surface.clone())?;
-                match surface.normal(0.0, 0.0).dot(outward) > 0.0 {
-                    true => Ok(face),
-                    false => {
-                        let loops = face.boundaries().iter().map(Wire::inverse).collect();
-                        Ok(Face::try_new(loops, face.surface())?.inverse())
-                    }
+                if orientation[&i] {
+                    Ok(face)
+                } else {
+                    let loops = face.boundaries().iter().map(Wire::inverse).collect();
+                    Ok(Face::try_new(loops, face.surface())?.inverse())
                 }
             }
         }
@@ -496,10 +559,27 @@ fn trimmed(curve: &Curve, front: Point3, back: Point3) -> Option<Curve> {
         return Some(Curve::Line(Line(front, back)));
     }
     let param = |c: &Curve, p: Point3| {
-        c.search_nearest_parameter(p, None, 100)
-            .filter(|&t| c.subs(t).near(&p))
+        let (a, b) = c.range_tuple();
+        for mut t in c
+            .search_nearest_parameter(p, None, 100)
+            .into_iter()
+            .chain((0..=16).map(|i| a + (b - a) * i as f64 / 16.))
+        {
+            for _ in 0..30 {
+                let delta = c.subs(t) - p;
+                let derivative = c.der(t);
+                if delta.so_small() {
+                    return Some(t);
+                }
+                if !t.is_finite() || derivative.so_small() {
+                    break;
+                }
+                t = (t - delta.dot(derivative) / derivative.magnitude2()).clamp(a, b);
+            }
+        }
+        None
     };
-    let mut curve = curve.clone();
+    let mut curve = super::intersect::extend_conic(curve, [front, back].into_iter());
     let (mut t0, t1) = (param(&curve, front)?, param(&curve, back)?);
     if t0 > t1 {
         curve.invert();

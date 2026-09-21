@@ -825,6 +825,11 @@ impl Surface {
             }
             Surface::RevolutedCurve(processor) => {
                 let transform = *processor.transform();
+                let distance = if processor.orientation() {
+                    distance
+                } else {
+                    -distance
+                };
                 let columns = [0, 1, 2].map(|i| transform[i].truncate());
                 let rigid = columns.iter().all(|c| c.magnitude().near(&1.0))
                     && columns[0].dot(columns[1]).so_small()
@@ -871,10 +876,14 @@ impl Surface {
                     }
                     _ => return Err(no_typed_offset),
                 };
-                Ok(Surface::RevolutedCurve(Processor::with_transform(
+                let mut offset = Processor::with_transform(
                     RevolutedCurve::by_revolution(curve, origin, axis),
                     transform,
-                )))
+                );
+                if !processor.orientation() {
+                    offset.invert();
+                }
+                Ok(Surface::RevolutedCurve(offset))
             }
             _ => Err(no_typed_offset),
         }

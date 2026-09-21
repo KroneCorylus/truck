@@ -9,6 +9,32 @@ use truck_modeling::{Curve, Elementary, Face, Surface};
 /// A parameter rectangle `((u0, u1), (v0, v1))` of a surface.
 pub type Domain = ((f64, f64), (f64, f64));
 
+pub(super) fn extend_conic(curve: &Curve, points: impl Iterator<Item = Point3>) -> Curve {
+    let Curve::Conic(conic) = curve else {
+        return curve.clone();
+    };
+    let Some(inverse) = conic.transform().invert() else {
+        return curve.clone();
+    };
+    let (mut a, mut b) = conic.range_tuple();
+    let mid = (a + b) / 2.;
+    for point in points {
+        let p = inverse.transform_point(point);
+        let mut t = p.y.atan2(p.x);
+        t -= 2. * PI * ((t - mid) / (2. * PI)).round();
+        a = a.min(t);
+        b = b.max(t);
+    }
+    let mut extended = Processor::with_transform(
+        TrimmedCurve::new(UnitCircle::<Point3>::new(), (a, b)),
+        *conic.transform(),
+    );
+    if !conic.orientation() {
+        extended.invert();
+    }
+    Curve::Conic(extended)
+}
+
 /// The parameter rectangle of `face` on its surface, each side enlarged by `margin` times the
 /// rectangle's diagonal: planes use their trimmed loops, a bounded curved side uses its bound,
 /// and a side left open
@@ -116,8 +142,8 @@ fn angular(surface: &Surface) -> Option<usize> {
 }
 
 /// The curves where `surface0` over `domain0` meets `surface1` over `domain1`. A plane against
-/// a plane gives an exact `Line`, clipped to both rectangles; a plane against a cylinder or a
-/// cone whose axis is normal to it gives an exact `Conic` over the angular range of its domain.
+/// a plane gives an exact `Line`, clipped to both rectangles. Plane/cylinder and plane/cone
+/// sections use exact lines or rational conics, including oblique sections.
 /// Anything else is tessellated at `tol` over its rectangle and the interference of the two
 /// meshes is lifted onto both surfaces as `IntersectionCurve`s with a smooth leader. Empty when
 /// the surfaces do not meet, or only touch; `None` when a curve cannot be lifted.
@@ -281,6 +307,66 @@ fn exact(
                 });
             }
             if !normal.cross(axis).so_small() {
+                if let Elementary::Cylinder { radius, .. } = elementary {
+                    let axial = normal.dot(axis);
+                    if axial.abs() < TOLERANCE {
+                        let distance = (origin - on_axis).dot(normal);
+                        let square = radius * radius - distance * distance;
+                        if square < 0. {
+                            return Some(Vec::new());
+                        }
+                        let side = axis.cross(normal).normalize() * square.sqrt();
+                        let mut curves = Vec::new();
+                        for point in [
+                            on_axis + normal * distance + side,
+                            on_axis + normal * distance - side,
+                        ] {
+                            let (u, v) = surface0.search_nearest_parameter(point, None, 100)?;
+                            let (du, dv) =
+                                surface0.search_nearest_parameter(point + axis, None, 100)?;
+                            if let Some((a, b)) = clip((u, v), (du - u, dv - v), domain0) {
+                                curves.push(Curve::Line(Line(point + a * axis, point + b * axis)));
+                            }
+                        }
+                        return Some(curves);
+                    }
+                    let angle = angular(surface1)?;
+                    let (a, b) = [domain1.0, domain1.1][angle];
+                    let other = match angle {
+                        0 => domain1.1,
+                        _ => domain1.0,
+                    };
+                    let mid = (other.0 + other.1) / 2.;
+                    let (start, tangent) = if angle == 0 {
+                        (surface1.subs(a, mid), surface1.uder(a, mid))
+                    } else {
+                        (surface1.subs(mid, a), surface1.vder(mid, a))
+                    };
+                    let x = radial(start, on_axis, axis).normalize();
+                    let y = axis.cross(x);
+                    let y = y * y.dot(tangent).signum();
+                    let x = radius * (x - axis * normal.dot(x) / axial);
+                    let y = radius * (y - axis * normal.dot(y) / axial);
+                    let center = on_axis + axis * normal.dot(origin - on_axis) / axial;
+                    let matrix = Matrix4::from_cols(
+                        x.extend(0.),
+                        y.extend(0.),
+                        normal.extend(0.),
+                        center.to_homogeneous(),
+                    );
+                    return Some(vec![Curve::Conic(Processor::with_transform(
+                        TrimmedCurve::new(UnitCircle::<Point3>::new(), (0., b - a)),
+                        matrix,
+                    ))]);
+                }
+                if let Elementary::Cone {
+                    apex,
+                    axis,
+                    half_angle,
+                } = elementary
+                {
+                    return cone_plane(plane, domain0, apex, axis, half_angle.0.tan());
+                }
                 return None;
             }
             let height = origin.to_vec().dot(axis);
@@ -335,6 +421,96 @@ fn exact(
     }
 }
 
+fn cone_plane(
+    plane: &Plane,
+    domain: Domain,
+    apex: Point3,
+    axis: Vector3,
+    tangent: f64,
+) -> Option<Vec<Curve>> {
+    let x = axis.cross(plane.normal()).normalize();
+    let y = plane.normal().cross(x).normalize();
+    let origin = plane.origin();
+    let delta = origin - apex;
+    let k = 1. + tangent * tangent;
+    let a = 1. - k * axis.dot(y).powi(2);
+    let d = delta.dot(x);
+    let e = delta.dot(y) - k * delta.dot(axis) * y.dot(axis);
+    let f = delta.magnitude2() - k * delta.dot(axis).powi(2) - d * d;
+    let bounds = [domain.0 .0, domain.0 .1]
+        .into_iter()
+        .flat_map(|u| [domain.1 .0, domain.1 .1].map(|v| plane.subs(u, v)))
+        .collect::<Vec<_>>();
+    let quadratic = |at: &dyn Fn(f64) -> Vector4, derivative: Vector4, lo: f64, hi: f64| {
+        Curve::NurbsCurve(NurbsCurve::new(BSplineCurve::new(
+            KnotVec::bezier_knot(2),
+            vec![at(lo), at(lo) + derivative * (hi - lo) / 2., at(hi)],
+        )))
+    };
+    if a.abs() < 1e-10 {
+        if e.abs() < TOLERANCE {
+            return None;
+        }
+        let center = origin - x * d - y * f / (2. * e);
+        let (lo, hi) = bounds
+            .iter()
+            .map(|p| (*p - center).dot(x))
+            .fold((f64::INFINITY, f64::NEG_INFINITY), |(a, b), v| {
+                (a.min(v), b.max(v))
+            });
+        let at = |t: f64| (center + x * t - y * t * t / (2. * e)).to_homogeneous();
+        return Some(vec![quadratic(&at, (x - y * lo / e).extend(0.), lo, hi)]);
+    }
+    let center = origin - x * d - y * e / a;
+    let q = f - e * e / a;
+    if a > 0. {
+        if q >= 0. {
+            return Some(Vec::new());
+        }
+        let matrix = Matrix4::from_cols(
+            (x * (-q).sqrt()).extend(0.),
+            (y * (-q / a).sqrt()).extend(0.),
+            plane.normal().extend(0.),
+            center.to_homogeneous(),
+        );
+        return Some(vec![Curve::Conic(Processor::with_transform(
+            TrimmedCurve::new(UnitCircle::<Point3>::new(), (0., 2. * PI)),
+            matrix,
+        ))]);
+    }
+    if q.abs() < TOLERANCE {
+        return None;
+    }
+    let (along, across, r, s) = if q > 0. {
+        (y, x, (q / -a).sqrt(), q.sqrt())
+    } else {
+        (x, y, (-q).sqrt(), (q / a).sqrt())
+    };
+    let reach = bounds
+        .iter()
+        .map(|p| (*p - center).dot(along).abs())
+        .fold(r * 2., f64::max);
+    let limit = ((reach - r) / (reach + r)).sqrt().min(1. - 1e-8);
+    let mut curves = Vec::new();
+    for sign in [-1., 1.] {
+        let at = |t: f64| {
+            (center.to_vec() * (1. - t * t)
+                + along * (sign * r * (1. + t * t))
+                + across * (2. * s * t))
+                .extend(1. - t * t)
+        };
+        let derivative = (-center.to_vec() * (-2. * limit)
+            + along * (-2. * limit * sign * r)
+            + across * (2. * s))
+            .extend(2. * limit);
+        let curve = quadratic(&at, derivative, -limit, limit);
+        if (curve.subs(0.5) - apex).dot(axis) > 0. {
+            curves.push(curve);
+        }
+    }
+    Some(curves)
+}
+
 pub(super) fn radial(p: Point3, origin: Point3, axis: Vector3) -> Vector3 {
     let r = p - origin;
     r - axis * r.dot(axis)
@@ -386,4 +562,44 @@ pub(super) fn project(surface: &Surface, p: Point3) -> Option<Point3> {
         }
         _ => return None,
     })
+}
+
+#[cfg(test)]
+mod section_tests {
+    use super::*;
+
+    #[test]
+    fn oblique_cone_sections_satisfy_both_surfaces() {
+        for transform in [
+            Matrix4::identity(),
+            Matrix4::from_translation(Vector3::new(7., -2., 4.))
+                * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.8)),
+        ] {
+            for slope in [0.5, 1.0, 2.0] {
+                let plane = Plane::new(
+                    Point3::new(0., 0., 3.),
+                    Point3::new(1., 0., 3.),
+                    Point3::new(0., 1., 3. + slope),
+                )
+                .transformed(transform);
+                let apex = transform.transform_point(Point3::origin());
+                let axis = transform.transform_vector(Vector3::unit_z());
+                let curves =
+                    cone_plane(&plane, ((-10., 10.), (-10., 10.)), apex, axis, 1.).unwrap();
+                assert!(!curves.is_empty());
+                for curve in curves {
+                    let (a, b) = curve.range_tuple();
+                    for i in 0..=100 {
+                        let point = curve.subs(a + (b - a) * i as f64 / 100.);
+                        let delta = point - apex;
+                        assert!((point - plane.origin()).dot(plane.normal()).abs() < 1e-8);
+                        assert!(
+                            (delta.magnitude2() - 2. * delta.dot(axis).powi(2)).abs() < 1e-7,
+                            "{slope} {point:?}"
+                        );
+                    }
+                }
+            }
+        }
+    }
 }

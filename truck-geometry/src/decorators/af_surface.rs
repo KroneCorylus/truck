@@ -24,6 +24,15 @@ impl<S0, S1> ApproxFilletSurface<S0, S1> {
     where
         S0: ParametricSurface3D,
         S1: ParametricSurface3D, {
+        NurbsCurve::new(BSplineCurve::new(
+            KnotVec::bezier_knot(3),
+            self.section_control_points(v).to_vec(),
+        ))
+    }
+    fn section_control_points(&self, v: f64) -> [Vector4; 4]
+    where
+        S0: ParametricSurface3D,
+        S1: ParametricSurface3D, {
         let Self {
             knot_vec,
             surface0,
@@ -46,10 +55,7 @@ impl<S0, S1> ApproxFilletSurface<S0, S1> {
         let striple1 = (surface1, side_control_points1, tangent_vecs1);
         let (pt0, pt1) = u_control_points(&basis, &dbasis, striple0, weight);
         let (pt3, pt2) = u_control_points(&basis, &dbasis, striple1, weight);
-        NurbsCurve::new(BSplineCurve::new(
-            KnotVec::bezier_knot(3),
-            vec![pt0, pt1, pt2, pt3],
-        ))
+        [pt0, pt1, pt2, pt3]
     }
     fn vdegree(&self) -> usize { self.knot_vec.len() - self.weights.len() - 1 }
 }
@@ -199,28 +205,7 @@ where
         self.ders(m + n, u, v)[m][n]
     }
     fn subs(&self, u: f64, v: f64) -> Point3 {
-        let Self {
-            knot_vec,
-            surface0,
-            surface1,
-            side_control_points0,
-            side_control_points1,
-            tangent_vecs0,
-            tangent_vecs1,
-            weights,
-        } = self;
-        let degree = self.vdegree();
-        let basis = knot_vec
-            .bspline_basis_functions(degree, 0, v)
-            .to_full_array();
-        let dbasis = knot_vec
-            .bspline_basis_functions(degree, 1, v)
-            .to_full_array();
-        let weight: f64 = basis.iter().zip(weights).map(|(&b, &w)| b * w).sum();
-        let striple0 = (surface0, side_control_points0, tangent_vecs0);
-        let striple1 = (surface1, side_control_points1, tangent_vecs1);
-        let (pt0, pt1) = u_control_points(&basis, &dbasis, striple0, weight);
-        let (pt3, pt2) = u_control_points(&basis, &dbasis, striple1, weight);
+        let [pt0, pt1, pt2, pt3] = self.section_control_points(v);
         let b = bezier_3rd_basis(0, u);
         Point3::from_homogeneous(b[0] * pt0 + b[1] * pt1 + b[2] * pt2 + b[3] * pt3)
     }
@@ -268,6 +253,40 @@ where
     }
 }
 
+impl<S0: ParametricSurface3D, S1: ParametricSurface3D> ApproxFilletSurface<S0, S1> {
+    fn presearch(
+        &self,
+        point: Point3,
+        ((u0, u1), (v0, v1)): ((f64, f64), (f64, f64)),
+    ) -> (f64, f64) {
+        // All u samples at a given v share the same rational Bezier cross-section.
+        let sections: Vec<_> = (0..=PRESEARCH_DIVISION)
+            .map(|j| {
+                let q = j as f64 / PRESEARCH_DIVISION as f64;
+                let v = v0 * (1.0 - q) + v1 * q;
+                (v, self.section_control_points(v))
+            })
+            .collect();
+        let mut result = (0.0, 0.0);
+        let mut distance = f64::INFINITY;
+        for i in 0..=PRESEARCH_DIVISION {
+            let p = i as f64 / PRESEARCH_DIVISION as f64;
+            let u = u0 * (1.0 - p) + u1 * p;
+            let b = bezier_3rd_basis(0, u);
+            for &(v, [p0, p1, p2, p3]) in &sections {
+                let candidate =
+                    Point3::from_homogeneous(b[0] * p0 + b[1] * p1 + b[2] * p2 + b[3] * p3);
+                let d = candidate.distance2(point);
+                if d < distance {
+                    distance = d;
+                    result = (u, v);
+                }
+            }
+        }
+        result
+    }
+}
+
 impl<S0, S1> SearchParameter<D2> for ApproxFilletSurface<S0, S1>
 where
     S0: ParametricSurface3D,
@@ -282,12 +301,8 @@ where
     ) -> Option<(f64, f64)> {
         let hint = match hint.into() {
             SPHint2D::Parameter(x, y) => (x, y),
-            SPHint2D::Range(range0, range1) => {
-                algo::surface::presearch(self, point, (range0, range1), PRESEARCH_DIVISION)
-            }
-            SPHint2D::None => {
-                algo::surface::presearch(self, point, self.range_tuple(), PRESEARCH_DIVISION)
-            }
+            SPHint2D::Range(range0, range1) => self.presearch(point, (range0, range1)),
+            SPHint2D::None => self.presearch(point, self.range_tuple()),
         };
         algo::surface::search_parameter(self, point, hint, trials)
     }
@@ -307,12 +322,8 @@ where
     ) -> Option<(f64, f64)> {
         let hint = match hint.into() {
             SPHint2D::Parameter(x, y) => (x, y),
-            SPHint2D::Range(range0, range1) => {
-                algo::surface::presearch(self, point, (range0, range1), PRESEARCH_DIVISION)
-            }
-            SPHint2D::None => {
-                algo::surface::presearch(self, point, self.range_tuple(), PRESEARCH_DIVISION)
-            }
+            SPHint2D::Range(range0, range1) => self.presearch(point, (range0, range1)),
+            SPHint2D::None => self.presearch(point, self.range_tuple()),
         };
         algo::surface::search_nearest_parameter(self, point, hint, trials)
     }
@@ -494,6 +505,88 @@ fn regular_contact(
 mod tests {
     use super::*;
     use proptest::{prelude::*, property_test};
+
+    #[derive(Clone)]
+    struct CountedPlane(Plane, std::rc::Rc<std::cell::Cell<usize>>);
+
+    impl ParametricSurface for CountedPlane {
+        type Point = Point3;
+        type Vector = Vector3;
+        fn subs(&self, u: f64, v: f64) -> Point3 { self.0.subs(u, v) }
+        fn uder(&self, u: f64, v: f64) -> Vector3 { self.0.uder(u, v) }
+        fn vder(&self, u: f64, v: f64) -> Vector3 { self.0.vder(u, v) }
+        fn uuder(&self, u: f64, v: f64) -> Vector3 { self.0.uuder(u, v) }
+        fn uvder(&self, u: f64, v: f64) -> Vector3 { self.0.uvder(u, v) }
+        fn vvder(&self, u: f64, v: f64) -> Vector3 { self.0.vvder(u, v) }
+        fn der_mn(&self, m: usize, n: usize, u: f64, v: f64) -> Vector3 {
+            self.1.set(self.1.get() + 1);
+            self.0.der_mn(m, n, u, v)
+        }
+    }
+    impl ParametricSurface3D for CountedPlane {}
+
+    #[test]
+    fn search_reuses_cross_sections() {
+        let calls = std::rc::Rc::new(std::cell::Cell::new(0));
+        let surface = ApproxFilletSurface {
+            knot_vec: KnotVec::bezier_knot(1),
+            surface0: CountedPlane(Plane::xy(), calls.clone()),
+            side_control_points0: vec![(-1.0, 0.0).into(), (-1.0, 1.0).into()],
+            tangent_vecs0: vec![(f64::sqrt(2.0), 0.0).into(); 2],
+            surface1: CountedPlane(Plane::yz(), calls.clone()),
+            side_control_points1: vec![(0.0, -1.0).into(), (1.0, -1.0).into()],
+            tangent_vecs1: vec![(-f64::sqrt(2.0), 0.0).into(); 2],
+            weights: vec![(1.0 + f64::sqrt(2.0)) / 3.0; 2],
+        };
+        let point = surface.subs(0.4, 0.6);
+        for nearest in [false, true] {
+            calls.set(0);
+            let (u, v) = if nearest {
+                surface.search_nearest_parameter(point, None, 100)
+            } else {
+                surface.search_parameter(point, None, 100)
+            }
+            .unwrap();
+            let count = calls.get();
+            assert_near!(surface.subs(u, v), point);
+            assert!(count < 1000, "repeated support evaluations: {count}");
+        }
+    }
+
+    #[test]
+    fn presearch_matches_the_original_grid() {
+        let fillet = RbfSurface::new(
+            Processor::with_transform(
+                UnitCircle::<Point3>::new(),
+                Matrix4::from_scale(300_f64.sqrt()),
+            ),
+            Sphere::new(Point3::new(0.0, 0.0, 10.0), 20.0),
+            Sphere::new(Point3::new(0.0, 0.0, -10.0), 20.0),
+            10.0,
+        );
+        let surface =
+            ApproxFilletSurface::approx_rolling_ball_fillet(&fillet, (0.3, 5.7), 0.001).unwrap();
+        for range in [
+            surface.range_tuple(),
+            ((0.2, 0.8), (1.0, 4.0)),
+            ((0.8, 0.2), (4.0, 1.0)),
+            ((0.0, 0.0), (2.0, 2.0)),
+        ] {
+            for (u, v, offset) in [(0.0, 0.3, 0.0), (0.35, 2.4, 0.0), (1.0, 5.7, 0.1)] {
+                let point = surface.subs(u, v) + Vector3::unit_z() * offset;
+                let original = algo::surface::presearch(&surface, point, range, PRESEARCH_DIVISION);
+                assert_eq!(surface.presearch(point, range), original);
+                assert_eq!(
+                    surface.search_parameter(point, SPHint2D::Range(range.0, range.1), 100),
+                    surface.search_parameter(point, original, 100)
+                );
+                assert_eq!(
+                    surface.search_nearest_parameter(point, SPHint2D::Range(range.0, range.1), 100),
+                    surface.search_nearest_parameter(point, original, 100)
+                );
+            }
+        }
+    }
 
     #[test]
     fn adaptive_contact_failure_is_propagated() {

@@ -519,6 +519,7 @@ where
 
 #[allow(dead_code)]
 pub struct LoopsStoreQuadruple<C> {
+    pub crosses_seam: bool,
     pub geom_loops_store0: LoopsStore<Point3, C>,
     pub poly_loops_store0: LoopsStore<Point3, PolylineCurve>,
     pub geom_loops_store1: LoopsStore<Point3, C>,
@@ -568,6 +569,7 @@ where
         error
     };
     let mut geom_loops_store0: LoopsStore<_, _> = geom_shell0.face_iter().collect();
+    let mut crosses_seam = false;
     let mut poly_loops_store0: LoopsStore<_, _> = poly_shell0.face_iter().collect();
     let mut geom_loops_store1: LoopsStore<_, _> = geom_shell1.face_iter().collect();
     let mut poly_loops_store1: LoopsStore<_, _> = poly_shell1.face_iter().collect();
@@ -605,202 +607,203 @@ where
             }
             overlapping += 1;
             let start = profile::now();
-            let result = (|| {
-                let ori0 = geom_shell0[face_index0].orientation();
-                let ori1 = geom_shell1[face_index1].orientation();
-                let surface0 = geom_shell0[face_index0].surface();
-                let surface1 = geom_shell1[face_index1].surface();
-                let polygon0 = polygons0[face_index0].as_ref()?;
-                let polygon1 = polygons1[face_index1].as_ref()?;
-                if let Some(same_normal) =
-                    coincident::coincidence(&surface0, polygon0, &surface1, polygon1)
-                {
-                    let overlap0 = match same_normal == (ori0 == ori1) {
-                        true => ShapesOpStatus::Both,
-                        false => ShapesOpStatus::Neither,
-                    };
-                    let mut a = coincident::FaceLoops {
-                        geom: &mut geom_loops_store0,
-                        poly: &mut poly_loops_store0,
-                        index: face_index0,
-                    };
-                    let mut b = coincident::FaceLoops {
-                        geom: &mut geom_loops_store1,
-                        poly: &mut poly_loops_store1,
-                        index: face_index1,
-                    };
-                    return coincident::cut(
-                        &mut a,
-                        &mut b,
-                        &surface0,
-                        [&poly_shell0[face_index0], &poly_shell1[face_index1]],
-                        same_normal,
-                        [overlap0, ShapesOpStatus::Neither],
-                    );
-                }
-                let intersections = intersection_curve::intersection_curves(
-                    surface0.clone(),
-                    polygon0,
-                    surface1.clone(),
-                    polygon1,
-                    tol,
-                )?;
-                intersections
-                    .into_iter()
-                    .flat_map(|(mut polyline, mut curve)| {
-                        let mut pieces = Vec::new();
-                        {
-                            let cuts: Vec<_> = (1..polyline.len() - 1)
-                                .filter(|&i| {
-                                    boundaries0[face_index0]
-                                        .iter()
-                                        .chain(&boundaries1[face_index1])
-                                        .any(|edge| {
-                                            edge.splits_at(
-                                                polyline[i - 1],
-                                                polyline[i],
-                                                polyline[i + 1],
-                                            )
-                                        })
-                                })
-                                .collect();
-                            for i in cuts.into_iter().rev() {
-                                pieces.push((polyline.cut(i as f64), curve.cut(i as f64)));
-                            }
-                        }
-                        pieces.push((polyline, curve));
-                        pieces.reverse();
-                        pieces
-                    })
-                    .filter(|(polyline, _)| {
-                        // A smooth seam is internal to the shell. Its cut must divide the other
-                        // face; ordinary outer boundaries still use the contact/coincidence path.
-                        let on0 = runs_along_boundary(polyline, &boundaries0[face_index0]);
-                        let on1 = runs_along_boundary(polyline, &boundaries1[face_index1]);
-                        !(on0 && on1)
-                            && (!on0
-                                || smooth_seam(polyline, face_index0, geom_shell0, poly_shell0))
-                            && (!on1
-                                || smooth_seam(polyline, face_index1, geom_shell1, poly_shell1))
-                    })
-                    .try_for_each(|(polyline, intersection_curve)| {
-                        let on0 = runs_along_boundary(&polyline, &boundaries0[face_index0]);
-                        let on1 = runs_along_boundary(&polyline, &boundaries1[face_index1]);
-                        let mut intersection_curve = intersection_curve.into();
-                        let status = ShapesOpStatus::from_is_curve(&intersection_curve)?;
-                        let (status0, status1) = match (ori0, ori1) {
-                            (true, true) => (status, status.not()),
-                            (true, false) => (status.not(), status.not()),
-                            (false, true) => (status, status),
-                            (false, false) => (status.not(), status),
+            let result =
+                (|| {
+                    let ori0 = geom_shell0[face_index0].orientation();
+                    let ori1 = geom_shell1[face_index1].orientation();
+                    let surface0 = geom_shell0[face_index0].surface();
+                    let surface1 = geom_shell1[face_index1].surface();
+                    let polygon0 = polygons0[face_index0].as_ref()?;
+                    let polygon1 = polygons1[face_index1].as_ref()?;
+                    if let Some(same_normal) =
+                        coincident::coincidence(&surface0, polygon0, &surface1, polygon1)
+                    {
+                        let overlap0 = match same_normal == (ori0 == ori1) {
+                            true => ShapesOpStatus::Both,
+                            false => ShapesOpStatus::Neither,
                         };
-                        if polyline.front().near(&polyline.back()) {
-                            let poly_wire = create_independent_loop(polyline);
-                            poly_loops_store0[face_index0].add_independent_loop(BoundaryWire::new(
-                                poly_wire.clone(),
-                                status0,
-                            ));
-                            poly_loops_store1[face_index1]
-                                .add_independent_loop(BoundaryWire::new(poly_wire, status1));
-                            let geom_wire = create_independent_loop(intersection_curve);
-                            geom_loops_store0[face_index0].add_independent_loop(BoundaryWire::new(
-                                geom_wire.clone(),
-                                status0,
-                            ));
-                            geom_loops_store1[face_index1]
-                                .add_independent_loop(BoundaryWire::new(geom_wire, status1));
-                        } else {
-                            let pv0 = Vertex::new(polyline.front());
-                            let pv1 = Vertex::new(polyline.back());
-                            let gv0 = Vertex::new(polyline.front());
-                            let gv1 = Vertex::new(polyline.back());
-                            for (pv, gv) in [(&pv0, &gv0), (&pv1, &gv1)] {
-                                let mut pemap = HashMap::default();
-                                let mut gemap = HashMap::default();
-                                insert_intersection_vertex(
-                                    &mut poly_loops_store0,
-                                    &mut geom_loops_store0,
-                                    face_index0,
-                                    pv,
-                                    gv,
-                                    &surface1,
-                                    &mut pemap,
-                                    &mut gemap,
-                                )?;
-                                insert_intersection_vertex(
-                                    &mut poly_loops_store1,
-                                    &mut geom_loops_store1,
-                                    face_index1,
-                                    pv,
-                                    gv,
-                                    &surface0,
-                                    &mut pemap,
-                                    &mut gemap,
-                                )?;
+                        let mut a = coincident::FaceLoops {
+                            geom: &mut geom_loops_store0,
+                            poly: &mut poly_loops_store0,
+                            index: face_index0,
+                        };
+                        let mut b = coincident::FaceLoops {
+                            geom: &mut geom_loops_store1,
+                            poly: &mut poly_loops_store1,
+                            index: face_index1,
+                        };
+                        return coincident::cut(
+                            &mut a,
+                            &mut b,
+                            &surface0,
+                            [&poly_shell0[face_index0], &poly_shell1[face_index1]],
+                            same_normal,
+                            [overlap0, ShapesOpStatus::Neither],
+                        );
+                    }
+                    let intersections = intersection_curve::intersection_curves(
+                        surface0.clone(),
+                        polygon0,
+                        surface1.clone(),
+                        polygon1,
+                        tol,
+                    )?;
+                    intersections
+                        .into_iter()
+                        .flat_map(|(mut polyline, mut curve)| {
+                            let mut pieces = Vec::new();
+                            {
+                                let cuts: Vec<_> = (1..polyline.len() - 1)
+                                    .filter(|&i| {
+                                        boundaries0[face_index0]
+                                            .iter()
+                                            .chain(&boundaries1[face_index1])
+                                            .any(|edge| {
+                                                edge.splits_at(
+                                                    polyline[i - 1],
+                                                    polyline[i],
+                                                    polyline[i + 1],
+                                                )
+                                            })
+                                    })
+                                    .collect();
+                                for i in cuts.into_iter().rev() {
+                                    pieces.push((polyline.cut(i as f64), curve.cut(i as f64)));
+                                }
                             }
-                            *intersection_curve.leader_mut().first_mut().unwrap() = gv0.point();
-                            *intersection_curve.leader_mut().last_mut().unwrap() = gv1.point();
-                            let mut polyline = polyline;
-                            *polyline.first_mut().unwrap() = pv0.point();
-                            *polyline.last_mut().unwrap() = pv1.point();
-                            let (pedge, gedge) = if on0 {
-                                boundary_pair(
-                                    &poly_loops_store0[face_index0],
-                                    &geom_loops_store0[face_index0],
-                                    &pv0,
-                                    &pv1,
-                                )?
-                            } else if on1 {
-                                boundary_pair(
-                                    &poly_loops_store1[face_index1],
-                                    &geom_loops_store1[face_index1],
-                                    &pv0,
-                                    &pv1,
-                                )?
-                            } else {
-                                (
-                                    Edge::new(&pv0, &pv1, polyline),
-                                    Edge::new(&gv0, &gv1, intersection_curve.into()),
-                                )
+                            pieces.push((polyline, curve));
+                            pieces.reverse();
+                            pieces
+                        })
+                        .filter(|(polyline, _)| {
+                            // A smooth seam is internal to the shell. Its cut must divide the other
+                            // face; ordinary outer boundaries still use the contact/coincidence path.
+                            let on0 = runs_along_boundary(polyline, &boundaries0[face_index0]);
+                            let on1 = runs_along_boundary(polyline, &boundaries1[face_index1]);
+                            !(on0 && on1)
+                                && (!on0
+                                    || smooth_seam(polyline, face_index0, geom_shell0, poly_shell0))
+                                && (!on1
+                                    || smooth_seam(polyline, face_index1, geom_shell1, poly_shell1))
+                        })
+                        .try_for_each(|(polyline, intersection_curve)| {
+                            let on0 = runs_along_boundary(&polyline, &boundaries0[face_index0]);
+                            let on1 = runs_along_boundary(&polyline, &boundaries1[face_index1]);
+                            crosses_seam |= on0 || on1;
+                            let mut intersection_curve = intersection_curve.into();
+                            let status = ShapesOpStatus::from_is_curve(&intersection_curve)?;
+                            let (status0, status1) = match (ori0, ori1) {
+                                (true, true) => (status, status.not()),
+                                (true, false) => (status.not(), status.not()),
+                                (false, true) => (status, status),
+                                (false, false) => (status.not(), status),
                             };
-                            if !on0
-                                && !poly_loops_store0[face_index0]
-                                    .iter()
-                                    .any(|wire| wire.iter().any(|edge| edge.id() == pedge.id()))
-                            {
-                                let positions = poly_loops_store0[face_index0].add_edge(
-                                    pedge.clone(),
-                                    status0,
-                                    normal_at(&surface0),
-                                )?;
-                                geom_loops_store0[face_index0].add_edge_at(
-                                    gedge.clone(),
-                                    status0,
-                                    positions,
+                            if polyline.front().near(&polyline.back()) {
+                                let poly_wire = create_independent_loop(polyline);
+                                poly_loops_store0[face_index0].add_independent_loop(
+                                    BoundaryWire::new(poly_wire.clone(), status0),
                                 );
-                            }
-                            if !on1
-                                && !poly_loops_store1[face_index1]
-                                    .iter()
-                                    .any(|wire| wire.iter().any(|edge| edge.id() == pedge.id()))
-                            {
-                                let positions = poly_loops_store1[face_index1].add_edge(
-                                    pedge,
-                                    status1,
-                                    normal_at(&surface1),
-                                )?;
+                                poly_loops_store1[face_index1]
+                                    .add_independent_loop(BoundaryWire::new(poly_wire, status1));
+                                let geom_wire = create_independent_loop(intersection_curve);
+                                geom_loops_store0[face_index0].add_independent_loop(
+                                    BoundaryWire::new(geom_wire.clone(), status0),
+                                );
                                 geom_loops_store1[face_index1]
-                                    .add_edge_at(gedge, status1, positions);
+                                    .add_independent_loop(BoundaryWire::new(geom_wire, status1));
+                            } else {
+                                let pv0 = Vertex::new(polyline.front());
+                                let pv1 = Vertex::new(polyline.back());
+                                let gv0 = Vertex::new(polyline.front());
+                                let gv1 = Vertex::new(polyline.back());
+                                for (pv, gv) in [(&pv0, &gv0), (&pv1, &gv1)] {
+                                    let mut pemap = HashMap::default();
+                                    let mut gemap = HashMap::default();
+                                    insert_intersection_vertex(
+                                        &mut poly_loops_store0,
+                                        &mut geom_loops_store0,
+                                        face_index0,
+                                        pv,
+                                        gv,
+                                        &surface1,
+                                        &mut pemap,
+                                        &mut gemap,
+                                    )?;
+                                    insert_intersection_vertex(
+                                        &mut poly_loops_store1,
+                                        &mut geom_loops_store1,
+                                        face_index1,
+                                        pv,
+                                        gv,
+                                        &surface0,
+                                        &mut pemap,
+                                        &mut gemap,
+                                    )?;
+                                }
+                                *intersection_curve.leader_mut().first_mut().unwrap() = gv0.point();
+                                *intersection_curve.leader_mut().last_mut().unwrap() = gv1.point();
+                                let mut polyline = polyline;
+                                *polyline.first_mut().unwrap() = pv0.point();
+                                *polyline.last_mut().unwrap() = pv1.point();
+                                let (pedge, gedge) = if on0 {
+                                    boundary_pair(
+                                        &poly_loops_store0[face_index0],
+                                        &geom_loops_store0[face_index0],
+                                        &pv0,
+                                        &pv1,
+                                    )?
+                                } else if on1 {
+                                    boundary_pair(
+                                        &poly_loops_store1[face_index1],
+                                        &geom_loops_store1[face_index1],
+                                        &pv0,
+                                        &pv1,
+                                    )?
+                                } else {
+                                    (
+                                        Edge::new(&pv0, &pv1, polyline),
+                                        Edge::new(&gv0, &gv1, intersection_curve.into()),
+                                    )
+                                };
+                                if !on0
+                                    && !poly_loops_store0[face_index0]
+                                        .iter()
+                                        .any(|wire| wire.iter().any(|edge| edge.id() == pedge.id()))
+                                {
+                                    let positions = poly_loops_store0[face_index0].add_edge(
+                                        pedge.clone(),
+                                        status0,
+                                        normal_at(&surface0),
+                                    )?;
+                                    geom_loops_store0[face_index0].add_edge_at(
+                                        gedge.clone(),
+                                        status0,
+                                        positions,
+                                    );
+                                }
+                                if !on1
+                                    && !poly_loops_store1[face_index1]
+                                        .iter()
+                                        .any(|wire| wire.iter().any(|edge| edge.id() == pedge.id()))
+                                {
+                                    let positions = poly_loops_store1[face_index1].add_edge(
+                                        pedge,
+                                        status1,
+                                        normal_at(&surface1),
+                                    )?;
+                                    geom_loops_store1[face_index1]
+                                        .add_edge_at(gedge, status1, positions);
+                                }
                             }
-                        }
-                        Some(())
-                    })
-            })();
+                            Some(())
+                        })
+                })();
             profile::lap(Stage::Interference, start);
             result.ok_or_else(|| pair_error(Code::IntersectionFailed, face_index0, face_index1))
         })?;
     profile::pairs(store0_len * store1_len, overlapping);
     Ok(LoopsStoreQuadruple {
+        crosses_seam,
         geom_loops_store0,
         poly_loops_store0,
         geom_loops_store1,

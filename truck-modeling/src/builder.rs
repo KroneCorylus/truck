@@ -1166,9 +1166,15 @@ fn path_segments(path: &Wire<Curve>) -> Result<(Vec<Segment>, bool)> {
     for k in 1..=joints {
         let (prev, next) = (&path[k - 1], &path[k % n]);
         let (end, start) = (tangents[k - 1].1, tangents[k % n].0);
-        let smooth =
-            prev.back() == next.front() && end.cross(start).so_small() && end.dot(start) > 0.0;
-        if !smooth {
+        let smooth = end.cross(start).so_small() && end.dot(start) > 0.0;
+        let miter = !closed
+            && segments.iter().all(|s| matches!(s, Segment::Line(_)))
+            && matches!(
+                (&segments[k - 1], &segments[k % n]),
+                (Segment::Line(_), Segment::Line(_))
+            )
+            && end.dot(start) > -1. + TOLERANCE;
+        if prev.back() != next.front() || (!smooth && !miter) {
             return Err(Error::PathNotSmooth(k % n));
         }
     }
@@ -1206,7 +1212,17 @@ fn sweep_wire(
     segments: &[Segment],
     closed: bool,
     tol: f64,
+    start: Point3,
 ) -> Result<SweptWire> {
+    if !closed
+        && segments.iter().all(|s| matches!(s, Segment::Line(_)))
+        && segments.windows(2).any(|pair| match pair {
+            [Segment::Line(a), Segment::Line(b)] => !a.cross(*b).so_small(),
+            _ => false,
+        })
+    {
+        return sweep_polyline(profile, segments, start);
+    }
     let mut faces = Vec::new();
     let mut wire = profile.clone();
     let mut total = Matrix4::identity();
@@ -1308,20 +1324,127 @@ fn sweep_wire(
     })
 }
 
+fn sweep_polyline(
+    profile: &Wire<Curve>,
+    segments: &[Segment],
+    mut origin: Point3,
+) -> Result<SweptWire> {
+    let vectors: Vec<_> = segments
+        .iter()
+        .map(|s| match s {
+            Segment::Line(v) => *v,
+            _ => unreachable!(),
+        })
+        .collect();
+    let mut wire = profile.clone();
+    let mut perpendicular = profile.clone();
+    let mut faces = Vec::new();
+    let mut total = Matrix4::identity();
+    for (k, &vector) in vectors.iter().enumerate() {
+        let axis = vector.normalize();
+        let translate = Matrix4::from_translation(vector);
+        origin += vector;
+        perpendicular = moved(&perpendicular, translate);
+        total = translate * total;
+        let mut next = perpendicular.clone();
+        if let Some(following) = vectors.get(k + 1) {
+            let direction = following.normalize();
+            let normal = (axis + direction).normalize();
+            let transverse = normal - axis * normal.dot(axis);
+            let shear = Matrix4::from_cols(
+                (Vector3::unit_x() - axis * transverse.x / normal.dot(axis)).extend(0.),
+                (Vector3::unit_y() - axis * transverse.y / normal.dot(axis)).extend(0.),
+                (Vector3::unit_z() - axis * transverse.z / normal.dot(axis)).extend(0.),
+                Vector4::unit_w(),
+            );
+            next = moved(
+                &perpendicular,
+                Matrix4::from_translation(origin.to_vec())
+                    * shear
+                    * Matrix4::from_translation(-origin.to_vec()),
+            );
+            let cross = axis.cross(direction);
+            if !cross.so_small() {
+                let rotation = Matrix4::from_translation(origin.to_vec())
+                    * Matrix4::from_axis_angle(
+                        cross.normalize(),
+                        Rad(axis.dot(direction).clamp(-1., 1.).acos()),
+                    )
+                    * Matrix4::from_translation(-origin.to_vec());
+                perpendicular = moved(&perpendicular, rotation);
+                total = rotation * total;
+            }
+        }
+        let controls = |wire: &Wire<Curve>| -> Result<Vec<Point3>> {
+            wire.iter()
+                .map(|edge| {
+                    let curve = edge
+                        .oriented_curve()
+                        .try_lift_up()
+                        .ok_or(Error::NoNurbsForm)?;
+                    if curve.control_points().iter().any(|p| p.w <= 0.) {
+                        return Err(Error::NoNurbsForm);
+                    }
+                    Ok(curve
+                        .control_points()
+                        .iter()
+                        .map(|p| p.to_point())
+                        .collect::<Vec<_>>())
+                })
+                .collect::<Result<Vec<_>>>()
+                .map(|points| points.into_iter().flatten().collect())
+        };
+        let from = controls(&wire)?;
+        let to = controls(&next)?;
+        if from
+            .iter()
+            .zip(&to)
+            .any(|(a, b)| (*b - *a).dot(axis) <= TOLERANCE)
+        {
+            return Err(Error::PathTooTight(k));
+        }
+        let minimum = from
+            .iter()
+            .map(|p| p.to_vec().dot(axis))
+            .fold(f64::INFINITY, f64::min);
+        let maximum = to
+            .iter()
+            .map(|p| p.to_vec().dot(axis))
+            .fold(f64::NEG_INFINITY, f64::max);
+        let reach = maximum - minimum;
+        faces.extend(topo_impls::connect_wires(
+            &wire,
+            &next,
+            LineConnector.connector(),
+            ExtrudeConnector {
+                vector: axis * reach,
+            }
+            .connector(),
+        ));
+        wire = next;
+    }
+    Ok(SweptWire {
+        faces,
+        wire,
+        motion: total,
+    })
+}
+
 /// Sweeps `profile` along `path`, carrying it rigidly with the path's tangent. Each line of the
-/// path translates it and each circular arc revolves it about the arc's axis, so lines give
+/// path translates it, open polyline corners use a shared bisector miter, and each circular arc revolves it about the arc's axis, so lines give
 /// `Surface::Extruded` faces and arcs `Surface::RevolutedCurve` faces, all exact. Any other path
 /// edge is followed by rotation-minimising frames at its parameter division at `tol`, the
 /// profile is copied to each frame and [`try_loft_shell`] skins through the copies, one NURBS face
 /// per profile edge; this is the only place `tol` enters. The path must be continuous and tangent
-/// continuous at its vertices, and the profile is taken to sit at its start. Consecutive segments
+/// continuous at its vertices except for open polyline corners, and the profile is taken to sit
+/// at its start. Consecutive segments
 /// share the moved profile, so the result is one shell with one face per profile edge and path
 /// edge, in path order. A closed path closes the shell onto the profile itself, which it must
 /// bring back to where it started: planar closed paths do. A closed path of a single spline edge
 /// is a closed loft and rejected as such.
 /// # Failures
-/// - [`Error::PathNotSmooth`] naming a path vertex with a gap or a corner
-/// - [`Error::PathTooTight`] naming an arc whose axis the profile reaches, or a spline whose
+/// - [`Error::PathNotSmooth`] naming a gap, reversal, or unsupported curved/closed-path corner
+/// - [`Error::PathTooTight`] naming a collapsed polyline miter, an arc whose axis the profile reaches, or a spline whose
 ///   radius of curvature at a division point is less than the profile's reach from the path
 /// - [`Error::ClosedPathNotPlanar`] when the profile does not return to its start
 /// - those of [`try_loft_shell`] on a spline edge
@@ -1331,10 +1454,16 @@ pub fn sweep_wire_along_wire(
     tol: f64,
 ) -> Result<Shell<Curve, Surface>> {
     let (segments, closed) = path_segments(path)?;
-    Ok(sweep_wire(profile, &segments, closed, tol)?
-        .faces
-        .into_iter()
-        .collect())
+    Ok(sweep_wire(
+        profile,
+        &segments,
+        closed,
+        tol,
+        path.front_vertex().unwrap().point(),
+    )?
+    .faces
+    .into_iter()
+    .collect())
 }
 
 /// Sweeps the face `profile` along `path` into a solid: [`sweep_wire_along_wire`] on every
@@ -1370,7 +1499,13 @@ pub fn sweep_along_wire(
     let mut far = Vec::new();
     let mut total = Matrix4::identity();
     for wire in profile.boundaries() {
-        let swept = sweep_wire(&wire, &segments, closed, tol)?;
+        let swept = sweep_wire(
+            &wire,
+            &segments,
+            closed,
+            tol,
+            path.front_vertex().unwrap().point(),
+        )?;
         shell.extend(swept.faces);
         far.push(swept.wire);
         total = swept.motion;

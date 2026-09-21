@@ -14,8 +14,8 @@ use truck_modeling::*;
 /// removed face is the opening, kept as an annulus around the cavity's mouth. With nothing
 /// removed the cavity is a second, inner shell of the result. The input is not modified.
 ///
-/// This operation takes positive thickness. Concave joins between planes are rebuilt by
-/// intersecting their offsets; curved concave joins still need a transition. Faces must be planes,
+/// This operation takes positive thickness. Concave joins involving a plane are rebuilt by
+/// intersecting their offsets; joins between curved faces still need a transition. Faces must be planes,
 /// cylinders or cones as `replace_surfaces` accepts, meeting three at every vertex. Faces that
 /// were not neighbours and come to interfere are not checked; a wall thinner than the solid's
 /// features is the caller's to avoid.
@@ -137,9 +137,9 @@ fn shell_direction(
                 ));
             };
             let turn = n.cross(m).dot(tangent);
-            let planar_join = matches!(surface, Surface::Plane(_))
-                && matches!(faces[other].surface(), Surface::Plane(_));
-            if turn < -TOLERANCE && !planar_join {
+            let intersects_plane = matches!(surface, Surface::Plane(_))
+                || matches!(faces[other].surface(), Surface::Plane(_));
+            if turn < -TOLERANCE && !intersects_plane {
                 return Err(LocalOpError::Concave {
                     face: face.id(),
                     neighbour: faces[other].id(),

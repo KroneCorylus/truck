@@ -74,3 +74,13 @@ fn draft_box(bencher: Bencher, count: usize) {
     check_solid(&run());
     bencher.bench(run);
 }
+
+#[divan::bench(sample_count = 20, sample_size = 1, max_time = 10)]
+fn rolling_fillet(bencher: Bencher) {
+    let solid = cube();
+    let wire: Wire = vec![solid.boundaries()[0][0].boundaries()[0][0].clone()].into();
+    let run =
+        || try_fillet_solid_along_wire(black_box(&solid), &wire, 0.2, TOL).expect("rolling fillet");
+    check_solid(&run().solid);
+    bencher.bench(run);
+}

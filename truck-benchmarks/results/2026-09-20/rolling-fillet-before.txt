@@ -1,0 +1,14 @@
+   Compiling truck-meshalgo v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-meshalgo)
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+   Compiling truck-hlr v0.1.0 (/home/krone/Development/Pieza_WS/truck/truck-hlr)
+   Compiling truck-benchmarks v0.1.0 (/home/krone/Development/Pieza_WS/truck/truck-benchmarks)
+    Finished `bench` profile [optimized] target(s) in 10.47s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running benches/actions.rs (target/release/deps/actions-62c012380e689677)
+Timer precision: 10 ns
+actions               fastest       │ slowest       │ median        │ mean          │ samples │ iters
+╰─ local                            │               │               │               │         │
+   ╰─ rolling_fillet  183.7 ms      │ 197 ms        │ 191 ms        │ 190.4 ms      │ 20      │ 20
+

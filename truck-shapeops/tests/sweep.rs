@@ -145,16 +145,25 @@ fn closed_planar_path_gives_a_torus() {
 }
 
 #[test]
-fn corners_and_tight_arcs_are_rejected() {
+fn polyline_corners_are_mitered_and_tight_paths_are_rejected() {
     let profile = disc(Point3::origin(), Vector3::unit_x(), 0.6);
     let v0 = builder::vertex(Point3::origin());
     let v1 = builder::vertex(Point3::new(1.0, 0.0, 0.0));
     let v2 = builder::vertex(Point3::new(1.0, 1.0, 0.0));
     let corner: MWire = vec![builder::line(&v0, &v1), builder::line(&v1, &v2)].into();
+    let swept = builder::sweep_along_wire(&profile, &corner, TOL).unwrap();
+    assert!(swept.is_geometric_consistent());
+    assert_solid(&from_modeling(&swept), PI * 0.6 * 0.6 * 2.0, &[0], TOL);
+    let reversal: MWire = vec![builder::line(&v0, &v1), builder::line(&v1, &v0)].into();
     assert_eq!(
-        builder::sweep_along_wire(&profile, &corner, TOL).unwrap_err(),
+        builder::sweep_along_wire(&profile, &reversal, TOL).unwrap_err(),
         Error::PathNotSmooth(1)
     );
+    let too_wide = disc(Point3::origin(), Vector3::unit_x(), 1.5);
+    assert!(matches!(
+        builder::sweep_along_wire(&too_wide, &corner, TOL),
+        Err(Error::PathTooTight(_))
+    ));
     let tight: MWire = vec![arc(
         &v0,
         Point3::new(0.0, 0.5, 0.0),

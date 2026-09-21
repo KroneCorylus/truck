@@ -222,3 +222,33 @@ fn splines_have_no_typed_offset() {
     let spline = Surface::BSplineSurface(BSplineSurface::from(plane));
     assert_eq!(spline.offset(0.1).unwrap_err(), Error::NoTypedOffset);
 }
+
+#[test]
+fn inverted_revolution_offsets_along_the_inverted_normal() {
+    for top_radius in [3.0, 4.0] {
+        let generator = Curve::Line(Line(
+            Point3::new(3., 0., 0.),
+            Point3::new(top_radius, 0., 5.),
+        ));
+        let surface = Surface::RevolutedCurve(Processor::new(RevolutedCurve::by_revolution(
+            generator,
+            Point3::origin(),
+            Vector3::unit_z(),
+        )));
+        for surface in [surface.clone(), surface.inverse()] {
+            for distance in [-0.2, 0.2] {
+                let offset = surface.offset(distance).unwrap();
+                for (u, v) in [(0.2, 0.4), (0.7, 2.0)] {
+                    let point = surface.subs(u, v);
+                    let normal = surface.normal(u, v);
+                    let expected = point + normal * distance;
+                    let (s, t) = offset
+                        .search_nearest_parameter(expected, None, 100)
+                        .unwrap();
+                    assert!(offset.subs(s, t).near(&expected));
+                    assert!(offset.normal(s, t).dot(normal) > 1. - EPS);
+                }
+            }
+        }
+    }
+}

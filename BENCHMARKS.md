@@ -1,5 +1,8 @@
 # CPU action benchmarks
 
+The [2026-09-20 fillet-search comparison](truck-benchmarks/results/2026-09-20/REPORT.md)
+records the rolling-fillet optimization and its effect on the application's threaded box.
+
 The [2026-09-12 comparison](truck-benchmarks/results/2026-09-12/REPORT.md) records PiezaCad
 and Truck before/after measurements against installed FreeCAD 1.1.3, including remaining
 losses and differences in the APIs being timed.
@@ -50,6 +53,7 @@ samples. Other cases use Divan's adaptive sample size and default sample count.
 | `boolean` | Batch and sequential subtraction | Same plate/cutters, 1, 10, 30, 100 cylindrical holes |
 | `boolean` | Union and intersection | Overlapping cylinders, chord tolerance 0.1, 0.01, 0.001; intersection also has a NURBS representation |
 | `local` | Fillet and chamfer | 1 or all 12 edges of a cube |
+| `local` | Rolling fillet | One edge of a cube, including blend validation |
 | `local` | Draft, shell | 1 or 4 side faces; open-top box with 0.2 wall thickness |
 | `tessellation` | Triangulate | Cylinder tolerance sweep; plates with 1, 10, 30, 100 holes |
 | `tessellation` | Convert mesh to polygon | Already tessellated plates |

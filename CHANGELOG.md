@@ -6,6 +6,13 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Repair everyday cut-plate workflows: classify faces individually when Boolean intersections run along smooth seams, preserving through holes and counterbores centered on plate edges and corners. Re-intersect planar/cylindrical pocket and notch shell joins, and retain the orientation of offset revolved surfaces.
+- Construct exact oblique plane/cylinder and plane/cone sections for local edits. Preserve trimmed conic domains and choose the nearby intersection branch; move periodic surface seams away from trimmed faces so equivalent drafted and revolved tubes shell and blend consistently.
+- Preserve split collinear blend selections and shared vertices when a corner contact consumes an edge. Open tangent chamfers trim their terminating faces. Fillet contact searches limit Newton steps, and tangent end contacts select the branch entering the retained face.
+- Breaking: `sweep_along_wire` and `sweep_wire_along_wire` now accept corners in open line-only paths and construct shared bisector miters, instead of returning `PathNotSmooth`. Callers need no signature changes; tests that assumed every corner was unsupported should instead verify the resulting solid. Gaps, reversals, collapsed miters and unsupported curved/closed-path corners still return errors. The existing corner test now checks analytic volume and closed geometry while retaining invalid-path checks.
+
+- Reuse rational Bezier cross-sections during approximate fillet surface point searches. Preserve the original sampling grid, seed selection and refinement while avoiding repeated support-surface evaluations. The rolling-fillet benchmark improves from 191 ms to 15.69 ms; the application's threaded box rebuild improves from 17.064 s to 8.128 s (see the 2026-09-20 benchmark report).
+
 - Add `truck_shapeops::thread::thread_groove` for single-start internal/external,
   right/left-handed 60-degree helical B-rep cutters with validated pitch, depth,
   turn count, and sampled helix accuracy. Exact rational radial sections preserve
