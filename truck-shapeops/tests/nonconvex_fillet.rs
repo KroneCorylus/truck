@@ -261,3 +261,261 @@ fn local_fillet_extreme_radii_return_diagnostics() {
         );
     }
 }
+
+/// An app sketch: a pentagon with a reflex vertex at `outline[4]`, extruded 20 high.
+struct Pentagon {
+    prism: Solid,
+    outline: [Point3; 5],
+    /// Interior angle at each outline vertex.
+    angles: [f64; 5],
+    area: f64,
+    perimeter: f64,
+}
+
+impl Pentagon {
+    fn new() -> Self {
+        let outline = [
+            (-50.11918803317464, 54.71104651125626),
+            (-46.848871341936984, -6.265190155003754),
+            (-1.7266402147777953, 18.012518685622943),
+            (-14.189935449778307, 41.56541242084759),
+            (-38.32230290663329, 37.19417041227136),
+        ]
+        .map(|(x, y)| Point3::new(x, y, 0.));
+        let vertices = builder::vertices(outline);
+        let wire: Wire = (0..5)
+            .map(|i| builder::line(&vertices[i], &vertices[(i + 1) % 5]))
+            .collect();
+        let prism = builder::tsweep(
+            &builder::try_attach_plane(&[wire]).unwrap(),
+            Vector3::unit_z() * 20.,
+        );
+        let (mut area, mut perimeter) = (0., 0.);
+        let angles = std::array::from_fn(|i| {
+            let [a, b, c] = [4, 0, 1].map(|j| outline[(i + j) % 5]);
+            area += (b.x * c.y - c.x * b.y) / 2.;
+            perimeter += b.distance(c);
+            let (u, v) = (a - b, c - b);
+            let angle = (v.x * u.y - v.y * u.x).atan2(u.dot(v));
+            if angle < 0. {
+                angle + 2. * PI
+            } else {
+                angle
+            }
+        });
+        assert!(angles[4] > PI, "the outline must be nonconvex");
+        Self {
+            prism,
+            outline,
+            angles,
+            area,
+            perimeter,
+        }
+    }
+    /// A point on the rim edge from `outline[i]` to `outline[i + 1]` at height `z`.
+    fn rim(&self, i: usize, z: f64) -> Point3 {
+        let [a, b] = [self.outline[i], self.outline[(i + 1) % 5]];
+        a + (b - a) / 2. + Vector3::unit_z() * z
+    }
+    /// A point on the vertical edge at `outline[i]`.
+    fn vertical(&self, i: usize) -> Point3 {
+        self.outline[i] + Vector3::unit_z() * 10.
+    }
+    fn length(&self, i: usize) -> f64 {
+        self.outline[i].distance(self.outline[(i + 1) % 5])
+    }
+    /// Checks the fillet of the edges through `points` against `expected(radius)`.
+    /// `corners` counts the generated tori and spheres.
+    fn check(
+        &self,
+        points: &[Point3],
+        radii: &[f64],
+        corners: (usize, usize),
+        expected: impl Fn(f64) -> f64,
+    ) {
+        for transform in [
+            Matrix4::identity(),
+            Matrix4::from_translation(Vector3::new(13., -7., 23.))
+                * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.73)),
+        ] {
+            let input = builder::transformed(&self.prism, transform);
+            let before = serde_json::to_string(&input.compress()).unwrap();
+            let mut ids: Vec<_> = points
+                .iter()
+                .map(|&p| {
+                    common::blend::edge_through(
+                        &input.boundaries()[0],
+                        transform.transform_point(p),
+                    )
+                    .id()
+                })
+                .collect();
+            for &radius in radii {
+                let result = try_fillet_solid_edges(&input, &ids, radius, TOL).unwrap();
+                let count = |torus: bool| {
+                    result
+                        .generated_faces
+                        .iter()
+                        .filter(|f| match f.surface().elementary() {
+                            Some((truck_modeling::geometry::Elementary::Torus { .. }, _)) => torus,
+                            Some((truck_modeling::geometry::Elementary::Sphere { .. }, _)) => {
+                                !torus
+                            }
+                            _ => false,
+                        })
+                        .count()
+                };
+                assert_eq!((count(true), count(false)), corners);
+                assert!(result.solid.is_geometric_consistent());
+                common::assert_solid(&result.solid, expected(radius), &[0], TOL);
+                common::blend::assert_step(&result.solid, expected(radius), TOL);
+                ids.reverse();
+                let reversed = try_fillet_solid_edges(&input, &ids, radius, TOL).unwrap();
+                assert_eq!(
+                    serde_json::to_string(&result.solid.compress()).unwrap(),
+                    serde_json::to_string(&reversed.solid.compress()).unwrap()
+                );
+            }
+            assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
+        }
+    }
+}
+
+const K: f64 = 1. - PI / 4.;
+/// Per unit `r³`, the removal lost where a right-angle rim round ends at inward distance
+/// `t` a further `t · cot` along its edge, integrated over the profile.
+const END: f64 = 5. / 6. - PI / 4.;
+fn cot(x: f64) -> f64 {
+    1. / x.tan()
+}
+/// Section area per `r²` of a round on a vertical edge of interior angle `angle`.
+fn corner(angle: f64) -> f64 {
+    cot(angle / 2.) - (PI - angle) / 2.
+}
+/// Correction per `r³` for a spherical corner with a vertical edge of interior angle `angle`.
+fn sphere(angle: f64) -> f64 {
+    corner(angle) / 3. + 2. * END * cot(angle / 2.)
+}
+/// Correction per `r³` where two convex rim rounds sweep a torus around a concave vertical
+/// round turning through `turn`. Along the concave round of radius `r`, the rim round at
+/// inward distance `t` runs `turn · (r + t)` instead of the `2r · tan(turn / 2)` of the
+/// sharp outline.
+fn torus(turn: f64) -> f64 {
+    K * (2. * (turn / 2.).tan() - turn) - turn * END
+}
+
+#[test]
+fn oblique_spherical_corners_work_beside_a_reflex_vertex() {
+    let pentagon = Pentagon::new();
+    // Every top and bottom edge, and the vertical edge at the corner between them.
+    let mut points: Vec<_> = (0..5)
+        .flat_map(|i| [0., 20.].map(|z| pentagon.rim(i, z)))
+        .collect();
+    points.push(pentagon.vertical(3));
+    let Pentagon {
+        area,
+        perimeter,
+        angles,
+        ..
+    } = pentagon;
+    pentagon.check(&points, &[1., 5.], (0, 2), |r| {
+        20. * area - (2. * perimeter * K + 20. * corner(angles[3])) * r * r
+            + 2. * (sphere(angles[3]) - 2. * END * cot(angles[3] / 2.)
+                + 2. * END * angles.iter().map(|&a| cot(a / 2.)).sum::<f64>())
+                * r.powi(3)
+    });
+}
+
+#[test]
+fn oblique_toroidal_corners_wrap_a_concave_round() {
+    let pentagon = Pentagon::new();
+    let Pentagon {
+        area,
+        perimeter,
+        angles,
+        ..
+    } = pentagon;
+    let turn = angles[4] - PI;
+    let concave = 20. * ((turn / 2.).tan() - turn / 2.);
+    // The concave vertical edge with both top rims, which end on the neighboring walls.
+    let points = [
+        pentagon.vertical(4),
+        pentagon.rim(3, 20.),
+        pentagon.rim(4, 20.),
+    ];
+    pentagon.check(&points, &[2.], (1, 0), |r| {
+        20. * area
+            + (concave - K * (pentagon.length(3) + pentagon.length(4))) * r * r
+            + (torus(turn) + END * (cot(angles[3]) + cot(angles[0]))) * r.powi(3)
+    });
+    // All rims and vertical edges but the one at the sharpest corner, as in the app.
+    let mut points: Vec<_> = (0..5)
+        .flat_map(|i| [0., 20.].map(|z| pentagon.rim(i, z)))
+        .collect();
+    points.extend((1..5).map(|i| pentagon.vertical(i)));
+    let convex: f64 = (1..4).map(|i| corner(angles[i])).sum();
+    let corners = (1..4).map(|i| sphere(angles[i])).sum::<f64>()
+        + 2. * END * cot(angles[0] / 2.)
+        + torus(turn);
+    pentagon.check(&points, &[1., 4.9], (2, 6), |r| {
+        20. * area
+            + (concave - 2. * perimeter * K - 20. * convex) * r * r
+            + 2. * corners * r.powi(3)
+    });
+    // At 5 the rounds at both ends of the wall beside the sharpest corner overlap.
+    let shell = &pentagon.prism.boundaries()[0];
+    let ids: Vec<_> = points
+        .iter()
+        .map(|&p| common::blend::edge_through(shell, p).id())
+        .collect();
+    let before = serde_json::to_string(&pentagon.prism.compress()).unwrap();
+    assert_eq!(
+        try_fillet_solid_edges(&pentagon.prism, &ids, 5., TOL)
+            .unwrap_err()
+            .code,
+        truck_base::diagnostics::Code::OutsideNeighbour
+    );
+    assert_eq!(
+        before,
+        serde_json::to_string(&pentagon.prism.compress()).unwrap()
+    );
+}
+
+#[test]
+fn oblique_toroidal_corner_ends_on_the_wall_of_a_sharp_rim() {
+    let pentagon = Pentagon::new();
+    let Pentagon { area, angles, .. } = pentagon;
+    let turn = angles[4] - PI;
+    // The rim round sweeps around the concave round until the plane of the other wall,
+    // `r` from the torus axis. At inward distance `t` it stops `acos(r / (r + t))` short
+    // of the full turn, and its straight part loses one tangent length `r · tan(turn / 2)`.
+    let removed = |r: f64| {
+        let section = |t: f64| {
+            let profile = r - (r * r - (r - t) * (r - t)).sqrt();
+            profile * ((turn - (r / (r + t)).acos()) * (r + t) - r * (turn / 2.).tan())
+        };
+        let n = 200_000;
+        let h = r / n as f64;
+        (0..=n)
+            .map(|i| {
+                let weight = if i == 0 || i == n {
+                    1.
+                } else if i % 2 == 1 {
+                    4.
+                } else {
+                    2.
+                };
+                weight * section(i as f64 * h)
+            })
+            .sum::<f64>()
+            * h
+            / 3.
+    };
+    let points = [pentagon.vertical(4), pentagon.rim(3, 20.)];
+    pentagon.check(&points, &[2., 4.], (1, 0), |r| {
+        20. * area
+            + (20. * ((turn / 2.).tan() - turn / 2.) - K * pentagon.length(3)) * r * r
+            + END * cot(angles[3]) * r.powi(3)
+            - removed(r)
+    });
+}

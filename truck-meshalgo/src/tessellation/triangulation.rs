@@ -1,7 +1,7 @@
 #![allow(clippy::many_single_char_names)]
 
 use super::*;
-use crate::filters::NormalFilters;
+use polygon_mesh::PolygonMeshEditor;
 use crate::Point2;
 use array_macro::array;
 use handles::FixedVertexHandle;
@@ -415,6 +415,62 @@ impl PolyBoundaryPiece {
     }
 }
 
+/// Gives every pole on a boundary — a run that stays at one spatial point while its parameter
+/// moves, like the tip of a revolved cone — a vertex at each parameter division it crosses.
+/// With the run's two ends alone, the triangles fanning into the pole are inverted in
+/// parameter space relative to space, and no finer tolerance repairs that.
+fn subdivide_poles(
+    loops: Vec<Vec<SurfacePoint>>,
+    surface: &impl PreMeshableSurface,
+    tol: f64,
+) -> Vec<Vec<SurfacePoint>> {
+    let bounds: BoundingBox<Point2> = loops.iter().flatten().map(|p| p.uv).collect();
+    let range = ((bounds.min()[0], bounds.max()[0]), (bounds.min()[1], bounds.max()[1]));
+    let mut division = None;
+    let mut result = Vec::with_capacity(loops.len());
+    for points in loops {
+        let mut subdivided = Vec::with_capacity(points.len());
+        for (a, b) in points.iter().circular_tuple_windows() {
+            subdivided.push(*a);
+            if !a.point.near(&b.point) {
+                continue;
+            }
+            let axis = match (a.uv.x.near(&b.uv.x), a.uv.y.near(&b.uv.y)) {
+                (true, false) => 1,
+                (false, true) => 0,
+                _ => continue,
+            };
+            let (udiv, vdiv) =
+                division.get_or_insert_with(|| surface.parameter_division(range, tol));
+            let (from, to) = (a.uv[axis], b.uv[axis]);
+            let at = |t: f64| {
+                let mut uv = a.uv;
+                uv[axis] = t;
+                uv
+            };
+            let stays = (1..4).all(|i| {
+                let uv = at(from + (to - from) * i as f64 / 4.0);
+                surface.subs(uv.x, uv.y).near(&a.point)
+            });
+            if !stays {
+                continue;
+            }
+            let mut crossed: Vec<f64> = [&*udiv, &*vdiv][axis]
+                .iter()
+                .copied()
+                .filter(|t| (t - from) * (t - to) < 0.0 && !t.near(&from) && !t.near(&to))
+                .collect();
+            crossed.sort_by(|s, t| (s - from).abs().total_cmp(&(t - from).abs()));
+            subdivided.extend(crossed.into_iter().map(|t| SurfacePoint {
+                point: a.point,
+                uv: at(t),
+            }));
+        }
+        result.push(subdivided);
+    }
+    result
+}
+
 fn abs_diff(previous: f64) -> impl Fn(&f64, &f64) -> std::cmp::Ordering {
     let f = move |x: &f64| f64::abs(x - previous);
     move |x: &f64, y: &f64| f(x).partial_cmp(&f(y)).unwrap()
@@ -568,7 +624,7 @@ impl PolyBoundary {
                 closed.push(connect_edges([vec0, vec1, vec2, vec3]));
             }
         }
-        Self::from_loops(closed)
+        Self::from_loops(subdivide_poles(closed, surface, tol))
     }
 
     fn from_loops(loops: Vec<Vec<SurfacePoint>>) -> Self {
@@ -691,7 +747,7 @@ where S: PreMeshableSurface {
         polyboundary,
         &boundary_map,
     );
-    mesh.make_face_compatible_to_normal();
+    orient_to_normals(&mut mesh);
     mesh
 }
 
@@ -819,6 +875,38 @@ fn insert_surface(
         }
     });
     single_direction
+}
+
+/// Turns each triangle to face the way the surface normals at its corners point. A triangle
+/// without area, such as one with two corners on a pole, faces no way at all: its normal is
+/// rounding noise, so it keeps the winding the triangulation gave it.
+fn orient_to_normals(mesh: &mut PolygonMesh) {
+    let mut editor = mesh.debug_editor();
+    let PolygonMeshEditor {
+        attributes: StandardAttributes {
+            positions, normals, ..
+        },
+        faces,
+        ..
+    } = &mut editor;
+    for face in faces.face_iter_mut() {
+        let corners: Vec<Point3> = face.iter().map(|v| positions[v.pos]).collect();
+        let area = (corners[1] - corners[0]).cross(corners[2] - corners[0]);
+        let longest = corners
+            .iter()
+            .circular_tuple_windows()
+            .map(|(a, b)| a.distance(*b))
+            .fold(0.0, f64::max);
+        if area.magnitude() <= TOLERANCE * longest {
+            continue;
+        }
+        let normal = face.iter().fold(Vector3::zero(), |normal, v| {
+            normal + v.nor.map(|i| normals[i]).unwrap_or_else(Vector3::zero)
+        });
+        if normal.dot(area) < 0.0 {
+            face.reverse();
+        }
+    }
 }
 
 /// Converts triangulation into `PolygonMesh`.

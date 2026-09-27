@@ -113,10 +113,13 @@ pub fn try_fillet_solid_along_wire<R: ScalarFunctionD1>(
 /// Equal-radius blends on selected edges of a modeling solid, including spherical corners.
 ///
 /// The convex planar construction is described by [`super::fillet_edges`]. Nonconvex
-/// boundaries also support orthogonal planar neighborhoods with three edges per touched
-/// vertex, retaining unrelated curves and holes. Two convex or two concave edges meet at
-/// an elliptical miter. Three edges of the same sense have a spherical corner; two convex
-/// edges meeting a concave edge have a tangent toroidal corner. Other mixed junctions are
+/// boundaries also support planar neighborhoods with three edges per touched vertex,
+/// retaining unrelated curves and holes. A single edge ends on the plane of the remaining
+/// face, elliptically when oblique. Two convex or two concave edges meet at an elliptical
+/// miter when their shared face is perpendicular to the others. Three edges of the same
+/// sense have a spherical corner at any angles. One or two convex edges meeting a concave
+/// edge have a tangent toroidal corner when the face the convex edges share is
+/// perpendicular to the two walls, which may meet at any angle. Other mixed junctions are
 /// unsupported. Contacts must fit the adjacent faces and avoid holes within twice `tol`.
 /// Straight edges between planes or a plane and an axial cylindrical ruling also support
 /// curved end faces. Connected channel rims meet at exact intersections of the blend

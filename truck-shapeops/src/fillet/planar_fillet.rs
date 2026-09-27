@@ -1,5 +1,4 @@
 use super::planar::{neighborhood, valid_boundaries};
-use itertools::Itertools;
 use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};
 use std::result::Result;
 use truck_base::diagnostics::{Code, Diagnostic};
@@ -53,18 +52,11 @@ pub(super) fn fillet(
         let mut faces: Vec<_> = incident.iter().flat_map(|&k| data.sides[k]).collect();
         faces.sort_unstable();
         faces.dedup();
-        if faces.len() != 3
-            || faces.iter().array_combinations().any(|[&a, &b]| {
-                data.planes[a]
-                    .unwrap()
-                    .0
-                    .dot(data.planes[b].unwrap().0)
-                    .abs()
-                    > TOLERANCE
-            })
-        {
+        if faces.len() != 3 {
             return Err(error(Code::UnsupportedGeometry));
         }
+        let normal = |f: usize| data.planes[f].unwrap().0;
+        let orthogonal = |a: usize, b: usize| normal(a).dot(normal(b)).abs() <= TOLERANCE;
         let vertex = &data.vertices[v];
         let end_index = |k: usize| usize::from(data.original_edges[k].front() != vertex);
         let mut contact = |k: usize, f: usize, point: &Vertex| {
@@ -87,15 +79,30 @@ pub(super) fn fillet(
             let top = common(a, b)?;
             let f = common(a, c)?;
             let g = common(b, c)?;
-            let [n, m, l] = [top, f, g].map(|f| data.planes[f].unwrap().0);
-            let center = vertex.point() + radius * (m + l - n);
+            // The rounds of the top rim sweep a torus around the concave round, which needs
+            // the top face perpendicular to both walls; the walls may meet at any angle.
+            if !orthogonal(top, f) || !orthogonal(top, g) {
+                return Err(error(Code::UnsupportedGeometry));
+            }
+            let [n, m, l] = [top, f, g].map(normal);
+            let plane = |f: usize, offset: f64| (normal(f), data.planes[f].unwrap().1 + offset);
+            let center = solve([plane(top, -radius), plane(f, radius), plane(g, radius)])
+                .ok_or_else(|| error(Code::UnsupportedGeometry))?;
             let root_a = Vertex::new(center - radius * m);
             let root_b = Vertex::new(center - radius * l);
             let top_a = Vertex::new(root_a.point() + radius * (n - m));
             let pair = chosen.len() == 2;
-            let top_b = Vertex::new(
-                root_b.point() + radius * if pair { n - 3_f64.sqrt() * m } else { n - l },
-            );
+            // Along the wall of an unselected edge, the direction away from the other wall.
+            let along = (m.dot(l) * l - m).normalize();
+            if pair && m.dot(l) >= 0.5 - TOLERANCE {
+                // The torus would meet the wall before it leaves the other wall.
+                return Err(error(Code::UnsupportedGeometry));
+            }
+            let top_b = Vertex::new(if pair {
+                center + radius * (n - l + 3_f64.sqrt() * along)
+            } else {
+                root_b.point() + radius * (n - l)
+            });
             for (k, face, p) in [
                 (a, top, &top_a),
                 (a, f, &root_a),
@@ -135,8 +142,8 @@ pub(super) fn fillet(
                     .search_parameter(top_b.point(), None, 100)
                     .ok_or_else(|| error(Code::BlendConstructionFailed))?;
                 let edge: Edge = super::create_pcurve_edge(
-                    (&root_b, uv0, n - m),
-                    (&top_b, uv1, -m),
+                    (&root_b, uv0, n + along),
+                    (&top_b, uv1, along),
                     wall.clone(),
                 )
                 .ok_or_else(|| error(Code::BlendConstructionFailed))?;
@@ -160,23 +167,37 @@ pub(super) fn fillet(
         }
         let s = sign(chosen[0]);
         let touched: HashSet<_> = chosen.iter().flat_map(|&k| data.sides[k]).collect();
-        let center = vertex.point()
-            - s * radius
-                * touched
-                    .iter()
-                    .map(|&f| data.planes[f].unwrap().0)
-                    .sum::<Vector3>();
+        let center = solve([faces[0], faces[1], faces[2]].map(|f| {
+            let (n, d) = data.planes[f].unwrap();
+            (n, d - if touched.contains(&f) { s * radius } else { 0. })
+        }))
+        .ok_or_else(|| error(Code::UnsupportedGeometry))?;
+        // A single round ends on the plane of the remaining face, an ellipse when that plane
+        // is oblique to the edge.
+        let termination = match chosen[..] {
+            [k] => {
+                let end = *faces.iter().find(|f| !touched.contains(f)).unwrap();
+                let edge = &data.original_edges[k];
+                let axis = (edge.back().point() - edge.front().point()).normalize();
+                (normal(end).cross(axis).magnitude() > TOLERANCE).then_some((normal(end), axis))
+            }
+            _ => None,
+        };
         let mut face_contacts: HashMap<_, _> = touched
             .iter()
             .map(|&f| {
-                (
-                    f,
-                    Vertex::new(center + s * radius * data.planes[f].unwrap().0),
-                )
+                let mut point = center + s * radius * normal(f);
+                if let Some((n, axis)) = termination {
+                    point -= axis * (n.dot(point - vertex.point()) / n.dot(axis));
+                }
+                (f, Vertex::new(point))
             })
             .collect();
         let miter = if chosen.len() == 2 {
             let shared = common(chosen[0], chosen[1])?;
+            if faces.iter().any(|&f| f != shared && !orthogonal(f, shared)) {
+                return Err(error(Code::UnsupportedGeometry));
+            }
             let tip = Vertex::new(vertex.point() - s * radius * data.planes[shared].unwrap().0);
             for &f in &faces {
                 if f != shared {
@@ -197,7 +218,7 @@ pub(super) fn fillet(
                 vertex.point(),
             ))
         } else {
-            None
+            termination.map(|(n, _)| (n, vertex.point()))
         };
         for &k in incident {
             let [a, b] = data.sides[k];
@@ -374,7 +395,7 @@ pub(super) fn fillet(
             .iter()
             .map(|&f| s * data.planes[f].unwrap().0)
             .collect();
-        let y = normals.iter().sum::<Vector3>().normalize();
+        let y = (data.vertices[v].point() - center).normalize();
         let z = normals[0].cross(y).normalize();
         let x = y.cross(z);
         let transform = Matrix4::from_cols(
@@ -398,6 +419,12 @@ pub(super) fn fillet(
         return Err(error(Code::InvalidOutputTopology));
     }
     Ok(result)
+}
+/// The common point of three planes `n · p = d`.
+fn solve(planes: [(Vector3, f64); 3]) -> Option<Point3> {
+    let [(a, d), (b, e), (c, f)] = planes;
+    let inverse = Matrix3::from_cols(a, b, c).transpose().invert()?;
+    Some(Point3::from_vec(inverse * Vector3::new(d, e, f)))
 }
 fn circle(a: &Vertex, b: &Vertex, center: Point3) -> Edge {
     let u = a.point() - center;
