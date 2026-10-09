@@ -173,7 +173,13 @@ pub(super) fn neighborhood(
         {
             continue;
         }
-        if edges.len() != 3 {
+        if edges.len() != 3
+            && edges
+                .iter()
+                .filter(|&&k| selected.contains(&original_edges[k].id()))
+                .count()
+                != 1
+        {
             return Err(error(Code::UnsupportedTopology));
         }
         for &k in edges {

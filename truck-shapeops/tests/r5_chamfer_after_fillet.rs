@@ -158,14 +158,24 @@ fn invalid_wires_and_distances_leave_input_unchanged() {
         (0.2, f64::INFINITY, TOL),
         (0.2, 0.2, 0.0),
         (0.2, 0.2, f64::NAN),
-        (1.0, 0.2, TOL),
-        (1.1, 0.2, TOL),
         (0.2, 10.0, TOL),
     ] {
         assert!(
             chamfer_solid_along_wire(&solid, &wire, d0, d1, tol).is_none(),
             "accepted distances {d0}, {d1}, tolerance {tol}"
         );
+    }
+    for inset in [1_f64, 1.1] {
+        let depth = 0.2;
+        let result = chamfer_solid_along_wire(&solid, &wire, inset, depth, TOL)
+            .expect("consumed circular contacts become cone tips and planar ridges");
+        let corner = 1. - std::f64::consts::PI / 4.;
+        let volume = 1000. - 40. * corner - 20. * inset * depth
+            + 4. / 3. * inset * inset * depth
+            + 4. * corner * (depth - depth / (3. * inset));
+        common::assert_solid(&result.solid, volume, &[0], TOL);
+        assert_step(&result.solid, volume);
+        assert_eq!(serde_json::to_string(&solid.compress()).unwrap(), before);
     }
     let mut scrambled = wire.clone();
     scrambled.swap(0, 2);

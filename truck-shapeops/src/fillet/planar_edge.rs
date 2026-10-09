@@ -128,20 +128,11 @@ pub(super) fn blend(
     let mut transitions = Vec::new();
     let mut range = (0_f64, length);
     for vertex in [start, finish] {
-        let ends: Vec<_> = shell
-            .iter()
-            .enumerate()
-            .filter(|(f, face)| {
-                *f != a && *f != b && face.vertex_iter().any(|v| v.id() == vertex.id())
-            })
-            .map(|(f, _)| f)
-            .collect();
-        let [end] = *ends.as_slice() else {
-            return Err(error(Code::UnsupportedTopology));
-        };
+        let (end, last, walk) =
+            end_walk(shell, [a, b], id, vertex).ok_or_else(|| error(Code::UnsupportedTopology))?;
         let mut points = Vec::new();
         let mut paths = Vec::new();
-        for (side, origin) in [(a, p), (b, q)] {
+        for (side, origin, end) in [(a, p, end), (b, q, last)] {
             let line = Line(origin, origin + axis);
             let (point, path) = trim_contact(
                 shell,
@@ -161,7 +152,7 @@ pub(super) fn blend(
             points.push(point);
             paths.push(path);
         }
-        transitions.push(paths);
+        transitions.push((paths, walk));
         contact.push([points[0].clone(), points[1].clone()]);
         end_faces.push(end);
     }
@@ -202,7 +193,7 @@ pub(super) fn blend(
     let mut connectors = HashMap::default();
     for end in 0..2 {
         let mut points = vec![contact[end][0].clone()];
-        let paths = &transitions[end];
+        let (paths, walk) = &transitions[end];
         let initial = end_faces[end];
         let mut walls = Vec::new();
         let mut current = paths[0]
@@ -213,6 +204,7 @@ pub(super) fn blend(
             .enumerate()
             .rev()
             .map(|(i, (e, v, _))| (e, v, if i == 0 { initial } else { paths[0][i - 1].2 }))
+            .chain(walk.iter().map(|(e, v, f)| (e, v, *f)))
             .chain(paths[1].iter().map(|(e, v, f)| (e, v, *f)))
         {
             let direction = edge.back().point() - edge.front().point();
@@ -419,6 +411,45 @@ pub(super) fn blend(
         return Err(error(Code::InvalidOutputTopology));
     }
     Ok(result)
+}
+
+#[allow(clippy::type_complexity)]
+pub(super) fn end_walk(
+    shell: &Shell,
+    [a, b]: [usize; 2],
+    selected: EdgeID,
+    vertex: &Vertex,
+) -> Option<(usize, usize, Vec<(Edge, Vertex, usize)>)> {
+    let mut previous = shell[a]
+        .edge_iter()
+        .find(|edge| edge.id() != selected && (edge.front() == vertex || edge.back() == vertex))?;
+    let mut current = shell
+        .iter()
+        .enumerate()
+        .find(|(i, face)| *i != a && face.edge_iter().any(|e| e.id() == previous.id()))?
+        .0;
+    let initial = current;
+    let mut walk = Vec::new();
+    for _ in 0..shell.len() {
+        if current == a || current == b {
+            return None;
+        }
+        let other = shell[current].edge_iter().find(|edge| {
+            edge.id() != previous.id() && (edge.front() == vertex || edge.back() == vertex)
+        })?;
+        let next = shell
+            .iter()
+            .enumerate()
+            .find(|(i, face)| *i != current && face.edge_iter().any(|e| e.id() == other.id()))?
+            .0;
+        if next == b {
+            return Some((initial, current, walk));
+        }
+        walk.push((other.clone(), vertex.clone(), next));
+        previous = other;
+        current = next;
+    }
+    None
 }
 
 fn cylinder_miter(a: &Surface, b: &Surface, endpoints: [Point3; 2]) -> Option<Plane> {

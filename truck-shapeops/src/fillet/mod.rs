@@ -478,6 +478,7 @@ where
 mod along_wire;
 pub use along_wire::{fillet_along_wire, try_fillet_along_wire};
 mod chamfer;
+mod chamfer_collapse;
 pub use chamfer::{chamfer_along_wire, chamfer_with_side, simple_chamfer, try_chamfer_along_wire};
 
 mod chamfer_edges;

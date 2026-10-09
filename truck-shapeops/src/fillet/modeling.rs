@@ -125,6 +125,9 @@ pub fn try_fillet_solid_along_wire<R: ScalarFunctionD1>(
 /// curved end faces. Connected channel rims meet at exact intersections of the blend
 /// surfaces, including elliptical miters between equal-radius cylinders. Contacts may
 /// extend across adjacent end-face patches while preserving the original support surfaces.
+/// A single selected edge may end at several planar faces, such as the miter between two
+/// earlier chamfers; its cylindrical round is trimmed against each face. Other selected
+/// edges can still meet at three-edge spherical corners in the same operation.
 /// The operation must not intersect distant faces or another boundary. Returns `None` on
 /// unsupported input without modifying it. An empty selection returns the original solid
 /// and empty history.
@@ -335,11 +338,15 @@ pub fn try_chamfer_solid_edges_with_distances(
     finish(solid, index, shell).map_err(|e| e.operation(operation))
 }
 
-/// Chamfers a closed tangent-continuous wire of a modeling solid.
+/// Chamfers an open or closed tangent-continuous wire of a modeling solid.
 ///
 /// Distances and supported geometry are described by [`super::chamfer_along_wire`]. Reversing
 /// the wire exchanges the sides associated with `d0` and `d1`. Returns `None` on invalid input
 /// or failed construction without modifying the input solid.
+/// On a planar rim bounded by perpendicular planes and convex cylinders, an inset may
+/// consume circular contacts. These corners end in exact conical tips; adjacent planar
+/// chamfers share a ridge beyond each tip. Consumed arcs must be bounded by straight edges.
+/// Open chains must terminate on straight edges and the cuts must retain the support faces.
 pub fn chamfer_solid_along_wire(
     solid: &Solid,
     wire: &Wire,
@@ -377,6 +384,10 @@ pub fn try_chamfer_solid_along_wire(
         ));
     }
     let shell = super::try_chamfer_along_wire(&solid.boundaries()[index], wire, d0, d1, tol)
+        .or_else(|error| {
+            super::chamfer_collapse::chamfer(&solid.boundaries()[index], wire, d0, d1, tol)
+                .ok_or(error)
+        })
         .map_err(|e| e.operation(operation).shell(index))?;
     finish(solid, index, shell).map_err(|e| e.operation(operation))
 }
