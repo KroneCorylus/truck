@@ -7,7 +7,7 @@
       "tracked_changes": "M src/BOPAlgo/BOPAlgo_PaveFiller.cxx\n M src/BRepAlgoAPI/BRepAlgoAPI_BuilderAlgo.cxx\n M src/IntTools/IntTools_FaceFace.cxx"
     },
     "truck": {
-      "revision": "655c6bd8f38e019698d653f0a5684ab7517fb084",
+      "revision": "e0808c3c8e97258af9cb2750368760dcd0dea527",
       "revision_scope": "Latest commit outside audits/fillet-chamfer; audit-only commits do not change the kernel baseline.",
       "tracked_changes_in_modeling": ""
     },
@@ -226,7 +226,7 @@
           "role": "implementation",
           "line": 9,
           "url": "../../truck-shapeops/src/fillet/along_wire.rs#L9",
-          "sha256": "02623ad92207c5a3830728254e7325de18876acac97cf5c8f370f428566c6dd3"
+          "sha256": "1e45bbb0212009ae420958c5138ba6b27d1696189eb770895e8293a820c4fcd6"
         },
         {
           "repo": "truck",
@@ -320,7 +320,7 @@
           "role": "implementation",
           "line": 260,
           "url": "../../truck-shapeops/src/fillet/along_wire.rs#L260",
-          "sha256": "02623ad92207c5a3830728254e7325de18876acac97cf5c8f370f428566c6dd3"
+          "sha256": "1e45bbb0212009ae420958c5138ba6b27d1696189eb770895e8293a820c4fcd6"
         }
       ],
       "required_outcome": "Taper a blend continuously to zero radius at an endpoint without leaving an invalid seam or degenerate solid."
@@ -716,7 +716,7 @@
           "role": "implementation",
           "line": 338,
           "url": "../../truck-shapeops/src/fillet/along_wire.rs#L338",
-          "sha256": "02623ad92207c5a3830728254e7325de18876acac97cf5c8f370f428566c6dd3"
+          "sha256": "1e45bbb0212009ae420958c5138ba6b27d1696189eb770895e8293a820c4fcd6"
         }
       ],
       "required_outcome": "Blend drafted or conical rims over varying cone angles and near the apex when a valid requested result exists."
@@ -752,7 +752,7 @@
           "role": "implementation",
           "line": 338,
           "url": "../../truck-shapeops/src/fillet/along_wire.rs#L338",
-          "sha256": "02623ad92207c5a3830728254e7325de18876acac97cf5c8f370f428566c6dd3"
+          "sha256": "1e45bbb0212009ae420958c5138ba6b27d1696189eb770895e8293a820c4fcd6"
         },
         {
           "repo": "truck",
@@ -775,8 +775,8 @@
         "freeform"
       ],
       "occt_scope": "Tests explicitly convert shapes to NURBS before chamfering.",
-      "truck_scope": "Fixed planar spline support recognition in the kernel and straight spline edge grouping in Pieza. The app now keeps B-spline/positive-weight NURBS segments with monotone collinear control polygons in the same junction operation as analytic lines. Planar rim fillets and asymmetric chamfers have regressions; broader representation invariance remains open.",
-      "next_case": "Compare curved support pairs and split faces across analytic/NURBS/STEP representations. Investigate the generic along-wire kernel path separately: the former app routing reached an IntersectionCurve panic instead of returning a diagnostic.",
+      "truck_scope": "Fixed planar spline support recognition, straight spline edge grouping in Pieza and bounded contact trimming in the generic kernel path. Planar rim fillets, asymmetric chamfers and sequential single-edge miter fillets have representation regressions. Broader invariance for curved supports and split faces remains open.",
+      "next_case": "Compare curved support pairs and split faces across analytic/NURBS/STEP representations, including smooth rolling continuations around existing rounds. Sequential single-edge miters now pass; this does not establish general junction or freeform parity.",
       "evidence": [
         {
           "repo": "occt",
@@ -867,6 +867,33 @@
           "line": 282,
           "url": "../../truck-shapeops/tests/drafted_fillet_miters.rs#L282",
           "sha256": "9b4dbe179040ebdf582eb97353566b7dc98d29a5e6b98119085fd47ea59ff1bc"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/along_wire.rs",
+          "find": "fn intersect_trimmed_curves",
+          "role": "implementation",
+          "line": 888,
+          "url": "../../truck-shapeops/src/fillet/along_wire.rs#L888",
+          "sha256": "1e45bbb0212009ae420958c5138ba6b27d1696189eb770895e8293a820c4fcd6"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/fillet_wire_representation.rs",
+          "find": "fn adjacent_bspline_fillets_meet_at_a_valid_miter_without_panicking",
+          "role": "test",
+          "line": 151,
+          "url": "../../truck-shapeops/tests/fillet_wire_representation.rs#L151",
+          "sha256": "301a869be38a3ead0eb7ad646838fbf7df0ecad12a799c366fe0e302b3bedea5"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/fillet_wire_representation.rs",
+          "find": "fn adjacent_nurbs_fillets_meet_at_a_valid_miter",
+          "role": "test",
+          "line": 154,
+          "url": "../../truck-shapeops/tests/fillet_wire_representation.rs#L154",
+          "sha256": "301a869be38a3ead0eb7ad646838fbf7df0ecad12a799c366fe0e302b3bedea5"
         }
       ],
       "required_outcome": "Handle equivalent physical geometry consistently when represented analytically, as exact NURBS, with split faces, or after STEP import.",
@@ -879,6 +906,10 @@
         "A STEP-linked NURBS cube supports filleting, document save/load and an upstream height change while retaining body and generated-face references. Output STEP is checked at the documented fitting tolerance, with closed tessellation and independent volume.",
         "App fix committed as 48e8fe2. cargo test --locked -p cad-core --no-fail-fast: 425 passed, 0 failed, 2 existing ignored, including the permanent imported-spline-fillet corpus case and CLI checks. cargo clippy --locked -p cad-core --all-targets completed with warnings in unchanged files.",
         "Broader suite validation found a pre-existing failure in r11_corners::unsupported_junctions_have_distinct_diagnostics: a pyramid chamfer succeeds where the test expects UnsupportedTopology. Reproduced unchanged at parent 7eb2d78d with the same Cargo.lock; the assertion is retained.",
+        "Direct kernel regressions fail on parent 38aa7217: the second adjacent single-edge fillet returns BlendConstructionFailed for analytic edges and panics in IntersectionCurve for cubic B-spline and weighted NURBS edges. Bounded, damped contact intersection with a sampled fallback seed fixes all three without changing their representations.",
+        "The new sequential miter cases check two radii, rotation/translation/scaling, reversed wires, input geometry and IDs, radius, surface normals, independent analytic volume, closed tessellation and STEP round trips. Guarded-curve unit tests forbid out-of-domain evaluations and retain rejection of disjoint curves and invalid hints. Existing collapsed-contact regressions are unchanged.",
+        "With the bounded-contact fix, the full application run reports 424 passed, 1 failed and 2 existing ignored. The failure is workflow_audit::equivalent_tubes_shell_and_blend: tube-shell rebuilds reach the unchanged 30-second limit. An isolated recheck and a fresh isolated build at Truck parent 38aa7217 / Pieza 48e8fe2 reproduce the timeout; shell checks take about 29-30 seconds in unchanged planar::valid_boundaries/contained. Fillet and chamfer cases in that workflow pass. The timeout and tests remain unchanged.",
+        "After clearing parent-comparison build artifacts, cargo test --locked -p truck-shapeops --no-fail-fast reports 291 passed, 1 failed and 1 existing ignored. All 7 new tests pass; the sole failure is the previously recorded r11_corners pyramid-chamfer assertion. cargo clippy --locked -p truck-shapeops --all-targets and targeted nightly rustfmt checks pass. The audit generator has 8 passing unit tests.",
         "These are independently specified Truck/Pieza regression fixtures, not executions of the 1,026 OCCT corpus entries."
       ]
     },
@@ -920,7 +951,7 @@
           "role": "implementation",
           "line": 269,
           "url": "../../truck-shapeops/src/fillet/along_wire.rs#L269",
-          "sha256": "02623ad92207c5a3830728254e7325de18876acac97cf5c8f370f428566c6dd3"
+          "sha256": "1e45bbb0212009ae420958c5138ba6b27d1696189eb770895e8293a820c4fcd6"
         }
       ],
       "required_outcome": "Blend along open and closed curved edges, including spline inflections and high curvature, with valid closure and contacts."
@@ -1351,11 +1382,11 @@
         {
           "repo": "truck",
           "path": "truck-shapeops/src/fillet/along_wire.rs",
-          "find": "Blending several fillets",
+          "find": "tangent junction patches between meeting rounds",
           "role": "implementation",
-          "line": 189,
-          "url": "../../truck-shapeops/src/fillet/along_wire.rs#L189",
-          "sha256": "02623ad92207c5a3830728254e7325de18876acac97cf5c8f370f428566c6dd3"
+          "line": 190,
+          "url": "../../truck-shapeops/src/fillet/along_wire.rs#L190",
+          "sha256": "1e45bbb0212009ae420958c5138ba6b27d1696189eb770895e8293a820c4fcd6"
         }
       ],
       "required_outcome": "Join four or more interacting blends at a vertex when the requested configuration has a valid solution."
@@ -1385,11 +1416,11 @@
         {
           "repo": "truck",
           "path": "truck-shapeops/src/fillet/along_wire.rs",
-          "find": "Blending several fillets",
+          "find": "tangent junction patches between meeting rounds",
           "role": "implementation",
-          "line": 189,
-          "url": "../../truck-shapeops/src/fillet/along_wire.rs#L189",
-          "sha256": "02623ad92207c5a3830728254e7325de18876acac97cf5c8f370f428566c6dd3"
+          "line": 190,
+          "url": "../../truck-shapeops/src/fillet/along_wire.rs#L190",
+          "sha256": "1e45bbb0212009ae420958c5138ba6b27d1696189eb770895e8293a820c4fcd6"
         },
         {
           "repo": "truck",
@@ -1658,7 +1689,7 @@
         "fillet"
       ],
       "occt_scope": "Start-solution failure is distinct from walking failure.",
-      "truck_scope": "Newton/contact routines have guards and failures; branch coverage across complex supports remains unverified.",
+      "truck_scope": "Contact solvers have guards and diagnostics. Along-wire contact trimming now constrains Newton evaluations to both curve domains, damps nonconvergent steps and retries a sampled seed when endpoint tangents are parallel. Competing branches across general supports remain unverified.",
       "next_case": "Multiple possible contact branches, tangent end contacts and seeds near a singularity.",
       "evidence": [
         {
@@ -1686,7 +1717,34 @@
           "role": "implementation",
           "line": 379,
           "url": "../../truck-shapeops/src/fillet/along_wire.rs#L379",
-          "sha256": "02623ad92207c5a3830728254e7325de18876acac97cf5c8f370f428566c6dd3"
+          "sha256": "1e45bbb0212009ae420958c5138ba6b27d1696189eb770895e8293a820c4fcd6"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/along_wire.rs",
+          "find": "fn contact_intersections_stay_inside_trimmed_domains",
+          "role": "test",
+          "line": 989,
+          "url": "../../truck-shapeops/src/fillet/along_wire.rs#L989",
+          "sha256": "1e45bbb0212009ae420958c5138ba6b27d1696189eb770895e8293a820c4fcd6"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/along_wire.rs",
+          "find": "fn contact_intersections_reseed_parallel_endpoint_tangents",
+          "role": "test",
+          "line": 1004,
+          "url": "../../truck-shapeops/src/fillet/along_wire.rs#L1004",
+          "sha256": "1e45bbb0212009ae420958c5138ba6b27d1696189eb770895e8293a820c4fcd6"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/along_wire.rs",
+          "find": "fn contact_intersections_reject_disjoint_curves_and_invalid_hints",
+          "role": "test",
+          "line": 1013,
+          "url": "../../truck-shapeops/src/fillet/along_wire.rs#L1013",
+          "sha256": "1e45bbb0212009ae420958c5138ba6b27d1696189eb770895e8293a820c4fcd6"
         }
       ],
       "required_outcome": "Find the intended valid contact solution near singularities and competing branches without unstable branch jumps or false failures."
@@ -1861,7 +1919,7 @@
         "sequential"
       ],
       "occt_scope": "Dedicated sequential chamfer grids and composition regressions.",
-      "truck_scope": "Many feature orders are tested; equal-radius sequential rim fillets and general topology transitions remain limited.",
+      "truck_scope": "Many feature orders are tested. Sequential single-edge rounds now form equal-radius miters for analytic, B-spline and weighted NURBS edges. Equal-radius rolling continuations around an earlier round still collapse a contact and need a different corner construction; general topology transitions remain limited.",
       "next_case": "Fillet→fillet, fillet→chamfer, chamfer→fillet and chamfer→chamfer with nearby and intersecting selections.",
       "evidence": [
         {
@@ -1890,6 +1948,15 @@
           "line": 164,
           "url": "../../truck-shapeops/tests/R10-sequential-fillet.rs#L164",
           "sha256": "002a2ea026b04280f5ffafb6c7daae0625cad7e8c3473a814e30ddd641b2d95b"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/fillet_wire_representation.rs",
+          "find": "fn adjacent_analytic_fillets_meet_at_a_valid_miter",
+          "role": "test",
+          "line": 148,
+          "url": "../../truck-shapeops/tests/fillet_wire_representation.rs#L148",
+          "sha256": "301a869be38a3ead0eb7ad646838fbf7df0ecad12a799c366fe0e302b3bedea5"
         }
       ],
       "required_outcome": "Apply successive rounds and bevels to earlier feature results with correct dimensions, valid topology and stable selections."
