@@ -6,6 +6,8 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Keep along-wire fillet contact intersections within both trimmed curve domains, damp divergent Newton steps and retry from a sampled seed when endpoint tangents are parallel. Adjacent single-edge rounds now form valid miters on analytic, cubic B-spline and weighted NURBS edges instead of failing or panicking in an intersection-curve evaluation. Regressions cover exact radius and volume, surface normals, closed tessellation, transforms, scale, reversed wires, immutable inputs and STEP round trips; collapsed rolling contacts remain rejected.
+
 - Recognize planar B-spline and positive-weight NURBS control nets in straight-edge fillet/chamfer construction. Drafted rim blends now work on equivalent spline representations, including cavity boundaries, while retaining their support surfaces and planar trim checks. Regressions cover both draft directions, two-edge and closed rims, exact volume, contact radius/tangency, transforms, scaling, selection order, immutable rejection and STEP round trips.
 
 - Add a reproducible fillet/chamfer feature parity audit against OCCT V7_9_3: 50 capability assessments and one implementation reference, all dedicated suite entries and related regressions, with source evidence, fixture dependencies and an offline searchable catalog. Assess geometric results and modeling behavior independently of API or implementation choices; measured geometry comparisons remain unverified.

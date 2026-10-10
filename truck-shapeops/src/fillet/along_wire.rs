@@ -186,8 +186,8 @@ impl<C: Clone> Cuts<C> {
 /// shell, and at every interior vertex of the chain the faces on each side must either be the
 /// same face or be separated by exactly one edge. An open chain may end at vertices with any
 /// number of faces: the fillet is trimmed against every face between the two side faces, and the
-/// edges between those faces are cut where they meet the fillet. Blending several fillets that
-/// meet at a vertex is not supported.
+/// edges between those faces are cut where they meet the fillet. An existing round can serve as
+/// an end face for a miter; tangent junction patches between meeting rounds are not constructed.
 ///
 /// Contact curves must remain regular: rounding the rim where an existing convex cylindrical
 /// fillet meets a perpendicular plane requires a smaller radius. Equal radii collapse one
@@ -851,7 +851,7 @@ fn trim_contact_edge<C: FilletedCurve<S>, S>(
     let adjacent_hint = if edge.orientation() == at_start { b } else { a };
     let range = curve.range_tuple();
     let hint = if at_start { range.0 } else { range.1 };
-    let (t, s) = search_intersection_parameter(curve, &adjacent, (hint, adjacent_hint), 100)?;
+    let (t, s) = intersect_trimmed_curves(curve, &adjacent, (hint, adjacent_hint))?;
     let p = curve.subs(t).midpoint(adjacent.subs(s));
     let vertex = if p.near(&edge.front().point()) {
         edge.front().clone()
@@ -883,4 +883,140 @@ fn trim_contact_edge<C: FilletedCurve<S>, S>(
         Some(edge.cut_with_parameter(&vertex, s)?.1)
     };
     Some((piece, vertex))
+}
+
+fn intersect_trimmed_curves<C: ParametricCurve3D + BoundedCurve>(
+    curve0: &C,
+    curve1: &C,
+    (t, s): (f64, f64),
+) -> Option<(f64, f64)> {
+    let (a, b) = curve0.range_tuple();
+    let (c, d) = curve1.range_tuple();
+    if ![a, b, c, d, t, s].iter().all(|x| x.is_finite()) || a >= b || c >= d {
+        return None;
+    }
+    let clamp = |p: Vector2| Vector2::new(p.x.clamp(a, b), p.y.clamp(c, d));
+    let solve = |mut param: Vector2| {
+        for _ in 0..=100 {
+            let (p, q) = (curve0.subs(param.x), curve1.subs(param.y));
+            if p.near2(&q) {
+                return Some(param.into());
+            }
+            let diff = p - q;
+            let (du, dv) = (curve0.der(param.x), -curve1.der(param.y));
+            let uv = du.dot(dv);
+            let jacobian = Matrix2::new(du.dot(du), uv, uv, dv.dot(dv));
+            let Some(inverse) = jacobian.invert() else {
+                return p.near(&q).then_some(param.into());
+            };
+            let step = inverse * Vector2::new(du.dot(diff), dv.dot(diff));
+            if !step.x.is_finite() || !step.y.is_finite() {
+                return None;
+            }
+            // Trimmed intersections have no guaranteed continuation outside either curve's range.
+            let mut next = None;
+            let mut fraction = 1.;
+            for _ in 0..16 {
+                let candidate = clamp(param - fraction * step);
+                let residual = curve0.subs(candidate.x) - curve1.subs(candidate.y);
+                if residual.magnitude2() < diff.magnitude2() {
+                    next = Some(candidate);
+                    break;
+                }
+                fraction *= 0.5;
+            }
+            match next {
+                Some(next) => param = next,
+                None => return p.near(&q).then_some(param.into()),
+            }
+        }
+        None
+    };
+    solve(clamp(Vector2::new(t, s))).or_else(|| {
+        let samples = |curve: &C, a: f64, b: f64| {
+            std::array::from_fn::<_, 5, _>(|i| {
+                let t = (a + (b - a) * i as f64 / 4.).clamp(a, b);
+                (t, curve.subs(t))
+            })
+        };
+        let samples0 = samples(curve0, a, b);
+        let samples1 = samples(curve1, c, d);
+        let mut nearest = (f64::INFINITY, Vector2::new(a, c));
+        for (t, p) in samples0 {
+            for (s, q) in samples1 {
+                let distance = p.distance2(q);
+                if distance < nearest.0 {
+                    nearest = (distance, Vector2::new(t, s));
+                }
+            }
+        }
+        solve(nearest.1)
+    })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[derive(Clone)]
+    struct Trimmed(BSplineCurve<Point3>);
+
+    impl ParametricCurve for Trimmed {
+        type Point = Point3;
+        type Vector = Vector3;
+        fn subs(&self, t: f64) -> Point3 {
+            assert!((0. ..=1.).contains(&t), "evaluation outside trim: {t}");
+            self.0.subs(t)
+        }
+        fn der(&self, t: f64) -> Vector3 { self.der_n(1, t) }
+        fn der2(&self, t: f64) -> Vector3 { self.der_n(2, t) }
+        fn der_n(&self, n: usize, t: f64) -> Vector3 {
+            assert!((0. ..=1.).contains(&t), "derivative outside trim: {t}");
+            self.0.der_n(n, t)
+        }
+        fn parameter_range(&self) -> ParameterRange { self.0.parameter_range() }
+    }
+    impl BoundedCurve for Trimmed {}
+
+    fn quadratic(points: [[f64; 3]; 3]) -> Trimmed {
+        Trimmed(BSplineCurve::new(
+            KnotVec::bezier_knot(2),
+            points.into_iter().map(Point3::from).collect(),
+        ))
+    }
+
+    #[test]
+    fn contact_intersections_stay_inside_trimmed_domains() {
+        let parabola = quadratic([[0., 0., 0.], [0., 0., 0.], [1., 0., 0.]]);
+        for x in [0.5, 1.] {
+            let line = quadratic([[x, -0.5, 0.], [x, 0., 0.], [x, 0.5, 0.]]);
+            // At t = 0.1, an unrestricted Newton step jumps beyond the curve's domain.
+            for hint in [(0.1, 0.5), (-1., 2.)] {
+                let (t, s) = intersect_trimmed_curves(&parabola, &line, hint).unwrap();
+                assert_near!(t, x.sqrt());
+                assert_near!(s, 0.5);
+                assert_near!(parabola.subs(t), line.subs(s));
+            }
+        }
+    }
+
+    #[test]
+    fn contact_intersections_reseed_parallel_endpoint_tangents() {
+        let parabola = quadratic([[0., 1., 0.], [0.5, 1., 0.], [1., 0., 0.]]);
+        let line = quadratic([[0., 0.5, 0.], [0.5, 0.5, 0.], [1., 0.5, 0.]]);
+        let (t, s) = intersect_trimmed_curves(&parabola, &line, (0., 0.)).unwrap();
+        assert_near!(t, 0.5_f64.sqrt());
+        assert_near!(s, t);
+    }
+
+    #[test]
+    fn contact_intersections_reject_disjoint_curves_and_invalid_hints() {
+        let parabola = quadratic([[0., 0., 0.], [0., 0., 0.], [1., 0., 0.]]);
+        let line = quadratic([[2., -0.5, 0.], [2., 0., 0.], [2., 0.5, 0.]]);
+        for hint in [(0.1, 0.5), (f64::NAN, 0.5), (0.1, f64::INFINITY)] {
+            assert!(intersect_trimmed_curves(&parabola, &line, hint).is_none());
+        }
+        let parallel = quadratic([[0., 1., 0.], [0., 1., 0.], [1., 1., 0.]]);
+        assert!(intersect_trimmed_curves(&parabola, &parallel, (0.5, 0.5)).is_none());
+    }
 }
