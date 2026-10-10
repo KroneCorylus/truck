@@ -317,18 +317,36 @@ fn fillet_to_nurbs(
     tol: f64,
 ) -> Option<NurbsSurface<Vector4>> {
     let (_, (a, b)) = surface.range_tuple();
+    if !a.is_finite() || !b.is_finite() || a >= b {
+        return None;
+    }
     // Interpolate the four homogeneous control points of each exact cross-section. Only the
     // longitudinal direction is approximated; the rational cubic across the fillet is retained.
-    for level in 0..7 {
+    for (preserve_breaks, level) in [false, true]
+        .into_iter()
+        .flat_map(|breaks| (0..7).map(move |level| (breaks, level)))
+    {
         let n = 3 * (1 << level) + 1;
         let mut knots = KnotVec::uniform_knot(3, n - 3);
         knots.transform(b - a, a);
+        if preserve_breaks {
+            // Contact tangents can change derivative at the source knots. Preserve those
+            // breaks instead of forcing a C2 fit across them.
+            let (breaks, _) = surface.vknot_vec().to_single_multi();
+            for &knot in &breaks[1..breaks.len() - 1] {
+                let count = knots.iter().filter(|&&value| value == knot).count();
+                for _ in count..3 {
+                    knots.add_knot(knot);
+                }
+            }
+        }
+        let n = knots.len() - 4;
         // Greville stations keep the clamped cubic interpolation system well-conditioned.
         let params: Vec<_> = (0..n)
             .map(|i| (knots[i + 1] + knots[i + 2] + knots[i + 3]) / 3.0)
             .collect();
         let sections: Vec<_> = params.iter().map(|&v| surface.fillet_bezier(v)).collect();
-        let rows = (0..4)
+        let Some(rows) = (0..4)
             .map(|row| {
                 Some(
                     BSplineCurve::try_interpole(
@@ -348,11 +366,19 @@ fn fillet_to_nurbs(
                     .to_vec(),
                 )
             })
-            .collect::<Option<Vec<_>>>()?;
+            .collect::<Option<Vec<_>>>()
+        else {
+            continue;
+        };
+        let (spans, _) = knots.to_single_multi();
         let nurbs: NurbsSurface<Vector4> =
             NurbsSurface::new(BSplineSurface::new((KnotVec::bezier_knot(3), knots), rows));
-        let valid = (0..=(n - 1) * 4).all(|j| {
-            let v = a + (b - a) * j as f64 / ((n - 1) * 4) as f64;
+        let mut samples = (0..=(n - 1) * 4)
+            .map(|j| a + (b - a) * j as f64 / ((n - 1) * 4) as f64)
+            .chain(spans.windows(2).flat_map(|span| {
+                (0..=4).map(move |i| span[0] + (span[1] - span[0]) * i as f64 / 4.0)
+            }));
+        let valid = samples.all(|v| {
             (0..=8).all(|i| {
                 let u = i as f64 / 8.0;
                 let error = nurbs.subs(u, v).distance(surface.subs(u, v));
