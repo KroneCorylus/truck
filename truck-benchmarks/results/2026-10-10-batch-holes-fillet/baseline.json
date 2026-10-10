@@ -1,0 +1,11 @@
+{
+  "parent": "ad3b76fa393d7db89d274866cf955acc1a8cce4f",
+  "parent_binaries_from": "truck-benchmarks/results/2026-10-10-all-benchmarks",
+  "source_files_checked": [
+    "truck-modeling/src/geometry.rs",
+    "truck-shapeops/src/transversal/integrate/mod.rs",
+    "truck-shapeops/src/transversal/integrate/through_hole.rs",
+    "truck-benchmarks/examples/compare_occt.rs"
+  ],
+  "dependency_lock_sha256": "58085733bd90cdb3ef2b8611cd443e22dae3281b715d5bdbca8707f3238d58bb"
+}

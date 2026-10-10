@@ -1,0 +1,22 @@
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-modeling)
+    Finished `release` profile [optimized] target(s) in 1.57s
+     Running unittests src/lib.rs (target/release/deps/truck_modeling-cd403b47d5ae25bb)
+
+running 1 test
+test geometry::inclusion_tests::sampled_inclusion_reuses_searches_without_dropping_samples ... FAILED
+
+failures:
+
+---- geometry::inclusion_tests::sampled_inclusion_reuses_searches_without_dropping_samples stdout ----
+
+thread 'geometry::inclusion_tests::sampled_inclusion_reuses_searches_without_dropping_samples' (622187) panicked at truck-modeling/src/geometry/inclusion_tests.rs:99:9:
+repeated full-surface searches: 33
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    geometry::inclusion_tests::sampled_inclusion_reuses_searches_without_dropping_samples
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-modeling --lib`

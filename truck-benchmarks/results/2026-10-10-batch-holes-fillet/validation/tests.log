@@ -1,0 +1,752 @@
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-modeling)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 37.43s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running unittests src/lib.rs (target/release/deps/truck_modeling-7dfa5953689ab7c9)
+
+running 12 tests
+****** test of the expressions of error messages ******
+
+Two same vertices cannot construct an edge.
+
+cannot attach a plane to a wire that is not on one plane.
+
+*******************************************************
+test errors::print_messages ... ok
+test geom_impls::test_geom_impl::test_take_one_axis_by_normal ... ok
+test geom_impls::test_geom_impl::test_circum_center ... ok
+test geom_impls::test_geom_impl::test_circle_arc ... ok
+test geom_impls::test_geom_impl::test_circle_arc_tangent0 ... ok
+test geometry::inclusion_tests::sampled_inclusion_reuses_searches_without_dropping_samples ... ok
+test geom_impls::test_geom_impl::test_circle_arc_three_point ... ok
+test geom_impls::test_geom_impl::test_attach_plane_with_multiple_boundary ... ok
+test builder::partial_torus::partial_torus ... ok
+test geometry::inclusion_tests::inclusion_preserves_periodic_seams_poles_and_transformed_curves ... ok
+test geom_impls::test_geom_impl::test_attach_plane_with_single_boundary ... ok
+test geometry::inclusion_tests::bad_seeded_results_fall_back_and_off_surface_curves_stay_rejected ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/conic.rs (target/release/deps/conic-f7d33e46ffe1af56)
+
+running 3 tests
+test circle_arc_by_tangent_is_conic ... ok
+test inverted_conic_reverses_and_stays_exact ... ok
+test circle_arc_by_transit_is_conic ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/conic_extrusion_inclusion.rs (target/release/deps/conic_extrusion_inclusion-8eea8f62d504b5b0)
+
+running 1 test
+test exact_cylinder_boundaries_include_at_small_and_large_scales ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/cylinder_search.rs (target/release/deps/cylinder_search-7310287767e1c044)
+
+running 3 tests
+test unsupported_cylinder_seeds_fall_back ... ok
+test explicit_hints_and_other_extrusions_keep_general_search ... ok
+test round_cylinders_match_general_projection ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/elementary.rs (target/release/deps/elementary-da1d6ac215269fe7)
+
+running 6 tests
+test extruded_disk_gives_cylinder ... ok
+test other_surfaces_are_not_elementary ... ok
+test transformed_and_inverted_surface_keeps_its_kind ... ok
+test revolved_profile_gives_planes_cylinder_and_cone ... ok
+test revolved_disk_gives_torus ... ok
+test revolved_half_circle_gives_sphere ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/extruded.rs (target/release/deps/extruded-e1bb2e82b533e65b)
+
+running 1 test
+test tsweep_of_disk_keeps_extruded_conic ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/loft_alignment.rs (target/release/deps/loft_alignment-94a922205be226da)
+
+running 1 test
+test translated_closed_sections_preserve_correspondence_and_winding ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/nurbs_cylinder.rs (target/release/deps/nurbs_cylinder-d6bc3b4d931027ad)
+
+running 4 tests
+test elliptic_or_nonruled_rational_surfaces_are_not_cylinders ... ok
+test non_bezier_knot_spans_are_not_assumed_to_be_circular ... ok
+test reversed_native_cylinder_offsets_preserve_orientation ... ok
+test rational_ruled_cylinders_have_exact_typed_offsets ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/offset.rs (target/release/deps/offset-673da4e6711fe273)
+
+running 6 tests
+test extruded_circle_changes_radius ... ok
+test plane_moves_along_its_normal ... ok
+test inverted_revolution_offsets_along_the_inverted_normal ... ok
+test splines_have_no_typed_offset ... ok
+test revolved_line_moves_a_cylinder_and_a_cone ... ok
+test revolved_circles_give_a_sphere_and_a_torus ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/revolved_search.rs (target/release/deps/revolved_search-0a5f3527224430b2)
+
+running 2 tests
+test revolved_cylinder_inverse_preserves_membership_and_orientation ... ok
+test native_revolved_nearest_matches_grid_search_under_similarity_transforms ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+
+     Running tests/topo_traits.rs (target/release/deps/topo_traits-1fee4e9c9db70591)
+
+running 15 tests
+test edge_sweep ... ok
+test edge_multi_sweep ... ok
+test edge_closed_sweep ... ok
+test face_sweep ... ok
+test face_closed_sweep ... ok
+test face_multi_sweep ... ok
+test vertex_multi_sweep ... ok
+test shell_sweep ... ok
+test shell_closed_sweep ... ok
+test vertex_sweep ... ok
+test vertex_closed_sweep ... ok
+test shell_multi_sweep ... ok
+test wire_closed_sweep ... ok
+test wire_multi_sweep ... ok
+test wire_sweep ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/release/deps/truck_shapeops-ee3a1558f73a21f9)
+
+running 33 tests
+test fillet::projected_section::tests::oblique_plane_section_preserves_exact_conic_at_different_scales ... ok
+test healing::tests::test_split_closed_edges ... ok
+test fillet::modeling::output_tests::topological_closure_does_not_accept_off_surface_boundaries ... ok
+test healing::tests::double_closed_boundary_cylinder ... ok
+test healing::tests::test_split_closed_face_simple_cylinder_case ... ok
+test local::intersect::section_tests::oblique_cone_sections_satisfy_both_surfaces ... ok
+test healing::tests::test_split_closed_face_cylinder_with_hole ... ok
+test transversal::divide_face::tests::division_traces_cut_edges_without_solving_them ... ok
+test healing::tests::many_closed_boundary_cylinder ... ok
+test transversal::divide_face::tests::divide_plane_test ... ok
+test healing::tests::test_split_closed_face_cylinder_with_rotated_hole ... ok
+test healing::tests::too_simple_cylinder ... ok
+test transversal::integrate::through_hole::tests::section_accepts_reversed_curve_parameters ... ok
+test transversal::intersection_curve::tests::intersection_curve_sphere_case ... ok
+test transversal::loops_store::tests::boundary_splits_keep_contacts_and_endpoints_but_not_samples_along_an_edge ... ok
+test transversal::loops_store::tests::boundary_boxes_preserve_near_edge_contacts ... ok
+test transversal::intersection_curve::tests::samples_crossing_a_periodic_seam_still_name_their_points ... ok
+test transversal::integrate::through_hole::tests::ambiguous_and_unsupported_cuts_defer_to_general_boolean ... ok
+test transversal::loops_store::tests::four_branches_at_interior_vertex ... ok
+test transversal::polyline_construction::tests::construct_polylines_positive0 ... ok
+test transversal::integrate::through_hole::tests::batch_rejects_overlapping_touching_nested_and_unsupported_cutters ... ok
+test transversal::polyline_construction::tests::construct_polylines_positive1 ... ok
+test transversal::polyline_construction::tests::construct_polylines_positive2 ... ok
+test transversal::polyline_construction::tests::construct_polylines_positive3 ... ok
+test transversal::intersection_curve::tests::tangent_contact_refines_a_mesh_seed ... ok
+test transversal::intersection_curve::tests::tangent_curvature_classification ... ok
+test healing::tests::step_import ... ok
+test transversal::faces_classification::tests::independent_intersection ... ok
+test transversal::divide_face::tests::independent_intersection ... ok
+test transversal::loops_store::tests::crossing_edges ... ok
+test transversal::intersection_curve::tests::collide_parabola ... ok
+test transversal::loops_store::tests::independent_intersection ... ok
+test transversal::loops_store::tests::rotated_intersection ... ok
+
+test result: ok. 33 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+     Running tests/R10-sequential-fillet.rs (target/release/deps/R10_sequential_fillet-fb6bd51e7e27b261)
+
+running 4 tests
+test first_fillet_input_and_second_wire_control ... ok
+test adjacent_second_fillet_must_not_panic_or_mutate_input ... ok
+test smaller_second_radius_on_original_fixture_preserves_geometry_and_history ... ok
+test sequential_radii_sizes_and_edge_orders ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 12.30s
+
+     Running tests/R12-face-extrude-round.rs (target/release/deps/R12_face_extrude_round-76261653155613be)
+
+running 5 tests
+test step_round_trip ... ok
+test disk_face_extension ... ok
+test planar_face_with_two_circular_holes ... ok
+test annular_face_extension ... ok
+test subsequent_booleans ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.37s
+
+     Running tests/R7-R8-extrude-remove.rs (target/release/deps/R7_R8_extrude_remove-f0832d1903829077)
+
+running 4 tests
+test sequential_conic_union_then_subtract ... ok
+test reflected_conics_cut_in_the_positive_z_direction ... ok
+test equivalent_conics_must_preserve_the_reference_volume ... ok
+test original_nurbs_remove_preserves_the_reference_volume ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.64s
+
+     Running tests/analytic_holes.rs (target/release/deps/analytic_holes-1bdcccfc9bc0dc6b)
+
+running 10 tests
+test through_hole_preserves_remote_faces_and_exact_circles ... ok
+test concave_outline_uses_material_winding ... ok
+test cap_parameter_origins_do_not_change_the_cut_height ... ok
+test reversed_axis_and_many_arc_segments_make_exact_holes ... ok
+test mixed_through_and_blind_batch_preserves_general_boolean_behavior ... ok
+test batch_combines_new_holes_and_empty_space_without_rebuilding_old_walls ... ok
+test overlapping_and_blind_cuts_after_an_exact_hole_use_the_general_solver ... ok
+test batch_holes_preserve_faces_and_exact_curves_under_transforms ... ok
+test repeated_holes_under_rigid_transforms_keep_unchanged_faces ... ok
+test thin_cylindrical_wall_and_empty_space_preserve_faces ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s
+
+     Running tests/annular_booleans.rs (target/release/deps/annular_booleans-75585652c8190ae0)
+
+running 1 test
+test annular_cuts_preserve_the_inner_web_and_counterbores_preserve_the_through_hole ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+
+     Running tests/app_sphere_bore.rs (target/release/deps/app_sphere_bore-4fcc18982a475873)
+
+running 1 test
+test app_revolved_sphere_in_equal_radius_bore ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/bench_plate.rs (target/release/deps/bench_plate-4ba14a1c7f7f44d8)
+
+running 1 test
+test plate_with_holes ... ignored
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/blend_limits.rs (target/release/deps/blend_limits-c0babdf1458ff779)
+
+running 2 tests
+test near_limit_chamfer_preserves_miter_contract ... ok
+test near_limit_fillet_retains_valid_small_faces ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.81s
+
+     Running tests/boolean.rs (target/release/deps/boolean-70442bfb51ff43a4)
+
+running 27 tests
+test cube_is_valid ... ok
+test cylinder_is_valid ... ok
+test subtract_boxes_sharing_edge ... ok
+test union_disjoint_cubes ... ok
+test union_boxes_sharing_corner ... ok
+test intersect_inner_box_sharing_faces ... ok
+test union_boxes_sharing_edge ... ok
+test punched_cube ... ok
+test subtract_stacked_cube ... ok
+test union_inner_box_sharing_faces ... ok
+test union_offset_stacked_cubes ... ok
+test subtract_flush_pocket ... ok
+test subtract_cylinder_on_plane ... ok
+test punched_cube_mesh_closed ... ok
+test union_offset_stacked_cubes_counts ... ok
+test union_stacked_cubes ... ok
+test punched_cube_rotated_seam ... ok
+test union_cylinder_standing_on_cube ... ok
+test union_cylinder_on_plane ... ok
+test punched_cube_edges_are_smooth ... ok
+test punched_cube_tolerance_stability ... ok
+test tangent_rod_in_equal_width_slot ... ok
+test tangent_steinmetz_intersection ... ok
+test sphere_is_valid ... ok
+test tangent_steinmetz_union ... ok
+test union_sphere_on_plane ... ok
+test tangent_sphere_in_equal_radius_bore ... ok
+
+test result: ok. 27 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/boolean_cache.rs (target/release/deps/boolean_cache-870d803600c0cce1)
+
+running 2 tests
+test sampling_does_not_change_equality_or_serialization ... ok
+test cached_and_uncached_booleans_are_identical ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/boolean_hole_fillet.rs (target/release/deps/boolean_hole_fillet-17d5b831372cc273)
+
+running 1 test
+test boolean_hole_rims_are_closed_consistent_and_have_the_expected_volume ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.63s
+
+     Running tests/chamfer.rs (target/release/deps/chamfer-1af5df2b04e81921)
+
+running 3 tests
+test chamfer_cube_asymmetric ... ok
+test chamfer_cube_symmetric ... ok
+test chamfer_edge_of_half_cylinder ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/chamfer_general.rs (target/release/deps/chamfer_general-861dcc4b338d5228)
+
+running 15 tests
+test a_flat_face_seam_is_not_a_concave_chamfer ... ok
+test concave_chamfers_reject_collapsed_neighbours ... ok
+test oversized_unequal_distances_preserve_the_input ... ok
+test an_untouched_four_edge_vertex_does_not_block_a_chamfer ... ok
+test three_edge_corners_do_not_require_a_globally_convex_body ... ok
+test chamfers_reject_hole_collisions_without_changing_the_body ... ok
+test concave_chamfers_measure_distances_on_oblique_support_faces ... ok
+test asymmetric_three_edge_corner_matches_an_affine_scaled_reference ... ok
+test mixed_three_way_chamfer_has_a_transition_face_above_the_inside_bevel ... ok
+test isolated_inset_edges_have_valid_planar_terminations ... ok
+test asymmetric_inset_chamfers_keep_their_contact_distances_and_order ... ok
+test concave_cavity_edges_and_mixed_disjoint_selections_preserve_volume ... ok
+test mixed_corner_transitions_support_distinct_setbacks_and_both_ends ... ok
+test concave_chamfers_add_material_and_preserve_distance_sides ... ok
+test holes_elsewhere_do_not_disable_a_planar_chamfer ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/channel_boundary.rs (target/release/deps/channel_boundary-d8b7ade1aafac7c4)
+
+running 1 test
+test a_cut_along_cylinder_seams_keeps_each_straight_rim_whole ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/channel_rim_blends.rs (target/release/deps/channel_rim_blends-a2c67df77f2ae1ca)
+
+running 4 tests
+test channel_lip_blends_reject_collapsed_outer_walls_without_mutation ... ok
+test cylindrical_channel_lips_round_independently_and_together ... ok
+test cylindrical_channel_lips_chamfer_with_equal_and_unequal_distances ... ok
+test connected_channel_rims_share_exact_miters_and_preserve_the_circular_channel ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.39s
+
+     Running tests/collapsed_trim.rs (target/release/deps/collapsed_trim-07422ff353e7ab33)
+
+running 1 test
+test thin_circular_segment_solid_keeps_shared_edges_when_refined ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/corner_hole.rs (target/release/deps/corner_hole-622da1fb8e011794)
+
+running 2 tests
+test blind_hole_at_exact_box_corner_retains_closed_quarter_bore ... ok
+test through_holes_and_counterbores_cross_cylinder_seams_at_plate_boundaries ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/curved_blend_ends.rs (target/release/deps/curved_blend_ends-8952fd1499e5f73b)
+
+running 4 tests
+test oversized_curved_end_blends_fail_without_changing_the_input ... ok
+test revolved_cylinder_terminations_preserve_exact_geometry ... ok
+test curved_terminations_can_turn_beyond_the_contact_line_endpoints ... ok
+test straight_blends_extend_and_trim_cylindrical_end_faces ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.49s
+
+     Running tests/cut_plate_workflows.rs (target/release/deps/cut_plate_workflows-f6cddaefa2422524)
+
+running 3 tests
+test semicircular_notch_chamfer_trims_both_open_ends ... ok
+test notch_fillet_meets_perimeter_fillets_at_collapsed_contact_edges ... ok
+test pocket_shell_reintersects_the_cylindrical_floor_join ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.37s
+
+     Running tests/diagnostics.rs (target/release/deps/diagnostics-db4592ec23ff2771)
+
+running 11 tests
+test invalid_parameters_preserve_operation_and_nonfinite_values ... ok
+test an_empty_surface_intersection_is_success_but_required_missing_boundaries_are_errors ... ok
+test input_topology_preserves_operand_and_coded_source ... ok
+test local_errors_identify_selection_and_parameters ... ok
+test blend_selection_errors_are_actionable_and_do_not_mutate_input ... ok
+test meshing_reports_all_omissions_and_strict_path_rejects_them ... ok
+test variable_radius_failure_identifies_the_derivative_and_station ... ok
+test empty_and_unchanged_results_remain_successful ... ok
+test nesting_orientation_and_unrepresentable_results_are_distinct ... ok
+test unsupported_planarity_has_a_face_location ... ok
+test local_reintersection_reports_the_actual_unsupported_neighbour ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/drafted_annulus.rs (target/release/deps/drafted_annulus-faff9a5dc3b18bc4)
+
+running 1 test
+test inner_and_outer_cylindrical_walls_draft_together ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.40s
+
+     Running tests/fillet.rs (target/release/deps/fillet-6ac4cc5abd0591c3)
+
+running 5 tests
+test create_fillet_with_side ... ok
+test fillet_cube_volume ... ok
+test fillet_swept_cube_volume ... ok
+test create_simple_fillet ... ok
+test complex_surface ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/fillet_chain.rs (target/release/deps/fillet_chain-5c69be61d5128850)
+
+running 5 tests
+test fillet_along_wire_rejects_corner ... ok
+test fillet_edge_ending_at_four_valent_vertex ... ok
+test fillet_chain_with_varying_radius ... ok
+test fillet_open_chain_around_rounded_corners ... ok
+test fillet_cylinder_rim ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+     Running tests/fillet_edges.rs (target/release/deps/fillet_edges-9d3c506e77c572f3)
+
+running 7 tests
+test unblendable_four_edge_vertex ... ok
+test one_edge_ends_on_planes ... ok
+test three_edges_meet_at_one_corner ... ok
+test rejects_unsupported_selections_and_radius_without_changes ... ok
+test rounded_tetrahedron ... ok
+test tangent_chain_subdivision_is_kept ... ok
+test all_twelve_box_edges ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/fixed_sweep.rs (target/release/deps/fixed_sweep-5b0b2211358a4744)
+
+running 2 tests
+test fixed_sweep_refuses_tangent_folds_and_invalid_tolerance_without_mutating ... ok
+test fixed_normal_spline_sweep_keeps_sections_and_exact_volume ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/intersect.rs (target/release/deps/intersect-9e6dd9eb739d3bea)
+
+running 4 tests
+test plane_against_cylinder_is_an_exact_circle ... ok
+test plane_against_plane_is_an_exact_line ... ok
+test plane_against_revolved_cylinder_is_an_exact_circle ... ok
+test two_cylinders_meet_along_a_curve_on_both ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/local_ops.rs (target/release/deps/local_ops-041b267060f08bc8)
+
+running 26 tests
+test bent_shell_is_rejected ... ok
+test box_top_tilted ... ok
+test box_top_that_misses_a_side_is_rejected ... ok
+test box_sides_drafted ... ok
+test box_top_moved_up ... ok
+test deleting_a_box_side_or_a_five_sided_face_is_rejected ... ok
+test box_shelled_closed_has_two_shells ... ok
+test box_top_raised ... ok
+test box_shelled_with_the_top_open ... ok
+test undraftable_face_is_rejected ... ok
+test drafting_large_box_uses_the_trimmed_face_domains ... ok
+test planar_shell_thickened ... ok
+test two_adjacent_faces_replaced_together ... ok
+test two_opposite_sides_drafted ... ok
+test deleting_a_round_face_restores_the_sharp_edge ... ok
+test face_beside_a_spline_is_rejected ... ok
+test outward_shell_preserves_the_cavity_and_expands_the_exterior ... ok
+test cylinder_top_raised ... ok
+test cylinder_top_tilted ... ok
+test hole_grown_by_offset ... ok
+test cylindrical_boss_drafted_to_a_cone ... ok
+test planar_concave_pocket_supports_closed_shelling ... ok
+test hole_moved_within_the_plate ... ok
+test hole_moved_out_of_the_plate_is_rejected ... ok
+test cylinder_shelled_with_one_end_open ... ok
+test outward_cylinder_shell_has_exact_offset_radius ... ok
+
+test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+
+     Running tests/loft.rs (target/release/deps/loft-a82b388164fc3a81)
+
+running 4 tests
+test mismatched_and_repeated_sections_are_rejected ... ok
+test align_sections_rotates_and_reverses ... ok
+test square_to_circle ... ok
+test three_circles_make_a_surface_of_revolution ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s
+
+     Running tests/mixed_chamfer_pair.rs (target/release/deps/mixed_chamfer_pair-c93e620f23497a50)
+
+running 2 tests
+test transitions_at_both_ends_share_the_vertical_bevel_and_reject_collisions ... ok
+test mixed_chamfer_pairs_have_a_planar_corner_transition ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/mixed_pair_fillet.rs (target/release/deps/mixed_pair_fillet-359e204cc5e309b7)
+
+running 1 test
+test concave_and_convex_pair_gets_a_trimmed_toroidal_transition ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s
+
+     Running tests/modeled_thread.rs (target/release/deps/modeled_thread-d2bd46fd554bff0b)
+
+running 4 tests
+test invalid_thread_dimensions_are_rejected ... ok
+test rotated_helix_keeps_pitch_radius_and_handedness ... ok
+test helical_cutter_is_closed_and_cuts_a_bore ... ok
+test internal_and_external_threads_match_helical_volume_in_both_hands ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.83s
+
+     Running tests/modeling_blends.rs (target/release/deps/modeling_blends-0011c974cc002620)
+
+running 5 tests
+test unsupported_operations_leave_geometry_and_ids_unchanged ... ok
+test twelve_edges_with_spherical_corners_remain_modeling_solids ... ok
+test box_chamfer_and_chain_fillet_remain_modeling_solids ... ok
+test constant_and_variable_radius_tangent_chains ... ok
+test curved_chain_survives_transform_serialization_and_step ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.35s
+
+     Running tests/nonconvex_chamfer.rs (target/release/deps/nonconvex_chamfer-c9c727a78078067e)
+
+running 2 tests
+test nonconvex_body_supports_outer_corners_and_a_complete_rim ... ok
+test chamfers_meet_at_a_reentrant_planar_corner ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/nonconvex_fillet.rs (target/release/deps/nonconvex_fillet-88544c4e4aca7be2)
+
+running 8 tests
+test local_fillet_extreme_radii_return_diagnostics ... ok
+test local_fillets_reject_collisions_and_collapsed_contacts_without_mutation ... ok
+test local_fillets_preserve_unrelated_curves_and_support_two_edge_miters ... ok
+test local_spherical_corners_work_on_nonconvex_bodies_and_cavity_shells ... ok
+test oblique_toroidal_corner_ends_on_the_wall_of_a_sharp_rim ... ok
+test mixed_three_edge_fillets_have_exact_tangent_torus_corners ... ok
+test oblique_toroidal_corners_wrap_a_concave_round ... ok
+test oblique_spherical_corners_work_beside_a_reflex_vertex ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 27.18s
+
+     Running tests/nonconvex_shell.rs (target/release/deps/nonconvex_shell-b53326751f536498)
+
+running 2 tests
+test concave_shell_collapse_fails_without_modifying_input ... ok
+test planar_concave_shells_preserve_offset_geometry_and_material ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/oblique_fillet_ends.rs (target/release/deps/oblique_fillet_ends-5363081792c9dbe5)
+
+running 1 test
+test oblique_planar_terminations_and_spherical_corners_remain_exact ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.57s
+
+     Running tests/plane_cylinder_lips.rs (target/release/deps/plane_cylinder_lips-9fbf0efda15bdc2a)
+
+running 7 tests
+test shallow_convex_cylinder_cap_rejects_nonfitting_fillet ... ok
+test concave_lip_below_axis_at_multiple_scales ... ok
+test convex_lip_below_axis_at_multiple_scales ... ok
+test concave_lip_through_axis_at_multiple_scales ... ok
+test convex_lip_through_axis_at_multiple_scales ... ok
+test convex_lip_above_axis_at_multiple_scales ... ok
+test concave_lip_above_axis_at_multiple_scales ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.22s
+
+     Running tests/r11_corners.rs (target/release/deps/r11_corners-899b70f547d5fc44)
+
+running 6 tests
+test unsupported_junctions_have_distinct_diagnostics ... FAILED
+test invalid_parameters_and_selections_leave_input_unchanged ... ok
+test sequential_chamfers_reproduce_kernel_gap ... ok
+test chamfer_fixture_table_and_order ... ok
+test miters_at_both_ends_and_next_to_a_spherical_corner ... ok
+test fillet_fixture_table_and_order ... ok
+
+failures:
+
+---- unsupported_junctions_have_distinct_diagnostics stdout ----
+
+thread 'unsupported_junctions_have_distinct_diagnostics' (637706) panicked at truck-shapeops/tests/r11_corners.rs:463:14:
+called `Result::unwrap_err()` on an `Ok` value: BlendResult { solid: Solid { boundaries: [Shell { face_list: [Face { boundaries: [Wire { edge_list: [Edge { vertices: (Vertex { point: Mutex { data: Point3 [10.0, 10.0, 0.0] } }, Vertex { point: Mutex { data: Point3 [0.0, 10.0, 0.0] } }), orientation: false, curve: Mutex { data: Line(Line(Point3 [10.0, 10.0, 0.0], Point3 [0.0, 10.0, 0.0])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [10.0, 0.21908902300206645, 0.0] } }, Vertex { point: Mutex { data: Point3 [10.0, 10.0, 0.0] } }), orientation: false, curve: Mutex { data: Line(Line(Point3 [10.0, 0.21908902300206642, 0.0], Point3 [10.0, 10.0, 0.0])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [9.780910976997934, 0.0, 0.0] } }, Vertex { point: Mutex { data: Point3 [10.0, 0.21908902300206645, 0.0] } }), orientation: false, curve: Mutex { data: Line(Line(Point3 [9.780910976997934, 0.0, 0.0], Point3 [10.0, 0.21908902300206645, 0.0])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [0.21908902300206634, 0.0, 0.0] } }, Vertex { point: Mutex { data: Point3 [9.780910976997934, 0.0, 0.0] } }), orientation: false, curve: Mutex { data: Line(Line(Point3 [0.21908902300206634, 0.0, 0.0], Point3 [9.780910976997934, 0.0, 0.0])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [0.21908902300206634, 0.0, 0.0] } }, Vertex { point: Mutex { data: Point3 [0.0, 0.21908902300206634, 0.0] } }), orientation: true, curve: Mutex { data: Line(Line(Point3 [0.21908902300206634, 0.0, 0.0], Point3 [0.0, 0.21908902300206634, 0.0])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [0.0, 0.21908902300206634, 0.0] } }, Vertex { point: Mutex { data: Point3 [0.0, 10.0, 0.0] } }), orientation: true, curve: Mutex { data: Line(Line(Point3 [0.0, 0.21908902300206634, 0.0], Point3 [0.0, 10.0, 0.0])) } }] }], orientation: true, surface: Mutex { data: Plane(Plane { o: Point3 [0.0, 10.0, 0.0], p: Point3 [10.0, 10.0, 0.0], q: Point3 [0.0, 0.0, 0.0] }) } }, Face { boundaries: [Wire { edge_list: [Edge { vertices: (Vertex { point: Mutex { data: Point3 [0.21908902300206634, 0.0, 0.0] } }, Vertex { point: Mutex { data: Point3 [9.780910976997934, 0.0, 0.0] } }), orientation: true, curve: Mutex { data: Line(Line(Point3 [0.21908902300206634, 0.0, 0.0], Point3 [9.780910976997934, 0.0, 0.0])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [9.780910976997934, 0.0, 0.0] } }, Vertex { point: Mutex { data: Point3 [5.0, 4.780910976997934, 9.561821953995867] } }), orientation: true, curve: Mutex { data: Line(Line(Point3 [9.780910976997934, 0.0, 0.0], Point3 [5.0, 4.780910976997934, 9.561821953995867])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [5.0, 4.780910976997934, 9.561821953995867] } }, Vertex { point: Mutex { data: Point3 [0.21908902300206634, 0.0, 0.0] } }), orientation: true, curve: Mutex { data: Line(Line(Point3 [5.0, 4.780910976997934, 9.561821953995867], Point3 [0.21908902300206634, 0.0, 0.0])) } }] }], orientation: true, surface: Mutex { data: Plane(Plane { o: Point3 [0.0, 0.0, 0.0], p: Point3 [10.0, 0.0, 0.0], q: Point3 [0.0, 5.0, 10.0] }) } }, Face { boundaries: [Wire { edge_list: [Edge { vertices: (Vertex { point: Mutex { data: Point3 [10.0, 0.21908902300206645, 0.0] } }, Vertex { point: Mutex { data: Point3 [10.0, 10.0, 0.0] } }), orientation: true, curve: Mutex { data: Line(Line(Point3 [10.0, 0.21908902300206642, 0.0], Point3 [10.0, 10.0, 0.0])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [10.0, 10.0, 0.0] } }, Vertex { point: Mutex { data: Point3 [5.109544511501031, 5.109544511501034, 9.780910976997935] } }), orientation: true, curve: Mutex { data: Line(Line(Point3 [10.0, 10.0, 0.0], Point3 [5.109544511501032, 5.109544511501032, 9.780910976997935])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [10.0, 0.21908902300206645, 0.0] } }, Vertex { point: Mutex { data: Point3 [5.109544511501031, 5.109544511501034, 9.780910976997935] } }), orientation: false, curve: Mutex { data: Line(Line(Point3 [10.0, 0.21908902300206645, 0.0], Point3 [5.109544511501031, 5.109544511501034, 9.780910976997935])) } }] }], orientation: true, surface: Mutex { data: Plane(Plane { o: Point3 [10.0, 0.0, 0.0], p: Point3 [10.0, 10.0, 0.0], q: Point3 [5.0, 0.0, 10.0] }) } }, Face { boundaries: [Wire { edge_list: [Edge { vertices: (Vertex { point: Mutex { data: Point3 [10.0, 10.0, 0.0] } }, Vertex { point: Mutex { data: Point3 [0.0, 10.0, 0.0] } }), orientation: true, curve: Mutex { data: Line(Line(Point3 [10.0, 10.0, 0.0], Point3 [0.0, 10.0, 0.0])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [0.0, 10.0, 0.0] } }, Vertex { point: Mutex { data: Point3 [4.890455488498967, 5.109544511501033, 9.780910976997934] } }), orientation: true, curve: Mutex { data: Line(Line(Point3 [0.0, 10.0, 0.0], Point3 [4.890455488498967, 5.109544511501033, 9.780910976997934])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [5.000000000000001, 5.073029674334022, 9.853940651331957] } }, Vertex { point: Mutex { data: Point3 [4.890455488498967, 5.109544511501033, 9.780910976997934] } }), orientation: false, curve: Mutex { data: Line(Line(Point3 [5.000000000000001, 5.073029674334022, 9.853940651331957], Point3 [4.890455488498967, 5.109544511501033, 9.780910976997934])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [5.000000000000001, 5.073029674334022, 9.853940651331957] } }, Vertex { point: Mutex { data: Point3 [5.109544511501031, 5.109544511501034, 9.780910976997935] } }), orientation: true, curve: Mutex { data: Line(Line(Point3 [5.000000000000001, 5.073029674334022, 9.853940651331957], Point3 [5.109544511501031, 5.109544511501034, 9.780910976997935])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [10.0, 10.0, 0.0] } }, Vertex { point: Mutex { data: Point3 [5.109544511501031, 5.109544511501034, 9.780910976997935] } }), orientation: false, curve: Mutex { data: Line(Line(Point3 [10.0, 10.0, 0.0], Point3 [5.109544511501032, 5.109544511501032, 9.780910976997935])) } }] }], orientation: true, surface: Mutex { data: Plane(Plane { o: Point3 [10.0, 10.0, 0.0], p: Point3 [0.0, 10.0, 0.0], q: Point3 [10.0, 5.0, 10.0] }) } }, Face { boundaries: [Wire { edge_list: [Edge { vertices: (Vertex { point: Mutex { data: Point3 [0.0, 0.21908902300206634, 0.0] } }, Vertex { point: Mutex { data: Point3 [0.0, 10.0, 0.0] } }), orientation: false, curve: Mutex { data: Line(Line(Point3 [0.0, 0.21908902300206634, 0.0], Point3 [0.0, 10.0, 0.0])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [4.890455488498967, 5.109544511501033, 9.780910976997934] } }, Vertex { point: Mutex { data: Point3 [0.0, 0.21908902300206634, 0.0] } }), orientation: false, curve: Mutex { data: Line(Line(Point3 [4.890455488498967, 5.109544511501033, 9.780910976997934], Point3 [0.0, 0.21908902300206634, 0.0])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [0.0, 10.0, 0.0] } }, Vertex { point: Mutex { data: Point3 [4.890455488498967, 5.109544511501033, 9.780910976997934] } }), orientation: false, curve: Mutex { data: Line(Line(Point3 [0.0, 10.0, 0.0], Point3 [4.890455488498967, 5.109544511501033, 9.780910976997934])) } }] }], orientation: true, surface: Mutex { data: Plane(Plane { o: Point3 [0.0, 10.0, 0.0], p: Point3 [0.0, 0.0, 0.0], q: Point3 [5.0, 10.0, 10.0] }) } }, Face { boundaries: [Wire { edge_list: [Edge { vertices: (Vertex { point: Mutex { data: Point3 [9.780910976997934, 0.0, 0.0] } }, Vertex { point: Mutex { data: Point3 [5.0, 4.780910976997934, 9.561821953995867] } }), orientation: false, curve: Mutex { data: Line(Line(Point3 [9.780910976997934, 0.0, 0.0], Point3 [5.0, 4.780910976997934, 9.561821953995867])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [9.780910976997934, 0.0, 0.0] } }, Vertex { point: Mutex { data: Point3 [10.0, 0.21908902300206645, 0.0] } }), orientation: true, curve: Mutex { data: Line(Line(Point3 [9.780910976997934, 0.0, 0.0], Point3 [10.0, 0.21908902300206645, 0.0])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [10.0, 0.21908902300206645, 0.0] } }, Vertex { point: Mutex { data: Point3 [5.109544511501031, 5.109544511501034, 9.780910976997935] } }), orientation: true, curve: Mutex { data: Line(Line(Point3 [10.0, 0.21908902300206645, 0.0], Point3 [5.109544511501031, 5.109544511501034, 9.780910976997935])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [5.000000000000001, 5.073029674334022, 9.853940651331957] } }, Vertex { point: Mutex { data: Point3 [5.109544511501031, 5.109544511501034, 9.780910976997935] } }), orientation: false, curve: Mutex { data: Line(Line(Point3 [5.000000000000001, 5.073029674334022, 9.853940651331957], Point3 [5.109544511501031, 5.109544511501034, 9.780910976997935])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [5.0, 4.780910976997934, 9.561821953995867] } }, Vertex { point: Mutex { data: Point3 [5.000000000000001, 5.073029674334022, 9.853940651331957] } }), orientation: false, curve: Mutex { data: Line(Line(Point3 [5.0, 4.780910976997934, 9.561821953995867], Point3 [5.000000000000001, 5.073029674334022, 9.853940651331957])) } }] }], orientation: true, surface: Mutex { data: Plane(Plane { o: Point3 [9.817425814164945, -0.03651483716701108, -0.07302967433402216], p: Point3 [10.036514837167012, 0.18257418583505539, -0.07302967433402216], q: Point3 [4.817425814164945, 4.963485162832989, 9.926970325665978] }) } }, Face { boundaries: [Wire { edge_list: [Edge { vertices: (Vertex { point: Mutex { data: Point3 [5.0, 4.780910976997934, 9.561821953995867] } }, Vertex { point: Mutex { data: Point3 [0.21908902300206634, 0.0, 0.0] } }), orientation: false, curve: Mutex { data: Line(Line(Point3 [5.0, 4.780910976997934, 9.561821953995867], Point3 [0.21908902300206634, 0.0, 0.0])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [5.0, 4.780910976997934, 9.561821953995867] } }, Vertex { point: Mutex { data: Point3 [5.000000000000001, 5.073029674334022, 9.853940651331957] } }), orientation: true, curve: Mutex { data: Line(Line(Point3 [5.0, 4.780910976997934, 9.561821953995867], Point3 [5.000000000000001, 5.073029674334022, 9.853940651331957])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [5.000000000000001, 5.073029674334022, 9.853940651331957] } }, Vertex { point: Mutex { data: Point3 [4.890455488498967, 5.109544511501033, 9.780910976997934] } }), orientation: true, curve: Mutex { data: Line(Line(Point3 [5.000000000000001, 5.073029674334022, 9.853940651331957], Point3 [4.890455488498967, 5.109544511501033, 9.780910976997934])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [4.890455488498967, 5.109544511501033, 9.780910976997934] } }, Vertex { point: Mutex { data: Point3 [0.0, 0.21908902300206634, 0.0] } }), orientation: true, curve: Mutex { data: Line(Line(Point3 [4.890455488498967, 5.109544511501033, 9.780910976997934], Point3 [0.0, 0.21908902300206634, 0.0])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [0.21908902300206634, 0.0, 0.0] } }, Vertex { point: Mutex { data: Point3 [0.0, 0.21908902300206634, 0.0] } }), orientation: false, curve: Mutex { data: Line(Line(Point3 [0.21908902300206634, 0.0, 0.0], Point3 [0.0, 0.21908902300206634, 0.0])) } }] }], orientation: true, surface: Mutex { data: Plane(Plane { o: Point3 [5.109544511501033, 4.890455488498967, 9.780910976997934], p: Point3 [4.890455488498967, 5.109544511501033, 9.780910976997934], q: Point3 [0.18257418583505558, -0.03651483716701076, -0.07302967433402152] }) } }] }] }, modified_faces: [(0x7f2d2c001870, Face { boundaries: [Wire { edge_list: [Edge { vertices: (Vertex { point: Mutex { data: Point3 [10.0, 10.0, 0.0] } }, Vertex { point: Mutex { data: Point3 [0.0, 10.0, 0.0] } }), orientation: false, curve: Mutex { data: Line(Line(Point3 [10.0, 10.0, 0.0], Point3 [0.0, 10.0, 0.0])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [10.0, 0.21908902300206645, 0.0] } }, Vertex { point: Mutex { data: Point3 [10.0, 10.0, 0.0] } }), orientation: false, curve: Mutex { data: Line(Line(Point3 [10.0, 0.21908902300206642, 0.0], Point3 [10.0, 10.0, 0.0])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [9.780910976997934, 0.0, 0.0] } }, Vertex { point: Mutex { data: Point3 [10.0, 0.21908902300206645, 0.0] } }), orientation: false, curve: Mutex { data: Line(Line(Point3 [9.780910976997934, 0.0, 0.0], Point3 [10.0, 0.21908902300206645, 0.0])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [0.21908902300206634, 0.0, 0.0] } }, Vertex { point: Mutex { data: Point3 [9.780910976997934, 0.0, 0.0] } }), orientation: false, curve: Mutex { data: Line(Line(Point3 [0.21908902300206634, 0.0, 0.0], Point3 [9.780910976997934, 0.0, 0.0])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [0.21908902300206634, 0.0, 0.0] } }, Vertex { point: Mutex { data: Point3 [0.0, 0.21908902300206634, 0.0] } }), orientation: true, curve: Mutex { data: Line(Line(Point3 [0.21908902300206634, 0.0, 0.0], Point3 [0.0, 0.21908902300206634, 0.0])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [0.0, 0.21908902300206634, 0.0] } }, Vertex { point: Mutex { data: Point3 [0.0, 10.0, 0.0] } }), orientation: true, curve: Mutex { data: Line(Line(Point3 [0.0, 0.21908902300206634, 0.0], Point3 [0.0, 10.0, 0.0])) } }] }], orientation: true, surface: Mutex { data: Plane(Plane { o: Point3 [0.0, 10.0, 0.0], p: Point3 [10.0, 10.0, 0.0], q: Point3 [0.0, 0.0, 0.0] }) } }), (0x7f2d2c001c90, Face { boundaries: [Wire { edge_list: [Edge { vertices: (Vertex { point: Mutex { data: Point3 [0.21908902300206634, 0.0, 0.0] } }, Vertex { point: Mutex { data: Point3 [9.780910976997934, 0.0, 0.0] } }), orientation: true, curve: Mutex { data: Line(Line(Point3 [0.21908902300206634, 0.0, 0.0], Point3 [9.780910976997934, 0.0, 0.0])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [9.780910976997934, 0.0, 0.0] } }, Vertex { point: Mutex { data: Point3 [5.0, 4.780910976997934, 9.561821953995867] } }), orientation: true, curve: Mutex { data: Line(Line(Point3 [9.780910976997934, 0.0, 0.0], Point3 [5.0, 4.780910976997934, 9.561821953995867])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [5.0, 4.780910976997934, 9.561821953995867] } }, Vertex { point: Mutex { data: Point3 [0.21908902300206634, 0.0, 0.0] } }), orientation: true, curve: Mutex { data: Line(Line(Point3 [5.0, 4.780910976997934, 9.561821953995867], Point3 [0.21908902300206634, 0.0, 0.0])) } }] }], orientation: true, surface: Mutex { data: Plane(Plane { o: Point3 [0.0, 0.0, 0.0], p: Point3 [10.0, 0.0, 0.0], q: Point3 [0.0, 5.0, 10.0] }) } }), (0x7f2d2c001f50, Face { boundaries: [Wire { edge_list: [Edge { vertices: (Vertex { point: Mutex { data: Point3 [10.0, 0.21908902300206645, 0.0] } }, Vertex { point: Mutex { data: Point3 [10.0, 10.0, 0.0] } }), orientation: true, curve: Mutex { data: Line(Line(Point3 [10.0, 0.21908902300206642, 0.0], Point3 [10.0, 10.0, 0.0])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [10.0, 10.0, 0.0] } }, Vertex { point: Mutex { data: Point3 [5.109544511501031, 5.109544511501034, 9.780910976997935] } }), orientation: true, curve: Mutex { data: Line(Line(Point3 [10.0, 10.0, 0.0], Point3 [5.109544511501032, 5.109544511501032, 9.780910976997935])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [10.0, 0.21908902300206645, 0.0] } }, Vertex { point: Mutex { data: Point3 [5.109544511501031, 5.109544511501034, 9.780910976997935] } }), orientation: false, curve: Mutex { data: Line(Line(Point3 [10.0, 0.21908902300206645, 0.0], Point3 [5.109544511501031, 5.109544511501034, 9.780910976997935])) } }] }], orientation: true, surface: Mutex { data: Plane(Plane { o: Point3 [10.0, 0.0, 0.0], p: Point3 [10.0, 10.0, 0.0], q: Point3 [5.0, 0.0, 10.0] }) } }), (0x7f2d2c002540, Face { boundaries: [Wire { edge_list: [Edge { vertices: (Vertex { point: Mutex { data: Point3 [10.0, 10.0, 0.0] } }, Vertex { point: Mutex { data: Point3 [0.0, 10.0, 0.0] } }), orientation: true, curve: Mutex { data: Line(Line(Point3 [10.0, 10.0, 0.0], Point3 [0.0, 10.0, 0.0])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [0.0, 10.0, 0.0] } }, Vertex { point: Mutex { data: Point3 [4.890455488498967, 5.109544511501033, 9.780910976997934] } }), orientation: true, curve: Mutex { data: Line(Line(Point3 [0.0, 10.0, 0.0], Point3 [4.890455488498967, 5.109544511501033, 9.780910976997934])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [5.000000000000001, 5.073029674334022, 9.853940651331957] } }, Vertex { point: Mutex { data: Point3 [4.890455488498967, 5.109544511501033, 9.780910976997934] } }), orientation: false, curve: Mutex { data: Line(Line(Point3 [5.000000000000001, 5.073029674334022, 9.853940651331957], Point3 [4.890455488498967, 5.109544511501033, 9.780910976997934])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [5.000000000000001, 5.073029674334022, 9.853940651331957] } }, Vertex { point: Mutex { data: Point3 [5.109544511501031, 5.109544511501034, 9.780910976997935] } }), orientation: true, curve: Mutex { data: Line(Line(Point3 [5.000000000000001, 5.073029674334022, 9.853940651331957], Point3 [5.109544511501031, 5.109544511501034, 9.780910976997935])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [10.0, 10.0, 0.0] } }, Vertex { point: Mutex { data: Point3 [5.109544511501031, 5.109544511501034, 9.780910976997935] } }), orientation: false, curve: Mutex { data: Line(Line(Point3 [10.0, 10.0, 0.0], Point3 [5.109544511501032, 5.109544511501032, 9.780910976997935])) } }] }], orientation: true, surface: Mutex { data: Plane(Plane { o: Point3 [10.0, 10.0, 0.0], p: Point3 [0.0, 10.0, 0.0], q: Point3 [10.0, 5.0, 10.0] }) } }), (0x7f2d2c002750, Face { boundaries: [Wire { edge_list: [Edge { vertices: (Vertex { point: Mutex { data: Point3 [0.0, 0.21908902300206634, 0.0] } }, Vertex { point: Mutex { data: Point3 [0.0, 10.0, 0.0] } }), orientation: false, curve: Mutex { data: Line(Line(Point3 [0.0, 0.21908902300206634, 0.0], Point3 [0.0, 10.0, 0.0])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [4.890455488498967, 5.109544511501033, 9.780910976997934] } }, Vertex { point: Mutex { data: Point3 [0.0, 0.21908902300206634, 0.0] } }), orientation: false, curve: Mutex { data: Line(Line(Point3 [4.890455488498967, 5.109544511501033, 9.780910976997934], Point3 [0.0, 0.21908902300206634, 0.0])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [0.0, 10.0, 0.0] } }, Vertex { point: Mutex { data: Point3 [4.890455488498967, 5.109544511501033, 9.780910976997934] } }), orientation: false, curve: Mutex { data: Line(Line(Point3 [0.0, 10.0, 0.0], Point3 [4.890455488498967, 5.109544511501033, 9.780910976997934])) } }] }], orientation: true, surface: Mutex { data: Plane(Plane { o: Point3 [0.0, 10.0, 0.0], p: Point3 [0.0, 0.0, 0.0], q: Point3 [5.0, 10.0, 10.0] }) } })], generated_faces: [Face { boundaries: [Wire { edge_list: [Edge { vertices: (Vertex { point: Mutex { data: Point3 [9.780910976997934, 0.0, 0.0] } }, Vertex { point: Mutex { data: Point3 [5.0, 4.780910976997934, 9.561821953995867] } }), orientation: false, curve: Mutex { data: Line(Line(Point3 [9.780910976997934, 0.0, 0.0], Point3 [5.0, 4.780910976997934, 9.561821953995867])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [9.780910976997934, 0.0, 0.0] } }, Vertex { point: Mutex { data: Point3 [10.0, 0.21908902300206645, 0.0] } }), orientation: true, curve: Mutex { data: Line(Line(Point3 [9.780910976997934, 0.0, 0.0], Point3 [10.0, 0.21908902300206645, 0.0])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [10.0, 0.21908902300206645, 0.0] } }, Vertex { point: Mutex { data: Point3 [5.109544511501031, 5.109544511501034, 9.780910976997935] } }), orientation: true, curve: Mutex { data: Line(Line(Point3 [10.0, 0.21908902300206645, 0.0], Point3 [5.109544511501031, 5.109544511501034, 9.780910976997935])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [5.000000000000001, 5.073029674334022, 9.853940651331957] } }, Vertex { point: Mutex { data: Point3 [5.109544511501031, 5.109544511501034, 9.780910976997935] } }), orientation: false, curve: Mutex { data: Line(Line(Point3 [5.000000000000001, 5.073029674334022, 9.853940651331957], Point3 [5.109544511501031, 5.109544511501034, 9.780910976997935])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [5.0, 4.780910976997934, 9.561821953995867] } }, Vertex { point: Mutex { data: Point3 [5.000000000000001, 5.073029674334022, 9.853940651331957] } }), orientation: false, curve: Mutex { data: Line(Line(Point3 [5.0, 4.780910976997934, 9.561821953995867], Point3 [5.000000000000001, 5.073029674334022, 9.853940651331957])) } }] }], orientation: true, surface: Mutex { data: Plane(Plane { o: Point3 [9.817425814164945, -0.03651483716701108, -0.07302967433402216], p: Point3 [10.036514837167012, 0.18257418583505539, -0.07302967433402216], q: Point3 [4.817425814164945, 4.963485162832989, 9.926970325665978] }) } }, Face { boundaries: [Wire { edge_list: [Edge { vertices: (Vertex { point: Mutex { data: Point3 [5.0, 4.780910976997934, 9.561821953995867] } }, Vertex { point: Mutex { data: Point3 [0.21908902300206634, 0.0, 0.0] } }), orientation: false, curve: Mutex { data: Line(Line(Point3 [5.0, 4.780910976997934, 9.561821953995867], Point3 [0.21908902300206634, 0.0, 0.0])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [5.0, 4.780910976997934, 9.561821953995867] } }, Vertex { point: Mutex { data: Point3 [5.000000000000001, 5.073029674334022, 9.853940651331957] } }), orientation: true, curve: Mutex { data: Line(Line(Point3 [5.0, 4.780910976997934, 9.561821953995867], Point3 [5.000000000000001, 5.073029674334022, 9.853940651331957])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [5.000000000000001, 5.073029674334022, 9.853940651331957] } }, Vertex { point: Mutex { data: Point3 [4.890455488498967, 5.109544511501033, 9.780910976997934] } }), orientation: true, curve: Mutex { data: Line(Line(Point3 [5.000000000000001, 5.073029674334022, 9.853940651331957], Point3 [4.890455488498967, 5.109544511501033, 9.780910976997934])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [4.890455488498967, 5.109544511501033, 9.780910976997934] } }, Vertex { point: Mutex { data: Point3 [0.0, 0.21908902300206634, 0.0] } }), orientation: true, curve: Mutex { data: Line(Line(Point3 [4.890455488498967, 5.109544511501033, 9.780910976997934], Point3 [0.0, 0.21908902300206634, 0.0])) } }, Edge { vertices: (Vertex { point: Mutex { data: Point3 [0.21908902300206634, 0.0, 0.0] } }, Vertex { point: Mutex { data: Point3 [0.0, 0.21908902300206634, 0.0] } }), orientation: false, curve: Mutex { data: Line(Line(Point3 [0.21908902300206634, 0.0, 0.0], Point3 [0.0, 0.21908902300206634, 0.0])) } }] }], orientation: true, surface: Mutex { data: Plane(Plane { o: Point3 [5.109544511501033, 4.890455488498967, 9.780910976997934], p: Point3 [4.890455488498967, 5.109544511501033, 9.780910976997934], q: Point3 [0.18257418583505558, -0.03651483716701076, -0.07302967433402152] }) } }] }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    unsupported_junctions_have_distinct_diagnostics
+
+test result: FAILED. 5 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+
+error: test failed, to rerun pass `-p truck-shapeops --test r11_corners`
+     Running tests/r4_boolean.rs (target/release/deps/r4_boolean-a9954826c95d8ed5)
+
+running 20 tests
+test empty_intersection ... ok
+test invalid_tolerances_return_none ... ok
+test cavity_intersect_enclosure_control ... ok
+test empty_union ... ok
+test disconnected_components_intersect_enclosure ... ok
+test empty_results_are_composable ... ok
+test cavity_union_remote_cube ... ok
+test primitive_boxes_also_reproduce_the_intersection_failure ... ok
+test island_inside_cavity_intersect_enclosure ... ok
+test split_cut_intersection_probe ... ok
+test split_cut_union ... ok
+test cavity_step_round_trip_control ... ok
+test invalid_shell_sets_return_none ... ok
+test split_cut_subtraction_and_subsequent_boolean ... ok
+test split_ignores_face_order ... ok
+test complements_of_multiple_shells ... ok
+test cut_crosses_both_exterior_and_cavity ... ok
+test nested_island_with_its_own_cavity ... ok
+test disconnected_coplanar_cutters ... ok
+test body_grouping_and_booleans_ignore_shell_and_operand_order ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+
+     Running tests/r5_chamfer_after_fillet.rs (target/release/deps/r5_chamfer_after_fillet-ad4bbd197a58d77e)
+
+running 6 tests
+test plain_top_chamfer_control ... ok
+test four_vertical_fillets_control ... ok
+test single_top_edges_require_explicit_tangent_wire ... ok
+test complete_top_wire_after_four_vertical_fillets ... ok
+test asymmetric_distances_follow_wire_orientation ... ok
+test invalid_wires_and_distances_leave_input_unchanged ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/rib_fillet.rs (target/release/deps/rib_fillet-b887f05d5456169b)
+
+running 2 tests
+test rib_fillets_preserve_placement_selection_order_and_radius_limits ... ok
+test reinforces_stepped_ribs_including_touching_rounds ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+
+     Running tests/rounded_local_ops.rs (target/release/deps/rounded_local_ops-3a51a858e0a39abe)
+
+running 3 tests
+test draft_propagation_stops_at_non_tangent_walls ... ok
+test drafting_planar_walls_propagates_across_tangent_corner_rounds ... ok
+test rounded_prisms_shell_inward_and_outward_with_constant_wall_thickness ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.76s
+
+     Running tests/sequential_blends.rs (target/release/deps/sequential_blends-f5b0e91684ffd0e9)
+
+running 6 tests
+test one_rim_can_mix_collapsed_and_regular_circular_contacts ... ok
+test chamfer_consumes_a_smaller_corner_fillet ... ok
+test collapsed_chamfers_preserve_distance_sides_under_rigid_transforms ... ok
+test closed_rim_chamfers_can_consume_all_four_rounds ... ok
+test fillet_ends_on_two_chamfer_faces ... ok
+test chamfer_then_fillet_keeps_the_opposite_three_edge_spherical_corner ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.98s
+
+     Running tests/sewing.rs (target/release/deps/sewing-28de1beb2c6603e2)
+
+running 1 test
+test tolerance_sewing_joins_near_seams_and_preserves_missing_faces ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/subtract_effect.rs (target/release/deps/subtract_effect-c13e8eee442d4590)
+
+running 3 tests
+test empty_operands_and_invalid_tolerance ... ok
+test removal_and_contact ... ok
+test disconnected_solids_and_cavity_shells ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/sweep.rs (target/release/deps/sweep-e48e491b4e7c63bf)
+
+running 7 tests
+test square_along_a_straight_spline_matches_tsweep ... ok
+test disc_along_a_segment_matches_tsweep ... ok
+test polyline_corners_are_mitered_and_tight_paths_are_rejected ... ok
+test disc_along_line_arc_line ... ok
+test disc_along_an_arc_matches_rsweep ... ok
+test square_along_a_non_planar_spline ... ok
+test closed_planar_path_gives_a_torus ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+
+   Doc-tests truck_modeling
+
+running 29 tests
+test truck-modeling/src/builder.rs - builder::rsweep (line 594) ... ignored
+test truck-modeling/src/builder.rs - builder::tsweep (line 482) ... ignored
+test truck-modeling/src/builder.rs - builder::vertex (line 20) ... ok
+test truck-modeling/src/sweep.rs - sweep::Vertex<P>::sweep (line 14) ... ok
+test truck-modeling/src/builder.rs - builder::clone (line 405) ... ok
+test truck-modeling/src/builder.rs - builder::vertices (line 32) ... ok
+test truck-modeling/src/builder.rs - builder::line (line 55) ... ok
+test truck-modeling/src/primitive.rs - primitive::rect (line 8) ... ok
+test truck-modeling/src/builder.rs - builder::circle_arc (line 108) ... ok
+test truck-modeling/src/builder.rs - builder::bezier (line 148) ... ok
+test truck-modeling/src/builder.rs - builder::circle_arc (line 89) ... ok
+test truck-modeling/src/primitive.rs - primitive::rect (line 26) ... ok
+test truck-modeling/src/sweep.rs - sweep::Edge<P,C>::sweep (line 45) ... ok
+test truck-modeling/src/builder.rs - builder::homotopy (line 178) ... ok
+test truck-modeling/src/primitive.rs - primitive::circle (line 64) ... ok
+test truck-modeling/src/builder.rs - builder::try_wire_homotopy (line 274) ... ok
+test truck-modeling/src/builder.rs - builder::sweep_along_wire (line 1475) ... ok
+test truck-modeling/src/builder.rs - builder::try_attach_plane (line 343) ... ok
+test truck-modeling/src/primitive.rs - primitive::cuboid (line 121) ... ok
+test truck-modeling/src/sweep.rs - sweep::Face<P,C,S>::sweep (line 183) ... ok
+test truck-modeling/src/sweep.rs - sweep::Wire<P,C>::sweep (line 108) ... ok
+test truck-modeling/src/builder.rs - builder::try_wire_homotopy (line 244) ... ok
+test truck-modeling/src/builder.rs - builder::try_wire_homotopy (line 219) ... ok
+test truck-modeling/src/builder.rs - builder::try_attach_plane (line 330) ... ok
+test truck-modeling/src/builder.rs - builder::cone (line 674) ... ok
+test truck-modeling/src/builder.rs - builder::try_loft_shell (line 794) ... ok
+test truck-modeling/src/builder.rs - builder::tsweep (line 444) ... ok
+test truck-modeling/src/builder.rs - builder::rsweep (line 504) ... ok
+test truck-modeling/src/builder.rs - builder::rsweep (line 533) ... ok
+
+test result: ok. 27 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.40s
+
+   Doc-tests truck_shapeops
+
+running 7 tests
+test truck-shapeops/src/local/shell.rs - local::shell::thicken (line 247) ... ok
+test truck-shapeops/src/local/shell.rs - local::shell::shell (line 28) ... ok
+test truck-shapeops/src/local/replace.rs - local::replace::replace_surfaces (line 190) ... ok
+test truck-shapeops/src/local/delete.rs - local::delete::delete_face (line 26) ... ok
+test truck-shapeops/src/local/mod.rs - local::move_faces (line 107) ... ok
+test truck-shapeops/src/local/draft.rs - local::draft::draft (line 22) ... ok
+test truck-shapeops/src/lib.rs - fillet (line 106) ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s
+
+error: 1 target failed:
+    `-p truck-shapeops --test r11_corners`

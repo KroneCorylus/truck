@@ -1,0 +1,626 @@
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index e17413f5..b7975363 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -6,7 +6,9 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
+ 
+ ## Unreleased
+ 
+-- Subtract isolated cylindrical through-holes analytically from single prismatic modeling bodies. Check disk clearance and material winding, reuse exact plane/cylinder sections, and retain every unaffected face. Native circular extrusions and line/circle cap boundaries are supported; contacts, overlapping or blind cuts, cavities, multiple shells and unsupported geometry use the existing Boolean solver. Regressions cover transformed sequences, reversed axes, concave outlines, thin walls, STEP export and subsequent general cuts.
++- Reuse predicted surface parameters when checking sampled curve inclusion, including fillet boundaries. Keep all 33 samples per edge and validate finite parameters, parameter ranges and geometric residuals before accepting a seeded solve; fall back to the existing global search on failure or across seams.
++- Extend analytic through-hole subtraction to batches of disjoint parallel cylindrical cutters. Verify complete outward cutter shells and separation, collect all openings before rebuilding the cap faces, and preserve unaffected faces and material-removal reporting. Unsupported or ambiguous batches use the general Boolean solver.
++- Subtract isolated cylindrical through-holes analytically from single prismatic modeling bodies. Check disk clearance and material winding, reuse exact plane/cylinder sections, and retain every unaffected face. Native circular extrusions and line/circle cap boundaries are supported; contacts, overlapping or blind cuts, cavities, multiple target shells and unsupported geometry use the existing Boolean solver. Regressions cover transformed sequences, reversed axes, concave outlines, thin walls, STEP export and subsequent general cuts.
+ - Breaking: `subtract`, `subtract_with_effect`, `try_subtract` and `try_subtract_with_effect` now require `'static` curve and surface types so modeling solids can use analytic subtraction. Generic wrappers must add `C: 'static, S: 'static`; borrowed geometry must become owned. Borrowing the solid itself is unchanged. PiezaCAD's calls in `cad-core/src/kernel/evaluation.rs` use owned modeling types and need no changes.
+ 
+ - Preserve collapsed tessellation trim loops by subdividing the original curve parameters locally, independently of chord tolerance. Only affected shared edges and their incident faces are resampled; unrelated boundaries retain their mesh. Planar trims never fall back to the full surface domain. Arc/chord faces, spline lenses and tiny holes are covered at coarse tolerances, across transforms and serial, parallel and compressed tessellation. Invalid or unresolvable trims remain missing faces reported by the existing diagnostics, with bounded recovery work.
+diff --git a/truck-modeling/src/geometry.rs b/truck-modeling/src/geometry.rs
+index d7490d36..3d74b1db 100644
+--- a/truck-modeling/src/geometry.rs
++++ b/truck-modeling/src/geometry.rs
+@@ -262,7 +262,8 @@ impl IncludeCurve<Curve> for Surface {
+ fn include_curve<S>(surface: &S, curve: &Curve) -> bool
+ where S: IncludeCurve<BSplineCurve<Point3>>
+         + IncludeCurve<NurbsCurve<Vector4>>
+-        + SearchParameter<D2, Point = Point3> {
++        + SearchParameter<D2, Point = Point3>
++        + ParametricSurface3D {
+     match curve {
+         &Curve::Line(curve) => surface.include(&BSplineCurve::from(curve)),
+         Curve::BSplineCurve(curve) => surface.include(curve),
+@@ -1090,11 +1091,34 @@ impl ToSameGeometry<Surface> for BSplineSurface<Point3> {
+     fn to_same_geometry(&self) -> Surface { Surface::BSplineSurface(self.clone()) }
+ }
+ 
+-fn sampled_include<S: SearchParameter<D2, Point = Point3>>(surface: &S, curve: &Curve) -> bool {
++fn sampled_include<S>(surface: &S, curve: &Curve) -> bool
++where S: SearchParameter<D2, Point = Point3> + ParametricSurface3D {
++    use std::ops::RangeBounds;
++
+     let (a, b) = curve.range_tuple();
++    let (urange, vrange) = surface.parameter_range();
++    let in_range = |&(u, v): &(f64, f64)| {
++        u.is_finite() && v.is_finite() && urange.contains(&u) && vrange.contains(&v)
++    };
++    let mut previous: Option<(f64, f64)> = None;
++    let mut current: Option<(f64, f64)> = None;
+     (0..=32).all(|i| {
+-        surface
+-            .search_parameter(curve.subs(a + (b - a) * i as f64 / 32.0), None, 100)
+-            .is_some()
++        let point = curve.subs(a + (b - a) * i as f64 / 32.0);
++        let hint = current.map(|(u, v)| match previous {
++            Some((s, t)) => (2. * u - s, 2. * v - t),
++            None => (u, v),
++        });
++        // Continue along the curve, but never trust a seed across a seam or a failed solve.
++        let parameter = hint
++            .filter(in_range)
++            .and_then(|uv| surface.search_parameter(point, Some(uv), 100))
++            .filter(|uv| in_range(uv) && surface.subs(uv.0, uv.1).near(&point))
++            .or_else(|| surface.search_parameter(point, None, 100));
++        previous = current;
++        current = parameter;
++        parameter.is_some()
+     })
+ }
++
++#[cfg(test)]
++mod inclusion_tests;
+diff --git a/truck-shapeops/src/transversal/integrate/mod.rs b/truck-shapeops/src/transversal/integrate/mod.rs
+index 00b377b2..76106aa0 100644
+--- a/truck-shapeops/src/transversal/integrate/mod.rs
++++ b/truck-shapeops/src/transversal/integrate/mod.rs
+@@ -408,7 +408,8 @@ fn boolean<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
+ /// Uses the same shell contract and tolerance as [`and`]. Prefer this over manually inverting
+ /// the cutter: `Solid::not` cannot distinguish the complement of an empty solid from empty.
+ /// Modeling solids use exact circular sections for isolated cylindrical through-holes in
+-/// prismatic bodies, retaining unaffected faces. Other cuts use the general Boolean solver.
++/// prismatic bodies, including batches of disjoint parallel cutters, retaining unaffected
++/// faces. Other cuts use the general Boolean solver.
+ /// Geometry types must own their data (`'static`); the solid references may be borrowed.
+ pub fn subtract<C: ShapeOpsCurve<S> + 'static, S: ShapeOpsSurface + 'static>(
+     solid0: &Solid<Point3, C, S>,
+diff --git a/truck-shapeops/src/transversal/integrate/through_hole.rs b/truck-shapeops/src/transversal/integrate/through_hole.rs
+index 8123b04c..8605e6ab 100644
+--- a/truck-shapeops/src/transversal/integrate/through_hole.rs
++++ b/truck-shapeops/src/transversal/integrate/through_hole.rs
+@@ -38,8 +38,8 @@ impl Cylinder {
+     fn height(&self, p: Point3) -> f64 { (p - self.origin).dot(self.axis) }
+     fn center(&self, h: f64) -> Point3 { self.origin + h * self.axis }
+ 
+-    fn recognize(tool: &Solid) -> Option<Self> {
+-        let surface = tool.face_iter().find_map(|face| {
++    fn recognize(tool: &Shell) -> Option<(Self, Prism<'_>)> {
++        let surface = tool.iter().find_map(|face| {
+             let s = face.surface();
+             cylindrical(&s).map(|_| s)
+         })?;
+@@ -111,15 +111,12 @@ impl Cylinder {
+                 }
+             }
+         }
+-        Some(cylinder)
++        Some((cylinder, prism))
+     }
+ }
+ 
+ impl<'a> Prism<'a> {
+-    fn recognize(solid: &'a Solid, cylinder: &Cylinder) -> Option<Self> {
+-        let [shell] = solid.boundaries().as_slice() else {
+-            return None;
+-        };
++    fn recognize(shell: &'a Shell, cylinder: &Cylinder) -> Option<Self> {
+         let mut caps = Vec::new();
+         for (i, face) in shell.iter().enumerate() {
+             let surface = face.surface();
+@@ -347,66 +344,98 @@ pub(super) fn subtract(
+     tool: &Solid,
+     tol: f64,
+ ) -> Option<SubtractionResult<Curve, Surface>> {
+-    let cylinder = Cylinder::recognize(tool)?;
+-    if tol >= cylinder.radius {
+-        return None;
+-    }
+-    let body = Prism::recognize(target, &cylinder)?;
+-    let cutter = Prism::recognize(tool, &cylinder)?;
+-    let [lo, hi] = body.heights;
+-    if cutter.heights[0] >= lo - TOLERANCE || cutter.heights[1] <= hi + TOLERANCE {
+-        return None;
+-    }
+-    let inside0 = disk_inside(
+-        &body.shell[body.caps[0]],
+-        cylinder.center(lo),
+-        cylinder.axis,
+-        cylinder.radius,
+-    )?;
+-    let inside1 = disk_inside(
+-        &body.shell[body.caps[1]],
+-        cylinder.center(hi),
+-        cylinder.axis,
+-        cylinder.radius,
+-    )?;
+-    if inside0 != inside1 {
++    let [target_shell] = target.boundaries().as_slice() else {
+         return None;
++    };
++    let cutters = tool
++        .boundaries()
++        .iter()
++        .map(Cylinder::recognize)
++        .collect::<Option<Vec<_>>>()?;
++    let axis = cutters.first()?.0.axis;
++    let mut envelopes: Vec<(Point3, f64)> = Vec::with_capacity(cutters.len());
++    for (cylinder, cutter) in &cutters {
++        if tol >= cylinder.radius || !parallel(axis, cylinder.axis) {
++            return None;
++        }
++        let [a, b] = cutter.heights;
++        let center = cylinder.center(a + (b - a) / 2.);
++        // Bound each complete cutter's projection, including the admitted axis tilt.
++        // Disjoint disks prove that these shells are separate bodies, never cavities.
++        let radius = cylinder.radius + (b - a) / 2. * axis.cross(cylinder.axis).magnitude();
++        if !radius.is_finite()
++            || envelopes.iter().any(|&(other, r)| {
++                let distance = (center - other).cross(axis).magnitude();
++                !distance.is_finite() || distance <= radius + r + TOLERANCE
++            })
++        {
++            return None;
++        }
++        envelopes.push((center, radius));
+     }
+     Solid::try_new(target.boundaries().clone()).ok()?;
+     Solid::try_new(tool.boundaries().clone()).ok()?;
+-    if !inside0 {
+-        return Some(SubtractionResult {
+-            solid: target.clone(),
+-            removed_material: false,
+-        });
+-    }
+-    let disk = section(&cylinder, lo, cutter.shell.len().checked_sub(2)?.max(2))?;
+-    let mut bore: Solid = builder::tsweep(&disk, cylinder.axis * (hi - lo));
+-    bore.not();
+-    let mut shell = body.shell.clone();
+-    for face in bore.face_iter() {
+-        if let Surface::Plane(plane) = face.surface() {
+-            let side = usize::from(cylinder.height(plane.origin()) > (lo + hi) / 2.0);
+-            let index = body.caps[side];
+-            let original = &body.shell[index];
+-            let mut opening = face.boundaries()[0].clone();
+-            if !original.orientation() {
+-                opening.invert();
++    let mut shell = target_shell.clone();
++    let mut cap_boundaries: Vec<Option<Vec<Wire>>> = vec![None; shell.len()];
++    let mut removed_material = false;
++    for (cylinder, cutter) in &cutters {
++        let body = Prism::recognize(target_shell, cylinder)?;
++        let [lo, hi] = body.heights;
++        if cutter.heights[0] >= lo - TOLERANCE || cutter.heights[1] <= hi + TOLERANCE {
++            return None;
++        }
++        let inside0 = disk_inside(
++            &body.shell[body.caps[0]],
++            cylinder.center(lo),
++            cylinder.axis,
++            cylinder.radius,
++        )?;
++        let inside1 = disk_inside(
++            &body.shell[body.caps[1]],
++            cylinder.center(hi),
++            cylinder.axis,
++            cylinder.radius,
++        )?;
++        if inside0 != inside1 {
++            return None;
++        }
++        if !inside0 {
++            continue;
++        }
++        removed_material = true;
++        let disk = section(cylinder, lo, cutter.shell.len().checked_sub(2)?.max(2))?;
++        let mut bore: Solid = builder::tsweep(&disk, cylinder.axis * (hi - lo));
++        bore.not();
++        for face in bore.face_iter() {
++            if let Surface::Plane(plane) = face.surface() {
++                let side = usize::from(cylinder.height(plane.origin()) > (lo + hi) / 2.0);
++                let index = body.caps[side];
++                let original = &body.shell[index];
++                let mut opening = face.boundaries()[0].clone();
++                if !original.orientation() {
++                    opening.invert();
++                }
++                cap_boundaries[index]
++                    .get_or_insert_with(|| original.absolute_boundaries().clone())
++                    .push(opening);
++            } else {
++                shell.push(face.clone());
+             }
+-            let mut boundaries = original.absolute_boundaries().clone();
+-            boundaries.push(opening);
++        }
++    }
++    for (index, boundaries) in cap_boundaries.into_iter().enumerate() {
++        if let Some(boundaries) = boundaries {
++            let original = &target_shell[index];
+             let mut cap = Face::try_new(boundaries, original.surface()).ok()?;
+             if !original.orientation() {
+                 cap.invert();
+             }
+             shell[index] = cap;
+-        } else {
+-            shell.push(face.clone());
+         }
+     }
+     Some(SubtractionResult {
+         solid: Solid::try_new(vec![shell]).ok()?,
+-        removed_material: true,
++        removed_material,
+     })
+ }
+ 
+@@ -441,6 +470,58 @@ mod tests {
+         assert!(solid.is_geometric_consistent());
+     }
+ 
++    #[test]
++    fn batch_rejects_overlapping_touching_nested_and_unsupported_cutters() {
++        let body: Solid = primitive::cuboid(BoundingBox::from_iter([
++            Point3::origin(),
++            Point3::new(12., 8., 2.),
++        ]));
++        let first = cylinder(Point3::new(3., 3., -1.), 1., 4.);
++        let check = |other: Solid| {
++            for reverse in [false, true] {
++                let mut shells = vec![first.boundaries()[0].clone(), other.boundaries()[0].clone()];
++                if reverse {
++                    shells.reverse();
++                }
++                assert!(subtract(&body, &Solid::new(shells), 0.001).is_none());
++            }
++        };
++        for x in [0., 1., 2., 2. + TOLERANCE / 2.] {
++            check(builder::translated(&first, x * Vector3::unit_x()));
++        }
++        let nested = cylinder(Point3::new(3., 3., -1.), 0.5, 4.);
++        check(nested.clone());
++        let mut cavity = nested;
++        cavity.not();
++        check(cavity);
++        check(cylinder(Point3::new(8., 3., 1.), 1., 2.));
++        check(cylinder(Point3::new(8., 3., 0.), 1., 2.));
++        let other = cylinder(Point3::new(8., 3., -1.), 1., 4.);
++        check(builder::rotated(
++            &other,
++            Point3::new(8., 3., 1.),
++            Vector3::unit_x(),
++            Rad(0.01),
++        ));
++        check(builder::scaled(
++            &other,
++            Point3::new(8., 3., 0.),
++            Vector3::new(1., 1.1, 1.),
++        ));
++        check(primitive::cuboid(BoundingBox::from_iter([
++            Point3::new(7., 2., -1.),
++            Point3::new(9., 4., 3.),
++        ])));
++        let separated = cylinder(Point3::new(5. + 4. * TOLERANCE, 3., -1.), 1., 4.);
++        let batch = Solid::new(vec![
++            first.boundaries()[0].clone(),
++            separated.boundaries()[0].clone(),
++        ]);
++        let cut = subtract(&body, &batch, 0.001).unwrap();
++        assert!(cut.removed_material);
++        assert!(cut.solid.is_geometric_consistent());
++    }
++
+     #[test]
+     fn ambiguous_and_unsupported_cuts_defer_to_general_boolean() {
+         let body: Solid = primitive::cuboid(BoundingBox::from_iter([
+diff --git a/truck-shapeops/tests/analytic_holes.rs b/truck-shapeops/tests/analytic_holes.rs
+index d65f8dd4..32132602 100644
+--- a/truck-shapeops/tests/analytic_holes.rs
++++ b/truck-shapeops/tests/analytic_holes.rs
+@@ -12,6 +12,128 @@ fn retained(before: &Solid, after: &Solid) -> usize {
+         .count()
+ }
+ 
++fn compound(solids: &[Solid]) -> Solid {
++    Solid::new(
++        solids
++            .iter()
++            .flat_map(|s| s.boundaries().iter().cloned())
++            .collect(),
++    )
++}
++
++#[test]
++fn batch_holes_preserve_faces_and_exact_curves_under_transforms() {
++    for moved in [false, true] {
++        let transform = |s: &Solid| {
++            if moved {
++                builder::transformed(
++                    s,
++                    Matrix4::from_translation(Vector3::new(100., -30., 5.))
++                        * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.71)),
++                )
++            } else {
++                s.clone()
++            }
++        };
++        let plate = transform(&cuboid(Point3::origin(), Point3::new(16., 12., 2.)));
++        let mut tools = Vec::new();
++        let mut removed = 0.;
++        for i in 0..6 {
++            let radius = 0.4 + 0.2 * (i % 3) as f64;
++            let axis = if i % 2 == 0 {
++                Vector3::unit_z()
++            } else {
++                -Vector3::unit_z()
++            };
++            let center = Point3::new(
++                2. + (i % 3) as f64 * 4.,
++                2. + (i / 3) as f64 * 4.,
++                if axis.z > 0. { -1. } else { 3. },
++            );
++            let wire = primitive::circle(
++                center + radius * Vector3::unit_x(),
++                center,
++                axis,
++                2 + i % 3 * 2,
++            );
++            let disk = builder::try_attach_plane(&[wire]).unwrap();
++            tools.push(transform(&builder::tsweep(&disk, 4. * axis)));
++            removed += 2. * PI * radius * radius;
++        }
++        for reverse in [false, true] {
++            if reverse {
++                tools.reverse();
++            }
++            let batch = compound(&tools);
++            let inputs = serde_json::to_string(&[plate.compress(), batch.compress()]).unwrap();
++            let cut = truck_shapeops::try_subtract_with_effect(&plate, &batch, TOL).unwrap();
++            assert!(cut.removed_material);
++            assert_eq!(retained(&plate, &cut.solid), 4);
++            assert!(cut
++                .solid
++                .edge_iter()
++                .all(|e| matches!(e.curve(), Curve::Line(_) | Curve::Conic(_))));
++            assert!(cut.solid.is_geometric_consistent());
++            assert_solid(&cut.solid, 384. - removed, &[6], TOL);
++            assert_eq!(
++                inputs,
++                serde_json::to_string(&[plate.compress(), batch.compress()]).unwrap()
++            );
++            if moved && reverse {
++                common::blend::assert_step(&cut.solid, 384. - removed, TOL);
++            }
++        }
++    }
++}
++
++#[test]
++fn batch_combines_new_holes_and_empty_space_without_rebuilding_old_walls() {
++    let plate = cuboid(Point3::origin(), Point3::new(16., 8., 2.));
++    let bore = cylinder(Point3::new(2., 2., -1.), Vector3::unit_z(), 1., 4.);
++    let plate = truck_shapeops::try_subtract(&plate, &bore, TOL).unwrap();
++    let empty = [
++        cylinder(Point3::new(2., 2., -1.), Vector3::unit_z(), 0.5, 4.),
++        cylinder(Point3::new(20., 2., -1.), Vector3::unit_z(), 1., 4.),
++    ];
++    let unchanged =
++        truck_shapeops::try_subtract_with_effect(&plate, &compound(&empty), TOL).unwrap();
++    assert!(!unchanged.removed_material);
++    assert_eq!(
++        retained(&plate, &unchanged.solid),
++        plate.face_iter().count()
++    );
++    let mut tools = empty.to_vec();
++    tools.push(cylinder(
++        Point3::new(6., 2., -1.),
++        Vector3::unit_z(),
++        1.,
++        4.,
++    ));
++    tools.push(cylinder(
++        Point3::new(10., 2., -1.),
++        Vector3::unit_z(),
++        0.5,
++        4.,
++    ));
++    let cut = truck_shapeops::try_subtract_with_effect(&plate, &compound(&tools), TOL).unwrap();
++    assert!(cut.removed_material);
++    assert_eq!(retained(&plate, &cut.solid), plate.face_iter().count() - 2);
++    assert_solid(&cut.solid, 256. - 4.5 * PI, &[3], TOL);
++    assert!(cut.solid.is_geometric_consistent());
++}
++
++#[test]
++fn mixed_through_and_blind_batch_preserves_general_boolean_behavior() {
++    let plate = cuboid(Point3::origin(), Point3::new(12., 8., 2.));
++    let tools = [
++        cylinder(Point3::new(3., 3., -1.), Vector3::unit_z(), 1., 4.),
++        cylinder(Point3::new(8., 3., 1.), Vector3::unit_z(), 0.5, 2.),
++    ];
++    let cut = truck_shapeops::try_subtract(&plate, &compound(&tools), TOL).unwrap();
++    assert_solid(&cut, 192. - 2.25 * PI, &[1], TOL);
++    assert!(cut.is_geometric_consistent());
++}
++
+ #[test]
+ fn through_hole_preserves_remote_faces_and_exact_circles() {
+     let plate = cuboid(Point3::origin(), Point3::new(12., 8., 2.));
+diff --git a/truck-modeling/src/geometry/inclusion_tests.rs b/truck-modeling/src/geometry/inclusion_tests.rs
+new file mode 100644
+index 00000000..e55d4fa0
+--- /dev/null
++++ b/truck-modeling/src/geometry/inclusion_tests.rs
+@@ -0,0 +1,168 @@
++use super::*;
++use std::{cell::RefCell, rc::Rc};
++
++#[derive(Clone, Copy)]
++enum Fault {
++    None,
++    Failure,
++    WrongPoint,
++    Nonfinite,
++    OutsideRange,
++}
++
++#[derive(Clone)]
++struct Counted {
++    surface: Surface,
++    calls: Rc<RefCell<Vec<(Point3, bool)>>>,
++    fault: Fault,
++}
++
++impl ParametricSurface for Counted {
++    type Point = Point3;
++    type Vector = Vector3;
++    fn subs(&self, u: f64, v: f64) -> Point3 { self.surface.subs(u, v) }
++    fn uder(&self, u: f64, v: f64) -> Vector3 { self.surface.uder(u, v) }
++    fn vder(&self, u: f64, v: f64) -> Vector3 { self.surface.vder(u, v) }
++    fn uuder(&self, u: f64, v: f64) -> Vector3 { self.surface.uuder(u, v) }
++    fn uvder(&self, u: f64, v: f64) -> Vector3 { self.surface.uvder(u, v) }
++    fn vvder(&self, u: f64, v: f64) -> Vector3 { self.surface.vvder(u, v) }
++    fn der_mn(&self, m: usize, n: usize, u: f64, v: f64) -> Vector3 {
++        self.surface.der_mn(m, n, u, v)
++    }
++    fn parameter_range(&self) -> (ParameterRange, ParameterRange) { self.surface.parameter_range() }
++}
++impl ParametricSurface3D for Counted {}
++
++impl SearchParameter<D2> for Counted {
++    type Point = Point3;
++    fn search_parameter<H: Into<SPHint2D>>(
++        &self,
++        point: Point3,
++        hint: H,
++        trials: usize,
++    ) -> Option<(f64, f64)> {
++        let hint = hint.into();
++        let seeded = matches!(hint, SPHint2D::Parameter(..));
++        self.calls.borrow_mut().push((point, seeded));
++        if seeded {
++            match self.fault {
++                Fault::None => {}
++                Fault::Failure => return None,
++                Fault::WrongPoint => return Some((0.5, 0.5)),
++                Fault::Nonfinite => return Some((f64::NAN, f64::INFINITY)),
++                Fault::OutsideRange => {
++                    return self
++                        .surface
++                        .search_parameter(point, None, trials)
++                        .map(|(u, v)| (u + 4. * TAU, v));
++                }
++            }
++        }
++        self.surface.search_parameter(point, hint, trials)
++    }
++}
++
++fn fillet() -> Surface {
++    let rolling = RbfSurface::new(
++        Line(Point3::origin(), Point3::new(4., 0., 0.)),
++        Surface::Plane(Plane::xy()),
++        Surface::Plane(Plane::zx()),
++        0.5,
++    );
++    let fillet =
++        ApproxFilletSurface::approx_rolling_ball_fillet(&rolling, (0., 1.), 0.001).unwrap();
++    Surface::Fillet(Processor::new(fillet.into()))
++}
++
++fn pcurve(surface: &Surface, a: Point2, b: Point2) -> Curve {
++    Curve::PCurve(PCurve::new(
++        BSplineCurve::from(Line(a, b)),
++        Box::new(surface.clone()),
++    ))
++}
++
++#[test]
++fn sampled_inclusion_reuses_searches_without_dropping_samples() {
++    let surface = Counted {
++        surface: fillet(),
++        calls: Rc::default(),
++        fault: Fault::None,
++    };
++    for reversed in [false, true] {
++        let mut curve = pcurve(&surface.surface, (0., 0.).into(), (0., 1.).into());
++        if reversed {
++            curve.invert();
++        }
++        surface.calls.borrow_mut().clear();
++        assert!(sampled_include(&surface, &curve));
++        let calls = surface.calls.borrow();
++        let cold = calls.iter().filter(|(_, seeded)| !seeded).count();
++        assert!(cold <= 3, "repeated full-surface searches: {cold}");
++        let (a, b) = curve.range_tuple();
++        for i in 0..=32 {
++            let point = curve.subs(a + (b - a) * i as f64 / 32.);
++            assert!(calls.iter().any(|(p, _)| p.near(&point)));
++        }
++    }
++}
++
++#[test]
++fn bad_seeded_results_fall_back_and_off_surface_curves_stay_rejected() {
++    let sphere = Surface::Sphere(Processor::new(Sphere::new(Point3::origin(), 2.)));
++    for base in [fillet(), sphere] {
++        for fault in [
++            Fault::Failure,
++            Fault::WrongPoint,
++            Fault::Nonfinite,
++            Fault::OutsideRange,
++        ] {
++            let surface = Counted {
++                surface: base.clone(),
++                calls: Rc::default(),
++                fault,
++            };
++            let curve = pcurve(&base, (0.1, 0.2).into(), (0.8, 0.7).into());
++            assert!(sampled_include(&surface, &curve));
++            let calls = surface.calls.borrow();
++            assert!(calls.iter().any(|(_, seeded)| *seeded));
++            assert!(calls.iter().filter(|(_, seeded)| !seeded).count() > 1);
++            drop(calls);
++            let off_surface =
++                curve.transformed(Matrix4::from_translation(Vector3::new(0., 0., 10.)));
++            assert!(!sampled_include(&surface, &off_surface));
++            let leaves_surface = Curve::Line(Line(base.subs(0.1, 0.2), Point3::new(10., 10., 10.)));
++            assert!(!sampled_include(&surface, &leaves_surface));
++        }
++    }
++}
++
++#[test]
++fn inclusion_preserves_periodic_seams_poles_and_transformed_curves() {
++    let sphere = Surface::Sphere(Processor::new(Sphere::new(Point3::origin(), 2.)));
++    let transform = Matrix4::from_translation(Vector3::new(30., -20., 10.))
++        * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.73))
++        * Matrix4::from_nonuniform_scale(0.5, 1.5, 2.);
++    for surface in [fillet(), sphere] {
++        let surface = surface.transformed(transform);
++        let paths = if matches!(surface, Surface::Sphere(_)) {
++            vec![
++                ((TAU - 0.2, 0.5), (TAU + 0.2, 0.5)),
++                ((0.2, 0.), (2., 0.)),
++                ((0.2, 0.1), (0.8, 1.2)),
++            ]
++        } else {
++            vec![((0., 0.), (0., 1.)), ((0.1, 0.1), (0.9, 0.9))]
++        };
++        for (a, b) in paths {
++            let mut curve = pcurve(&surface, a.into(), b.into());
++            for _ in 0..2 {
++                let (a, b) = curve.range_tuple();
++                assert!((0..=32).all(|i| surface
++                    .search_parameter(curve.subs(a + (b - a) * i as f64 / 32.), None, 100)
++                    .is_some()));
++                assert!(surface.include(&curve));
++                curve.invert();
++            }
++        }
++    }
++}

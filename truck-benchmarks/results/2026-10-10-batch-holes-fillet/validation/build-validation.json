@@ -1,0 +1,49 @@
+[
+  {
+    "name": "clippy",
+    "command": [
+      "cargo",
+      "clippy",
+      "--release",
+      "--locked",
+      "-j2",
+      "-p",
+      "truck-modeling",
+      "-p",
+      "truck-shapeops",
+      "--all-targets"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "actions-smoke",
+    "command": [
+      "cargo",
+      "bench",
+      "--locked",
+      "-j2",
+      "-p",
+      "truck-benchmarks",
+      "--bench",
+      "actions",
+      "--",
+      "--test"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "build-compare",
+    "command": [
+      "cargo",
+      "build",
+      "--release",
+      "--locked",
+      "-j2",
+      "-p",
+      "truck-benchmarks",
+      "--example",
+      "compare_occt"
+    ],
+    "exit_code": 0
+  }
+]

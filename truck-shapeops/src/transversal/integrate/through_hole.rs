@@ -38,8 +38,8 @@ impl Cylinder {
     fn height(&self, p: Point3) -> f64 { (p - self.origin).dot(self.axis) }
     fn center(&self, h: f64) -> Point3 { self.origin + h * self.axis }
 
-    fn recognize(tool: &Solid) -> Option<Self> {
-        let surface = tool.face_iter().find_map(|face| {
+    fn recognize(tool: &Shell) -> Option<(Self, Prism<'_>)> {
+        let surface = tool.iter().find_map(|face| {
             let s = face.surface();
             cylindrical(&s).map(|_| s)
         })?;
@@ -111,15 +111,12 @@ impl Cylinder {
                 }
             }
         }
-        Some(cylinder)
+        Some((cylinder, prism))
     }
 }
 
 impl<'a> Prism<'a> {
-    fn recognize(solid: &'a Solid, cylinder: &Cylinder) -> Option<Self> {
-        let [shell] = solid.boundaries().as_slice() else {
-            return None;
-        };
+    fn recognize(shell: &'a Shell, cylinder: &Cylinder) -> Option<Self> {
         let mut caps = Vec::new();
         for (i, face) in shell.iter().enumerate() {
             let surface = face.surface();
@@ -347,66 +344,98 @@ pub(super) fn subtract(
     tool: &Solid,
     tol: f64,
 ) -> Option<SubtractionResult<Curve, Surface>> {
-    let cylinder = Cylinder::recognize(tool)?;
-    if tol >= cylinder.radius {
+    let [target_shell] = target.boundaries().as_slice() else {
         return None;
-    }
-    let body = Prism::recognize(target, &cylinder)?;
-    let cutter = Prism::recognize(tool, &cylinder)?;
-    let [lo, hi] = body.heights;
-    if cutter.heights[0] >= lo - TOLERANCE || cutter.heights[1] <= hi + TOLERANCE {
-        return None;
-    }
-    let inside0 = disk_inside(
-        &body.shell[body.caps[0]],
-        cylinder.center(lo),
-        cylinder.axis,
-        cylinder.radius,
-    )?;
-    let inside1 = disk_inside(
-        &body.shell[body.caps[1]],
-        cylinder.center(hi),
-        cylinder.axis,
-        cylinder.radius,
-    )?;
-    if inside0 != inside1 {
-        return None;
+    };
+    let cutters = tool
+        .boundaries()
+        .iter()
+        .map(Cylinder::recognize)
+        .collect::<Option<Vec<_>>>()?;
+    let axis = cutters.first()?.0.axis;
+    let mut envelopes: Vec<(Point3, f64)> = Vec::with_capacity(cutters.len());
+    for (cylinder, cutter) in &cutters {
+        if tol >= cylinder.radius || !parallel(axis, cylinder.axis) {
+            return None;
+        }
+        let [a, b] = cutter.heights;
+        let center = cylinder.center(a + (b - a) / 2.);
+        // Bound each complete cutter's projection, including the admitted axis tilt.
+        // Disjoint disks prove that these shells are separate bodies, never cavities.
+        let radius = cylinder.radius + (b - a) / 2. * axis.cross(cylinder.axis).magnitude();
+        if !radius.is_finite()
+            || envelopes.iter().any(|&(other, r)| {
+                let distance = (center - other).cross(axis).magnitude();
+                !distance.is_finite() || distance <= radius + r + TOLERANCE
+            })
+        {
+            return None;
+        }
+        envelopes.push((center, radius));
     }
     Solid::try_new(target.boundaries().clone()).ok()?;
     Solid::try_new(tool.boundaries().clone()).ok()?;
-    if !inside0 {
-        return Some(SubtractionResult {
-            solid: target.clone(),
-            removed_material: false,
-        });
-    }
-    let disk = section(&cylinder, lo, cutter.shell.len().checked_sub(2)?.max(2))?;
-    let mut bore: Solid = builder::tsweep(&disk, cylinder.axis * (hi - lo));
-    bore.not();
-    let mut shell = body.shell.clone();
-    for face in bore.face_iter() {
-        if let Surface::Plane(plane) = face.surface() {
-            let side = usize::from(cylinder.height(plane.origin()) > (lo + hi) / 2.0);
-            let index = body.caps[side];
-            let original = &body.shell[index];
-            let mut opening = face.boundaries()[0].clone();
-            if !original.orientation() {
-                opening.invert();
+    let mut shell = target_shell.clone();
+    let mut cap_boundaries: Vec<Option<Vec<Wire>>> = vec![None; shell.len()];
+    let mut removed_material = false;
+    for (cylinder, cutter) in &cutters {
+        let body = Prism::recognize(target_shell, cylinder)?;
+        let [lo, hi] = body.heights;
+        if cutter.heights[0] >= lo - TOLERANCE || cutter.heights[1] <= hi + TOLERANCE {
+            return None;
+        }
+        let inside0 = disk_inside(
+            &body.shell[body.caps[0]],
+            cylinder.center(lo),
+            cylinder.axis,
+            cylinder.radius,
+        )?;
+        let inside1 = disk_inside(
+            &body.shell[body.caps[1]],
+            cylinder.center(hi),
+            cylinder.axis,
+            cylinder.radius,
+        )?;
+        if inside0 != inside1 {
+            return None;
+        }
+        if !inside0 {
+            continue;
+        }
+        removed_material = true;
+        let disk = section(cylinder, lo, cutter.shell.len().checked_sub(2)?.max(2))?;
+        let mut bore: Solid = builder::tsweep(&disk, cylinder.axis * (hi - lo));
+        bore.not();
+        for face in bore.face_iter() {
+            if let Surface::Plane(plane) = face.surface() {
+                let side = usize::from(cylinder.height(plane.origin()) > (lo + hi) / 2.0);
+                let index = body.caps[side];
+                let original = &body.shell[index];
+                let mut opening = face.boundaries()[0].clone();
+                if !original.orientation() {
+                    opening.invert();
+                }
+                cap_boundaries[index]
+                    .get_or_insert_with(|| original.absolute_boundaries().clone())
+                    .push(opening);
+            } else {
+                shell.push(face.clone());
             }
-            let mut boundaries = original.absolute_boundaries().clone();
-            boundaries.push(opening);
+        }
+    }
+    for (index, boundaries) in cap_boundaries.into_iter().enumerate() {
+        if let Some(boundaries) = boundaries {
+            let original = &target_shell[index];
             let mut cap = Face::try_new(boundaries, original.surface()).ok()?;
             if !original.orientation() {
                 cap.invert();
             }
             shell[index] = cap;
-        } else {
-            shell.push(face.clone());
         }
     }
     Some(SubtractionResult {
         solid: Solid::try_new(vec![shell]).ok()?,
-        removed_material: true,
+        removed_material,
     })
 }
 
@@ -439,6 +468,58 @@ mod tests {
         let disk = section(&cylinder, 1., 6).unwrap();
         let solid: Solid = builder::tsweep(&disk, Vector3::unit_z());
         assert!(solid.is_geometric_consistent());
+    }
+
+    #[test]
+    fn batch_rejects_overlapping_touching_nested_and_unsupported_cutters() {
+        let body: Solid = primitive::cuboid(BoundingBox::from_iter([
+            Point3::origin(),
+            Point3::new(12., 8., 2.),
+        ]));
+        let first = cylinder(Point3::new(3., 3., -1.), 1., 4.);
+        let check = |other: Solid| {
+            for reverse in [false, true] {
+                let mut shells = vec![first.boundaries()[0].clone(), other.boundaries()[0].clone()];
+                if reverse {
+                    shells.reverse();
+                }
+                assert!(subtract(&body, &Solid::new(shells), 0.001).is_none());
+            }
+        };
+        for x in [0., 1., 2., 2. + TOLERANCE / 2.] {
+            check(builder::translated(&first, x * Vector3::unit_x()));
+        }
+        let nested = cylinder(Point3::new(3., 3., -1.), 0.5, 4.);
+        check(nested.clone());
+        let mut cavity = nested;
+        cavity.not();
+        check(cavity);
+        check(cylinder(Point3::new(8., 3., 1.), 1., 2.));
+        check(cylinder(Point3::new(8., 3., 0.), 1., 2.));
+        let other = cylinder(Point3::new(8., 3., -1.), 1., 4.);
+        check(builder::rotated(
+            &other,
+            Point3::new(8., 3., 1.),
+            Vector3::unit_x(),
+            Rad(0.01),
+        ));
+        check(builder::scaled(
+            &other,
+            Point3::new(8., 3., 0.),
+            Vector3::new(1., 1.1, 1.),
+        ));
+        check(primitive::cuboid(BoundingBox::from_iter([
+            Point3::new(7., 2., -1.),
+            Point3::new(9., 4., 3.),
+        ])));
+        let separated = cylinder(Point3::new(5. + 4. * TOLERANCE, 3., -1.), 1., 4.);
+        let batch = Solid::new(vec![
+            first.boundaries()[0].clone(),
+            separated.boundaries()[0].clone(),
+        ]);
+        let cut = subtract(&body, &batch, 0.001).unwrap();
+        assert!(cut.removed_material);
+        assert!(cut.solid.is_geometric_consistent());
     }
 
     #[test]

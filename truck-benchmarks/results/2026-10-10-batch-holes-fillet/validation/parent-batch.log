@@ -1,0 +1,28 @@
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-modeling)
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 11.02s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/analytic_holes.rs (target/release/deps/analytic_holes-1bdcccfc9bc0dc6b)
+
+running 1 test
+test batch_holes_preserve_faces_and_exact_curves_under_transforms ... FAILED
+
+failures:
+
+---- batch_holes_preserve_faces_and_exact_curves_under_transforms stdout ----
+
+thread 'batch_holes_preserve_faces_and_exact_curves_under_transforms' (623022) panicked at truck-shapeops/tests/analytic_holes.rs:48:13:
+assertion `left == right` failed
+  left: 0
+ right: 4
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    batch_holes_preserve_faces_and_exact_curves_under_transforms
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p truck-shapeops --test analytic_holes`

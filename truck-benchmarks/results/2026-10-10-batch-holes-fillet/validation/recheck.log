@@ -1,0 +1,75 @@
+cylinder_tolerance 1 before {'tessellation/cylinder_tolerance/0.001': 0.2109, 'tessellation/cylinder_tolerance/0.01': 0.06025, 'tessellation/cylinder_tolerance/0.1': 0.041740000000000006}
+cylinder_tolerance 1 after {'tessellation/cylinder_tolerance/0.001': 0.1931, 'tessellation/cylinder_tolerance/0.01': 0.05849, 'tessellation/cylinder_tolerance/0.1': 0.03936}
+cylinder_tolerance 2 after {'tessellation/cylinder_tolerance/0.001': 0.1896, 'tessellation/cylinder_tolerance/0.01': 0.058820000000000004, 'tessellation/cylinder_tolerance/0.1': 0.039380000000000005}
+cylinder_tolerance 2 before {'tessellation/cylinder_tolerance/0.001': 0.1862, 'tessellation/cylinder_tolerance/0.01': 0.05727, 'tessellation/cylinder_tolerance/0.1': 0.03968}
+cylinder_tolerance 3 before {'tessellation/cylinder_tolerance/0.001': 0.1834, 'tessellation/cylinder_tolerance/0.01': 0.05779, 'tessellation/cylinder_tolerance/0.1': 0.04933}
+cylinder_tolerance 3 after {'tessellation/cylinder_tolerance/0.001': 0.1807, 'tessellation/cylinder_tolerance/0.01': 0.056659999999999995, 'tessellation/cylinder_tolerance/0.1': 0.039060000000000004}
+cylinder_tolerance 4 after {'tessellation/cylinder_tolerance/0.001': 0.19190000000000002, 'tessellation/cylinder_tolerance/0.01': 0.057280000000000005, 'tessellation/cylinder_tolerance/0.1': 0.03885}
+cylinder_tolerance 4 before {'tessellation/cylinder_tolerance/0.001': 0.1784, 'tessellation/cylinder_tolerance/0.01': 0.05708, 'tessellation/cylinder_tolerance/0.1': 0.03943}
+cylinder_tolerance 5 before {'tessellation/cylinder_tolerance/0.001': 0.1814, 'tessellation/cylinder_tolerance/0.01': 0.05715, 'tessellation/cylinder_tolerance/0.1': 0.03911}
+cylinder_tolerance 5 after {'tessellation/cylinder_tolerance/0.001': 0.1786, 'tessellation/cylinder_tolerance/0.01': 0.05775, 'tessellation/cylinder_tolerance/0.1': 0.039200000000000006}
+[
+  {
+    "case": "tessellation/cylinder_tolerance/0.001",
+    "workers": 4,
+    "before": 0.1834,
+    "before_rounds": [
+      0.2109,
+      0.1862,
+      0.1834,
+      0.1784,
+      0.1814
+    ],
+    "after": 0.1896,
+    "after_rounds": [
+      0.1931,
+      0.1896,
+      0.1807,
+      0.19190000000000002,
+      0.1786
+    ],
+    "speedup": 0.9672995780590719
+  },
+  {
+    "case": "tessellation/cylinder_tolerance/0.01",
+    "workers": 4,
+    "before": 0.05727,
+    "before_rounds": [
+      0.06025,
+      0.05727,
+      0.05779,
+      0.05708,
+      0.05715
+    ],
+    "after": 0.05775,
+    "after_rounds": [
+      0.05849,
+      0.058820000000000004,
+      0.056659999999999995,
+      0.057280000000000005,
+      0.05775
+    ],
+    "speedup": 0.9916883116883116
+  },
+  {
+    "case": "tessellation/cylinder_tolerance/0.1",
+    "workers": 4,
+    "before": 0.03968,
+    "before_rounds": [
+      0.041740000000000006,
+      0.03968,
+      0.04933,
+      0.03943,
+      0.03911
+    ],
+    "after": 0.039200000000000006,
+    "after_rounds": [
+      0.03936,
+      0.039380000000000005,
+      0.039060000000000004,
+      0.03885,
+      0.039200000000000006
+    ],
+    "speedup": 1.0122448979591836
+  }
+]

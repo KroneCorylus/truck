@@ -262,7 +262,8 @@ impl IncludeCurve<Curve> for Surface {
 fn include_curve<S>(surface: &S, curve: &Curve) -> bool
 where S: IncludeCurve<BSplineCurve<Point3>>
         + IncludeCurve<NurbsCurve<Vector4>>
-        + SearchParameter<D2, Point = Point3> {
+        + SearchParameter<D2, Point = Point3>
+        + ParametricSurface3D {
     match curve {
         &Curve::Line(curve) => surface.include(&BSplineCurve::from(curve)),
         Curve::BSplineCurve(curve) => surface.include(curve),
@@ -1090,11 +1091,34 @@ impl ToSameGeometry<Surface> for BSplineSurface<Point3> {
     fn to_same_geometry(&self) -> Surface { Surface::BSplineSurface(self.clone()) }
 }
 
-fn sampled_include<S: SearchParameter<D2, Point = Point3>>(surface: &S, curve: &Curve) -> bool {
+fn sampled_include<S>(surface: &S, curve: &Curve) -> bool
+where S: SearchParameter<D2, Point = Point3> + ParametricSurface3D {
+    use std::ops::RangeBounds;
+
     let (a, b) = curve.range_tuple();
+    let (urange, vrange) = surface.parameter_range();
+    let in_range = |&(u, v): &(f64, f64)| {
+        u.is_finite() && v.is_finite() && urange.contains(&u) && vrange.contains(&v)
+    };
+    let mut previous: Option<(f64, f64)> = None;
+    let mut current: Option<(f64, f64)> = None;
     (0..=32).all(|i| {
-        surface
-            .search_parameter(curve.subs(a + (b - a) * i as f64 / 32.0), None, 100)
-            .is_some()
+        let point = curve.subs(a + (b - a) * i as f64 / 32.0);
+        let hint = current.map(|(u, v)| match previous {
+            Some((s, t)) => (2. * u - s, 2. * v - t),
+            None => (u, v),
+        });
+        // Continue along the curve, but never trust a seed across a seam or a failed solve.
+        let parameter = hint
+            .filter(in_range)
+            .and_then(|uv| surface.search_parameter(point, Some(uv), 100))
+            .filter(|uv| in_range(uv) && surface.subs(uv.0, uv.1).near(&point))
+            .or_else(|| surface.search_parameter(point, None, 100));
+        previous = current;
+        current = parameter;
+        parameter.is_some()
     })
 }
+
+#[cfg(test)]
+mod inclusion_tests;

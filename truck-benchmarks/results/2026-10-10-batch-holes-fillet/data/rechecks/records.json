@@ -1,0 +1,292 @@
+[
+  {
+    "family": "cylinder_tolerance",
+    "round": 1,
+    "engine": "before",
+    "workers": 4,
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/batch-fillet/actions-before",
+      "--bench",
+      "cylinder_tolerance",
+      "--color",
+      "never",
+      "--sample-count",
+      "500",
+      "--sample-size",
+      "1",
+      "--max-time",
+      "60"
+    ],
+    "log": "cylinder_tolerance-r1-before.txt",
+    "medians_ms": {
+      "tessellation/cylinder_tolerance/0.001": 0.2109,
+      "tessellation/cylinder_tolerance/0.01": 0.06025,
+      "tessellation/cylinder_tolerance/0.1": 0.041740000000000006
+    }
+  },
+  {
+    "family": "cylinder_tolerance",
+    "round": 1,
+    "engine": "after",
+    "workers": 4,
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/batch-fillet/actions-after",
+      "--bench",
+      "cylinder_tolerance",
+      "--color",
+      "never",
+      "--sample-count",
+      "500",
+      "--sample-size",
+      "1",
+      "--max-time",
+      "60"
+    ],
+    "log": "cylinder_tolerance-r1-after.txt",
+    "medians_ms": {
+      "tessellation/cylinder_tolerance/0.001": 0.1931,
+      "tessellation/cylinder_tolerance/0.01": 0.05849,
+      "tessellation/cylinder_tolerance/0.1": 0.03936
+    }
+  },
+  {
+    "family": "cylinder_tolerance",
+    "round": 2,
+    "engine": "after",
+    "workers": 4,
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/batch-fillet/actions-after",
+      "--bench",
+      "cylinder_tolerance",
+      "--color",
+      "never",
+      "--sample-count",
+      "500",
+      "--sample-size",
+      "1",
+      "--max-time",
+      "60"
+    ],
+    "log": "cylinder_tolerance-r2-after.txt",
+    "medians_ms": {
+      "tessellation/cylinder_tolerance/0.001": 0.1896,
+      "tessellation/cylinder_tolerance/0.01": 0.058820000000000004,
+      "tessellation/cylinder_tolerance/0.1": 0.039380000000000005
+    }
+  },
+  {
+    "family": "cylinder_tolerance",
+    "round": 2,
+    "engine": "before",
+    "workers": 4,
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/batch-fillet/actions-before",
+      "--bench",
+      "cylinder_tolerance",
+      "--color",
+      "never",
+      "--sample-count",
+      "500",
+      "--sample-size",
+      "1",
+      "--max-time",
+      "60"
+    ],
+    "log": "cylinder_tolerance-r2-before.txt",
+    "medians_ms": {
+      "tessellation/cylinder_tolerance/0.001": 0.1862,
+      "tessellation/cylinder_tolerance/0.01": 0.05727,
+      "tessellation/cylinder_tolerance/0.1": 0.03968
+    }
+  },
+  {
+    "family": "cylinder_tolerance",
+    "round": 3,
+    "engine": "before",
+    "workers": 4,
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/batch-fillet/actions-before",
+      "--bench",
+      "cylinder_tolerance",
+      "--color",
+      "never",
+      "--sample-count",
+      "500",
+      "--sample-size",
+      "1",
+      "--max-time",
+      "60"
+    ],
+    "log": "cylinder_tolerance-r3-before.txt",
+    "medians_ms": {
+      "tessellation/cylinder_tolerance/0.001": 0.1834,
+      "tessellation/cylinder_tolerance/0.01": 0.05779,
+      "tessellation/cylinder_tolerance/0.1": 0.04933
+    }
+  },
+  {
+    "family": "cylinder_tolerance",
+    "round": 3,
+    "engine": "after",
+    "workers": 4,
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/batch-fillet/actions-after",
+      "--bench",
+      "cylinder_tolerance",
+      "--color",
+      "never",
+      "--sample-count",
+      "500",
+      "--sample-size",
+      "1",
+      "--max-time",
+      "60"
+    ],
+    "log": "cylinder_tolerance-r3-after.txt",
+    "medians_ms": {
+      "tessellation/cylinder_tolerance/0.001": 0.1807,
+      "tessellation/cylinder_tolerance/0.01": 0.056659999999999995,
+      "tessellation/cylinder_tolerance/0.1": 0.039060000000000004
+    }
+  },
+  {
+    "family": "cylinder_tolerance",
+    "round": 4,
+    "engine": "after",
+    "workers": 4,
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/batch-fillet/actions-after",
+      "--bench",
+      "cylinder_tolerance",
+      "--color",
+      "never",
+      "--sample-count",
+      "500",
+      "--sample-size",
+      "1",
+      "--max-time",
+      "60"
+    ],
+    "log": "cylinder_tolerance-r4-after.txt",
+    "medians_ms": {
+      "tessellation/cylinder_tolerance/0.001": 0.19190000000000002,
+      "tessellation/cylinder_tolerance/0.01": 0.057280000000000005,
+      "tessellation/cylinder_tolerance/0.1": 0.03885
+    }
+  },
+  {
+    "family": "cylinder_tolerance",
+    "round": 4,
+    "engine": "before",
+    "workers": 4,
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/batch-fillet/actions-before",
+      "--bench",
+      "cylinder_tolerance",
+      "--color",
+      "never",
+      "--sample-count",
+      "500",
+      "--sample-size",
+      "1",
+      "--max-time",
+      "60"
+    ],
+    "log": "cylinder_tolerance-r4-before.txt",
+    "medians_ms": {
+      "tessellation/cylinder_tolerance/0.001": 0.1784,
+      "tessellation/cylinder_tolerance/0.01": 0.05708,
+      "tessellation/cylinder_tolerance/0.1": 0.03943
+    }
+  },
+  {
+    "family": "cylinder_tolerance",
+    "round": 5,
+    "engine": "before",
+    "workers": 4,
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/batch-fillet/actions-before",
+      "--bench",
+      "cylinder_tolerance",
+      "--color",
+      "never",
+      "--sample-count",
+      "500",
+      "--sample-size",
+      "1",
+      "--max-time",
+      "60"
+    ],
+    "log": "cylinder_tolerance-r5-before.txt",
+    "medians_ms": {
+      "tessellation/cylinder_tolerance/0.001": 0.1814,
+      "tessellation/cylinder_tolerance/0.01": 0.05715,
+      "tessellation/cylinder_tolerance/0.1": 0.03911
+    }
+  },
+  {
+    "family": "cylinder_tolerance",
+    "round": 5,
+    "engine": "after",
+    "workers": 4,
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/batch-fillet/actions-after",
+      "--bench",
+      "cylinder_tolerance",
+      "--color",
+      "never",
+      "--sample-count",
+      "500",
+      "--sample-size",
+      "1",
+      "--max-time",
+      "60"
+    ],
+    "log": "cylinder_tolerance-r5-after.txt",
+    "medians_ms": {
+      "tessellation/cylinder_tolerance/0.001": 0.1786,
+      "tessellation/cylinder_tolerance/0.01": 0.05775,
+      "tessellation/cylinder_tolerance/0.1": 0.039200000000000006
+    }
+  }
+]

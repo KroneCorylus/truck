@@ -1,5 +1,15 @@
 # CPU action benchmarks
 
+## Batch holes and fillet validation
+
+The [2026-10-10 batch and fillet report](truck-benchmarks/results/2026-10-10-batch-holes-fillet/REPORT.md)
+measures 100 batch holes falling from **186.65 ms to 0.92 ms** with one worker, versus
+**89.54 ms** in OCCT 7.9.3. Bore-rim filleting falls from **10.41 ms to 1.85 ms**;
+OCCT remains faster at **0.315 ms**. All 20 direct cases and all 72 actions were rerun
+before and after with one and four workers. All benchmark checks passed, and Truck now
+leads in **38 of 40** direct case/worker comparisons. The report includes regression tests,
+the known parent test failure, representation differences, raw samples and source hashes.
+
 ## Full suite after the hole optimization
 
 The [complete 2026-10-10 run](truck-benchmarks/results/2026-10-10-all-benchmarks/REPORT.md)

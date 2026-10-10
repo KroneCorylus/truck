@@ -1,0 +1,2 @@
+RESULT {"peak_rss_kib":5164,"phase":"timing","samples_ms":[0.018425999999999998,0.015881,0.016421,0.014758,0.014277000000000001,0.01568,0.014216999999999999,0.014227,0.014548,0.014337,0.014768,0.014558,0.014317,0.014036999999999999,0.016241]}
+RESULT {"phase":"qa","qa":{"expected_volume":2.008106024174559,"faces":6,"geometric":true,"mesh_closed":true,"pass":true,"qa_tolerance":0.00001,"relative_volume_error":1.4376465066605046e-6,"topology":true,"triangles":11240,"volume":2.0081031372279483}}

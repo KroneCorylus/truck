@@ -12,6 +12,128 @@ fn retained(before: &Solid, after: &Solid) -> usize {
         .count()
 }
 
+fn compound(solids: &[Solid]) -> Solid {
+    Solid::new(
+        solids
+            .iter()
+            .flat_map(|s| s.boundaries().iter().cloned())
+            .collect(),
+    )
+}
+
+#[test]
+fn batch_holes_preserve_faces_and_exact_curves_under_transforms() {
+    for moved in [false, true] {
+        let transform = |s: &Solid| {
+            if moved {
+                builder::transformed(
+                    s,
+                    Matrix4::from_translation(Vector3::new(100., -30., 5.))
+                        * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.71)),
+                )
+            } else {
+                s.clone()
+            }
+        };
+        let plate = transform(&cuboid(Point3::origin(), Point3::new(16., 12., 2.)));
+        let mut tools = Vec::new();
+        let mut removed = 0.;
+        for i in 0..6 {
+            let radius = 0.4 + 0.2 * (i % 3) as f64;
+            let axis = if i % 2 == 0 {
+                Vector3::unit_z()
+            } else {
+                -Vector3::unit_z()
+            };
+            let center = Point3::new(
+                2. + (i % 3) as f64 * 4.,
+                2. + (i / 3) as f64 * 4.,
+                if axis.z > 0. { -1. } else { 3. },
+            );
+            let wire = primitive::circle(
+                center + radius * Vector3::unit_x(),
+                center,
+                axis,
+                2 + i % 3 * 2,
+            );
+            let disk = builder::try_attach_plane(&[wire]).unwrap();
+            tools.push(transform(&builder::tsweep(&disk, 4. * axis)));
+            removed += 2. * PI * radius * radius;
+        }
+        for reverse in [false, true] {
+            if reverse {
+                tools.reverse();
+            }
+            let batch = compound(&tools);
+            let inputs = serde_json::to_string(&[plate.compress(), batch.compress()]).unwrap();
+            let cut = truck_shapeops::try_subtract_with_effect(&plate, &batch, TOL).unwrap();
+            assert!(cut.removed_material);
+            assert_eq!(retained(&plate, &cut.solid), 4);
+            assert!(cut
+                .solid
+                .edge_iter()
+                .all(|e| matches!(e.curve(), Curve::Line(_) | Curve::Conic(_))));
+            assert!(cut.solid.is_geometric_consistent());
+            assert_solid(&cut.solid, 384. - removed, &[6], TOL);
+            assert_eq!(
+                inputs,
+                serde_json::to_string(&[plate.compress(), batch.compress()]).unwrap()
+            );
+            if moved && reverse {
+                common::blend::assert_step(&cut.solid, 384. - removed, TOL);
+            }
+        }
+    }
+}
+
+#[test]
+fn batch_combines_new_holes_and_empty_space_without_rebuilding_old_walls() {
+    let plate = cuboid(Point3::origin(), Point3::new(16., 8., 2.));
+    let bore = cylinder(Point3::new(2., 2., -1.), Vector3::unit_z(), 1., 4.);
+    let plate = truck_shapeops::try_subtract(&plate, &bore, TOL).unwrap();
+    let empty = [
+        cylinder(Point3::new(2., 2., -1.), Vector3::unit_z(), 0.5, 4.),
+        cylinder(Point3::new(20., 2., -1.), Vector3::unit_z(), 1., 4.),
+    ];
+    let unchanged =
+        truck_shapeops::try_subtract_with_effect(&plate, &compound(&empty), TOL).unwrap();
+    assert!(!unchanged.removed_material);
+    assert_eq!(
+        retained(&plate, &unchanged.solid),
+        plate.face_iter().count()
+    );
+    let mut tools = empty.to_vec();
+    tools.push(cylinder(
+        Point3::new(6., 2., -1.),
+        Vector3::unit_z(),
+        1.,
+        4.,
+    ));
+    tools.push(cylinder(
+        Point3::new(10., 2., -1.),
+        Vector3::unit_z(),
+        0.5,
+        4.,
+    ));
+    let cut = truck_shapeops::try_subtract_with_effect(&plate, &compound(&tools), TOL).unwrap();
+    assert!(cut.removed_material);
+    assert_eq!(retained(&plate, &cut.solid), plate.face_iter().count() - 2);
+    assert_solid(&cut.solid, 256. - 4.5 * PI, &[3], TOL);
+    assert!(cut.solid.is_geometric_consistent());
+}
+
+#[test]
+fn mixed_through_and_blind_batch_preserves_general_boolean_behavior() {
+    let plate = cuboid(Point3::origin(), Point3::new(12., 8., 2.));
+    let tools = [
+        cylinder(Point3::new(3., 3., -1.), Vector3::unit_z(), 1., 4.),
+        cylinder(Point3::new(8., 3., 1.), Vector3::unit_z(), 0.5, 2.),
+    ];
+    let cut = truck_shapeops::try_subtract(&plate, &compound(&tools), TOL).unwrap();
+    assert_solid(&cut, 192. - 2.25 * PI, &[1], TOL);
+    assert!(cut.is_geometric_consistent());
+}
+
 #[test]
 fn through_hole_preserves_remote_faces_and_exact_circles() {
     let plate = cuboid(Point3::origin(), Point3::new(12., 8., 2.));

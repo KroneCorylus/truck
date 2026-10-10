@@ -408,7 +408,8 @@ fn boolean<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
 /// Uses the same shell contract and tolerance as [`and`]. Prefer this over manually inverting
 /// the cutter: `Solid::not` cannot distinguish the complement of an empty solid from empty.
 /// Modeling solids use exact circular sections for isolated cylindrical through-holes in
-/// prismatic bodies, retaining unaffected faces. Other cuts use the general Boolean solver.
+/// prismatic bodies, including batches of disjoint parallel cutters, retaining unaffected
+/// faces. Other cuts use the general Boolean solver.
 /// Geometry types must own their data (`'static`); the solid references may be borrowed.
 pub fn subtract<C: ShapeOpsCurve<S> + 'static, S: ShapeOpsSurface + 'static>(
     solid0: &Solid<Point3, C, S>,

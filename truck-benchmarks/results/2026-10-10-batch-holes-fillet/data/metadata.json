@@ -1,0 +1,47 @@
+{
+  "parent": "ad3b76fa393d7db89d274866cf955acc1a8cce4f",
+  "created_utc": "2026-10-10T13:14:25Z",
+  "cpus": "0,1,2,3",
+  "workers": [
+    1,
+    4
+  ],
+  "rounds": 2,
+  "direct_samples": 15,
+  "action_samples": 20,
+  "tolerance": 0.001,
+  "qa_tolerance": 0.001,
+  "fuzzy": 0,
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.1\nLLVM version: 22.1.8\n",
+  "platform": "Linux main 7.2.8-200.fc44.x86_64 #1 SMP PREEMPT_DYNAMIC Fri Sep 25 21:05:44 UTC 2026 x86_64 GNU/Linux\n",
+  "binaries": {
+    "before": {
+      "path": "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/batch-fillet/compare-before",
+      "sha256": "38fd5bc0d46e4c53e8b66d79cd2e4aaaebc47fe9de82ebcfe11fc97f3a719ca6"
+    },
+    "after": {
+      "path": "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/batch-fillet/compare-after",
+      "sha256": "1a572ad9b2bb71c41beaa97c3a57418f6924260cb85b5bb1e056738dcd340d46"
+    },
+    "occt": {
+      "path": "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/occt-comparison/compare_occt",
+      "sha256": "a773baa64db65d1ad66d31e8a3e98cbdc7611febbb20575210d7147fc64fdb1c"
+    }
+  },
+  "action_binaries": {
+    "before": {
+      "path": "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/batch-fillet/actions-before",
+      "sha256": "6cdf5633f7e44cc2ba4b8d34cd12fb1d95badde7902fa6426b526fd403087f1b"
+    },
+    "after": {
+      "path": "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/batch-fillet/actions-after",
+      "sha256": "81f2b4d948ceed9fec960bad4a3658dc518ea3af3c9e0b66ebe0f0f6e1491997"
+    }
+  },
+  "occt_version": "7.9.3",
+  "occt_libraries": "\tlinux-vdso.so.1 (0x00007f7a1a497000)\n\tlibTKernel.so.7.9 => /lib64/libTKernel.so.7.9 (0x00007f7a1a289000)\n\tlibTKMath.so.7.9 => /lib64/libTKMath.so.7.9 (0x00007f7a1a000000)\n\tlibTKG2d.so.7.9 => /lib64/libTKG2d.so.7.9 (0x00007f7a1a227000)\n\tlibTKG3d.so.7.9 => /lib64/libTKG3d.so.7.9 (0x00007f7a19ecc000)\n\tlibTKGeomBase.so.7.9 => /lib64/libTKGeomBase.so.7.9 (0x00007f7a19800000)\n\tlibTKBRep.so.7.9 => /lib64/libTKBRep.so.7.9 (0x00007f7a19dce000)\n\tlibTKGeomAlgo.so.7.9 => /lib64/libTKGeomAlgo.so.7.9 (0x00007f7a19200000)\n\tlibTKTopAlgo.so.7.9 => /lib64/libTKTopAlgo.so.7.9 (0x00007f7a18e00000)\n\tlibTKPrim.so.7.9 => /lib64/libTKPrim.so.7.9 (0x00007f7a19d72000)\n\tlibTKBO.so.7.9 => /lib64/libTKBO.so.7.9 (0x00007f7a18c26000)\n\tlibTKBool.so.7.9 => /lib64/libTKBool.so.7.9 (0x00007f7a18800000)\n\tlibTKFillet.so.7.9 => /lib64/libTKFillet.so.7.9 (0x00007f7a18400000)\n\tlibTKMesh.so.7.9 => /lib64/libTKMesh.so.7.9 (0x00007f7a19723000)\n\tlibTKXSBase.so.7.9 => /lib64/libTKXSBase.so.7.9 (0x00007f7a18216000)\n\tlibTKDESTEP.so.7.9 => /lib64/libTKDESTEP.so.7.9 (0x00007f7a17a00000)\n\tlibstdc++.so.6 => /lib64/libstdc++.so.6 (0x00007f7a17600000)\n\tlibm.so.6 => /lib64/libm.so.6 (0x00007f7a190e9000)\n\tlibgcc_s.so.1 => /lib64/libgcc_s.so.1 (0x00007f7a19d45000)\n\tlibc.so.6 => /lib64/libc.so.6 (0x00007f7a17407000)\n\tlibtbb.so.12 => /lib64/libtbb.so.12 (0x00007f7a19cee000)\n\tlibTKShHealing.so.7.9 => /lib64/libTKShHealing.so.7.9 (0x00007f7a17000000)\n\tlibTKDE.so.7.9 => /lib64/libTKDE.so.7.9 (0x00007f7a190c7000)\n\tlibTKXCAF.so.7.9 => /lib64/libTKXCAF.so.7.9 (0x00007f7a18b45000)\n\tlibTKLCAF.so.7.9 => /lib64/libTKLCAF.so.7.9 (0x00007f7a1872c000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f7a1a499000)\n\tlibTKVCAF.so.7.9 => /lib64/libTKVCAF.so.7.9 (0x00007f7a1908d000)\n\tlibTKV3d.so.7.9 => /lib64/libTKV3d.so.7.9 (0x00007f7a16c00000)\n\tlibTKService.so.7.9 => /lib64/libTKService.so.7.9 (0x00007f7a178c1000)\n\tlibTKCAF.so.7.9 => /lib64/libTKCAF.so.7.9 (0x00007f7a186af000)\n\tlibTKCDF.so.7.9 => /lib64/libTKCDF.so.7.9 (0x00007f7a181be000)\n\tlibTKHLR.so.7.9 => /lib64/libTKHLR.so.7.9 (0x00007f7a172f0000)\n\tlibX11.so.6 => /lib64/libX11.so.6 (0x00007f7a16aab000)\n\tlibfontconfig.so.1 => /lib64/libfontconfig.so.1 (0x00007f7a1729d000)\n\tlibfreetype.so.6 => /lib64/libfreetype.so.6 (0x00007f7a16f24000)\n\tlibxcb.so.1 => /lib64/libxcb.so.1 (0x00007f7a18b1b000)\n\tlibxml2.so.2 => /lib64/libxml2.so.2 (0x00007f7a1693c000)\n\tlibz.so.1 => /lib64/libz.so.1 (0x00007f7a17273000)\n\tlibbz2.so.1 => /lib64/libbz2.so.1 (0x00007f7a1970b000)\n\tlibpng16.so.16 => /lib64/libpng16.so.16 (0x00007f7a16ee7000)\n\tlibharfbuzz.so.0 => /lib64/libharfbuzz.so.0 (0x00007f7a16800000)\n\tlibbrotlidec.so.1 => /lib64/libbrotlidec.so.1 (0x00007f7a186a0000)\n\tlibXau.so.6 => /lib64/libXau.so.6 (0x00007f7a19706000)\n\tliblzma.so.5 => /lib64/liblzma.so.5 (0x00007f7a167ca000)\n\tlibglib-2.0.so.0 => /lib64/libglib-2.0.so.0 (0x00007f7a16668000)\n\tlibgraphite2.so.3 => /lib64/libgraphite2.so.3 (0x00007f7a1819e000)\n\tlibbrotlicommon.so.1 => /lib64/libbrotlicommon.so.1 (0x00007f7a17250000)\n\tlibpcre2-8.so.0 => /lib64/libpcre2-8.so.0 (0x00007f7a165b7000)\n",
+  "fixtures": {
+    "thread-1.step": "b880bc8386915202dc76e085ca006d7e7bcc5741aae2a9bef3f0a8ebefe33b72",
+    "thread-4.step": "bdad9058050fa259182bec202c109a916a99ee6f5643d763b631f8cdadaa8aae"
+  }
+}
