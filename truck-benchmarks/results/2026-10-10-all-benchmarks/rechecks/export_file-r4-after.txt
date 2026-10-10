@@ -1,0 +1,8 @@
+Timer precision: 10 ns
+actions            fastest       │ slowest       │ median        │ mean          │ samples │ iters
+╰─ step                          │               │               │               │         │
+   ╰─ export_file                │               │               │               │         │
+      ├─ 1         77.69 µs      │ 312.3 µs      │ 84.28 µs      │ 90.21 µs      │ 500     │ 500
+      ├─ 10        192.4 µs      │ 312.8 µs      │ 204.3 µs      │ 211.5 µs      │ 500     │ 500
+      ╰─ 30        433.1 µs      │ 683.6 µs      │ 451.2 µs      │ 464.4 µs      │ 500     │ 500
+

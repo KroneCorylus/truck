@@ -1,0 +1,8 @@
+Timer precision: 10 ns
+actions                   fastest       │ slowest       │ median        │ mean          │ samples │ iters
+╰─ tessellation                         │               │               │               │         │
+   ╰─ cylinder_tolerance                │               │               │               │         │
+      ├─ 0.001            149.3 µs      │ 415 µs        │ 179.2 µs      │ 190 µs        │ 500     │ 500
+      ├─ 0.01             53.62 µs      │ 119.5 µs      │ 56.55 µs      │ 58.43 µs      │ 500     │ 500
+      ╰─ 0.1              35.5 µs       │ 95.5 µs       │ 38.3 µs       │ 38.7 µs       │ 500     │ 500
+

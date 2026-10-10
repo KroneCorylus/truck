@@ -1,0 +1,23 @@
+{
+  "binaries": {
+    "before": "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+    "after": "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+    "occt": "/home/krone/Development/Pieza_WS/investigations/sequential-holes-2026-10-10/runner-build/compare_occt"
+  },
+  "sha256": {
+    "before": "caa07350dd9e9788f2cc4ffdfc80659a9e82c0d70b464d17f7401b8a05ded325",
+    "after": "38fd5bc0d46e4c53e8b66d79cd2e4aaaebc47fe9de82ebcfe11fc97f3a719ca6",
+    "occt": "623e8da86117920256129611543f46eabdf481ac9db20c9682a8fb234c94189b"
+  },
+  "revision": "3729a083932f5d73a29a4e84cc0b03866869aa27",
+  "cpus": "0,1,2,3",
+  "samples": 5,
+  "rounds": 2,
+  "tolerance": 0.001,
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.1\nLLVM version: 22.1.8\n",
+  "kernel": "Linux main 7.2.8-200.fc44.x86_64 #1 SMP PREEMPT_DYNAMIC Fri Sep 25 21:05:44 UTC 2026 x86_64 GNU/Linux",
+  "cpu": "AMD Ryzen 9 7950X3D 16-Core Processor",
+  "occt_revision": "a016080bf6738d6aeae020badee4e888ad1540a5",
+  "occt_version": "V7_9_3",
+  "parent_root_clean": true
+}

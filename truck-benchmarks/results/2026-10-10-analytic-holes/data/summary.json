@@ -1,0 +1,101 @@
+[
+  {
+    "case": "holes_sequential/1",
+    "workers": 1,
+    "before": 1.5204149999999998,
+    "after": 0.022768499999999997,
+    "occt": 1.3677169999999998,
+    "speedup": 66.77712629290467
+  },
+  {
+    "case": "holes_sequential/10",
+    "workers": 1,
+    "before": 62.2727835,
+    "after": 0.488047,
+    "occt": 18.306306,
+    "speedup": 127.59587396295849
+  },
+  {
+    "case": "holes_sequential/30",
+    "workers": 1,
+    "before": 461.11149,
+    "after": 3.4045240000000003,
+    "occt": 88.76933600000001,
+    "speedup": 135.44081052152958
+  },
+  {
+    "case": "holes_sequential/100",
+    "workers": 1,
+    "before": 5440.234125,
+    "after": 32.8906635,
+    "occt": 696.681678,
+    "speedup": 165.4035992615351
+  },
+  {
+    "case": "holes_sequential/1",
+    "workers": 4,
+    "before": 1.2125385,
+    "after": 0.0246725,
+    "occt": 1.2322315000000001,
+    "speedup": 49.145344006484954
+  },
+  {
+    "case": "holes_sequential/10",
+    "workers": 4,
+    "before": 37.359342,
+    "after": 0.4923255,
+    "occt": 16.440438,
+    "speedup": 75.88341859196811
+  },
+  {
+    "case": "holes_sequential/30",
+    "workers": 4,
+    "before": 254.9968725,
+    "after": 3.4400120000000003,
+    "occt": 75.218644,
+    "speedup": 74.12673923811893
+  },
+  {
+    "case": "holes_sequential/100",
+    "workers": 4,
+    "before": 2942.7240755000003,
+    "after": 32.8835655,
+    "occt": 577.988392,
+    "speedup": 89.48920321611718
+  },
+  {
+    "case": "holes_batch/100",
+    "workers": 1,
+    "before": 184.8377265,
+    "after": 183.8878065,
+    "speedup": 1.005165758502862
+  },
+  {
+    "case": "thin_wall/0.01",
+    "workers": 1,
+    "before": 8.628638500000001,
+    "after": 0.01797,
+    "speedup": 480.16908736783535
+  },
+  {
+    "case": "fillet_bore/0.5",
+    "workers": 1,
+    "before": 10.492823999999999,
+    "after": 10.466723000000002,
+    "speedup": 1.0024937126930746
+  },
+  {
+    "case": "mesh_plate/100",
+    "workers": 1,
+    "before": 62.476319000000004,
+    "after": 62.05195950000001,
+    "speedup": 1.0068387767835114
+  },
+  {
+    "case": "knurl/16",
+    "workers": 1,
+    "before": 9.447386000000002,
+    "after": 9.390090999999998,
+    "speedup": 1.0061016448083415
+  }
+]

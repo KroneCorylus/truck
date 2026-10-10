@@ -1,0 +1,59 @@
+{
+  "created_utc": "2026-10-10T12:11:24Z",
+  "cpus": "0,1,2,3",
+  "workers": [
+    1,
+    4
+  ],
+  "samples": 20,
+  "rounds": 2,
+  "parent_revision": "3729a083932f5d73a29a4e84cc0b03866869aa27",
+  "revision": "3729a083932f5d73a29a4e84cc0b03866869aa27",
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.1\nLLVM version: 22.1.8\n",
+  "builds": [
+    {
+      "command": [
+        "cargo",
+        "bench",
+        "--locked",
+        "-p",
+        "truck-benchmarks",
+        "--bench",
+        "actions",
+        "--no-run",
+        "--message-format=json"
+      ],
+      "cwd": "/home/krone/Development/Pieza_WS/truck",
+      "exit_code": 0,
+      "seconds": 0.10692351899342611,
+      "log": "actions/build-before.log"
+    },
+    {
+      "command": [
+        "cargo",
+        "bench",
+        "--locked",
+        "-p",
+        "truck-benchmarks",
+        "--bench",
+        "actions",
+        "--no-run",
+        "--message-format=json"
+      ],
+      "cwd": "/home/krone/Development/Pieza_WS/truck-analytic-holes",
+      "exit_code": 0,
+      "seconds": 0.10052490900852717,
+      "log": "actions/build-after.log"
+    }
+  ],
+  "binaries": {
+    "before": {
+      "path": "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/all-benchmarks/actions-before",
+      "sha256": "c93a61c99e5e5853bfeb758e9599e6ec05012231b0dad03dda05652f71803210"
+    },
+    "after": {
+      "path": "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/all-benchmarks/actions-after",
+      "sha256": "6cdf5633f7e44cc2ba4b8d34cd12fb1d95badde7902fa6426b526fd403087f1b"
+    }
+  }
+}

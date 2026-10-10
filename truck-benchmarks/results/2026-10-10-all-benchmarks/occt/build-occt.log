@@ -1,0 +1,3 @@
+[ 50%] Building CXX object CMakeFiles/compare_occt.dir/main.cpp.o
+[100%] Linking CXX executable compare_occt
+[100%] Built target compare_occt

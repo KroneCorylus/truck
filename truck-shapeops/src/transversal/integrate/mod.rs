@@ -1,4 +1,5 @@
 mod components;
+mod through_hole;
 pub use components::{solid_components, try_solid_components};
 use rustc_hash::FxHashMap as HashMap;
 use std::result::Result;
@@ -406,7 +407,10 @@ fn boolean<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
 ///
 /// Uses the same shell contract and tolerance as [`and`]. Prefer this over manually inverting
 /// the cutter: `Solid::not` cannot distinguish the complement of an empty solid from empty.
-pub fn subtract<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
+/// Modeling solids use exact circular sections for isolated cylindrical through-holes in
+/// prismatic bodies, retaining unaffected faces. Other cuts use the general Boolean solver.
+/// Geometry types must own their data (`'static`); the solid references may be borrowed.
+pub fn subtract<C: ShapeOpsCurve<S> + 'static, S: ShapeOpsSurface + 'static>(
     solid0: &Solid<Point3, C, S>,
     solid1: &Solid<Point3, C, S>,
     tol: f64,
@@ -429,7 +433,7 @@ pub struct SubtractionResult<C, S> {
 /// Uses the same tolerance, nonmutation, and failure contract as [`subtract`]. No
 /// second boolean or mesh-volume comparison is performed. Shells may be disconnected
 /// or nested, including cavity boundaries, as described in [`and`].
-pub fn subtract_with_effect<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
+pub fn subtract_with_effect<C: ShapeOpsCurve<S> + 'static, S: ShapeOpsSurface + 'static>(
     solid0: &Solid<Point3, C, S>,
     solid1: &Solid<Point3, C, S>,
     tol: f64,
@@ -460,7 +464,7 @@ pub fn try_or<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
 }
 
 /// Subtraction with stable diagnostics, including empty operands.
-pub fn try_subtract<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
+pub fn try_subtract<C: ShapeOpsCurve<S> + 'static, S: ShapeOpsSurface + 'static>(
     solid0: &Solid<Point3, C, S>,
     solid1: &Solid<Point3, C, S>,
     tol: f64,
@@ -471,7 +475,7 @@ pub fn try_subtract<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
 }
 
 /// Subtraction with diagnostics and material-removal information from the same operation.
-pub fn try_subtract_with_effect<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
+pub fn try_subtract_with_effect<C: ShapeOpsCurve<S> + 'static, S: ShapeOpsSurface + 'static>(
     solid0: &Solid<Point3, C, S>,
     solid1: &Solid<Point3, C, S>,
     tol: f64,
@@ -479,11 +483,23 @@ pub fn try_subtract_with_effect<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     subtraction(solid0, solid1, tol).map_err(|e| e.operation("subtract_with_effect"))
 }
 
-fn subtraction<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
+fn subtraction<C: ShapeOpsCurve<S> + 'static, S: ShapeOpsSurface + 'static>(
     solid0: &Solid<Point3, C, S>,
     solid1: &Solid<Point3, C, S>,
     tol: f64,
 ) -> Result<SubtractionResult<C, S>, Diagnostic> {
+    truck_base::diagnostics::validate_tolerance(tol, "boolean")?;
+    let (target, tool): (&dyn std::any::Any, &dyn std::any::Any) = (solid0, solid1);
+    if let (Some(target), Some(tool)) = (
+        target.downcast_ref::<truck_modeling::Solid>(),
+        tool.downcast_ref::<truck_modeling::Solid>(),
+    ) {
+        if let Some(result) = through_hole::subtract(target, tool, tol) {
+            // The input downcasts establish C and S; custom geometry uses the generic solver.
+            let result: Box<dyn std::any::Any> = Box::new(result);
+            return Ok(*result.downcast::<SubtractionResult<C, S>>().unwrap());
+        }
+    }
     if solid1.boundaries().is_empty() {
         return Ok(SubtractionResult {
             solid: try_or(solid0, solid1, tol)?,

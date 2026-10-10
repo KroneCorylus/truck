@@ -1,0 +1,582 @@
+[
+  {
+    "family": "export_file",
+    "round": 1,
+    "engine": "before",
+    "workers": 4,
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/all-benchmarks/actions-before",
+      "--bench",
+      "export_file",
+      "--color",
+      "never",
+      "--sample-count",
+      "500",
+      "--sample-size",
+      "1",
+      "--max-time",
+      "60"
+    ],
+    "log": "export_file-r1-before.txt",
+    "medians_ms": {
+      "step/export_file/1": 0.07998999999999999,
+      "step/export_file/10": 0.1987,
+      "step/export_file/30": 0.45060000000000006
+    }
+  },
+  {
+    "family": "export_file",
+    "round": 1,
+    "engine": "after",
+    "workers": 4,
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/all-benchmarks/actions-after",
+      "--bench",
+      "export_file",
+      "--color",
+      "never",
+      "--sample-count",
+      "500",
+      "--sample-size",
+      "1",
+      "--max-time",
+      "60"
+    ],
+    "log": "export_file-r1-after.txt",
+    "medians_ms": {
+      "step/export_file/1": 0.08106999999999999,
+      "step/export_file/10": 0.2041,
+      "step/export_file/30": 0.4884
+    }
+  },
+  {
+    "family": "export_file",
+    "round": 2,
+    "engine": "after",
+    "workers": 4,
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/all-benchmarks/actions-after",
+      "--bench",
+      "export_file",
+      "--color",
+      "never",
+      "--sample-count",
+      "500",
+      "--sample-size",
+      "1",
+      "--max-time",
+      "60"
+    ],
+    "log": "export_file-r2-after.txt",
+    "medians_ms": {
+      "step/export_file/1": 0.08846,
+      "step/export_file/10": 0.2125,
+      "step/export_file/30": 0.4522
+    }
+  },
+  {
+    "family": "export_file",
+    "round": 2,
+    "engine": "before",
+    "workers": 4,
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/all-benchmarks/actions-before",
+      "--bench",
+      "export_file",
+      "--color",
+      "never",
+      "--sample-count",
+      "500",
+      "--sample-size",
+      "1",
+      "--max-time",
+      "60"
+    ],
+    "log": "export_file-r2-before.txt",
+    "medians_ms": {
+      "step/export_file/1": 0.08001000000000001,
+      "step/export_file/10": 0.2018,
+      "step/export_file/30": 0.44489999999999996
+    }
+  },
+  {
+    "family": "export_file",
+    "round": 3,
+    "engine": "before",
+    "workers": 4,
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/all-benchmarks/actions-before",
+      "--bench",
+      "export_file",
+      "--color",
+      "never",
+      "--sample-count",
+      "500",
+      "--sample-size",
+      "1",
+      "--max-time",
+      "60"
+    ],
+    "log": "export_file-r3-before.txt",
+    "medians_ms": {
+      "step/export_file/1": 0.08237000000000001,
+      "step/export_file/10": 0.2042,
+      "step/export_file/30": 0.4457
+    }
+  },
+  {
+    "family": "export_file",
+    "round": 3,
+    "engine": "after",
+    "workers": 4,
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/all-benchmarks/actions-after",
+      "--bench",
+      "export_file",
+      "--color",
+      "never",
+      "--sample-count",
+      "500",
+      "--sample-size",
+      "1",
+      "--max-time",
+      "60"
+    ],
+    "log": "export_file-r3-after.txt",
+    "medians_ms": {
+      "step/export_file/1": 0.08426,
+      "step/export_file/10": 0.2006,
+      "step/export_file/30": 0.44789999999999996
+    }
+  },
+  {
+    "family": "export_file",
+    "round": 4,
+    "engine": "after",
+    "workers": 4,
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/all-benchmarks/actions-after",
+      "--bench",
+      "export_file",
+      "--color",
+      "never",
+      "--sample-count",
+      "500",
+      "--sample-size",
+      "1",
+      "--max-time",
+      "60"
+    ],
+    "log": "export_file-r4-after.txt",
+    "medians_ms": {
+      "step/export_file/1": 0.08428000000000001,
+      "step/export_file/10": 0.2043,
+      "step/export_file/30": 0.4512
+    }
+  },
+  {
+    "family": "export_file",
+    "round": 4,
+    "engine": "before",
+    "workers": 4,
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/all-benchmarks/actions-before",
+      "--bench",
+      "export_file",
+      "--color",
+      "never",
+      "--sample-count",
+      "500",
+      "--sample-size",
+      "1",
+      "--max-time",
+      "60"
+    ],
+    "log": "export_file-r4-before.txt",
+    "medians_ms": {
+      "step/export_file/1": 0.08067,
+      "step/export_file/10": 0.2046,
+      "step/export_file/30": 0.44139999999999996
+    }
+  },
+  {
+    "family": "export_file",
+    "round": 5,
+    "engine": "before",
+    "workers": 4,
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/all-benchmarks/actions-before",
+      "--bench",
+      "export_file",
+      "--color",
+      "never",
+      "--sample-count",
+      "500",
+      "--sample-size",
+      "1",
+      "--max-time",
+      "60"
+    ],
+    "log": "export_file-r5-before.txt",
+    "medians_ms": {
+      "step/export_file/1": 0.083,
+      "step/export_file/10": 0.2039,
+      "step/export_file/30": 0.4455
+    }
+  },
+  {
+    "family": "export_file",
+    "round": 5,
+    "engine": "after",
+    "workers": 4,
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/all-benchmarks/actions-after",
+      "--bench",
+      "export_file",
+      "--color",
+      "never",
+      "--sample-count",
+      "500",
+      "--sample-size",
+      "1",
+      "--max-time",
+      "60"
+    ],
+    "log": "export_file-r5-after.txt",
+    "medians_ms": {
+      "step/export_file/1": 0.08442000000000001,
+      "step/export_file/10": 0.1996,
+      "step/export_file/30": 0.44560000000000005
+    }
+  },
+  {
+    "family": "cylinder_tolerance",
+    "round": 1,
+    "engine": "before",
+    "workers": 4,
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/all-benchmarks/actions-before",
+      "--bench",
+      "cylinder_tolerance",
+      "--color",
+      "never",
+      "--sample-count",
+      "500",
+      "--sample-size",
+      "1",
+      "--max-time",
+      "60"
+    ],
+    "log": "cylinder_tolerance-r1-before.txt",
+    "medians_ms": {
+      "tessellation/cylinder_tolerance/0.001": 0.19590000000000002,
+      "tessellation/cylinder_tolerance/0.01": 0.057159999999999996,
+      "tessellation/cylinder_tolerance/0.1": 0.04272
+    }
+  },
+  {
+    "family": "cylinder_tolerance",
+    "round": 1,
+    "engine": "after",
+    "workers": 4,
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/all-benchmarks/actions-after",
+      "--bench",
+      "cylinder_tolerance",
+      "--color",
+      "never",
+      "--sample-count",
+      "500",
+      "--sample-size",
+      "1",
+      "--max-time",
+      "60"
+    ],
+    "log": "cylinder_tolerance-r1-after.txt",
+    "medians_ms": {
+      "tessellation/cylinder_tolerance/0.001": 0.19990000000000002,
+      "tessellation/cylinder_tolerance/0.01": 0.05643,
+      "tessellation/cylinder_tolerance/0.1": 0.03862
+    }
+  },
+  {
+    "family": "cylinder_tolerance",
+    "round": 2,
+    "engine": "after",
+    "workers": 4,
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/all-benchmarks/actions-after",
+      "--bench",
+      "cylinder_tolerance",
+      "--color",
+      "never",
+      "--sample-count",
+      "500",
+      "--sample-size",
+      "1",
+      "--max-time",
+      "60"
+    ],
+    "log": "cylinder_tolerance-r2-after.txt",
+    "medians_ms": {
+      "tessellation/cylinder_tolerance/0.001": 0.18380000000000002,
+      "tessellation/cylinder_tolerance/0.01": 0.05705,
+      "tessellation/cylinder_tolerance/0.1": 0.0386
+    }
+  },
+  {
+    "family": "cylinder_tolerance",
+    "round": 2,
+    "engine": "before",
+    "workers": 4,
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/all-benchmarks/actions-before",
+      "--bench",
+      "cylinder_tolerance",
+      "--color",
+      "never",
+      "--sample-count",
+      "500",
+      "--sample-size",
+      "1",
+      "--max-time",
+      "60"
+    ],
+    "log": "cylinder_tolerance-r2-before.txt",
+    "medians_ms": {
+      "tessellation/cylinder_tolerance/0.001": 0.18969999999999998,
+      "tessellation/cylinder_tolerance/0.01": 0.05761,
+      "tessellation/cylinder_tolerance/0.1": 0.03854
+    }
+  },
+  {
+    "family": "cylinder_tolerance",
+    "round": 3,
+    "engine": "before",
+    "workers": 4,
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/all-benchmarks/actions-before",
+      "--bench",
+      "cylinder_tolerance",
+      "--color",
+      "never",
+      "--sample-count",
+      "500",
+      "--sample-size",
+      "1",
+      "--max-time",
+      "60"
+    ],
+    "log": "cylinder_tolerance-r3-before.txt",
+    "medians_ms": {
+      "tessellation/cylinder_tolerance/0.001": 0.1766,
+      "tessellation/cylinder_tolerance/0.01": 0.05775,
+      "tessellation/cylinder_tolerance/0.1": 0.0385
+    }
+  },
+  {
+    "family": "cylinder_tolerance",
+    "round": 3,
+    "engine": "after",
+    "workers": 4,
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/all-benchmarks/actions-after",
+      "--bench",
+      "cylinder_tolerance",
+      "--color",
+      "never",
+      "--sample-count",
+      "500",
+      "--sample-size",
+      "1",
+      "--max-time",
+      "60"
+    ],
+    "log": "cylinder_tolerance-r3-after.txt",
+    "medians_ms": {
+      "tessellation/cylinder_tolerance/0.001": 0.17250000000000001,
+      "tessellation/cylinder_tolerance/0.01": 0.05705,
+      "tessellation/cylinder_tolerance/0.1": 0.038380000000000004
+    }
+  },
+  {
+    "family": "cylinder_tolerance",
+    "round": 4,
+    "engine": "after",
+    "workers": 4,
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/all-benchmarks/actions-after",
+      "--bench",
+      "cylinder_tolerance",
+      "--color",
+      "never",
+      "--sample-count",
+      "500",
+      "--sample-size",
+      "1",
+      "--max-time",
+      "60"
+    ],
+    "log": "cylinder_tolerance-r4-after.txt",
+    "medians_ms": {
+      "tessellation/cylinder_tolerance/0.001": 0.1792,
+      "tessellation/cylinder_tolerance/0.01": 0.056549999999999996,
+      "tessellation/cylinder_tolerance/0.1": 0.0383
+    }
+  },
+  {
+    "family": "cylinder_tolerance",
+    "round": 4,
+    "engine": "before",
+    "workers": 4,
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/all-benchmarks/actions-before",
+      "--bench",
+      "cylinder_tolerance",
+      "--color",
+      "never",
+      "--sample-count",
+      "500",
+      "--sample-size",
+      "1",
+      "--max-time",
+      "60"
+    ],
+    "log": "cylinder_tolerance-r4-before.txt",
+    "medians_ms": {
+      "tessellation/cylinder_tolerance/0.001": 0.1758,
+      "tessellation/cylinder_tolerance/0.01": 0.05808,
+      "tessellation/cylinder_tolerance/0.1": 0.038840000000000006
+    }
+  },
+  {
+    "family": "cylinder_tolerance",
+    "round": 5,
+    "engine": "before",
+    "workers": 4,
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/all-benchmarks/actions-before",
+      "--bench",
+      "cylinder_tolerance",
+      "--color",
+      "never",
+      "--sample-count",
+      "500",
+      "--sample-size",
+      "1",
+      "--max-time",
+      "60"
+    ],
+    "log": "cylinder_tolerance-r5-before.txt",
+    "medians_ms": {
+      "tessellation/cylinder_tolerance/0.001": 0.1782,
+      "tessellation/cylinder_tolerance/0.01": 0.05639,
+      "tessellation/cylinder_tolerance/0.1": 0.03873
+    }
+  },
+  {
+    "family": "cylinder_tolerance",
+    "round": 5,
+    "engine": "after",
+    "workers": 4,
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/all-benchmarks/actions-after",
+      "--bench",
+      "cylinder_tolerance",
+      "--color",
+      "never",
+      "--sample-count",
+      "500",
+      "--sample-size",
+      "1",
+      "--max-time",
+      "60"
+    ],
+    "log": "cylinder_tolerance-r5-after.txt",
+    "medians_ms": {
+      "tessellation/cylinder_tolerance/0.001": 0.1779,
+      "tessellation/cylinder_tolerance/0.01": 0.056600000000000004,
+      "tessellation/cylinder_tolerance/0.1": 0.03896
+    }
+  }
+]

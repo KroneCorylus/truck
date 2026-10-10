@@ -1,0 +1,4 @@
+72 action cases x 2 engines x 2 worker limits x 2 rounds, all 20 samples: pass
+20 OCCT cases x 2 engines x 2 worker limits x (preflight + 2 rounds): 240 pass; 40/40 volume agreements
+6 repeated action cases x 2 engines x 5 rounds, all 500 samples: pass
+All captured source hashes and action binary hashes match after measurement

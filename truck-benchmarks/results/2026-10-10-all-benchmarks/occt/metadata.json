@@ -1,0 +1,155 @@
+{
+  "created_utc": "2026-10-10T12:13:36Z",
+  "cases": [
+    "holes_batch/1",
+    "holes_batch/10",
+    "holes_batch/30",
+    "holes_batch/100",
+    "holes_sequential/1",
+    "holes_sequential/10",
+    "holes_sequential/30",
+    "holes_sequential/100",
+    "knurl/16",
+    "knurl/64",
+    "knurl/128",
+    "thread/1",
+    "thread/4",
+    "near_tangent/0.01",
+    "near_tangent/0.001",
+    "thin_wall/0.1",
+    "thin_wall/0.01",
+    "fillet_bore/0.5",
+    "mesh_plate/1",
+    "mesh_plate/100"
+  ],
+  "workers": [
+    1,
+    4
+  ],
+  "cpus": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "samples": 15,
+  "rounds": 2,
+  "timeout_seconds": 180,
+  "tolerance": 0.001,
+  "qa_tolerance": 0.001,
+  "fuzzy": 0,
+  "revision": "3729a083932f5d73a29a4e84cc0b03866869aa27",
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.1\nLLVM version: 22.1.8",
+  "compiler": "c++ (GCC) 16.2.1 20260819 (Red Hat 16.2.1-2)\nCopyright (C) 2026 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.",
+  "platform": "Linux-7.2.8-200.fc44.x86_64-x86_64-with-glibc2.43",
+  "lscpu": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           48 bits physical, 48 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  32\nOn-line CPU(s) list:                     0-31\nVendor ID:                               AuthenticAMD\nModel name:                              AMD Ryzen 9 7950X3D 16-Core Processor\nCPU family:                              25\nModel:                                   97\nThread(s) per core:                      2\nCore(s) per socket:                      16\nSocket(s):                               1\nStepping:                                2\nFrequency boost:                         enabled\nCPU(s) scaling MHz:                      74%\nCPU max MHz:                             5763.3560\nCPU min MHz:                             416.6290\nBogoMIPS:                                8384.00\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good amd_lbr_v2 nopl xtopology nonstop_tsc cpuid extd_apicid aperfmperf rapl pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpuid_fault cpb cat_l3 cdp_l3 hw_pstate ssbd mba perfmon_v2 ibrs ibpb stibp ibrs_enhanced vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local user_shstk avx512_bf16 clzero irperf xsaveerptr rdpru wbnoinvd cppc arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic vgif x2avic v_spec_ctrl vnmi avx512vbmi umip pku ospke avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid overflow_recov succor smca fsrm flush_l1d amd_lbr_pmc_freeze\nVirtualization:                          AMD-V\nL1d cache:                               512 KiB (16 instances)\nL1i cache:                               512 KiB (16 instances)\nL2 cache:                                16 MiB (16 instances)\nL3 cache:                                128 MiB (2 instances)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-31\nVulnerability Gather data sampling:      Not affected\nVulnerability Ghostwrite:                Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Old microcode:             Not affected\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Not affected\nVulnerability Spec rstack overflow:      Mitigation; Safe RET\nVulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; Enhanced / Automatic IBRS; IBPB conditional; STIBP always-on; PBRSB-eIBRS Not affected; BHI Not affected\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Mitigation; Clear CPU buffers\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Mitigation; IBPB before exit to userspace",
+  "occt_version": "7.9.3",
+  "build_commands": [
+    [
+      "build-truck",
+      [
+        "cargo",
+        "build",
+        "--release",
+        "-j2",
+        "-p",
+        "truck-benchmarks",
+        "--example",
+        "compare_occt"
+      ]
+    ],
+    [
+      "configure-occt",
+      [
+        "cmake",
+        "-S",
+        "truck-benchmarks/occt",
+        "-B",
+        "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/occt-comparison",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DOCCT_INCLUDE_DIR=/home/krone/Development/Pieza_WS/truck/target/occt-sdk/usr/include/opencascade",
+        "-DOCCT_LIBRARY_DIR=/home/krone/Development/Pieza_WS/truck/target/occt-sdk/usr/lib64"
+      ]
+    ],
+    [
+      "build-occt",
+      [
+        "cmake",
+        "--build",
+        "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/occt-comparison",
+        "-j2"
+      ]
+    ]
+  ],
+  "occt_linked_libraries": "linux-vdso.so.1 (0x00007fb325c32000)\n\tlibTKernel.so.7.9 => /lib64/libTKernel.so.7.9 (0x00007fb325a24000)\n\tlibTKMath.so.7.9 => /lib64/libTKMath.so.7.9 (0x00007fb325800000)\n\tlibTKG2d.so.7.9 => /lib64/libTKG2d.so.7.9 (0x00007fb32579e000)\n\tlibTKG3d.so.7.9 => /lib64/libTKG3d.so.7.9 (0x00007fb32566a000)\n\tlibTKGeomBase.so.7.9 => /lib64/libTKGeomBase.so.7.9 (0x00007fb325000000)\n\tlibTKBRep.so.7.9 => /lib64/libTKBRep.so.7.9 (0x00007fb32556c000)\n\tlibTKGeomAlgo.so.7.9 => /lib64/libTKGeomAlgo.so.7.9 (0x00007fb324a00000)\n\tlibTKTopAlgo.so.7.9 => /lib64/libTKTopAlgo.so.7.9 (0x00007fb324600000)\n\tlibTKPrim.so.7.9 => /lib64/libTKPrim.so.7.9 (0x00007fb325510000)\n\tlibTKBO.so.7.9 => /lib64/libTKBO.so.7.9 (0x00007fb324426000)\n\tlibTKBool.so.7.9 => /lib64/libTKBool.so.7.9 (0x00007fb324000000)\n\tlibTKFillet.so.7.9 => /lib64/libTKFillet.so.7.9 (0x00007fb323c00000)\n\tlibTKMesh.so.7.9 => /lib64/libTKMesh.so.7.9 (0x00007fb324f23000)\n\tlibTKXSBase.so.7.9 => /lib64/libTKXSBase.so.7.9 (0x00007fb323a16000)\n\tlibTKDESTEP.so.7.9 => /lib64/libTKDESTEP.so.7.9 (0x00007fb323200000)\n\tlibstdc++.so.6 => /lib64/libstdc++.so.6 (0x00007fb322e00000)\n\tlibm.so.6 => /lib64/libm.so.6 (0x00007fb3248e9000)\n\tlibgcc_s.so.1 => /lib64/libgcc_s.so.1 (0x00007fb3248bc000)\n\tlibc.so.6 => /lib64/libc.so.6 (0x00007fb322c07000)\n\tlibtbb.so.12 => /lib64/libtbb.so.12 (0x00007fb3243cf000)\n\tlibTKShHealing.so.7.9 => /lib64/libTKShHealing.so.7.9 (0x00007fb322800000)\n\tlibTKDE.so.7.9 => /lib64/libTKDE.so.7.9 (0x00007fb32489a000)\n\tlibTKXCAF.so.7.9 => /lib64/libTKXCAF.so.7.9 (0x00007fb323f1f000)\n\tlibTKLCAF.so.7.9 => /lib64/libTKLCAF.so.7.9 (0x00007fb32312c000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007fb325c34000)\n\tlibTKVCAF.so.7.9 => /lib64/libTKVCAF.so.7.9 (0x00007fb324395000)\n\tlibTKV3d.so.7.9 => /lib64/libTKV3d.so.7.9 (0x00007fb322400000)\n\tlibTKService.so.7.9 => /lib64/libTKService.so.7.9 (0x00007fb322ac8000)\n\tlibTKCAF.so.7.9 => /lib64/libTKCAF.so.7.9 (0x00007fb324318000)\n\tlibTKCDF.so.7.9 => /lib64/libTKCDF.so.7.9 (0x00007fb323ec7000)\n\tlibTKHLR.so.7.9 => /lib64/libTKHLR.so.7.9 (0x00007fb3226e9000)\n\tlibX11.so.6 => /lib64/libX11.so.6 (0x00007fb3222ab000)\n\tlibfontconfig.so.1 => /lib64/libfontconfig.so.1 (0x00007fb3239c3000)\n\tlibfreetype.so.6 => /lib64/libfreetype.so.6 (0x00007fb3221cf000)\n\tlibxcb.so.1 => /lib64/libxcb.so.1 (0x00007fb323e9d000)\n\tlibxml2.so.2 => /lib64/libxml2.so.2 (0x00007fb322060000)\n\tlibz.so.1 => /lib64/libz.so.1 (0x00007fb323999000)\n\tlibbz2.so.1 => /lib64/libbz2.so.1 (0x00007fb3254f4000)\n\tlibpng16.so.16 => /lib64/libpng16.so.16 (0x00007fb3230ef000)\n\tlibharfbuzz.so.0 => /lib64/libharfbuzz.so.0 (0x00007fb321f24000)\n\tlibbrotlidec.so.1 => /lib64/libbrotlidec.so.1 (0x00007fb324f14000)\n\tlibXau.so.6 => /lib64/libXau.so.6 (0x00007fb3254ef000)\n\tliblzma.so.5 => /lib64/liblzma.so.5 (0x00007fb3230b9000)\n\tlibglib-2.0.so.0 => /lib64/libglib-2.0.so.0 (0x00007fb321dc2000)\n\tlibgraphite2.so.3 => /lib64/libgraphite2.so.3 (0x00007fb322aa8000)\n\tlibbrotlicommon.so.1 => /lib64/libbrotlicommon.so.1 (0x00007fb322a85000)\n\tlibpcre2-8.so.0 => /lib64/libpcre2-8.so.0 (0x00007fb321d11000)",
+  "occt_library_sha256": {
+    "/lib64/libTKernel.so.7.9": "655ae806fb993152c14ed1b9ad7bd18b81a5ac31fc79c945d190f7c8f64bc0fb",
+    "/lib64/libTKMath.so.7.9": "b0ea8007475ab8b85192bb5a6ec606a7b5f04859ac645c42ad18a5a54f43fe4d",
+    "/lib64/libTKG2d.so.7.9": "7ef79098c6b07c05ad9acac089fe3fb4e8550f26f19c5a2f42de59c450cf71a2",
+    "/lib64/libTKG3d.so.7.9": "c9dc250c81492e8f9446bff17018d64a93fc5ab009487509bf1c27810a3b3c12",
+    "/lib64/libTKGeomBase.so.7.9": "0d6e11af384206ea11df7438c089442174a4413e9725a809d7b7ad5a502dae56",
+    "/lib64/libTKBRep.so.7.9": "7d07ff2f68ec0b494f3caa16f222e3238774dd864c7eef5d9f8fe5c892156709",
+    "/lib64/libTKGeomAlgo.so.7.9": "389c67e1b7371882ed9804dfd2b573278a2b009bb80a496176bbfdfdbf9e28d0",
+    "/lib64/libTKTopAlgo.so.7.9": "e27be7f4138763c0ac0f82e477b0ee277519d6b5c37ddc6b9ae97018592ccef1",
+    "/lib64/libTKPrim.so.7.9": "1fa2933404dcd2c95e22e7a8703b8a9be3cb8c485dc175389f11a046fec3e64e",
+    "/lib64/libTKBO.so.7.9": "f9284f414c79dac5d9733f6f45142551fc69aaeedc4eea6c369edcf3f94ef0fa",
+    "/lib64/libTKBool.so.7.9": "7467d4d0996a9c2567a2f7b5c03c4022af81a63ca49b9a874649eef187099f71",
+    "/lib64/libTKFillet.so.7.9": "98b023dddfa18f285da1037234638f142f2cf8c82df07e5c0cc39d5ebb456ade",
+    "/lib64/libTKMesh.so.7.9": "031f5259343be29d7e782db5c58021a1c48137eda09581d0aa6dcf3c2715698d",
+    "/lib64/libTKXSBase.so.7.9": "7ffea711d6764e22691ce9e02d08af52dfc4d07dc27740dadf0a1d1fa95f3493",
+    "/lib64/libTKDESTEP.so.7.9": "025afdb6a14daca55860b613a3774f1f71abf4a1bf4afc551f8a52a3b59a6db3",
+    "/lib64/libTKShHealing.so.7.9": "a3ca6af500c7ec0b900049cd84760757f65d717e3fb529af1e0e3dfdd9ad9ff8",
+    "/lib64/libTKDE.so.7.9": "1905ba60b07967122a3a3b9b05218ea8e5d6b27c80200cb7c84bf47208af3779",
+    "/lib64/libTKXCAF.so.7.9": "df1afe6724b30ae39d31bebeb002b5a8d934c352595f9cf821912d36c0e28d6b",
+    "/lib64/libTKLCAF.so.7.9": "c1e878b32990e75996ea7199493fb3d99578df7c320d6f867e162da4fd2b400d",
+    "/lib64/libTKVCAF.so.7.9": "7f1ec5b9eda771080413a2bf1c7740a6330ff42a9d612681bb2474a9eb55c4dd",
+    "/lib64/libTKV3d.so.7.9": "9b9f3de75194582ebb7230dbee28996e7a3063d105fea6621260a6adfe81c440",
+    "/lib64/libTKService.so.7.9": "4e9ef00ce97e193557e2ca4fcf842c889cbb3bb86c9944c6a0a738cf55b38e36",
+    "/lib64/libTKCAF.so.7.9": "b628df8dd35de29a7482b368d79f2dca46f7120d302e2f10e67a56626b5730a6",
+    "/lib64/libTKCDF.so.7.9": "1b3d4255d3331600b489a8b14266d0547859cecc7922d6392c9d72bfad1f92d7",
+    "/lib64/libTKHLR.so.7.9": "992bae41f644683602236628f2671b88f443c421e1dffc5cd99845a7cb8eb335"
+  },
+  "binaries": {
+    "truck": "38fd5bc0d46e4c53e8b66d79cd2e4aaaebc47fe9de82ebcfe11fc97f3a719ca6",
+    "occt": "a773baa64db65d1ad66d31e8a3e98cbdc7611febbb20575210d7147fc64fdb1c"
+  },
+  "fixtures": {
+    "thread-1.step": "6a54807b1b5e8d1d998746ed581960b859065df5ff0e54ebcbf9d4fc03e888a5",
+    "thread-4.step": "a274075ffed2368669fb596434d6e520274579bbe9542eaf0df0fa7369e3dc1c"
+  },
+  "cpu_governors": {
+    "/sys/devices/system/cpu/cpu21/cpufreq/scaling_governor": "powersave",
+    "/sys/devices/system/cpu/cpu11/cpufreq/scaling_governor": "powersave",
+    "/sys/devices/system/cpu/cpu9/cpufreq/scaling_governor": "powersave",
+    "/sys/devices/system/cpu/cpu7/cpufreq/scaling_governor": "powersave",
+    "/sys/devices/system/cpu/cpu28/cpufreq/scaling_governor": "powersave",
+    "/sys/devices/system/cpu/cpu18/cpufreq/scaling_governor": "powersave",
+    "/sys/devices/system/cpu/cpu5/cpufreq/scaling_governor": "powersave",
+    "/sys/devices/system/cpu/cpu26/cpufreq/scaling_governor": "powersave",
+    "/sys/devices/system/cpu/cpu16/cpufreq/scaling_governor": "powersave",
+    "/sys/devices/system/cpu/cpu3/cpufreq/scaling_governor": "powersave",
+    "/sys/devices/system/cpu/cpu24/cpufreq/scaling_governor": "powersave",
+    "/sys/devices/system/cpu/cpu14/cpufreq/scaling_governor": "powersave",
+    "/sys/devices/system/cpu/cpu1/cpufreq/scaling_governor": "powersave",
+    "/sys/devices/system/cpu/cpu22/cpufreq/scaling_governor": "powersave",
+    "/sys/devices/system/cpu/cpu12/cpufreq/scaling_governor": "powersave",
+    "/sys/devices/system/cpu/cpu30/cpufreq/scaling_governor": "powersave",
+    "/sys/devices/system/cpu/cpu20/cpufreq/scaling_governor": "powersave",
+    "/sys/devices/system/cpu/cpu10/cpufreq/scaling_governor": "powersave",
+    "/sys/devices/system/cpu/cpu8/cpufreq/scaling_governor": "powersave",
+    "/sys/devices/system/cpu/cpu29/cpufreq/scaling_governor": "powersave",
+    "/sys/devices/system/cpu/cpu19/cpufreq/scaling_governor": "powersave",
+    "/sys/devices/system/cpu/cpu6/cpufreq/scaling_governor": "powersave",
+    "/sys/devices/system/cpu/cpu27/cpufreq/scaling_governor": "powersave",
+    "/sys/devices/system/cpu/cpu17/cpufreq/scaling_governor": "powersave",
+    "/sys/devices/system/cpu/cpu4/cpufreq/scaling_governor": "powersave",
+    "/sys/devices/system/cpu/cpu25/cpufreq/scaling_governor": "powersave",
+    "/sys/devices/system/cpu/cpu15/cpufreq/scaling_governor": "powersave",
+    "/sys/devices/system/cpu/cpu2/cpufreq/scaling_governor": "powersave",
+    "/sys/devices/system/cpu/cpu23/cpufreq/scaling_governor": "powersave",
+    "/sys/devices/system/cpu/cpu13/cpufreq/scaling_governor": "powersave",
+    "/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor": "powersave",
+    "/sys/devices/system/cpu/cpu31/cpufreq/scaling_governor": "powersave"
+  },
+  "environment": {}
+}

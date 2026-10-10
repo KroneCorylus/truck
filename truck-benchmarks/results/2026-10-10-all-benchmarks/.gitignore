@@ -1,0 +1,4 @@
+!*.json
+!*.jsonl
+!Cargo.lock
+__pycache__/

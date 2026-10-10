@@ -1,0 +1,4639 @@
+[
+  {
+    "engine": "after",
+    "case": "holes_batch/1",
+    "workers": 1,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "holes_batch/1",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-holes_batch-1-1t-r0.log",
+    "timing": {
+      "peak_rss_kib": 5152,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 25.716814692820414,
+      "faces": 8,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.00030998509898665577,
+      "topology": true,
+      "triangles": 304,
+      "volume": 25.72478652216859
+    }
+  },
+  {
+    "engine": "after",
+    "case": "holes_batch/10",
+    "workers": 1,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "holes_batch/10",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-holes_batch-10-1t-r0.log",
+    "timing": {
+      "peak_rss_kib": 8384,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 321.1681469282041,
+      "faces": 26,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 7.855248122941358e-05,
+      "topology": true,
+      "triangles": 5172,
+      "volume": 321.1933754830372
+    }
+  },
+  {
+    "engine": "after",
+    "case": "holes_batch/30",
+    "workers": 1,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "holes_batch/30",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-holes_batch-30-1t-r0.log",
+    "timing": {
+      "peak_rss_kib": 13272,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 771.5044407846124,
+      "faces": 66,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 9.810159202517296e-05,
+      "topology": true,
+      "triangles": 15492,
+      "volume": 771.5801265985078
+    }
+  },
+  {
+    "engine": "after",
+    "case": "holes_batch/100",
+    "workers": 1,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "holes_batch/100",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-holes_batch-100-1t-r0.log",
+    "timing": {
+      "peak_rss_kib": 30504,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 2571.6814692820412,
+      "faces": 206,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 9.81015423555542e-05,
+      "topology": true,
+      "triangles": 51612,
+      "volume": 2571.933755200625
+    }
+  },
+  {
+    "engine": "after",
+    "case": "holes_sequential/1",
+    "workers": 1,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "holes_sequential/1",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-holes_sequential-1-1t-r0.log",
+    "timing": {
+      "peak_rss_kib": 4868,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 25.716814692820414,
+      "faces": 8,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.00030998509898665577,
+      "topology": true,
+      "triangles": 304,
+      "volume": 25.72478652216859
+    }
+  },
+  {
+    "engine": "after",
+    "case": "holes_sequential/10",
+    "workers": 1,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "holes_sequential/10",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-holes_sequential-10-1t-r0.log",
+    "timing": {
+      "peak_rss_kib": 5356,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 321.1681469282041,
+      "faces": 26,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.000248213573622824,
+      "topology": true,
+      "triangles": 2932,
+      "volume": 321.247865221687
+    }
+  },
+  {
+    "engine": "after",
+    "case": "holes_sequential/30",
+    "workers": 1,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "holes_sequential/30",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-holes_sequential-30-1t-r0.log",
+    "timing": {
+      "peak_rss_kib": 5084,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 771.5044407846124,
+      "faces": 66,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.0003099850989892253,
+      "topology": true,
+      "triangles": 8772,
+      "volume": 771.7435956650596
+    }
+  },
+  {
+    "engine": "after",
+    "case": "holes_sequential/100",
+    "workers": 1,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "holes_sequential/100",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-holes_sequential-100-1t-r0.log",
+    "timing": {
+      "peak_rss_kib": 6080,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 2571.6814692820412,
+      "faces": 206,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.0003099850989871918,
+      "topology": true,
+      "triangles": 29212,
+      "volume": 2572.47865221686
+    }
+  },
+  {
+    "engine": "after",
+    "case": "knurl/16",
+    "workers": 1,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "knurl/16",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-knurl-16-1t-r0.log",
+    "timing": {
+      "peak_rss_kib": 7600,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 3563.51528438101,
+      "faces": 50,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 5.098818404044317e-05,
+      "topology": true,
+      "triangles": 636,
+      "volume": 3563.333587207859
+    }
+  },
+  {
+    "engine": "after",
+    "case": "knurl/64",
+    "workers": 1,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "knurl/64",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-knurl-64-1t-r0.log",
+    "timing": {
+      "peak_rss_kib": 11348,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 3566.1596071893273,
+      "faces": 194,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 5.094388207137585e-05,
+      "topology": true,
+      "triangles": 1020,
+      "volume": 3565.977933174851
+    }
+  },
+  {
+    "engine": "after",
+    "case": "knurl/128",
+    "workers": 1,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "knurl/128",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-knurl-128-1t-r0.log",
+    "timing": {
+      "peak_rss_kib": 18644,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 3566.291886067614,
+      "faces": 386,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 5.0941556422108556e-05,
+      "topology": true,
+      "triangles": 1532,
+      "volume": 3566.1102136082823
+    }
+  },
+  {
+    "engine": "after",
+    "case": "thread/1",
+    "workers": 1,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "thread/1",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-thread-1-1t-r0.log",
+    "timing": {
+      "peak_rss_kib": 14944,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 59.09532214799491,
+      "faces": 23,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.0001333850699360023,
+      "topology": true,
+      "triangles": 20374,
+      "volume": 59.087439714317306
+    }
+  },
+  {
+    "engine": "after",
+    "case": "thread/4",
+    "workers": 1,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "thread/4",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-thread-4-1t-r0.log",
+    "timing": {
+      "peak_rss_kib": 22460,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 236.38128859197963,
+      "faces": 65,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.00010928160302494129,
+      "topology": true,
+      "triangles": 22776,
+      "volume": 236.3554564658372
+    }
+  },
+  {
+    "engine": "after",
+    "case": "near_tangent/0.01",
+    "workers": 1,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "near_tangent/0.01",
+      "0",
+      "0.001",
+      "1e-06",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-near_tangent-0.01-1t-r0.log",
+    "timing": {
+      "peak_rss_kib": 6432,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 0.002664665772941388,
+      "faces": 6,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 1e-06,
+      "relative_volume_error": 0.00019328384431576323,
+      "topology": true,
+      "triangles": 572,
+      "volume": 0.0026641507360969773
+    }
+  },
+  {
+    "engine": "after",
+    "case": "near_tangent/0.001",
+    "workers": 1,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "near_tangent/0.001",
+      "0",
+      "0.001",
+      "1e-06",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-near_tangent-0.001-1t-r0.log",
+    "timing": {
+      "peak_rss_kib": 6156,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 8.432107943567857e-05,
+      "faces": 6,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 1e-06,
+      "relative_volume_error": 0.001735937636830792,
+      "topology": true,
+      "triangles": 188,
+      "volume": 8.417470330030798e-05
+    }
+  },
+  {
+    "engine": "after",
+    "case": "thin_wall/0.1",
+    "workers": 1,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "thin_wall/0.1",
+      "0",
+      "0.001",
+      "0.0001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-thin_wall-0.1-1t-r0.log",
+    "timing": {
+      "peak_rss_kib": 5044,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 19.854865570687515,
+      "faces": 6,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.0001,
+      "relative_volume_error": 1.5590778012030686e-05,
+      "topology": true,
+      "triangles": 3544,
+      "volume": 19.854556017885944
+    }
+  },
+  {
+    "engine": "after",
+    "case": "thin_wall/0.01",
+    "workers": 1,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "thin_wall/0.01",
+      "0",
+      "0.001",
+      "1e-05",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-thin_wall-0.01-1t-r0.log",
+    "timing": {
+      "peak_rss_kib": 5204,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 2.008106024174559,
+      "faces": 6,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 1e-05,
+      "relative_volume_error": 1.4376465066605046e-06,
+      "topology": true,
+      "triangles": 11240,
+      "volume": 2.0081031372279483
+    }
+  },
+  {
+    "engine": "after",
+    "case": "fillet_bore/0.5",
+    "workers": 1,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "fillet_bore/0.5",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-fillet_bore-0.5-1t-r0.log",
+    "timing": {
+      "peak_rss_kib": 5800,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 3716.2077256525126,
+      "faces": 10,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 2.4286636060838437e-05,
+      "topology": true,
+      "triangles": 8708,
+      "volume": 3716.297979837072
+    }
+  },
+  {
+    "engine": "after",
+    "case": "mesh_plate/1",
+    "workers": 1,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "mesh_plate/1",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-mesh_plate-1-1t-r0.log",
+    "timing": {
+      "peak_rss_kib": 5704,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 25.716814692820414,
+      "faces": null,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.00030998509898665577,
+      "topology": true,
+      "triangles": 304,
+      "volume": 25.72478652216859
+    }
+  },
+  {
+    "engine": "after",
+    "case": "mesh_plate/100",
+    "workers": 1,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "mesh_plate/100",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-mesh_plate-100-1t-r0.log",
+    "timing": {
+      "peak_rss_kib": 24060,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 2571.6814692820412,
+      "faces": null,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.0003099850989871918,
+      "topology": true,
+      "triangles": 29212,
+      "volume": 2572.47865221686
+    }
+  },
+  {
+    "engine": "before",
+    "case": "holes_sequential/1",
+    "workers": 1,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "holes_sequential/1",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-holes_sequential-1-1t-r0.log",
+    "timing": {
+      "peak_rss_kib": 6272,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 25.716814692820414,
+      "faces": 8,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 9.810153650045973e-05,
+      "topology": true,
+      "triangles": 528,
+      "volume": 25.719337551855677
+    }
+  },
+  {
+    "engine": "occt",
+    "case": "holes_sequential/1",
+    "workers": 1,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/investigations/sequential-holes-2026-10-10/runner-build/compare_occt",
+      "holes_sequential/1",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "occt-holes_sequential-1-1t-r0.log",
+    "timing": {
+      "phase": "timing",
+      "peak_rss_kib": 22140,
+      "samples_ms": []
+    },
+    "qa": {
+      "pass": true,
+      "geometric": true,
+      "mesh_closed": true,
+      "solids": 1,
+      "faces": 7,
+      "triangles": 416,
+      "volume": 25.72094804706868,
+      "exact_volume": 25.716814692820417,
+      "expected_volume": 25.716814692820414,
+      "relative_volume_error": 0.00016072574685625803,
+      "exact_relative_volume_error": 1.381475008175232e-16,
+      "qa_tolerance": 0.001
+    }
+  },
+  {
+    "engine": "before",
+    "case": "holes_sequential/1",
+    "workers": 1,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "holes_sequential/1",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-holes_sequential-1-1t-r1.log",
+    "timing": {
+      "peak_rss_kib": 6412,
+      "phase": "timing",
+      "samples_ms": [
+        1.541711,
+        1.575796,
+        1.773798,
+        1.522624,
+        1.541501
+      ]
+    },
+    "qa": {
+      "expected_volume": 25.716814692820414,
+      "faces": 8,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 9.810153650045973e-05,
+      "topology": true,
+      "triangles": 528,
+      "volume": 25.719337551855677
+    }
+  },
+  {
+    "engine": "after",
+    "case": "holes_sequential/1",
+    "workers": 1,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "holes_sequential/1",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-holes_sequential-1-1t-r1.log",
+    "timing": {
+      "peak_rss_kib": 4992,
+      "phase": "timing",
+      "samples_ms": [
+        0.023805999999999997,
+        0.024266000000000003,
+        0.021710999999999998,
+        0.021370999999999998,
+        0.019726999999999998
+      ]
+    },
+    "qa": {
+      "expected_volume": 25.716814692820414,
+      "faces": 8,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.00030998509898665577,
+      "topology": true,
+      "triangles": 304,
+      "volume": 25.72478652216859
+    }
+  },
+  {
+    "engine": "occt",
+    "case": "holes_sequential/1",
+    "workers": 1,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/investigations/sequential-holes-2026-10-10/runner-build/compare_occt",
+      "holes_sequential/1",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "occt-holes_sequential-1-1t-r1.log",
+    "timing": {
+      "phase": "timing",
+      "peak_rss_kib": 22196,
+      "samples_ms": [
+        1.383728,
+        1.349843,
+        1.33806,
+        1.434505,
+        1.329644
+      ]
+    },
+    "qa": {
+      "pass": true,
+      "geometric": true,
+      "mesh_closed": true,
+      "solids": 1,
+      "faces": 7,
+      "triangles": 416,
+      "volume": 25.72094804706868,
+      "exact_volume": 25.716814692820417,
+      "expected_volume": 25.716814692820414,
+      "relative_volume_error": 0.00016072574685625803,
+      "exact_relative_volume_error": 1.381475008175232e-16,
+      "qa_tolerance": 0.001
+    }
+  },
+  {
+    "engine": "occt",
+    "case": "holes_sequential/1",
+    "workers": 1,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/investigations/sequential-holes-2026-10-10/runner-build/compare_occt",
+      "holes_sequential/1",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "occt-holes_sequential-1-1t-r2.log",
+    "timing": {
+      "phase": "timing",
+      "peak_rss_kib": 22260,
+      "samples_ms": [
+        1.412493,
+        1.375632,
+        1.385591,
+        1.422452,
+        1.363328
+      ]
+    },
+    "qa": {
+      "pass": true,
+      "geometric": true,
+      "mesh_closed": true,
+      "solids": 1,
+      "faces": 7,
+      "triangles": 416,
+      "volume": 25.72094804706868,
+      "exact_volume": 25.716814692820417,
+      "expected_volume": 25.716814692820414,
+      "relative_volume_error": 0.00016072574685625803,
+      "exact_relative_volume_error": 1.381475008175232e-16,
+      "qa_tolerance": 0.001
+    }
+  },
+  {
+    "engine": "after",
+    "case": "holes_sequential/1",
+    "workers": 1,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "holes_sequential/1",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-holes_sequential-1-1t-r2.log",
+    "timing": {
+      "peak_rss_kib": 5016,
+      "phase": "timing",
+      "samples_ms": [
+        0.027342,
+        0.026381,
+        0.022834,
+        0.023826,
+        0.022954000000000002
+      ]
+    },
+    "qa": {
+      "expected_volume": 25.716814692820414,
+      "faces": 8,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.00030998509898665577,
+      "topology": true,
+      "triangles": 304,
+      "volume": 25.72478652216859
+    }
+  },
+  {
+    "engine": "before",
+    "case": "holes_sequential/1",
+    "workers": 1,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "holes_sequential/1",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-holes_sequential-1-1t-r2.log",
+    "timing": {
+      "peak_rss_kib": 6328,
+      "phase": "timing",
+      "samples_ms": [
+        1.521793,
+        1.4991189999999999,
+        1.508297,
+        1.475284,
+        1.483901
+      ]
+    },
+    "qa": {
+      "expected_volume": 25.716814692820414,
+      "faces": 8,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 9.810153650045973e-05,
+      "topology": true,
+      "triangles": 528,
+      "volume": 25.719337551855677
+    }
+  },
+  {
+    "engine": "before",
+    "case": "holes_sequential/10",
+    "workers": 1,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "holes_sequential/10",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-holes_sequential-10-1t-r0.log",
+    "timing": {
+      "peak_rss_kib": 9964,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 321.1681469282041,
+      "faces": 26,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 7.855119176166236e-05,
+      "topology": true,
+      "triangles": 5172,
+      "volume": 321.1933750689012
+    }
+  },
+  {
+    "engine": "occt",
+    "case": "holes_sequential/10",
+    "workers": 1,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/investigations/sequential-holes-2026-10-10/runner-build/compare_occt",
+      "holes_sequential/10",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "occt-holes_sequential-10-1t-r0.log",
+    "timing": {
+      "phase": "timing",
+      "peak_rss_kib": 22476,
+      "samples_ms": []
+    },
+    "qa": {
+      "pass": true,
+      "geometric": true,
+      "mesh_closed": true,
+      "solids": 1,
+      "faces": 16,
+      "triangles": 4052,
+      "volume": 321.20948047068555,
+      "exact_volume": 321.1681469282039,
+      "expected_volume": 321.1681469282041,
+      "relative_volume_error": 0.00012869751523230885,
+      "exact_relative_volume_error": 7.07958362676796e-16,
+      "qa_tolerance": 0.001
+    }
+  },
+  {
+    "engine": "before",
+    "case": "holes_sequential/10",
+    "workers": 1,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "holes_sequential/10",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-holes_sequential-10-1t-r1.log",
+    "timing": {
+      "peak_rss_kib": 10952,
+      "phase": "timing",
+      "samples_ms": [
+        62.530823999999996,
+        62.113002,
+        61.726048,
+        62.201031,
+        61.919209
+      ]
+    },
+    "qa": {
+      "expected_volume": 321.1681469282041,
+      "faces": 26,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 7.855119176166236e-05,
+      "topology": true,
+      "triangles": 5172,
+      "volume": 321.1933750689012
+    }
+  },
+  {
+    "engine": "after",
+    "case": "holes_sequential/10",
+    "workers": 1,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "holes_sequential/10",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-holes_sequential-10-1t-r1.log",
+    "timing": {
+      "peak_rss_kib": 5128,
+      "phase": "timing",
+      "samples_ms": [
+        0.5599259999999999,
+        0.49017099999999997,
+        0.49375899999999995,
+        0.487797,
+        0.48607300000000003
+      ]
+    },
+    "qa": {
+      "expected_volume": 321.1681469282041,
+      "faces": 26,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.000248213573622824,
+      "topology": true,
+      "triangles": 2932,
+      "volume": 321.247865221687
+    }
+  },
+  {
+    "engine": "occt",
+    "case": "holes_sequential/10",
+    "workers": 1,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/investigations/sequential-holes-2026-10-10/runner-build/compare_occt",
+      "holes_sequential/10",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "occt-holes_sequential-10-1t-r1.log",
+    "timing": {
+      "phase": "timing",
+      "peak_rss_kib": 22464,
+      "samples_ms": [
+        18.356869,
+        18.385313,
+        18.293066,
+        18.190379,
+        18.116697
+      ]
+    },
+    "qa": {
+      "pass": true,
+      "geometric": true,
+      "mesh_closed": true,
+      "solids": 1,
+      "faces": 16,
+      "triangles": 4052,
+      "volume": 321.20948047068555,
+      "exact_volume": 321.1681469282039,
+      "expected_volume": 321.1681469282041,
+      "relative_volume_error": 0.00012869751523230885,
+      "exact_relative_volume_error": 7.07958362676796e-16,
+      "qa_tolerance": 0.001
+    }
+  },
+  {
+    "engine": "occt",
+    "case": "holes_sequential/10",
+    "workers": 1,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/investigations/sequential-holes-2026-10-10/runner-build/compare_occt",
+      "holes_sequential/10",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "occt-holes_sequential-10-1t-r2.log",
+    "timing": {
+      "phase": "timing",
+      "peak_rss_kib": 22572,
+      "samples_ms": [
+        18.582572,
+        18.653468,
+        18.319546,
+        18.267397,
+        18.276013
+      ]
+    },
+    "qa": {
+      "pass": true,
+      "geometric": true,
+      "mesh_closed": true,
+      "solids": 1,
+      "faces": 16,
+      "triangles": 4052,
+      "volume": 321.20948047068555,
+      "exact_volume": 321.1681469282039,
+      "expected_volume": 321.1681469282041,
+      "relative_volume_error": 0.00012869751523230885,
+      "exact_relative_volume_error": 7.07958362676796e-16,
+      "qa_tolerance": 0.001
+    }
+  },
+  {
+    "engine": "after",
+    "case": "holes_sequential/10",
+    "workers": 1,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "holes_sequential/10",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-holes_sequential-10-1t-r2.log",
+    "timing": {
+      "peak_rss_kib": 5336,
+      "phase": "timing",
+      "samples_ms": [
+        0.567881,
+        0.485923,
+        0.48045299999999996,
+        0.485753,
+        0.492476
+      ]
+    },
+    "qa": {
+      "expected_volume": 321.1681469282041,
+      "faces": 26,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.000248213573622824,
+      "topology": true,
+      "triangles": 2932,
+      "volume": 321.247865221687
+    }
+  },
+  {
+    "engine": "before",
+    "case": "holes_sequential/10",
+    "workers": 1,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "holes_sequential/10",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-holes_sequential-10-1t-r2.log",
+    "timing": {
+      "peak_rss_kib": 10080,
+      "phase": "timing",
+      "samples_ms": [
+        62.284471,
+        62.356598999999996,
+        62.477392,
+        62.447354,
+        62.432565000000004
+      ]
+    },
+    "qa": {
+      "expected_volume": 321.1681469282041,
+      "faces": 26,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 7.855119176166236e-05,
+      "topology": true,
+      "triangles": 5172,
+      "volume": 321.1933750689012
+    }
+  },
+  {
+    "engine": "before",
+    "case": "holes_sequential/30",
+    "workers": 1,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "holes_sequential/30",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-holes_sequential-30-1t-r0.log",
+    "timing": {
+      "peak_rss_kib": 18544,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 771.5044407846124,
+      "faces": 66,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 9.810004518930091e-05,
+      "topology": true,
+      "triangles": 15492,
+      "volume": 771.5801254051171
+    }
+  },
+  {
+    "engine": "occt",
+    "case": "holes_sequential/30",
+    "workers": 1,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/investigations/sequential-holes-2026-10-10/runner-build/compare_occt",
+      "holes_sequential/30",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "occt-holes_sequential-30-1t-r0.log",
+    "timing": {
+      "phase": "timing",
+      "peak_rss_kib": 22968,
+      "samples_ms": []
+    },
+    "qa": {
+      "pass": true,
+      "geometric": true,
+      "mesh_closed": true,
+      "solids": 1,
+      "faces": 36,
+      "triangles": 12132,
+      "volume": 771.6284414120503,
+      "exact_volume": 771.5044407846121,
+      "expected_volume": 771.5044407846124,
+      "relative_volume_error": 0.00016072574684314325,
+      "exact_relative_volume_error": 2.947146684107162e-16,
+      "qa_tolerance": 0.001
+    }
+  },
+  {
+    "engine": "before",
+    "case": "holes_sequential/30",
+    "workers": 1,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "holes_sequential/30",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-holes_sequential-30-1t-r1.log",
+    "timing": {
+      "peak_rss_kib": 20212,
+      "phase": "timing",
+      "samples_ms": [
+        461.689124,
+        460.550067,
+        459.887243,
+        461.004189,
+        460.205354
+      ]
+    },
+    "qa": {
+      "expected_volume": 771.5044407846124,
+      "faces": 66,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 9.810004518930091e-05,
+      "topology": true,
+      "triangles": 15492,
+      "volume": 771.5801254051171
+    }
+  },
+  {
+    "engine": "after",
+    "case": "holes_sequential/30",
+    "workers": 1,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "holes_sequential/30",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-holes_sequential-30-1t-r1.log",
+    "timing": {
+      "peak_rss_kib": 5608,
+      "phase": "timing",
+      "samples_ms": [
+        3.439366,
+        3.310208,
+        3.76953,
+        3.449957,
+        3.312873
+      ]
+    },
+    "qa": {
+      "expected_volume": 771.5044407846124,
+      "faces": 66,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.0003099850989892253,
+      "topology": true,
+      "triangles": 8772,
+      "volume": 771.7435956650596
+    }
+  },
+  {
+    "engine": "occt",
+    "case": "holes_sequential/30",
+    "workers": 1,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/investigations/sequential-holes-2026-10-10/runner-build/compare_occt",
+      "holes_sequential/30",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "occt-holes_sequential-30-1t-r1.log",
+    "timing": {
+      "phase": "timing",
+      "peak_rss_kib": 23164,
+      "samples_ms": [
+        88.457712,
+        88.817424,
+        89.05044,
+        88.724565,
+        89.006195
+      ]
+    },
+    "qa": {
+      "pass": true,
+      "geometric": true,
+      "mesh_closed": true,
+      "solids": 1,
+      "faces": 36,
+      "triangles": 12132,
+      "volume": 771.6284414120503,
+      "exact_volume": 771.5044407846121,
+      "expected_volume": 771.5044407846124,
+      "relative_volume_error": 0.00016072574684314325,
+      "exact_relative_volume_error": 2.947146684107162e-16,
+      "qa_tolerance": 0.001
+    }
+  },
+  {
+    "engine": "occt",
+    "case": "holes_sequential/30",
+    "workers": 1,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/investigations/sequential-holes-2026-10-10/runner-build/compare_occt",
+      "holes_sequential/30",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "occt-holes_sequential-30-1t-r2.log",
+    "timing": {
+      "phase": "timing",
+      "peak_rss_kib": 23252,
+      "samples_ms": [
+        88.641285,
+        88.86795,
+        88.721248,
+        88.776364,
+        88.703004
+      ]
+    },
+    "qa": {
+      "pass": true,
+      "geometric": true,
+      "mesh_closed": true,
+      "solids": 1,
+      "faces": 36,
+      "triangles": 12132,
+      "volume": 771.6284414120503,
+      "exact_volume": 771.5044407846121,
+      "expected_volume": 771.5044407846124,
+      "relative_volume_error": 0.00016072574684314325,
+      "exact_relative_volume_error": 2.947146684107162e-16,
+      "qa_tolerance": 0.001
+    }
+  },
+  {
+    "engine": "after",
+    "case": "holes_sequential/30",
+    "workers": 1,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "holes_sequential/30",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-holes_sequential-30-1t-r2.log",
+    "timing": {
+      "peak_rss_kib": 5752,
+      "phase": "timing",
+      "samples_ms": [
+        3.369682,
+        3.288968,
+        3.341649,
+        3.7804610000000003,
+        3.3972450000000003
+      ]
+    },
+    "qa": {
+      "expected_volume": 771.5044407846124,
+      "faces": 66,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.0003099850989892253,
+      "topology": true,
+      "triangles": 8772,
+      "volume": 771.7435956650596
+    }
+  },
+  {
+    "engine": "before",
+    "case": "holes_sequential/30",
+    "workers": 1,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "holes_sequential/30",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-holes_sequential-30-1t-r2.log",
+    "timing": {
+      "peak_rss_kib": 19500,
+      "phase": "timing",
+      "samples_ms": [
+        461.68034800000004,
+        460.953481,
+        460.860042,
+        462.756745,
+        461.672913
+      ]
+    },
+    "qa": {
+      "expected_volume": 771.5044407846124,
+      "faces": 66,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 9.810004518930091e-05,
+      "topology": true,
+      "triangles": 15492,
+      "volume": 771.5801254051171
+    }
+  },
+  {
+    "engine": "before",
+    "case": "holes_sequential/100",
+    "workers": 1,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "holes_sequential/100",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-holes_sequential-100-1t-r0.log",
+    "timing": {
+      "peak_rss_kib": 49976,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 2571.6814692820412,
+      "faces": 206,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 9.810125665043109e-05,
+      "topology": true,
+      "triangles": 51612,
+      "volume": 2571.9337544658824
+    }
+  },
+  {
+    "engine": "occt",
+    "case": "holes_sequential/100",
+    "workers": 1,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/investigations/sequential-holes-2026-10-10/runner-build/compare_occt",
+      "holes_sequential/100",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "occt-holes_sequential-100-1t-r0.log",
+    "timing": {
+      "phase": "timing",
+      "peak_rss_kib": 24648,
+      "samples_ms": []
+    },
+    "qa": {
+      "pass": true,
+      "geometric": true,
+      "mesh_closed": true,
+      "solids": 1,
+      "faces": 106,
+      "triangles": 40412,
+      "volume": 2572.094804706917,
+      "exact_volume": 2571.6814692820303,
+      "expected_volume": 2571.6814692820412,
+      "relative_volume_error": 0.00016072574687526713,
+      "exact_relative_volume_error": 4.243891225114313e-15,
+      "qa_tolerance": 0.001
+    }
+  },
+  {
+    "engine": "before",
+    "case": "holes_sequential/100",
+    "workers": 1,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "holes_sequential/100",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-holes_sequential-100-1t-r1.log",
+    "timing": {
+      "peak_rss_kib": 55920,
+      "phase": "timing",
+      "samples_ms": [
+        5443.767236000001,
+        5435.945753,
+        5434.654552999999,
+        5430.83152,
+        5439.015169
+      ]
+    },
+    "qa": {
+      "expected_volume": 2571.6814692820412,
+      "faces": 206,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 9.810125665043109e-05,
+      "topology": true,
+      "triangles": 51612,
+      "volume": 2571.9337544658824
+    }
+  },
+  {
+    "engine": "after",
+    "case": "holes_sequential/100",
+    "workers": 1,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "holes_sequential/100",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-holes_sequential-100-1t-r1.log",
+    "timing": {
+      "peak_rss_kib": 6880,
+      "phase": "timing",
+      "samples_ms": [
+        32.822593,
+        32.694227,
+        32.647587,
+        32.886075,
+        32.830508
+      ]
+    },
+    "qa": {
+      "expected_volume": 2571.6814692820412,
+      "faces": 206,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.0003099850989871918,
+      "topology": true,
+      "triangles": 29212,
+      "volume": 2572.47865221686
+    }
+  },
+  {
+    "engine": "occt",
+    "case": "holes_sequential/100",
+    "workers": 1,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/investigations/sequential-holes-2026-10-10/runner-build/compare_occt",
+      "holes_sequential/100",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "occt-holes_sequential-100-1t-r1.log",
+    "timing": {
+      "phase": "timing",
+      "peak_rss_kib": 24704,
+      "samples_ms": [
+        695.652181,
+        692.942206,
+        700.355686,
+        695.246261,
+        695.663873
+      ]
+    },
+    "qa": {
+      "pass": true,
+      "geometric": true,
+      "mesh_closed": true,
+      "solids": 1,
+      "faces": 106,
+      "triangles": 40412,
+      "volume": 2572.094804706917,
+      "exact_volume": 2571.6814692820303,
+      "expected_volume": 2571.6814692820412,
+      "relative_volume_error": 0.00016072574687526713,
+      "exact_relative_volume_error": 4.243891225114313e-15,
+      "qa_tolerance": 0.001
+    }
+  },
+  {
+    "engine": "occt",
+    "case": "holes_sequential/100",
+    "workers": 1,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/investigations/sequential-holes-2026-10-10/runner-build/compare_occt",
+      "holes_sequential/100",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "occt-holes_sequential-100-1t-r2.log",
+    "timing": {
+      "phase": "timing",
+      "peak_rss_kib": 24504,
+      "samples_ms": [
+        697.711175,
+        697.383938,
+        698.653786,
+        696.841896,
+        698.326407
+      ]
+    },
+    "qa": {
+      "pass": true,
+      "geometric": true,
+      "mesh_closed": true,
+      "solids": 1,
+      "faces": 106,
+      "triangles": 40412,
+      "volume": 2572.094804706917,
+      "exact_volume": 2571.6814692820303,
+      "expected_volume": 2571.6814692820412,
+      "relative_volume_error": 0.00016072574687526713,
+      "exact_relative_volume_error": 4.243891225114313e-15,
+      "qa_tolerance": 0.001
+    }
+  },
+  {
+    "engine": "after",
+    "case": "holes_sequential/100",
+    "workers": 1,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "holes_sequential/100",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-holes_sequential-100-1t-r2.log",
+    "timing": {
+      "peak_rss_kib": 6704,
+      "phase": "timing",
+      "samples_ms": [
+        33.00361,
+        32.829246,
+        32.828575,
+        32.95873400000001,
+        33.198074
+      ]
+    },
+    "qa": {
+      "expected_volume": 2571.6814692820412,
+      "faces": 206,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.0003099850989871918,
+      "topology": true,
+      "triangles": 29212,
+      "volume": 2572.47865221686
+    }
+  },
+  {
+    "engine": "before",
+    "case": "holes_sequential/100",
+    "workers": 1,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "holes_sequential/100",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-holes_sequential-100-1t-r2.log",
+    "timing": {
+      "peak_rss_kib": 56624,
+      "phase": "timing",
+      "samples_ms": [
+        5472.690269,
+        5435.40244,
+        5444.522497,
+        5454.097608,
+        5434.495418
+      ]
+    },
+    "qa": {
+      "expected_volume": 2571.6814692820412,
+      "faces": 206,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 9.810125665043109e-05,
+      "topology": true,
+      "triangles": 51612,
+      "volume": 2571.9337544658824
+    }
+  },
+  {
+    "engine": "before",
+    "case": "holes_sequential/1",
+    "workers": 4,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "holes_sequential/1",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-holes_sequential-1-4t-r0.log",
+    "timing": {
+      "peak_rss_kib": 6476,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 25.716814692820414,
+      "faces": 8,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 9.810153650045973e-05,
+      "topology": true,
+      "triangles": 528,
+      "volume": 25.719337551855677
+    }
+  },
+  {
+    "engine": "after",
+    "case": "holes_sequential/1",
+    "workers": 4,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "holes_sequential/1",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-holes_sequential-1-4t-r0.log",
+    "timing": {
+      "peak_rss_kib": 5080,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 25.716814692820414,
+      "faces": 8,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.00030998509898665577,
+      "topology": true,
+      "triangles": 304,
+      "volume": 25.72478652216859
+    }
+  },
+  {
+    "engine": "occt",
+    "case": "holes_sequential/1",
+    "workers": 4,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/investigations/sequential-holes-2026-10-10/runner-build/compare_occt",
+      "holes_sequential/1",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "occt-holes_sequential-1-4t-r0.log",
+    "timing": {
+      "phase": "timing",
+      "peak_rss_kib": 22252,
+      "samples_ms": []
+    },
+    "qa": {
+      "pass": true,
+      "geometric": true,
+      "mesh_closed": true,
+      "solids": 1,
+      "faces": 7,
+      "triangles": 416,
+      "volume": 25.72094804706868,
+      "exact_volume": 25.716814692820417,
+      "expected_volume": 25.716814692820414,
+      "relative_volume_error": 0.00016072574685625803,
+      "exact_relative_volume_error": 1.381475008175232e-16,
+      "qa_tolerance": 0.001
+    }
+  },
+  {
+    "engine": "before",
+    "case": "holes_sequential/1",
+    "workers": 4,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "holes_sequential/1",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-holes_sequential-1-4t-r1.log",
+    "timing": {
+      "peak_rss_kib": 6700,
+      "phase": "timing",
+      "samples_ms": [
+        1.485653,
+        1.188573,
+        1.194865,
+        1.195676,
+        1.378778
+      ]
+    },
+    "qa": {
+      "expected_volume": 25.716814692820414,
+      "faces": 8,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 9.810153650045973e-05,
+      "topology": true,
+      "triangles": 528,
+      "volume": 25.719337551855677
+    }
+  },
+  {
+    "engine": "after",
+    "case": "holes_sequential/1",
+    "workers": 4,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "holes_sequential/1",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-holes_sequential-1-4t-r1.log",
+    "timing": {
+      "peak_rss_kib": 5036,
+      "phase": "timing",
+      "samples_ms": [
+        0.028164,
+        0.026911,
+        0.024978,
+        0.024347,
+        0.023104
+      ]
+    },
+    "qa": {
+      "expected_volume": 25.716814692820414,
+      "faces": 8,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.00030998509898665577,
+      "topology": true,
+      "triangles": 304,
+      "volume": 25.72478652216859
+    }
+  },
+  {
+    "engine": "occt",
+    "case": "holes_sequential/1",
+    "workers": 4,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/investigations/sequential-holes-2026-10-10/runner-build/compare_occt",
+      "holes_sequential/1",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "occt-holes_sequential-1-4t-r1.log",
+    "timing": {
+      "phase": "timing",
+      "peak_rss_kib": 22448,
+      "samples_ms": [
+        1.299476,
+        1.238439,
+        1.245752,
+        1.224051,
+        1.261974
+      ]
+    },
+    "qa": {
+      "pass": true,
+      "geometric": true,
+      "mesh_closed": true,
+      "solids": 1,
+      "faces": 7,
+      "triangles": 416,
+      "volume": 25.72094804706868,
+      "exact_volume": 25.716814692820417,
+      "expected_volume": 25.716814692820414,
+      "relative_volume_error": 0.00016072574685625803,
+      "exact_relative_volume_error": 1.381475008175232e-16,
+      "qa_tolerance": 0.001
+    }
+  },
+  {
+    "engine": "occt",
+    "case": "holes_sequential/1",
+    "workers": 4,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/investigations/sequential-holes-2026-10-10/runner-build/compare_occt",
+      "holes_sequential/1",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "occt-holes_sequential-1-4t-r2.log",
+    "timing": {
+      "phase": "timing",
+      "peak_rss_kib": 22416,
+      "samples_ms": [
+        1.218711,
+        1.234492,
+        1.196519,
+        1.181379,
+        1.257255
+      ]
+    },
+    "qa": {
+      "pass": true,
+      "geometric": true,
+      "mesh_closed": true,
+      "solids": 1,
+      "faces": 7,
+      "triangles": 416,
+      "volume": 25.72094804706868,
+      "exact_volume": 25.716814692820417,
+      "expected_volume": 25.716814692820414,
+      "relative_volume_error": 0.00016072574685625803,
+      "exact_relative_volume_error": 1.381475008175232e-16,
+      "qa_tolerance": 0.001
+    }
+  },
+  {
+    "engine": "after",
+    "case": "holes_sequential/1",
+    "workers": 4,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "holes_sequential/1",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-holes_sequential-1-4t-r2.log",
+    "timing": {
+      "peak_rss_kib": 4980,
+      "phase": "timing",
+      "samples_ms": [
+        0.028263999999999997,
+        0.026891,
+        0.023375,
+        0.022924,
+        0.024367
+      ]
+    },
+    "qa": {
+      "expected_volume": 25.716814692820414,
+      "faces": 8,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.00030998509898665577,
+      "topology": true,
+      "triangles": 304,
+      "volume": 25.72478652216859
+    }
+  },
+  {
+    "engine": "before",
+    "case": "holes_sequential/1",
+    "workers": 4,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "holes_sequential/1",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-holes_sequential-1-4t-r2.log",
+    "timing": {
+      "peak_rss_kib": 6780,
+      "phase": "timing",
+      "samples_ms": [
+        1.247766,
+        1.2009569999999998,
+        1.450055,
+        1.229401,
+        1.220033
+      ]
+    },
+    "qa": {
+      "expected_volume": 25.716814692820414,
+      "faces": 8,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 9.810153650045973e-05,
+      "topology": true,
+      "triangles": 528,
+      "volume": 25.719337551855677
+    }
+  },
+  {
+    "engine": "before",
+    "case": "holes_sequential/10",
+    "workers": 4,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "holes_sequential/10",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-holes_sequential-10-4t-r0.log",
+    "timing": {
+      "peak_rss_kib": 11804,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 321.1681469282041,
+      "faces": 26,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 7.855119176166236e-05,
+      "topology": true,
+      "triangles": 5172,
+      "volume": 321.1933750689012
+    }
+  },
+  {
+    "engine": "after",
+    "case": "holes_sequential/10",
+    "workers": 4,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "holes_sequential/10",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-holes_sequential-10-4t-r0.log",
+    "timing": {
+      "peak_rss_kib": 5340,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 321.1681469282041,
+      "faces": 26,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.000248213573622824,
+      "topology": true,
+      "triangles": 2932,
+      "volume": 321.247865221687
+    }
+  },
+  {
+    "engine": "occt",
+    "case": "holes_sequential/10",
+    "workers": 4,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/investigations/sequential-holes-2026-10-10/runner-build/compare_occt",
+      "holes_sequential/10",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "occt-holes_sequential-10-4t-r0.log",
+    "timing": {
+      "phase": "timing",
+      "peak_rss_kib": 22716,
+      "samples_ms": []
+    },
+    "qa": {
+      "pass": true,
+      "geometric": true,
+      "mesh_closed": true,
+      "solids": 1,
+      "faces": 16,
+      "triangles": 4052,
+      "volume": 321.20948047068555,
+      "exact_volume": 321.1681469282039,
+      "expected_volume": 321.1681469282041,
+      "relative_volume_error": 0.00012869751523230885,
+      "exact_relative_volume_error": 7.07958362676796e-16,
+      "qa_tolerance": 0.001
+    }
+  },
+  {
+    "engine": "before",
+    "case": "holes_sequential/10",
+    "workers": 4,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "holes_sequential/10",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-holes_sequential-10-4t-r1.log",
+    "timing": {
+      "peak_rss_kib": 13860,
+      "phase": "timing",
+      "samples_ms": [
+        37.623564,
+        38.201194,
+        36.900876,
+        37.402791,
+        36.726031
+      ]
+    },
+    "qa": {
+      "expected_volume": 321.1681469282041,
+      "faces": 26,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 7.855119176166236e-05,
+      "topology": true,
+      "triangles": 5172,
+      "volume": 321.1933750689012
+    }
+  },
+  {
+    "engine": "after",
+    "case": "holes_sequential/10",
+    "workers": 4,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "holes_sequential/10",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-holes_sequential-10-4t-r1.log",
+    "timing": {
+      "peak_rss_kib": 5572,
+      "phase": "timing",
+      "samples_ms": [
+        0.606605,
+        0.500812,
+        0.477858,
+        0.48438000000000003,
+        0.476906
+      ]
+    },
+    "qa": {
+      "expected_volume": 321.1681469282041,
+      "faces": 26,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.000248213573622824,
+      "topology": true,
+      "triangles": 2932,
+      "volume": 321.247865221687
+    }
+  },
+  {
+    "engine": "occt",
+    "case": "holes_sequential/10",
+    "workers": 4,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/investigations/sequential-holes-2026-10-10/runner-build/compare_occt",
+      "holes_sequential/10",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "occt-holes_sequential-10-4t-r1.log",
+    "timing": {
+      "phase": "timing",
+      "peak_rss_kib": 22960,
+      "samples_ms": [
+        17.913026,
+        17.617879,
+        16.391784,
+        16.496145,
+        16.217179
+      ]
+    },
+    "qa": {
+      "pass": true,
+      "geometric": true,
+      "mesh_closed": true,
+      "solids": 1,
+      "faces": 16,
+      "triangles": 4052,
+      "volume": 321.20948047068555,
+      "exact_volume": 321.1681469282039,
+      "expected_volume": 321.1681469282041,
+      "relative_volume_error": 0.00012869751523230885,
+      "exact_relative_volume_error": 7.07958362676796e-16,
+      "qa_tolerance": 0.001
+    }
+  },
+  {
+    "engine": "occt",
+    "case": "holes_sequential/10",
+    "workers": 4,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/investigations/sequential-holes-2026-10-10/runner-build/compare_occt",
+      "holes_sequential/10",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "occt-holes_sequential-10-4t-r2.log",
+    "timing": {
+      "phase": "timing",
+      "peak_rss_kib": 22956,
+      "samples_ms": [
+        16.428956,
+        16.384731,
+        16.409507,
+        16.16055,
+        16.030821
+      ]
+    },
+    "qa": {
+      "pass": true,
+      "geometric": true,
+      "mesh_closed": true,
+      "solids": 1,
+      "faces": 16,
+      "triangles": 4052,
+      "volume": 321.20948047068555,
+      "exact_volume": 321.1681469282039,
+      "expected_volume": 321.1681469282041,
+      "relative_volume_error": 0.00012869751523230885,
+      "exact_relative_volume_error": 7.07958362676796e-16,
+      "qa_tolerance": 0.001
+    }
+  },
+  {
+    "engine": "after",
+    "case": "holes_sequential/10",
+    "workers": 4,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "holes_sequential/10",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-holes_sequential-10-4t-r2.log",
+    "timing": {
+      "peak_rss_kib": 5204,
+      "phase": "timing",
+      "samples_ms": [
+        0.509969,
+        0.500271,
+        0.49510099999999996,
+        0.48749699999999996,
+        0.521161
+      ]
+    },
+    "qa": {
+      "expected_volume": 321.1681469282041,
+      "faces": 26,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.000248213573622824,
+      "topology": true,
+      "triangles": 2932,
+      "volume": 321.247865221687
+    }
+  },
+  {
+    "engine": "before",
+    "case": "holes_sequential/10",
+    "workers": 4,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "holes_sequential/10",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-holes_sequential-10-4t-r2.log",
+    "timing": {
+      "peak_rss_kib": 13428,
+      "phase": "timing",
+      "samples_ms": [
+        38.998684999999995,
+        37.315893,
+        36.693498,
+        37.501019,
+        36.702605
+      ]
+    },
+    "qa": {
+      "expected_volume": 321.1681469282041,
+      "faces": 26,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 7.855119176166236e-05,
+      "topology": true,
+      "triangles": 5172,
+      "volume": 321.1933750689012
+    }
+  },
+  {
+    "engine": "before",
+    "case": "holes_sequential/30",
+    "workers": 4,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "holes_sequential/30",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-holes_sequential-30-4t-r0.log",
+    "timing": {
+      "peak_rss_kib": 24964,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 771.5044407846124,
+      "faces": 66,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 9.810004518930091e-05,
+      "topology": true,
+      "triangles": 15492,
+      "volume": 771.5801254051171
+    }
+  },
+  {
+    "engine": "after",
+    "case": "holes_sequential/30",
+    "workers": 4,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "holes_sequential/30",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-holes_sequential-30-4t-r0.log",
+    "timing": {
+      "peak_rss_kib": 5440,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 771.5044407846124,
+      "faces": 66,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.0003099850989892253,
+      "topology": true,
+      "triangles": 8772,
+      "volume": 771.7435956650596
+    }
+  },
+  {
+    "engine": "occt",
+    "case": "holes_sequential/30",
+    "workers": 4,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/investigations/sequential-holes-2026-10-10/runner-build/compare_occt",
+      "holes_sequential/30",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "occt-holes_sequential-30-4t-r0.log",
+    "timing": {
+      "phase": "timing",
+      "peak_rss_kib": 23156,
+      "samples_ms": []
+    },
+    "qa": {
+      "pass": true,
+      "geometric": true,
+      "mesh_closed": true,
+      "solids": 1,
+      "faces": 36,
+      "triangles": 12132,
+      "volume": 771.6284414120503,
+      "exact_volume": 771.5044407846121,
+      "expected_volume": 771.5044407846124,
+      "relative_volume_error": 0.00016072574684314325,
+      "exact_relative_volume_error": 2.947146684107162e-16,
+      "qa_tolerance": 0.001
+    }
+  },
+  {
+    "engine": "before",
+    "case": "holes_sequential/30",
+    "workers": 4,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "holes_sequential/30",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-holes_sequential-30-4t-r1.log",
+    "timing": {
+      "peak_rss_kib": 28560,
+      "phase": "timing",
+      "samples_ms": [
+        249.81329,
+        255.22157899999996,
+        251.44656799999998,
+        258.16411,
+        257.571953
+      ]
+    },
+    "qa": {
+      "expected_volume": 771.5044407846124,
+      "faces": 66,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 9.810004518930091e-05,
+      "topology": true,
+      "triangles": 15492,
+      "volume": 771.5801254051171
+    }
+  },
+  {
+    "engine": "after",
+    "case": "holes_sequential/30",
+    "workers": 4,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "holes_sequential/30",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-holes_sequential-30-4t-r1.log",
+    "timing": {
+      "peak_rss_kib": 5632,
+      "phase": "timing",
+      "samples_ms": [
+        3.616166,
+        3.7638390000000004,
+        3.450768,
+        3.328593,
+        3.303045
+      ]
+    },
+    "qa": {
+      "expected_volume": 771.5044407846124,
+      "faces": 66,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.0003099850989892253,
+      "topology": true,
+      "triangles": 8772,
+      "volume": 771.7435956650596
+    }
+  },
+  {
+    "engine": "occt",
+    "case": "holes_sequential/30",
+    "workers": 4,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/investigations/sequential-holes-2026-10-10/runner-build/compare_occt",
+      "holes_sequential/30",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "occt-holes_sequential-30-4t-r1.log",
+    "timing": {
+      "phase": "timing",
+      "peak_rss_kib": 23712,
+      "samples_ms": [
+        77.9502,
+        75.170531,
+        74.666984,
+        75.05542,
+        74.648359
+      ]
+    },
+    "qa": {
+      "pass": true,
+      "geometric": true,
+      "mesh_closed": true,
+      "solids": 1,
+      "faces": 36,
+      "triangles": 12132,
+      "volume": 771.6284414120503,
+      "exact_volume": 771.5044407846121,
+      "expected_volume": 771.5044407846124,
+      "relative_volume_error": 0.00016072574684314325,
+      "exact_relative_volume_error": 2.947146684107162e-16,
+      "qa_tolerance": 0.001
+    }
+  },
+  {
+    "engine": "occt",
+    "case": "holes_sequential/30",
+    "workers": 4,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/investigations/sequential-holes-2026-10-10/runner-build/compare_occt",
+      "holes_sequential/30",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "occt-holes_sequential-30-4t-r2.log",
+    "timing": {
+      "phase": "timing",
+      "peak_rss_kib": 23548,
+      "samples_ms": [
+        75.173648,
+        75.068776,
+        75.458755,
+        75.381868,
+        75.892939
+      ]
+    },
+    "qa": {
+      "pass": true,
+      "geometric": true,
+      "mesh_closed": true,
+      "solids": 1,
+      "faces": 36,
+      "triangles": 12132,
+      "volume": 771.6284414120503,
+      "exact_volume": 771.5044407846121,
+      "expected_volume": 771.5044407846124,
+      "relative_volume_error": 0.00016072574684314325,
+      "exact_relative_volume_error": 2.947146684107162e-16,
+      "qa_tolerance": 0.001
+    }
+  },
+  {
+    "engine": "after",
+    "case": "holes_sequential/30",
+    "workers": 4,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "holes_sequential/30",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-holes_sequential-30-4t-r2.log",
+    "timing": {
+      "peak_rss_kib": 5748,
+      "phase": "timing",
+      "samples_ms": [
+        3.539358,
+        3.426962,
+        3.429256,
+        3.397205,
+        3.489472
+      ]
+    },
+    "qa": {
+      "expected_volume": 771.5044407846124,
+      "faces": 66,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.0003099850989892253,
+      "topology": true,
+      "triangles": 8772,
+      "volume": 771.7435956650596
+    }
+  },
+  {
+    "engine": "before",
+    "case": "holes_sequential/30",
+    "workers": 4,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "holes_sequential/30",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-holes_sequential-30-4t-r2.log",
+    "timing": {
+      "peak_rss_kib": 28508,
+      "phase": "timing",
+      "samples_ms": [
+        254.77216600000003,
+        253.173545,
+        252.40856499999998,
+        258.15590399999996,
+        255.60084700000002
+      ]
+    },
+    "qa": {
+      "expected_volume": 771.5044407846124,
+      "faces": 66,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 9.810004518930091e-05,
+      "topology": true,
+      "triangles": 15492,
+      "volume": 771.5801254051171
+    }
+  },
+  {
+    "engine": "before",
+    "case": "holes_sequential/100",
+    "workers": 4,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "holes_sequential/100",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-holes_sequential-100-4t-r0.log",
+    "timing": {
+      "peak_rss_kib": 77132,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 2571.6814692820412,
+      "faces": 206,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 9.810125665043109e-05,
+      "topology": true,
+      "triangles": 51612,
+      "volume": 2571.9337544658824
+    }
+  },
+  {
+    "engine": "after",
+    "case": "holes_sequential/100",
+    "workers": 4,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "holes_sequential/100",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-holes_sequential-100-4t-r0.log",
+    "timing": {
+      "peak_rss_kib": 6204,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 2571.6814692820412,
+      "faces": 206,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.0003099850989871918,
+      "topology": true,
+      "triangles": 29212,
+      "volume": 2572.47865221686
+    }
+  },
+  {
+    "engine": "occt",
+    "case": "holes_sequential/100",
+    "workers": 4,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/investigations/sequential-holes-2026-10-10/runner-build/compare_occt",
+      "holes_sequential/100",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "occt-holes_sequential-100-4t-r0.log",
+    "timing": {
+      "phase": "timing",
+      "peak_rss_kib": 25132,
+      "samples_ms": []
+    },
+    "qa": {
+      "pass": true,
+      "geometric": true,
+      "mesh_closed": true,
+      "solids": 1,
+      "faces": 106,
+      "triangles": 40412,
+      "volume": 2572.094804706917,
+      "exact_volume": 2571.6814692820303,
+      "expected_volume": 2571.6814692820412,
+      "relative_volume_error": 0.00016072574687526713,
+      "exact_relative_volume_error": 4.243891225114313e-15,
+      "qa_tolerance": 0.001
+    }
+  },
+  {
+    "engine": "before",
+    "case": "holes_sequential/100",
+    "workers": 4,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "holes_sequential/100",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-holes_sequential-100-4t-r1.log",
+    "timing": {
+      "peak_rss_kib": 85608,
+      "phase": "timing",
+      "samples_ms": [
+        2935.255796,
+        2969.822388,
+        2944.389319,
+        2907.6182510000003,
+        2946.523057
+      ]
+    },
+    "qa": {
+      "expected_volume": 2571.6814692820412,
+      "faces": 206,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 9.810125665043109e-05,
+      "topology": true,
+      "triangles": 51612,
+      "volume": 2571.9337544658824
+    }
+  },
+  {
+    "engine": "after",
+    "case": "holes_sequential/100",
+    "workers": 4,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "holes_sequential/100",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-holes_sequential-100-4t-r1.log",
+    "timing": {
+      "peak_rss_kib": 6608,
+      "phase": "timing",
+      "samples_ms": [
+        33.192122999999995,
+        32.842240000000004,
+        32.521295,
+        32.676853,
+        32.68218400000001
+      ]
+    },
+    "qa": {
+      "expected_volume": 2571.6814692820412,
+      "faces": 206,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.0003099850989871918,
+      "topology": true,
+      "triangles": 29212,
+      "volume": 2572.47865221686
+    }
+  },
+  {
+    "engine": "occt",
+    "case": "holes_sequential/100",
+    "workers": 4,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/investigations/sequential-holes-2026-10-10/runner-build/compare_occt",
+      "holes_sequential/100",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "occt-holes_sequential-100-4t-r1.log",
+    "timing": {
+      "phase": "timing",
+      "peak_rss_kib": 25704,
+      "samples_ms": [
+        570.364098,
+        584.1622,
+        585.187109,
+        583.01126,
+        574.171661
+      ]
+    },
+    "qa": {
+      "pass": true,
+      "geometric": true,
+      "mesh_closed": true,
+      "solids": 1,
+      "faces": 106,
+      "triangles": 40412,
+      "volume": 2572.094804706917,
+      "exact_volume": 2571.6814692820303,
+      "expected_volume": 2571.6814692820412,
+      "relative_volume_error": 0.00016072574687526713,
+      "exact_relative_volume_error": 4.243891225114313e-15,
+      "qa_tolerance": 0.001
+    }
+  },
+  {
+    "engine": "occt",
+    "case": "holes_sequential/100",
+    "workers": 4,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/investigations/sequential-holes-2026-10-10/runner-build/compare_occt",
+      "holes_sequential/100",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "occt-holes_sequential-100-4t-r2.log",
+    "timing": {
+      "phase": "timing",
+      "peak_rss_kib": 25836,
+      "samples_ms": [
+        572.965524,
+        573.917042,
+        573.087389,
+        572.74962,
+        571.506813
+      ]
+    },
+    "qa": {
+      "pass": true,
+      "geometric": true,
+      "mesh_closed": true,
+      "solids": 1,
+      "faces": 106,
+      "triangles": 40412,
+      "volume": 2572.094804706917,
+      "exact_volume": 2571.6814692820303,
+      "expected_volume": 2571.6814692820412,
+      "relative_volume_error": 0.00016072574687526713,
+      "exact_relative_volume_error": 4.243891225114313e-15,
+      "qa_tolerance": 0.001
+    }
+  },
+  {
+    "engine": "after",
+    "case": "holes_sequential/100",
+    "workers": 4,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "holes_sequential/100",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-holes_sequential-100-4t-r2.log",
+    "timing": {
+      "peak_rss_kib": 6560,
+      "phase": "timing",
+      "samples_ms": [
+        33.149581,
+        33.08494700000001,
+        32.745525,
+        33.233081999999996,
+        33.075559
+      ]
+    },
+    "qa": {
+      "expected_volume": 2571.6814692820412,
+      "faces": 206,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.0003099850989871918,
+      "topology": true,
+      "triangles": 29212,
+      "volume": 2572.47865221686
+    }
+  },
+  {
+    "engine": "before",
+    "case": "holes_sequential/100",
+    "workers": 4,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "holes_sequential/100",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-holes_sequential-100-4t-r2.log",
+    "timing": {
+      "peak_rss_kib": 88940,
+      "phase": "timing",
+      "samples_ms": [
+        2966.0073709999997,
+        2913.966104,
+        2941.922731,
+        2941.058832,
+        2935.286885
+      ]
+    },
+    "qa": {
+      "expected_volume": 2571.6814692820412,
+      "faces": 206,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 9.810125665043109e-05,
+      "topology": true,
+      "triangles": 51612,
+      "volume": 2571.9337544658824
+    }
+  },
+  {
+    "engine": "before",
+    "case": "holes_batch/100",
+    "workers": 1,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "holes_batch/100",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-holes_batch-100-1t-r0.log",
+    "timing": {
+      "peak_rss_kib": 30256,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 2571.6814692820412,
+      "faces": 206,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 9.81015423555542e-05,
+      "topology": true,
+      "triangles": 51612,
+      "volume": 2571.933755200625
+    }
+  },
+  {
+    "engine": "before",
+    "case": "holes_batch/100",
+    "workers": 1,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "holes_batch/100",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-holes_batch-100-1t-r1.log",
+    "timing": {
+      "peak_rss_kib": 33452,
+      "phase": "timing",
+      "samples_ms": [
+        185.59693,
+        184.997107,
+        184.662575,
+        183.982598,
+        183.955586
+      ]
+    },
+    "qa": {
+      "expected_volume": 2571.6814692820412,
+      "faces": 206,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 9.81015423555542e-05,
+      "topology": true,
+      "triangles": 51612,
+      "volume": 2571.933755200625
+    }
+  },
+  {
+    "engine": "after",
+    "case": "holes_batch/100",
+    "workers": 1,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "holes_batch/100",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-holes_batch-100-1t-r1.log",
+    "timing": {
+      "peak_rss_kib": 33384,
+      "phase": "timing",
+      "samples_ms": [
+        184.981237,
+        183.491826,
+        183.64227499999998,
+        184.47619600000002,
+        184.41918700000002
+      ]
+    },
+    "qa": {
+      "expected_volume": 2571.6814692820412,
+      "faces": 206,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 9.81015423555542e-05,
+      "topology": true,
+      "triangles": 51612,
+      "volume": 2571.933755200625
+    }
+  },
+  {
+    "engine": "after",
+    "case": "holes_batch/100",
+    "workers": 1,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "holes_batch/100",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-holes_batch-100-1t-r2.log",
+    "timing": {
+      "peak_rss_kib": 33272,
+      "phase": "timing",
+      "samples_ms": [
+        184.55113,
+        183.326178,
+        183.87914,
+        183.356426,
+        183.026252
+      ]
+    },
+    "qa": {
+      "expected_volume": 2571.6814692820412,
+      "faces": 206,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 9.81015423555542e-05,
+      "topology": true,
+      "triangles": 51612,
+      "volume": 2571.933755200625
+    }
+  },
+  {
+    "engine": "before",
+    "case": "holes_batch/100",
+    "workers": 1,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "holes_batch/100",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-holes_batch-100-1t-r2.log",
+    "timing": {
+      "peak_rss_kib": 33244,
+      "phase": "timing",
+      "samples_ms": [
+        186.14948,
+        184.394981,
+        185.012878,
+        184.885212,
+        185.085126
+      ]
+    },
+    "qa": {
+      "expected_volume": 2571.6814692820412,
+      "faces": 206,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 9.81015423555542e-05,
+      "topology": true,
+      "triangles": 51612,
+      "volume": 2571.933755200625
+    }
+  },
+  {
+    "engine": "before",
+    "case": "thin_wall/0.01",
+    "workers": 1,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "thin_wall/0.01",
+      "0",
+      "0.001",
+      "1e-05",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-thin_wall-0.01-1t-r0.log",
+    "timing": {
+      "peak_rss_kib": 7416,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 2.008106024174559,
+      "faces": 6,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 1e-05,
+      "relative_volume_error": 0.0003540065613173056,
+      "topology": true,
+      "triangles": 13816,
+      "volume": 2.0073951414661804
+    }
+  },
+  {
+    "engine": "before",
+    "case": "thin_wall/0.01",
+    "workers": 1,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "thin_wall/0.01",
+      "5",
+      "0.001",
+      "1e-05",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-thin_wall-0.01-1t-r1.log",
+    "timing": {
+      "peak_rss_kib": 7556,
+      "phase": "timing",
+      "samples_ms": [
+        8.991149,
+        8.895596000000001,
+        8.480859,
+        8.627962,
+        8.517871
+      ]
+    },
+    "qa": {
+      "expected_volume": 2.008106024174559,
+      "faces": 6,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 1e-05,
+      "relative_volume_error": 0.0003540065613173056,
+      "topology": true,
+      "triangles": 13816,
+      "volume": 2.0073951414661804
+    }
+  },
+  {
+    "engine": "after",
+    "case": "thin_wall/0.01",
+    "workers": 1,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "thin_wall/0.01",
+      "5",
+      "0.001",
+      "1e-05",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-thin_wall-0.01-1t-r1.log",
+    "timing": {
+      "peak_rss_kib": 5216,
+      "phase": "timing",
+      "samples_ms": [
+        0.022784000000000002,
+        0.019648,
+        0.026631,
+        0.017223000000000002,
+        0.017503
+      ]
+    },
+    "qa": {
+      "expected_volume": 2.008106024174559,
+      "faces": 6,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 1e-05,
+      "relative_volume_error": 1.4376465066605046e-06,
+      "topology": true,
+      "triangles": 11240,
+      "volume": 2.0081031372279483
+    }
+  },
+  {
+    "engine": "after",
+    "case": "thin_wall/0.01",
+    "workers": 1,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "thin_wall/0.01",
+      "5",
+      "0.001",
+      "1e-05",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-thin_wall-0.01-1t-r2.log",
+    "timing": {
+      "peak_rss_kib": 5136,
+      "phase": "timing",
+      "samples_ms": [
+        0.018666000000000002,
+        0.016292,
+        0.016872,
+        0.014327,
+        0.014097
+      ]
+    },
+    "qa": {
+      "expected_volume": 2.008106024174559,
+      "faces": 6,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 1e-05,
+      "relative_volume_error": 1.4376465066605046e-06,
+      "topology": true,
+      "triangles": 11240,
+      "volume": 2.0081031372279483
+    }
+  },
+  {
+    "engine": "before",
+    "case": "thin_wall/0.01",
+    "workers": 1,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "thin_wall/0.01",
+      "5",
+      "0.001",
+      "1e-05",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-thin_wall-0.01-1t-r2.log",
+    "timing": {
+      "peak_rss_kib": 7244,
+      "phase": "timing",
+      "samples_ms": [
+        8.629315,
+        8.668509,
+        8.636879,
+        8.485438,
+        8.607222
+      ]
+    },
+    "qa": {
+      "expected_volume": 2.008106024174559,
+      "faces": 6,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 1e-05,
+      "relative_volume_error": 0.0003540065613173056,
+      "topology": true,
+      "triangles": 13816,
+      "volume": 2.0073951414661804
+    }
+  },
+  {
+    "engine": "before",
+    "case": "fillet_bore/0.5",
+    "workers": 1,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "fillet_bore/0.5",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-fillet_bore-0.5-1t-r0.log",
+    "timing": {
+      "peak_rss_kib": 6544,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 3716.2077256525126,
+      "faces": 10,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 2.7905528826341e-05,
+      "topology": true,
+      "triangles": 8720,
+      "volume": 3716.3114283943255
+    }
+  },
+  {
+    "engine": "before",
+    "case": "fillet_bore/0.5",
+    "workers": 1,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "fillet_bore/0.5",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-fillet_bore-0.5-1t-r1.log",
+    "timing": {
+      "peak_rss_kib": 6652,
+      "phase": "timing",
+      "samples_ms": [
+        10.455332,
+        10.416376999999999,
+        10.434251,
+        10.338667,
+        10.427809
+      ]
+    },
+    "qa": {
+      "expected_volume": 3716.2077256525126,
+      "faces": 10,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 2.7905528826341e-05,
+      "topology": true,
+      "triangles": 8720,
+      "volume": 3716.3114283943255
+    }
+  },
+  {
+    "engine": "after",
+    "case": "fillet_bore/0.5",
+    "workers": 1,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "fillet_bore/0.5",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-fillet_bore-0.5-1t-r1.log",
+    "timing": {
+      "peak_rss_kib": 6016,
+      "phase": "timing",
+      "samples_ms": [
+        11.053199999999999,
+        10.488265,
+        10.599969000000002,
+        10.538832,
+        10.676105999999999
+      ]
+    },
+    "qa": {
+      "expected_volume": 3716.2077256525126,
+      "faces": 10,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 2.4286636060838437e-05,
+      "topology": true,
+      "triangles": 8708,
+      "volume": 3716.297979837072
+    }
+  },
+  {
+    "engine": "after",
+    "case": "fillet_bore/0.5",
+    "workers": 1,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "fillet_bore/0.5",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-fillet_bore-0.5-1t-r2.log",
+    "timing": {
+      "peak_rss_kib": 5788,
+      "phase": "timing",
+      "samples_ms": [
+        11.03763,
+        10.291076,
+        10.333477,
+        10.342054,
+        10.30879
+      ]
+    },
+    "qa": {
+      "expected_volume": 3716.2077256525126,
+      "faces": 10,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 2.4286636060838437e-05,
+      "topology": true,
+      "triangles": 8708,
+      "volume": 3716.297979837072
+    }
+  },
+  {
+    "engine": "before",
+    "case": "fillet_bore/0.5",
+    "workers": 1,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "fillet_bore/0.5",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-fillet_bore-0.5-1t-r2.log",
+    "timing": {
+      "peak_rss_kib": 6608,
+      "phase": "timing",
+      "samples_ms": [
+        10.563078,
+        10.499297,
+        10.629065,
+        10.557839,
+        10.536597
+      ]
+    },
+    "qa": {
+      "expected_volume": 3716.2077256525126,
+      "faces": 10,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 2.7905528826341e-05,
+      "topology": true,
+      "triangles": 8720,
+      "volume": 3716.3114283943255
+    }
+  },
+  {
+    "engine": "before",
+    "case": "mesh_plate/100",
+    "workers": 1,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "mesh_plate/100",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-mesh_plate-100-1t-r0.log",
+    "timing": {
+      "peak_rss_kib": 23368,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 2571.6814692820412,
+      "faces": null,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.0003099850989871918,
+      "topology": true,
+      "triangles": 29212,
+      "volume": 2572.47865221686
+    }
+  },
+  {
+    "engine": "before",
+    "case": "mesh_plate/100",
+    "workers": 1,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "mesh_plate/100",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-mesh_plate-100-1t-r1.log",
+    "timing": {
+      "peak_rss_kib": 33876,
+      "phase": "timing",
+      "samples_ms": [
+        64.12802099999999,
+        62.520494,
+        62.677445,
+        61.475637,
+        61.749052999999996
+      ]
+    },
+    "qa": {
+      "expected_volume": 2571.6814692820412,
+      "faces": null,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.0003099850989871918,
+      "topology": true,
+      "triangles": 29212,
+      "volume": 2572.47865221686
+    }
+  },
+  {
+    "engine": "after",
+    "case": "mesh_plate/100",
+    "workers": 1,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "mesh_plate/100",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-mesh_plate-100-1t-r1.log",
+    "timing": {
+      "peak_rss_kib": 33388,
+      "phase": "timing",
+      "samples_ms": [
+        64.307005,
+        63.45996900000001,
+        61.182565000000004,
+        61.283559000000004,
+        61.129573
+      ]
+    },
+    "qa": {
+      "expected_volume": 2571.6814692820412,
+      "faces": null,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.0003099850989871918,
+      "topology": true,
+      "triangles": 29212,
+      "volume": 2572.47865221686
+    }
+  },
+  {
+    "engine": "after",
+    "case": "mesh_plate/100",
+    "workers": 1,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "mesh_plate/100",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-mesh_plate-100-1t-r2.log",
+    "timing": {
+      "peak_rss_kib": 30464,
+      "phase": "timing",
+      "samples_ms": [
+        63.83957699999999,
+        62.82036000000001,
+        63.138982,
+        60.855867,
+        60.943937
+      ]
+    },
+    "qa": {
+      "expected_volume": 2571.6814692820412,
+      "faces": null,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.0003099850989871918,
+      "topology": true,
+      "triangles": 29212,
+      "volume": 2572.47865221686
+    }
+  },
+  {
+    "engine": "before",
+    "case": "mesh_plate/100",
+    "workers": 1,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "mesh_plate/100",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-mesh_plate-100-1t-r2.log",
+    "timing": {
+      "peak_rss_kib": 32976,
+      "phase": "timing",
+      "samples_ms": [
+        63.833947,
+        63.272698000000005,
+        61.045491,
+        62.432144,
+        61.319908
+      ]
+    },
+    "qa": {
+      "expected_volume": 2571.6814692820412,
+      "faces": null,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 0.0003099850989871918,
+      "topology": true,
+      "triangles": 29212,
+      "volume": 2572.47865221686
+    }
+  },
+  {
+    "engine": "before",
+    "case": "knurl/16",
+    "workers": 1,
+    "round": 0,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "knurl/16",
+      "0",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-knurl-16-1t-r0.log",
+    "timing": {
+      "peak_rss_kib": 7552,
+      "phase": "timing",
+      "samples_ms": []
+    },
+    "qa": {
+      "expected_volume": 3563.51528438101,
+      "faces": 50,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 5.098818404044317e-05,
+      "topology": true,
+      "triangles": 636,
+      "volume": 3563.333587207859
+    }
+  },
+  {
+    "engine": "before",
+    "case": "knurl/16",
+    "workers": 1,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "knurl/16",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-knurl-16-1t-r1.log",
+    "timing": {
+      "peak_rss_kib": 7768,
+      "phase": "timing",
+      "samples_ms": [
+        9.432417000000001,
+        9.937006,
+        9.416186,
+        9.47037,
+        9.446875
+      ]
+    },
+    "qa": {
+      "expected_volume": 3563.51528438101,
+      "faces": 50,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 5.098818404044317e-05,
+      "topology": true,
+      "triangles": 636,
+      "volume": 3563.333587207859
+    }
+  },
+  {
+    "engine": "after",
+    "case": "knurl/16",
+    "workers": 1,
+    "round": 1,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "knurl/16",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-knurl-16-1t-r1.log",
+    "timing": {
+      "peak_rss_kib": 7888,
+      "phase": "timing",
+      "samples_ms": [
+        9.453267,
+        9.369295999999999,
+        9.492332,
+        9.357753,
+        9.300934999999999
+      ]
+    },
+    "qa": {
+      "expected_volume": 3563.51528438101,
+      "faces": 50,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 5.098818404044317e-05,
+      "topology": true,
+      "triangles": 636,
+      "volume": 3563.333587207859
+    }
+  },
+  {
+    "engine": "after",
+    "case": "knurl/16",
+    "workers": 1,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_after",
+      "knurl/16",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "after-knurl-16-1t-r2.log",
+    "timing": {
+      "peak_rss_kib": 8048,
+      "phase": "timing",
+      "samples_ms": [
+        9.469458,
+        9.383754,
+        9.657439,
+        9.410886,
+        9.399263999999999
+      ]
+    },
+    "qa": {
+      "expected_volume": 3563.51528438101,
+      "faces": 50,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 5.098818404044317e-05,
+      "topology": true,
+      "triangles": 636,
+      "volume": 3563.333587207859
+    }
+  },
+  {
+    "engine": "before",
+    "case": "knurl/16",
+    "workers": 1,
+    "round": 2,
+    "status": "pass",
+    "exit_code": 0,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/target/analytic-holes/compare_before",
+      "knurl/16",
+      "5",
+      "0.001",
+      "0.001",
+      "/home/krone/Development/Pieza_WS/truck-analytic-holes/truck-benchmarks/results/2026-10-10-analytic-holes/data"
+    ],
+    "log": "before-knurl-16-1t-r2.log",
+    "timing": {
+      "peak_rss_kib": 7944,
+      "phase": "timing",
+      "samples_ms": [
+        9.898122,
+        9.447897000000001,
+        9.459419,
+        9.379705,
+        9.337985
+      ]
+    },
+    "qa": {
+      "expected_volume": 3563.51528438101,
+      "faces": 50,
+      "geometric": true,
+      "mesh_closed": true,
+      "pass": true,
+      "qa_tolerance": 0.001,
+      "relative_volume_error": 5.098818404044317e-05,
+      "topology": true,
+      "triangles": 636,
+      "volume": 3563.333587207859
+    }
+  }
+]

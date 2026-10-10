@@ -1,5 +1,22 @@
 # CPU action benchmarks
 
+## Full suite after the hole optimization
+
+The [complete 2026-10-10 run](truck-benchmarks/results/2026-10-10-all-benchmarks/REPORT.md)
+measures all 72 actions before and after the optimization and all 20 direct OCCT cases,
+with one and four workers. Every benchmark check passed. Truck leads in 32 of 40 OCCT
+case/worker comparisons; batch hole subtraction and bore-rim filleting remain slower.
+The report retains all measurements and longer reruns of two apparent action slowdowns.
+
+## Analytic through-hole subtraction
+
+The [2026-10-10 optimization report](truck-benchmarks/results/2026-10-10-analytic-holes/REPORT.md)
+records 100 sequential cylindrical holes falling from 5,440.23 ms to 32.89 ms with one
+worker; direct OCCT 7.9.3 takes 696.68 ms in the same run. The analytic path applies to
+isolated through-holes in prismatic modeling bodies. Other cuts retain the general solver.
+The report includes correctness checks, the existing parent test failure, raw samples,
+source and binary hashes, and measurements of adjacent operations.
+
 ## Direct OpenCascade comparison
 
 `truck-benchmarks/scripts/compare_occt.py` compares our native Rust kernel with a small

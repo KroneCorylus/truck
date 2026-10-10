@@ -1,0 +1,7 @@
+M BENCHMARKS.md
+ M CHANGELOG.md
+ M truck-shapeops/src/transversal/integrate/mod.rs
+?? truck-benchmarks/results/2026-10-10-all-benchmarks/
+?? truck-benchmarks/results/2026-10-10-analytic-holes/
+?? truck-shapeops/src/transversal/integrate/through_hole.rs
+?? truck-shapeops/tests/analytic_holes.rs
