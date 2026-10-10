@@ -1,0 +1,11 @@
+OCCT 7.9.3
+distance=0.2 ridges=0 done=true valid=1 solids=1 faces=6 volume=333.095962401609 truck_miter_volume=333.095962401609 planes_match=1 matches_miter_volume=1
+distance=0.2 ridges=01 done=true valid=1 solids=1 faces=8 volume=332.857814407518 truck_miter_volume=332.861512656859 planes_match=1 matches_miter_volume=0
+distance=0.2 ridges=02 done=true valid=1 solids=1 faces=7 volume=332.86034418207 truck_miter_volume=332.860344182069 planes_match=1 matches_miter_volume=1
+distance=0.2 ridges=012 done=true valid=1 solids=1 faces=9 volume=332.626674639587 truck_miter_volume=332.627355030805 planes_match=1 matches_miter_volume=0
+distance=0.2 ridges=0123 done=true valid=1 solids=1 faces=10 volume=332.392481328986 truck_miter_volume=332.394365879542 planes_match=1 matches_miter_volume=0
+distance=1.2 ridges=0 done=true valid=1 solids=1 faces=6 volume=325.261212080955 truck_miter_volume=325.261212080955 planes_match=1 matches_miter_volume=1
+distance=1.2 ridges=01 done=true valid=1 solids=1 faces=8 volume=317.024583711376 truck_miter_volume=317.820067214822 planes_match=1 matches_miter_volume=0
+distance=1.2 ridges=02 done=true valid=1 solids=1 faces=7 volume=317.567676660324 truck_miter_volume=317.567676660324 planes_match=1 matches_miter_volume=1
+distance=1.2 ridges=012 done=true valid=1 solids=1 faces=9 volume=310.289324247902 truck_miter_volume=310.442019987314 planes_match=1 matches_miter_volume=0
+distance=1.2 ridges=0123 done=true valid=1 solids=1 faces=10 volume=302.778699216511 truck_miter_volume=303.316363314304 planes_match=1 matches_miter_volume=0

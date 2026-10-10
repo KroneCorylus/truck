@@ -76,10 +76,10 @@
     "composition": [
       "simultaneous vs sequential",
       "all selection orders",
-      "fillet→fillet",
-      "fillet→chamfer",
-      "chamfer→fillet",
-      "chamfer→chamfer",
+      "fillet\u2192fillet",
+      "fillet\u2192chamfer",
+      "chamfer\u2192fillet",
+      "chamfer\u2192chamfer",
       "Boolean-generated edges",
       "nearby hole/cavity"
     ]
@@ -584,8 +584,8 @@
         "freeform"
       ],
       "occt_scope": "Tests explicitly convert shapes to NURBS before chamfering.",
-      "truck_scope": "Fixed planar spline support recognition, straight spline edge grouping in Pieza and bounded contact trimming in the generic kernel path. Planar rim fillets, asymmetric chamfers and sequential single-edge miter fillets have representation regressions. Circular rim blends also have analytic/exact-NURBS controls, including elevated degrees and shifted parameter domains. Broader invariance for curved support pairs and split faces remains open.",
-      "next_case": "Compare non-cylindrical curved support pairs and split faces across analytic/NURBS/STEP representations, including smooth rolling continuations around existing rounds. Passing cylindrical rims and sequential single-edge miters does not establish general junction or freeform parity. Extremely short fillet parameter domains still fail STEP preparation gracefully; physical equivalence across arbitrary parameter scales is not established.",
+      "truck_scope": "Fixed planar spline support recognition, straight spline edge grouping in Pieza and bounded contact trimming in the generic kernel path. Planar rim fillets, asymmetric chamfers and sequential single-edge miter fillets have representation regressions. Circular rim blends also have analytic/exact-NURBS controls, including elevated degrees and shifted parameter domains. Broader invariance for curved support pairs and split faces remains open. STEP export also covers short, long and shifted longitudinal fillet domains.",
+      "next_case": "Compare non-cylindrical curved support pairs and split faces across analytic/NURBS/STEP representations, including smooth rolling continuations around existing rounds. Passing cylindrical rims and sequential single-edge miters does not establish general junction or freeform parity. Fillet surface parameter scaling is covered during STEP preparation; extend equivalent checks to support and boundary-curve parameters.",
       "evidence": [
         {
           "repo": "occt",
@@ -682,6 +682,12 @@
           "path": "truck-shapeops/tests/curved_blend_representation.rs",
           "find": "fn reparameterized_nurbs_cylinder_rim",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/curved_blend_representation.rs",
+          "find": "fn fillet_parameter_domains_preserve_step_geometry",
+          "role": "test"
         }
       ],
       "required_outcome": "Handle equivalent physical geometry consistently when represented analytically, as exact NURBS, with split faces, or after STEP import.",
@@ -693,7 +699,7 @@
         "App regressions pass for two-edge/full-rim selections, weighted NURBS and B-spline segments, unequal chamfer side assignments, radius/volume/closed-mesh checks, transforms, scale, reversed selection order and retained names. Bowed, retracing and singular splines are excluded from straight-segment routing.",
         "A STEP-linked NURBS cube supports filleting, document save/load and an upstream height change while retaining body and generated-face references. Output STEP is checked at the documented fitting tolerance, with closed tessellation and independent volume.",
         "App fix committed as 48e8fe2. cargo test --locked -p cad-core --no-fail-fast: 425 passed, 0 failed, 2 existing ignored, including the permanent imported-spline-fillet corpus case and CLI checks. cargo clippy --locked -p cad-core --all-targets completed with warnings in unchanged files.",
-        "Broader suite validation found a pre-existing failure in r11_corners::unsupported_junctions_have_distinct_diagnostics: a pyramid chamfer succeeds where the test expects UnsupportedTopology. Reproduced unchanged at parent 7eb2d78d with the same Cargo.lock; the assertion is retained.",
+        "Earlier suite validation found a pre-existing failure in r11_corners::unsupported_junctions_have_distinct_diagnostics: a pyramid chamfer succeeds where the test expects UnsupportedTopology. Reproduced unchanged at parent 7eb2d78d with the same Cargo.lock; that assertion was retained at the time and is superseded by the validated pyramid chamfer contract recorded under J06.",
         "Direct kernel regressions fail on parent 38aa7217: the second adjacent single-edge fillet returns BlendConstructionFailed for analytic edges and panics in IntersectionCurve for cubic B-spline and weighted NURBS edges. Bounded, damped contact intersection with a sampled fallback seed fixes all three without changing their representations.",
         "The new sequential miter cases check two radii, rotation/translation/scaling, reversed wires, input geometry and IDs, radius, surface normals, independent analytic volume, closed tessellation and STEP round trips. Guarded-curve unit tests forbid out-of-domain evaluations and retain rejection of disjoint curves and invalid hints. Existing collapsed-contact regressions are unchanged.",
         "With the bounded-contact fix, the full application run reports 424 passed, 1 failed and 2 existing ignored. The failure is workflow_audit::equivalent_tubes_shell_and_blend: tube-shell rebuilds reach the unchanged 30-second limit. An isolated recheck and a fresh isolated build at Truck parent 38aa7217 / Pieza 48e8fe2 reproduce the timeout; shell checks take about 29-30 seconds in unchanged planar::valid_boundaries/contained. Fillet and chamfer cases in that workflow pass. The timeout and tests remain unchanged.",
@@ -701,7 +707,9 @@
         "These are independently specified Truck/Pieza regression fixtures, not executions of the 1,026 OCCT corpus entries.",
         "Cylindrical rim construction already succeeded on analytic, exact NURBS and degree-elevated/shifted NURBS supports. Stronger STEP checks failed on both NURBS cases with the parent exporter. Retaining source contact knots after uniform fitting fails now allows all three to pass sampled radius/normal or unequal-chamfer section checks, independent volume, closed tessellation, immutable input and STEP round trips at the unchanged fitting tolerance.",
         "The previously recorded tube-shell timeout is addressed by conservative segment bounds and cached projection in shared planar validation. Release shell_tube median: 3.554 s before, 160.4 ms after, five samples with one worker. An annular-solid regression also fails on parent 7405a948 because disconnected rims occupy one face (genus 2 instead of 1); separate rim faces and the corresponding Pieza naming migration correct this. See the planar-validation benchmark report for raw evidence and validation scope.",
-        "Latest validation: full cad-core suite 427 passed, 0 failed, 2 existing ignored; full shapeops suite 299 passed, the same r11_corners diagnostic mismatch, and 1 existing ignored. After a final short-domain export safeguard, all 15 targeted blend/export tests and all 79 STEP tests pass, along with the four app shell regressions. Kernel/STEP/benchmark Clippy, targeted nightly formatting and the action benchmark smoke suite pass; app Clippy has warnings in unchanged files. Full logs, parent failures and final benchmark hashes are retained in truck-benchmarks/results/2026-10-10-planar-validation/REPORT.md."
+        "Validation before longitudinal parameter normalization: full cad-core suite 427 passed, 0 failed, 2 existing ignored; full shapeops suite 299 passed, the same r11_corners diagnostic mismatch, and 1 existing ignored. After a final short-domain export safeguard, all 15 targeted blend/export tests and all 79 STEP tests pass, along with the four app shell regressions. Kernel/STEP/benchmark Clippy, targeted nightly formatting and the action benchmark smoke suite pass; app Clippy has warnings in unchanged files. Full logs, parent failures and final benchmark hashes are retained in truck-benchmarks/results/2026-10-10-planar-validation/REPORT.md.",
+        "STEP fillet fitting now normalizes longitudinal knots before evaluation and interpolation. The parent rejects a 1e-9 domain; the strengthened regression requires successful export for scales 1e-9 through 1e9 and shifted domains, on original and rotated/translated/scaled solids. It checks sampled positional error at the requested tolerance, source solid validity, closed STEP meshes, analytic volume and unchanged input. This is export coverage; arbitrary support and boundary-curve parameterization remain separate gaps.",
+        "Current kernel validation after STEP parameter normalization and correction of the obsolete pyramid-chamfer test contract: full shapeops suite 303 passed, 0 failed, 1 existing ignored; geometry 250 passed, 0 failed, 1 existing ignored; STEP 79 passed, 0 failed. Final R11 checks, all-targets Clippy, benchmark smoke, targeted nightly formatting and audit-generator tests pass. Export timings and raw validation logs are in truck-benchmarks/results/2026-10-10-fillet-parameter-domains/REPORT.md. The app was unchanged and was not rerun in this batch."
       ]
     },
     {
@@ -1053,11 +1061,12 @@
       "truck_status": "partial",
       "priority": "P1",
       "tags": [
-        "fillet"
+        "fillet",
+        "chamfer"
       ],
-      "occt_scope": "General n-corner construction exists, with documented and implementation limitations.",
-      "truck_scope": "The equal-radius multi-edge path rejects general high-valence corners. Single-blend high-valence termination is a different supported case.",
-      "next_case": "Pyramid apex with two, three, four and all incident edges selected.",
+      "occt_scope": "General n-corner construction exists, with documented and implementation limitations. An independent OCCT 7.9.3 pyramid chamfer probe succeeds for one through four selected ridges, including the opposite pair, but constructs different corner geometry for adjacent selections.",
+      "truck_scope": "The equal-radius multi-edge fillet path rejects general high-valence corners. The solid-level planar intersection fallback already chamfers a square pyramid with one through four selected ridges, including opposite pairs. These are valid mitered bevels; OCCT adds a corner face in adjacent, three- and four-ridge cases. Single-fillet high-valence termination is a separate supported case.",
+      "next_case": "Investigate the extra corner-transition geometry produced by OCCT for adjacent pyramid chamfers, comparing continuity and local geometry rather than API signatures. Retain pyramid fillets as an open gap. Extend chamfers to skewed pyramids, five or more incident edges, unequal setbacks and mixed concavity.",
       "evidence": [
         {
           "repo": "occt",
@@ -1076,9 +1085,31 @@
           "path": "truck-shapeops/src/fillet/along_wire.rs",
           "find": "tangent junction patches between meeting rounds",
           "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/r11_corners.rs",
+          "find": "fn pyramid_chamfers_preserve_setbacks_at_four_edge_vertices",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/probes/pyramid_chamfers.cpp",
+          "find": "int main()",
+          "role": "reference-probe"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/probes/pyramid_chamfers_occt.txt",
+          "find": "OCCT 7.9.3",
+          "role": "reference-result"
         }
       ],
-      "required_outcome": "Join four or more interacting blends at a vertex when the requested configuration has a valid solution."
+      "required_outcome": "Join four or more interacting blends at a vertex when the requested configuration has a valid solution.",
+      "verification": [
+        "One through four pyramid ridges, including both adjacent and opposite pairs, pass for setbacks 0.2 and 1.2 before/after rigid transforms, with independent bevel-plane equations, integrated analytic volume, closed topology and mesh, convexity, face history, reversed selection order, immutable input and STEP. The old UnsupportedTopology chamfer assertion failed because construction already succeeded; it is replaced by the stronger valid-solid contract, retaining the unsupported fillet diagnostic. No construction or diagnostic code changed. Derivations are in truck-shapeops/tests/R11.md.",
+        "Independent paired probe: installed OCCT 7.9.3 produces valid single solids with the requested bevel planes in all ten pyramid cases. Single-ridge and opposite-pair volumes match the analytic Truck miter construction; adjacent, three- and four-ridge cases add a face and remove extra material. This records a corner-geometry difference, not an invalid OCCT output or absence of Truck chamfer support. See audits/fillet-chamfer/probes/README.md. The 1,026 inventoried upstream cases remain unexecuted."
+      ]
     },
     {
       "id": "J07",
@@ -1418,7 +1449,7 @@
         "periodic-seam"
       ],
       "occt_scope": "Dedicated periodic/singular extrema and parameter repairs.",
-      "truck_scope": "Some exact conic seam handling and reversed-curve fixes exist; general paired seam coverage remains open.",
+      "truck_scope": "Some exact conic seam handling and reversed-curve fixes exist. STEP fitting normalizes longitudinal fillet domains, including sub-tolerance ranges; general support, boundary-curve and paired seam coverage remains open.",
       "next_case": "Reverse surface parameters and move the seam through the same physical geometry; verify every edge lies on both supports.",
       "evidence": [
         {
@@ -1442,13 +1473,13 @@
         {
           "repo": "truck",
           "path": "truck-shapeops/tests/curved_blend_representation.rs",
-          "find": "fn short_fillet_parameter_domains_do_not_panic_on_step_export",
+          "find": "fn fillet_parameter_domains_preserve_step_geometry",
           "role": "test"
         }
       ],
       "required_outcome": "Keep blend boundaries on both supports and close them correctly when surface parameters, orientations or seam positions change.",
       "verification": [
-        "A fillet longitudinal domain compressed to 1e-9 reproduces a knot-evaluation panic during STEP preparation. The exporter now rejects domains below the evaluator resolution with None, preserving input and the fitting budget. This is safe failure, not support for STEP export at arbitrary parameter scales."
+        "STEP fillet fitting now normalizes longitudinal knots before evaluation and interpolation. The parent rejects a 1e-9 domain; the strengthened regression requires successful export for scales 1e-9 through 1e9 and shifted domains, on original and rotated/translated/scaled solids. It checks sampled positional error at the requested tolerance, source solid validity, closed STEP meshes, analytic volume and unchanged input. This is export coverage; arbitrary support and boundary-curve parameterization remain separate gaps."
       ]
     },
     {
@@ -1528,7 +1559,7 @@
       ],
       "occt_scope": "Dedicated sequential chamfer grids and composition regressions.",
       "truck_scope": "Many feature orders are tested. Sequential single-edge rounds now form equal-radius miters for analytic, B-spline and weighted NURBS edges. Equal-radius rolling continuations around an earlier round still collapse a contact and need a different corner construction; general topology transitions remain limited.",
-      "next_case": "Fillet→fillet, fillet→chamfer, chamfer→fillet and chamfer→chamfer with nearby and intersecting selections.",
+      "next_case": "Fillet\u2192fillet, fillet\u2192chamfer, chamfer\u2192fillet and chamfer\u2192chamfer with nearby and intersecting selections.",
       "evidence": [
         {
           "repo": "occt",
@@ -1724,12 +1755,19 @@
           "path": "cad-core/tests/shell.rs",
           "find": "fn opened_pocket_keeps_names_when_its_shells_separate",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/curved_blend_representation.rs",
+          "find": "fn fillet_parameter_domains_preserve_step_geometry",
+          "role": "test"
         }
       ],
       "required_outcome": "Deliver blend results usable for closed meshing, STEP interchange and further modeling while preserving dimensions and validity.",
       "verification": [
         "Analytic and exact-NURBS circular rim fillets and unequal chamfers now pass independent dimension/volume and closed STEP round-trip checks, including degree elevation and shifted support domains. Source-knot fitting is a sampled approximation at the requested tolerance, not a certified global bound. Downstream shell validation also checks separate opening rims for one/two holes, inward/outward offsets, rigid transforms, exact volumes and STEP.",
-        "Opened blind pockets now retain their two physical closed components. Explicit outer/inner face ancestry replaces positional shell naming; each component passes independent volume/STEP checks, and app references survive pocket-depth edits and save/load. Both components are recovered from the exported STEP file."
+        "Opened blind pockets now retain their two physical closed components. Explicit outer/inner face ancestry replaces positional shell naming; each component passes independent volume/STEP checks, and app references survive pocket-depth edits and save/load. Both components are recovered from the exported STEP file.",
+        "STEP fillet fitting now normalizes longitudinal knots before evaluation and interpolation. The parent rejects a 1e-9 domain; the strengthened regression requires successful export for scales 1e-9 through 1e9 and shifted domains, on original and rotated/translated/scaled solids. It checks sampled positional error at the requested tolerance, source solid validity, closed STEP meshes, analytic volume and unchanged input. This is export coverage; arbitrary support and boundary-curve parameterization remain separate gaps."
       ]
     },
     {

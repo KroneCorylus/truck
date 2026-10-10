@@ -7,7 +7,7 @@
       "tracked_changes": "M src/BOPAlgo/BOPAlgo_PaveFiller.cxx\n M src/BRepAlgoAPI/BRepAlgoAPI_BuilderAlgo.cxx\n M src/IntTools/IntTools_FaceFace.cxx"
     },
     "truck": {
-      "revision": "aa3f2d15cc208d696807c7bad9cf73b71e072d25",
+      "revision": "2a2906641b2443cd944429f5ed0b49e7589e57ed",
       "revision_scope": "Latest commit outside audits/fillet-chamfer; audit-only commits do not change the kernel baseline.",
       "tracked_changes_in_modeling": ""
     },
@@ -175,7 +175,7 @@
           "role": "implementation",
           "line": 139,
           "url": "../../truck-shapeops/src/fillet/modeling.rs#L139",
-          "sha256": "70a80369c3d404f5f029eec05adc229b0ba06ac0588f02dfe87906d5af1332fd"
+          "sha256": "7336e64f0c44bf44be1e80f32ba0f83e98c619867ba0c176a498dae5c34f9528"
         },
         {
           "repo": "truck",
@@ -286,7 +286,7 @@
           "role": "implementation",
           "line": 139,
           "url": "../../truck-shapeops/src/fillet/modeling.rs#L139",
-          "sha256": "70a80369c3d404f5f029eec05adc229b0ba06ac0588f02dfe87906d5af1332fd"
+          "sha256": "7336e64f0c44bf44be1e80f32ba0f83e98c619867ba0c176a498dae5c34f9528"
         }
       ],
       "required_outcome": "Create a valid joined corner where incident edge fillets have different specified radii, with the intended contacts and continuity."
@@ -418,9 +418,9 @@
           "path": "truck-shapeops/src/fillet/modeling.rs",
           "find": "pub fn chamfer_solid_edges",
           "role": "implementation",
-          "line": 235,
-          "url": "../../truck-shapeops/src/fillet/modeling.rs#L235",
-          "sha256": "70a80369c3d404f5f029eec05adc229b0ba06ac0588f02dfe87906d5af1332fd"
+          "line": 237,
+          "url": "../../truck-shapeops/src/fillet/modeling.rs#L237",
+          "sha256": "7336e64f0c44bf44be1e80f32ba0f83e98c619867ba0c176a498dae5c34f9528"
         },
         {
           "repo": "truck",
@@ -460,9 +460,9 @@
           "path": "truck-shapeops/src/fillet/modeling.rs",
           "find": "pub fn try_chamfer_solid_edges_with_distances",
           "role": "implementation",
-          "line": 301,
-          "url": "../../truck-shapeops/src/fillet/modeling.rs#L301",
-          "sha256": "70a80369c3d404f5f029eec05adc229b0ba06ac0588f02dfe87906d5af1332fd"
+          "line": 303,
+          "url": "../../truck-shapeops/src/fillet/modeling.rs#L303",
+          "sha256": "7336e64f0c44bf44be1e80f32ba0f83e98c619867ba0c176a498dae5c34f9528"
         },
         {
           "repo": "truck",
@@ -511,9 +511,9 @@
           "path": "truck-shapeops/src/fillet/modeling.rs",
           "find": "pub fn try_chamfer_solid_edges_with_distances",
           "role": "implementation",
-          "line": 301,
-          "url": "../../truck-shapeops/src/fillet/modeling.rs#L301",
-          "sha256": "70a80369c3d404f5f029eec05adc229b0ba06ac0588f02dfe87906d5af1332fd"
+          "line": 303,
+          "url": "../../truck-shapeops/src/fillet/modeling.rs#L303",
+          "sha256": "7336e64f0c44bf44be1e80f32ba0f83e98c619867ba0c176a498dae5c34f9528"
         },
         {
           "repo": "app",
@@ -553,9 +553,9 @@
           "path": "truck-shapeops/src/fillet/modeling.rs",
           "find": "pub fn chamfer_solid_edges",
           "role": "implementation",
-          "line": 235,
-          "url": "../../truck-shapeops/src/fillet/modeling.rs#L235",
-          "sha256": "70a80369c3d404f5f029eec05adc229b0ba06ac0588f02dfe87906d5af1332fd"
+          "line": 237,
+          "url": "../../truck-shapeops/src/fillet/modeling.rs#L237",
+          "sha256": "7336e64f0c44bf44be1e80f32ba0f83e98c619867ba0c176a498dae5c34f9528"
         }
       ],
       "required_outcome": "Produce a chamfer whose normal sections maintain the requested throat dimension along the selected edge."
@@ -586,9 +586,9 @@
           "path": "truck-shapeops/src/fillet/modeling.rs",
           "find": "pub fn chamfer_solid_edges",
           "role": "implementation",
-          "line": 235,
-          "url": "../../truck-shapeops/src/fillet/modeling.rs#L235",
-          "sha256": "70a80369c3d404f5f029eec05adc229b0ba06ac0588f02dfe87906d5af1332fd"
+          "line": 237,
+          "url": "../../truck-shapeops/src/fillet/modeling.rs#L237",
+          "sha256": "7336e64f0c44bf44be1e80f32ba0f83e98c619867ba0c176a498dae5c34f9528"
         }
       ],
       "required_outcome": "Produce the requested constant-throat chamfer with penetration, satisfying both the throat and offset-support constraints."
@@ -775,8 +775,8 @@
         "freeform"
       ],
       "occt_scope": "Tests explicitly convert shapes to NURBS before chamfering.",
-      "truck_scope": "Fixed planar spline support recognition, straight spline edge grouping in Pieza and bounded contact trimming in the generic kernel path. Planar rim fillets, asymmetric chamfers and sequential single-edge miter fillets have representation regressions. Circular rim blends also have analytic/exact-NURBS controls, including elevated degrees and shifted parameter domains. Broader invariance for curved support pairs and split faces remains open.",
-      "next_case": "Compare non-cylindrical curved support pairs and split faces across analytic/NURBS/STEP representations, including smooth rolling continuations around existing rounds. Passing cylindrical rims and sequential single-edge miters does not establish general junction or freeform parity. Extremely short fillet parameter domains still fail STEP preparation gracefully; physical equivalence across arbitrary parameter scales is not established.",
+      "truck_scope": "Fixed planar spline support recognition, straight spline edge grouping in Pieza and bounded contact trimming in the generic kernel path. Planar rim fillets, asymmetric chamfers and sequential single-edge miter fillets have representation regressions. Circular rim blends also have analytic/exact-NURBS controls, including elevated degrees and shifted parameter domains. Broader invariance for curved support pairs and split faces remains open. STEP export also covers short, long and shifted longitudinal fillet domains.",
+      "next_case": "Compare non-cylindrical curved support pairs and split faces across analytic/NURBS/STEP representations, including smooth rolling continuations around existing rounds. Passing cylindrical rims and sequential single-edge miters does not establish general junction or freeform parity. Fillet surface parameter scaling is covered during STEP preparation; extend equivalent checks to support and boundary-curve parameters.",
       "evidence": [
         {
           "repo": "occt",
@@ -902,7 +902,7 @@
           "role": "test",
           "line": 55,
           "url": "../../truck-shapeops/tests/curved_blend_representation.rs#L55",
-          "sha256": "1097b95361a398eefa16ecbe9f69c834f20f6dae96e6b7b54502649a7eb2ff06"
+          "sha256": "3c922556f51ba63e8d3bd3cea56206b992b4b96d4a0270c71730c9715de13657"
         },
         {
           "repo": "truck",
@@ -911,7 +911,7 @@
           "role": "test",
           "line": 58,
           "url": "../../truck-shapeops/tests/curved_blend_representation.rs#L58",
-          "sha256": "1097b95361a398eefa16ecbe9f69c834f20f6dae96e6b7b54502649a7eb2ff06"
+          "sha256": "3c922556f51ba63e8d3bd3cea56206b992b4b96d4a0270c71730c9715de13657"
         },
         {
           "repo": "truck",
@@ -920,7 +920,16 @@
           "role": "test",
           "line": 109,
           "url": "../../truck-shapeops/tests/curved_blend_representation.rs#L109",
-          "sha256": "1097b95361a398eefa16ecbe9f69c834f20f6dae96e6b7b54502649a7eb2ff06"
+          "sha256": "3c922556f51ba63e8d3bd3cea56206b992b4b96d4a0270c71730c9715de13657"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/curved_blend_representation.rs",
+          "find": "fn fillet_parameter_domains_preserve_step_geometry",
+          "role": "test",
+          "line": 113,
+          "url": "../../truck-shapeops/tests/curved_blend_representation.rs#L113",
+          "sha256": "3c922556f51ba63e8d3bd3cea56206b992b4b96d4a0270c71730c9715de13657"
         }
       ],
       "required_outcome": "Handle equivalent physical geometry consistently when represented analytically, as exact NURBS, with split faces, or after STEP import.",
@@ -932,7 +941,7 @@
         "App regressions pass for two-edge/full-rim selections, weighted NURBS and B-spline segments, unequal chamfer side assignments, radius/volume/closed-mesh checks, transforms, scale, reversed selection order and retained names. Bowed, retracing and singular splines are excluded from straight-segment routing.",
         "A STEP-linked NURBS cube supports filleting, document save/load and an upstream height change while retaining body and generated-face references. Output STEP is checked at the documented fitting tolerance, with closed tessellation and independent volume.",
         "App fix committed as 48e8fe2. cargo test --locked -p cad-core --no-fail-fast: 425 passed, 0 failed, 2 existing ignored, including the permanent imported-spline-fillet corpus case and CLI checks. cargo clippy --locked -p cad-core --all-targets completed with warnings in unchanged files.",
-        "Broader suite validation found a pre-existing failure in r11_corners::unsupported_junctions_have_distinct_diagnostics: a pyramid chamfer succeeds where the test expects UnsupportedTopology. Reproduced unchanged at parent 7eb2d78d with the same Cargo.lock; the assertion is retained.",
+        "Earlier suite validation found a pre-existing failure in r11_corners::unsupported_junctions_have_distinct_diagnostics: a pyramid chamfer succeeds where the test expects UnsupportedTopology. Reproduced unchanged at parent 7eb2d78d with the same Cargo.lock; that assertion was retained at the time and is superseded by the validated pyramid chamfer contract recorded under J06.",
         "Direct kernel regressions fail on parent 38aa7217: the second adjacent single-edge fillet returns BlendConstructionFailed for analytic edges and panics in IntersectionCurve for cubic B-spline and weighted NURBS edges. Bounded, damped contact intersection with a sampled fallback seed fixes all three without changing their representations.",
         "The new sequential miter cases check two radii, rotation/translation/scaling, reversed wires, input geometry and IDs, radius, surface normals, independent analytic volume, closed tessellation and STEP round trips. Guarded-curve unit tests forbid out-of-domain evaluations and retain rejection of disjoint curves and invalid hints. Existing collapsed-contact regressions are unchanged.",
         "With the bounded-contact fix, the full application run reports 424 passed, 1 failed and 2 existing ignored. The failure is workflow_audit::equivalent_tubes_shell_and_blend: tube-shell rebuilds reach the unchanged 30-second limit. An isolated recheck and a fresh isolated build at Truck parent 38aa7217 / Pieza 48e8fe2 reproduce the timeout; shell checks take about 29-30 seconds in unchanged planar::valid_boundaries/contained. Fillet and chamfer cases in that workflow pass. The timeout and tests remain unchanged.",
@@ -940,7 +949,9 @@
         "These are independently specified Truck/Pieza regression fixtures, not executions of the 1,026 OCCT corpus entries.",
         "Cylindrical rim construction already succeeded on analytic, exact NURBS and degree-elevated/shifted NURBS supports. Stronger STEP checks failed on both NURBS cases with the parent exporter. Retaining source contact knots after uniform fitting fails now allows all three to pass sampled radius/normal or unequal-chamfer section checks, independent volume, closed tessellation, immutable input and STEP round trips at the unchanged fitting tolerance.",
         "The previously recorded tube-shell timeout is addressed by conservative segment bounds and cached projection in shared planar validation. Release shell_tube median: 3.554 s before, 160.4 ms after, five samples with one worker. An annular-solid regression also fails on parent 7405a948 because disconnected rims occupy one face (genus 2 instead of 1); separate rim faces and the corresponding Pieza naming migration correct this. See the planar-validation benchmark report for raw evidence and validation scope.",
-        "Latest validation: full cad-core suite 427 passed, 0 failed, 2 existing ignored; full shapeops suite 299 passed, the same r11_corners diagnostic mismatch, and 1 existing ignored. After a final short-domain export safeguard, all 15 targeted blend/export tests and all 79 STEP tests pass, along with the four app shell regressions. Kernel/STEP/benchmark Clippy, targeted nightly formatting and the action benchmark smoke suite pass; app Clippy has warnings in unchanged files. Full logs, parent failures and final benchmark hashes are retained in truck-benchmarks/results/2026-10-10-planar-validation/REPORT.md."
+        "Validation before longitudinal parameter normalization: full cad-core suite 427 passed, 0 failed, 2 existing ignored; full shapeops suite 299 passed, the same r11_corners diagnostic mismatch, and 1 existing ignored. After a final short-domain export safeguard, all 15 targeted blend/export tests and all 79 STEP tests pass, along with the four app shell regressions. Kernel/STEP/benchmark Clippy, targeted nightly formatting and the action benchmark smoke suite pass; app Clippy has warnings in unchanged files. Full logs, parent failures and final benchmark hashes are retained in truck-benchmarks/results/2026-10-10-planar-validation/REPORT.md.",
+        "STEP fillet fitting now normalizes longitudinal knots before evaluation and interpolation. The parent rejects a 1e-9 domain; the strengthened regression requires successful export for scales 1e-9 through 1e9 and shifted domains, on original and rotated/translated/scaled solids. It checks sampled positional error at the requested tolerance, source solid validity, closed STEP meshes, analytic volume and unchanged input. This is export coverage; arbitrary support and boundary-curve parameterization remain separate gaps.",
+        "Current kernel validation after STEP parameter normalization and correction of the obsolete pyramid-chamfer test contract: full shapeops suite 303 passed, 0 failed, 1 existing ignored; geometry 250 passed, 0 failed, 1 existing ignored; STEP 79 passed, 0 failed. Final R11 checks, all-targets Clippy, benchmark smoke, targeted nightly formatting and audit-generator tests pass. Export timings and raw validation logs are in truck-benchmarks/results/2026-10-10-fillet-parameter-domains/REPORT.md. The app was unchanged and was not rerun in this batch."
       ]
     },
     {
@@ -1140,7 +1151,7 @@
           "role": "implementation",
           "line": 55,
           "url": "../../truck-shapeops/src/fillet/modeling.rs#L55",
-          "sha256": "70a80369c3d404f5f029eec05adc229b0ba06ac0588f02dfe87906d5af1332fd"
+          "sha256": "7336e64f0c44bf44be1e80f32ba0f83e98c619867ba0c176a498dae5c34f9528"
         }
       ],
       "required_outcome": "Blend open-shell edges and terminate correctly on free boundaries for surface-modeling tasks."
@@ -1385,11 +1396,12 @@
       "truck_status": "partial",
       "priority": "P1",
       "tags": [
-        "fillet"
+        "fillet",
+        "chamfer"
       ],
-      "occt_scope": "General n-corner construction exists, with documented and implementation limitations.",
-      "truck_scope": "The equal-radius multi-edge path rejects general high-valence corners. Single-blend high-valence termination is a different supported case.",
-      "next_case": "Pyramid apex with two, three, four and all incident edges selected.",
+      "occt_scope": "General n-corner construction exists, with documented and implementation limitations. An independent OCCT 7.9.3 pyramid chamfer probe succeeds for one through four selected ridges, including the opposite pair, but constructs different corner geometry for adjacent selections.",
+      "truck_scope": "The equal-radius multi-edge fillet path rejects general high-valence corners. The solid-level planar intersection fallback already chamfers a square pyramid with one through four selected ridges, including opposite pairs. These are valid mitered bevels; OCCT adds a corner face in adjacent, three- and four-ridge cases. Single-fillet high-valence termination is a separate supported case.",
+      "next_case": "Investigate the extra corner-transition geometry produced by OCCT for adjacent pyramid chamfers, comparing continuity and local geometry rather than API signatures. Retain pyramid fillets as an open gap. Extend chamfers to skewed pyramids, five or more incident edges, unequal setbacks and mixed concavity.",
       "evidence": [
         {
           "repo": "occt",
@@ -1417,9 +1429,40 @@
           "line": 190,
           "url": "../../truck-shapeops/src/fillet/along_wire.rs#L190",
           "sha256": "1e45bbb0212009ae420958c5138ba6b27d1696189eb770895e8293a820c4fcd6"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/r11_corners.rs",
+          "find": "fn pyramid_chamfers_preserve_setbacks_at_four_edge_vertices",
+          "role": "test",
+          "line": 454,
+          "url": "../../truck-shapeops/tests/r11_corners.rs#L454",
+          "sha256": "567fccb8a831ec0c550f11331bc74d39c5ee2456538f06da1a33ade34864ae08"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/probes/pyramid_chamfers.cpp",
+          "find": "int main()",
+          "role": "reference-probe",
+          "line": 26,
+          "url": "probes/pyramid_chamfers.cpp#L26",
+          "sha256": "ce475b0b37debf740deaf4c6c4f1e72c8ee664c340f3e419adef889c0b4b340b"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/probes/pyramid_chamfers_occt.txt",
+          "find": "OCCT 7.9.3",
+          "role": "reference-result",
+          "line": 1,
+          "url": "probes/pyramid_chamfers_occt.txt#L1",
+          "sha256": "de913c7ac6da75e2462d4cfc5ab548fb80497b8bec05dfcaacc8fd0a6b687be9"
         }
       ],
-      "required_outcome": "Join four or more interacting blends at a vertex when the requested configuration has a valid solution."
+      "required_outcome": "Join four or more interacting blends at a vertex when the requested configuration has a valid solution.",
+      "verification": [
+        "One through four pyramid ridges, including both adjacent and opposite pairs, pass for setbacks 0.2 and 1.2 before/after rigid transforms, with independent bevel-plane equations, integrated analytic volume, closed topology and mesh, convexity, face history, reversed selection order, immutable input and STEP. The old UnsupportedTopology chamfer assertion failed because construction already succeeded; it is replaced by the stronger valid-solid contract, retaining the unsupported fillet diagnostic. No construction or diagnostic code changed. Derivations are in truck-shapeops/tests/R11.md.",
+        "Independent paired probe: installed OCCT 7.9.3 produces valid single solids with the requested bevel planes in all ten pyramid cases. Single-ridge and opposite-pair volumes match the analytic Truck miter construction; adjacent, three- and four-ridge cases add a face and remove extra material. This records a corner-geometry difference, not an invalid OCCT output or absence of Truck chamfer support. See audits/fillet-chamfer/probes/README.md. The 1,026 inventoried upstream cases remain unexecuted."
+      ]
     },
     {
       "id": "J07",
@@ -1459,7 +1502,7 @@
           "role": "implementation",
           "line": 122,
           "url": "../../truck-shapeops/src/fillet/modeling.rs#L122",
-          "sha256": "70a80369c3d404f5f029eec05adc229b0ba06ac0588f02dfe87906d5af1332fd"
+          "sha256": "7336e64f0c44bf44be1e80f32ba0f83e98c619867ba0c176a498dae5c34f9528"
         }
       ],
       "required_outcome": "Close multi-blend corners on general curved supports with valid contact and continuity, independent of patch construction method."
@@ -1533,9 +1576,9 @@
           "path": "truck-shapeops/src/fillet/modeling.rs",
           "find": "Sizes that remove an original face",
           "role": "implementation",
-          "line": 228,
-          "url": "../../truck-shapeops/src/fillet/modeling.rs#L228",
-          "sha256": "70a80369c3d404f5f029eec05adc229b0ba06ac0588f02dfe87906d5af1332fd"
+          "line": 230,
+          "url": "../../truck-shapeops/src/fillet/modeling.rs#L230",
+          "sha256": "7336e64f0c44bf44be1e80f32ba0f83e98c619867ba0c176a498dae5c34f9528"
         },
         {
           "repo": "truck",
@@ -1575,9 +1618,9 @@
           "path": "truck-shapeops/src/fillet/modeling.rs",
           "find": "an unselected edge, or a bevel contact",
           "role": "implementation",
-          "line": 228,
-          "url": "../../truck-shapeops/src/fillet/modeling.rs#L228",
-          "sha256": "70a80369c3d404f5f029eec05adc229b0ba06ac0588f02dfe87906d5af1332fd"
+          "line": 230,
+          "url": "../../truck-shapeops/src/fillet/modeling.rs#L230",
+          "sha256": "7336e64f0c44bf44be1e80f32ba0f83e98c619867ba0c176a498dae5c34f9528"
         },
         {
           "repo": "truck",
@@ -1618,9 +1661,9 @@
           "path": "truck-geometry/src/decorators/af_surface.rs",
           "find": "fn regular_contact",
           "role": "implementation",
-          "line": 489,
-          "url": "../../truck-geometry/src/decorators/af_surface.rs#L489",
-          "sha256": "d35e687a5ffa690cb435d1f5391a5202571f502ba08484da7951a48bcd9b8ef3"
+          "line": 507,
+          "url": "../../truck-geometry/src/decorators/af_surface.rs#L507",
+          "sha256": "498001f79edd8d658d71c5bd39d8ade5f86d3bedd752e07a79ae535fdd7f020d"
         },
         {
           "repo": "truck",
@@ -1663,7 +1706,7 @@
           "role": "implementation",
           "line": 123,
           "url": "../../truck-shapeops/src/fillet/modeling.rs#L123",
-          "sha256": "70a80369c3d404f5f029eec05adc229b0ba06ac0588f02dfe87906d5af1332fd"
+          "sha256": "7336e64f0c44bf44be1e80f32ba0f83e98c619867ba0c176a498dae5c34f9528"
         },
         {
           "repo": "truck",
@@ -1836,9 +1879,9 @@
           "path": "truck-geometry/src/decorators/af_surface.rs",
           "find": "fn adaptive_contact_failure_is_propagated",
           "role": "test",
-          "line": 592,
-          "url": "../../truck-geometry/src/decorators/af_surface.rs#L592",
-          "sha256": "d35e687a5ffa690cb435d1f5391a5202571f502ba08484da7951a48bcd9b8ef3"
+          "line": 657,
+          "url": "../../truck-geometry/src/decorators/af_surface.rs#L657",
+          "sha256": "498001f79edd8d658d71c5bd39d8ade5f86d3bedd752e07a79ae535fdd7f020d"
         }
       ],
       "required_outcome": "Maintain requested geometric accuracy through rapidly changing curvature and unequal feature scales without missed contact failures."
@@ -1852,7 +1895,7 @@
         "periodic-seam"
       ],
       "occt_scope": "Dedicated periodic/singular extrema and parameter repairs.",
-      "truck_scope": "Some exact conic seam handling and reversed-curve fixes exist; general paired seam coverage remains open.",
+      "truck_scope": "Some exact conic seam handling and reversed-curve fixes exist. STEP fitting normalizes longitudinal fillet domains, including sub-tolerance ranges; general support, boundary-curve and paired seam coverage remains open.",
       "next_case": "Reverse surface parameters and move the seam through the same physical geometry; verify every edge lies on both supports.",
       "evidence": [
         {
@@ -1880,21 +1923,21 @@
           "role": "implementation",
           "line": 39,
           "url": "../../truck-shapeops/src/fillet/modeling.rs#L39",
-          "sha256": "70a80369c3d404f5f029eec05adc229b0ba06ac0588f02dfe87906d5af1332fd"
+          "sha256": "7336e64f0c44bf44be1e80f32ba0f83e98c619867ba0c176a498dae5c34f9528"
         },
         {
           "repo": "truck",
           "path": "truck-shapeops/tests/curved_blend_representation.rs",
-          "find": "fn short_fillet_parameter_domains_do_not_panic_on_step_export",
+          "find": "fn fillet_parameter_domains_preserve_step_geometry",
           "role": "test",
           "line": 113,
           "url": "../../truck-shapeops/tests/curved_blend_representation.rs#L113",
-          "sha256": "1097b95361a398eefa16ecbe9f69c834f20f6dae96e6b7b54502649a7eb2ff06"
+          "sha256": "3c922556f51ba63e8d3bd3cea56206b992b4b96d4a0270c71730c9715de13657"
         }
       ],
       "required_outcome": "Keep blend boundaries on both supports and close them correctly when surface parameters, orientations or seam positions change.",
       "verification": [
-        "A fillet longitudinal domain compressed to 1e-9 reproduces a knot-evaluation panic during STEP preparation. The exporter now rejects domains below the evaluator resolution with None, preserving input and the fitting budget. This is safe failure, not support for STEP export at arbitrary parameter scales."
+        "STEP fillet fitting now normalizes longitudinal knots before evaluation and interpolation. The parent rejects a 1e-9 domain; the strengthened regression requires successful export for scales 1e-9 through 1e9 and shifted domains, on original and rotated/translated/scaled solids. It checks sampled positional error at the requested tolerance, source solid validity, closed STEP meshes, analytic volume and unchanged input. This is export coverage; arbitrary support and boundary-curve parameterization remain separate gaps."
       ]
     },
     {
@@ -2138,7 +2181,7 @@
           "role": "implementation",
           "line": 13,
           "url": "../../truck-shapeops/src/fillet/modeling.rs#L13",
-          "sha256": "70a80369c3d404f5f029eec05adc229b0ba06ac0588f02dfe87906d5af1332fd"
+          "sha256": "7336e64f0c44bf44be1e80f32ba0f83e98c619867ba0c176a498dae5c34f9528"
         },
         {
           "repo": "app",
@@ -2197,9 +2240,9 @@
           "path": "truck-stepio/src/out/modeling.rs",
           "find": "fn fillet_to_nurbs",
           "role": "implementation",
-          "line": 315,
-          "url": "../../truck-stepio/src/out/modeling.rs#L315",
-          "sha256": "2fd57dcf22fccb6d6468249a6181ead45bf78a3cf6dca2befc80ecd193f45d86"
+          "line": 316,
+          "url": "../../truck-stepio/src/out/modeling.rs#L316",
+          "sha256": "6acc73b4de1fb69b0ed45f87b01c1e006d8b561f14f14b6816d6457b55f287b6"
         },
         {
           "repo": "truck",
@@ -2208,7 +2251,7 @@
           "role": "test",
           "line": 109,
           "url": "../../truck-shapeops/tests/curved_blend_representation.rs#L109",
-          "sha256": "1097b95361a398eefa16ecbe9f69c834f20f6dae96e6b7b54502649a7eb2ff06"
+          "sha256": "3c922556f51ba63e8d3bd3cea56206b992b4b96d4a0270c71730c9715de13657"
         },
         {
           "repo": "truck",
@@ -2254,12 +2297,22 @@
           "line": 14,
           "url": "../../../PiezaCAD/cad-core/tests/shell.rs#L14",
           "sha256": "d1e11a87cf07bfc77c692e0226a730ccecd962101a3847ae4eedcc982ce8c695"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/curved_blend_representation.rs",
+          "find": "fn fillet_parameter_domains_preserve_step_geometry",
+          "role": "test",
+          "line": 113,
+          "url": "../../truck-shapeops/tests/curved_blend_representation.rs#L113",
+          "sha256": "3c922556f51ba63e8d3bd3cea56206b992b4b96d4a0270c71730c9715de13657"
         }
       ],
       "required_outcome": "Deliver blend results usable for closed meshing, STEP interchange and further modeling while preserving dimensions and validity.",
       "verification": [
         "Analytic and exact-NURBS circular rim fillets and unequal chamfers now pass independent dimension/volume and closed STEP round-trip checks, including degree elevation and shifted support domains. Source-knot fitting is a sampled approximation at the requested tolerance, not a certified global bound. Downstream shell validation also checks separate opening rims for one/two holes, inward/outward offsets, rigid transforms, exact volumes and STEP.",
-        "Opened blind pockets now retain their two physical closed components. Explicit outer/inner face ancestry replaces positional shell naming; each component passes independent volume/STEP checks, and app references survive pocket-depth edits and save/load. Both components are recovered from the exported STEP file."
+        "Opened blind pockets now retain their two physical closed components. Explicit outer/inner face ancestry replaces positional shell naming; each component passes independent volume/STEP checks, and app references survive pocket-depth edits and save/load. Both components are recovered from the exported STEP file.",
+        "STEP fillet fitting now normalizes longitudinal knots before evaluation and interpolation. The parent rejects a 1e-9 domain; the strengthened regression requires successful export for scales 1e-9 through 1e9 and shifted domains, on original and rotated/translated/scaled solids. It checks sampled positional error at the requested tolerance, source solid validity, closed STEP meshes, analytic volume and unchanged input. This is export coverage; arbitrary support and boundary-curve parameterization remain separate gaps."
       ]
     },
     {
@@ -2308,7 +2361,7 @@
           "role": "implementation",
           "line": 209,
           "url": "../../truck-shapeops/src/fillet/modeling.rs#L209",
-          "sha256": "70a80369c3d404f5f029eec05adc229b0ba06ac0588f02dfe87906d5af1332fd"
+          "sha256": "7336e64f0c44bf44be1e80f32ba0f83e98c619867ba0c176a498dae5c34f9528"
         }
       ],
       "required_outcome": "Explain failed selections and stages clearly, preserve the model and allow the user to correct or retry a failed blend."
@@ -51328,6 +51381,7 @@
         "chamfer"
       ],
       "family_hints": [
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -51856,6 +51910,7 @@
         "chamfer"
       ],
       "family_hints": [
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -51966,6 +52021,7 @@
         "chamfer"
       ],
       "family_hints": [
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -53031,6 +53087,7 @@
         "chamfer"
       ],
       "family_hints": [
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -55544,6 +55601,7 @@
         "chamfer"
       ],
       "family_hints": [
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -55651,6 +55709,7 @@
         "chamfer"
       ],
       "family_hints": [
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -55743,6 +55802,7 @@
         "chamfer"
       ],
       "family_hints": [
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -56475,6 +56535,7 @@
       ],
       "family_hints": [
         "G02",
+        "J06",
         "D05",
         "W04",
         "W05",
@@ -57977,6 +58038,7 @@
         "chamfer"
       ],
       "family_hints": [
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -58090,6 +58152,7 @@
         "chamfer"
       ],
       "family_hints": [
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -59542,6 +59605,7 @@
         "G03",
         "G04",
         "G05",
+        "J06",
         "D05",
         "N02",
         "N04",
@@ -59654,6 +59718,7 @@
       "family_hints": [
         "C04",
         "C05",
+        "J06",
         "D05",
         "N02",
         "N04",
@@ -59764,6 +59829,7 @@
       "family_hints": [
         "C04",
         "C05",
+        "J06",
         "D05",
         "N02",
         "N04",
@@ -59874,6 +59940,7 @@
       "family_hints": [
         "C04",
         "C05",
+        "J06",
         "D05",
         "N02",
         "N04",
@@ -59984,6 +60051,7 @@
       "family_hints": [
         "C04",
         "C05",
+        "J06",
         "D05",
         "N02",
         "N04",
@@ -60094,6 +60162,7 @@
       "family_hints": [
         "C04",
         "C05",
+        "J06",
         "D05",
         "N02",
         "N04",
@@ -60209,6 +60278,7 @@
         "C06",
         "G01",
         "G03",
+        "J06",
         "D05",
         "N02",
         "N04",
@@ -60325,6 +60395,7 @@
         "C06",
         "G01",
         "G03",
+        "J06",
         "D05",
         "N02",
         "N04",
@@ -60439,6 +60510,7 @@
         "C04",
         "C05",
         "G02",
+        "J06",
         "D05",
         "N02",
         "N04",
@@ -60553,6 +60625,7 @@
         "C04",
         "C05",
         "G02",
+        "J06",
         "D05",
         "N02",
         "N04",
@@ -60667,6 +60740,7 @@
         "C04",
         "C05",
         "G02",
+        "J06",
         "D05",
         "N02",
         "N04",
@@ -60783,6 +60857,7 @@
         "C06",
         "G01",
         "G03",
+        "J06",
         "D05",
         "N02",
         "N04",
@@ -60897,6 +60972,7 @@
         "C04",
         "C05",
         "G02",
+        "J06",
         "D05",
         "N02",
         "N04",
@@ -61015,6 +61091,7 @@
         "G03",
         "G04",
         "G05",
+        "J06",
         "D05",
         "N02",
         "N04",
@@ -61126,6 +61203,7 @@
       "family_hints": [
         "C04",
         "C05",
+        "J06",
         "D05",
         "N02",
         "N04",
@@ -61250,6 +61328,7 @@
         "C06",
         "G01",
         "G03",
+        "J06",
         "D05",
         "N02",
         "N04",
@@ -61368,6 +61447,7 @@
         "G03",
         "G04",
         "G05",
+        "J06",
         "D05",
         "N02",
         "N04",
@@ -61484,6 +61564,7 @@
         "C06",
         "G01",
         "G03",
+        "J06",
         "D05",
         "N02",
         "N04",
@@ -61600,6 +61681,7 @@
         "C06",
         "G01",
         "G03",
+        "J06",
         "D05",
         "N02",
         "N04",
@@ -61716,6 +61798,7 @@
         "C06",
         "G01",
         "G03",
+        "J06",
         "D05",
         "N02",
         "N04",
@@ -64626,6 +64709,7 @@
         "chamfer"
       ],
       "family_hints": [
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -64854,6 +64938,7 @@
         "chamfer"
       ],
       "family_hints": [
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -64973,6 +65058,7 @@
         "chamfer"
       ],
       "family_hints": [
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -65775,6 +65861,7 @@
         "chamfer"
       ],
       "family_hints": [
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -65900,6 +65987,7 @@
         "chamfer"
       ],
       "family_hints": [
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -67898,6 +67986,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -68032,6 +68121,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -68160,6 +68250,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -68288,6 +68379,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -68416,6 +68508,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -68544,6 +68637,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -68672,6 +68766,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -68800,6 +68895,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -68928,6 +69024,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -69056,6 +69153,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -69184,6 +69282,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -69312,6 +69411,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -69440,6 +69540,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -69568,6 +69669,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -69696,6 +69798,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -69824,6 +69927,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -69952,6 +70056,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -70080,6 +70185,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -70208,6 +70314,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -70336,6 +70443,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -70464,6 +70572,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -70592,6 +70701,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -70720,6 +70830,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -70848,6 +70959,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -70976,6 +71088,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -71104,6 +71217,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -71232,6 +71346,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -71360,6 +71475,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -71488,6 +71604,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -71616,6 +71733,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -71744,6 +71862,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -71872,6 +71991,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -72000,6 +72120,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -72128,6 +72249,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -72256,6 +72378,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -72384,6 +72507,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -72512,6 +72636,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -72640,6 +72765,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -72768,6 +72894,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -72896,6 +73023,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -73024,6 +73152,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -73152,6 +73281,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -73280,6 +73410,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -73408,6 +73539,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -73536,6 +73668,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -73664,6 +73797,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -73792,6 +73926,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -73920,6 +74055,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -74048,6 +74184,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -74176,6 +74313,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -74304,6 +74442,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -74450,6 +74589,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -74596,6 +74736,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -74736,6 +74877,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -74888,6 +75030,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -75016,6 +75159,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -75144,6 +75288,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -75272,6 +75417,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -75400,6 +75546,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -75528,6 +75675,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -75656,6 +75804,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -75792,6 +75941,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -75950,6 +76100,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -76126,6 +76277,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -76302,6 +76454,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -76468,6 +76621,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -76614,6 +76768,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -76792,6 +76947,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -76926,6 +77082,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -77054,6 +77211,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -77182,6 +77340,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -77311,6 +77470,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -77443,6 +77603,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -77593,6 +77754,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -77743,6 +77905,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -77887,6 +78050,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -78043,6 +78207,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -78175,6 +78340,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -78307,6 +78473,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -78439,6 +78606,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -78571,6 +78739,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -78703,6 +78872,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -78835,6 +79005,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -78975,6 +79146,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -79137,6 +79309,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -79317,6 +79490,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -79497,6 +79671,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -79667,6 +79842,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -79817,6 +79993,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -79999,6 +80176,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -80137,6 +80315,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -80269,6 +80448,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -80401,6 +80581,7 @@
       ],
       "family_hints": [
         "C03",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -80536,6 +80717,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -80670,6 +80852,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -80798,6 +80981,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -80926,6 +81110,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -81054,6 +81239,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -81182,6 +81368,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -81310,6 +81497,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -81438,6 +81626,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -81566,6 +81755,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -81694,6 +81884,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -81822,6 +82013,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -81950,6 +82142,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -82078,6 +82271,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -82206,6 +82400,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -82334,6 +82529,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -82462,6 +82658,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -82590,6 +82787,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -82718,6 +82916,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -82846,6 +83045,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -82974,6 +83174,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -83102,6 +83303,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -83230,6 +83432,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -83358,6 +83561,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -83486,6 +83690,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -83614,6 +83819,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -83742,6 +83948,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -83870,6 +84077,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -83998,6 +84206,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -84126,6 +84335,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -84254,6 +84464,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -84382,6 +84593,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -84510,6 +84722,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -84638,6 +84851,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -84766,6 +84980,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -84894,6 +85109,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -85022,6 +85238,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -85150,6 +85367,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -85278,6 +85496,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -85406,6 +85625,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -85534,6 +85754,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -85662,6 +85883,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -85790,6 +86012,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -85918,6 +86141,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -86046,6 +86270,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -86174,6 +86399,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -86302,6 +86528,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -86430,6 +86657,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -86558,6 +86786,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -86686,6 +86915,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -86814,6 +87044,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -86942,6 +87173,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -87088,6 +87320,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -87234,6 +87467,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -87374,6 +87608,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -87526,6 +87761,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -87654,6 +87890,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -87782,6 +88019,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -87910,6 +88148,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -88038,6 +88277,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -88166,6 +88406,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -88294,6 +88535,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -88430,6 +88672,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -88588,6 +88831,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -88764,6 +89008,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -88940,6 +89185,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -89106,6 +89352,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -89252,6 +89499,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -89430,6 +89678,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -89564,6 +89813,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -89692,6 +89942,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -89820,6 +90071,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -89949,6 +90201,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -90081,6 +90334,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -90231,6 +90485,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -90381,6 +90636,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -90525,6 +90781,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -90681,6 +90938,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -90813,6 +91071,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -90945,6 +91204,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -91077,6 +91337,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -91209,6 +91470,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -91341,6 +91603,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -91473,6 +91736,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -91613,6 +91877,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -91775,6 +92040,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -91955,6 +92221,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -92135,6 +92402,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -92305,6 +92573,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -92455,6 +92724,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -92637,6 +92907,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -92775,6 +93046,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -92907,6 +93179,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -93039,6 +93312,7 @@
       ],
       "family_hints": [
         "C02",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -93174,6 +93448,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -93308,6 +93583,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -93436,6 +93712,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -93564,6 +93841,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -93692,6 +93970,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -93820,6 +94099,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -93948,6 +94228,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -94076,6 +94357,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -94204,6 +94486,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -94332,6 +94615,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -94460,6 +94744,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -94588,6 +94873,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -94716,6 +95002,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -94844,6 +95131,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -94972,6 +95260,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -95100,6 +95389,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -95228,6 +95518,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -95356,6 +95647,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -95484,6 +95776,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -95612,6 +95905,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -95740,6 +96034,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -95868,6 +96163,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -95996,6 +96292,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -96124,6 +96421,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -96252,6 +96550,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -96380,6 +96679,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -96508,6 +96808,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -96636,6 +96937,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -96764,6 +97066,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -96892,6 +97195,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -97020,6 +97324,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -97148,6 +97453,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -97276,6 +97582,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -97404,6 +97711,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -97532,6 +97840,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -97660,6 +97969,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -97788,6 +98098,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -97916,6 +98227,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -98044,6 +98356,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -98172,6 +98485,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -98300,6 +98614,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -98428,6 +98743,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -98556,6 +98872,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -98684,6 +99001,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -98812,6 +99130,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -98940,6 +99259,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -99068,6 +99388,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -99196,6 +99517,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -99324,6 +99646,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -99452,6 +99775,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -99580,6 +99904,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -99726,6 +100051,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -99872,6 +100198,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -100012,6 +100339,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -100164,6 +100492,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -100292,6 +100621,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -100420,6 +100750,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -100548,6 +100879,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -100676,6 +101008,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -100804,6 +101137,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -100932,6 +101266,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -101068,6 +101403,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -101226,6 +101562,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -101402,6 +101739,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -101578,6 +101916,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -101744,6 +102083,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -101890,6 +102230,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -102068,6 +102409,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -102202,6 +102544,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -102330,6 +102673,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -102458,6 +102802,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D05",
         "W05",
         "W07"
@@ -102587,6 +102932,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -102719,6 +103065,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -102869,6 +103216,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -103019,6 +103367,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -103163,6 +103512,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -103319,6 +103669,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -103451,6 +103802,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -103583,6 +103935,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -103715,6 +104068,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -103847,6 +104201,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -103979,6 +104334,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -104111,6 +104467,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -104251,6 +104608,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -104413,6 +104771,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -104593,6 +104952,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -104773,6 +105133,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -104943,6 +105304,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -105093,6 +105455,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -105275,6 +105638,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -105413,6 +105777,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -105545,6 +105910,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D02",
         "D05",
         "W01",
@@ -105677,6 +106043,7 @@
       ],
       "family_hints": [
         "C01",
+        "J06",
         "D02",
         "D05",
         "W01",
