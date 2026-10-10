@@ -1,5 +1,6 @@
 mod components;
 pub use components::{solid_components, try_solid_components};
+use rustc_hash::FxHashMap as HashMap;
 use std::result::Result;
 use truck_base::diagnostics::{Code, Diagnostic};
 
@@ -202,14 +203,15 @@ fn classify_unknown<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
 /// snapping and the bounding-box slack in `loops_store` and `polyline_construction` use the
 /// global `TOLERANCE`.
 fn process_boundaries<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
-    shell0: &Shell<Point3, C, S>,
-    shell1: &Shell<Point3, C, S>,
+    shells: [&Shell<Point3, C, S>; 2],
     tol: f64,
     poly_shells: [&Shell<Point3, PolylineCurve<Point3>, Option<PolygonMesh>>; 2],
     meshes: [&[PolygonMesh]; 2],
     inverted: [bool; 2],
     intersection: bool,
+    history: &mut Option<&mut HashMap<FaceID<S>, FaceID<S>>>,
 ) -> Result<(Shell<Point3, C, S>, bool), Diagnostic> {
+    let [shell0, shell1] = shells;
     let [poly_shell0, poly_shell1] = poly_shells;
     let [meshes0, meshes1] = meshes;
     let altshell0: AltCurveShell<C, S> =
@@ -227,13 +229,22 @@ fn process_boundaries<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
         ..
     } = quadruple?;
     let start = profile::now();
-    let mut cls0 =
-        divide_face::try_divide_faces(&altshell0, &loops_store0, tol).map_err(|e| e.operand(0))?;
+    let mut sources = HashMap::default();
+    let mut cls0 = divide_face::try_divide_faces(&altshell0, &loops_store0, tol, |id, i| {
+        if history.is_some() {
+            sources.insert(id, shell0[i].id());
+        }
+    })
+    .map_err(|e| e.operand(0))?;
     if !crosses_seam {
         cls0.integrate_by_component();
     }
-    let mut cls1 =
-        divide_face::try_divide_faces(&altshell1, &loops_store1, tol).map_err(|e| e.operand(1))?;
+    let mut cls1 = divide_face::try_divide_faces(&altshell1, &loops_store1, tol, |id, i| {
+        if history.is_some() {
+            sources.insert(id, shell1[i].id());
+        }
+    })
+    .map_err(|e| e.operand(1))?;
     if !crosses_seam {
         cls1.integrate_by_component();
     }
@@ -262,7 +273,16 @@ fn process_boundaries<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
         or0
     };
     let start = profile::now();
-    let shell = altshell_to_shell(&shell)?;
+    let converted = altshell_to_shell(&shell)?;
+    if let Some(history) = history {
+        history.extend(
+            shell
+                .iter()
+                .zip(&converted)
+                .map(|(old, new)| (new.id(), sources[&old.id()])),
+        );
+    }
+    let shell = converted;
     profile::lap(Stage::Fitting, start);
     Ok((shell, removed_material))
 }
@@ -321,6 +341,7 @@ fn boolean<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     solid1: &Solid<Point3, C, S>,
     tol: f64,
     intersection: bool,
+    mut history: Option<&mut HashMap<FaceID<S>, FaceID<S>>>,
 ) -> Result<(Solid<Point3, C, S>, bool), Diagnostic> {
     let start = profile::now();
     let (poly0, meshes0, nesting0) =
@@ -329,6 +350,14 @@ fn boolean<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
         components::triangulate_boundaries(solid1, tol).map_err(|e| e.operand(1))?;
     profile::lap(Stage::Triangulation, start);
     if solid0.boundaries().is_empty() || solid1.boundaries().is_empty() {
+        if let Some(history) = &mut history {
+            history.extend(
+                solid0
+                    .face_iter()
+                    .chain(solid1.face_iter())
+                    .map(|face| (face.id(), face.id())),
+            );
+        }
         return Ok((
             if intersection {
                 Solid::new(Vec::new())
@@ -343,13 +372,13 @@ fn boolean<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     let shell0 = solid0.face_iter().cloned().collect();
     let shell1 = solid1.face_iter().cloned().collect();
     let (shell, removed_material) = process_boundaries(
-        &shell0,
-        &shell1,
+        [&shell0, &shell1],
         tol,
         [&poly0, &poly1],
         [meshes0.as_slice(), meshes1.as_slice()],
         [nesting0.inverted, nesting1.inverted],
         intersection,
+        &mut history,
     )?;
     let unbounded = if intersection {
         nesting0.inverted && nesting1.inverted
@@ -414,7 +443,7 @@ pub fn try_and<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     solid1: &Solid<Point3, C, S>,
     tol: f64,
 ) -> Result<Solid<Point3, C, S>, Diagnostic> {
-    boolean(solid0, solid1, tol, true)
+    boolean(solid0, solid1, tol, true, None)
         .map(|(solid, _)| solid)
         .map_err(|e| e.operation("and"))
 }
@@ -425,7 +454,7 @@ pub fn try_or<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     solid1: &Solid<Point3, C, S>,
     tol: f64,
 ) -> Result<Solid<Point3, C, S>, Diagnostic> {
-    boolean(solid0, solid1, tol, false)
+    boolean(solid0, solid1, tol, false, None)
         .map(|(solid, _)| solid)
         .map_err(|e| e.operation("or"))
 }
@@ -463,9 +492,19 @@ fn subtraction<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
     }
     let mut complement = solid1.clone();
     complement.not();
-    let (solid, removed_material) = boolean(solid0, &complement, tol, true)?;
+    let (solid, removed_material) = boolean(solid0, &complement, tol, true, None)?;
     Ok(SubtractionResult {
         solid,
         removed_material,
     })
+}
+
+/// Retain exact face ancestry while assembling additive local blends.
+pub(crate) fn union_with_history<C: ShapeOpsCurve<S>, S: ShapeOpsSurface>(
+    a: &Solid<Point3, C, S>,
+    b: &Solid<Point3, C, S>,
+    tol: f64,
+    history: &mut HashMap<FaceID<S>, FaceID<S>>,
+) -> Result<Solid<Point3, C, S>, Diagnostic> {
+    boolean(a, b, tol, false, Some(history)).map(|(solid, _)| solid)
 }

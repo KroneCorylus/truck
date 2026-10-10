@@ -154,13 +154,14 @@ where
     C: BoundedCurve<Point = Point3> + ParameterDivision1D<Point = Point3>,
     S: ParametricSurface3D + SearchParameter<D2, Point = Point3>,
 {
-    try_divide_faces(shell, loops_store, tol).ok()
+    try_divide_faces(shell, loops_store, tol, |_, _| {}).ok()
 }
 
 pub fn try_divide_faces<C, S>(
     shell: &Shell<Point3, AltCurve<C, S>, S>,
     loops_store: &LoopsStore<Point3, AltCurve<C, S>>,
     tol: f64,
+    mut record: impl FnMut(FaceID<S>, usize),
 ) -> Result<FacesClassification<Point3, AltCurve<C, S>, S>, Diagnostic>
 where
     C: BoundedCurve<Point = Point3> + ParameterDivision1D<Point = Point3>,
@@ -186,11 +187,14 @@ where
                 if !face.orientation() {
                     new_face.invert();
                 }
+                record(new_face.id(), index);
                 res.push(new_face, ShapesOpStatus::Unknown);
             } else {
                 let vec = divide_one_face(face, loops, tol).map_err(|e| e.face(index))?;
-                vec.into_iter()
-                    .for_each(|(face, status)| res.push(face, status));
+                vec.into_iter().for_each(|(face, status)| {
+                    record(face.id(), index);
+                    res.push(face, status);
+                });
             }
             Ok(())
         })?;

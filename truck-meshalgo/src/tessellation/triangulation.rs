@@ -1,11 +1,11 @@
 #![allow(clippy::many_single_char_names)]
 
 use super::*;
-use polygon_mesh::PolygonMeshEditor;
 use crate::Point2;
 use array_macro::array;
 use handles::FixedVertexHandle;
 use itertools::Itertools;
+use polygon_mesh::PolygonMeshEditor;
 use rustc_hash::FxHashMap as HashMap;
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -49,7 +49,12 @@ where
         .or_else(|| surface.search_nearest_parameter(point, None, 100))
 }
 
-fn edge_polyline<C: PolylineableCurve>(curve: &C, front: Point3, back: Point3, tol: f64) -> PolylineCurve {
+fn edge_polyline<C: PolylineableCurve>(
+    curve: &C,
+    front: Point3,
+    back: Point3,
+    tol: f64,
+) -> PolylineCurve {
     let mut poly = PolylineCurve::from_curve(curve, curve.range_tuple(), tol);
     // Close fitted-curve seams with shared vertices, preserving roundoff at singular poles.
     if let Some(point) = poly.first_mut().filter(|p| p.distance(front) > TOLERANCE2) {
@@ -78,11 +83,7 @@ where
     refine_winding(
         tol,
         |tol| shell_tessellation_once(shell, tol, &sp),
-        |shell| {
-            shell
-                .face_iter()
-                .all(|f| f.surface().as_ref().is_none_or(consistent_winding))
-        },
+        |mesh, tol| repair_and_check_shell(shell, mesh, tol, &sp),
     )
 }
 
@@ -144,11 +145,7 @@ where
     refine_winding(
         tol,
         |tol| shell_tessellation_single_thread_once(shell, tol, &sp),
-        |shell| {
-            shell
-                .face_iter()
-                .all(|f| f.surface().as_ref().is_none_or(consistent_winding))
-        },
+        |mesh, tol| repair_and_check_shell(shell, mesh, tol, &sp),
     )
 }
 
@@ -212,8 +209,12 @@ where
 {
     refine_winding(
         tol,
-        |tol| cshell_tessellation_once(shell, tol, &sp),
-        |shell| {
+        |tol| {
+            let mut mesh = cshell_tessellation_once(shell, tol, &sp);
+            repair_compressed_trims(shell, &mut mesh, tol, &sp);
+            mesh
+        },
+        |shell, _| {
             shell
                 .faces
                 .iter()
@@ -236,34 +237,22 @@ where
         let curve = &edge.curve;
         CompressedEdge {
             vertices: edge.vertices,
-            curve: edge_polyline(curve, vertices[edge.vertices.0], vertices[edge.vertices.1], tol),
+            curve: edge_polyline(
+                curve,
+                vertices[edge.vertices.0],
+                vertices[edge.vertices.1],
+                tol,
+            ),
         }
     };
     #[cfg(not(target_arch = "wasm32"))]
     let edges: Vec<_> = shell.edges.par_iter().map(tessellate_edge).collect();
     #[cfg(target_arch = "wasm32")]
     let edges: Vec<_> = shell.edges.iter().map(tessellate_edge).collect();
-    let tessellate_face = |face: &CompressedFace<S>| {
-        let boundaries = face.boundaries.clone();
-        let surface = &face.surface;
-        let create_edge = |edge_idx: &CompressedEdgeIndex| match edge_idx.orientation {
-            true => Some(edges.get(edge_idx.index)?.curve.clone()),
-            false => Some(edges.get(edge_idx.index)?.curve.inverse()),
-        };
-        let create_boundary = |wire: &Vec<CompressedEdgeIndex>| {
-            let wire_iter = wire.iter().filter_map(create_edge);
-            PolyBoundaryPiece::try_new(surface, wire_iter, &sp)
-        };
-        let preboundary: Option<Vec<_>> = boundaries.iter().map(create_boundary).collect();
-        let polygon: Option<PolygonMesh> = preboundary.map(|preboundary| {
-            let boundary = PolyBoundary::new(preboundary, &surface, tol);
-            trimming_tessellation(&surface, &boundary, tol)
-        });
-        CompressedFace {
-            boundaries,
-            orientation: face.orientation,
-            surface: polygon,
-        }
+    let tessellate_face = |face: &CompressedFace<S>| CompressedFace {
+        boundaries: face.boundaries.clone(),
+        orientation: face.orientation,
+        surface: compressed_face_polygon(face, &edges, tol, &sp),
     };
     #[cfg(not(target_arch = "wasm32"))]
     let faces = shell.faces.par_iter().map(tessellate_face).collect();
@@ -276,8 +265,153 @@ where
     }
 }
 
+fn compressed_boundary<S: PreMeshableSurface>(
+    surface: &S,
+    wire: &[CompressedEdgeIndex],
+    edges: &[CompressedEdge<PolylineCurve>],
+    sp: impl SP<S>,
+) -> Option<PolyBoundaryPiece> {
+    let curves = wire
+        .iter()
+        .map(|edge| {
+            let curve = edges.get(edge.index)?.curve.clone();
+            Some(if edge.orientation {
+                curve
+            } else {
+                curve.inverse()
+            })
+        })
+        .collect::<Option<Vec<_>>>()?;
+    PolyBoundaryPiece::try_new(surface, curves.into_iter(), sp)
+}
+
+fn compressed_face_polygon<S: PreMeshableSurface>(
+    face: &CompressedFace<S>,
+    edges: &[CompressedEdge<PolylineCurve>],
+    tol: f64,
+    sp: impl SP<S>,
+) -> Option<PolygonMesh> {
+    let pieces = face
+        .boundaries
+        .iter()
+        .map(|wire| compressed_boundary(&face.surface, wire, edges, &sp))
+        .collect::<Option<Vec<_>>>()?;
+    let boundary = PolyBoundary::new(pieces, &face.surface, tol)?;
+    Some(trimming_tessellation(&face.surface, &boundary, tol))
+}
+
+fn repair_and_check_shell<C: PolylineableCurve, S: PreMeshableSurface>(
+    source: &Shell<Point3, C, S>,
+    mesh: &mut MeshedShell,
+    tol: f64,
+    sp: impl SP<S>,
+) -> bool {
+    let mut missing = false;
+    let consistent = mesh.iter().all(|face| match face.surface() {
+        Some(surface) => consistent_winding(&surface),
+        None => {
+            missing = true;
+            true
+        }
+    });
+    if !consistent || !missing {
+        return consistent;
+    }
+    let mut compressed = mesh.compress();
+    repair_compressed_trims(&source.compress(), &mut compressed, tol, sp);
+    for (face, repaired) in mesh.iter().zip(&compressed.faces) {
+        face.set_surface(repaired.surface.clone());
+        for (wire, indices) in face.absolute_boundaries().iter().zip(&repaired.boundaries) {
+            for (edge, index) in wire.iter().zip(indices) {
+                edge.set_curve(compressed.edges[index.index].curve.clone());
+            }
+        }
+    }
+    mesh.iter()
+        .all(|face| face.surface().as_ref().is_none_or(consistent_winding))
+}
+
+fn repair_compressed_trims<C: PolylineableCurve, S: PreMeshableSurface>(
+    source: &CompressedShell<Point3, C, S>,
+    mesh: &mut MeshedCShell,
+    tol: f64,
+    sp: impl SP<S>,
+) {
+    if mesh.faces.iter().all(|face| face.surface.is_some()) {
+        return;
+    }
+    let mut parameters = HashMap::<usize, Vec<f64>>::default();
+    loop {
+        let mut requested = vec![false; mesh.edges.len()];
+        for (face, meshed) in source.faces.iter().zip(&mesh.faces) {
+            if meshed.surface.is_some() {
+                continue;
+            }
+            for wire in &face.boundaries {
+                let Some(piece) = compressed_boundary(&face.surface, wire, &mesh.edges, &sp) else {
+                    continue;
+                };
+                if piece.is_collapsed() {
+                    for edge in wire {
+                        requested[edge.index] = true;
+                    }
+                }
+            }
+        }
+        let mut changed = vec![false; mesh.edges.len()];
+        for (index, requested) in requested.into_iter().enumerate() {
+            if !requested {
+                continue;
+            }
+            let curve = &source.edges[index].curve;
+            let params = parameters
+                .entry(index)
+                .or_insert_with(|| curve.parameter_division(curve.range_tuple(), tol).0);
+            // Bound work on invalid trims; exhaustion leaves a reported missing face.
+            if params.len() > 2048 {
+                continue;
+            }
+            let mut refined = Vec::with_capacity(2 * params.len() - 1);
+            for pair in params.windows(2) {
+                refined.push(pair[0]);
+                let middle = pair[0] + (pair[1] - pair[0]) / 2.0;
+                if middle != pair[0] && middle != pair[1] {
+                    refined.push(middle);
+                }
+            }
+            if let Some(last) = params.last() {
+                refined.push(*last);
+            }
+            if refined.len() == params.len() {
+                continue;
+            }
+            // Keep the existing shared vertices, including fitted-curve endpoint corrections.
+            let old = &mesh.edges[index].curve;
+            let mut points: PolylineCurve = refined.iter().map(|t| curve.subs(*t)).collect();
+            points[0] = old[0];
+            let last = points.len() - 1;
+            points[last] = old[old.len() - 1];
+            mesh.edges[index].curve = points;
+            *params = refined;
+            changed[index] = true;
+        }
+        if !changed.iter().any(|changed| *changed) {
+            break;
+        }
+        for (face, meshed) in source.faces.iter().zip(&mut mesh.faces) {
+            if face
+                .boundaries
+                .iter()
+                .flatten()
+                .any(|edge| changed[edge.index])
+            {
+                meshed.surface = compressed_face_polygon(face, &mesh.edges, tol, &sp);
+            }
+        }
+    }
+}
+
 // Spatial normal correction reverses a triangle's UV winding when its chords fold.
-// Refine the whole shell so adjacent faces continue to share boundary samples.
 fn consistent_winding(mesh: &PolygonMesh) -> bool {
     mesh.tri_faces().iter().all(|tri| {
         let [a, b, c] = tri.map(|vertex| mesh.uv_coords()[vertex.uv.unwrap()]);
@@ -288,16 +422,18 @@ fn consistent_winding(mesh: &PolygonMesh) -> bool {
 fn refine_winding<T>(
     mut tol: f64,
     tessellate: impl Fn(f64) -> T,
-    consistent: impl Fn(&T) -> bool,
+    consistent: impl Fn(&mut T, f64) -> bool,
 ) -> T {
+    // Refine folded triangles with shared samples on adjacent faces.
     let mut result = tessellate(tol);
     for _ in 0..7 {
-        if consistent(&result) {
+        if consistent(&mut result, tol) {
             return result;
         }
         tol /= 2.;
         result = tessellate(tol);
     }
+    consistent(&mut result, tol);
     result
 }
 
@@ -315,9 +451,9 @@ fn shell_create_polygon<S: PreMeshableSurface>(
             PolyBoundaryPiece::try_new(surface, wire_iter, &sp)
         })
         .collect::<Option<Vec<_>>>();
-    let polygon: Option<PolygonMesh> = preboundary.map(|preboundary| {
-        let boundary = PolyBoundary::new(preboundary, &surface, tol);
-        trimming_tessellation(surface, &boundary, tol)
+    let polygon: Option<PolygonMesh> = preboundary.and_then(|preboundary| {
+        let boundary = PolyBoundary::new(preboundary, &surface, tol)?;
+        Some(trimming_tessellation(surface, &boundary, tol))
     });
     let mut new_face = Face::debug_new(wires, polygon);
     if !orientation {
@@ -342,6 +478,13 @@ impl From<(Point2, Point3)> for SurfacePoint {
 struct PolyBoundaryPiece(Vec<SurfacePoint>);
 
 impl PolyBoundaryPiece {
+    fn is_collapsed(&self) -> bool {
+        let Some((first, last)) = self.0.first().zip(self.0.last()) else {
+            return true;
+        };
+        first.uv.distance(last.uv) < 1.0e-3 && loop_orientation(&self.0).is_none()
+    }
+
     fn try_new<S: PreMeshableSurface>(
         surface: &S,
         wire: impl Iterator<Item = PolylineCurve>,
@@ -425,7 +568,10 @@ fn subdivide_poles(
     tol: f64,
 ) -> Vec<Vec<SurfacePoint>> {
     let bounds: BoundingBox<Point2> = loops.iter().flatten().map(|p| p.uv).collect();
-    let range = ((bounds.min()[0], bounds.max()[0]), (bounds.min()[1], bounds.max()[1]));
+    let range = (
+        (bounds.min()[0], bounds.max()[0]),
+        (bounds.min()[1], bounds.max()[1]),
+    );
     let mut division = None;
     let mut result = Vec::with_capacity(loops.len());
     for points in loops {
@@ -510,16 +656,27 @@ fn normalize_range(curve: &mut Vec<SurfacePoint>, compidx: usize, (u0, u1): (f64
     *curve = curve1;
 }
 
-fn loop_orientation(curve: &[SurfacePoint]) -> bool {
-    curve
-        .iter()
-        .circular_tuple_windows()
-        .fold(0.0, |sum, (p, q)| sum + (q.x + p.x) * (q.y - p.y))
-        > 0.0
+fn loop_orientation(curve: &[SurfacePoint]) -> Option<bool> {
+    let origin = curve.first()?.uv;
+    let (area, scale) =
+        curve
+            .iter()
+            .circular_tuple_windows()
+            .fold((0.0, 0.0), |(area, scale), (p, q)| {
+                let (p, q) = (p.uv - origin, q.uv - origin);
+                let (a, b) = (p.x * q.y, p.y * q.x);
+                (area + a - b, scale + a.abs() + b.abs())
+            });
+    let roundoff = f64::EPSILON * (curve.len() + 2) as f64 * scale;
+    (area.abs() > roundoff).then_some(area > 0.0)
 }
 
 impl PolyBoundary {
-    fn new(pieces: Vec<PolyBoundaryPiece>, surface: &impl PreMeshableSurface, tol: f64) -> Self {
+    fn new(
+        pieces: Vec<PolyBoundaryPiece>,
+        surface: &impl PreMeshableSurface,
+        tol: f64,
+    ) -> Option<Self> {
         let (mut closed, mut open) = (Vec::new(), Vec::new());
         pieces.into_iter().for_each(|PolyBoundaryPiece(mut vec)| {
             match vec[0].uv.distance(vec[vec.len() - 1].uv) < 1.0e-3 {
@@ -609,7 +766,14 @@ impl PolyBoundary {
             }
             _ => {}
         }
-        if !closed.iter().any(|curve| loop_orientation(curve)) {
+        // A collapsed trim needs finer shared edges, not the full surface domain.
+        let has_outer = closed.iter().try_fold(false, |has_outer, curve| {
+            Some(loop_orientation(curve)? || has_outer)
+        })?;
+        if !has_outer {
+            if surface.u_period().is_none() && surface.v_period().is_none() {
+                return None;
+            }
             if let (Some((u0, u1)), Some((v0, v1))) = surface.try_range_tuple() {
                 let p = [
                     (Point2::new(u0, v0), surface.subs(u0, v0)).into(),
@@ -624,7 +788,7 @@ impl PolyBoundary {
                 closed.push(connect_edges([vec0, vec1, vec2, vec3]));
             }
         }
-        Self::from_loops(subdivide_poles(closed, surface, tol))
+        Some(Self::from_loops(subdivide_poles(closed, surface, tol)))
     }
 
     fn from_loops(loops: Vec<Vec<SurfacePoint>>) -> Self {

@@ -13,7 +13,7 @@ use truck_modeling::{EdgeID, Face, FaceID, ScalarFunctionD1, Shell, Solid, Wire}
 pub struct BlendResult {
     /// The resulting solid, ready for tessellation and subsequent boolean operations.
     pub solid: Solid,
-    /// Input face ID and its replacement, in input face order. Unchanged faces are omitted.
+    /// Input face ID and its surviving replacements, in input face order. Unchanged faces are omitted.
     pub modified_faces: Vec<(FaceID, Face)>,
     /// Added blend and corner faces, in result order.
     pub generated_faces: Vec<Face>,
@@ -128,6 +128,9 @@ pub fn try_fillet_solid_along_wire<R: ScalarFunctionD1>(
 /// A single selected edge may end at several planar faces, such as the miter between two
 /// earlier chamfers; its cylindrical round is trimmed against each face. Other selected
 /// edges can still meet at three-edge spherical corners in the same operation.
+/// Parallel concave edges ending on transverse planar caps also support stepped rib joints
+/// and split coplanar caps. Equal-radius rounds may touch and consume their shared planar
+/// support; overlapping contact patches are rejected. Face history retains split replacements.
 /// The operation must not intersect distant faces or another boundary. Returns `None` on
 /// unsupported input without modifying it. An empty selection returns the original solid
 /// and empty history.
@@ -198,8 +201,11 @@ pub fn try_fillet_solid_edges(
             }
             _ => Err(error),
         })
-        .map_err(|e| e.operation(operation).shell(index))?;
-    finish(solid, index, shell).map_err(|e| e.operation(operation))
+        .map_err(|e| e.operation(operation).shell(index));
+    match shell {
+        Ok(shell) => finish(solid, index, shell).map_err(|e| e.operation(operation)),
+        Err(error) => super::additive::fillet(solid, edges, radius, tol).map_err(|_| error),
+    }
 }
 
 /// Equal-distance chamfers on straight sharp edges with planar or cylindrical support.

@@ -89,7 +89,12 @@ fn inside(p: Point3, original: &[Point3], normal: Vector3, epsilon: f64) -> bool
     winding
 }
 
-fn contained(points: &[Point3], original: &[Point3], normal: Vector3, epsilon: f64) -> bool {
+pub(super) fn contained(
+    points: &[Point3],
+    original: &[Point3],
+    normal: Vector3,
+    epsilon: f64,
+) -> bool {
     (0..points.len()).all(|i| {
         inside(points[i], original, normal, epsilon)
             && inside(
@@ -99,6 +104,20 @@ fn contained(points: &[Point3], original: &[Point3], normal: Vector3, epsilon: f
                 epsilon,
             )
     }) && !loops_intersect(points, original, normal, epsilon)
+}
+
+pub(super) fn contains_patch(face: &Face, points: &[Point3], normal: Vector3, tol: f64) -> bool {
+    let loops: Vec<_> = face
+        .boundaries()
+        .iter()
+        .map(|w| sample_wire(w, tol))
+        .collect();
+    contained(points, &loops[0], normal, TOLERANCE)
+        && loops[1..].iter().all(|hole| {
+            !loops_touch(points, hole, normal, TOLERANCE)
+                && !inside(hole[0], points, normal, TOLERANCE)
+                && !inside(points[0], hole, normal, TOLERANCE)
+        })
 }
 
 pub(super) struct Neighborhood {

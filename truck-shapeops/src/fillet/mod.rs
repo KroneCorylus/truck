@@ -488,6 +488,7 @@ mod edges;
 pub(crate) mod planar;
 mod planar_edge;
 mod planar_fillet;
+mod additive;
 mod projected_section;
 pub use edges::{fillet_edges, try_fillet_edges};
 
