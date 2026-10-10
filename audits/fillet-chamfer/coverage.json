@@ -1,0 +1,1799 @@
+{
+  "scope": {
+    "title": "Fillet and chamfer feature parity audit",
+    "baseline": "OCCT V7_9_3 source inventory plus the recorded Truck/Pieza revisions. Includes 3D, 2D, related workflows and all textual candidates under the discovery rules.",
+    "meaning_of_all": "Every dedicated test-grid entry, matching registered test/helper, discovered blend command and retained reference in this pinned checkout. This is not a claim about all mathematical configurations or current/future OCCT releases.",
+    "execution": "The OCCT case corpus has not been executed or paired here. Targeted Truck regression results are recorded on capability entries; case-level comparisons remain unverified.",
+    "mapping": "Capability assessments describe observable outcomes supported or restricted by reviewed source evidence. Per-case tags and links are automated hints; they do not prove Truck handles that fixture.",
+    "objective": "Achieve at least OCCT-level fillet/chamfer capabilities and robustness for equivalent modeling tasks in Truck/Pieza.",
+    "equivalence": "Judge the requested geometry, dimensions, validity, editing behavior and practical performance. Different APIs, algorithms, languages, surface representations and internal operation sequences are acceptable. Missing a corresponding OCCT method is not evidence of a feature gap."
+  },
+  "status_definitions": {
+    "implemented-with-tests": "The stated capability has an implementation and relevant assertions, through any equivalent construction. Executed checks are recorded separately where available; broader OCCT case parity remains unverified.",
+    "partial": "Some configurations have supporting evidence; others have known restrictions or remain unverified. Read the outcome and scope before treating any specific case as a gap.",
+    "behavior-difference": "The inspected constructions produce different physical constraints or behavior for the same nominal input. Check whether parameter conversion or another existing route provides equivalent results before declaring a capability gap.",
+    "app-limitation": "An observed product restriction prevents expressing or using a capability. An internal pipeline difference alone is not sufficient evidence.",
+    "unverified": "The requested outcome has not been established from the inspected evidence. Absence of an OCCT-style API does not establish lack of capability.",
+    "reference-only": "An OCCT implementation choice retained for investigation. It is not itself a feature requirement or parity deficit."
+  },
+  "validation_contract": [
+    "Express each case as a modeling task: input geometry, physical selection, intended radius/distances/angle, termination and expected result. Identify the same physical entities without relying on ordinal edge IDs across kernels.",
+    "Accept any Truck/Pieza construction that satisfies the task, including parameter conversion and composed operations. Require equivalent editing intent and automation; a manually sculpted lookalike does not establish a parametric feature.",
+    "API names, signatures, call counts, solver strategy, patch representation and face counts are not parity requirements. Internal differences matter only through observable correctness, robustness, editing or performance.",
+    "Record operation failure, crash/timeout, invalid output and valid output separately. A harness expected failure is not a working blend; successful return alone is not proof of correctness.",
+    "Validate contact radius/distances/angle, tangency where required, orientation, closed topology/mesh, material membership and global self-intersection independently. Check open-shell tasks against their own boundary contract.",
+    "Compare shape and dimensions within explicit tolerances, with volume as a supplementary check. Different valid topology decompositions are acceptable.",
+    "Preserve unchanged input on failure; verify persistent selections after upstream edits, STEP round trips and downstream modeling. These outcomes do not require matching OCCT history or diagnostic methods.",
+    "Use analytic expectations where available; OCCT supplies cases and comparative evidence, not an infallible oracle or a ceiling on supported behavior.",
+    "Record versions, tolerances, physical selection, runtime and fixture hash with results. Practical latency matters, but matching OCCT timing exactly is not required."
+  ],
+  "variation_axes": {
+    "support_pairs": [
+      "plane",
+      "cylinder",
+      "cone",
+      "sphere",
+      "torus",
+      "Bezier/B-spline/NURBS"
+    ],
+    "spines": [
+      "line",
+      "circle/ellipse",
+      "open spline",
+      "closed single edge",
+      "split tangent chain",
+      "inflection/high curvature"
+    ],
+    "junctions": [
+      "1/2/3/4+ selected edges",
+      "all convex",
+      "all concave",
+      "mixed concavity",
+      "orthogonal/oblique",
+      "open boundary",
+      "multiple end faces"
+    ],
+    "sizes": [
+      "small/ordinary",
+      "just below collapse",
+      "exact collapse",
+      "above collapse",
+      "unequal radii/distances",
+      "zero/nonfinite invalid input"
+    ],
+    "representation": [
+      "analytic vs exact NURBS",
+      "split/unsplit edges and faces",
+      "reversed orientation",
+      "periodic seam moved",
+      "STEP round trip"
+    ],
+    "transform": [
+      "rigid motion",
+      "uniform scaling with tolerance policy",
+      "large coordinates"
+    ],
+    "composition": [
+      "simultaneous vs sequential",
+      "all selection orders",
+      "fillet→fillet",
+      "fillet→chamfer",
+      "chamfer→fillet",
+      "chamfer→chamfer",
+      "Boolean-generated edges",
+      "nearby hole/cavity"
+    ]
+  },
+  "families": [
+    {
+      "id": "F01",
+      "title": "Constant-radius planar fillets",
+      "truck_status": "implemented-with-tests",
+      "priority": "P2",
+      "tags": [
+        "fillet"
+      ],
+      "occt_scope": "Constant-radius contours with analytic special cases.",
+      "truck_scope": "Convex and concave local planar constructions have independent volume and mesh regressions.",
+      "next_case": "Pair box, wedge, tetrahedron and cavity cases; compare contact radius and retained volume.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/BRepFilletAPI/BRepFilletAPI_MakeFillet.hxx",
+          "find": "const Standard_Real Radius",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/modeling.rs",
+          "find": "pub fn fillet_solid_edges",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/fillet_edges.rs",
+          "find": "fn all_twelve_box_edges",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/nonconvex_fillet.rs",
+          "find": "fn local_spherical_corners",
+          "role": "test"
+        }
+      ],
+      "required_outcome": "Round selected planar-solid edges to the requested constant radius, for convex and concave material, while preserving a valid solid."
+    },
+    {
+      "id": "F02",
+      "title": "Variable radius along a tangent chain",
+      "truck_status": "partial",
+      "priority": "P2",
+      "tags": [
+        "variable-radius"
+      ],
+      "occt_scope": "Linear, interpolated and general radius laws.",
+      "truck_scope": "Kernel tests cover variable-radius chains; the physical profile must be translated to its per-edge parameterization. Pieza currently stores one radius per feature, so product-level variable-radius intent remains limited.",
+      "next_case": "Use unequal edge lengths, split an edge, and compare the same physical radius law; include varying derivatives.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/BRepFilletAPI/BRepFilletAPI_MakeFillet.hxx",
+          "find": "Handle(Law_Function)",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/along_wire.rs",
+          "find": "The radius function",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/modeling_blends.rs",
+          "find": "fn constant_and_variable_radius_tangent_chains",
+          "role": "test"
+        },
+        {
+          "repo": "app",
+          "path": "cad-core/src/document.rs",
+          "find": "pub struct Fillet",
+          "role": "implementation"
+        }
+      ],
+      "required_outcome": "Create a smooth blend whose radius follows the requested physical profile along an entire connected chain, including unequal-length and split edges."
+    },
+    {
+      "id": "F03",
+      "title": "Different radii meeting at a corner",
+      "truck_status": "unverified",
+      "priority": "P1",
+      "tags": [
+        "variable-radius"
+      ],
+      "occt_scope": "Per-edge/contour radii and general corner filling.",
+      "truck_scope": "Equal-radius joined corners are covered. The inspected multi-edge entry point accepts one common radius, but this alone does not prove unequal-radius corners impossible through other constructions. A valid unequal-radius joined result has not been established.",
+      "next_case": "Three edges at a corner with radii 1, 2 and 3, convex then mixed concavity. Try existing joint and composed constructions; judge the resulting contacts, continuity and solid validity.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/BRepFilletAPI/BRepFilletAPI_MakeFillet.hxx",
+          "find": "SetRadius(",
+          "role": "implementation"
+        },
+        {
+          "repo": "occt",
+          "path": "src/ChFi3d/ChFi3d_FilBuilder_C3.cxx",
+          "find": "GeomFill_ConstrainedFilling fil",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/modeling.rs",
+          "find": "pub fn fillet_solid_edges",
+          "role": "implementation"
+        }
+      ],
+      "required_outcome": "Create a valid joined corner where incident edge fillets have different specified radii, with the intended contacts and continuity."
+    },
+    {
+      "id": "F04",
+      "title": "Tapered radius reaching zero",
+      "truck_status": "partial",
+      "priority": "P2",
+      "tags": [
+        "variable-radius",
+        "degenerate"
+      ],
+      "occt_scope": "Singular-corner machinery exists; acceptance of a particular zero-radius law needs execution.",
+      "truck_scope": "Chain validation rejects radius values at or below zero, including endpoints.",
+      "next_case": "Sweep a positive radius down to zero at an endpoint and record each kernel result without presuming OCCT success.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/ChFi3d/ChFi3d_Builder.cxx",
+          "find": "void ChFi3d_Builder::PerformSingularCorner",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/along_wire.rs",
+          "find": "positive && value <= 0.0",
+          "role": "implementation"
+        }
+      ],
+      "required_outcome": "Taper a blend continuously to zero radius at an endpoint without leaving an invalid seam or degenerate solid."
+    },
+    {
+      "id": "F05",
+      "title": "Fillet section representation choices",
+      "truck_status": "reference-only",
+      "priority": "Reference",
+      "tags": [
+        "fillet"
+      ],
+      "occt_scope": "Rational, quasi-angular and polynomial section representations.",
+      "truck_scope": "Truck chooses analytic or procedural surfaces internally. Matching the OCCT representation selector is not required; retain this topic only to investigate accuracy, interoperability or performance differences.",
+      "next_case": "Investigate representations only when an accuracy, STEP, downstream modeling or performance failure is observed. Do not add a selector solely to mirror OCCT.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/BRepFilletAPI/BRepFilletAPI_MakeFillet.hxx",
+          "find": "ChFi3d_QuasiAngular",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/mod.rs",
+          "find": "STEP has no native rolling-ball",
+          "role": "implementation"
+        }
+      ],
+      "required_outcome": "No independent representation-selector requirement. The resulting shape must satisfy geometric accuracy and downstream use regardless of its internal representation."
+    },
+    {
+      "id": "F06",
+      "title": "Smoothness within and between blend surfaces",
+      "truck_status": "unverified",
+      "priority": "P3",
+      "tags": [
+        "tangent"
+      ],
+      "occt_scope": "Configurable internal C0/C1/C2 and support angular tolerance; this is not a promise of G2 support-face blending.",
+      "truck_scope": "Truck has construction-specific smoothness contracts, including deliberately creased two-edge miters. Lack of a continuity-setting method does not establish a gap; evaluate the smoothness required for each result.",
+      "next_case": "Choose a corner or chain with a specified smoothness requirement, then measure internal joins and support-face tangency separately in each output.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/BRepFilletAPI/BRepFilletAPI_MakeFillet.hxx",
+          "find": "SetContinuity",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/edges.rs",
+          "find": "but meet with a crease",
+          "role": "implementation"
+        }
+      ],
+      "required_outcome": "Achieve the required smoothness within blend surfaces and across their joins; distinguish that from tangency to the support faces."
+    },
+    {
+      "id": "C01",
+      "title": "Equal-distance chamfers",
+      "truck_status": "implemented-with-tests",
+      "priority": "P2",
+      "tags": [
+        "equal-distance",
+        "chamfer"
+      ],
+      "occt_scope": "Symmetric chamfers propagated along contours.",
+      "truck_scope": "Planar neighborhoods, nonconvex corners and selected cylinder lips are covered.",
+      "next_case": "Pair simple OCCT fixtures with planar convex and concave solids.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/BRepFilletAPI/BRepFilletAPI_MakeChamfer.hxx",
+          "find": "const Standard_Real Dis,",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/modeling.rs",
+          "find": "pub fn chamfer_solid_edges",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/nonconvex_chamfer.rs",
+          "find": "fn chamfers_meet_at_a_reentrant_planar_corner",
+          "role": "test"
+        }
+      ],
+      "required_outcome": "Bevel selected edges by equal specified setbacks on both supports, including convex and concave material."
+    },
+    {
+      "id": "C02",
+      "title": "Unequal chamfer distances and side identity",
+      "truck_status": "implemented-with-tests",
+      "priority": "P2",
+      "tags": [
+        "two-distances"
+      ],
+      "occt_scope": "Two distances with an explicit reference face.",
+      "truck_scope": "Per-edge distance pairs and wire direction define the two sides; the app translates named face order.",
+      "next_case": "Reverse wire and face storage order and swap distances; verify contact dimensions.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/BRepFilletAPI/BRepFilletAPI_MakeChamfer.hxx",
+          "find": "const Standard_Real Dis1",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/modeling.rs",
+          "find": "pub fn try_chamfer_solid_edges_with_distances",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/chamfer_general.rs",
+          "find": "fn asymmetric_inset_chamfers",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/r5_chamfer_after_fillet.rs",
+          "find": "fn asymmetric_distances_follow_wire_orientation",
+          "role": "test"
+        }
+      ],
+      "required_outcome": "Bevel with independently specified setbacks on the intended two support faces; orientation or storage order must not silently exchange them."
+    },
+    {
+      "id": "C03",
+      "title": "Distance-and-angle chamfers",
+      "truck_status": "unverified",
+      "priority": "P3",
+      "tags": [
+        "distance-angle"
+      ],
+      "occt_scope": "Explicit distance and angle mode.",
+      "truck_scope": "The existing two-distance construction can express some equivalent planar chamfers after converting the intended angle and setback. That conversion, curved-support behavior and parametric edit semantics need validation; an AddDA-style method is unnecessary.",
+      "next_case": "Convert setback and angle into two support distances on a non-right-angle wedge and validate the result after changing the wedge angle. Then check a curved support where the intended angle must remain controlled.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/BRepFilletAPI/BRepFilletAPI_MakeChamfer.hxx",
+          "find": "AddDA",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/modeling.rs",
+          "find": "pub fn try_chamfer_solid_edges_with_distances",
+          "role": "implementation"
+        },
+        {
+          "repo": "app",
+          "path": "cad-core/src/document.rs",
+          "find": "pub struct Chamfer",
+          "role": "implementation"
+        }
+      ],
+      "required_outcome": "Produce a chamfer with the requested setback and angle, including non-right-angle supports, using any equivalent parameterization."
+    },
+    {
+      "id": "C04",
+      "title": "Constant-throat chamfers",
+      "truck_status": "unverified",
+      "priority": "P3",
+      "tags": [
+        "constant-throat"
+      ],
+      "occt_scope": "Symmetric constant-throat section constraint.",
+      "truck_scope": "No constant-throat result has been established. Check whether existing distance-based constructions, with derived parameters, satisfy the same throat constraint before identifying new kernel work.",
+      "next_case": "Recreate bug28828_8 and bug28828_10 using existing Truck constructions where possible; measure throat along the edge, including changing support curvature.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/ChFiDS/ChFiDS_ChamfMode.hxx",
+          "find": "ChFiDS_ConstThroatChamfer",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/modeling.rs",
+          "find": "pub fn chamfer_solid_edges",
+          "role": "implementation"
+        }
+      ],
+      "required_outcome": "Produce a chamfer whose normal sections maintain the requested throat dimension along the selected edge."
+    },
+    {
+      "id": "C05",
+      "title": "Constant throat with penetration",
+      "truck_status": "unverified",
+      "priority": "P3",
+      "tags": [
+        "constant-throat"
+      ],
+      "occt_scope": "Penetrating throat uses an offset support to define the section.",
+      "truck_scope": "The penetrating-throat outcome has not been demonstrated. A differently named or composed construction can supply parity if it satisfies the same geometric constraints.",
+      "next_case": "Recreate bug28828_9, bug28828_11 and NURBS bug28828_6; evaluate existing setback or composed constructions against the throat and penetration dimensions.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/ChFiDS/ChFiDS_ChamfMode.hxx",
+          "find": "ChFiDS_ConstThroatWithPenetrationChamfer",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/modeling.rs",
+          "find": "pub fn chamfer_solid_edges",
+          "role": "implementation"
+        }
+      ],
+      "required_outcome": "Produce the requested constant-throat chamfer with penetration, satisfying both the throat and offset-support constraints."
+    },
+    {
+      "id": "C06",
+      "title": "Meaning of distance on curved supports",
+      "truck_status": "behavior-difference",
+      "priority": "P1",
+      "tags": [
+        "chamfer",
+        "cylinder",
+        "freeform"
+      ],
+      "occt_scope": "Classic numerical chamfer contacts satisfy a normal-section plane and a guide-to-contact chord distance.",
+      "truck_scope": "Generic Truck contacts use nearest projections of tangent offsets; the same numeric parameter generally gives a different physical setback from OCCT. This is a dimension-convention difference until equivalent inputs or alternate constructions have been tested.",
+      "next_case": "On a radius-2 cylinder, request a physical chord setback of 1. Translate each parameter convention and measure the result; then check varying curvature where a single converted value may be insufficient.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/BlendFunc/BlendFunc_Corde.cxx",
+          "find": "F(2) = vref.SquareMagnitude() - dis * dis",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/chamfer.rs",
+          "find": "surface.search_nearest_parameter(p + w * distance",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/channel_rim_blends.rs",
+          "find": "fn chamfer_section",
+          "role": "test"
+        }
+      ],
+      "required_outcome": "Produce the intended measurable setbacks on curved supports after explicitly translating dimension conventions between kernels."
+    },
+    {
+      "id": "G01",
+      "title": "Plane/cylinder lips and rims",
+      "truck_status": "implemented-with-tests",
+      "priority": "P2",
+      "tags": [
+        "cylinder"
+      ],
+      "occt_scope": "Analytic line/circle special cases plus generic walking.",
+      "truck_scope": "Straight axial lips, circular rims, holes and channels have tests; this does not cover all oblique intersections.",
+      "next_case": "Compare convex/concave lips, hole/boss rims, and a tilted plane cutting a cylinder.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/ChFiKPart/ChFiKPart_ComputeData.cxx",
+          "find": "GeomAbs_Cylinder",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/plane_cylinder_lips.rs",
+          "find": "fn check_lip",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/boolean_hole_fillet.rs",
+          "find": "fn boolean_hole_rims",
+          "role": "test"
+        }
+      ],
+      "required_outcome": "Blend lips and rims formed by planes and cylinders, for holes, bosses and channels in either material sense."
+    },
+    {
+      "id": "G02",
+      "title": "Plane/cone and drafted rims",
+      "truck_status": "unverified",
+      "priority": "P2",
+      "tags": [
+        "cone"
+      ],
+      "occt_scope": "Explicit analytic plane/cone cases.",
+      "truck_scope": "Generic surface APIs exist, but complete paired blend coverage of cone angles and apex proximity has not been established.",
+      "next_case": "Cone rims at several draft angles, both material senses, approaching the apex.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/ChFiKPart/ChFiKPart_ComputeData_FilPlnCon.cxx",
+          "find": "ChFiKPart_MakeFillet",
+          "role": "implementation"
+        },
+        {
+          "repo": "occt",
+          "path": "src/ChFiKPart/ChFiKPart_ComputeData_ChPlnCon.cxx",
+          "find": "ChFiKPart_MakeChamfer",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/along_wire.rs",
+          "find": "RbfSurface::new",
+          "role": "implementation"
+        }
+      ],
+      "required_outcome": "Blend drafted or conical rims over varying cone angles and near the apex when a valid requested result exists."
+    },
+    {
+      "id": "G03",
+      "title": "Cylinder/cylinder, sphere, torus and spline support pairs",
+      "truck_status": "unverified",
+      "priority": "P1",
+      "tags": [
+        "cylinder",
+        "sphere",
+        "torus",
+        "freeform"
+      ],
+      "occt_scope": "Generic numerical construction extends beyond analytic special cases.",
+      "truck_scope": "Generic rolling-ball surfaces exist. A broad solid-level support-pair matrix has not been established.",
+      "next_case": "Pair each support type with each other type; convex/concave, isolated edge and corner, regular versus near singular.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/BRepBlend/BRepBlend_Walking.hxx",
+          "find": "class BRepBlend_Walking",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/along_wire.rs",
+          "find": "RbfSurface::new",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/fillet.rs",
+          "find": "fn complex_surface",
+          "role": "test"
+        }
+      ],
+      "required_outcome": "Blend intersections between curved supports, including cylinders, cones, spheres, tori and spline surfaces, with valid contacts and trimmed output."
+    },
+    {
+      "id": "G04",
+      "title": "Equivalent analytic versus NURBS representations",
+      "truck_status": "partial",
+      "priority": "P1",
+      "tags": [
+        "freeform"
+      ],
+      "occt_scope": "Tests explicitly convert shapes to NURBS before chamfering.",
+      "truck_scope": "Confirmed and fixed a kernel representation gap: drafted rim fillets failed on exact planar NURBS supports although the analytic body worked. Straight-edge construction now recognizes planar B-spline/NURBS control nets and retains the same trim checks. App grouping still checks Curve::Line; broader representation invariance remains open.",
+      "next_case": "Check app grouping with straight edges encoded as splines, then curved support pairs, split faces and imported STEP bodies. Keep equivalent physical dimensions and selections.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "tests/bugs/modalg_7/bug28828_6",
+          "find": "nurbsconvert b a",
+          "role": "test"
+        },
+        {
+          "repo": "app",
+          "path": "cad-core/src/kernel/blend.rs",
+          "find": "matches!(chains[i].1[0].curve(), Curve::Line(_))",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/fillet.rs",
+          "find": "fn complex_surface",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-modeling/src/geometry.rs",
+          "find": "fn spline_plane",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/drafted_fillet_miters.rs",
+          "find": "fn nurbs_drafted_rims_match_analytic_geometry",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/drafted_fillet_miters.rs",
+          "find": "fn bspline_drafted_rims_match_analytic_geometry",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/drafted_fillet_miters.rs",
+          "find": "fn spline_cavity_rim_chamfers_preserve_the_same_setbacks",
+          "role": "test"
+        }
+      ],
+      "required_outcome": "Handle equivalent physical geometry consistently when represented analytically, as exact NURBS, with split faces, or after STEP import.",
+      "verification": [
+        "Reproduced UnsupportedGeometry on a valid NURBS-converted drafted rim before the fix; the equivalent analytic fixture passed.",
+        "Truck regressions now pass for B-spline/NURBS rims, convex and cavity boundaries, both draft directions, two-edge/full-rim selections, two radii, rotation/translation/scaling, input and selection-order preservation, exact volume, contact radius/tangency and STEP exchange.",
+        "Spline cavity-rim chamfers also pass independent volume and STEP checks for both draft directions and both spline representations.",
+        "Broader suite validation found a pre-existing failure in r11_corners::unsupported_junctions_have_distinct_diagnostics: a pyramid chamfer succeeds where the test expects UnsupportedTopology. Reproduced unchanged at parent 7eb2d78d with the same Cargo.lock; the assertion is retained.",
+        "These are independently specified Truck regression fixtures, not executions of the 1,026 OCCT corpus entries."
+      ]
+    },
+    {
+      "id": "G05",
+      "title": "Curved and closed spline spines",
+      "truck_status": "partial",
+      "priority": "P1",
+      "tags": [
+        "freeform",
+        "periodic-seam"
+      ],
+      "occt_scope": "Closed Bezier/spline spine regressions and general walking.",
+      "truck_scope": "A generic curved-surface test exists; closed spline seam, inflection and tiny-edge variants remain unverified.",
+      "next_case": "Port the six bug30940 cases, including a closed single-edge Bezier spine.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "tests/bugs/modalg_7/bug30940_2",
+          "find": "beziercurve",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/fillet.rs",
+          "find": "fn complex_surface",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/along_wire.rs",
+          "find": "let closed = wire.is_cyclic()",
+          "role": "implementation"
+        }
+      ],
+      "required_outcome": "Blend along open and closed curved edges, including spline inflections and high curvature, with valid closure and contacts."
+    },
+    {
+      "id": "T01",
+      "title": "Tangent propagation across support changes",
+      "truck_status": "implemented-with-tests",
+      "priority": "P2",
+      "tags": [
+        "tangent"
+      ],
+      "occt_scope": "Contours propagate along tangent edges and tangent support series.",
+      "truck_scope": "Application propagation checks edge tangents and both face normals; the kernel accepts explicitly supplied chains.",
+      "next_case": "Vary tangency around the threshold and split one support into multiple patches.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/BRepFilletAPI/BRepFilletAPI_MakeChamfer.hxx",
+          "find": "two series of tangential faces",
+          "role": "implementation"
+        },
+        {
+          "repo": "app",
+          "path": "cad-core/src/kernel/blend.rs",
+          "find": "fn tangent_chain",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/fillet_chain.rs",
+          "find": "fn fillet_open_chain_around_rounded_corners",
+          "role": "test"
+        }
+      ],
+      "required_outcome": "Round or bevel a tangent chain continuously across edge splits and changes of support face."
+    },
+    {
+      "id": "T02",
+      "title": "Closed chains and periodic seams",
+      "truck_status": "partial",
+      "priority": "P1",
+      "tags": [
+        "periodic-seam"
+      ],
+      "occt_scope": "Closed/tangent states, periodic surface handling and seam-related regressions, including expected failures.",
+      "truck_scope": "Cylinder-rim seam crossings are tested; broader seam interactions are unverified.",
+      "next_case": "Move cylinder/torus seams through a termination, then repeat with a closed spline edge.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/ChFiDS/ChFiDS_State.hxx",
+          "find": "ChFiDS_Closed",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/fillet_chain.rs",
+          "find": "fn fillet_cylinder_rim",
+          "role": "test"
+        },
+        {
+          "repo": "occt",
+          "path": "tests/bugs/modalg_7/bug26655",
+          "find": "TODO",
+          "role": "expected-failure-marker"
+        }
+      ],
+      "required_outcome": "Complete a closed blend without gaps or invalid topology, regardless of where periodic seams lie."
+    },
+    {
+      "id": "T03",
+      "title": "Branching or ambiguous chain selection",
+      "truck_status": "partial",
+      "priority": "P2",
+      "tags": [
+        "tangent"
+      ],
+      "occt_scope": "Contour discovery and endpoint classification.",
+      "truck_scope": "The app explicitly rejects multiple tangent continuation candidates.",
+      "next_case": "A vertex with two geometrically tangent candidates; establish desired selection semantics.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/ChFi3d/ChFi3d_Builder_1.cxx",
+          "find": "PerformExtremity",
+          "role": "implementation"
+        },
+        {
+          "repo": "app",
+          "path": "cad-core/src/kernel/blend.rs",
+          "find": "tangent edge chain branches",
+          "role": "implementation"
+        }
+      ],
+      "required_outcome": "Resolve or report ambiguous tangent branches predictably, while allowing the intended explicit path to be selected."
+    },
+    {
+      "id": "T04",
+      "title": "Open shells and free-boundary terminations",
+      "truck_status": "partial",
+      "priority": "P3",
+      "tags": [
+        "fillet"
+      ],
+      "occt_scope": "Shell input and explicit free-boundary endpoint state.",
+      "truck_scope": "Generic face/shell functions exist, while the app uses solid wrappers requiring closed output.",
+      "next_case": "A two-face open shell ending at a free boundary; separate kernel capability from app scope.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/ChFiDS/ChFiDS_State.hxx",
+          "find": "ChFiDS_FreeBoundary",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/mod.rs",
+          "find": "pub fn fillet_with_side",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/modeling.rs",
+          "find": "Solid::try_new",
+          "role": "implementation"
+        }
+      ],
+      "required_outcome": "Blend open-shell edges and terminate correctly on free boundaries for surface-modeling tasks."
+    },
+    {
+      "id": "J01",
+      "title": "Single fillet with oblique end faces",
+      "truck_status": "implemented-with-tests",
+      "priority": "P2",
+      "tags": [
+        "fillet"
+      ],
+      "occt_scope": "Intersection with terminating support faces.",
+      "truck_scope": "Exact planar elliptical terminations and selected curved ends are covered.",
+      "next_case": "Acute and obtuse end planes, flipped orientations and very short retained edges.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/ChFi3d/ChFi3d_Builder_C1.cxx",
+          "find": "PerformIntersectionAtEnd",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/oblique_fillet_ends.rs",
+          "find": "fn oblique_planar_terminations",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/curved_blend_ends.rs",
+          "find": "fn straight_blends_extend",
+          "role": "test"
+        }
+      ],
+      "required_outcome": "Terminate a blend correctly against oblique end faces while preserving the requested radius and a valid boundary."
+    },
+    {
+      "id": "J02",
+      "title": "Single blend ending across multiple faces",
+      "truck_status": "partial",
+      "priority": "P1",
+      "tags": [
+        "fillet"
+      ],
+      "occt_scope": "End intersection across face neighborhoods; API documentation retains limitations.",
+      "truck_scope": "Four-valent single-fillet endings and endings on two earlier chamfers have tests.",
+      "next_case": "Use nonplanar multi-face caps and changed seam placement; do not label every four-valent vertex unsupported.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/ChFi3d/ChFi3d_Builder_C1.cxx",
+          "find": "PerformIntersectionAtEnd",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/fillet_chain.rs",
+          "find": "fn fillet_edge_ending_at_four_valent_vertex",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/sequential_blends.rs",
+          "find": "fn fillet_ends_on_two_chamfer_faces",
+          "role": "test"
+        }
+      ],
+      "required_outcome": "Terminate one blend across a neighborhood of several end faces without gaps, overlaps or damage to unrelated geometry."
+    },
+    {
+      "id": "J03",
+      "title": "Three equal-radius edges with the same concavity",
+      "truck_status": "implemented-with-tests",
+      "priority": "P2",
+      "tags": [
+        "fillet",
+        "sphere"
+      ],
+      "occt_scope": "Spherical special cases and general three-corner construction.",
+      "truck_scope": "Spherical corners at arbitrary planar angles, including nonconvex bodies and cavity shells.",
+      "next_case": "Pair tetrahedra and oblique reentrant solids, with one, two and three selected edges.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/ChFi3d/ChFi3d_FilBuilder_C3.cxx",
+          "find": "PerformThreeCorner",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/fillet_edges.rs",
+          "find": "fn rounded_tetrahedron",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/nonconvex_fillet.rs",
+          "find": "fn oblique_spherical_corners",
+          "role": "test"
+        }
+      ],
+      "required_outcome": "Join three equal-radius, same-concavity rounds at a valid corner over general planar support angles."
+    },
+    {
+      "id": "J04",
+      "title": "Two-edge junction with nonorthogonal supports",
+      "truck_status": "partial",
+      "priority": "P1",
+      "tags": [
+        "fillet"
+      ],
+      "occt_scope": "Intersection and constrained-filling paths.",
+      "truck_scope": "The specialized planar miter path requires perpendicular supports, but the solid-level intersection fallback already handles drafted planar rims. Equal-draft convex/cavity configurations have geometric regressions. The required continuity and more general corner configurations still need case-by-case verification.",
+      "next_case": "Broaden solid-level tests to unequal draft angles and multi-blend configurations, measuring dimensions and junction continuity. Do not infer a missing capability from restrictions in the specialized path alone.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/ChFi3d/ChFi3d_FilBuilder_C2.cxx",
+          "find": "GeomFill_ConstrainedFilling fil",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/planar_fillet.rs",
+          "find": "let miter = if chosen.len() == 2",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/edges.rs",
+          "find": "but meet with a crease",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/drafted_fillet_miters.rs",
+          "find": "fn analytic_drafted_rims_control",
+          "role": "test"
+        }
+      ],
+      "required_outcome": "Join two selected edge rounds at an oblique corner with the required continuity and preservation of the remaining sharp edge.",
+      "verification": [
+        "An equal-draft analytic rim control passed before kernel changes, including independent volume checks. It was not a missing solid-level feature."
+      ]
+    },
+    {
+      "id": "J05",
+      "title": "Mixed convex/concave corner transitions",
+      "truck_status": "partial",
+      "priority": "P1",
+      "tags": [
+        "fillet",
+        "chamfer",
+        "torus"
+      ],
+      "occt_scope": "Concavity states distinguish same-side and opposite-side corner configurations.",
+      "truck_scope": "Toroidal fillet patches require the rim face perpendicular to both walls; some remaining mixed combinations reject. Chamfers have planar transitions.",
+      "next_case": "Enumerate each concavity sign pattern, selected subset and oblique support angle.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/ChFiDS/ChFiDS_State.hxx",
+          "find": "ChFiDS_OnDiff",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/planar_fillet.rs",
+          "find": "if chosen.len() >= 2 && concave.len() == 1",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/mixed_pair_fillet.rs",
+          "find": "fn concave_and_convex_pair",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/mixed_chamfer_pair.rs",
+          "find": "fn mixed_chamfer_pairs",
+          "role": "test"
+        }
+      ],
+      "required_outcome": "Construct valid transitions where convex and concave blends meet, including oblique support configurations."
+    },
+    {
+      "id": "J06",
+      "title": "Four or more interacting blends at a vertex",
+      "truck_status": "partial",
+      "priority": "P1",
+      "tags": [
+        "fillet"
+      ],
+      "occt_scope": "General n-corner construction exists, with documented and implementation limitations.",
+      "truck_scope": "The equal-radius multi-edge path rejects general high-valence corners. Single-blend high-valence termination is a different supported case.",
+      "next_case": "Pyramid apex with two, three, four and all incident edges selected.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/ChFi3d/ChFi3d_Builder_CnCrn.cxx",
+          "find": "void ChFi3d_Builder::PerformMoreThreeCorner",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/fillet_edges.rs",
+          "find": "fn unblendable_four_edge_vertex",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/along_wire.rs",
+          "find": "Blending several fillets",
+          "role": "implementation"
+        }
+      ],
+      "required_outcome": "Join four or more interacting blends at a vertex when the requested configuration has a valid solution."
+    },
+    {
+      "id": "J07",
+      "title": "General curved multi-blend corner filling",
+      "truck_status": "partial",
+      "priority": "P1",
+      "tags": [
+        "freeform",
+        "fillet"
+      ],
+      "occt_scope": "Constrained patch filling after intersection of blend strips.",
+      "truck_scope": "Exact special junctions exist; generic chain construction does not join several fillets at a vertex.",
+      "next_case": "Cylinder/cone or spline supports meeting at a multi-edge corner, with equal then unequal radii.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/ChFi3d/ChFi3d_FilBuilder_C3.cxx",
+          "find": "GeomFill_ConstrainedFilling fil",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/along_wire.rs",
+          "find": "Blending several fillets",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/modeling.rs",
+          "find": "Other mixed junctions",
+          "role": "implementation"
+        }
+      ],
+      "required_outcome": "Close multi-blend corners on general curved supports with valid contact and continuity, independent of patch construction method."
+    },
+    {
+      "id": "D01",
+      "title": "Contact collapse and singular tips",
+      "truck_status": "partial",
+      "priority": "P1",
+      "tags": [
+        "degenerate"
+      ],
+      "occt_scope": "Singular corners and degenerate boundaries are explicitly represented.",
+      "truck_scope": "Equal-radius sequential rim fillets fail by contract. Specific collapsed chamfers are supported.",
+      "next_case": "Sweep second-radius/first-radius through 0.99, 1 and 1.01; compare fillet and chamfer behavior.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/ChFi3d/ChFi3d_Builder.cxx",
+          "find": "void ChFi3d_Builder::PerformSingularCorner",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/R10-sequential-fillet.rs",
+          "find": "fn adjacent_second_fillet_must_not_panic",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/sequential_blends.rs",
+          "find": "fn chamfer_consumes_a_smaller_corner_fillet",
+          "role": "test"
+        }
+      ],
+      "required_outcome": "Handle valid limiting cases where contact curves collapse or tips become singular, with controlled rejection of impossible configurations."
+    },
+    {
+      "id": "D02",
+      "title": "Disappearing support faces",
+      "truck_status": "partial",
+      "priority": "P1",
+      "tags": [
+        "degenerate",
+        "sequential"
+      ],
+      "occt_scope": "Topology reconstruction can remove/replace entities; this is not a guarantee for every collapse.",
+      "truck_scope": "Touching concave rib rounds can consume a face. Ordinary chamfer construction rejects removing original faces.",
+      "next_case": "A thin support face shrinking to zero and disappearing, with parallel and intersecting rounds.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/BRepFilletAPI/BRepFilletAPI_MakeFillet.hxx",
+          "find": "IsDeleted",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/modeling.rs",
+          "find": "Sizes that remove an original face",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/rib_fillet.rs",
+          "find": "fn reinforces_stepped_ribs_including_touching_rounds",
+          "role": "test"
+        }
+      ],
+      "required_outcome": "Continue valid blending through the disappearance of a support face and reconstruct the remaining material correctly."
+    },
+    {
+      "id": "D03",
+      "title": "Disappearing unselected edges and blend contacts",
+      "truck_status": "partial",
+      "priority": "P1",
+      "tags": [
+        "degenerate"
+      ],
+      "occt_scope": "Corner rebuilding and restricted-boundary handling.",
+      "truck_scope": "Ordinary chamfer construction rejects removing unselected edges or bevel contacts; narrow exceptions exist in specialized rim handling.",
+      "next_case": "Drive the chamfer across the exact limit where one unselected edge vanishes.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/ChFi3d/ChFi3d_Builder_CnCrn.cxx",
+          "find": "PerformMoreThreeCorner",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/modeling.rs",
+          "find": "an unselected edge, or a bevel contact",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/blend_limits.rs",
+          "find": "fn near_limit_chamfer",
+          "role": "test"
+        }
+      ],
+      "required_outcome": "Continue valid blending when an unselected edge or intermediate blend contact disappears, rebuilding local topology correctly."
+    },
+    {
+      "id": "D04",
+      "title": "Folded offsets and overlapping blend patches",
+      "truck_status": "partial",
+      "priority": "P1",
+      "tags": [
+        "degenerate",
+        "self-intersection"
+      ],
+      "occt_scope": "Twisted-surface state and walking checks; failure remains possible.",
+      "truck_scope": "Regular-contact checks reject folded offsets. Rib patch overlap is rejected. No general recovery construction established.",
+      "next_case": "Increase radius through local curvature and overlap limits and require either a valid result or an actionable rejection.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/ChFiDS/ChFiDS_ErrorStatus.hxx",
+          "find": "ChFiDS_TwistedSurface",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-geometry/src/decorators/af_surface.rs",
+          "find": "fn regular_contact",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/additive.rs",
+          "find": "if overlap(axis)",
+          "role": "implementation"
+        }
+      ],
+      "required_outcome": "Produce a valid result where one exists as offsets fold or blend patches meet; reliably reject invalid or self-intersecting outcomes."
+    },
+    {
+      "id": "D05",
+      "title": "Contact crossing a trim loop or hole",
+      "truck_status": "partial",
+      "priority": "P1",
+      "tags": [
+        "chamfer",
+        "fillet"
+      ],
+      "occt_scope": "Walking uses domains, restrictions and endpoint intersections; boundary crossing has limitations.",
+      "truck_scope": "Some neighboring patch traversal works; planar contacts approaching holes are rejected.",
+      "next_case": "Put a hole or split trim boundary directly in the contact path, varying clearance across tolerance.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/BRepBlend/BRepBlend_Walking.hxx",
+          "find": "SetDomainsToRecadre",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/modeling.rs",
+          "find": "avoid holes within twice",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/chamfer_general.rs",
+          "find": "fn chamfers_reject_hole_collisions",
+          "role": "test"
+        }
+      ],
+      "required_outcome": "Handle blend contacts that reach trim boundaries or holes, producing the intended material boundary or an accurate geometric rejection."
+    },
+    {
+      "id": "D06",
+      "title": "Distant face/cavity collisions and global self-intersections",
+      "truck_status": "partial",
+      "priority": "P1",
+      "tags": [
+        "self-intersection"
+      ],
+      "occt_scope": "Local walking and topology construction do not establish universal collision correctness.",
+      "truck_scope": "The public contract excludes distant faces and other boundaries; there is no global blend collision/self-intersection check.",
+      "next_case": "A blend approaching a remote wall or cavity; independently test intersections and material membership in both outputs.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/BRepBlend/BRepBlend_Walking.hxx",
+          "find": "TwistOnS1",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/mod.rs",
+          "find": "do not perform a global collision",
+          "role": "implementation"
+        }
+      ],
+      "required_outcome": "Detect or resolve collisions with distant faces and cavities so a successful blend cannot silently leave an invalid or self-intersecting body."
+    },
+    {
+      "id": "N01",
+      "title": "Reliable contacts near singularities and competing solutions",
+      "truck_status": "partial",
+      "priority": "P1",
+      "tags": [
+        "fillet"
+      ],
+      "occt_scope": "Start-solution failure is distinct from walking failure.",
+      "truck_scope": "Newton/contact routines have guards and failures; branch coverage across complex supports remains unverified.",
+      "next_case": "Multiple possible contact branches, tangent end contacts and seeds near a singularity.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/ChFiDS/ChFiDS_ErrorStatus.hxx",
+          "find": "ChFiDS_StartsolFailure",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-geometry/src/decorators/rbf_surface/contact_circle.rs",
+          "find": "fn next_point",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/along_wire.rs",
+          "find": "find_contact",
+          "role": "implementation"
+        }
+      ],
+      "required_outcome": "Find the intended valid contact solution near singularities and competing branches without unstable branch jumps or false failures."
+    },
+    {
+      "id": "N02",
+      "title": "Accuracy through rapidly changing curvature",
+      "truck_status": "partial",
+      "priority": "P2",
+      "tags": [
+        "freeform",
+        "tolerance"
+      ],
+      "occt_scope": "Walking controls steps/deflection and approximation tolerances.",
+      "truck_scope": "Adaptive contact sampling and fitting exist; failed inserted samples propagate.",
+      "next_case": "High-curvature spike between initial samples, long/short edge ratios and tight tolerance.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/BRepBlend/BRepBlend_Walking.hxx",
+          "find": "CheckDeflection",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-geometry/src/decorators/af_surface.rs",
+          "find": "fn adaptive_contact_failure_is_propagated",
+          "role": "test"
+        }
+      ],
+      "required_outcome": "Maintain requested geometric accuracy through rapidly changing curvature and unequal feature scales without missed contact failures."
+    },
+    {
+      "id": "N03",
+      "title": "Pcurve domains, periodic parameters and seam endpoints",
+      "truck_status": "partial",
+      "priority": "P1",
+      "tags": [
+        "periodic-seam"
+      ],
+      "occt_scope": "Dedicated periodic/singular extrema and parameter repairs.",
+      "truck_scope": "Some exact conic seam handling and reversed-curve fixes exist; general paired seam coverage remains open.",
+      "next_case": "Reverse surface parameters and move the seam through the same physical geometry; verify every edge lies on both supports.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/ChFi3d/ChFi3d_Builder_2.cxx",
+          "find": "ChFi3d_SingularExtremity",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/boolean_hole_fillet.rs",
+          "find": "fn boolean_hole_rims",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/modeling.rs",
+          "find": "validate_geometry",
+          "role": "implementation"
+        }
+      ],
+      "required_outcome": "Keep blend boundaries on both supports and close them correctly when surface parameters, orientations or seam positions change."
+    },
+    {
+      "id": "N04",
+      "title": "Almost tangent and nearly coplanar edges",
+      "truck_status": "partial",
+      "priority": "P1",
+      "tags": [
+        "tangent",
+        "tolerance"
+      ],
+      "occt_scope": "Angular tolerances and almost-smooth-edge regressions.",
+      "truck_scope": "App propagation uses a fixed normal/tangent dot threshold; coplanar chamfers are rejected.",
+      "next_case": "Sweep dihedral angle and tangent discontinuity across each threshold at multiple scales.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "tests/bugs/modalg_7/bug31030",
+          "find": "almost smooth edge",
+          "role": "test"
+        },
+        {
+          "repo": "app",
+          "path": "cad-core/src/kernel/blend.rs",
+          "find": "1.0 - 1.0e-8",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/chamfer_general.rs",
+          "find": "fn a_flat_face_seam",
+          "role": "test"
+        }
+      ],
+      "required_outcome": "Handle nearly tangent and nearly coplanar selections consistently around tolerance thresholds, without invalid output or unstable propagation."
+    },
+    {
+      "id": "N05",
+      "title": "Near-limit sizes and tiny retained features",
+      "truck_status": "implemented-with-tests",
+      "priority": "P1",
+      "tags": [
+        "tolerance"
+      ],
+      "occt_scope": "Tolerance/scale test grids and shape-tolerance assertions.",
+      "truck_scope": "Near-limit box fillet/chamfer regressions retain tiny valid faces. Broader sliver configurations remain unverified.",
+      "next_case": "Sweep just below, at and above size limits; translate far from the origin and repeat at different scales.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "tests/blend/tolblend_simple/begin",
+          "find": "tolblend",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/blend_limits.rs",
+          "find": "fn near_limit_fillet_retains_valid_small_faces",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/blend_limits.rs",
+          "find": "fn near_limit_chamfer",
+          "role": "test"
+        }
+      ],
+      "required_outcome": "Retain valid tiny features near blend size limits and reject sizes beyond the valid geometric range consistently across transforms and scales."
+    },
+    {
+      "id": "W01",
+      "title": "Sequential fillet/chamfer composition",
+      "truck_status": "partial",
+      "priority": "P1",
+      "tags": [
+        "sequential"
+      ],
+      "occt_scope": "Dedicated sequential chamfer grids and composition regressions.",
+      "truck_scope": "Many feature orders are tested; equal-radius sequential rim fillets and general topology transitions remain limited.",
+      "next_case": "Fillet→fillet, fillet→chamfer, chamfer→fillet and chamfer→chamfer with nearby and intersecting selections.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "tests/chamfer/dist_angle_sequence/begin",
+          "find": "chamf_sequence",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/sequential_blends.rs",
+          "find": "fn chamfer_then_fillet",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/R10-sequential-fillet.rs",
+          "find": "fn sequential_radii_sizes_and_edge_orders",
+          "role": "test"
+        }
+      ],
+      "required_outcome": "Apply successive rounds and bevels to earlier feature results with correct dimensions, valid topology and stable selections."
+    },
+    {
+      "id": "W02",
+      "title": "Simultaneous straight and curved selections",
+      "truck_status": "unverified",
+      "priority": "P1",
+      "tags": [
+        "sequential",
+        "freeform"
+      ],
+      "occt_scope": "All added contours are passed to one builder with junction construction.",
+      "truck_scope": "Pieza processes straight selections and curved chains in separate sequential groups. That implementation choice is acceptable if it delivers the requested joint geometry and stable selection behavior; an outcome difference has not been demonstrated here.",
+      "next_case": "Apply the same mixed selection in varied enumeration orders. Compare dimensions, junction continuity, validity and edited results; flag only demonstrated failures or differences in those outcomes.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/BRepFilletAPI/BRepFilletAPI_MakeFillet.hxx",
+          "find": "all the contours",
+          "role": "implementation"
+        },
+        {
+          "repo": "app",
+          "path": "cad-core/src/kernel/blend.rs",
+          "find": "groups.sort_by_key",
+          "role": "implementation"
+        }
+      ],
+      "required_outcome": "Apply one requested selection containing straight and curved edges with the intended joined result, independent of selection enumeration order."
+    },
+    {
+      "id": "W03",
+      "title": "Blends on Boolean-generated intersections",
+      "truck_status": "implemented-with-tests",
+      "priority": "P1",
+      "tags": [
+        "fillet",
+        "cylinder"
+      ],
+      "occt_scope": "Boolean/blend combinations and regression fixtures.",
+      "truck_scope": "Boolean-created hole rims and channel lips have tests; arbitrary Boolean spline intersections need more coverage.",
+      "next_case": "Pair through/blind holes, rotated channels, tangent cuts and spline intersection edges.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/BRepTest/BRepTest_FilletCommands.cxx",
+          "find": "\"bfuseblend\"",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/boolean_hole_fillet.rs",
+          "find": "fn boolean_hole_rims",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/channel_rim_blends.rs",
+          "find": "fn connected_channel_rims",
+          "role": "test"
+        }
+      ],
+      "required_outcome": "Blend physically selected intersection edges created by Boolean operations and preserve valid solid geometry."
+    },
+    {
+      "id": "W04",
+      "title": "Stable references after topology edits",
+      "truck_status": "partial",
+      "priority": "P2",
+      "tags": [
+        "history"
+      ],
+      "occt_scope": "Generated/modified/deleted queries and OCAF recomputation tests.",
+      "truck_scope": "Face ancestry and regression tests support reference persistence through some changes. Coverage after splits, deletions and replacements remains partial; matching OCCT history-query methods is unnecessary.",
+      "next_case": "Upstream edit after a face splits/disappears; re-resolve every selected edge and generated face.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/BRepFilletAPI/BRepFilletAPI_MakeFillet.hxx",
+          "find": "IsDeleted",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/modeling.rs",
+          "find": "pub struct BlendResult",
+          "role": "implementation"
+        },
+        {
+          "repo": "app",
+          "path": "cad-core/tests/blends.rs",
+          "find": "fn a_fillet_reference_survives_a_boss",
+          "role": "test"
+        }
+      ],
+      "required_outcome": "Keep downstream references attached to their intended geometry after upstream edits split, replace or remove blend topology."
+    },
+    {
+      "id": "W05",
+      "title": "Closed meshes, STEP and downstream modeling",
+      "truck_status": "implemented-with-tests",
+      "priority": "P2",
+      "tags": [
+        "fillet",
+        "chamfer"
+      ],
+      "occt_scope": "Shape, property, tolerance and downstream operation checks across the corpus.",
+      "truck_scope": "Common blend checks cover topology, meshes, volume, STEP and selected Boolean operations. These do not alone prove absence of all self-intersections.",
+      "next_case": "For each paired case, validate the result before and after STEP and a small downstream cut.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "tests/bugs/modalg_7/bug30940_2",
+          "find": "checkmaxtol",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/modeling_blends.rs",
+          "find": "fn curved_chain_survives_transform_serialization_and_step",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/common/mod.rs",
+          "find": "pub fn assert_solid",
+          "role": "test-helper"
+        }
+      ],
+      "required_outcome": "Deliver blend results usable for closed meshing, STEP interchange and further modeling while preserving dimensions and validity."
+    },
+    {
+      "id": "W06",
+      "title": "Actionable failures and recovery",
+      "truck_status": "partial",
+      "priority": "P2",
+      "tags": [
+        "fillet"
+      ],
+      "occt_scope": "Faulty contour/vertex queries, stripe status and optional partial result.",
+      "truck_scope": "Structured diagnostics identify stages, selections and stations; some fallback paths retain an earlier error. Validate whether users can locate and correct a failure. An OCCT-style partial-result object is not required.",
+      "next_case": "Mix one invalid selection into a valid operation; check that diagnostics identify the cause, the input remains intact and correction/retry succeeds.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/BRepFilletAPI/BRepFilletAPI_MakeFillet.hxx",
+          "find": "NbFaultyContours",
+          "role": "implementation"
+        },
+        {
+          "repo": "occt",
+          "path": "src/BRepFilletAPI/BRepFilletAPI_MakeFillet.hxx",
+          "find": "BadShape",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/diagnostics.rs",
+          "find": "fn variable_radius_failure_identifies",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/modeling.rs",
+          "find": "map_err(|_| error)",
+          "role": "implementation"
+        }
+      ],
+      "required_outcome": "Explain failed selections and stages clearly, preserve the model and allow the user to correct or retry a failed blend."
+    },
+    {
+      "id": "W07",
+      "title": "Invalid selections, parameters and immutable failure",
+      "truck_status": "implemented-with-tests",
+      "priority": "P2",
+      "tags": [
+        "fillet",
+        "chamfer"
+      ],
+      "occt_scope": "Error reporting and robustness regressions, including invalid geometry.",
+      "truck_scope": "Selection, nonfinite parameter, tolerance and input-preservation checks exist.",
+      "next_case": "Empty/duplicate/stale edges, zero/negative/NaN sizes and nonmanifold input; no panic or input mutation.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/ChFiDS/ChFiDS_ErrorStatus.hxx",
+          "find": "ChFiDS_Error",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/diagnostics.rs",
+          "find": "fn blend_selection_errors_are_actionable",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/diagnostics.rs",
+          "find": "fn invalid_parameters_preserve",
+          "role": "test"
+        }
+      ],
+      "required_outcome": "Handle invalid, empty, duplicate or stale selections and invalid numeric parameters deterministically without panic or input mutation."
+    },
+    {
+      "id": "W08",
+      "title": "Face-driven rolling ball and stopping faces",
+      "truck_status": "unverified",
+      "priority": "P3",
+      "tags": [
+        "face-rolling-ball"
+      ],
+      "occt_scope": "Separate BiTgte interface permits face pairs, selected edges and stopping faces.",
+      "truck_scope": "Existing product blends start from selected edges or face boundaries. The broader face-to-face result with stopping faces is unverified; the absence of matching methods alone is not a capability finding.",
+      "next_case": "Use a face-pair fixture with an explicit stopping face and attempt equivalent existing constructions; judge the support contacts, termination and editable result.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/BiTgte/BiTgte_Blend.hxx",
+          "find": "SetStoppingFace",
+          "role": "implementation"
+        },
+        {
+          "repo": "app",
+          "path": "cad-core/src/kernel/blend.rs",
+          "find": "pub fn blend_face_edges",
+          "role": "implementation"
+        }
+      ],
+      "required_outcome": "Construct a round between selected support faces and terminate it at specified limiting faces, through any equivalent feature construction."
+    },
+    {
+      "id": "W09",
+      "title": "Boolean and blend composition",
+      "truck_status": "implemented-with-tests",
+      "priority": "P3",
+      "tags": [
+        "boolean-blend"
+      ],
+      "occt_scope": "DRAW wrappers expose fuse/cut plus blend.",
+      "truck_scope": "Existing Boolean and blend operations compose, with regression coverage for selected generated hole rims. A combined wrapper is not a separate feature requirement; broader intersection geometry is tracked under W03.",
+      "next_case": "Check fuse and cut results followed by blending their intended intersection edges, including subsequent edits. Reuse W03 geometry coverage; do not add a wrapper just to match DRAW.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/BRepTest/BRepTest_FilletCommands.cxx",
+          "find": "\"bcutblend\"",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/boolean_hole_fillet.rs",
+          "find": "fn boolean_hole_rims",
+          "role": "test"
+        }
+      ],
+      "required_outcome": "Fuse or cut bodies, then blend the intended resulting intersection edges while preserving the modeling intent through edits."
+    },
+    {
+      "id": "S01",
+      "title": "2D line/arc fillets",
+      "truck_status": "partial",
+      "priority": "P3",
+      "tags": [
+        "2d"
+      ],
+      "occt_scope": "Analytic and iterative planar fillet APIs.",
+      "truck_scope": "Pieza has sketch corner filleting using offset/intersection candidates; separate from the 3D kernel API.",
+      "next_case": "Line-line, line-circle and circle-circle corners, both sides, small/large radii and trimmed domains.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/ChFi2d/ChFi2d_FilletAPI.hxx",
+          "find": "class ChFi2d_FilletAPI",
+          "role": "implementation"
+        },
+        {
+          "repo": "app",
+          "path": "cad-core/src/sketch/edit.rs",
+          "find": "fn rounding",
+          "role": "implementation"
+        },
+        {
+          "repo": "app",
+          "path": "cad-core/src/sketch/edit.rs",
+          "find": "fn a_fillet_rounds_a_corner",
+          "role": "test"
+        }
+      ],
+      "required_outcome": "Round trimmed planar line/arc corners to the requested radius and chosen side, retaining connected sketch geometry."
+    },
+    {
+      "id": "S02",
+      "title": "2D general curves and multiple solutions",
+      "truck_status": "unverified",
+      "priority": "P3",
+      "tags": [
+        "2d",
+        "freeform"
+      ],
+      "occt_scope": "Iterative fillets and solution-selection APIs cover broader curve configurations.",
+      "truck_scope": "Complete sketch parity for spline/ellipse corners, multiple solutions and extension is unverified.",
+      "next_case": "Exercise all fillet2d fixtures and distinguish underlying-curve solutions from trimmed-edge solutions.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/ChFi2d/ChFi2d_FilletAlgo.hxx",
+          "find": "class ChFi2d_FilletAlgo",
+          "role": "implementation"
+        },
+        {
+          "repo": "app",
+          "path": "cad-core/src/sketch/edit.rs",
+          "find": "fn parallels",
+          "role": "implementation"
+        },
+        {
+          "repo": "app",
+          "path": "cad-core/src/sketch/meet.rs",
+          "find": "fn sampled",
+          "role": "implementation"
+        }
+      ],
+      "required_outcome": "Round general planar curve corners with the intended radius, trimmed domains and selected solution when several are possible."
+    },
+    {
+      "id": "S03",
+      "title": "2D chamfers and corner edits",
+      "truck_status": "unverified",
+      "priority": "P3",
+      "tags": [
+        "2d",
+        "chamfer"
+      ],
+      "occt_scope": "Planar chamfer API and fillet/chamfer modification/removal in MakeFillet2d.",
+      "truck_scope": "A parametric sketch-chamfer workflow has not been established in the inspected code. Existing sketch edits may construct some equivalent geometry; validate dimensional intent and later edits before classifying the feature as covered or missing.",
+      "next_case": "Create line-line chamfers with setbacks or angle, then change and remove them while retaining connectivity and constraints. Evaluate existing sketch edits as a possible equivalent route.",
+      "evidence": [
+        {
+          "repo": "occt",
+          "path": "src/ChFi2d/ChFi2d_ChamferAPI.hxx",
+          "find": "class ChFi2d_ChamferAPI",
+          "role": "implementation"
+        },
+        {
+          "repo": "occt",
+          "path": "src/BRepFilletAPI/BRepFilletAPI_MakeFillet2d.hxx",
+          "find": "RemoveChamfer",
+          "role": "implementation"
+        },
+        {
+          "repo": "app",
+          "path": "cad-core/src/sketch/edit.rs",
+          "find": "pub fn fillet(",
+          "role": "implementation"
+        }
+      ],
+      "required_outcome": "Create and edit planar sketch chamfers with specified setbacks or angles, maintaining connectivity and edit behavior."
+    }
+  ]
+}

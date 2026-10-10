@@ -125,6 +125,8 @@ pub fn try_fillet_solid_along_wire<R: ScalarFunctionD1>(
 /// curved end faces. Connected channel rims meet at exact intersections of the blend
 /// surfaces, including elliptical miters between equal-radius cylinders. Contacts may
 /// extend across adjacent end-face patches while preserving the original support surfaces.
+/// This intersection construction also handles drafted planar rim junctions and recognizes
+/// planar B-spline and positive-weight NURBS supports without changing their representation.
 /// A single selected edge may end at several planar faces, such as the miter between two
 /// earlier chamfers; its cylindrical round is trimmed against each face. Other selected
 /// edges can still meet at three-edge spherical corners in the same operation.

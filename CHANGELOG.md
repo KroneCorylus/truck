@@ -6,6 +6,10 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Recognize planar B-spline and positive-weight NURBS control nets in straight-edge fillet/chamfer construction. Drafted rim blends now work on equivalent spline representations, including cavity boundaries, while retaining their support surfaces and planar trim checks. Regressions cover both draft directions, two-edge and closed rims, exact volume, contact radius/tangency, transforms, scaling, selection order, immutable rejection and STEP round trips.
+
+- Add a reproducible fillet/chamfer feature parity audit against OCCT V7_9_3: 50 capability assessments and one implementation reference, all dedicated suite entries and related regressions, with source evidence, fixture dependencies and an offline searchable catalog. Assess geometric results and modeling behavior independently of API or implementation choices; measured geometry comparisons remain unverified.
+
 - Reuse predicted surface parameters when checking sampled curve inclusion, including fillet boundaries. Keep all 33 samples per edge and validate finite parameters, parameter ranges and geometric residuals before accepting a seeded solve; fall back to the existing global search on failure or across seams.
 - Extend analytic through-hole subtraction to batches of disjoint parallel cylindrical cutters. Verify complete outward cutter shells and separation, collect all openings before rebuilding the cap faces, and preserve unaffected faces and material-removal reporting. Unsupported or ambiguous batches use the general Boolean solver.
 - Subtract isolated cylindrical through-holes analytically from single prismatic modeling bodies. Check disk clearance and material winding, reuse exact plane/cylinder sections, and retain every unaffected face. Native circular extrusions and line/circle cap boundaries are supported; contacts, overlapping or blind cuts, cavities, multiple target shells and unsupported geometry use the existing Boolean solver. Regressions cover transformed sequences, reversed axes, concave outlines, thin walls, STEP export and subsequent general cuts.

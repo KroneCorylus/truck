@@ -623,7 +623,8 @@ impl Surface {
     /// Recognised: a plane; a stored sphere under a similarity transform; an extruded round circle along its own axis; a revolved line
     /// parallel to the axis (cylinder), perpendicular to it (plane) or meeting it (cone); a
     /// revolved round circle in a plane through the axis, centred on the axis (sphere) or off
-    /// it (torus); and a clamped rational quadratic patch ruled along a circular section.
+    /// it (torus); a clamped rational quadratic patch ruled along a circular section;
+    /// and regular planar B-spline or positive-weight NURBS patches.
     pub fn elementary(&self) -> Option<(Elementary, bool)> {
         let elementary = match self {
             Surface::Plane(plane) => return Some((Elementary::Plane(*plane), true)),
@@ -633,7 +634,26 @@ impl Surface {
             }
             .transformed(*surface.transform())?,
             Surface::Extruded(surface) => extruded_elementary(surface)?,
-            Surface::NurbsSurface(surface) => nurbs_cylinder(surface)?,
+            Surface::BSplineSurface(surface) => {
+                spline_plane(self, surface.control_points().iter().flatten().copied())?
+            }
+            Surface::NurbsSurface(surface) => nurbs_cylinder(surface).or_else(|| {
+                let points = surface.non_rationalized().control_points();
+                if points
+                    .iter()
+                    .flatten()
+                    .any(|p| !p.w.is_finite() || p.w <= 0.)
+                {
+                    return None;
+                }
+                spline_plane(
+                    self,
+                    points
+                        .iter()
+                        .flatten()
+                        .map(|p| Point3::from_vec(p.truncate() / p.w)),
+                )
+            })?,
             Surface::RevolutedCurve(surface) => {
                 revolved_elementary(surface.entity())?.transformed(*surface.transform())?
             }
@@ -647,6 +667,35 @@ impl Surface {
             .dot(elementary.canonical_direction(self.subs(u, v)));
         Some((elementary, outward > 0.0))
     }
+}
+
+fn spline_plane(surface: &Surface, points: impl Iterator<Item = Point3>) -> Option<Elementary> {
+    let (u, v) = surface.try_range_tuple();
+    let (u, v) = (u?, v?);
+    let (u, v) = ((u.0 + u.1) / 2., (v.0 + v.1) / 2.);
+    let origin = surface.subs(u, v);
+    let x = surface.uder(u, v);
+    let y = surface.vder(u, v);
+    let normal = surface.normal(u, v).normalize();
+    if !origin.to_vec().magnitude2().is_finite()
+        || !x.magnitude2().is_finite()
+        || !y.magnitude2().is_finite()
+        || !normal.magnitude2().is_finite()
+    {
+        return None;
+    }
+    // Coplanar control points establish the entire spline's plane, not just sample points.
+    if !points
+        .into_iter()
+        .all(|p| p.to_vec().magnitude2().is_finite() && (p - origin).dot(normal).abs() <= TOLERANCE)
+    {
+        return None;
+    }
+    Some(Elementary::Plane(Plane::new(
+        origin,
+        origin + x,
+        origin + y,
+    )))
 }
 
 impl Elementary {

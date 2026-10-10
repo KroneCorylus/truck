@@ -299,3 +299,79 @@ fn other_surfaces_are_not_elementary() {
     let elliptic = Surface::Extruded(ExtrudedCurve::by_extrusion(ellipse, Vector3::unit_z()));
     assert!(elliptic.elementary().is_none());
 }
+
+#[test]
+fn planar_splines_keep_their_plane_under_weights_transforms_and_orientation() {
+    let points: Vec<Vec<_>> = (0..3)
+        .map(|i| {
+            (0..3)
+                .map(|j| Point3::new(i as f64, j as f64, (2 * i + j) as f64))
+                .collect()
+        })
+        .collect();
+    let spline = BSplineSurface::new((KnotVec::bezier_knot(2), KnotVec::bezier_knot(2)), points);
+    let mut rational = NurbsSurface::from(spline.clone());
+    for (i, p) in rational
+        .non_rationalized_mut()
+        .control_points_mut()
+        .enumerate()
+    {
+        *p *= 0.5 + i as f64;
+    }
+    let transform = Matrix4::from_translation(Vector3::new(13., -7., 23.))
+        * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.73))
+        * Matrix4::from_nonuniform_scale(2., 0.5, 3.);
+    for original in [
+        Surface::BSplineSurface(spline),
+        Surface::NurbsSurface(rational),
+    ] {
+        for placed in [original.clone(), original.transformed(transform)] {
+            for surface in [placed.clone(), placed.inverse()] {
+                let (Elementary::Plane(plane), forward) = surface.elementary().unwrap() else {
+                    panic!("a coplanar control net must describe a plane")
+                };
+                let normal = plane.normal().normalize() * if forward { 1. } else { -1. };
+                for u in [0., 0.2, 0.7, 1.] {
+                    for v in [0., 0.3, 0.8, 1.] {
+                        assert!((surface.subs(u, v) - plane.origin()).dot(normal).abs() < EPS);
+                        assert!(normal.dot(surface.normal(u, v).normalize()) > 1. - EPS);
+                    }
+                }
+            }
+        }
+    }
+}
+
+#[test]
+fn warped_degenerate_and_singular_splines_are_not_planes() {
+    let knots = (KnotVec::bezier_knot(2), KnotVec::bezier_knot(2));
+    let points: Vec<Vec<_>> = (0..3)
+        .map(|i| {
+            (0..3)
+                .map(|j| Point3::new(i as f64, j as f64, 0.))
+                .collect()
+        })
+        .collect();
+    let mut warped = points.clone();
+    warped[1][1].z = 0.01;
+    let spline = BSplineSurface::new(knots.clone(), warped);
+    for surface in [
+        Surface::BSplineSurface(spline.clone()),
+        Surface::NurbsSurface(spline.into()),
+    ] {
+        assert!(surface.elementary().is_none());
+    }
+    let degenerate = BSplineSurface::new(knots.clone(), vec![vec![Point3::origin(); 3]; 3]);
+    assert!(Surface::BSplineSurface(degenerate).elementary().is_none());
+    let base: NurbsSurface<Vector4> = NurbsSurface::from(BSplineSurface::new(knots, points));
+    for weight in [0., -1., f64::NAN] {
+        let mut singular = base.clone();
+        singular
+            .non_rationalized_mut()
+            .control_points_mut()
+            .nth(4)
+            .unwrap()
+            .w = weight;
+        assert!(Surface::NurbsSurface(singular).elementary().is_none());
+    }
+}

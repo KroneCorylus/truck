@@ -35,6 +35,7 @@ changing anything.
 - [DIAGNOSTICS.md](DIAGNOSTICS.md): error codes and the `try_*` APIs.
 - [BENCHMARKS.md](BENCHMARKS.md): how to measure performance, and reference numbers.
 - [CHANGELOG.md](CHANGELOG.md): every change, with breaking changes marked.
+- [Fillet/chamfer audit](audits/fillet-chamfer/catalog.html): OCCT cases, required geometric outcomes, Truck/Pieza feature coverage and reproduction commands. Open the HTML locally for the searchable viewer.
 - Crate docs: `cargo doc --open -p <crate>`.
 
 ## Building and testing

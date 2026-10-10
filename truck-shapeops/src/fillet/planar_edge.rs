@@ -42,9 +42,12 @@ pub(super) fn blend_edges(
         {
             return Err(error(Code::UnsupportedGeometry));
         }
-        let curved = [a, b]
-            .iter()
-            .any(|&i| !matches!(shell[i].oriented_surface(), Surface::Plane(_)));
+        let curved = [a, b].iter().any(|&i| {
+            !matches!(
+                shell[i].surface().elementary(),
+                Some((Elementary::Plane(_), _))
+            )
+        });
         work.push((
             !curved,
             a,
@@ -260,22 +263,26 @@ pub(super) fn blend(
                 continue;
             }
             let direction = v1.point() - v0.point();
-            let exact = match (&wall, &surface) {
-                (Surface::Plane(_), Surface::Plane(_)) => {
+            let exact = match (wall.elementary(), surface.elementary()) {
+                (Some((Elementary::Plane(_), _)), Some((Elementary::Plane(_), _))) => {
                     Some(Curve::Line(Line(v0.point(), v1.point())))
                 }
-                (Surface::Plane(plane), _) => super::projected_section::projected_section(
-                    &surface,
-                    *plane,
-                    v0.point(),
-                    v1.point(),
-                ),
-                (_, Surface::Plane(plane)) => super::projected_section::projected_section(
-                    &wall,
-                    *plane,
-                    v0.point(),
-                    v1.point(),
-                ),
+                (Some((Elementary::Plane(plane), _)), _) => {
+                    super::projected_section::projected_section(
+                        &surface,
+                        plane,
+                        v0.point(),
+                        v1.point(),
+                    )
+                }
+                (_, Some((Elementary::Plane(plane), _))) => {
+                    super::projected_section::projected_section(
+                        &wall,
+                        plane,
+                        v0.point(),
+                        v1.point(),
+                    )
+                }
                 _ => cylinder_miter(&wall, &surface, [v0.point(), v1.point()]).and_then(|plane| {
                     super::projected_section::projected_section(
                         &surface,
@@ -382,8 +389,9 @@ pub(super) fn blend(
             result.push(face.clone());
             continue;
         }
-        if let Surface::Plane(plane) = face.oriented_surface() {
-            if !valid_boundaries(face, &boundaries, plane.normal().normalize(), tol) {
+        if let Some((Elementary::Plane(plane), forward)) = face.oriented_surface().elementary() {
+            let normal = plane.normal().normalize() * if forward { 1. } else { -1. };
+            if !valid_boundaries(face, &boundaries, normal, tol) {
                 return Err(error(Code::OutsideNeighbour).face(f));
             }
         }
