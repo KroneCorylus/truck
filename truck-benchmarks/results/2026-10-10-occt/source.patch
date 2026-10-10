@@ -1,0 +1,1214 @@
+diff --git a/BENCHMARKS.md b/BENCHMARKS.md
+index 6a2fe439..7abe4126 100644
+--- a/BENCHMARKS.md
++++ b/BENCHMARKS.md
+@@ -1,5 +1,117 @@
+ # CPU action benchmarks
+ 
++## Direct OpenCascade comparison
++
++`truck-benchmarks/scripts/compare_occt.py` compares our native Rust kernel with a small
++C++ runner linked directly to OCCT. It does not launch FreeCAD or include Python calls
++inside an operation timer. The existing FreeCAD/document suite below remains useful for
++application-level workflows.
++
++On Linux, install CMake, a C++17 compiler, and OCCT development headers/libraries (7.8 or
++newer, including `TKDESTEP`). Python uses only its standard library. The Rust example uses
++the workspace's existing `serde_json` version for diagnostic records; no production crate
++or production dependency changes.
++
++From the Truck checkout:
++
++```bash
++python3 truck-benchmarks/scripts/compare_occt.py \
++  --output truck-benchmarks/results/2026-10-10-occt \
++  --samples 15 --rounds 2 --workers 1,4 --cpus 0,1,2,3
++
++# Quick smoke check, or narrow a run with --filter thread.
++python3 truck-benchmarks/scripts/compare_occt.py \
++  --output target/occt-smoke-new --samples 1 --rounds 1 --workers 1 --cpus 0
++
++python3 -m unittest discover -s truck-benchmarks/scripts -p test_compare_occt.py
++```
++
++Output directories must be new. Pick available physical CPUs on your machine; the defaults
++are cores 0–3 in one L3 domain on this workstation. Every subprocess is pinned to that same
++set. OCCT uses its native thread pool, limited to the requested worker count; its Boolean
++and mesh parallelism is disabled with one worker. Truck uses `RAYON_NUM_THREADS`. These are
++resource limits, not a claim of identical parallel algorithms.
++
++If headers/libraries are outside the system search path, pass `--occt-include /path/to/include/opencascade`
++and `--occt-lib /path/to/lib`. CMake stores those paths in `target/occt-comparison`.
++On this Fedora workstation, OCCT 7.9.3 runtime libraries were already installed. Matching
++`opencascade-devel-7.9.3-4.fc44.1.x86_64` headers were extracted under `target/occt-sdk`;
++its development library symlinks point to the installed `/usr/lib64` runtime libraries.
++The report's CMake cache records these local build paths. No system package changes are
++required when using an existing matching SDK this way.
++
++The 20 cases are:
++
++| Case | Geometry and timed operation |
++|---|---|
++| `holes_batch/{1,10,30,100}` | Existing plate/cylindrical cutters, one compound subtraction |
++| `holes_sequential/{1,10,30,100}` | Same material removal, one subtraction per hole |
++| `knurl/{16,64,128}` | Radius 12, height 8 cylinder; disjoint triangular cutters form axial grooves of depth 0.35 |
++| `thread/{1,4}` | External 60° thread on radius 4 shaft, pitch 1.25, depth 0.4, root flat pitch/8; one Boolean subtraction |
++| `near_tangent/{0.01,0.001}` | Intersection of radius 1, height 2 cylinders with the specified radial overlap |
++| `thin_wall/{0.1,0.01}` | Radius 4, height 8 cylinder bored through to the specified wall thickness |
++| `fillet_bore/0.5` | Round the upper radius-3 through-hole rim in a 20 × 20 × 10 block |
++| `mesh_plate/{1,100}` | Fresh triangulation and triangle extraction of the existing perforated plate |
++
++All dimensions are millimetres. Knurl cutters clear the stock but stay inside disjoint
++angular sectors; this is straight knurling, not a diamond knurl. Thread operands use Truck's
++native rational spline cutter; the helper exports it to STEP and OCCT imports/checks it
++outside the timer. Standard STEP transfer may heal geometry. The representations and face
++counts can differ, so this is a matched workload rather than identical instruction streams.
++
++Every case has an analytic expected volume. Thread volume integrates the groove's linear
++60° flank over radius, for an integer number of turns; tools extend one pitch beyond each
++end. Knurl volume sums each triangular notch plus its circular segment. Neither expected
++volume is copied from either kernel's answer.
++
++Each engine/case/worker configuration first runs an untimed preflight in its own process.
++Only passing preflights proceed to timing. Each timed process reconstructs its fixtures,
++performs one warmup, records the requested raw samples, then validates the last output.
++Final-output destruction is outside the timer, while intermediate work is included. OCCT
++booleans use non-destructive inputs and native tolerances with `--fuzzy 0` by default.
++`--tolerance 0.001` controls Truck operations and both engines' absolute mesh deflection;
++those settings are not equivalent geometric error guarantees. OCCT meshing uses a loose
++π angular cap and copies the input topology without cached triangulations inside the timer.
++
++Validation requires closed topology, native geometry consistency, complete closed oriented
++meshes, positive volume and analytic volume error at most **0.2%**. Truck uses
++`is_geometric_consistent`; OCCT uses `BRepCheck_Analyzer` with geometric/exact checks and
++also integrates B-rep volume. Both merge coincident mesh positions at 1e-8 mm for closure
++checks. The default QA mesh deflection is 0.001 mm, tightened to overlap/10000 for near
++tangencies and wall/1000 for thin walls, with a shared 1e-6 mm floor (Truck's tessellation
++minimum). CLI operation and QA tolerances must also be at least 1e-6 mm. This avoids judging small volumes using a coarse
++validation mesh; it does not change the timed operation. Meshing cases validate the actual
++timed mesh. These checks do not certify all surface deviations or equivalent topology.
++
++Both engines must pass every round and agree on final mesh volume within 0.2% to earn a
++ratio. Failures, panics, malformed output, missing samples and timeouts remain explicit;
++failed preflights produce skipped timing rows. `--timeout` (default 180 seconds) bounds each
++whole case process, including fixture setup and QA. A timeout therefore does not establish
++an operation-latency lower bound. Timing records are flushed before QA so evidence survives
++a subsequent validation timeout.
++
++Builds and measurements run sequentially; every second timed round reverses execution
++order. The report gives median of round medians, empirical P95, maximum and raw samples.
++P95 from a small sample is descriptive, not a reliable tail guarantee. Peak RSS is read
++before output QA, but includes process setup, libraries, warmup, thread pools and retained
++outputs; thread setup also includes OCCT's STEP import/check. No aggregate speedup is computed.
++
++The output preserves raw logs, `records.jsonl`, `metadata.json`, `summary.json`, `REPORT.md`,
++input STEP files/hashes, source hashes, tracked and untracked source patches, `Cargo.lock`,
++CMake settings, compiler versions and linked-library paths. Sources and binaries should
++remain unchanged during a run. Rebuild a report without measurements using:
++
++```bash
++python3 truck-benchmarks/scripts/compare_occt.py \
++  --output truck-benchmarks/results/2026-10-10-occt --report-only
++```
++
++OCCT reference contracts: [Boolean operations](https://occt3d.com/dev/doc/refman/html/class_b_rep_algo_a_p_i___cut.html),
++[shape validation](https://occt3d.com/dev/doc/refman/html/class_b_rep_check___analyzer.html),
++and [volume integration](https://occt3d.com/dev/doc/refman/html/class_b_rep_g_prop.html).
++
++## Existing action suite
++
+ The [2026-09-20 fillet-search comparison](truck-benchmarks/results/2026-09-20/REPORT.md)
+ records the rolling-fillet optimization and its effect on the application's threaded box.
+ 
+diff --git a/truck-benchmarks/Cargo.toml b/truck-benchmarks/Cargo.toml
+index e0224221..ede7af09 100644
+--- a/truck-benchmarks/Cargo.toml
++++ b/truck-benchmarks/Cargo.toml
+@@ -10,6 +10,7 @@ allocations = []
+ 
+ [dev-dependencies]
+ divan = "0.1.21"
++serde_json = "1.0.151"
+ truck-modeling = { path = "../truck-modeling" }
+ truck-shapeops = { path = "../truck-shapeops", default-features = false }
+ truck-meshalgo = { path = "../truck-meshalgo" }
+diff --git a/truck-benchmarks/examples/compare_occt.rs b/truck-benchmarks/examples/compare_occt.rs
+new file mode 100644
+index 00000000..eddff776
+--- /dev/null
++++ b/truck-benchmarks/examples/compare_occt.rs
+@@ -0,0 +1,335 @@
++//! Native counterpart of occt/main.cpp. See scripts/compare_occt.py.
++#[allow(dead_code)]
++#[path = "../benches/fixtures.rs"]
++mod fixtures;
++
++use serde_json::{json, Value};
++use std::{
++    f64::consts::{PI, TAU},
++    hint::black_box,
++    path::Path,
++    time::Instant,
++};
++use truck_meshalgo::prelude::*;
++use truck_modeling::*;
++use truck_shapeops::{
++    fillet::try_fillet_solid_along_wire,
++    thread::{thread_groove, ThreadGroove},
++};
++
++enum Output {
++    Solid(Solid),
++    Mesh(PolygonMesh),
++}
++
++struct Case {
++    run: Box<dyn Fn() -> Output>,
++    expected: f64,
++    qa_tol: f64,
++}
++
++fn cylinder(radius: f64, height: f64, center: Point3) -> Solid {
++    let disc = builder::try_attach_plane(vec![fixtures::circle(center, radius)]).unwrap();
++    builder::tsweep(&disc, Vector3::unit_z() * height)
++}
++
++fn compound(solids: &[Solid]) -> Solid {
++    Solid::new(
++        solids
++            .iter()
++            .flat_map(|s| s.boundaries().iter().cloned())
++            .collect(),
++    )
++}
++
++fn thread_cutter(turns: usize) -> Solid {
++    thread_groove(ThreadGroove {
++        origin: Point3::new(0.0, 0.0, -1.25),
++        axis: Vector3::unit_z(),
++        radius: 4.0,
++        depth: 0.4,
++        pitch: 1.25,
++        length: (turns + 2) as f64 * 1.25,
++        internal: false,
++        left_handed: false,
++    })
++    .expect("thread cutter")
++}
++
++fn thread_volume(turns: usize) -> f64 {
++    let (r, root, pitch): (f64, f64, f64) = (4.0, 3.6, 1.25);
++    let radial_area = (r * r - root * root) / 2.0;
++    let radial_moment = (r.powi(3) - root.powi(3)) / 3.0 - root * radial_area;
++    turns as f64
++        * (PI * r * r * pitch
++            - 4.0 * PI * (pitch / 16.0 * radial_area + radial_moment / 3.0_f64.sqrt()))
++}
++
++fn knurl(count: usize) -> (Solid, Solid, f64) {
++    let (r, depth, height) = (12.0, 0.35, 8.0);
++    let half = PI / (2.0 * count as f64);
++    let outer_x = r - depth + 1.25 * (r * half.cos() - (r - depth));
++    let outer_y = 1.25 * r * half.sin();
++    assert!(outer_x > r && outer_y.atan2(outer_x) < PI / count as f64);
++    let p = Point3::new(r - depth, 0.0, -1.0);
++    let cutters: Vec<_> = (0..count)
++        .map(|i| {
++            let points = [
++                p,
++                p + (Point3::new(r * half.cos(), -r * half.sin(), -1.0) - p) * 1.25,
++                p + (Point3::new(r * half.cos(), r * half.sin(), -1.0) - p) * 1.25,
++            ];
++            let vertices = points.map(builder::vertex);
++            let wire: Wire = (0..3)
++                .map(|j| builder::line(&vertices[j], &vertices[(j + 1) % 3]))
++                .collect();
++            let face = builder::try_attach_plane(vec![wire]).unwrap();
++            builder::rotated(
++                &builder::tsweep(&face, Vector3::unit_z() * 10.0),
++                Point3::origin(),
++                Vector3::unit_z(),
++                Rad(TAU * i as f64 / count as f64),
++            )
++        })
++        .collect();
++    let removed = r * r * half - (r - depth) * r * half.sin();
++    (
++        cylinder(r, height, Point3::origin()),
++        compound(&cutters),
++        height * (PI * r * r - count as f64 * removed),
++    )
++}
++
++fn fixture(name: &str, tol: f64, qa_tol: f64) -> Case {
++    let (kind, parameter) = name.split_once('/').expect("case/parameter");
++    let n = || parameter.parse::<usize>().expect("integer parameter");
++    let scalar = || parameter.parse::<f64>().expect("numeric parameter");
++    let (run, expected, qa_tol): (Box<dyn Fn() -> Output>, f64, f64) = match kind {
++        "holes_batch" | "holes_sequential" => {
++            let (plate, cutters) = fixtures::plate_and_cutters(n());
++            let batch = compound(&cutters);
++            let sequential = kind == "holes_sequential";
++            (
++                Box::new(move || {
++                    Output::Solid(if sequential {
++                        cutters.iter().fold(plate.clone(), |s, c| {
++                            truck_shapeops::try_subtract(&s, c, tol).expect("subtract")
++                        })
++                    } else {
++                        truck_shapeops::try_subtract(&plate, &batch, tol).expect("subtract")
++                    })
++                }),
++                fixtures::plate_volume(n()),
++                qa_tol,
++            )
++        }
++        "knurl" => {
++            let (body, tool, volume) = knurl(n());
++            (
++                Box::new(move || {
++                    Output::Solid(
++                        truck_shapeops::try_subtract(&body, &tool, tol).expect("knurl subtraction"),
++                    )
++                }),
++                volume,
++                qa_tol,
++            )
++        }
++        "thread" => {
++            let body = cylinder(4.0, n() as f64 * 1.25, Point3::origin());
++            let tool = thread_cutter(n());
++            (
++                Box::new(move || {
++                    Output::Solid(
++                        truck_shapeops::try_subtract(&body, &tool, tol)
++                            .expect("thread subtraction"),
++                    )
++                }),
++                thread_volume(n()),
++                qa_tol,
++            )
++        }
++        "near_tangent" => {
++            let overlap = scalar();
++            let distance = 2.0 - overlap;
++            let a = cylinder(1.0, 2.0, Point3::origin());
++            let b = cylinder(1.0, 2.0, Point3::new(distance, 0.0, 0.0));
++            let area =
++                2.0 * (distance / 2.0).acos() - distance / 2.0 * (4.0 - distance * distance).sqrt();
++            (
++                Box::new(move || {
++                    Output::Solid(
++                        truck_shapeops::try_and(&a, &b, tol).expect("near tangent intersection"),
++                    )
++                }),
++                area * 2.0,
++                qa_tol.min(overlap / 10000.0).max(1e-6),
++            )
++        }
++        "thin_wall" => {
++            let wall = scalar();
++            let body = cylinder(4.0, 8.0, Point3::origin());
++            let tool = cylinder(4.0 - wall, 10.0, Point3::new(0.0, 0.0, -1.0));
++            (
++                Box::new(move || {
++                    Output::Solid(
++                        truck_shapeops::try_subtract(&body, &tool, tol).expect("thin wall"),
++                    )
++                }),
++                PI * (16.0 - (4.0 - wall).powi(2)) * 8.0,
++                qa_tol.min(wall / 1000.0),
++            )
++        }
++        "fillet_bore" => {
++            let radius = scalar();
++            let block = fixtures::cuboid(
++                Point3::new(-10.0, -10.0, 0.0),
++                Point3::new(10.0, 10.0, 10.0),
++            );
++            let tool = cylinder(3.0, 12.0, Point3::new(0.0, 0.0, -1.0));
++            let body = truck_shapeops::try_subtract(&block, &tool, tol).unwrap();
++            let rim = body
++                .face_iter()
++                .find(|f| {
++                    matches!(f.surface(), Surface::Plane(_))
++                        && f.vertex_iter().all(|v| (v.point().z - 10.0).abs() < 1e-6)
++                })
++                .unwrap()
++                .boundaries()
++                .into_iter()
++                .find(|w| w.iter().all(|e| !matches!(e.curve(), Curve::Line(_))))
++                .unwrap();
++            let removed = 2.0
++                * PI
++                * (3.0 * radius.powi(2) * (1.0 - PI / 4.0)
++                    + radius.powi(3) * (5.0 / 6.0 - PI / 4.0));
++            (
++                Box::new(move || {
++                    Output::Solid(
++                        try_fillet_solid_along_wire(&body, &rim, radius, tol)
++                            .expect("bore fillet")
++                            .solid,
++                    )
++                }),
++                4000.0 - 90.0 * PI - removed,
++                qa_tol,
++            )
++        }
++        "mesh_plate" => {
++            let body = fixtures::perforated_plate(n());
++            (
++                Box::new(move || {
++                    let mesh = body.triangulation(tol);
++                    assert!(
++                        mesh.face_iter().all(|f| f.surface().is_some()),
++                        "partial timed mesh"
++                    );
++                    Output::Mesh(mesh.to_polygon())
++                }),
++                fixtures::plate_volume(n()),
++                tol,
++            )
++        }
++        _ => panic!("unknown case {name}"),
++    };
++    Case {
++        run,
++        expected,
++        qa_tol,
++    }
++}
++
++fn check(output: &Output, expected: f64, tol: f64) -> Value {
++    let (mut mesh, faces, geometric, topology) = match output {
++        Output::Solid(solid) => {
++            let topology = solid.boundaries().len() == 1
++                && Solid::try_new(solid.boundaries().clone()).is_ok();
++            let geometric = solid.is_geometric_consistent();
++            let meshed = solid.triangulation(tol);
++            assert!(
++                meshed.face_iter().all(|f| f.surface().is_some()),
++                "partial QA tessellation"
++            );
++            (
++                meshed.to_polygon(),
++                Some(solid.face_iter().count()),
++                geometric,
++                topology,
++            )
++        }
++        Output::Mesh(mesh) => (mesh.clone(), None, true, true),
++    };
++    mesh.put_together_same_attrs(1e-8)
++        .remove_degenerate_faces()
++        .remove_unused_attrs();
++    let closed = format!("{:?}", mesh.shell_condition()) == "Closed";
++    let volume = mesh.volume();
++    let error = (volume - expected).abs() / expected;
++    let pass =
++        topology && geometric && closed && volume.is_finite() && volume > 0.0 && error <= 0.002;
++    json!({"pass":pass,"topology":topology,"geometric":geometric,"mesh_closed":closed,
++        "faces":faces,"triangles":mesh.faces().triangle_iter().count(),"volume":volume,
++        "expected_volume":expected,"relative_volume_error":error,"qa_tolerance":tol})
++}
++
++fn peak_rss_kib() -> Option<u64> {
++    std::fs::read_to_string("/proc/self/status")
++        .ok()?
++        .lines()
++        .find_map(|line| {
++            line.strip_prefix("VmHWM:")
++                .and_then(|s| s.split_whitespace().next()?.parse().ok())
++        })
++}
++
++fn main() {
++    let args: Vec<_> = std::env::args().collect();
++    if args.get(1).map(String::as_str) == Some("--export-threads") {
++        let directory = Path::new(&args[2]);
++        std::fs::create_dir_all(directory).unwrap();
++        for turns in [1, 4] {
++            let tool = thread_cutter(turns).compress();
++            use truck_stepio::out::*;
++            let design = StepDesign::from_model(StepModel::from(&tool));
++            std::fs::write(
++                directory.join(format!("thread-{turns}.step")),
++                StepDisplay::new(Default::default(), design).to_string(),
++            )
++            .unwrap();
++        }
++        return;
++    }
++    assert_eq!(args.len(), 6, "CASE SAMPLES TOL QA_TOL FIXTURE_DIR");
++    let samples: usize = args[2].parse().unwrap();
++    let tol: f64 = args[3].parse().unwrap();
++    let qa_tol: f64 = args[4].parse().unwrap();
++    assert!(tol.is_finite() && tol > 0.0 && qa_tol.is_finite() && qa_tol > 0.0);
++    let result = std::panic::catch_unwind(|| {
++        let case = fixture(&args[1], tol, qa_tol);
++        let mut output = black_box((case.run)());
++        let mut times = Vec::with_capacity(samples);
++        for _ in 0..samples {
++            let start = Instant::now();
++            let next = black_box((case.run)());
++            times.push(start.elapsed().as_secs_f64() * 1000.0);
++            output = next;
++        }
++        let rss = peak_rss_kib();
++        // Persist timing evidence even if independent postflight QA panics or times out.
++        println!(
++            "RESULT {}",
++            json!({"phase":"timing","samples_ms":times,"peak_rss_kib":rss})
++        );
++        let qa = check(&output, case.expected, case.qa_tol);
++        println!("RESULT {}", json!({"phase":"qa","qa":qa}));
++    });
++    if let Err(error) = result {
++        let message = error
++            .downcast_ref::<String>()
++            .map(String::as_str)
++            .or_else(|| error.downcast_ref::<&str>().copied())
++            .unwrap_or("panic");
++        println!("RESULT {}", json!({"phase":"failure","error":message}));
++        std::process::exit(1);
++    }
++}
+diff --git a/truck-benchmarks/occt/CMakeLists.txt b/truck-benchmarks/occt/CMakeLists.txt
+new file mode 100644
+index 00000000..a383a5a7
+--- /dev/null
++++ b/truck-benchmarks/occt/CMakeLists.txt
+@@ -0,0 +1,15 @@
++cmake_minimum_required(VERSION 3.16)
++project(truck_occt_comparison LANGUAGES CXX)
++set(CMAKE_CXX_STANDARD 17)
++set(CMAKE_CXX_STANDARD_REQUIRED ON)
++if(NOT CMAKE_BUILD_TYPE)
++  set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
++endif()
++find_path(OCCT_INCLUDE_DIR Standard_Version.hxx PATH_SUFFIXES opencascade REQUIRED)
++add_executable(compare_occt main.cpp)
++target_include_directories(compare_occt SYSTEM PRIVATE "${OCCT_INCLUDE_DIR}")
++target_compile_options(compare_occt PRIVATE -Wall -Wextra -Wpedantic)
++foreach(lib TKernel TKMath TKG2d TKG3d TKGeomBase TKBRep TKGeomAlgo TKTopAlgo TKPrim TKBO TKBool TKFillet TKMesh TKXSBase TKDESTEP)
++  find_library(OCCT_${lib} NAMES ${lib} HINTS "${OCCT_LIBRARY_DIR}" REQUIRED)
++  target_link_libraries(compare_occt PRIVATE "${OCCT_${lib}}")
++endforeach()
+diff --git a/truck-benchmarks/occt/main.cpp b/truck-benchmarks/occt/main.cpp
+new file mode 100644
+index 00000000..580c2498
+--- /dev/null
++++ b/truck-benchmarks/occt/main.cpp
+@@ -0,0 +1,307 @@
++#include <BRepAlgoAPI_Common.hxx>
++#include <BRepAlgoAPI_Cut.hxx>
++#include <BRepBuilderAPI_Copy.hxx>
++#include <BRepBuilderAPI_MakeEdge.hxx>
++#include <BRepBuilderAPI_MakeFace.hxx>
++#include <BRepBuilderAPI_MakePolygon.hxx>
++#include <BRepBuilderAPI_MakeWire.hxx>
++#include <BRepCheck_Analyzer.hxx>
++#include <BRepFilletAPI_MakeFillet.hxx>
++#include <BRepGProp.hxx>
++#include <BRepMesh_IncrementalMesh.hxx>
++#include <BRepPrimAPI_MakeBox.hxx>
++#include <BRepPrimAPI_MakeCylinder.hxx>
++#include <BRepPrimAPI_MakePrism.hxx>
++#include <BRepAdaptor_Curve.hxx>
++#include <BRep_Tool.hxx>
++#include <BRep_Builder.hxx>
++#include <GProp_GProps.hxx>
++#include <OSD_Parallel.hxx>
++#include <OSD_ThreadPool.hxx>
++#include <Poly_Triangulation.hxx>
++#include <STEPControl_Reader.hxx>
++#include <Standard_Version.hxx>
++#include <TopExp_Explorer.hxx>
++#include <TopTools_ListOfShape.hxx>
++#include <TopoDS.hxx>
++#include <TopoDS_Compound.hxx>
++#include <gp_Circ.hxx>
++#include <algorithm>
++#include <array>
++#include <chrono>
++#include <cmath>
++#include <cstdlib>
++#include <fstream>
++#include <functional>
++#include <iomanip>
++#include <iostream>
++#include <map>
++#include <sstream>
++#include <stdexcept>
++#include <string>
++#include <vector>
++
++constexpr double pi = 3.14159265358979323846;
++double fuzzy = 0.0;
++bool parallel = false;
++using Triangle = std::array<gp_Pnt, 3>;
++struct Output {
++  TopoDS_Shape shape;
++  std::vector<Triangle> triangles;
++  bool isMesh = false;
++};
++struct Case {
++  std::function<Output()> run;
++  double expected;
++  double qaTolerance;
++};
++
++void require(bool condition, const std::string& message) {
++  if (!condition) throw std::runtime_error(message);
++}
++
++std::string quote(const std::string& s) {
++  std::ostringstream out;
++  out << '"';
++  for (unsigned char c : s) {
++    if (c == '"' || c == '\\') out << '\\' << c;
++    else if (c < 32) out << "\\u" << std::hex << std::setw(4) << std::setfill('0') << int(c);
++    else out << c;
++  }
++  out << '"';
++  return out.str();
++}
++
++TopoDS_Shape cylinder(double r, double height, double x = 0, double y = 0, double z = 0) {
++  return BRepPrimAPI_MakeCylinder(gp_Ax2(gp_Pnt(x,y,z),gp_Dir(0,0,1)), r, height).Shape();
++}
++
++TopoDS_Shape compound(const std::vector<TopoDS_Shape>& shapes) {
++  BRep_Builder builder;
++  TopoDS_Compound result;
++  builder.MakeCompound(result);
++  for (const auto& shape : shapes) builder.Add(result, shape);
++  return result;
++}
++
++template<class Algorithm>
++TopoDS_Shape boolean(const TopoDS_Shape& a, const TopoDS_Shape& b) {
++  Algorithm operation;
++  TopTools_ListOfShape arguments, tools;
++  arguments.Append(a);
++  tools.Append(b);
++  operation.SetArguments(arguments);
++  operation.SetTools(tools);
++  operation.SetNonDestructive(true);
++  operation.SetRunParallel(parallel);
++  operation.SetFuzzyValue(fuzzy);
++  operation.Build();
++  if (operation.HasErrors() || !operation.IsDone()) {
++    std::ostringstream errors;
++    operation.DumpErrors(errors);
++    throw std::runtime_error("boolean: " + errors.str());
++  }
++  return operation.Shape();
++}
++
++std::vector<Triangle> mesh(const TopoDS_Shape& body, double tol) {
++  BRepMesh_IncrementalMesh mesher(body, tol, false, pi, parallel);
++  require(mesher.IsDone(), "tessellation failed");
++  std::vector<Triangle> result;
++  for (TopExp_Explorer it(body, TopAbs_FACE); it.More(); it.Next()) {
++    const auto face = TopoDS::Face(it.Current());
++    TopLoc_Location location;
++    const auto triangulation = BRep_Tool::Triangulation(face, location);
++    require(!triangulation.IsNull() && triangulation->NbTriangles()>0, "missing mesh face");
++    for (int i=1; i<=triangulation->NbTriangles(); ++i) {
++      int a,b,c;
++      triangulation->Triangle(i).Get(a,b,c);
++      if (face.Orientation() == TopAbs_REVERSED) std::swap(b,c);
++      result.push_back({triangulation->Node(a).Transformed(location.Transformation()),
++                        triangulation->Node(b).Transformed(location.Transformation()),
++                        triangulation->Node(c).Transformed(location.Transformation())});
++    }
++  }
++  return result;
++}
++
++TopoDS_Wire circle(double x, double y, double r) {
++  return BRepBuilderAPI_MakeWire(BRepBuilderAPI_MakeEdge(
++    gp_Circ(gp_Ax2(gp_Pnt(x,y,0),gp_Dir(0,0,1)),r)).Edge()).Wire();
++}
++
++Case fixture(const std::string& name, double tol, double qaTol, const std::string& directory) {
++  const auto slash = name.find('/');
++  require(slash != std::string::npos, "case/parameter required");
++  const auto kind = name.substr(0,slash);
++  const auto parameter = name.substr(slash+1);
++  const double value = std::stod(parameter);
++  const int n = static_cast<int>(value);
++  if (kind=="holes_batch" || kind=="holes_sequential" || kind=="mesh_plate") {
++    const int cols=static_cast<int>(std::ceil(std::sqrt(n))), rows=(n+cols-1)/cols;
++    const double expected=cols*rows*32.0-n*pi*2.0;
++    auto plate=BRepPrimAPI_MakeBox(cols*4.0,rows*4.0,2.0).Shape();
++    std::vector<TopoDS_Shape> cutters;
++    for(int i=0;i<n;++i) cutters.push_back(cylinder(1,4,(i%cols)*4+2,(i/cols)*4+2,-1));
++    if(kind=="mesh_plate") {
++      BRepBuilderAPI_MakePolygon rectangle;
++      for (const auto& p : std::vector<gp_Pnt>{{0,0,0},{cols*4.0,0,0},{cols*4.0,rows*4.0,0},{0,rows*4.0,0}}) rectangle.Add(p);
++      rectangle.Close();
++      BRepBuilderAPI_MakeFace face(rectangle.Wire());
++      for(int i=0;i<n;++i) { auto hole=circle((i%cols)*4+2,(i/cols)*4+2,1); hole.Reverse(); face.Add(hole); }
++      plate=BRepPrimAPI_MakePrism(face.Face(),gp_Vec(0,0,2)).Shape();
++      return {[plate,tol] {
++        const auto copy=BRepBuilderAPI_Copy(plate,false,false).Shape();
++        return Output{copy,mesh(copy,tol),true};
++      },expected,tol};
++    }
++    const auto batch=compound(cutters);
++    return {[plate,cutters,batch,kind] {
++      auto result=plate;
++      if(kind=="holes_sequential") for(const auto& cutter:cutters) result=boolean<BRepAlgoAPI_Cut>(result,cutter);
++      else result=boolean<BRepAlgoAPI_Cut>(plate,batch);
++      return Output{result,{},false};
++    },expected,qaTol};
++  }
++  if(kind=="knurl") {
++    const double r=12, depth=.35, half=pi/(2*n), height=8;
++    const double outerX=r-depth+1.25*(r*std::cos(half)-(r-depth)), outerY=1.25*r*std::sin(half);
++    require(outerX>r && std::atan2(outerY,outerX)<pi/n,"knurl tools must clear the stock and remain disjoint");
++    std::vector<TopoDS_Shape> cutters;
++    for(int i=0;i<n;++i) {
++      const double angle=2*pi*i/n;
++      BRepBuilderAPI_MakePolygon polygon;
++      for(const auto& xy:std::vector<std::array<double,2>>{{r-depth,0},
++          {outerX,-outerY}, {outerX,outerY}}) {
++        polygon.Add(gp_Pnt(xy[0]*std::cos(angle)-xy[1]*std::sin(angle),xy[0]*std::sin(angle)+xy[1]*std::cos(angle),-1));
++      }
++      polygon.Close();
++      cutters.push_back(BRepPrimAPI_MakePrism(BRepBuilderAPI_MakeFace(polygon.Wire()).Face(),gp_Vec(0,0,10)).Shape());
++    }
++    const auto body=cylinder(r,height), tool=compound(cutters);
++    return {[body,tool] {return Output{boolean<BRepAlgoAPI_Cut>(body,tool),{},false};},
++      height*(pi*r*r-n*(r*r*half-(r-depth)*r*std::sin(half))),qaTol};
++  }
++  if(kind=="thread") {
++    STEPControl_Reader reader;
++    require(reader.ReadFile((directory+"/thread-"+std::to_string(n)+".step").c_str())==IFSelect_RetDone,"read thread STEP");
++    require(reader.TransferRoots()>0,"transfer thread STEP");
++    const auto tool=reader.OneShape();
++    require(BRepCheck_Analyzer(tool,true,false,true).IsValid(),"invalid imported thread operand");
++    const auto body=cylinder(4,n*1.25);
++    const double r=4, root=3.6, pitch=1.25;
++    const double radialArea=(r*r-root*root)/2;
++    const double radialMoment=(r*r*r-root*root*root)/3-root*radialArea;
++    return {[body,tool] {return Output{boolean<BRepAlgoAPI_Cut>(body,tool),{},false};},
++      n*(pi*r*r*pitch-4*pi*(pitch/16*radialArea+radialMoment/std::sqrt(3.0))),qaTol};
++  }
++  if(kind=="near_tangent") {
++    const double distance=2-value;
++    const auto a=cylinder(1,2), b=cylinder(1,2,distance);
++    return {[a,b] {return Output{boolean<BRepAlgoAPI_Common>(a,b),{},false};},
++      2*(2*std::acos(distance/2)-distance/2*std::sqrt(4-distance*distance)),std::max(1e-6,std::min(qaTol,value/10000))};
++  }
++  if(kind=="thin_wall") {
++    const auto body=cylinder(4,8), tool=cylinder(4-value,10,0,0,-1);
++    return {[body,tool] {return Output{boolean<BRepAlgoAPI_Cut>(body,tool),{},false};},
++      pi*(16-(4-value)*(4-value))*8,std::min(qaTol,value/1000)};
++  }
++  if(kind=="fillet_bore") {
++    const auto body=boolean<BRepAlgoAPI_Cut>(BRepPrimAPI_MakeBox(gp_Pnt(-10,-10,0),20,20,10).Shape(),cylinder(3,12,0,0,-1));
++    TopoDS_Edge edge;
++    for(TopExp_Explorer it(body,TopAbs_EDGE);it.More();it.Next()) {
++      BRepAdaptor_Curve curve(TopoDS::Edge(it.Current()));
++      if(curve.GetType()==GeomAbs_Circle && std::abs(curve.Circle().Location().Z()-10)<1e-6) {edge=TopoDS::Edge(it.Current());break;}
++    }
++    require(!edge.IsNull(),"missing bore rim");
++    const double removed=2*pi*(3*value*value*(1-pi/4)+value*value*value*(5.0/6-pi/4));
++    return {[body,edge,value] {
++      BRepFilletAPI_MakeFillet fillet(body);
++      fillet.Add(value,edge);
++      fillet.Build();
++      require(fillet.IsDone(),"bore fillet failed");
++      return Output{fillet.Shape(),{},false};
++    },4000-90*pi-removed,qaTol};
++  }
++  throw std::runtime_error("unknown case " + name);
++}
++
++void check(Output output, double expected, double tol) {
++  int solids=0, faces=0;
++  for(TopExp_Explorer it(output.shape,TopAbs_SOLID);it.More();it.Next()) ++solids;
++  for(TopExp_Explorer it(output.shape,TopAbs_FACE);it.More();it.Next()) ++faces;
++  const bool geometric=BRepCheck_Analyzer(output.shape,true,false,true).IsValid();
++  GProp_GProps properties;
++  BRepGProp::VolumeProperties(output.shape,properties,1e-9,true,false);
++  const double exactVolume=properties.Mass();
++  if(!output.isMesh) output.triangles=mesh(output.shape,tol);
++  using Vertex=std::array<long long,3>;
++  using Edge=std::pair<Vertex,Vertex>;
++  std::map<Edge,std::pair<int,int>> edges;
++  double volume=0;
++  for(const auto& triangle:output.triangles) {
++    std::array<Vertex,3> vertices;
++    for(int i=0;i<3;++i) vertices[i]={std::llround(triangle[i].X()/1e-8),std::llround(triangle[i].Y()/1e-8),std::llround(triangle[i].Z()/1e-8)};
++    if(vertices[0]==vertices[1] || vertices[1]==vertices[2] || vertices[2]==vertices[0]) continue;
++    volume+=triangle[0].XYZ().Dot(triangle[1].XYZ().Crossed(triangle[2].XYZ()))/6;
++    for(int i=0;i<3;++i) {
++      auto a=vertices[i], b=vertices[(i+1)%3];
++      const int sign=a<b?1:-1;
++      if(b<a) std::swap(a,b);
++      auto& edge=edges[{a,b}]; ++edge.first; edge.second+=sign;
++    }
++  }
++  const bool closed=!edges.empty() && std::all_of(edges.begin(),edges.end(),[](const auto& e){return e.second.first==2 && e.second.second==0;});
++  const double error=std::abs(volume-expected)/expected;
++  const double exactError=std::abs(exactVolume-expected)/expected;
++  const bool pass=solids==1 && geometric && closed && std::isfinite(volume) && volume>0 && error<=.002 && exactError<=.002;
++  std::cout << "RESULT {\"phase\":\"qa\",\"qa\":{\"pass\":" << (pass?"true":"false")
++    << ",\"geometric\":" << (geometric?"true":"false") << ",\"mesh_closed\":" << (closed?"true":"false")
++    << ",\"solids\":" << solids << ",\"faces\":" << faces << ",\"triangles\":" << output.triangles.size()
++    << ",\"volume\":" << volume << ",\"exact_volume\":" << exactVolume << ",\"expected_volume\":" << expected
++    << ",\"relative_volume_error\":" << error << ",\"exact_relative_volume_error\":" << exactError << ",\"qa_tolerance\":" << tol << "}}" << std::endl;
++}
++
++long peakRss() {
++  std::ifstream status("/proc/self/status");
++  std::string line;
++  while(std::getline(status,line)) if(line.rfind("VmHWM:",0)==0) return std::stol(line.substr(6));
++  return 0;
++}
++
++int main(int argc,char** argv) {
++  std::cout << std::setprecision(17);
++  if(argc==2 && std::string(argv[1])=="--version") {std::cout << OCC_VERSION_COMPLETE << std::endl;return 0;}
++  try {
++    require(argc==6,"CASE SAMPLES TOL QA_TOL FIXTURE_DIR");
++    const int samples=std::stoi(argv[2]);
++    const double tol=std::stod(argv[3]), qaTol=std::stod(argv[4]);
++    require(samples>=0 && std::isfinite(tol) && tol>0 && std::isfinite(qaTol) && qaTol>0,"invalid settings");
++    const int workers=std::getenv("RAYON_NUM_THREADS")?std::stoi(std::getenv("RAYON_NUM_THREADS")):1;
++    parallel=workers>1;
++    fuzzy=std::getenv("OCCT_FUZZY")?std::stod(std::getenv("OCCT_FUZZY")):0;
++    require(workers>0 && std::isfinite(fuzzy) && fuzzy>=0,"invalid threads/fuzzy tolerance");
++    OSD_Parallel::SetUseOcctThreads(true);
++    OSD_ThreadPool::DefaultPool(workers)->Init(workers);
++    const auto test=fixture(argv[1],tol,qaTol,argv[5]);
++    auto output=test.run();
++    std::vector<double> times;
++    for(int i=0;i<samples;++i) {
++      const auto start=std::chrono::steady_clock::now();
++      auto next=test.run();
++      const auto end=std::chrono::steady_clock::now();
++      times.push_back(std::chrono::duration<double,std::milli>(end-start).count());
++      output=std::move(next);
++    }
++    std::cout << "RESULT {\"phase\":\"timing\",\"peak_rss_kib\":" << peakRss() << ",\"samples_ms\":[";
++    for(size_t i=0;i<times.size();++i) {if(i) std::cout << ',';std::cout << times[i];}
++    std::cout << "]}" << std::endl;
++    check(std::move(output),test.expected,test.qaTolerance);
++  } catch(const Standard_Failure& e) {
++    std::cout << "RESULT {\"phase\":\"failure\",\"error\":" << quote(e.GetMessageString()?e.GetMessageString():"OCCT failure") << "}" << std::endl;
++    return 1;
++  } catch(const std::exception& e) {
++    std::cout << "RESULT {\"phase\":\"failure\",\"error\":" << quote(e.what()) << "}" << std::endl;
++    return 1;
++  }
++}
+diff --git a/truck-benchmarks/scripts/compare_occt.py b/truck-benchmarks/scripts/compare_occt.py
+new file mode 100644
+index 00000000..07537eed
+--- /dev/null
++++ b/truck-benchmarks/scripts/compare_occt.py
+@@ -0,0 +1,300 @@
++#!/usr/bin/env python3
++"""Build, validate and compare native Truck/OCCT kernels; no third-party Python packages."""
++import argparse
++import hashlib
++import json
++import math
++import os
++from pathlib import Path
++import platform
++import signal
++import statistics
++import subprocess
++import time
++
++ROOT = Path(__file__).resolve().parents[2]
++CASES = (
++    [f"holes_{mode}/{n}" for mode in ("batch", "sequential") for n in (1, 10, 30, 100)]
++    + [f"knurl/{n}" for n in (16, 64, 128)]
++    + [f"thread/{n}" for n in (1, 4)]
++    + [f"near_tangent/{gap}" for gap in ("0.01", "0.001")]
++    + [f"thin_wall/{wall}" for wall in ("0.1", "0.01")]
++    + ["fillet_bore/0.5"]
++    + [f"mesh_plate/{n}" for n in (1, 100)]
++)
++
++
++def command(args, log, env=None, timeout=None):
++    start = time.monotonic()
++    with log.open("w") as output:
++        process = subprocess.Popen(args, cwd=ROOT, env=env, stdout=output,
++                                   stderr=subprocess.STDOUT, start_new_session=True)
++        try:
++            code = process.wait(timeout=timeout)
++            status = "complete" if code == 0 else "failed"
++        except subprocess.TimeoutExpired:
++            try:
++                os.killpg(process.pid, signal.SIGKILL)
++            except ProcessLookupError:
++                pass
++            code = process.wait()
++            status = "timeout"
++    return dict(status=status, exit_code=code, wall_seconds=time.monotonic()-start,
++                command=[str(a) for a in args], log=str(log.name))
++
++
++def parse_result(text, samples, execution):
++    result = dict(execution)
++    phases = {}
++    try:
++        for line in text.splitlines():
++            if line.startswith("RESULT "):
++                record = json.loads(line[7:])
++                phase = record["phase"]
++                if phase in phases:
++                    raise ValueError(f"duplicate {phase} record")
++                phases[phase] = record
++        result["timing"] = phases.get("timing")
++        result["qa"] = phases.get("qa", {}).get("qa")
++        if "failure" in phases:
++            result["error"] = phases["failure"]["error"]
++        if result["status"] != "complete":
++            return result
++        if "failure" in phases:
++            raise ValueError("failure record with successful exit")
++        times = phases["timing"]["samples_ms"]
++        if len(times) != samples or not all(isinstance(t, (int, float)) and math.isfinite(t) and t > 0 for t in times):
++            raise ValueError("missing, non-finite or incorrect sample count")
++        qa = phases["qa"]["qa"]
++        for key in ("volume", "expected_volume", "relative_volume_error", "qa_tolerance"):
++            if not isinstance(qa[key], (int, float)) or not math.isfinite(qa[key]):
++                raise ValueError(f"non-finite QA {key}")
++        if qa["pass"] is not True:
++            result["status"] = "invalid"
++        elif (qa["volume"] <= 0 or qa["expected_volume"] <= 0 or qa["relative_volume_error"] > .002
++              or qa.get("geometric") is not True or qa.get("mesh_closed") is not True
++              or qa.get("topology", True) is not True or qa.get("solids", 1) != 1
++              or not math.isclose(abs(qa["volume"]-qa["expected_volume"])/qa["expected_volume"],
++                                  qa["relative_volume_error"],rel_tol=1e-8,abs_tol=1e-12)):
++            raise ValueError("inconsistent QA pass")
++        else:
++            result["status"] = "pass"
++    except (KeyError, ValueError, TypeError) as error:
++        result["status"] = "protocol_error"
++        result["error"] = str(error)
++    return result
++
++
++def summarize(records, cases, workers, rounds):
++    rows = []
++    indexed = {}
++    for record in records:
++        key = (record["case"], record["engine"], record["workers"], record["round"])
++        if key in indexed:
++            raise ValueError(f"duplicate measurement {key}")
++        indexed[key] = record
++    expected_keys = {(case, engine, worker, round_) for case in cases
++                     for engine in ("truck", "occt") for worker in workers
++                     for round_ in range(rounds+1)}
++    if indexed.keys() != expected_keys:
++        raise ValueError("missing or unexpected measurement coverage")
++    for case in cases:
++        for worker in workers:
++            row = dict(case=case, workers=worker, ratio=None)
++            for engine in ("truck", "occt"):
++                runs = [indexed[case, engine, worker, r] for r in range(rounds+1)]
++                failures = [r for r in runs if r["status"] != "pass"]
++                if failures:
++                    row[engine] = dict(status=failures[0]["status"])
++                    continue
++                if not all(math.isclose(r['qa']['expected_volume'],runs[0]['qa']['expected_volume'],rel_tol=1e-10) for r in runs):
++                    raise ValueError(f"fixture changed across rounds: {case}/{engine}")
++                timed = runs[1:]
++                medians = [statistics.median(r["timing"]["samples_ms"]) for r in timed]
++                values = sorted(t for r in timed for t in r["timing"]["samples_ms"])
++                row[engine] = dict(status="pass", median_ms=statistics.median(medians),
++                    round_medians_ms=medians, p95_ms=values[math.ceil(len(values)*.95)-1],
++                    max_ms=max(values), samples=len(values),
++                    peak_rss_kib=max(r["timing"]["peak_rss_kib"] or 0 for r in timed),
++                    qa=timed[-1]["qa"])
++            if all(row[e]["status"] == "pass" for e in ("truck", "occt")):
++                a, b = row["truck"]["qa"], row["occt"]["qa"]
++                if not math.isclose(a["expected_volume"], b["expected_volume"], rel_tol=1e-10):
++                    raise ValueError(f"fixture mismatch: {case}")
++                # Two individually acceptable errors can still disagree by twice the bound.
++                row["agreement"] = abs(a["volume"]-b["volume"])/a["expected_volume"] <= .002
++                if row["agreement"]:
++                    row["ratio"] = row["occt"]["median_ms"]/row["truck"]["median_ms"]
++            rows.append(row)
++    return rows
++
++
++def report(output, metadata, records):
++    rows = summarize(records, metadata["cases"], metadata["workers"], metadata["rounds"])
++    (output/"summary.json").write_text(json.dumps(rows, indent=2)+"\n")
++    lines = ["# Truck versus direct OpenCascade", "",
++        f"OCCT {metadata['occt_version']}; Truck `{metadata['revision']}` plus `source.patch` and `sources.sha256`. "
++        f"{metadata['samples']} samples × {metadata['rounds']} rounds; CPUs {metadata['cpus']}.", "",
++        "Native warmed operation latency in milliseconds. Setup, process startup, final-result destruction and QA are outside timers. "
++        "Preflight and every timed process must pass native geometry checks, closed mesh and analytic volume within 0.2%. "
++        "A failed preflight is retained and that engine/case is skipped in subsequent rounds. Ratios require both engines to pass and agree on volume. "
++        "Ratios above 1 favor Truck; none is an overall speed claim.", "",
++        f"Truck operation/mesh tolerance: {metadata['tolerance']} mm; QA deflection: {metadata['qa_tolerance']} mm, "
++        "tightened for narrow intersections/walls, with a shared 1e-6 mm floor. OCCT uses native geometric tolerances, "
++        f"additional fuzzy tolerance {metadata['fuzzy']} mm, and absolute mesh deflection matching Truck. These settings are different contracts.", "",
++        "| Case | Workers | Truck median ms | OCCT median ms | OCCT / Truck | QA |",
++        "|---|---:|---:|---:|---:|---|"]
++    def median(data):
++        return f"{data['median_ms']:.4g}" if data['status']=='pass' else "—"
++    for row in rows:
++        qa = "; ".join(f"{engine}: {row[engine]['status']}" for engine in ("truck", "occt") if row[engine]['status'] != "pass") or ("pass" if row.get("agreement") else "volume disagreement")
++        ratio = f"{row['ratio']:.2f}×" if row['ratio'] is not None else "—"
++        lines.append(f"| {row['case']} | {row['workers']} | {median(row['truck'])} | {median(row['occt'])} | {ratio} | {qa} |")
++    lines += ["", "## Variation and memory", "",
++        "P95 is the empirical nearest-rank value across raw samples, not a confidence interval. "
++        "Peak RSS is the process high-water mark read **before postflight QA**, including fixture setup, warmup, "
++        "libraries, thread pools and retained output. It is not isolated allocation cost. Thread setup includes STEP import/checking on OCCT.", "",
++        "| Case | Workers | Engine | P95 ms | Max ms | Peak RSS MiB | Round medians ms |",
++        "|---|---:|---|---:|---:|---:|---|"]
++    for row in rows:
++        for engine in ("truck", "occt"):
++            data = row[engine]
++            if data['status']=='pass':
++                medians = ", ".join(f"{v:.4g}" for v in data['round_medians_ms'])
++                lines.append(f"| {row['case']} | {row['workers']} | {engine} | {data['p95_ms']:.4g} | {data['max_ms']:.4g} | {data['peak_rss_kib']/1024:.2f} | {medians} |")
++    lines += ["", "## Failures", ""]
++    failures = [r for r in records if r['status'] not in ("pass", "skipped")]
++    if not failures:
++        lines += ["All recorded checks passed."]
++    for record in failures:
++        detail = record.get('error') or json.dumps(record.get('qa'), sort_keys=True)
++        lines.append(f"- {record['case']}, {record['engine']}, {record['workers']} workers, round {record['round']}: "
++                     f"**{record['status']}**. [Log]({record['log']}). {detail}")
++    lines += ["", "## Scope", "",
++        "- Knurl cases are straight axial triangular grooves, not diamond/helical knurling. Threads are external 60° grooves, 1.25 mm pitch, radius 4 mm, depth 0.4 mm; native Truck cutters are exported to STEP for OCCT outside timing. OCCT's standard STEP transfer may heal geometry; operands are not asserted to have identical topology.",
++        "- Hole and meshing fixtures reuse the existing benchmark dimensions. Mesh results include fresh triangulation and triangle extraction; OCCT also copies topology without cached triangulation in the timed operation.",
++        "- One worker disables OCCT Boolean/mesh parallelism. Multiple workers use OCCT's own thread pool with the stated limit; Truck uses Rayon. Both share the same CPU affinity. Fillet internal parallelism is API-dependent.",
++        "- Mesh volume/closure and native checks are sanity gates, not proof of identical surfaces or universal modeling correctness. Truck's mesh checks and OCCT's native analyzer have different implementations. Topology counts may differ.",
++        "- All engines and builds run sequentially. Even-numbered rounds reverse execution order. The active desktop, power policy, installed OCCT build and compiler differences remain sources of variation. No UI latency is measured.",
++        "", "See `metadata.json`, `records.jsonl`, `summary.json`, `sources.sha256`, `source.patch` and raw logs. "
++        f"Methodology and reproduction: [BENCHMARKS.md]({os.path.relpath(ROOT/'BENCHMARKS.md',output)}#direct-opencascade-comparison).", ""]
++    (output/"REPORT.md").write_text("\n".join(lines))
++
++
++def capture(args):
++    return subprocess.check_output(args, cwd=ROOT, text=True, stderr=subprocess.STDOUT).strip()
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--output", type=Path, required=True)
++    parser.add_argument("--samples", type=int, default=15)
++    parser.add_argument("--rounds", type=int, default=2)
++    parser.add_argument("--workers", default="1,4")
++    parser.add_argument("--cpus", default="0,1,2,3")
++    parser.add_argument("--filter", default="", help="case substring")
++    parser.add_argument("--timeout", type=float, default=180)
++    parser.add_argument("--tolerance", type=float, default=.001)
++    parser.add_argument("--qa-tolerance", type=float, default=.001)
++    parser.add_argument("--fuzzy", type=float, default=0)
++    parser.add_argument("--occt-include", type=Path)
++    parser.add_argument("--occt-lib", type=Path)
++    parser.add_argument("--report-only", action="store_true")
++    args = parser.parse_args()
++    output = args.output.resolve()
++    if args.report_only:
++        report(output, json.loads((output/"metadata.json").read_text()),
++               [json.loads(line) for line in (output/"records.jsonl").read_text().splitlines()])
++        return
++    workers = [int(w) for w in args.workers.split(",")]
++    cpus = [int(c) for c in args.cpus.split(",")]
++    cases = [case for case in CASES if args.filter in case]
++    if (not cases or args.samples<1 or args.rounds<1 or min(workers)<1 or len(set(workers))!=len(workers)
++        or max(workers)>len(cpus) or not set(cpus)<=os.sched_getaffinity(0)
++        or any(not math.isfinite(v) or v<=0 for v in (args.timeout,args.tolerance,args.qa_tolerance))
++        or min(args.tolerance,args.qa_tolerance)<1e-6 or not math.isfinite(args.fuzzy) or args.fuzzy<0):
++        parser.error("invalid cases, sample counts, workers, CPU affinity, timeout or tolerances")
++    output.mkdir(parents=True, exist_ok=False)
++    build = ROOT/"target/occt-comparison"
++    cmake = ["cmake", "-S", "truck-benchmarks/occt", "-B", str(build), "-DCMAKE_BUILD_TYPE=Release"]
++    if args.occt_include:
++        cmake += [f"-DOCCT_INCLUDE_DIR={args.occt_include.resolve()}"]
++    if args.occt_lib:
++        cmake += [f"-DOCCT_LIBRARY_DIR={args.occt_lib.resolve()}"]
++    build_commands = [("build-truck", ["cargo", "build", "--release", "-j2", "-p", "truck-benchmarks", "--example", "compare_occt"]),
++                      ("configure-occt", cmake), ("build-occt", ["cmake", "--build", str(build), "-j2"])]
++    for name, cmd in build_commands:
++        result = command(cmd, output/f"{name}.log")
++        if result["status"] != "complete":
++            raise RuntimeError(f"{name} failed: {output/result['log']}")
++    binaries = dict(truck=ROOT/"target/release/examples/compare_occt", occt=build/"compare_occt")
++    fixtures = output/"fixtures"
++    result = command([binaries['truck'], "--export-threads", fixtures], output/"prepare-fixtures.log", timeout=args.timeout)
++    if result['status'] != 'complete':
++        raise RuntimeError("thread fixture preparation failed; see prepare-fixtures.log")
++    source_names = capture(["git","ls-files","--cached","--others","--exclude-standard","-z"]).split('\0')
++    source_names.append('Cargo.lock')
++    sources = {name: hashlib.sha256((ROOT/name).read_bytes()).hexdigest() for name in source_names
++               if (ROOT/name).is_file() and (Path(name).suffix in ('.rs','.py','.cpp','.hxx') or Path(name).name in ('Cargo.toml','Cargo.lock','CMakeLists.txt'))}
++    (output/"sources.sha256").write_text("".join(f"{digest}  {path}\n" for path,digest in sorted(sources.items())))
++    patch = capture(["git", "diff", "HEAD", "--", "."])+"\n"
++    untracked = capture(["git","ls-files","--others","--exclude-standard","-z"]).split('\0')
++    for name in untracked:
++        if name in sources:
++            diff = subprocess.run(["git","diff","--no-index","--","/dev/null",name],cwd=ROOT,text=True,capture_output=True)
++            if diff.returncode not in (0,1):
++                raise RuntimeError(diff.stderr)
++            patch += diff.stdout
++    (output/"source.patch").write_text(patch)
++    (output/"Cargo.lock").write_bytes((ROOT/"Cargo.lock").read_bytes())
++    (output/"CMakeCache.txt").write_bytes((build/"CMakeCache.txt").read_bytes())
++    (output/"git-status.txt").write_text(capture(["git", "status", "--short"])+"\n")
++    libraries = capture(['ldd',binaries['occt']])
++    library_hashes = {}
++    for line in libraries.splitlines():
++        fields = line.split()
++        if len(fields)>=3 and fields[0].startswith('libTK') and fields[1]=='=>' and Path(fields[2]).is_file():
++            library_hashes[fields[2]] = hashlib.sha256(Path(fields[2]).read_bytes()).hexdigest()
++    metadata = dict(created_utc=time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime()),
++        cases=cases, workers=workers, cpus=cpus, samples=args.samples, rounds=args.rounds,
++        timeout_seconds=args.timeout, tolerance=args.tolerance, qa_tolerance=args.qa_tolerance, fuzzy=args.fuzzy,
++        revision=capture(["git", "rev-parse", "HEAD"]), rustc=capture(["rustc", "-Vv"]),
++        compiler=capture(["c++", "--version"]), platform=platform.platform(),
++        lscpu=capture(["lscpu"]), occt_version=capture([binaries['occt'], "--version"]),
++        build_commands=build_commands,
++        occt_linked_libraries=libraries, occt_library_sha256=library_hashes,
++        binaries={name:hashlib.sha256(path.read_bytes()).hexdigest() for name,path in binaries.items()},
++        fixtures={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in fixtures.iterdir()},
++        cpu_governors={str(p):p.read_text().strip() for p in Path('/sys/devices/system/cpu').glob('cpu[0-9]*/cpufreq/scaling_governor')},
++        environment={k:os.environ[k] for k in ('RUSTFLAGS','CXXFLAGS','CARGO_PROFILE_RELEASE_LTO') if k in os.environ})
++    (output/"metadata.json").write_text(json.dumps(metadata,indent=2)+"\n")
++    (output/".gitignore").write_text("!metadata.json\n!summary.json\n!Cargo.lock\n")
++    records, blocked = [], set()
++    jobs = [(case,engine,worker) for case in cases for worker in workers for engine in ('truck','occt')]
++    with (output/"records.jsonl").open('w') as stream:
++        for round_ in range(args.rounds+1):
++            for case,engine,worker in (reversed(jobs) if round_>0 and round_%2==0 else jobs):
++                key = (case,engine,worker)
++                log = output/f"r{round_}-{engine}-{worker}t-{case.replace('/','-')}.log"
++                if key in blocked:
++                    record = dict(status="skipped", error="preflight did not pass", log=log.name)
++                else:
++                    count = 0 if round_==0 else args.samples
++                    env = dict(os.environ, RAYON_NUM_THREADS=str(worker), OCCT_FUZZY=str(args.fuzzy))
++                    cmd = ["taskset", "-c", args.cpus, binaries[engine], case, str(count),
++                           str(args.tolerance), str(args.qa_tolerance), fixtures]
++                    execution = command(cmd,log,env,args.timeout)
++                    record = parse_result(log.read_text(),count,execution)
++                    if round_==0 and record['status']!='pass':
++                        blocked.add(key)
++                record.update(case=case,engine=engine,workers=worker,round=round_)
++                records.append(record)
++                stream.write(json.dumps(record)+"\n")
++                stream.flush()
++                print(f"r{round_} {engine:5} {worker}t {case:24} {record['status']}",flush=True)
++    report(output,metadata,records)
++    print(f"Report: {output/'REPORT.md'}",flush=True)
++
++
++if __name__ == '__main__':
++    main()
+diff --git a/truck-benchmarks/scripts/test_compare_occt.py b/truck-benchmarks/scripts/test_compare_occt.py
+new file mode 100644
+index 00000000..2908c091
+--- /dev/null
++++ b/truck-benchmarks/scripts/test_compare_occt.py
+@@ -0,0 +1,93 @@
++"""Reporting must never turn an incomplete or invalid benchmark into a speedup."""
++import copy
++import json
++import unittest
++
++from compare_occt import parse_result, summarize
++
++
++def qa():
++    return dict(pass_=True, volume=10.0, expected_volume=10.0, relative_volume_error=0.0,
++                geometric=True, mesh_closed=True, qa_tolerance=.001)
++
++
++def output(samples):
++    checks = qa()
++    checks['pass'] = checks.pop('pass_')
++    return [dict(phase='timing',samples_ms=samples,peak_rss_kib=1024),dict(phase='qa',qa=checks)]
++
++
++def parse(records, count, status='complete'):
++    return parse_result('\n'.join('RESULT '+json.dumps(r) for r in records),count,dict(status=status))
++
++
++def measurements():
++    records = []
++    for engine in ('truck','occt'):
++        for round_ in (0,1,2):
++            samples = [] if round_==0 else ([1,2,3] if engine=='truck' else [3,4,5])
++            row = parse(output(samples),len(samples))
++            row.update(case='holes_batch/1',engine=engine,workers=1,round=round_)
++            records.append(row)
++    return records
++
++
++class CorrectnessGates(unittest.TestCase):
++    def test_success_uses_round_medians_and_keeps_tail(self):
++        result = summarize(measurements(),['holes_batch/1'],[1],2)[0]
++        self.assertEqual(result['ratio'],2)
++        self.assertEqual(result['truck']['p95_ms'],3)
++
++    def test_failed_preflight_or_timed_round_never_gets_ratio(self):
++        for index in (0,1,2):
++            for status in ('invalid','failed','timeout','protocol_error'):
++                records = measurements()
++                records[index]['status'] = status
++                self.assertIsNone(summarize(records,['holes_batch/1'],[1],2)[0]['ratio'])
++
++    def test_incomplete_or_duplicate_coverage_is_rejected(self):
++        records = measurements()
++        for broken in (records[:-1],records+[records[0]]):
++            with self.assertRaises(ValueError):
++                summarize(broken,['holes_batch/1'],[1],2)
++
++    def test_fixture_mismatch_is_rejected(self):
++        records = measurements()
++        records[-1]['qa']['expected_volume'] = 11
++        with self.assertRaises(ValueError):
++            summarize(records,['holes_batch/1'],[1],2)
++
++    def test_individually_acceptable_but_disagreeing_volumes_get_no_ratio(self):
++        records = measurements()
++        records[2]['qa']['volume'] = 9.985
++        records[5]['qa']['volume'] = 10.015
++        self.assertIsNone(summarize(records,['holes_batch/1'],[1],2)[0]['ratio'])
++
++    def test_invalid_samples_and_missing_qa_are_rejected(self):
++        for samples in ([1], [1,float('nan')], [1,-1], [1,0]):
++            self.assertEqual(parse(output(samples),2)['status'],'protocol_error')
++        self.assertEqual(parse(output([1])[:1],1)['status'],'protocol_error')
++        records = output([1])
++        self.assertEqual(parse(records+[copy.deepcopy(records[0])],1)['status'],'protocol_error')
++
++    def test_failing_native_qa_and_nonfinite_volume_are_rejected(self):
++        records = output([1])
++        records[1]['qa']['pass'] = False
++        self.assertEqual(parse(records,1)['status'],'invalid')
++        records[1]['qa']['pass'] = True
++        records[1]['qa']['volume'] = float('nan')
++        self.assertEqual(parse(records,1)['status'],'protocol_error')
++
++    def test_inconsistent_volume_error_is_rejected(self):
++        records = output([1])
++        records[1]['qa']['volume'] = 10.1
++        self.assertEqual(parse(records,1)['status'],'protocol_error')
++
++    def test_timeout_preserves_timings_without_claiming_success(self):
++        result = parse(output([1])[:1],1,'timeout')
++        self.assertEqual(result['status'],'timeout')
++        self.assertEqual(result['timing']['samples_ms'],[1])
++
++
++if __name__ == '__main__':
++    unittest.main()

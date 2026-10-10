@@ -1,0 +1,16 @@
+Validation for the native Truck / OCCT benchmark extension
+
+cargo clippy --release -p truck-benchmarks --example compare_occt -- -D warnings
+PASS. Existing nom/quick-xml future-incompatibility notices remain.
+
+python3 -m unittest discover -s truck-benchmarks/scripts -p test_compare_occt.py
+PASS: 9 reporting/correctness-gate tests.
+
+python3 truck-benchmarks/scripts/compare_occt.py --output truck-benchmarks/results/2026-10-10-occt --samples 15 --rounds 2 --workers 1,4 --cpus 0,1,2,3 --timeout 180
+PASS: 80 preflights and 160 timed-process postflights; 2,400 timed operations.
+All 40 paired case/worker comparisons pass both engines' QA and volume-agreement gates.
+Native Rust and C++ optimized builds completed before measurement.
+
+All source fingerprints in sources.sha256 matched the working tree after the run.
+Round medians, empirical P95, peak RSS and raw QA are retained in the report/logs.
+These are benchmark sanity checks, not a replacement for the geometric regression suite.

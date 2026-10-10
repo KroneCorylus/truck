@@ -1,5 +1,117 @@
 # CPU action benchmarks
 
+## Direct OpenCascade comparison
+
+`truck-benchmarks/scripts/compare_occt.py` compares our native Rust kernel with a small
+C++ runner linked directly to OCCT. It does not launch FreeCAD or include Python calls
+inside an operation timer. The existing FreeCAD/document suite below remains useful for
+application-level workflows.
+
+On Linux, install CMake, a C++17 compiler, and OCCT development headers/libraries (7.8 or
+newer, including `TKDESTEP`). Python uses only its standard library. The Rust example uses
+the workspace's existing `serde_json` version for diagnostic records; no production crate
+or production dependency changes.
+
+From the Truck checkout:
+
+```bash
+python3 truck-benchmarks/scripts/compare_occt.py \
+  --output truck-benchmarks/results/2026-10-10-occt \
+  --samples 15 --rounds 2 --workers 1,4 --cpus 0,1,2,3
+
+# Quick smoke check, or narrow a run with --filter thread.
+python3 truck-benchmarks/scripts/compare_occt.py \
+  --output target/occt-smoke-new --samples 1 --rounds 1 --workers 1 --cpus 0
+
+python3 -m unittest discover -s truck-benchmarks/scripts -p test_compare_occt.py
+```
+
+Output directories must be new. Pick available physical CPUs on your machine; the defaults
+are cores 0–3 in one L3 domain on this workstation. Every subprocess is pinned to that same
+set. OCCT uses its native thread pool, limited to the requested worker count; its Boolean
+and mesh parallelism is disabled with one worker. Truck uses `RAYON_NUM_THREADS`. These are
+resource limits, not a claim of identical parallel algorithms.
+
+If headers/libraries are outside the system search path, pass `--occt-include /path/to/include/opencascade`
+and `--occt-lib /path/to/lib`. CMake stores those paths in `target/occt-comparison`.
+On this Fedora workstation, OCCT 7.9.3 runtime libraries were already installed. Matching
+`opencascade-devel-7.9.3-4.fc44.1.x86_64` headers were extracted under `target/occt-sdk`;
+its development library symlinks point to the installed `/usr/lib64` runtime libraries.
+The report's CMake cache records these local build paths. No system package changes are
+required when using an existing matching SDK this way.
+
+The 20 cases are:
+
+| Case | Geometry and timed operation |
+|---|---|
+| `holes_batch/{1,10,30,100}` | Existing plate/cylindrical cutters, one compound subtraction |
+| `holes_sequential/{1,10,30,100}` | Same material removal, one subtraction per hole |
+| `knurl/{16,64,128}` | Radius 12, height 8 cylinder; disjoint triangular cutters form axial grooves of depth 0.35 |
+| `thread/{1,4}` | External 60° thread on radius 4 shaft, pitch 1.25, depth 0.4, root flat pitch/8; one Boolean subtraction |
+| `near_tangent/{0.01,0.001}` | Intersection of radius 1, height 2 cylinders with the specified radial overlap |
+| `thin_wall/{0.1,0.01}` | Radius 4, height 8 cylinder bored through to the specified wall thickness |
+| `fillet_bore/0.5` | Round the upper radius-3 through-hole rim in a 20 × 20 × 10 block |
+| `mesh_plate/{1,100}` | Fresh triangulation and triangle extraction of the existing perforated plate |
+
+All dimensions are millimetres. Knurl cutters clear the stock but stay inside disjoint
+angular sectors; this is straight knurling, not a diamond knurl. Thread operands use Truck's
+native rational spline cutter; the helper exports it to STEP and OCCT imports/checks it
+outside the timer. Standard STEP transfer may heal geometry. The representations and face
+counts can differ, so this is a matched workload rather than identical instruction streams.
+
+Every case has an analytic expected volume. Thread volume integrates the groove's linear
+60° flank over radius, for an integer number of turns; tools extend one pitch beyond each
+end. Knurl volume sums each triangular notch plus its circular segment. Neither expected
+volume is copied from either kernel's answer.
+
+Each engine/case/worker configuration first runs an untimed preflight in its own process.
+Only passing preflights proceed to timing. Each timed process reconstructs its fixtures,
+performs one warmup, records the requested raw samples, then validates the last output.
+Final-output destruction is outside the timer, while intermediate work is included. OCCT
+booleans use non-destructive inputs and native tolerances with `--fuzzy 0` by default.
+`--tolerance 0.001` controls Truck operations and both engines' absolute mesh deflection;
+those settings are not equivalent geometric error guarantees. OCCT meshing uses a loose
+π angular cap and copies the input topology without cached triangulations inside the timer.
+
+Validation requires closed topology, native geometry consistency, complete closed oriented
+meshes, positive volume and analytic volume error at most **0.2%**. Truck uses
+`is_geometric_consistent`; OCCT uses `BRepCheck_Analyzer` with geometric/exact checks and
+also integrates B-rep volume. Both merge coincident mesh positions at 1e-8 mm for closure
+checks. The default QA mesh deflection is 0.001 mm, tightened to overlap/10000 for near
+tangencies and wall/1000 for thin walls, with a shared 1e-6 mm floor (Truck's tessellation
+minimum). CLI operation and QA tolerances must also be at least 1e-6 mm. This avoids judging small volumes using a coarse
+validation mesh; it does not change the timed operation. Meshing cases validate the actual
+timed mesh. These checks do not certify all surface deviations or equivalent topology.
+
+Both engines must pass every round and agree on final mesh volume within 0.2% to earn a
+ratio. Failures, panics, malformed output, missing samples and timeouts remain explicit;
+failed preflights produce skipped timing rows. `--timeout` (default 180 seconds) bounds each
+whole case process, including fixture setup and QA. A timeout therefore does not establish
+an operation-latency lower bound. Timing records are flushed before QA so evidence survives
+a subsequent validation timeout.
+
+Builds and measurements run sequentially; every second timed round reverses execution
+order. The report gives median of round medians, empirical P95, maximum and raw samples.
+P95 from a small sample is descriptive, not a reliable tail guarantee. Peak RSS is read
+before output QA, but includes process setup, libraries, warmup, thread pools and retained
+outputs; thread setup also includes OCCT's STEP import/check. No aggregate speedup is computed.
+
+The output preserves raw logs, `records.jsonl`, `metadata.json`, `summary.json`, `REPORT.md`,
+input STEP files/hashes, source hashes, tracked and untracked source patches, `Cargo.lock`,
+CMake settings, compiler versions and linked-library paths. Sources and binaries should
+remain unchanged during a run. Rebuild a report without measurements using:
+
+```bash
+python3 truck-benchmarks/scripts/compare_occt.py \
+  --output truck-benchmarks/results/2026-10-10-occt --report-only
+```
+
+OCCT reference contracts: [Boolean operations](https://occt3d.com/dev/doc/refman/html/class_b_rep_algo_a_p_i___cut.html),
+[shape validation](https://occt3d.com/dev/doc/refman/html/class_b_rep_check___analyzer.html),
+and [volume integration](https://occt3d.com/dev/doc/refman/html/class_b_rep_g_prop.html).
+
+## Existing action suite
+
 The [2026-09-20 fillet-search comparison](truck-benchmarks/results/2026-09-20/REPORT.md)
 records the rolling-fillet optimization and its effect on the application's threaded box.
 
