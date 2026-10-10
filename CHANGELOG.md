@@ -6,6 +6,8 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Verify existing square-pyramid chamfers with one through four selected ridges at the apex. Replace the outdated unsupported-chamfer expectation with independent setback planes, analytic volumes, convexity, history, transformed/reversed selections and STEP round trips; retain the unsupported four-edge fillet diagnostic. Construction behavior and diagnostic codes are unchanged.
+
 - Normalize longitudinal fillet parameters during STEP fitting, so short and shifted domains can export at the requested geometric tolerance. `ApproxFilletSurface::try_vknot_normalize` preserves the geometry and rejects invalid knot ranges without mutation. The former no-panic regression now requires successful, closed STEP round trips with analytic volume and sampled surface accuracy at parameter scales `1e-9` and `1e9`, including rigid transforms and model scaling. See `truck-benchmarks/results/2026-10-10-fillet-parameter-domains/REPORT.md` for validation and export timings.
 
 - Validate dense planar trim loops with conservative projected segment bounds and cached point projection. Sampling, crossing, containment and clearance predicates are retained; differential tests compare them with the exhaustive validator. This removes the tube-shell workflow's 30-second timeout; measurements and validation are recorded in `truck-benchmarks/results/2026-10-10-planar-validation/REPORT.md`.

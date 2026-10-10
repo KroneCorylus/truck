@@ -413,9 +413,7 @@ fn invalid_parameters_and_selections_leave_input_unchanged() {
     assert_eq!(snapshot(&input), before);
 }
 
-#[test]
-fn unsupported_junctions_have_distinct_diagnostics() {
-    use truck_base::diagnostics::Code;
+fn pyramid() -> Solid {
     let vertices = builder::vertices([
         [0.0, 0.0, 0.0],
         [10.0, 0.0, 0.0],
@@ -449,23 +447,94 @@ fn unsupported_junctions_have_distinct_diagnostics() {
         builder::try_attach_plane(&[wire]).unwrap()
     })
     .collect();
-    let input = Solid::new(vec![shell]);
+    Solid::new(vec![shell])
+}
+
+#[test]
+fn pyramid_chamfers_preserve_setbacks_at_four_edge_vertices() {
+    for transform in transforms() {
+        let input = builder::transformed(&pyramid(), transform);
+        let inverse = transform.invert().unwrap();
+        let before = snapshot(&input);
+        common::assert_solid(&input, 1000. / 3., &[0], TOL);
+        let corners = [(-1., -1.), (1., -1.), (1., 1.), (-1., 1.)];
+        let ids = corners.map(|(x, y)| {
+            edge_between(
+                &input,
+                transform.transform_point(Point3::new(5. + 5. * x, 5. + 5. * y, 0.)),
+                transform.transform_point(Point3::new(5., 5., 10.)),
+            )
+            .id()
+        });
+        for distance in [0.2, 1.2] {
+            let h = distance * (6.0_f64 / 5.).sqrt();
+            for (indices, correction) in [
+                (&[0][..], 1. / 4.),
+                (&[0, 1][..], 7. / 9.),
+                (&[0, 2][..], 2. / 3.),
+                (&[0, 1, 2][..], 4. / 3.),
+                (&[0, 1, 2, 3][..], 2.),
+            ] {
+                // Integrate square sections with the selected corners clipped by
+                // x+y-z >= h and its rotations. The cubic term accounts for overlaps
+                // and for the apex consumed by the intersecting bevel planes.
+                let count = indices.len();
+                let selected: Vec<_> = indices.iter().map(|&i| ids[i]).collect();
+                let expected = 1000. / 3. - count as f64 * 5. * h * h + correction * h.powi(3);
+                let result = try_chamfer_solid_edges(&input, &selected, distance, TOL)
+                    .unwrap_or_else(|e| panic!("selected={indices:?}, distance={distance}: {e:?}"));
+                assert!(result.solid.is_geometric_consistent());
+                common::assert_solid(&result.solid, expected, &[0], TOL);
+                assert_history(&input, &result, count);
+                assert_convex_geometry(&result);
+                for &i in indices {
+                    let (x, y) = corners[i];
+                    let normal = Vector3::new(x, y, 1.).normalize();
+                    let face = result
+                        .generated_faces
+                        .iter()
+                        .find(|face| {
+                            inverse
+                                .transform_vector(face.oriented_surface().normal(0., 0.))
+                                .normalize()
+                                .dot(normal)
+                                > 1. - 1e-8
+                        })
+                        .expect("requested bevel plane");
+                    for vertex in face.vertex_iter() {
+                        let p = inverse.transform_point(vertex.point());
+                        assert!((x * (p.x - 5.) + y * (p.y - 5.) + p.z - 10. + h).abs() < 1e-8);
+                    }
+                }
+                let mut reversed = selected;
+                reversed.reverse();
+                let again = try_chamfer_solid_edges(&input, &reversed, distance, TOL).unwrap();
+                assert_eq!(snapshot(&result.solid), snapshot(&again.solid));
+                common::blend::assert_step(&result.solid, expected, TOL);
+                assert_eq!(before, snapshot(&input));
+            }
+        }
+    }
+}
+
+#[test]
+fn unsupported_pyramid_fillets_leave_input_unchanged() {
+    use truck_base::diagnostics::Code;
+    let input = pyramid();
     let before = snapshot(&input);
-    let ids = [edges[&(0, 4)].id(), edges[&(1, 4)].id()];
+    let ids = [Point3::origin(), Point3::new(10., 0., 0.)]
+        .map(|point| edge_between(&input, point, Point3::new(5., 5., 10.)).id());
     assert_eq!(
         try_fillet_solid_edges(&input, &ids, 1.0, TOL)
             .unwrap_err()
             .code,
         Code::UnsupportedTopology
     );
-    assert_eq!(
-        try_chamfer_solid_edges(&input, &ids, 0.2, TOL)
-            .unwrap_err()
-            .code,
-        Code::UnsupportedTopology
-    );
     assert_eq!(before, snapshot(&input));
+}
 
+#[test]
+fn skewed_two_edge_fillets_form_valid_miters() {
     let transform = Matrix4::from_cols(
         Vector4::new(1.0, 0.2, 0.0, 0.0),
         Vector4::unit_y(),

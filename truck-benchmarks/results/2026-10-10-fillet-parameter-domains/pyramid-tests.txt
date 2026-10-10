@@ -1,0 +1,18 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.77s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/r11_corners.rs (target/debug/deps/r11_corners-c5ed7e0a0d2b8967)
+
+running 8 tests
+test unsupported_pyramid_fillets_leave_input_unchanged ... ok
+test invalid_parameters_and_selections_leave_input_unchanged ... ok
+test sequential_chamfers_reproduce_kernel_gap ... ok
+test miters_at_both_ends_and_next_to_a_spherical_corner ... ok
+test chamfer_fixture_table_and_order ... ok
+test pyramid_chamfers_preserve_setbacks_at_four_edge_vertices ... ok
+test skewed_two_edge_fillets_form_valid_miters ... ok
+test fillet_fixture_table_and_order ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.72s
+

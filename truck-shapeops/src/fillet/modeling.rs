@@ -212,13 +212,15 @@ pub fn try_fillet_solid_edges(
 
 /// Equal-distance chamfers on straight sharp edges with planar or cylindrical support.
 ///
-/// Each touched vertex must have three incident edges. Distances are measured on both adjacent
-/// faces, perpendicular to each selected edge. Bevel planes trim one another: two meet
-/// along a miter, shortening the unselected edge. Three meet at a point, except where two
+/// Distances are measured on both adjacent faces, perpendicular to each selected edge.
+/// Bevel planes trim one another: two meet along a miter, shortening the unselected edge.
+/// Three meet at a point, except where two
 /// convex edges meet a concave edge: a planar transition joins the common face to the
 /// inside bevel. Reversing selection order has no effect.
 /// Nonconvex shells and one-, two- and three-edge junctions are supported. Two-edge bevels
 /// use a triangular transition when their contacts on the unselected edge differ.
+/// Planar intersections also handle some higher-valence junctions, including one through
+/// four selected ridges at a square pyramid's apex.
 /// Unrelated curved faces, curved boundary segments and inner loops are preserved. Contact
 /// boundaries that approach a hole within twice `tol` are rejected. Convex chamfers remove
 /// material; concave chamfers add material between the support faces. Curved geometry at a

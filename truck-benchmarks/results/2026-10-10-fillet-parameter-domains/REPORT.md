@@ -1,4 +1,4 @@
-# Fillet parameter domains during STEP export
+# Fillet parameter domains and pyramid chamfer validation
 
 STEP preparation now exports a fillet whose longitudinal knot range is scaled to
 `1e-9`, instead of rejecting the same physical surface. The fitter normalizes a copy
@@ -70,3 +70,29 @@ RAYON_NUM_THREADS=1 cargo bench --locked -p truck-benchmarks --bench actions -- 
 RAYON_NUM_THREADS=1 taskset -c 0 target/release/deps/actions-d92deb45127f2497 \
   --bench step::prepare_fillet --sample-count 20 --sample-size 1
 ```
+
+## Pyramid corner verification and full-suite follow-up
+
+The existing `r11_corners` failure expected pyramid chamfers to return
+`UnsupportedTopology`, although the solid-level planar intersection fallback already
+constructed them. Before changing that expectation, independent checks verified one
+through four selected ridges at setbacks 0.2 and 1.2, before/after a rigid transform.
+The final test also covers the opposite-edge pair. It checks the requested bevel planes,
+integrated exact volume, topology, closed tessellation, convexity, face history, selection
+order, immutable input and STEP. The retained fillet rejection and skewed-fillet success
+checks are separate tests. No chamfer construction or diagnostic code was changed.
+
+`pyramid-old-contract.txt` records the stale assertion failing on successful construction.
+`pyramid-tests.txt` records all eight final R11 tests passing. The complete shapeops suite
+passes **303 tests, 0 failures, 1 existing ignored** in `shapeops-tests.txt`. That full run
+compiled before adding the opposite-pair selection; the separate R11 run verifies the
+final expanded test. The final R11/library Clippy check and targeted nightly formatting
+also pass. The application was not modified or rerun in this batch.
+
+An independent installed-OCCT-7.9.3 probe also constructs all ten pyramid selection/size
+cases as valid single solids with the requested bevel planes. Single-ridge and opposite-pair
+volumes match Truck's analytic miter volume. Adjacent, three-ridge and four-ridge selections
+have an extra OCCT face and different corner volumes. This is a remaining corner-construction
+difference, not an invalid result. The source, output, exact scope and build command are in
+`audits/fillet-chamfer/probes/README.md`. These paired probes do not execute any of the
+1,026 inventoried upstream regression entries.
