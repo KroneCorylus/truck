@@ -96,6 +96,22 @@ void registerCommands() {
         self.assertNotIn("</script><script>alert(1)", result["catalog.html"])
         self.assertEqual(json.loads(result["catalog.json"])["payload"], "</script><script>alert(1)</script>")
 
+    def test_committing_the_audit_does_not_change_the_kernel_baseline(self):
+        audit.git(self.root, "init", "-q")
+        def commit():
+            audit.git(self.root, "add", ".")
+            audit.git(self.root, "-c", "user.name=Audit Test", "-c", "user.email=audit@example.invalid", "-c", "commit.gpgsign=false", "commit", "-qm", "fixture")
+            return audit.git(self.root, "rev-parse", "HEAD")
+        self.put("truck-modeling/src/geometry.rs", "first")
+        baseline = commit()
+        self.put("audits/fillet-chamfer/catalog.json", "snapshot")
+        commit()
+        self.assertEqual(audit.truck_revision(self.root), baseline)
+        self.put("truck-modeling/src/geometry.rs", "second")
+        changed = commit()
+        self.assertNotEqual(changed, baseline)
+        self.assertEqual(audit.truck_revision(self.root), changed)
+
 
 if __name__ == "__main__":
     unittest.main()

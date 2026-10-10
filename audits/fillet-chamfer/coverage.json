@@ -584,8 +584,8 @@
         "freeform"
       ],
       "occt_scope": "Tests explicitly convert shapes to NURBS before chamfering.",
-      "truck_scope": "Confirmed and fixed a kernel representation gap: drafted rim fillets failed on exact planar NURBS supports although the analytic body worked. Straight-edge construction now recognizes planar B-spline/NURBS control nets and retains the same trim checks. App grouping still checks Curve::Line; broader representation invariance remains open.",
-      "next_case": "Check app grouping with straight edges encoded as splines, then curved support pairs, split faces and imported STEP bodies. Keep equivalent physical dimensions and selections.",
+      "truck_scope": "Fixed planar spline support recognition in the kernel and straight spline edge grouping in Pieza. The app now keeps B-spline/positive-weight NURBS segments with monotone collinear control polygons in the same junction operation as analytic lines. Planar rim fillets and asymmetric chamfers have regressions; broader representation invariance remains open.",
+      "next_case": "Compare curved support pairs and split faces across analytic/NURBS/STEP representations. Investigate the generic along-wire kernel path separately: the former app routing reached an IntersectionCurve panic instead of returning a diagnostic.",
       "evidence": [
         {
           "repo": "occt",
@@ -596,8 +596,26 @@
         {
           "repo": "app",
           "path": "cad-core/src/kernel/blend.rs",
-          "find": "matches!(chains[i].1[0].curve(), Curve::Line(_))",
+          "find": "fn straight_edge",
           "role": "implementation"
+        },
+        {
+          "repo": "app",
+          "path": "cad-core/src/kernel/blend/tests.rs",
+          "find": "fn straight_spline_junctions_match_analytic_edges",
+          "role": "test"
+        },
+        {
+          "repo": "app",
+          "path": "cad-core/src/kernel/blend/tests.rs",
+          "find": "fn imported_spline_junctions_survive_save_load_and_linked_part_edits",
+          "role": "test"
+        },
+        {
+          "repo": "app",
+          "path": "cad-core/corpus/imported-spline-fillet/document.json",
+          "find": "\"Fillet\":",
+          "role": "test"
         },
         {
           "repo": "truck",
@@ -635,8 +653,12 @@
         "Reproduced UnsupportedGeometry on a valid NURBS-converted drafted rim before the fix; the equivalent analytic fixture passed.",
         "Truck regressions now pass for B-spline/NURBS rims, convex and cavity boundaries, both draft directions, two-edge/full-rim selections, two radii, rotation/translation/scaling, input and selection-order preservation, exact volume, contact radius/tangency and STEP exchange.",
         "Spline cavity-rim chamfers also pass independent volume and STEP checks for both draft directions and both spline representations.",
+        "Before the app fix, two selected cubic B-spline cube edges were handled sequentially and panicked inside IntersectionCurve; the analytic control passed. Grouping by segment geometry fixes the selected junction without changing curve representations.",
+        "App regressions pass for two-edge/full-rim selections, weighted NURBS and B-spline segments, unequal chamfer side assignments, radius/volume/closed-mesh checks, transforms, scale, reversed selection order and retained names. Bowed, retracing and singular splines are excluded from straight-segment routing.",
+        "A STEP-linked NURBS cube supports filleting, document save/load and an upstream height change while retaining body and generated-face references. Output STEP is checked at the documented fitting tolerance, with closed tessellation and independent volume.",
+        "App fix committed as 48e8fe2. cargo test --locked -p cad-core --no-fail-fast: 425 passed, 0 failed, 2 existing ignored, including the permanent imported-spline-fillet corpus case and CLI checks. cargo clippy --locked -p cad-core --all-targets completed with warnings in unchanged files.",
         "Broader suite validation found a pre-existing failure in r11_corners::unsupported_junctions_have_distinct_diagnostics: a pyramid chamfer succeeds where the test expects UnsupportedTopology. Reproduced unchanged at parent 7eb2d78d with the same Cargo.lock; the assertion is retained.",
-        "These are independently specified Truck regression fixtures, not executions of the 1,026 OCCT corpus entries."
+        "These are independently specified Truck/Pieza regression fixtures, not executions of the 1,026 OCCT corpus entries."
       ]
     },
     {

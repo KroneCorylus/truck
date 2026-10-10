@@ -52,6 +52,11 @@ def git(root, *args):
     return subprocess.check_output(["git", "-C", str(root), *args], text=True).strip()
 
 
+def truck_revision(root):
+    # Committing the audit must not make its own generated snapshot stale.
+    return git(root, "log", "-1", "--format=%H", "--", ".", ":(exclude)audits/fillet-chamfer")
+
+
 def source_ref(root, path, revision=None, line=1):
     rel = path.relative_to(root).as_posix()
     if revision:
@@ -344,7 +349,7 @@ def build(occt, app):
         "schema_version": 1,
         "snapshots": {
             "occt": {"revision": revision, "tag": git(occt, "describe", "--tags", "--always"), "tracked_changes": git(occt, "status", "--porcelain", "--untracked-files=no")},
-            "truck": {"revision": git(TRUCK, "rev-parse", "HEAD"), "tracked_changes_in_modeling": git(TRUCK, "status", "--porcelain", "--untracked-files=no", "--", "truck-shapeops", "truck-geometry", "truck-modeling")},
+            "truck": {"revision": truck_revision(TRUCK), "revision_scope": "Latest commit outside audits/fillet-chamfer; audit-only commits do not change the kernel baseline.", "tracked_changes_in_modeling": git(TRUCK, "status", "--porcelain", "--untracked-files=no", "--", "truck-shapeops", "truck-geometry", "truck-modeling")},
             "app": {"revision": git(app, "rev-parse", "HEAD"), "tracked_changes_in_core": git(app, "status", "--porcelain", "--untracked-files=no", "--", "cad-core")},
         },
         "scope": coverage["scope"], "status_definitions": coverage["status_definitions"],
