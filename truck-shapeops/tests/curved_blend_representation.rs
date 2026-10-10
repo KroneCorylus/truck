@@ -110,10 +110,70 @@ fn reparameterized_nurbs_cylinder_rim() { check(Representation::ReparameterizedN
 
 #[test]
 #[cfg(feature = "step-test")]
-fn short_fillet_parameter_domains_do_not_panic_on_step_export() {
+fn fillet_parameter_domains_preserve_step_geometry() {
+    check_fillet_parameter_domains(1., Matrix4::identity());
+    check_fillet_parameter_domains(
+        2.,
+        Matrix4::from_translation(Vector3::new(13., -7., 23.))
+            * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.73))
+            * Matrix4::from_scale(2.),
+    );
+}
+
+#[cfg(feature = "step-test")]
+fn check_fillet_parameter_domains(model_scale: f64, transform: Matrix4) {
     let input = cylinder(Representation::Nurbs);
     let result = try_fillet_solid_along_wire(&input, &rim(&input), 0.5, TOL).unwrap();
-    let mut solid = result.solid.compress();
+    let source = builder::transformed(&result.solid, transform);
+    let area = 0.5_f64.powi(2) * (1. - PI / 4.);
+    let centroid = 0.5 * (10. - 3. * PI) / (12. - 3. * PI);
+    let volume = (200. * PI - 2. * PI * (5. - centroid) * area) * model_scale.powi(3);
+    common::assert_solid(&source, volume, &[0], TOL);
+    for (scale, offset) in [(1e-9, 0.), (1e-9, -3e-9), (1e9, -3e9), (0.125, 8.)] {
+        let solid = reparameterize_fillet(&source, scale, offset);
+        let before = serde_json::to_string(&solid).unwrap();
+        let prepared = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+            truck_stepio::out::prepare_for_step(&solid, TOL / 20.0)
+        }));
+        assert!(prepared.is_ok(), "export must not panic: {scale}, {offset}");
+        let prepared = prepared
+            .unwrap()
+            .expect("parameter-independent STEP preparation");
+        for (original, fitted) in source
+            .face_iter()
+            .zip(prepared.boundaries.iter().flat_map(|shell| &shell.faces))
+        {
+            if !matches!(original.surface(), Surface::Fillet(_)) {
+                continue;
+            }
+            let original = original.surface();
+            let (u, v) = original.try_range_tuple();
+            let (x, y) = fitted.surface.try_range_tuple();
+            let ((a, b), (c, d)) = (u.unwrap(), v.unwrap());
+            let ((e, f), (g, h)) = (x.unwrap(), y.unwrap());
+            for i in 0..=16 {
+                for j in 0..=32 {
+                    let (u, v) = (i as f64 / 16., j as f64 / 32.);
+                    let expected = original.subs(a + (b - a) * u, c + (d - c) * v);
+                    let actual = fitted.surface.subs(e + (f - e) * u, g + (h - g) * v);
+                    assert!(expected.distance(actual) <= TOL / 20.0);
+                }
+            }
+        }
+        let prepared = Solid::extract(prepared).unwrap();
+        common::assert_topology(&prepared, &[0]);
+        common::blend::assert_step(&Solid::extract(solid.clone()).unwrap(), volume, TOL);
+        assert_eq!(before, serde_json::to_string(&solid).unwrap());
+    }
+}
+
+#[cfg(feature = "step-test")]
+fn reparameterize_fillet(
+    source: &Solid,
+    scale: f64,
+    offset: f64,
+) -> truck_topology::compress::CompressedSolid<Point3, Curve, Surface> {
+    let mut solid = source.compress();
     for face in solid
         .boundaries
         .iter_mut()
@@ -122,7 +182,7 @@ fn short_fillet_parameter_domains_do_not_panic_on_step_export() {
         if let Surface::Fillet(processor) = &face.surface {
             let mut entity = serde_json::to_value(processor.entity()).unwrap();
             for knot in entity["knot_vec"].as_array_mut().unwrap() {
-                *knot = serde_json::json!(knot.as_f64().unwrap() * 1e-9);
+                *knot = serde_json::json!(knot.as_f64().unwrap() * scale + offset);
             }
             let mut scaled = Processor::with_transform(
                 serde_json::from_value::<ApproxFilletSurface<Box<Surface>, Box<Surface>>>(entity)
@@ -135,10 +195,5 @@ fn short_fillet_parameter_domains_do_not_panic_on_step_export() {
             face.surface = Surface::Fillet(scaled);
         }
     }
-    let before = serde_json::to_string(&solid).unwrap();
-    let prepared = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-        truck_stepio::out::prepare_for_step(&solid, TOL / 20.0)
-    }));
-    assert!(prepared.is_ok(), "an unresolved fit must return None");
-    assert_eq!(before, serde_json::to_string(&solid).unwrap());
+    solid
 }

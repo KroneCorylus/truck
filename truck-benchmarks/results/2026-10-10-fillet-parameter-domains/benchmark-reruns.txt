@@ -1,0 +1,75 @@
+Pinned CPU: 0
+VERSION: before
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-modeling)
+   Compiling truck-meshalgo v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-meshalgo)
+   Compiling truck-drafting v0.1.0 (/home/krone/Development/Pieza_WS/truck/truck-drafting)
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+   Compiling truck-hlr v0.1.0 (/home/krone/Development/Pieza_WS/truck/truck-hlr)
+   Compiling truck-benchmarks v0.1.0 (/home/krone/Development/Pieza_WS/truck/truck-benchmarks)
+    Finished `bench` profile [optimized] target(s) in 12.63s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+  Executable benches/actions.rs (target/release/deps/actions-d92deb45127f2497)
+RUN: 1
+Timer precision: 10 ns
+actions               fastest       │ slowest       │ median        │ mean          │ samples │ iters
+╰─ step                             │               │               │               │         │
+   ╰─ prepare_fillet                │               │               │               │         │
+      ├─ false        18.67 ms      │ 19.46 ms      │ 18.8 ms       │ 18.85 ms      │ 20      │ 20
+      ╰─ true         13.34 ms      │ 13.86 ms      │ 13.38 ms      │ 13.42 ms      │ 20      │ 20
+
+RUN: 2
+Timer precision: 10 ns
+actions               fastest       │ slowest       │ median        │ mean          │ samples │ iters
+╰─ step                             │               │               │               │         │
+   ╰─ prepare_fillet                │               │               │               │         │
+      ├─ false        19.02 ms      │ 19.6 ms       │ 19.25 ms      │ 19.26 ms      │ 20      │ 20
+      ╰─ true         13.13 ms      │ 13.41 ms      │ 13.21 ms      │ 13.23 ms      │ 20      │ 20
+
+RUN: 3
+Timer precision: 10 ns
+actions               fastest       │ slowest       │ median        │ mean          │ samples │ iters
+╰─ step                             │               │               │               │         │
+   ╰─ prepare_fillet                │               │               │               │         │
+      ├─ false        18.99 ms      │ 19.3 ms       │ 19.06 ms      │ 19.08 ms      │ 20      │ 20
+      ╰─ true         13 ms         │ 13.18 ms      │ 13.11 ms      │ 13.11 ms      │ 20      │ 20
+
+VERSION: after
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-modeling)
+   Compiling truck-meshalgo v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-meshalgo)
+   Compiling truck-drafting v0.1.0 (/home/krone/Development/Pieza_WS/truck/truck-drafting)
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/truck-stepio)
+   Compiling truck-hlr v0.1.0 (/home/krone/Development/Pieza_WS/truck/truck-hlr)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+   Compiling truck-benchmarks v0.1.0 (/home/krone/Development/Pieza_WS/truck/truck-benchmarks)
+    Finished `bench` profile [optimized] target(s) in 12.58s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+  Executable benches/actions.rs (target/release/deps/actions-d92deb45127f2497)
+RUN: 1
+Timer precision: 20 ns
+actions               fastest       │ slowest       │ median        │ mean          │ samples │ iters
+╰─ step                             │               │               │               │         │
+   ╰─ prepare_fillet                │               │               │               │         │
+      ├─ false        19.07 ms      │ 19.66 ms      │ 19.21 ms      │ 19.23 ms      │ 20      │ 20
+      ╰─ true         13.32 ms      │ 13.69 ms      │ 13.46 ms      │ 13.47 ms      │ 20      │ 20
+
+RUN: 2
+Timer precision: 10 ns
+actions               fastest       │ slowest       │ median        │ mean          │ samples │ iters
+╰─ step                             │               │               │               │         │
+   ╰─ prepare_fillet                │               │               │               │         │
+      ├─ false        18.58 ms      │ 18.9 ms       │ 18.72 ms      │ 18.72 ms      │ 20      │ 20
+      ╰─ true         13.93 ms      │ 14.31 ms      │ 14.04 ms      │ 14.04 ms      │ 20      │ 20
+
+RUN: 3
+Timer precision: 10 ns
+actions               fastest       │ slowest       │ median        │ mean          │ samples │ iters
+╰─ step                             │               │               │               │         │
+   ╰─ prepare_fillet                │               │               │               │         │
+      ├─ false        18.55 ms      │ 18.91 ms      │ 18.67 ms      │ 18.69 ms      │ 20      │ 20
+      ╰─ true         12.96 ms      │ 13.3 ms       │ 13.05 ms      │ 13.06 ms      │ 20      │ 20
+

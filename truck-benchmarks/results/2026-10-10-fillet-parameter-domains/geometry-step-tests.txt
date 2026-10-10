@@ -1,0 +1,566 @@
+   Compiling truck-geotrait v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-geotrait)
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+   Compiling truck-topology v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-topology)
+   Compiling truck-polymesh v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-polymesh)
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-modeling)
+   Compiling truck-meshalgo v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-meshalgo)
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 11.72s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running unittests src/lib.rs (target/debug/deps/truck_geometry-45c7e3567bdc8e03)
+
+running 26 tests
+****** test of the expressions of error messages ******
+
+This knot vector consists single value.
+
+Cannot concat two knot vectors whose the back of the first and the front of the second are different.
+the back of the first knot vector: 0
+the front of the second knot vector: 1
+
+This knot vector is not clamped.
+
+This knot vector is not sorted.
+
+This knot vector is too short compared to the degree.
+the length of knot_vec: 1
+the degree: 2
+
+The 7th knot in this knot vector cannot be removed.
+
+The control point must not be empty.
+
+The knot vector must be more than the control points.
+the length of knot_vec: 1
+the number of control points: 2
+
+The number of control points is irregular
+
+*******************************************************
+test decorators::extruded_curve::extrude_line ... ok
+test decorators::af_surface::tests::adaptive_contact_failure_is_propagated ... ok
+test decorators::rbf_surface::contact_circle::tests::singular_contact_planes_return_none ... ok
+test decorators::test_range_common_part ... ok
+test nurbs::bspcurve::cubic_bezier_interpolation_test ... ok
+test decorators::rbf_surface::contact_circle::tests::invalid_contact_circles_return_none ... ok
+test nurbs::knot_vec::tests::floor_is_the_last_knot_not_above ... ok
+test nurbs::knot_vec::tests::nan_knots_are_rejected ... ok
+test errors::print_messages ... ok
+test specifieds::line::line ... ok
+test specifieds::parabola::snp_test ... ok
+test specifieds::parabola::sp_test ... ok
+test decorators::af_surface::tests::search_reuses_cross_sections ... ok
+test decorators::intersection_curve::intersection_branch_at_a_tangent_endpoint ... ok
+test decorators::rbf_surface::algo::rot_der_n_test ... ok
+test decorators::rbf_surface::algo::fillet_between_two_spheres_deralgo ... ok
+test decorators::af_surface::tests::normalize_longitudinal_parameters_preserves_geometry ... ok
+test nurbs::nurbssurface::test_include3d ... ok
+test nurbs::nurbssurface::test_include2d ... ok
+test nurbs::bspsurface::test_include_bspcurve2 ... ok
+test decorators::intersection_curve::double_projection_tests::sphere_case ... ok
+test nurbs::bspsurface::test_include_bspcurve3 ... ok
+test decorators::intersection_curve::double_projection_tests::plane_case ... ok
+test decorators::af_surface::tests::plane_cylinder ... ok
+test decorators::af_surface::tests::test_ders ... ok
+test decorators::af_surface::tests::presearch_matches_the_original_grid ... ok
+
+test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+
+     Running tests/af_surface.rs (target/debug/deps/af_surface-e58baa00218bbf6a)
+
+running 1 test
+test approx_fillet_between_two_spheres ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+
+     Running tests/bspcurve.rs (target/debug/deps/bspcurve-d835aa2084ef01ed)
+
+running 10 tests
+test bsp_bench ... ignored
+test concat_negative_test ... ok
+test test_2nd_derivation ... ok
+test test_invert ... ok
+test test_near_as_curve ... ok
+test test_derivation ... ok
+test test_substitution ... ok
+test test_parameter_division ... ok
+test test_der_n ... ok
+test parameter_random_tests ... ok
+
+test result: ok. 9 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+     Running tests/bspsurface.rs (target/debug/deps/bspsurface-4e0e952f85967791)
+
+running 7 tests
+test test_uderivation ... ok
+test test_vderivation ... ok
+test test_substitution ... ok
+test test_vvderivation ... ok
+test test_uvderivation ... ok
+test test_uuderivation ... ok
+test test_der_mn ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.64s
+
+     Running tests/circle.rs (target/debug/deps/circle-95e22a9e74f58884)
+
+running 11 tests
+test inverse_axes_and_signed_zero_stay_in_one_revolution ... ok
+test parameter_division ... ok
+test inverse_near_axes_preserves_parameter_precision ... ok
+test scaled_circle_accepts_submicron_local_chord_tolerance ... ok
+test search_nearest_parameter ... ok
+test search_parameter_with_range ... ok
+test search_nearest_parameter_with_parameter_hint ... ok
+test search_nearest_parameter_with_range ... ok
+test search_parameter_with_parameter_hint ... ok
+test search_parameter ... ok
+test to_nurbs ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/edge_blend.rs (target/debug/deps/edge_blend-30b341b6bbe5a142)
+
+running 2 tests
+test test_edge_blend_ders_by_bspline_surface ... ok
+test test_edge_blend_ends_by_bezier_surface ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+     Running tests/hyperbola.rs (target/debug/deps/hyperbola-858a89e9584cdfda)
+
+running 3 tests
+test sp_negative_test ... ok
+test snp_test ... ok
+test sp_test ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/intersection_cache.rs (target/debug/deps/intersection_cache-42b719d45f9174f5)
+
+running 1 test
+test unchanged_clones_reuse_division_and_mutations_detach ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/intersection_curve.rs (target/debug/deps/intersection_curve-1aef3ebd096524a8)
+
+running 4 tests
+test a_misleading_hint_can_return_a_triple_that_does_not_name_its_point ... ok
+test hints_from_the_previous_sample_find_the_same_point_up_to_a_period ... ok
+test sphere_case ... ok
+test cylinder_case ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+     Running tests/nurbscurve.rs (target/debug/deps/nurbscurve-c4efe82190c173e2)
+
+running 5 tests
+test nurbs_circle ... ok
+test test_parameter_division ... ok
+test test_der_n ... ok
+test test_ders ... ok
+test concat_positive_test ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running tests/nurbssurface.rs (target/debug/deps/nurbssurface-70582507cd60b6cc)
+
+running 2 tests
+test nurbs_sphere ... ok
+test test_der_mn ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.76s
+
+     Running tests/offset.rs (target/debug/deps/offset-70342770bb8cd223)
+
+running 5 tests
+test normal_field_line_with_variable_length ... ok
+test offset_curve_search_parameter ... ok
+test normal_field_unit_circle_with_fixed_length ... ok
+test normal_field_surface_ders_on_plane ... ok
+test offset_surface_search_parameter ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/pcurve.rs (target/debug/deps/pcurve-cc0dedeb933b08de)
+
+running 1 test
+test pcurve_derivation ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/plane.rs (target/debug/deps/plane-08754203a8d1f9dc)
+
+running 1 test
+test into_bspline ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/processor.rs (target/debug/deps/processor-5d8509f2bed4c807)
+
+running 5 tests
+test reversed_curve_divisions_keep_parameters_and_points_together ... ok
+test inverted_processor_swaps_search_hints ... ok
+test singular_curve_division_ignores_translation ... ok
+test compatible_with_bspsurface ... ok
+test compatible_with_bspcurve ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+
+     Running tests/processor_curve_derivatives.rs (target/debug/deps/processor_curve_derivatives-1eab3219a4399b09)
+
+running 1 test
+test reversed_curve_derivative_tables_follow_the_chain_rule ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/rbf_surface.rs (target/debug/deps/rbf_surface-9850f031ad8df02e)
+
+running 4 tests
+test contact_circle_as_curve ... ok
+test test_cpwae_plane ... ok
+test test_cpwae ... ok
+test fillet_between_two_spheres ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+     Running tests/revolved_curve.rs (target/debug/deps/revolved_curve-bdf13aa5b1aa384d)
+
+running 8 tests
+test include_curve_abnormal0 ... ok
+test search_nearest_parameter ... ok
+test include_curve_normal ... ok
+test search_nearest_parameter_with_fixed_points ... ok
+test search_parameter_with_fixed_points ... ok
+test search_parameter ... ok
+test include_curve_abnormal1 ... ok
+test revolve_test ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/ruled_search.rs (target/debug/deps/ruled_search-e9af63a8611bef0c)
+
+running 7 tests
+test degenerate_rulings_and_ranges_fall_back ... ok
+test rational_ruled_surface_division_skips_the_affine_axis ... ok
+test nonpositive_rational_weights_use_grid_seed ... ok
+test native_conics_with_oblique_positive_and_negative_extrusion ... ok
+test rational_circles_ellipses_and_swapped_parameters ... ok
+test bspline_ruled_and_general_surfaces ... ok
+test unequal_ruling_weights_use_grid_seed ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+
+     Running tests/sphere.rs (target/debug/deps/sphere-bdd9dec4e5736bcf)
+
+running 4 tests
+test parameter_grid_diagonals_respect_chord_tolerance ... ok
+test sphere_derivation_test ... ok
+test test_der_mn ... ok
+test search_parameter_test ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/thin_surface_search.rs (target/debug/deps/thin_surface_search-0daf45799a472563)
+
+running 1 test
+test thin_rational_patch_inverts_boundary_and_interior_points ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/torus.rs (target/debug/deps/torus-516133979f2e84cc)
+
+running 2 tests
+test surface ... ok
+test test_der_mn ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/trimmed_curve.rs (target/debug/deps/trimmed_curve-058484628d5e33bc)
+
+running 1 test
+test trimmed_circle_searches_stay_in_range ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/truck_stepio-640e3ac1d0405f54)
+
+running 4 tests
+test r#in::deserialize_pscr ... ok
+test out::modeling::tests::noncircular_quadratics_remain_splines ... ok
+test r#in::step_geometry::sphere::surface ... ok
+test r#in::step_geometry::geom_impls::builder ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/affine_conics.rs (target/debug/deps/affine_conics-0fd8cd8adb9fa9e8)
+
+running 1 test
+test affine_conic_arcs_keep_their_locus_and_direction_in_step ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/analytic_boundaries.rs (target/debug/deps/analytic_boundaries-dac725b1976f8aa7)
+
+running 1 test
+test circular_boolean_boundaries_remain_exact_circles_in_step ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/assembly_strings.rs (target/debug/deps/assembly_strings-8159b1a4d7310b97)
+
+running 1 test
+test assembly_labels_escape_step_strings_without_changing_geometry ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/input/main.rs (target/debug/deps/input-1cad586dc2abab3c)
+
+running 46 tests
+test diagnostics::syntax_is_coded_and_preserves_the_parser_source ... ok
+test assy::occt_assy ... ok
+test diagnostics::unsupported_surface_reports_omitted_face_and_dependency ... ok
+test diagnostics::unreadable_records_and_dependency_omissions_have_distinct_codes ... ok
+test geometry::cartesian_point ... ok
+test geometry::direction ... ok
+test geometry::axis2_placement_2d ... ok
+test geometry::line ... ok
+test geometry::placement ... ok
+test geometry::axis2_placement_3d ... ok
+test geometry::plane ... ok
+test geometry::ellipse ... ok
+test geometry::parabola ... ok
+test geometry::hyperbola ... ok
+test table::try_from_step ... ok
+test skipped::face_on_an_unsupported_surface_is_skipped_and_named ... ok
+test geometry::circle ... ok
+test table::read ... ok
+test geometry::axis1_placement ... ok
+test geometry::bezier_curve ... ok
+test skipped::unreadable_vertex_takes_its_edges_and_faces_with_it ... ok
+test geometry::spherical_surface ... ok
+test geometry::vector ... ok
+test geometry::toroidal_surface ... ok
+test geometry::nurbs_curve_bezier_curve ... ok
+test geometry::quasi_uniform_curve ... ok
+test geometry::uniform_curve ... ok
+test geometry::conical_surface ... ok
+test geometry::cylindrical_surface ... ok
+test geometry::nurbs_curve_quasi_uniform_curve ... ok
+test geometry::nurbs_curve_uniform_curve ... ok
+test corpus::unsupported_entities_of_the_corpus_are_listed_in_the_crate_doc ... ok
+test geometry::bezier_surface ... ok
+test geometry::nurbs_surface_bezier_surface ... ok
+test geometry::b_spline_curve_with_knots ... ok
+test geometry::surface_of_linear_extrusion ... ok
+test geometry::nurbs_curve_b_spline_curve_with_knots ... ok
+test geometry::polyline ... ok
+test geometry::quasi_uniform_surface ... ok
+test geometry::nurbs_surface_quasi_uniform_surface ... ok
+test geometry::surface_of_revolution ... ok
+test tessellate_shape::tessellate_shape ... ok
+test geometry::uniform_surface ... ok
+test geometry::b_spline_surface_with_knots ... ok
+test geometry::nurbs_surface_uniform_surface ... ok
+test geometry::nurbs_surface_b_spline_surface_with_knots ... ok
+
+test result: ok. 46 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.75s
+
+     Running tests/io/main.rs (target/debug/deps/io-1362b6d8a8016b4d)
+
+running 11 tests
+test modeling::skewed_extrusion_stays_a_linear_extrusion ... ok
+test modeling::elliptical_arc_is_written_as_ellipse ... ok
+test ioi::surface_curves_read_as_space_curves ... ok
+test oi::oi ... ok
+test modeling::cylinder_is_written_as_cylindrical_surface ... ok
+test modeling::cylinder_survives_a_round_trip ... ok
+test ioi::assy_ioi ... ok
+test modeling::conic_torus_round_trips_with_positive_volume ... ok
+test modeling::revolved_solid_is_written_with_elementary_surfaces ... ok
+test ioi::ioi ... ok
+test modeling::occt_primitives_map_onto_modeling ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.52s
+
+     Running tests/output/main.rs (target/debug/deps/output-701f1fba9cc88f99)
+
+running 8 tests
+test derive::derive_out ... ok
+test screenshot::default_shell ... ok
+test screenshot::custom_header ... ok
+test screenshot::koch ... ok
+test screenshot::cube ... ok
+test geometry::geometry ... ok
+test topology::parse_shell ... ok
+test topology::parse_solid ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/spherical_corners.rs (target/debug/deps/spherical_corners-c31b8698b78bf864)
+
+running 1 test
+test spherical_corner_step_trims_are_exact_meridians_and_equators ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+   Doc-tests truck_geometry
+
+running 139 tests
+test truck-geometry/src/errors.rs - errors::Error::DifferentBackFront (line 29) ... ok
+test truck-geometry/src/decorators/mod.rs - decorators::HomotopySurface (line 299) ... ok
+test truck-geometry/src/nurbs/bspcurve.rs - nurbs::bspcurve::BSplineCurve<P>::clamp (line 668) ... ok
+test truck-geometry/src/errors.rs - errors::Error::TooShortKnotVector (line 122) ... ok
+test truck-geometry/src/errors.rs - errors::Error::EmptyControlPoints (line 106) ... ok
+test truck-geometry/src/nurbs/bspcurve.rs - nurbs::bspcurve::BSplineCurve<P>::is_const (line 460) ... ok
+test truck-geometry/src/decorators/revolved_curve.rs - decorators::revolved_curve::RevolutedCurve<C>::is_front_fixed (line 271) ... ok
+test truck-geometry/src/errors.rs - errors::Error::NotClampedKnotVector (line 42) ... ok
+test truck-geometry/src/errors.rs - errors::Error::TooLargeDegree (line 72) ... ok
+test truck-geometry/src/decorators/rbf_surface/algo.rs - decorators::rbf_surface::algo::RbfSurface<C,S0,S1,R>::contact_circle (line 19) ... ok
+test truck-geometry/src/errors.rs - errors::Error::IrregularControlPoints (line 140) ... ok
+test truck-geometry/src/decorators/mod.rs - decorators::ExtrudedCurve (line 49) ... ok
+test truck-geometry/src/errors.rs - errors::Error::DifferentLength (line 157) ... ok
+test truck-geometry/src/nurbs/bspcurve.rs - nurbs::bspcurve::BSplineCurve<P>::degree (line 114) ... ok
+test truck-geometry/src/nurbs/bspcurve.rs - nurbs::bspcurve::BSplineCurve<P>::add_knot (line 512) ... ok
+test truck-geometry/src/decorators/mod.rs - decorators::Processor (line 128) ... ok
+test truck-geometry/src/decorators/revolved_curve.rs - decorators::revolved_curve::RevolutedCurve<C>::is_back_fixed (line 286) ... ok
+test truck-geometry/src/decorators/mod.rs - decorators::Processor (line 100) ... ok
+test truck-geometry/src/errors.rs - errors::Error::CannotRemoveKnot (line 91) ... ok
+test truck-geometry/src/errors.rs - errors::Error::ZeroRange (line 14) ... ok
+test truck-geometry/src/errors.rs - errors::Error::NotSortedVector (line 57) ... ok
+test truck-geometry/src/nurbs/bspcurve.rs - nurbs::bspcurve::BSplineCurve<P>::bezier_decomposition (line 816) ... ok
+test truck-geometry/src/nurbs/bspcurve.rs - nurbs::bspcurve::BSplineCurve<P>::derivation (line 173) ... ok
+test truck-geometry/src/nurbs/bspcurve.rs - nurbs::bspcurve::BSplineCurve<P>::get_closure (line 147) ... ok
+test truck-geometry/src/decorators/mod.rs - decorators::IntersectionCurve (line 243) ... ok
+test truck-geometry/src/decorators/mod.rs - decorators::RevolutedCurve (line 14) ... ok
+test truck-geometry/src/nurbs/bspcurve.rs - nurbs::bspcurve::BSplineCurve<P>::elevate_degree (line 647) ... ok
+test truck-geometry/src/nurbs/bspcurve.rs - nurbs::bspcurve::BSplineCurve<P>::add_knot (line 497) ... ok
+test truck-geometry/src/errors.rs - errors::Error::GaussianEliminationFailure (line 176) ... ok
+test truck-geometry/src/nurbs/bspcurve.rs - nurbs::bspcurve::BSplineCurve<P>::is_arc_of (line 1090) ... ok
+test truck-geometry/src/decorators/mod.rs - decorators::PCurve (line 166) ... ok
+test truck-geometry/src/nurbs/bspcurve.rs - nurbs::bspcurve::BSplineCurve<P>::cubic_approximation (line 1359) ... ok
+test truck-geometry/src/nurbs/bspcurve.rs - nurbs::bspcurve::BSplineCurve<P>::try_concat (line 1022) ... ok
+test truck-geometry/src/nurbs/bspcurve.rs - nurbs::bspcurve::BSplineCurve<P>::search_nearest_parameter (line 1170) ... ok
+test truck-geometry/src/nurbs/bspcurve.rs - nurbs::bspcurve::BSplineCurve<P>::search_nearest_parameter (line 1151) ... ok
+test truck-geometry/src/nurbs/bspcurve.rs - nurbs::bspcurve::BSplineCurve<P>::near_as_curve (line 918) ... ok
+test truck-geometry/src/nurbs/bspcurve.rs - nurbs::bspcurve::BSplineCurve<P>::near2_as_curve (line 947) ... ok
+test truck-geometry/src/nurbs/bspcurve.rs - nurbs::bspcurve::BSplineCurve<P>::syncro_knots (line 757) ... ok
+test truck-geometry/src/nurbs/bspcurve.rs - nurbs::bspcurve::BSplineCurve<P>::is_const (line 476) ... ok
+test truck-geometry/src/nurbs/bspcurve.rs - nurbs::bspcurve::BSplineCurve<P>::optimize (line 697) ... ok
+test truck-geometry/src/nurbs/bspcurve.rs - nurbs::bspcurve::BSplineCurve<P>::least_square (line 295) ... ok
+test truck-geometry/src/nurbs/bspcurve.rs - nurbs::bspcurve::BSplineCurve<P>::remove_knot (line 560) ... ok
+test truck-geometry/src/nurbs/bspsurface.rs - nurbs::bspsurface::BSplineSurface<P>::add_vknot (line 776) ... ok
+test truck-geometry/src/nurbs/bspsurface.rs - nurbs::bspsurface::BSplineSurface<P>::add_uknot (line 725) ... ok
+test truck-geometry/src/nurbs/bspcurve.rs - nurbs::bspcurve::BSplineCurve<P>::make_locally_injective (line 886) ... ok
+test truck-geometry/src/nurbs/bspsurface.rs - nurbs::bspsurface::BSplineSurface<P>::ctrl_pts_column_iter (line 154) ... ok
+test truck-geometry/src/nurbs/bspsurface.rs - nurbs::bspsurface::BSplineSurface<P>::degrees (line 222) ... ok
+test truck-geometry/src/nurbs/bspcurve.rs - nurbs::bspcurve::BSplineCurve<P>::make_locally_injective (line 851) ... ok
+test truck-geometry/src/nurbs/bspsurface.rs - nurbs::bspsurface::BSplineSurface<P>::column_curve (line 296) ... ok
+test truck-geometry/src/nurbs/bspsurface.rs - nurbs::bspsurface::BSplineSurface<P>::ctrl_pts_row_iter (line 129) ... ok
+test truck-geometry/src/nurbs/bspcurve.rs - nurbs::bspcurve::BSplineCurve<P>::syncro_degree (line 727) ... ok
+test truck-geometry/src/nurbs/bspcurve.rs - nurbs::bspcurve::BSplineCurve<P>::try_remove_knot (line 582) ... ok
+test truck-geometry/src/nurbs/bspcurve.rs - nurbs::bspcurve::BSplineCurve<P>::try_concat (line 1027) ... ok
+test truck-geometry/src/nurbs/bspcurve.rs - nurbs::bspcurve::BSplineCurve<P>::quadratic_approximation (line 368) ... ok
+test truck-geometry/src/nurbs/bspsurface.rs - nurbs::bspsurface::BSplineSurface<P>::near2_as_surface (line 1650) ... ok
+test truck-geometry/src/nurbs/bspcurve.rs - nurbs::bspcurve::BSplineCurve<P>::try_interpole (line 233) ... ok
+test truck-geometry/src/nurbs/bspsurface.rs - nurbs::bspsurface::BSplineSurface<P>::elevate_udegree (line 1062) ... ok
+test truck-geometry/src/nurbs/bspsurface.rs - nurbs::bspsurface::BSplineSurface<P>::by_boundary (line 1459) ... ok
+test truck-geometry/src/nurbs/bspsurface.rs - nurbs::bspsurface::BSplineSurface<P>::by_boundary (line 1428) ... ok
+test truck-geometry/src/nurbs/bspsurface.rs - nurbs::bspsurface::BSplineSurface<P>::near_as_surface (line 1625) ... ok
+test truck-geometry/src/nurbs/bspsurface.rs - nurbs::bspsurface::BSplineSurface<P>::homotopy (line 1384) ... ok
+test truck-geometry/src/nurbs/bspsurface.rs - nurbs::bspsurface::BSplineSurface<P>::elevate_vdegree (line 1027) ... ok
+test truck-geometry/src/nurbs/bspsurface.rs - nurbs::bspsurface::BSplineSurface<P>::least_square (line 517) ... ok
+test truck-geometry/src/nurbs/bspsurface.rs - nurbs::bspsurface::BSplineSurface<P>::remove_uknot (line 902) ... ok
+test truck-geometry/src/nurbs/bspsurface.rs - nurbs::bspsurface::BSplineSurface<P>::remove_vknot (line 1001) ... ok
+test truck-geometry/src/nurbs/bspsurface.rs - nurbs::bspsurface::BSplineSurface<P>::udegree (line 188) ... ok
+test truck-geometry/src/nurbs/bspsurface.rs - nurbs::bspsurface::BSplineSurface<P>::row_curve (line 322) ... ok
+test truck-geometry/src/nurbs/bspsurface.rs - nurbs::bspsurface::BSplineSurface<V>::is_const (line 675) ... ok
+test truck-geometry/src/nurbs/bspsurface.rs - nurbs::bspsurface::BSplineSurface<P>::vdegree (line 205) ... ok
+test truck-geometry/src/nurbs/bspsurface.rs - nurbs::bspsurface::BSplineSurface<P>::swap_axes (line 244) ... ok
+test truck-geometry/src/nurbs/bspsurface.rs - nurbs::bspsurface::BSplineSurface<P>::syncro_uvknots (line 1121) ... ok
+test truck-geometry/src/nurbs/knot_vec.rs - nurbs::knot_vec::KnotVec::bezier_knot (line 551) ... ok
+test truck-geometry/src/nurbs/knot_vec.rs - nurbs::knot_vec::KnotVec::add_knot (line 81) ... ok
+test truck-geometry/src/nurbs/bspsurface.rs - nurbs::bspsurface::BSplineSurface<P>::syncro_uvdegrees (line 1088) ... ok
+test truck-geometry/src/nurbs/bspsurface.rs - nurbs::bspsurface::BSplineSurface<P>::try_remove_uknot (line 831) ... ok
+test truck-geometry/src/nurbs/bspsurface.rs - nurbs::bspsurface::BSplineSurface<P>::splitted_boundary (line 1561) ... ok
+test truck-geometry/src/nurbs/bspsurface.rs - nurbs::bspsurface::BSplineSurface<V>::is_const (line 693) ... ok
+test truck-geometry/src/nurbs/knot_vec.rs - nurbs::knot_vec::KnotVec::from (line 583) ... ok
+test truck-geometry/src/nurbs/knot_vec.rs - nurbs::knot_vec::KnotVec::bspline_basis_functions (line 112) ... ok
+test truck-geometry/src/nurbs/knot_vec.rs - nurbs::knot_vec::KnotVec::bspline_basis_functions (line 127) ... ok
+test truck-geometry/src/nurbs/bspsurface.rs - nurbs::bspsurface::BSplineSurface<P>::sectional_curve (line 1299) ... ok
+test truck-geometry/src/nurbs/bspsurface.rs - nurbs::bspsurface::BSplineSurface<P>::try_remove_vknot (line 930) ... ok
+test truck-geometry/src/nurbs/knot_vec.rs - nurbs::knot_vec::KnotVec::floor (line 56) ... ok
+test truck-geometry/src/nurbs/knot_vec.rs - nurbs::knot_vec::KnotVec::concat (line 456) ... ok
+test truck-geometry/src/nurbs/bspsurface.rs - nurbs::bspsurface::BSplineSurface<P>::vderivation (line 425) ... ok
+test truck-geometry/src/nurbs/knot_vec.rs - nurbs::knot_vec::KnotVec::is_clamped (line 415) ... ok
+test truck-geometry/src/nurbs/bspsurface.rs - nurbs::bspsurface::BSplineSurface<P>::ucut (line 1175) ... ok
+test truck-geometry/src/nurbs/knot_vec.rs - nurbs::knot_vec::KnotVec::from (line 613) ... ok
+test truck-geometry/src/nurbs/knot_vec.rs - nurbs::knot_vec::KnotVec::from (line 597) ... ok
+test truck-geometry/src/nurbs/knot_vec.rs - nurbs::knot_vec::KnotVec::invert (line 391) ... ok
+test truck-geometry/src/nurbs/bspsurface.rs - nurbs::bspsurface::BSplineSurface<P>::uderivation (line 377) ... ok
+test truck-geometry/src/nurbs/knot_vec.rs - nurbs::knot_vec::KnotVec::multiplicity (line 69) ... ok
+test truck-geometry/src/nurbs/knot_vec.rs - nurbs::knot_vec::KnotVec::from_single_multi (line 521) ... ok
+test truck-geometry/src/nurbs/bspsurface.rs - nurbs::bspsurface::BSplineSurface<P>::vcut (line 1251) ... ok
+test truck-geometry/src/nurbs/knot_vec.rs - nurbs::knot_vec::KnotVec::normalize (line 364) ... ok
+test truck-geometry/src/nurbs/knot_vec.rs - nurbs::knot_vec::KnotVec::range_length (line 12) ... ok
+test truck-geometry/src/nurbs/knot_vec.rs - nurbs::knot_vec::KnotVec::same_range (line 27) ... ok
+test truck-geometry/src/nurbs/knot_vec.rs - nurbs::knot_vec::KnotVec::to_single_multi (line 489) ... ok
+test truck-geometry/src/nurbs/knot_vec.rs - nurbs::knot_vec::KnotVec::sub_vec (line 475) ... ok
+test truck-geometry/src/nurbs/knot_vec.rs - nurbs::knot_vec::KnotVec::uniform_knot (line 566) ... ok
+test truck-geometry/src/nurbs/knot_vec.rs - nurbs::knot_vec::KnotVec::try_concat (line 428) ... ok
+test truck-geometry/src/nurbs/knot_vec.rs - nurbs::knot_vec::KnotVec::translate (line 379) ... ok
+test truck-geometry/src/nurbs/knot_vec.rs - nurbs::knot_vec::KnotVec::transform (line 323) ... ok
+test truck-geometry/src/nurbs/mod.rs - nurbs::BSplineCurve (line 64) ... ok
+test truck-geometry/src/nurbs/nurbscurve.rs - nurbs::nurbscurve::NurbsCurve<V>::is_const (line 110) ... ok
+test truck-geometry/src/nurbs/knot_vec.rs - nurbs::knot_vec::KnotVec::try_normalize (line 345) ... ok
+test truck-geometry/src/nurbs/knot_vec.rs - nurbs::knot_vec::KnotVec::try_bspline_basis_functions (line 194) ... ok
+test truck-geometry/src/nurbs/knot_vec.rs - nurbs::knot_vec::Vec<f64>::from (line 629) ... ok
+test truck-geometry/src/nurbs/knot_vec.rs - nurbs::knot_vec::KnotVec::try_bspline_basis_functions (line 177) ... ok
+test truck-geometry/src/nurbs/mod.rs - nurbs::BasisWindow (line 26) ... ok
+test truck-geometry/src/nurbs/nurbscurve.rs - nurbs::nurbscurve::NurbsCurve<V>::near_as_curve (line 154) ... ok
+test truck-geometry/src/nurbs/nurbssurface.rs - nurbs::nurbssurface::NurbsSurface<V>::degrees (line 149) ... ok
+test truck-geometry/src/nurbs/nurbscurve.rs - nurbs::nurbscurve::NurbsCurve<V>::is_const (line 129) ... ok
+test truck-geometry/src/nurbs/nurbscurve.rs - nurbs::nurbscurve::NurbsCurve<V>::search_nearest_parameter (line 410) ... ok
+test truck-geometry/src/nurbs/nurbssurface.rs - nurbs::nurbssurface::NurbsSurface<V>::is_const (line 237) ... ok
+test truck-geometry/src/nurbs/nurbssurface.rs - nurbs::nurbssurface::NurbsSurface<V>::ctrl_pts_column_iter (line 81) ... ok
+test truck-geometry/src/nurbs/nurbssurface.rs - nurbs::nurbssurface::NurbsSurface<V>::ctrl_pts_row_iter (line 56) ... ok
+test truck-geometry/src/nurbs/mod.rs - nurbs::BSplineSurface (line 105) ... ok
+test truck-geometry/src/nurbs/nurbscurve.rs - nurbs::nurbscurve::NurbsCurve<V>::near2_as_curve (line 184) ... ok
+test truck-geometry/src/nurbs/nurbscurve.rs - nurbs::nurbscurve::NurbsCurve<V>::search_nearest_parameter (line 430) ... ok
+test truck-geometry/src/nurbs/nurbssurface.rs - nurbs::nurbssurface::NurbsSurface<V>::near2_as_surface (line 295) ... ok
+test truck-geometry/src/nurbs/nurbssurface.rs - nurbs::nurbssurface::NurbsSurface<V>::near_as_surface (line 268) ... ok
+test truck-geometry/src/nurbs/nurbscurve.rs - nurbs::nurbscurve::NurbsCurve<V>::make_locally_injective (line 348) ... ok
+test truck-geometry/src/nurbs/nurbssurface.rs - nurbs::nurbssurface::NurbsSurface<V>::udegree (line 115) ... ok
+test truck-geometry/src/specifieds/line.rs - specifieds::line::Line<P>::distance_to_point (line 32) ... ok
+test truck-geometry/src/specifieds/line.rs - specifieds::line::Line<P>::projection (line 20) ... ok
+test truck-geometry/src/nurbs/nurbssurface.rs - nurbs::nurbssurface::NurbsSurface<V>::vdegree (line 132) ... ok
+test truck-geometry/src/nurbs/nurbscurve.rs - nurbs::nurbscurve::NurbsCurve<V>::make_locally_injective (line 309) ... ok
+test truck-geometry/src/nurbs/nurbssurface.rs - nurbs::nurbssurface::NurbsSurface<V>::search_parameter (line 822) ... ok
+test truck-geometry/src/nurbs/nurbssurface.rs - nurbs::nurbssurface::NurbsSurface<V>::search_nearest_parameter (line 533) ... ok
+test truck-geometry/src/specifieds/line.rs - specifieds::line::Line<P>::distance_to_point_as_segment (line 50) ... ok
+test truck-geometry/src/specifieds/line.rs - specifieds::line::Line<Point2>::intersection (line 83) ... ok
+test truck-geometry/src/specifieds/mod.rs - specifieds::Line (line 5) ... ok
+test truck-geometry/src/nurbs/nurbssurface.rs - nurbs::nurbssurface::NurbsSurface<V>::splitted_boundary (line 420) ... ok
+test truck-geometry/src/specifieds/line.rs - specifieds::line::Line<Point2>::intersection (line 72) ... ok
+test truck-geometry/src/specifieds/mod.rs - specifieds::Plane (line 27) ... ok
+test truck-geometry/src/specifieds/mod.rs - specifieds::Sphere (line 55) ... ok
+test truck-geometry/src/specifieds/plane.rs - specifieds::plane::Plane::get_parameter (line 37) ... ok
+test truck-geometry/src/specifieds/plane.rs - specifieds::plane::Plane::normal (line 24) ... ok
+
+test result: ok. 139 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.89s
+
+   Doc-tests truck_stepio
+
+running 6 tests
+test truck-stepio/src/out/mod.rs - out::SliceDisplay (line 40) ... ok
+test truck-stepio/src/out/mod.rs - out::IndexSliceDisplay (line 104) ... ok
+test truck-stepio/src/lib.rs - r#in (line 59) ... ok
+test truck-stepio/src/in/convert.rs - r#in::convert::Table::to_compressed_shell (line 307) ... ok
+test truck-stepio/src/in/step_geometry/mod.rs - r#in::step_geometry::modeling_impls (line 273) ... ok
+test truck-stepio/src/in/convert.rs - r#in::convert::Table::to_compressed_solid (line 363) ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.31s
+

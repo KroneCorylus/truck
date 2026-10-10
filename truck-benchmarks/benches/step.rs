@@ -1,6 +1,68 @@
 use super::fixtures::*;
 use divan::{black_box, Bencher};
+use truck_meshalgo::prelude::*;
+use truck_modeling::*;
 use truck_stepio::{out::*, r#in::Table};
+
+#[divan::bench(args = [false, true], sample_count = 5, sample_size = 1)]
+fn prepare_fillet(bencher: Bencher, nurbs: bool) {
+    let disc = builder::try_attach_plane(&[circle(Point3::origin(), 5.)]).unwrap();
+    let mut solid = builder::tsweep(&disc, Vector3::unit_z() * 8.);
+    if nurbs {
+        solid = solid.mapped(
+            |point| *point,
+            |curve| Curve::NurbsCurve(NurbsCurve::try_from(curve).unwrap()),
+            |surface| match surface {
+                Surface::Extruded(surface) => {
+                    let bottom = NurbsCurve::try_from(surface.entity_curve()).unwrap();
+                    let top =
+                        bottom.transformed(Matrix4::from_translation(surface.extruding_vector()));
+                    NurbsSurface::new(BSplineSurface::homotopy(
+                        bottom.into_non_rationalized(),
+                        top.into_non_rationalized(),
+                    ))
+                    .into()
+                }
+                other => other.clone(),
+            },
+        );
+    }
+    let rim = solid
+        .face_iter()
+        .find(|face| face.vertex_iter().all(|vertex| vertex.point().z.near(&8.)))
+        .unwrap()
+        .boundaries()[0]
+        .clone();
+    let result =
+        truck_shapeops::fillet::try_fillet_solid_along_wire(&solid, &rim, 0.5, 0.001).unwrap();
+    let compressed = result.solid.compress();
+    let run = || prepare_for_step(black_box(&compressed), 0.00005).expect("fillet STEP fit");
+    let area = 0.25 * (1. - std::f64::consts::PI / 4.);
+    let centroid = 0.5 * (10. - 3. * std::f64::consts::PI) / (12. - 3. * std::f64::consts::PI);
+    let volume = 200. * std::f64::consts::PI - 2. * std::f64::consts::PI * (5. - centroid) * area;
+    check_volume(&result.solid, volume);
+    let prepared = Solid::extract(run()).unwrap();
+    let meshed = prepared.robust_triangulation(0.001);
+    assert!(meshed.face_iter().all(|face| face.surface().is_some()));
+    let mut mesh = meshed.to_polygon();
+    mesh.put_together_same_attrs(TOLERANCE)
+        .remove_degenerate_faces()
+        .remove_unused_attrs();
+    assert_eq!(
+        mesh.shell_condition(),
+        truck_modeling::shell::ShellCondition::Closed
+    );
+    let area: f64 = mesh
+        .faces()
+        .triangle_iter()
+        .map(|tri| {
+            let [p, q, r] = [0, 1, 2].map(|i| mesh.positions()[tri[i].pos]);
+            (q - p).cross(r - p).magnitude() / 2.
+        })
+        .sum();
+    assert!((mesh.volume() - volume).abs() <= area * 0.0011);
+    bencher.bench(run);
+}
 
 fn fixture(holes: usize) -> String {
     let solid = perforated_plate(holes).compress();

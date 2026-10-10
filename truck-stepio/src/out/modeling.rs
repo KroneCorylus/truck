@@ -9,7 +9,8 @@ use truck_topology::compress::CompressedSolid;
 /// Contact and intersection curves become spatial splines (exact forms are retained when
 /// available); rolling-ball surfaces become rational B-spline surfaces. Exact circular
 /// quadratic splines become circles, and spherical octants align their parameter axes with
-/// their circular boundaries. Other geometry stays exact. Topology, indices, face order and
+/// their circular boundaries. Fillet surfaces use normalized longitudinal parameters.
+/// Other geometry stays exact. Topology, indices, face order and
 /// orientation are preserved, and the input is not modified. Use this before exporting a blend:
 /// the STEP formatter cannot directly represent [`Surface::Fillet`] or [`Curve::PCurve`].
 ///
@@ -316,10 +317,11 @@ fn fillet_to_nurbs(
     surface: &ApproxFilletSurface<Box<Surface>, Box<Surface>>,
     tol: f64,
 ) -> Option<NurbsSurface<Vector4>> {
+    // Fit in dimensionless coordinates so knot evaluation and interpolation do not
+    // depend on the source parameter scale or lose precision to a large offset.
+    let mut surface = surface.clone();
+    surface.try_vknot_normalize()?;
     let (_, (a, b)) = surface.range_tuple();
-    if !a.is_finite() || !b.is_finite() || a >= b || (b - a).so_small() {
-        return None;
-    }
     // Interpolate the four homogeneous control points of each exact cross-section. Only the
     // longitudinal direction is approximated; the rational cubic across the fillet is retained.
     for (preserve_breaks, level) in [false, true]

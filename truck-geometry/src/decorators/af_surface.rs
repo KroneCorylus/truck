@@ -7,6 +7,24 @@ impl<S0, S1> ApproxFilletSurface<S0, S1> {
     pub const fn surface1(&self) -> &S1 { &self.surface1 }
     /// Returns the knot vector for the parameter `v`.
     pub const fn vknot_vec(&self) -> &KnotVec { &self.knot_vec }
+    /// Normalizes the longitudinal parameter to `[0, 1]`, preserving the geometry.
+    ///
+    /// Returns `None` without mutation for non-finite, unordered or zero-range knots.
+    /// Positive ranges below the modeling tolerance are allowed: knots are dimensionless.
+    pub fn try_vknot_normalize(&mut self) -> Option<&mut Self> {
+        let knots = self.knot_vec.as_slice();
+        let (a, b) = (*knots.first()?, *knots.last()?);
+        let span = b - a;
+        if !span.is_finite()
+            || span <= 0.0
+            || knots.iter().any(|knot| !knot.is_finite())
+            || knots.windows(2).any(|pair| pair[0] > pair[1])
+        {
+            return None;
+        }
+        self.knot_vec = knots.iter().map(|knot| (knot - a) / span).collect();
+        Some(self)
+    }
     /// Returns side curve on the first surface.
     pub fn side_pcurve0(&self) -> PCurve<BSplineCurve<Point2>, S0>
     where S0: Clone {
@@ -505,6 +523,53 @@ fn regular_contact(
 mod tests {
     use super::*;
     use proptest::{prelude::*, property_test};
+
+    #[test]
+    fn normalize_longitudinal_parameters_preserves_geometry() {
+        let original = ApproxFilletSurface {
+            knot_vec: KnotVec::bezier_knot(2),
+            surface0: Plane::xy(),
+            side_control_points0: vec![(-1., 0.).into(), (-2., 0.25).into(), (-1., 1.).into()],
+            tangent_vecs0: vec![(f64::sqrt(2.0), 0.).into(); 3],
+            surface1: Plane::yz(),
+            side_control_points1: vec![(0., -1.).into(), (0.25, -2.).into(), (1., -1.).into()],
+            tangent_vecs1: vec![(-f64::sqrt(2.0), 0.).into(); 3],
+            weights: vec![(1. + f64::sqrt(2.0)) / 3.; 3],
+        };
+        for (scale, offset) in [(1e-9, -3e-9), (1e9, -3e9), (0.125, 8.)] {
+            let mut surface = original.clone();
+            surface.knot_vec.transform(scale, offset);
+            surface.try_vknot_normalize().unwrap();
+            assert_eq!(surface.range_tuple(), ((0., 1.), (0., 1.)));
+            for u in [0., 0.3, 0.7, 1.] {
+                for v in [0., 0.3, 0.7, 1.] {
+                    assert_near!(surface.subs(u, v), original.subs(u, v));
+                    assert_near!(surface.ders(2, u, v), original.ders(2, u, v));
+                }
+            }
+        }
+        let mut nan = KnotVec::bezier_knot(2);
+        nan.translate(f64::NAN);
+        for knots in [
+            KnotVec::new(),
+            vec![1.; 6].into(),
+            vec![-f64::MAX, f64::MAX].into(),
+            nan,
+        ] {
+            let mut surface = original.clone();
+            surface.knot_vec = knots;
+            let before: Vec<_> = surface.vknot_vec().iter().map(|x| x.to_bits()).collect();
+            assert!(surface.try_vknot_normalize().is_none());
+            assert_eq!(
+                surface
+                    .vknot_vec()
+                    .iter()
+                    .map(|x| x.to_bits())
+                    .collect::<Vec<_>>(),
+                before
+            );
+        }
+    }
 
     #[derive(Clone)]
     struct CountedPlane(Plane, std::rc::Rc<std::cell::Cell<usize>>);

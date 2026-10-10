@@ -1,0 +1,10 @@
+{
+  "baseline": "e34c0701",
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.1\nLLVM version: 22.1.8\n",
+  "source_sha256": {
+    "truck-geometry/src/decorators/af_surface.rs": "498001f79edd8d658d71c5bd39d8ade5f86d3bedd752e07a79ae535fdd7f020d",
+    "truck-stepio/src/out/modeling.rs": "6acc73b4de1fb69b0ed45f87b01c1e006d8b561f14f14b6816d6457b55f287b6",
+    "truck-shapeops/tests/curved_blend_representation.rs": "3c922556f51ba63e8d3bd3cea56206b992b4b96d4a0270c71730c9715de13657",
+    "truck-benchmarks/benches/step.rs": "6f47a7a8c8505930f673c7a8c1ddca5bad42ffaed8f337668e87c84fd9e9601a"
+  }
+}
