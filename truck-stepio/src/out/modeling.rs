@@ -317,7 +317,7 @@ fn fillet_to_nurbs(
     tol: f64,
 ) -> Option<NurbsSurface<Vector4>> {
     let (_, (a, b)) = surface.range_tuple();
-    if !a.is_finite() || !b.is_finite() || a >= b {
+    if !a.is_finite() || !b.is_finite() || a >= b || (b - a).so_small() {
         return None;
     }
     // Interpolate the four homogeneous control points of each exact cross-section. Only the
@@ -332,8 +332,13 @@ fn fillet_to_nurbs(
         if preserve_breaks {
             // Contact tangents can change derivative at the source knots. Preserve those
             // breaks instead of forcing a C2 fit across them.
-            let (breaks, _) = surface.vknot_vec().to_single_multi();
-            for &knot in &breaks[1..breaks.len() - 1] {
+            let mut breaks = surface.vknot_vec().as_slice().to_vec();
+            breaks.dedup();
+            // Keep the fallback within the uniform fitter's 193-control-point limit.
+            if breaks.len().saturating_sub(2) * 3 + 4 > 193 {
+                return None;
+            }
+            for &knot in breaks.iter().filter(|&&knot| a < knot && knot < b) {
                 let count = knots.iter().filter(|&&value| value == knot).count();
                 for _ in count..3 {
                     knots.add_knot(knot);
@@ -341,6 +346,9 @@ fn fillet_to_nurbs(
             }
         }
         let n = knots.len() - 4;
+        if n > 193 {
+            continue;
+        }
         // Greville stations keep the clamped cubic interpolation system well-conditioned.
         let params: Vec<_> = (0..n)
             .map(|i| (knots[i + 1] + knots[i + 2] + knots[i + 3]) / 3.0)
@@ -370,7 +378,8 @@ fn fillet_to_nurbs(
         else {
             continue;
         };
-        let (spans, _) = knots.to_single_multi();
+        let mut spans = knots.as_slice().to_vec();
+        spans.dedup();
         let nurbs: NurbsSurface<Vector4> =
             NurbsSurface::new(BSplineSurface::new((KnotVec::bezier_knot(3), knots), rows));
         let mut samples = (0..=(n - 1) * 4)

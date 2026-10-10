@@ -1,0 +1,32 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.47s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/curved_blend_representation.rs (target/debug/deps/curved_blend_representation-6a5063b1ec823ec4)
+
+running 3 tests
+test nurbs_cylinder_rim ... FAILED
+test analytic_cylinder_rim ... ok
+test reparameterized_nurbs_cylinder_rim ... FAILED
+
+failures:
+
+---- nurbs_cylinder_rim stdout ----
+
+thread 'nurbs_cylinder_rim' (1321039) panicked at truck-shapeops/tests/common/blend.rs:43:62:
+STEP preparation
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- reparameterized_nurbs_cylinder_rim stdout ----
+
+thread 'reparameterized_nurbs_cylinder_rim' (1321040) panicked at truck-shapeops/tests/common/blend.rs:43:62:
+STEP preparation
+
+
+failures:
+    nurbs_cylinder_rim
+    reparameterized_nurbs_cylinder_rim
+
+test result: FAILED. 1 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.92s
+
+error: test failed, to rerun pass `-p truck-shapeops --test curved_blend_representation`

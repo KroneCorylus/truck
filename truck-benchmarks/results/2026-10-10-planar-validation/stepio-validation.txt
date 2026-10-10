@@ -1,0 +1,137 @@
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.91s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running unittests src/lib.rs (target/debug/deps/truck_stepio-4439b72995f08b11)
+
+running 4 tests
+test r#in::deserialize_pscr ... ok
+test out::modeling::tests::noncircular_quadratics_remain_splines ... ok
+test r#in::step_geometry::sphere::surface ... ok
+test r#in::step_geometry::geom_impls::builder ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/affine_conics.rs (target/debug/deps/affine_conics-5a20da6ccf076afe)
+
+running 1 test
+test affine_conic_arcs_keep_their_locus_and_direction_in_step ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/analytic_boundaries.rs (target/debug/deps/analytic_boundaries-a348ccfb28ba04dc)
+
+running 1 test
+test circular_boolean_boundaries_remain_exact_circles_in_step ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/assembly_strings.rs (target/debug/deps/assembly_strings-494dee609e992f5e)
+
+running 1 test
+test assembly_labels_escape_step_strings_without_changing_geometry ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/input/main.rs (target/debug/deps/input-ebde0a807c63fb15)
+
+running 46 tests
+test diagnostics::syntax_is_coded_and_preserves_the_parser_source ... ok
+test assy::occt_assy ... ok
+test diagnostics::unreadable_records_and_dependency_omissions_have_distinct_codes ... ok
+test diagnostics::unsupported_surface_reports_omitted_face_and_dependency ... ok
+test geometry::direction ... ok
+test geometry::cartesian_point ... ok
+test geometry::axis2_placement_2d ... ok
+test geometry::axis2_placement_3d ... ok
+test geometry::placement ... ok
+test geometry::line ... ok
+test geometry::plane ... ok
+test geometry::axis1_placement ... ok
+test table::read ... ok
+test table::try_from_step ... ok
+test geometry::parabola ... ok
+test skipped::face_on_an_unsupported_surface_is_skipped_and_named ... ok
+test geometry::hyperbola ... ok
+test geometry::circle ... ok
+test skipped::unreadable_vertex_takes_its_edges_and_faces_with_it ... ok
+test geometry::ellipse ... ok
+test geometry::bezier_curve ... ok
+test geometry::spherical_surface ... ok
+test geometry::vector ... ok
+test geometry::nurbs_curve_bezier_curve ... ok
+test geometry::quasi_uniform_curve ... ok
+test geometry::toroidal_surface ... ok
+test geometry::nurbs_curve_quasi_uniform_curve ... ok
+test geometry::cylindrical_surface ... ok
+test geometry::uniform_curve ... ok
+test geometry::conical_surface ... ok
+test corpus::unsupported_entities_of_the_corpus_are_listed_in_the_crate_doc ... ok
+test geometry::nurbs_curve_uniform_curve ... ok
+test geometry::bezier_surface ... ok
+test geometry::nurbs_surface_bezier_surface ... ok
+test geometry::b_spline_curve_with_knots ... ok
+test geometry::nurbs_curve_b_spline_curve_with_knots ... ok
+test geometry::surface_of_linear_extrusion ... ok
+test geometry::polyline ... ok
+test geometry::quasi_uniform_surface ... ok
+test geometry::nurbs_surface_quasi_uniform_surface ... ok
+test geometry::surface_of_revolution ... ok
+test tessellate_shape::tessellate_shape ... ok
+test geometry::uniform_surface ... ok
+test geometry::b_spline_surface_with_knots ... ok
+test geometry::nurbs_surface_uniform_surface ... ok
+test geometry::nurbs_surface_b_spline_surface_with_knots ... ok
+
+test result: ok. 46 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.73s
+
+     Running tests/io/main.rs (target/debug/deps/io-fe974982d8fe0dc9)
+
+running 11 tests
+test modeling::elliptical_arc_is_written_as_ellipse ... ok
+test modeling::skewed_extrusion_stays_a_linear_extrusion ... ok
+test ioi::surface_curves_read_as_space_curves ... ok
+test oi::oi ... ok
+test modeling::cylinder_is_written_as_cylindrical_surface ... ok
+test modeling::cylinder_survives_a_round_trip ... ok
+test ioi::assy_ioi ... ok
+test modeling::conic_torus_round_trips_with_positive_volume ... ok
+test modeling::revolved_solid_is_written_with_elementary_surfaces ... ok
+test ioi::ioi ... ok
+test modeling::occt_primitives_map_onto_modeling ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.56s
+
+     Running tests/output/main.rs (target/debug/deps/output-c26ee4829428cb9f)
+
+running 8 tests
+test derive::derive_out ... ok
+test screenshot::custom_header ... ok
+test screenshot::default_shell ... ok
+test screenshot::koch ... ok
+test screenshot::cube ... ok
+test geometry::geometry ... ok
+test topology::parse_solid ... ok
+test topology::parse_shell ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/spherical_corners.rs (target/debug/deps/spherical_corners-b931203e0d42e837)
+
+running 1 test
+test spherical_corner_step_trims_are_exact_meridians_and_equators ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+   Doc-tests truck_stepio
+
+running 6 tests
+test truck-stepio/src/out/mod.rs - out::SliceDisplay (line 40) ... ok
+test truck-stepio/src/out/mod.rs - out::IndexSliceDisplay (line 104) ... ok
+test truck-stepio/src/lib.rs - r#in (line 59) ... ok
+test truck-stepio/src/in/convert.rs - r#in::convert::Table::to_compressed_shell (line 307) ... ok
+test truck-stepio/src/in/step_geometry/mod.rs - r#in::step_geometry::modeling_impls (line 273) ... ok
+test truck-stepio/src/in/convert.rs - r#in::convert::Table::to_compressed_solid (line 363) ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.31s

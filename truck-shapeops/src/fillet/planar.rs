@@ -9,28 +9,101 @@ fn crosses(a: Point3, b: Point3, c: Point3, d: Point3, normal: Vector3, epsilon:
     opposite(side(a, b, c), side(a, b, d)) && opposite(side(c, d, a), side(c, d, b))
 }
 
+fn any_segment_pair(
+    a: &[Point3],
+    b: Option<&[Point3]>,
+    normal: Vector3,
+    clearance: f64,
+    mut test: impl FnMut(usize, usize) -> bool,
+) -> bool {
+    if a.len() + b.map_or(0, <[_]>::len) <= 32
+        || !normal.magnitude2().is_finite()
+        || normal.so_small()
+    {
+        return (0..a.len()).any(|i| {
+            let range = b.map_or(i + 1..a.len(), |b| 0..b.len());
+            range.into_iter().any(|j| test(i, j))
+        });
+    }
+    if a.is_empty() {
+        return false;
+    }
+    let normal = normal.normalize();
+    let axis = if normal.x.abs() < 0.9 {
+        Vector3::unit_x()
+    } else {
+        Vector3::unit_y()
+    };
+    let x = normal.cross(axis).normalize();
+    let y = normal.cross(x);
+    let project = |p: Point3| [(p - a[0]).dot(x), (p - a[0]).dot(y)];
+    let mut segments: Vec<_> = std::iter::once(a)
+        .chain(b)
+        .enumerate()
+        .flat_map(|(group, points)| {
+            (0..points.len()).map(move |i| {
+                let (p, q) = (project(points[i]), project(points[(i + 1) % points.len()]));
+                (
+                    [p[0].min(q[0]), p[1].min(q[1])],
+                    [p[0].max(q[0]), p[1].max(q[1])],
+                    group,
+                    i,
+                )
+            })
+        })
+        .collect();
+    let extent = segments.iter().fold(0.0_f64, |extent, (min, max, _, _)| {
+        min.iter().chain(max).fold(extent, |m, v| m.max(v.abs()))
+    });
+    // Projected bounds only discard distant pairs; the original predicates decide contact.
+    let padding = clearance + 64.0 * f64::EPSILON * (1.0 + extent);
+    segments.sort_unstable_by(|a, b| a.0[0].total_cmp(&b.0[0]));
+    for (i, &(min_a, max_a, group_a, index_a)) in segments.iter().enumerate() {
+        for &(min_b, max_b, group_b, index_b) in &segments[i + 1..] {
+            if min_b[0] > max_a[0] + padding {
+                break;
+            }
+            if (b.is_some() && group_a == group_b)
+                || min_b[1] > max_a[1] + padding
+                || min_a[1] > max_b[1] + padding
+            {
+                continue;
+            }
+            let (i, j) = if b.is_none() {
+                (index_a.min(index_b), index_a.max(index_b))
+            } else if group_a == 0 {
+                (index_a, index_b)
+            } else {
+                (index_b, index_a)
+            };
+            if test(i, j) {
+                return true;
+            }
+        }
+    }
+    false
+}
+
 pub(super) fn valid_polygon(points: &[Point3], normal: Vector3, epsilon: f64) -> bool {
     if points.len() < 3 {
         return false;
     }
     polygon_area(points).dot(normal) > epsilon * epsilon
-        && (0..points.len()).all(|i| {
+        && (0..points.len()).all(|i| points[i].distance(points[(i + 1) % points.len()]) > epsilon)
+        && !any_segment_pair(points, None, normal, epsilon, |i, j| {
+            if j == i + 1 || (i == 0 && j == points.len() - 1) {
+                return false;
+            }
             let (a, b) = (points[i], points[(i + 1) % points.len()]);
-            a.distance(b) > epsilon
-                && (i + 1..points.len()).all(|j| {
-                    if j == i + 1 || (i == 0 && j == points.len() - 1) {
-                        return true;
-                    }
-                    let (c, d) = (points[j], points[(j + 1) % points.len()]);
-                    !crosses(a, b, c, d, normal, epsilon)
-                        && [(a, c, d), (b, c, d), (c, a, b), (d, a, b)]
-                            .iter()
-                            .all(|&(p, q, r)| {
-                                let axis = r - q;
-                                let t = ((p - q).dot(axis) / axis.magnitude2()).clamp(0.0, 1.0);
-                                p.distance(q + t * axis) > epsilon
-                            })
-                })
+            let (c, d) = (points[j], points[(j + 1) % points.len()]);
+            crosses(a, b, c, d, normal, epsilon)
+                || ![(a, c, d), (b, c, d), (c, a, b), (d, a, b)]
+                    .iter()
+                    .all(|&(p, q, r)| {
+                        let axis = r - q;
+                        let t = ((p - q).dot(axis) / axis.magnitude2()).clamp(0.0, 1.0);
+                        p.distance(q + t * axis) > epsilon
+                    })
         })
 }
 
@@ -52,41 +125,58 @@ pub(super) fn sample_wire(wire: &Wire, tolerance: f64) -> Vec<Point3> {
 }
 
 fn loops_intersect(a: &[Point3], b: &[Point3], normal: Vector3, epsilon: f64) -> bool {
-    (0..a.len()).any(|i| {
-        (0..b.len()).any(|j| {
-            crosses(
-                a[i],
-                a[(i + 1) % a.len()],
-                b[j],
-                b[(j + 1) % b.len()],
-                normal,
-                epsilon,
-            )
-        })
+    any_segment_pair(a, Some(b), normal, epsilon, |i, j| {
+        crosses(
+            a[i],
+            a[(i + 1) % a.len()],
+            b[j],
+            b[(j + 1) % b.len()],
+            normal,
+            epsilon,
+        )
     })
 }
 
 fn inside(p: Point3, original: &[Point3], normal: Vector3, epsilon: f64) -> bool {
+    all_inside(std::iter::once(p), original, normal, epsilon)
+}
+
+fn all_inside(
+    mut points: impl Iterator<Item = Point3>,
+    original: &[Point3],
+    normal: Vector3,
+    epsilon: f64,
+) -> bool {
     let x = (original[1] - original[0]).normalize();
     let y = normal.cross(x);
     let project = |p: Point3| Point2::new((p - original[0]).dot(x), (p - original[0]).dot(y));
-    let p = project(p);
-    let mut winding = false;
-    for j in 0..original.len() {
-        let (a, b) = (
-            project(original[j]),
-            project(original[(j + 1) % original.len()]),
-        );
-        let axis = b - a;
-        let t = ((p - a).dot(axis) / axis.magnitude2()).clamp(0.0, 1.0);
-        if p.distance(a + t * axis) <= epsilon {
-            return true;
+    let original: Vec<_> = original.iter().map(|&p| project(p)).collect();
+    let extent = original
+        .iter()
+        .fold(0.0_f64, |m, p| m.max(p.x.abs()).max(p.y.abs()));
+    let padding = epsilon + 64.0 * f64::EPSILON * (1.0 + extent);
+    points.all(|p| {
+        let p = project(p);
+        let mut winding = false;
+        for j in 0..original.len() {
+            let (a, b) = (original[j], original[(j + 1) % original.len()]);
+            let axis = b - a;
+            if p.x >= a.x.min(b.x) - padding
+                && p.x <= a.x.max(b.x) + padding
+                && p.y >= a.y.min(b.y) - padding
+                && p.y <= a.y.max(b.y) + padding
+            {
+                let t = ((p - a).dot(axis) / axis.magnitude2()).clamp(0.0, 1.0);
+                if p.distance(a + t * axis) <= epsilon {
+                    return true;
+                }
+            }
+            if (a.y > p.y) != (b.y > p.y) && p.x < a.x + (p.y - a.y) * axis.x / axis.y {
+                winding = !winding;
+            }
         }
-        if (a.y > p.y) != (b.y > p.y) && p.x < a.x + (p.y - a.y) * axis.x / axis.y {
-            winding = !winding;
-        }
-    }
-    winding
+        winding
+    })
 }
 
 pub(super) fn contained(
@@ -95,15 +185,17 @@ pub(super) fn contained(
     normal: Vector3,
     epsilon: f64,
 ) -> bool {
-    (0..points.len()).all(|i| {
-        inside(points[i], original, normal, epsilon)
-            && inside(
-                points[i] + (points[(i + 1) % points.len()] - points[i]) / 2.0,
-                original,
-                normal,
-                epsilon,
-            )
-    }) && !loops_intersect(points, original, normal, epsilon)
+    if points.is_empty() {
+        return true;
+    }
+    let samples = (0..points.len()).flat_map(|i| {
+        [
+            points[i],
+            points[i] + (points[(i + 1) % points.len()] - points[i]) / 2.0,
+        ]
+    });
+    all_inside(samples, original, normal, epsilon)
+        && !loops_intersect(points, original, normal, epsilon)
 }
 
 pub(super) fn contains_patch(face: &Face, points: &[Point3], normal: Vector3, tol: f64) -> bool {
@@ -245,14 +337,12 @@ fn loops_touch(a: &[Point3], b: &[Point3], normal: Vector3, clearance: f64) -> b
         let t = ((p - q).dot(axis) / axis.magnitude2()).clamp(0.0, 1.0);
         p.distance(q + t * axis)
     };
-    (0..a.len()).any(|i| {
-        (0..b.len()).any(|j| {
-            let (a, b, c, d) = (a[i], a[(i + 1) % a.len()], b[j], b[(j + 1) % b.len()]);
-            crosses(a, b, c, d, normal, TOLERANCE)
-                || [(a, c, d), (b, c, d), (c, a, b), (d, a, b)]
-                    .iter()
-                    .any(|&(p, q, r)| distance(p, q, r) <= clearance)
-        })
+    any_segment_pair(a, Some(b), normal, clearance, |i, j| {
+        let (a, b, c, d) = (a[i], a[(i + 1) % a.len()], b[j], b[(j + 1) % b.len()]);
+        crosses(a, b, c, d, normal, TOLERANCE)
+            || [(a, c, d), (b, c, d), (c, a, b), (d, a, b)]
+                .iter()
+                .any(|&(p, q, r)| distance(p, q, r) <= clearance)
     })
 }
 
@@ -291,3 +381,6 @@ pub(crate) fn valid_boundaries(
     }
     true
 }
+
+#[cfg(test)]
+mod tests;

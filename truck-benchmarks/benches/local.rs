@@ -47,6 +47,24 @@ fn shell_box(bencher: Bencher) {
     bencher.bench(run);
 }
 
+#[divan::bench(sample_count = 5, sample_size = 1, max_time = 300)]
+fn shell_tube(bencher: Bencher) {
+    let face = builder::try_attach_plane(&[
+        circle(Point3::origin(), 10.),
+        circle(Point3::origin(), 3.).inverse(),
+    ])
+    .unwrap();
+    let solid = builder::tsweep(&face, Vector3::unit_z() * 10.);
+    let top = solid
+        .face_iter()
+        .find(|face| face.vertex_iter().all(|vertex| vertex.point().z.near(&10.)))
+        .unwrap()
+        .id();
+    let run = || try_shell(black_box(&solid), &[top], 0.5).expect("tube shell");
+    check_volume(&run(), 169. * std::f64::consts::PI);
+    bencher.bench(run);
+}
+
 #[divan::bench(args = [1, 4])]
 fn draft_box(bencher: Bencher, count: usize) {
     let solid = cube();

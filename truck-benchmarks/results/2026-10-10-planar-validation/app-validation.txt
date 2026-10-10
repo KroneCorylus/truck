@@ -1,0 +1,752 @@
+    Blocking waiting for file lock on package cache
+   Compiling cad-core v0.1.0 (/home/krone/Development/Pieza_WS/PiezaCAD/cad-core)
+    Finished `test` profile [optimized + debuginfo] target(s) in 32.82s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running unittests src/lib.rs (target/debug/deps/cad_core-8c0b4e94376cde03)
+
+running 239 tests
+test build::tests::an_extrude_whose_shape_is_gone_is_reported_not_fatal ... ok
+test build::tests::a_sketch_whose_face_is_gone_is_reported_not_fatal ... ok
+test build::tests::a_suppressed_extrude_makes_nothing ... ok
+test build::tests::a_sketch_on_the_yz_plane_extrudes_along_x ... ok
+test build::tests::editing_a_sketch_rebuilds_what_was_extruded_from_it ... ok
+test build::tests::revolve_rejects_crossing_axis_and_lost_axis_references ... ok
+test build::tests::editing_a_sketch_hides_everything_after_it ... ok
+test build::tests::a_circular_edge_projects_as_the_whole_circle_it_is ... ok
+test build::tests::a_reference_to_a_deleted_line_is_lost ... ok
+test build::tests::an_extrude_whose_height_is_not_a_number_is_reported ... ok
+test build::tests::a_reference_follows_the_face_of_the_line_it_names ... ok
+test build::tests::suppressing_a_sketch_stops_what_was_built_on_it ... ok
+test build::tests::a_shape_bounded_by_arcs_extrudes_to_the_volume_its_geometry_says ... ok
+test build::tests::revolve_accepts_named_sketch_and_model_axes_and_tracks_dependencies ... ok
+test build::tests::boolean_scope_changes_only_the_named_body_and_reports_missing_targets ... ok
+test build::tests::symmetric_and_second_direction_have_the_expected_extent ... ok
+test build::tests::thin_walls_reject_crossings_and_coincident_offset_sides ... ok
+test dimension::tests::a_diameter_reaches_across_the_circle_and_a_radius_out_from_its_middle ... ok
+test dimension::tests::a_dimension_that_is_not_a_number_shows_what_was_typed ... ok
+test dimension::tests::a_distance_between_lines_is_drawn_square_across_them ... ok
+test dimension::tests::a_length_is_drawn_beside_the_line_it_measures ... ok
+test dimension::tests::a_reference_dimension_reads_the_geometry_and_says_so_in_parentheses ... ok
+test dimension::tests::an_angle_is_measured_about_where_the_two_lines_would_meet ... ok
+test dimension::tests::an_angle_reads_the_corner_its_text_was_put_in ... ok
+test dimension::tests::an_angle_that_reaches_past_a_line_is_drawn_out_to_it ... ok
+test dimension::tests::an_unplaced_length_lands_clear_of_the_line ... ok
+test dimension::tests::carrying_an_angle_round_the_corner_reads_the_other_angle ... ok
+test dimension::tests::parallel_lines_have_no_corner_to_measure_an_angle_about ... ok
+test document::tests::a_default_name_never_collides_with_one_the_user_typed ... ok
+test document::tests::a_feature_can_be_moved_but_not_above_what_it_is_built_on ... ok
+test document::tests::a_param_holds_what_was_typed_until_it_is_asked_for_a_number ... ok
+test document::tests::a_sketch_containing_only_dots_is_not_empty ... ok
+test build::tests::a_sketch_on_a_face_goes_where_that_face_goes ... ok
+test document::tests::a_sketch_on_a_face_cannot_be_built_before_the_face_is ... ok
+test document::tests::a_sketch_is_empty_until_something_is_drawn_in_it ... ok
+test document::tests::deleting_a_sketch_takes_its_extrudes_with_it ... ok
+test document::tests::deleting_a_sketch_takes_the_whole_chain_built_on_it ... ok
+test document::tests::explicit_boolean_targets_are_dependencies ... ok
+test document::tests::features_are_named_in_the_order_they_were_made ... ok
+test expression::tests::arithmetic_units_functions_and_precedence ... ok
+test expression::tests::scope_is_ordered_and_errors_propagate ... ok
+test file::tests::a_dimensioned_sketch_survives_being_written_and_read_back ... ok
+test build::tests::rolling_back_leaves_out_the_feature_it_sits_on_and_the_rest ... ok
+test file::tests::a_version_15_angle_comes_forward_reading_the_corner_it_was_drawn_in ... ok
+test file::tests::a_document_survives_being_written_and_read_back ... ok
+test file::tests::a_version_2_dimension_comes_forward_with_nowhere_written_on_it ... ok
+test file::tests::a_file_from_a_later_version_is_refused_rather_than_misread ... ok
+test file::tests::counters_behind_the_ids_on_file_move_past_them ... ok
+test file::tests::loading_a_sketch_does_not_reuse_the_ids_it_saved ... ok
+test file::tests::the_rules_on_a_sketch_survive_being_written_and_read_back ... ok
+test build::tests::thin_corner_is_mitred_and_branches_are_refused ... ok
+test file::tests::the_version_is_the_first_thing_in_the_file ... ok
+test kernel::blend::tests::bowed_retracing_and_singular_splines_are_not_straight_segments ... ok
+test build::tests::cut_preview_tools_keep_scoped_depth_and_second_direction ... ok
+test file::tests::two_features_or_entities_under_one_id_are_refused ... ok
+test build::tests::a_round_boss_keeps_its_curved_faces_named ... ok
+test kernel::edge::tests::a_circle_facing_the_plane_lands_as_a_circle ... ok
+test kernel::edge::tests::a_circle_seen_at_an_angle_lands_as_the_ellipse_it_flattens_to ... ok
+test kernel::edge::tests::a_circle_standing_square_to_the_plane_lands_on_nothing ... ok
+test build::tests::a_projection_whose_edge_is_gone_is_reported_not_fatal ... ok
+test kernel::evaluation::legacy::tests::rational_weights_varying_along_the_ruled_direction_use_the_original_search ... ok
+test file::tests::a_version_1_file_comes_forward_with_its_points_shared ... ok
+test build::tests::revolve_on_axis_builds_closed_full_partial_and_reversed_shafts ... ok
+test build::tests::an_add_bridges_two_bodies_and_retains_the_first_identity ... ok
+test kernel::evaluation::legacy::tests::projected_seeds_preserve_exact_and_nearest_searches_in_both_parameter_directions ... ok
+test kernel::measure::tests::trimmed_distances_include_interior_crossings_and_skew_segments ... ok
+test kernel::extrude::tests::an_angled_end_plane_keeps_exact_walls_and_cap_names_in_both_directions ... ok
+test kernel::tests::a_flat_trim_boundary_does_not_make_a_bulging_imported_surface_planar ... ok
+test build::tests::boolean_intersection_and_complete_removal_handle_empty_results ... ok
+test kernel::tests::a_loop_drawn_the_other_way_gives_the_same_solid ... ok
+test kernel::tests::empty_shapes_are_rejected ... ok
+test kernel::tests::an_edge_is_named_by_the_two_faces_it_separates ... ok
+test kernel::tests::a_meshed_face_keeps_the_name_of_the_face_it_came_from ... ok
+test build::tests::intersect_accepts_disjoint_profile_regions ... ok
+test kernel::tests::every_face_of_an_extrude_is_named_after_the_line_it_came_from ... ok
+test kernel::tests::extrusion_is_a_closed_outward_solid ... ok
+test kernel::tests::a_circle_extrudes_to_a_true_cylinder_not_a_prism ... ok
+test metrics::tests::a_guard_dropped_out_of_turn_closes_what_it_holds ... ok
+test metrics::tests::percentiles_come_from_the_recent_durations ... ok
+test metrics::tests::same_named_stretches_merge_at_every_depth ... ok
+test metrics::tests::the_stream_gives_each_duration_once_in_order_with_its_nesting ... ok
+test kernel::tests::a_hole_is_cut_through_the_solid ... ok
+test kernel::tests::the_faces_of_one_drawn_curve_share_its_name_and_differ_by_where_they_are ... ok
+test build::tests::curved_face_and_vertex_limits_resolve_without_sampling_the_tool ... ok
+test kernel::tests::the_plane_of_a_face_is_read_off_its_shape_not_off_its_surface ... ok
+test kernel::tests::a_hole_gets_sides_of_its_own ... ok
+test kernel::tests::exports_write_readable_files ... ok
+test pick::tests::a_corner_beats_the_face_it_sits_on ... ok
+test kernel::boolean::tests::an_empty_cutter_preserves_the_target_and_its_names ... ok
+test plane::tests::a_datum_plane_is_the_two_axes_it_is_named_after ... ok
+test plane::tests::a_frame_is_right_handed_and_its_axes_are_square_to_each_other ... ok
+test plane::tests::a_point_lifted_onto_the_plane_comes_back_as_itself ... ok
+test plane::tests::the_frame_of_a_plane_does_not_depend_on_where_on_it_you_look ... ok
+test pick::tests::a_ray_down_the_middle_hits_the_top_of_the_block ... ok
+test pick::tests::an_edge_beats_the_face_it_borders_but_loses_to_a_corner ... ok
+test plugin::tests::dependencies_are_ordered_shared_and_versioned ... ok
+test pick::tests::a_ray_from_the_side_hits_the_wall_of_the_line_it_came_from ... ok
+test plugin::tests::manifest_and_output_validation_reject_invalid_data ... ok
+test pick::tests::a_ray_up_from_underneath_hits_the_face_the_sketch_was_on ... ok
+test build::tests::removed_is_what_a_cut_takes_from_each_body_it_reaches ... ok
+test build::tests::editing_the_peg_moves_the_collar_projected_off_it ... ok
+test section::tests::a_plane_on_a_face_cuts_the_face_outline ... ok
+test pick::tests::a_ray_into_thin_air_picks_nothing ... ok
+test pick::tests::filtered_picking_skips_corners_without_picking_through_faces ... ok
+test plugin::tests::source_fingerprint_ignores_reindexing_but_detects_geometry_changes ... ok
+test plugin::tests::overhangs_respect_angle_print_direction_and_bed_contact ... ok
+test section::tests::a_plane_missing_the_mesh_or_touching_an_edge_cuts_nothing ... ok
+test section::tests::a_plane_through_a_box_cuts_one_closed_rectangle ... ok
+test section::tests::two_meshes_cut_one_loop_each ... ok
+test sketch::edit::tests::a_fillet_rounds_a_corner_with_an_arc_touching_both_sides ... ok
+test sketch::edit::tests::a_drag_leaves_a_shape_it_does_not_reach_exactly_where_it_was ... ok
+test build::tests::disjoint_automatic_operations_fail_without_creating_a_tool_body ... ok
+test sketch::edit::tests::a_pasted_copy_carries_its_own_rules_and_stands_on_its_own ... ok
+test sketch::edit::tests::a_mirrored_line_follows_the_one_it_came_from ... ok
+test sketch::edit::tests::a_quarter_turn_swaps_level_for_upright ... ok
+test sketch::edit::tests::a_polygon_keeps_its_sides_equal_and_is_free_to_move_grow_and_turn ... ok
+test sketch::edit::tests::extending_grows_a_line_to_the_next_thing_in_its_way ... ok
+test sketch::edit::tests::every_move_of_a_drag_comes_out_as_one_transform_from_where_it_began ... ok
+test sketch::edit::tests::a_turned_rectangle_is_still_a_rectangle_and_free_to_turn ... ok
+test sketch::edit::tests::offsetting_a_corner_mitres_the_two_copies_together ... ok
+test sketch::edit::tests::a_slot_is_held_to_the_five_ways_a_slot_can_move ... ok
+test sketch::edit::tests::a_transform_carries_a_free_shape_exactly_where_it_is_sent ... ok
+test sketch::edit::tests::what_is_held_resists_a_transform ... ok
+test sketch::edit::tests::trimming_a_circle_between_two_crossings_leaves_the_other_half ... ok
+test sketch::tests::a_circle_is_one_shape_and_offers_only_its_own_points_to_snap_to ... ok
+test sketch::tests::a_chain_shares_the_point_each_line_ends_on ... ok
+test sketch::edit::tests::scaling_grows_the_dimensions_that_measure_only_what_moves ... ok
+test sketch::tests::a_crossing_sits_on_both_curves_it_was_found_between ... ok
+test sketch::tests::a_curve_is_cut_on_the_same_angles_however_much_of_it_is_asked_for ... ok
+test sketch::tests::a_crossing_is_a_vertex_although_nobody_drew_a_point_there ... ok
+test sketch::edit::tests::trimming_takes_the_stretch_of_a_line_the_click_was_on ... ok
+test sketch::tests::a_dimension_leaves_no_glyph_behind_it ... ok
+test sketch::tests::a_half_circle_closed_by_a_line_is_a_region ... ok
+test pick::tests::the_middle_of_a_face_is_the_face ... ok
+test sketch::tests::a_circle_is_marked_on_its_rim_and_the_mark_points_out_of_it ... ok
+test sketch::tests::a_line_drawn_across_a_circle_cuts_it_in_two ... ok
+test sketch::tests::a_closed_square_is_one_region ... ok
+test sketch::tests::a_line_dropped_near_a_horizontal_but_not_on_one_is_left_free ... ok
+test sketch::tests::a_constraint_is_marked_beside_each_thing_it_names ... ok
+test sketch::tests::a_line_hanging_off_a_shape_is_ignored ... ok
+test sketch::tests::a_line_that_barely_cuts_a_circle_still_cuts_it ... ok
+test sketch::tests::a_rule_about_a_deleted_line_goes_with_it ... ok
+test sketch::tests::a_construction_line_bounds_no_region ... ok
+test sketch::tests::a_line_drawn_across_an_ellipse_cuts_it_in_two ... ok
+test sketch::tests::a_shared_wall_disappears_when_both_sides_are_selected ... ok
+test sketch::tests::a_rectangle_drawn_square_to_the_axes_is_held_square_to_them ... ok
+test sketch::tests::a_line_tangent_to_a_circle_touches_it_once ... ok
+test sketch::tests::a_lock_and_an_alignment_meet_at_a_corner_that_is_not_there ... ok
+test build::tests::a_failed_boolean_leaves_all_targets_intact_and_later_features_build ... ok
+test sketch::tests::an_empty_sketch_snaps_to_its_origin_and_both_axes ... ok
+test sketch::tests::an_arc_drawn_clockwise_comes_back_as_the_other_way_round ... ok
+test sketch::tests::a_wall_landing_mid_line_still_divides_the_shape ... ok
+test sketch::tests::an_arc_is_kept_as_its_centre_and_its_two_ends ... ok
+test sketch::tests::a_square_inside_a_square_is_a_ring_and_a_middle ... ok
+test sketch::tests::an_arc_leaving_along_a_line_is_held_tangent_to_it ... ok
+test sketch::tests::an_end_dropped_on_a_line_is_held_on_that_line ... ok
+test sketch::tests::an_arc_merely_meeting_a_line_is_left_alone ... ok
+test sketch::tests::an_end_dropped_on_a_corner_shares_that_point_instead_of_being_told_to_meet_it ... ok
+test metrics::tests::a_slow_outer_stretch_is_kept_with_what_ran_inside_it ... ok
+test sketch::tests::a_rectangle_drawn_turned_is_held_square_at_its_corners ... ok
+test sketch::tests::an_end_dropped_on_the_middle_of_a_line_is_held_at_its_middle ... ok
+test sketch::tests::clicking_picks_the_line_under_the_cursor ... ok
+test sketch::tests::an_open_chain_is_not_a_region ... ok
+test sketch::tests::origin_axes_intersect_alignment_guides_and_preserve_anchor_priority ... ok
+test sketch::tests::crossing_lines_are_cut_at_the_crossing ... ok
+test sketch::tests::deleting_a_selected_shape_takes_its_lines_with_it ... ok
+test sketch::tests::the_line_being_drawn_holds_horizontal_and_vertical ... ok
+test sketch::tests::snapping_prefers_vertices_then_midpoints_then_lines ... ok
+test sketch::tests::squares_sharing_a_wall_are_two_regions ... ok
+test sketch::tests::regions_far_apart_extrude_as_separate_pieces ... ok
+test solve::tests::a_circle_told_its_diameter_comes_out_half_of_it_across ... ok
+test sketch::tests::extruding_both_fills_the_hole_in ... ok
+test solve::tests::a_fixed_point_does_not_move_and_is_not_a_freedom ... ok
+test solve::tests::a_dimension_that_is_not_a_number_is_reported_rather_than_ignored ... ok
+test sketch::tests::the_same_drawing_is_worked_out_the_same_way_twice ... ok
+test sketch::tests::two_circles_told_to_touch_meet_at_one_point ... ok
+test solve::tests::a_line_told_to_be_horizontal_becomes_horizontal ... ok
+test solve::tests::a_line_told_to_be_vertical_becomes_vertical ... ok
+test sketch::tests::extruding_the_ring_alone_keeps_the_hole ... ok
+test solve::tests::a_line_told_to_touch_a_circle_ends_up_a_radius_away_from_its_middle ... ok
+test sketch::tests::standalone_points_survive_curve_removal_and_round_trip ... ok
+test solve::tests::a_point_told_to_be_the_middle_of_a_line_lands_halfway_along_it ... ok
+test solve::tests::a_rectangle_stays_square_when_one_side_is_retyped ... ok
+test solve::tests::a_rectangle_can_be_dimensioned_to_fifty_by_zero ... ok
+test solve::tests::a_reference_dimension_holds_nothing ... ok
+test solve::tests::a_point_told_how_far_it_stands_off_a_line_moves_to_that_distance ... ok
+test build::tests::up_to_body_keeps_the_first_segment_and_rejects_partial_coverage ... ok
+test plugin::tests::generated_geometry_survives_plugin_removal_and_refuses_stale_source ... ok
+test build::tests::split_face_and_edge_hints_choose_the_domain_instead_of_the_nearest_centre ... ok
+test solve::tests::a_point_told_to_sit_on_a_circle_lands_on_it ... ok
+test solve::tests::a_point_told_to_sit_on_a_line_lands_on_it ... ok
+test solve::tests::a_trial_step_with_a_collapsed_direction_is_rejected ... ok
+test solve::tests::a_slot_told_to_be_symmetric_comes_out_even_about_its_middle_line ... ok
+test solve::tests::a_rule_repeated_is_redundant_rather_than_a_conflict ... ok
+test solve::tests::a_triangle_pinned_at_one_corner_and_held_level_has_nothing_left ... ok
+test solve::tests::a_triangle_with_three_lengths_is_rigid_but_for_where_it_sits ... ok
+test solve::tests::an_angle_read_the_other_way_holds_the_lines_at_what_is_left_of_half_a_turn ... ok
+test solve::tests::an_arc_told_its_radius_grows_about_its_middle ... ok
+test solve::tests::an_arc_told_to_touch_the_line_it_leaves_meets_it_smoothly ... ok
+test solve::tests::an_unconstrained_sketch_is_left_alone ... ok
+test solve::tests::an_over_constrained_square_names_the_rule_that_clashes ... ok
+test plugin::tests::cycles_undeclared_imports_errors_and_timeouts_are_isolated ... ok
+test plugin::tests::fins_are_closed_with_horizontal_contacts_and_print_frame_transforms ... ok
+test solve::tests::collapsed_lines_still_have_length_and_equal_residuals ... ok
+test solve::tests::conflicts_find_separate_clashes_and_later_rules_without_blaming_reference_dimensions ... ok
+test solve::tests::conflicts_include_fixed_points_and_clear_when_resolved ... ok
+test solve::tests::solving_a_sketch_that_already_holds_moves_nothing ... ok
+test solve::tests::two_circles_told_to_be_concentric_share_a_middle ... ok
+test solve::tests::two_lines_told_to_be_equal_come_out_the_same_length ... ok
+test solve::tests::two_lines_told_to_be_perpendicular_stand_square ... ok
+test solve::tests::two_lines_told_to_be_parallel_run_the_same_way ... ok
+test solve::tests::two_circles_told_to_touch_stand_their_radii_apart ... ok
+test solve::tests::the_short_ways_to_count_freedom_agree_with_ranking ... ok
+test solve::tests::two_points_told_how_far_apart_they_are_move_to_that_distance ... ok
+test solve::tests::dragging_moves_what_is_free_and_leaves_what_is_held ... ok
+test solve::tests::two_lines_told_the_angle_between_them_come_out_at_it ... ok
+test solve::tests::two_circles_told_to_be_equal_come_out_the_same_size ... ok
+test solve::tests::two_parallel_lines_told_how_far_apart_they_are_move_to_that_distance ... ok
+test solve::tests::two_points_told_to_coincide_end_up_in_one_place ... ok
+test build::tests::split_bodies_keep_references_across_rebuild_resize_and_explicit_scope ... ok
+test kernel::boolean::tests::component_order_names_cavities_and_step_survive_shell_permutations ... ok
+test build::tests::extrusion_limits_follow_named_geometry_and_preserve_old_files ... ok
+test build::tests::boolean_boss_and_flipped_pocket_keep_the_target_body_and_face_names ... ok
+test build::tests::thin_line_arc_chain_builds_exact_walls_and_survives_size_edits ... ok
+test build::tests::circular_remove_keeps_volume_and_names_for_both_scopes ... ok
+test build::tests::sealed_pocket_is_one_body_with_a_cavity_and_accepts_later_booleans ... ok
+test solve::tests::a_three_hundred_unknown_sketch_solves_quickly ... ok
+test solve::tests::a_sketch_of_many_separate_shapes_solves_quickly ... ok
+test build::tests::a_pattern_instance_that_only_touches_the_target_leaves_it_as_it_was ... ok
+test build::tests::revolved_groove_preserves_names_through_edits_and_file_round_trips ... ok
+test build::tests::a_multi_profile_remove_cuts_each_explicit_target_in_one_call ... ok
+test kernel::blend::tests::imported_spline_junctions_survive_save_load_and_linked_part_edits ... ok
+test kernel::blend::tests::straight_spline_junctions_match_analytic_edges ... ok
+test build::tests::coincident_domains_keep_distinct_sources_across_add_remove_intersect_and_edits ... ok
+test build::tests::overlapping_pattern_instances_are_cut_one_at_a_time ... ok
+test build::tests::a_three_by_three_hole_pattern_is_cut_in_one_call ... ok
+test build::tests::compound_circle_remove_matches_the_independent_cross_section_volume ... ok
+test solve::tests::a_long_connected_shape_solves_and_counts_quickly ... ok
+test build::tests::every_corpus_remove_cut_together_builds_what_one_tool_at_a_time_did has been running for over 60 seconds
+test build::tests::every_corpus_remove_cut_together_builds_what_one_tool_at_a_time_did ... ok
+
+test result: ok. 239 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 75.54s
+
+     Running unittests src/bin/cadc.rs (target/debug/deps/cadc-2ee821dada987926)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/analytic_step.rs (target/debug/deps/analytic_step-34658309cce85474)
+
+running 2 tests
+test every_cylinder_side_keeps_its_exact_parameters_and_orientation_in_step ... ok
+test named_conics_preserve_the_curved_corpus_geometry ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.34s
+
+     Running tests/assembly.rs (target/debug/deps/assembly-8ad7410ed1b317b6)
+
+running 10 tests
+test linked_part_assets_invalidate_the_assembly_cache ... ok
+test fastened_mate_converges_from_full_turn_placements ... ok
+test a_four_bar_linkage_has_one_degree_of_freedom ... ok
+test mate_freedom_is_independent_of_full_turn_placement ... ok
+test mate_feature_preserves_prior_geometry_when_overconstrained ... ok
+test implicit_connectors_use_the_cylinder_axis_and_trimmed_plane_centroid ... ok
+test all_mates_have_their_expected_freedom_and_solve_perturbed_inputs ... ok
+test linked_instances_share_a_source_build_but_reload_changed_parts ... ok
+test three_instances_roundtrip_export_step_and_count_bom ... ok
+test full_turn_mate_document_rebuilds_and_reloads ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/audit_extrusion.rs (target/debug/deps/audit_extrusion-7494c58bb1870d4c)
+
+running 7 tests
+test tapered_rectangles_keep_depths_in_both_directions ... ok
+test failed_late_profile_keeps_all_target_geometry_and_allows_later_feature ... ok
+test tapered_cylinder ... ok
+test through_all_obeys_flip_second_direction_and_explicit_multibody_scope ... ok
+test multiple_regions_apply_all_boolean_operations_with_both_scopes ... ok
+test nested_regions_holes_and_disconnected_islands_in_both_directions ... ok
+test tapered_annuli_keep_inner_and_outer_faces_in_both_directions ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+     Running tests/blend_limits.rs (target/debug/deps/blend_limits-9998e1dc7aae4a18)
+
+running 2 tests
+test near_limit_chamfer_builds_and_retains_miter_geometry_after_reload ... ok
+test near_limit_fillet_builds_and_retains_names_after_reload ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s
+
+     Running tests/blend_patterns.rs (target/debug/deps/blend_patterns-dfdceec8b1da162b)
+
+running 3 tests
+test chamfer_pattern_repeats_the_actual_removed_corner_and_preserves_provenance ... ok
+test fillet_pattern_repeats_the_actual_removed_corner_and_preserves_provenance ... ok
+test cylindrical_face_patch_closes_planar_loops_and_mirrors_about_an_offset_origin ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+     Running tests/blends.rs (target/debug/deps/blends-b541149ffe1b0a54)
+
+running 10 tests
+test unsupported_corner_sizes_report_the_reason_and_preserve_the_body ... ok
+test invalid_blends_preserve_targets_and_report_lost_edges ... ok
+test a_failed_second_body_blend_does_not_modify_the_first ... ok
+test asymmetric_corner_chamfers_preserve_distance_sides ... ok
+test a_fillet_reference_survives_a_boss_splitting_its_adjacent_face ... ok
+test the_fillet_chamfer_corpus_matches_its_analytic_volume ... ok
+test corner_blends_preserve_selection_names_and_survive_upstream_edits ... ok
+test equal_radius_box_corners_are_named ... ok
+test fillet_then_tangent_top_chamfer_survives_edits_and_step ... ok
+test a_picked_cylinder_rim_fillets_the_complete_tangent_chain ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.92s
+
+     Running tests/boolean_hole_fillet.rs (target/debug/deps/boolean_hole_fillet-0e67fe920c08522f)
+
+running 1 test
+test hole_rim_fillet_is_independent_of_extrusion_or_boolean_history ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.53s
+
+     Running tests/channel_boundary.rs (target/debug/deps/channel_boundary-ffcc2e84abb4ca44)
+
+running 1 test
+test channel_rims_are_single_named_edges_before_and_after_the_saved_fillet ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running tests/channel_rim_blends.rs (target/debug/deps/channel_rim_blends-361885700abeec2b)
+
+running 2 tests
+test captured_rim_survives_upstream_edits_distance_swaps_and_reload ... ok
+test captured_channel_accepts_each_rim_selection_in_either_order ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.35s
+
+     Running tests/contact_booleans.rs (target/debug/deps/contact_booleans-b80057cc7bbca23f)
+
+running 4 tests
+test pure_face_edge_and_vertex_contacts_rebuild_as_expected ... ok
+test tangent_rod_in_equal_slot_rebuilds ... ok
+test tangent_steinmetz_union_and_intersection_use_the_app_adapter ... ok
+test tangent_sphere_in_equal_bore_rebuilds ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+
+     Running tests/corpus.rs (target/debug/deps/corpus-25415850d53aa63b)
+
+running 3 tests
+test plugin_support_mesh_survives_reopen_and_exports_with_its_source ... ok
+test cadc_check_says_what_the_corpus_expects ... ok
+test every_document_in_the_corpus_builds_what_it_used_to ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 15.55s
+
+     Running tests/datums.rs (target/debug/deps/datums-91b53c58591185b7)
+
+running 5 tests
+test degenerate_datums_fail_without_preventing_later_features ... ok
+test points_axes_and_three_point_planes_resolve_from_persistent_inputs ... ok
+test cylinder_axes_are_read_from_exact_surfaces ... ok
+test legacy_rational_cylinder_recognition_rejects_an_elliptical_extrusion ... ok
+test offset_angle_and_midplane_sketches_build_and_follow_upstream_edits ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/draft.rs (target/debug/deps/draft-28be9309c222329d)
+
+running 2 tests
+test an_invalid_draft_is_atomic ... ok
+test draft_and_extrude_taper_agree_and_keep_face_references ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/extrude_planar_limits.rs (target/debug/deps/extrude_planar_limits-9c599a50917b5a60)
+
+running 2 tests
+test planar_limit_conics_survive_step_and_document_round_trips ... ok
+test conic_profiles_reach_planar_limits_with_holes_flip_second_direction_and_placement ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.86s
+
+     Running tests/face_blends.rs (target/debug/deps/face_blends-db25d1d3eae5f95a)
+
+running 5 tests
+test boundary_expansion_keeps_distinct_edges_with_the_same_name ... ok
+test asymmetric_face_chamfer_keeps_distance_one_on_the_selected_face ... ok
+test overlapping_faces_and_explicit_edges_are_blended_once ... ok
+test lost_face_preserves_the_body_and_legacy_blends_load_without_faces ... ok
+test face_blends_follow_new_hole_boundaries_and_preserve_existing_names ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+
+     Running tests/face_extrude.rs (target/debug/deps/face_extrude-b6d3725ffeb5e0d1)
+
+running 7 tests
+test face_extrude_rejects_missing_and_curved_faces_atomically ... ok
+test face_extrude_uses_trimmed_face_and_tracks_its_history_position ... ok
+test face_extrude_follows_angled_normals_and_exact_limits ... ok
+test face_extrude_reuses_depths_boolean_modes_and_survives_upstream_edits ... ok
+test face_extrude_resolves_split_domains_and_updates_the_face_outline ... ok
+test face_extrude_adds_top_bottom_and_side_and_preserves_holes ... ok
+test face_extrude_preserves_round_boundaries_and_names_multiple_sources ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+
+     Running tests/face_references.rs (target/debug/deps/face_references-24e7ed59ffd58c5c)
+
+running 3 tests
+test reversed_model_edges_preserve_projected_corner_ids ... ok
+test snapped_points_and_constraints_follow_face_edges_after_save_and_source_edit ... ok
+test coplanar_boundaries_include_other_bodies_and_opposite_normals_but_not_offset_faces ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/feature_reorder.rs (target/debug/deps/feature_reorder-fa06ef6e588b7ec5)
+
+running 5 tests
+test reorder_can_repair_an_existing_forward_reference ... ok
+test projected_edges_depend_on_both_face_creators_even_on_a_world_plane ... ok
+test projected_edge_corpus_cannot_cross_the_projection_source ... ok
+test reorder_preserves_suppressed_dependencies_and_is_atomic ... ok
+test touching_scope_reorder_reports_failure_and_keeps_building_and_can_be_restored ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/formats.rs (target/debug/deps/formats-f4795facb4a24186)
+
+running 2 tests
+test dxf_round_trip_preserves_lines_circles_arcs_units_and_bulged_polylines ... ok
+test corpus_meshes_round_trip_obj_stl_and_three_mf_packages ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/freecad_reference.rs (target/debug/deps/freecad_reference-d761a7fa12e65690)
+
+running 3 tests
+test freecad_cut_contact_matrix ... ok
+test freecad_common_contact_matrix ... ok
+test freecad_fuse_contact_matrix ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/healing.rs (target/debug/deps/healing-7f0cf1f86739579c)
+
+running 2 tests
+test inverted_solid_normals_are_reported_and_only_repaired_when_requested ... ok
+test seam_repair_closes_geometry_but_a_missing_face_remains_a_visible_reference ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/holes.rs (target/debug/deps/holes-6548ba5e81ec3abf)
+
+running 4 tests
+test corner_vertex_cut_makes_a_closed_quarter_bore_with_exact_volume ... ok
+test invalid_or_lost_locations_leave_the_plate_unchanged ... ok
+test blind_and_countersunk_holes_match_their_analytic_volumes ... ok
+test four_counterbores_match_the_analytic_volume_and_keep_names_after_an_edit ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+
+     Running tests/import.rs (target/debug/deps/import-0d776c15ac5de7e1)
+
+running 3 tests
+test malformed_units_and_missing_geometry_are_rejected ... ok
+test a_freecad_bracket_imports_and_its_named_edge_can_be_filleted ... ok
+test exported_parts_reimport_and_save_as_preserves_relative_asset_paths ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/knurl.rs (target/debug/deps/knurl-2c65e7b1e4f3e07c)
+
+running 4 tests
+test invalid_knurl_is_atomic ... ok
+test rotated_cylinders_zero_margin_and_clearance_failures ... ok
+test hex_bore_and_chamfers_survive_native_knurl_and_export ... ok
+test native_knurl_is_closed_editable_and_persistent ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.76s
+
+     Running tests/loft.rs (target/debug/deps/loft-d5bfa4a230b44166)
+
+running 2 tests
+test circular_sections_make_the_expected_cylinder_and_failure_is_atomic ... ok
+test square_to_circle_loft_retains_names_across_edits_and_step ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+
+     Running tests/loft_degenerate.rs (target/debug/deps/loft_degenerate-0714906511390b57)
+
+running 3 tests
+test folded_or_repeated_loft_profiles_fail_without_losing_other_features ... ok
+test monotonic_annular_lofts_keep_volume_in_both_directions_and_all_datum_planes ... ok
+test laterally_offset_profiles_allow_both_progression_directions_but_not_folds ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 15.79s
+
+     Running tests/loft_holes.rs (target/debug/deps/loft_holes-024476fae354a908)
+
+running 3 tests
+test reordered_loft_holes_survive_height_edits_and_step ... ok
+test three_section_lofts_allow_independent_hole_position_changes ... ok
+test loft_holes_follow_geometry_across_creation_order_translation_and_reload ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.62s
+
+     Running tests/measure.rs (target/debug/deps/measure-85b33f9e75a12ae0)
+
+running 4 tests
+test primitive_vertex_edge_face_distance_length_area_and_angles ... ok
+test box_mass_centroid_density_validation_and_document_round_trip ... ok
+test cylinder_mass_area_centroid_and_curved_edge_length_use_fine_sampling ... ok
+test enclosed_cavities_subtract_from_mass_instead_of_adding ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/mixed_chamfer_pair.rs (target/debug/deps/mixed_chamfer_pair-f757340a0fc6f60c)
+
+running 1 test
+test mixed_chamfer_pair_preserves_setbacks_names_and_edits ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/parts.rs (target/debug/deps/parts-beab5bbabe9e9280)
+
+running 1 test
+test split_names_two_bodies_then_moves_copies_and_combines_them ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/patterns.rs (target/debug/deps/patterns-4f7452adb583294d)
+
+running 3 tests
+test invalid_counts_and_unavailable_sources_are_atomic ... ok
+test circular_holes_use_a_datum_axis_and_do_not_duplicate_the_full_turn ... ok
+test a_hole_grid_and_mirrored_boss_match_volume_and_keep_instance_names ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.40s
+
+     Running tests/planar_blend.rs (target/debug/deps/planar_blend-537141167194146c)
+
+running 6 tests
+test reported_reentrant_chamfer_preserves_bodies_and_names ... ok
+test disjoint_planar_fillets_keep_native_surfaces_and_downstream_names ... ok
+test reported_three_way_chamfer_has_four_named_faces_and_survives_edits ... ok
+test reported_concave_chamfer_preserves_curved_cut_and_survives_edits ... ok
+test reported_nonconvex_fillet_preserves_names_through_edits_and_reload ... ok
+test reported_chamfer_with_a_circular_cut_supports_single_edges_and_unequal_distances ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.47s
+
+     Running tests/planes.rs (target/debug/deps/planes-cd672d11d879d1bf)
+
+running 7 tests
+test both_midplane_bisectors_and_parallel_degeneracy_are_explicit ... ok
+test version_30_plane_frames_survive_migration_unchanged ... ok
+test line_angle_passes_through_an_offset_axis_and_rejects_perpendicular_reference ... ok
+test basic_constructions_follow_references_and_preserve_orientation ... ok
+test curve_point_uses_exact_circle_tangent_and_rejects_off_curve_points ... ok
+test circular_edges_cylinder_axes_and_connector_frames_are_plane_sources ... ok
+test cylinder_tangents_select_both_solutions_and_reject_impossible_references ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/projects.rs (target/debug/deps/projects-a4e31faaa4ea4b46)
+
+running 8 tests
+test malformed_projects_and_invalid_source_kinds_are_rejected ... ok
+test save_as_and_workbench_import_rebase_inactive_external_assets ... ok
+test source_failure_invalidates_assembly_fingerprints_and_does_not_use_old_solids ... ok
+test project_roundtrip_preserves_workbenches_and_legacy_files_migrate ... ok
+test external_project_sources_reload_saved_edits_and_report_missing_files ... ok
+test step_definitions_are_shared_per_qualified_source ... ok
+test in_memory_sources_update_all_assemblies_and_keep_distinct_identities ... ok
+test cli_converts_without_overwriting_legacy_and_requires_export_scope ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/resume.rs (target/debug/deps/resume-10ccc3deba9876a0)
+
+running 1 test
+test a_build_carried_on_from_where_another_stopped_comes_out_the_same ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+     Running tests/revolve_composition.rs (target/debug/deps/revolve_composition-bb5b8dd074d45acc)
+
+running 1 test
+test revolved_cylinders_and_sectors_accept_concentric_blind_cuts ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.64s
+
+     Running tests/rib_fillet.rs (target/debug/deps/rib_fillet-550e63de2649b712)
+
+running 1 test
+test captured_rib_slot_joint_supports_single_and_all_selected_fillets ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.90s
+
+     Running tests/rounded_local.rs (target/debug/deps/rounded_local-2ffef90484e2051d)
+
+running 1 test
+test rounded_enclosures_shell_and_draft_after_upstream_edits_and_reload ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.44s
+
+     Running tests/section.rs (target/debug/deps/section-7ab548d18b5c79ce)
+
+running 2 tests
+test a_cut_copied_into_a_sketch_is_fixed_and_bounds_a_region ... ok
+test a_solid_and_its_stl_cut_the_same_closed_loop ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/sequential_blends.rs (target/debug/deps/sequential_blends-3eff55259e4c9b32)
+
+running 1 test
+test reported_model_supports_both_blend_orders_and_upstream_edits ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.38s
+
+     Running tests/shell.rs (target/debug/deps/shell-20cc46190cad2d6f)
+
+running 4 tests
+test invalid_shell_preserves_the_input_body ... ok
+test inward_and_outward_open_boxes_keep_names_and_exact_volume ... ok
+test opened_pocket_keeps_names_when_its_shells_separate ... ok
+test annular_opening_rims_keep_distinct_references_after_edits ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.17s
+
+     Running tests/sketch_offset_patterns.rs (target/debug/deps/sketch_offset_patterns-178cbe69f76e67e8)
+
+running 8 tests
+test invalid_patterns_and_offsets_leave_the_sketch_untouched ... ok
+test circular_patterns_rotate_fixed_geometry_and_do_not_duplicate_a_full_turn ... ok
+test linear_pattern_keeps_connected_copies_construction_and_dimensions ... ok
+test offset_open_line_preserves_end_alignment_and_follows_the_source ... ok
+test circle_and_arc_offset_dimensions_change_the_gap_not_the_source_radius ... ok
+test one_offset_dimension_drives_a_mitred_closed_chain_and_survives_reload ... ok
+test mixed_line_and_arc_offsets_keep_their_shared_ends_when_resized ... ok
+test clockwise_patterns_rotate_ellipse_axes_and_spline_tangents ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/splines.rs (target/debug/deps/splines-98229b921f75d45b)
+
+running 6 tests
+test invalid_spline_input_does_not_mutate_the_sketch ... ok
+test a_line_tangent_to_the_interior_of_a_fixed_spline_solves_and_reports_freedom ... ok
+test spline_tangency_handles_circles_and_another_spline ... ok
+test spline_point_on_and_endpoint_tangency_solve ... ok
+test mirrored_and_transformed_splines_preserve_fit_points_and_tangents ... ok
+test interpolated_region_extrudes_exact_splines_and_keeps_references ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/sweep.rs (target/debug/deps/sweep-d8a2d6143d57b5bc)
+
+running 3 tests
+test fixed_normal_line_sweep_and_model_edge_path_have_exact_volume ... ok
+test a_rectangular_rail_follows_an_interpolated_spline_in_both_modes ... ok
+test swept_pipe_matches_pappus_and_keeps_references ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s
+
+     Running tests/sweep_order.rs (target/debug/deps/sweep_order-e103980f5e43ea39)
+
+running 1 test
+test open_sweep_starts_at_profile_independent_of_selection_order_and_reverse ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/threads.rs (target/debug/deps/threads-738e8707bbf7d09d)
+
+running 7 tests
+test version_29_threads_stay_cosmetic_and_new_geometry_requires_version_30 ... ok
+test standalone_cylinder_threads_are_atomic_and_survive_copies ... ok
+test invalid_modeled_hole_preserves_the_uncut_target ... ok
+test hole_threads_preserve_geometry_names_and_step_properties_across_edits ... ok
+test modeled_hole_has_real_geometry_and_round_trips ... ok
+test four_modeled_m8_holes_make_a_closed_measurement_mesh ... ok
+test standalone_modeled_shaft_deduplicates_faces_and_edits_pitch ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 17.35s
+
+     Running tests/tool_audit_sketch_20260919.rs (target/debug/deps/tool_audit_sketch_20260919-a651fc82a09fc081)
+
+running 11 tests
+test ambiguous_branched_offsets_leave_the_sketch_unchanged ... ok
+test chain_offset_does_not_depend_on_line_creation_direction ... ok
+test pasted_explicit_point_survives_removing_its_adjoining_line ... ok
+test version_28_sketches_migrate_without_inventing_mirror_dependencies ... ok
+test mirrored_spline_follows_source_tangent_edit ... ok
+test mirrored_circle_follows_source_radius_edit ... ok
+test degenerate_mirror_axes_report_conflict_without_corrupting_tangents ... ok
+test cursor_side_orients_closed_offsets_with_mixed_directions_and_selection_order ... ok
+test deleting_a_mirror_source_releases_its_copy_and_cycles_report_conflict ... ok
+test mirrored_curve_dependencies_survive_document_reload_and_tangent_reset ... ok
+test mirrored_spline_tangents_follow_a_rotating_axis_during_drag ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/touching_remove.rs (target/debug/deps/touching_remove-ebd7e66096a005f4)
+
+running 3 tests
+test profile_hole_pattern_rebuild ... ignored, diagnostic benchmark; run the release test explicitly
+test profile_part_unsuppress_latency ... ignored, diagnostic benchmark; run the release test explicitly
+test touching_remove_uses_the_subtraction_result_instead_of_a_preflight_intersection ... ok
+
+test result: ok. 1 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/variables.rs (target/debug/deps/variables-74525e44b48db906)
+
+running 3 tests
+test sketch_dimensions_solve_in_document_scope_and_survive_reload ... ok
+test a_dimension_that_does_not_evaluate_leaves_the_others_driving ... ok
+test plate_count_tracks_variables_and_keeps_named_faces ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.39s
+
+     Running tests/workflow_audit.rs (target/debug/deps/workflow_audit-2bab7f0ed439685e)
+
+running 7 tests
+test audit_document_worker ... ok
+test holes_near_edges_and_each_other ... ok
+test shell_and_draft_after_cutting ... ok
+test blends_around_bores_pockets_and_notches ... ok
+test captured_stepped_channel_full_selection_and_subsets ... ok
+test equivalent_tubes_shell_and_blend ... ok
+test sweep_path_joins_and_loft_section_order ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 10.75s
+
+   Doc-tests cad_core
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

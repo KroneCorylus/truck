@@ -8,10 +8,21 @@ use truck_base::diagnostics::{Code, Diagnostic};
 use truck_geometry::prelude::*;
 use truck_modeling::*;
 
+/// A hollowed solid and the source of each output face, independent of component order.
+#[derive(Clone, Debug)]
+pub struct ShellResult {
+    /// The result, with each connected boundary in a separate shell.
+    pub solid: Solid,
+    /// `(output, source)` IDs for outer faces and opening rims.
+    pub outer_faces: Vec<(FaceID, FaceID)>,
+    /// `(output, source)` IDs for retained inner faces.
+    pub inner_faces: Vec<(FaceID, FaceID)>,
+}
+
 /// Hollows `solid` to walls of `thickness`, with the faces in `removed` opened. Every kept face
 /// is offset inward with [`Surface::offset`](truck_modeling::Surface::offset) and the offsets
 /// are re-intersected with each other through [`super::replace_surfaces`], which gives the cavity; a
-/// removed face is the opening, kept as an annulus around the cavity's mouth. With nothing
+/// removed face leaves one separate rim per boundary around the cavity's mouth. With nothing
 /// removed the cavity is a second, inner shell of the result. The input is not modified.
 ///
 /// This operation takes positive thickness. Concave joins involving a plane are rebuilt by
@@ -19,6 +30,8 @@ use truck_modeling::*;
 /// cylinders or cones as `replace_surfaces` accepts, meeting three at every vertex. Faces that
 /// were not neighbours and come to interfere are not checked; a wall thinner than the solid's
 /// features is the caller's to avoid.
+/// Openings can separate the result into multiple closed boundaries. Use
+/// [`try_shell_with_history`] for face correspondence instead of relying on face order.
 /// # Failures
 /// - [`LocalOpError::NotInward`] for a thickness that is not positive
 /// - [`LocalOpError::Concave`] naming the faces of a concave edge
@@ -41,20 +54,14 @@ pub fn shell(
     removed: &[FaceID],
     thickness: f64,
 ) -> Result<Solid, LocalOpError<Surface>> {
-    shell_impl(solid, removed, thickness).map_err(|e| e.legacy)
+    shell_direction(solid, removed, thickness, false)
+        .map(|result| result.solid)
+        .map_err(|e| e.legacy)
 }
 
 /// Diagnostic variant of [`shell()`], with input-relative locations and retained causes.
 pub fn try_shell(solid: &Solid, removed: &[FaceID], thickness: f64) -> Result<Solid, Diagnostic> {
-    super::validate_solid(solid, "shell")?;
-    if !thickness.is_finite() || thickness <= 0.0 {
-        return Err(
-            Diagnostic::new(Code::InvalidParameter, "shell", "validate_input")
-                .parameter("thickness", thickness),
-        );
-    }
-    shell_impl(solid, removed, thickness)
-        .map_err(|e| locate_failure(solid.face_iter(), removed, "shell", e))
+    try_shell_with_history(solid, removed, thickness, false).map(|result| result.solid)
 }
 
 /// Hollows outward: the input is the cavity and kept faces grow outward by `thickness`.
@@ -65,23 +72,27 @@ pub fn try_shell_outward(
     removed: &[FaceID],
     thickness: f64,
 ) -> Result<Solid, Diagnostic> {
-    super::validate_solid(solid, "shell_outward")?;
-    if !thickness.is_finite() || thickness <= 0.0 {
-        return Err(
-            Diagnostic::new(Code::InvalidParameter, "shell_outward", "validate_input")
-                .parameter("thickness", thickness),
-        );
-    }
-    shell_direction(solid, removed, thickness, true)
-        .map_err(|e| locate_failure(solid.face_iter(), removed, "shell_outward", e))
+    try_shell_with_history(solid, removed, thickness, true).map(|result| result.solid)
 }
 
-pub(super) fn shell_impl(
+/// Hollows inward or outward as [`try_shell`] or [`try_shell_outward`], retaining source
+/// face IDs for both walls and every opening rim. The input and its IDs are unchanged.
+pub fn try_shell_with_history(
     solid: &Solid,
     removed: &[FaceID],
     thickness: f64,
-) -> Result<Solid, Failure> {
-    shell_direction(solid, removed, thickness, false)
+    outward: bool,
+) -> Result<ShellResult, Diagnostic> {
+    let operation = if outward { "shell_outward" } else { "shell" };
+    super::validate_solid(solid, operation)?;
+    if !thickness.is_finite() || thickness <= 0.0 {
+        return Err(
+            Diagnostic::new(Code::InvalidParameter, operation, "validate_input")
+                .parameter("thickness", thickness),
+        );
+    }
+    shell_direction(solid, removed, thickness, outward)
+        .map_err(|e| locate_failure(solid.face_iter(), removed, operation, e))
 }
 
 fn shell_direction(
@@ -89,7 +100,7 @@ fn shell_direction(
     removed: &[FaceID],
     thickness: f64,
     outward: bool,
-) -> Result<Solid, Failure> {
+) -> Result<ShellResult, Failure> {
     if !thickness.is_finite() || thickness <= 0.0 {
         return Err(LocalOpError::NotInward.into());
     }
@@ -192,6 +203,8 @@ fn shell_direction(
 
     let mut outer: Shell = Shell::new();
     let mut inner: Shell = Shell::new();
+    let mut outer_faces = Vec::new();
+    let mut inner_faces = Vec::new();
     for (i, source) in faces.iter().enumerate() {
         let (face, cavity_face) = if outward {
             (cavity_faces[i], source)
@@ -200,32 +213,50 @@ fn shell_direction(
         };
         match opened.contains(&i) {
             true => {
-                // the opening: the face with the cavity's mouth as a hole
-                let mut loops = face.boundaries();
-                loops.extend(cavity_face.boundaries().iter().map(Wire::inverse));
-                outer.push(Face::try_new(loops, face.oriented_surface()).map_err(|e| {
-                    Failure::new(
-                        LocalOpError::Unsupported { face: face.id() },
-                        Code::InvalidOutputTopology,
-                        "validate_output",
-                    )
-                    .source(e)
-                })?);
+                // Each boundary leaves a separate rim around the opening, including its holes.
+                for (index, (boundary, cavity_boundary)) in face
+                    .boundaries()
+                    .into_iter()
+                    .zip(cavity_face.boundaries())
+                    .enumerate()
+                {
+                    let loops = if index == 0 {
+                        vec![boundary, cavity_boundary.inverse()]
+                    } else {
+                        vec![cavity_boundary.inverse(), boundary]
+                    };
+                    let rim = Face::try_new(loops, face.oriented_surface()).map_err(|e| {
+                        Failure::new(
+                            LocalOpError::Unsupported { face: face.id() },
+                            Code::InvalidOutputTopology,
+                            "validate_output",
+                        )
+                        .source(e)
+                    })?;
+                    outer_faces.push((rim.id(), source.id()));
+                    outer.push(rim);
+                }
             }
             false => {
+                outer_faces.push((face.id(), source.id()));
+                inner_faces.push((cavity_face.id(), source.id()));
                 outer.push(face.clone());
                 inner.push(cavity_face.inverse());
             }
         }
     }
     let shells = match opened.is_empty() {
-        true => vec![outer, inner],
+        true => outer
+            .connected_components()
+            .into_iter()
+            .chain(inner.connected_components())
+            .collect(),
         false => {
             outer.append(&mut inner);
-            vec![outer]
+            outer.connected_components()
         }
     };
-    Solid::try_new(shells).map_err(|e| {
+    let solid = Solid::try_new(shells).map_err(|e| {
         Failure::new(
             LocalOpError::Unsupported {
                 face: faces[0].id(),
@@ -234,6 +265,11 @@ fn shell_direction(
             "validate_output",
         )
         .source(e)
+    })?;
+    Ok(ShellResult {
+        solid,
+        outer_faces,
+        inner_faces,
     })
 }
 

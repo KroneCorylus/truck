@@ -107,3 +107,38 @@ fn assert_rim_dimensions(result: &BlendResult, fillet: bool) {
 
 #[test]
 fn reparameterized_nurbs_cylinder_rim() { check(Representation::ReparameterizedNurbs); }
+
+#[test]
+#[cfg(feature = "step-test")]
+fn short_fillet_parameter_domains_do_not_panic_on_step_export() {
+    let input = cylinder(Representation::Nurbs);
+    let result = try_fillet_solid_along_wire(&input, &rim(&input), 0.5, TOL).unwrap();
+    let mut solid = result.solid.compress();
+    for face in solid
+        .boundaries
+        .iter_mut()
+        .flat_map(|shell| &mut shell.faces)
+    {
+        if let Surface::Fillet(processor) = &face.surface {
+            let mut entity = serde_json::to_value(processor.entity()).unwrap();
+            for knot in entity["knot_vec"].as_array_mut().unwrap() {
+                *knot = serde_json::json!(knot.as_f64().unwrap() * 1e-9);
+            }
+            let mut scaled = Processor::with_transform(
+                serde_json::from_value::<ApproxFilletSurface<Box<Surface>, Box<Surface>>>(entity)
+                    .unwrap(),
+                *processor.transform(),
+            );
+            if !processor.orientation() {
+                scaled.invert();
+            }
+            face.surface = Surface::Fillet(scaled);
+        }
+    }
+    let before = serde_json::to_string(&solid).unwrap();
+    let prepared = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        truck_stepio::out::prepare_for_step(&solid, TOL / 20.0)
+    }));
+    assert!(prepared.is_ok(), "an unresolved fit must return None");
+    assert_eq!(before, serde_json::to_string(&solid).unwrap());
+}

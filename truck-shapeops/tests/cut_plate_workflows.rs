@@ -28,9 +28,33 @@ fn pocket_shell_reintersects_the_cylindrical_floor_join() {
         })
         .unwrap()
         .id();
-    let output = truck_shapeops::local::try_shell(&input, &[top], 0.5).unwrap();
-    assert!(output.is_geometric_consistent());
-    common::assert_solid(&output, 570.5 + 22.375 * PI, &[0], TOL);
+    let before = serde_json::to_string(&input.compress()).unwrap();
+    for outward in [false, true] {
+        let output = if outward {
+            truck_shapeops::local::try_shell_outward(&input, &[top], 0.5)
+        } else {
+            truck_shapeops::local::try_shell(&input, &[top], 0.5)
+        }
+        .unwrap();
+        let outer_volume = if outward { 630.5 } else { 570.5 };
+        let cup_volume = if outward { 16.875 * PI } else { 22.375 * PI };
+        assert!(output.is_geometric_consistent());
+        // Removing the annular top separates the outer container from the pocket's cup.
+        common::assert_solid(&output, outer_volume + cup_volume, &[0, 0], TOL);
+        let parts = truck_shapeops::solid_components(&output, TOL).unwrap();
+        assert_eq!(parts.len(), 2);
+        let mut volumes = Vec::new();
+        for part in &parts {
+            let outer = part.vertex_iter().any(|v| v.point().x.abs() > 5.0);
+            let volume = if outer { outer_volume } else { cup_volume };
+            common::assert_solid(part, volume, &[0], TOL);
+            common::blend::assert_step(part, volume, TOL);
+            volumes.push(volume);
+        }
+        assert!(volumes.contains(&outer_volume));
+        assert!(volumes.contains(&cup_volume));
+        assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
+    }
 }
 
 #[test]

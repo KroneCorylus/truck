@@ -1,0 +1,8 @@
+Baseline Truck: 7405a9480ec537302fbf4271c9444a4744993d7b
+Baseline PiezaCAD: 48e8fe291f7d85f06d34e9afb800b99bee0d8d11
+CPU: AMD Ryzen 9 7950X3D; 16 cores, 32 logical CPUs
+RAYON_NUM_THREADS=1; no CPU affinity; no simultaneous tests or builds during timings.
+Tube: 5 samples, 1 iteration each; control sample counts are in the raw logs.
+New shell_tube fixture identical before/after apart from formatting.
+After sources and benchmark executable identified in after-sha256.txt.
+Validated PiezaCAD revision: f5a381704a12c8d93f02e7d79665d595dea55dd2

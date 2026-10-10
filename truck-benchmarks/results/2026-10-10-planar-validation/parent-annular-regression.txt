@@ -1,0 +1,24 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.41s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/nonconvex_shell.rs (target/debug/deps/nonconvex_shell-c102c766e8d13f1a)
+
+running 1 test
+test annular_shell_preserves_hole_clearance_and_volume has been running for over 60 seconds
+
+thread 'annular_shell_preserves_hole_clearance_and_volume' (1312672) panicked at truck-shapeops/tests/common/mod.rs:36:5:
+assertion `left == right` failed: genus of boundary shells
+  left: [2]
+ right: [1]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test annular_shell_preserves_hole_clearance_and_volume ... FAILED
+
+failures:
+
+failures:
+    annular_shell_preserves_hole_clearance_and_volume
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 3 filtered out; finished in 72.92s
+
+error: test failed, to rerun pass `-p truck-shapeops --test nonconvex_shell`

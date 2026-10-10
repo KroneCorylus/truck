@@ -1,0 +1,42 @@
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+   Compiling cad-core v0.1.0 (/home/krone/Development/Pieza_WS/PiezaCAD/cad-core)
+    Finished `test` profile [optimized + debuginfo] target(s) in 7.40s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/workflow_audit.rs (target/debug/deps/workflow_audit-2bab7f0ed439685e)
+
+running 1 test
+AUDIT {"case":"tube-source-revolved-false-tapered-false","elapsed_ms":40,"issues":[],"volume":2858.558340777307}
+AUDIT {"case":"tube-fillet-revolved-false-tapered-false","elapsed_ms":1003,"issues":[],"volume":2854.246351901362}
+AUDIT {"case":"tube-chamfer-revolved-false-tapered-false","elapsed_ms":60,"issues":[],"volume":2848.432649013699}
+AUDIT {"case":"tube-shell-revolved-false-tapered-false","elapsed_ms":341,"issues":["Shell 1: kernel shell face correspondence changed","volume 2858.558340777307 differs from expected 530.929158456675"],"volume":2858.558340777307}
+AUDIT {"case":"tube-source-revolved-false-tapered-true","elapsed_ms":40,"issues":[],"volume":2450.2322859981427}
+AUDIT {"case":"tube-fillet-revolved-false-tapered-true","elapsed_ms":1184,"issues":[],"volume":2446.7653281711023}
+AUDIT {"case":"tube-chamfer-revolved-false-tapered-true","elapsed_ms":80,"issues":[],"volume":2440.0789966285483}
+AUDIT {"case":"tube-shell-revolved-false-tapered-true","elapsed_ms":341,"issues":["Shell 1: kernel shell face correspondence changed","volume 2450.2322859981427 differs from expected 531.843248572855"],"volume":2450.2322859981427}
+AUDIT {"case":"tube-source-revolved-true-tapered-false","elapsed_ms":40,"issues":[],"volume":2858.558340777312}
+AUDIT {"case":"tube-fillet-revolved-true-tapered-false","elapsed_ms":903,"issues":[],"volume":2854.2463518945624}
+AUDIT {"case":"tube-chamfer-revolved-true-tapered-false","elapsed_ms":60,"issues":[],"volume":2848.4326490137046}
+AUDIT {"case":"tube-shell-revolved-true-tapered-false","elapsed_ms":281,"issues":["Shell 1: kernel shell face correspondence changed","volume 2858.558340777312 differs from expected 530.929158456675"],"volume":2858.558340777312}
+AUDIT {"case":"tube-source-revolved-true-tapered-true","elapsed_ms":40,"issues":[],"volume":2450.2322859982187}
+AUDIT {"case":"tube-fillet-revolved-true-tapered-true","elapsed_ms":1224,"issues":[],"volume":2446.7653281655316}
+AUDIT {"case":"tube-chamfer-revolved-true-tapered-true","elapsed_ms":80,"issues":[],"volume":2440.078996628586}
+AUDIT {"case":"tube-shell-revolved-true-tapered-true","elapsed_ms":281,"issues":["Shell 1: kernel shell face correspondence changed","volume 2450.2322859982187 differs from expected 531.843248572855"],"volume":2450.2322859982187}
+
+thread 'equivalent_tubes_shell_and_blend' (1328026) panicked at cad-core/tests/workflow_audit.rs:90:9:
+tube-shell-revolved-false-tapered-false: [String("Shell 1: kernel shell face correspondence changed"), String("volume 2858.558340777307 differs from expected 530.929158456675")]
+tube-shell-revolved-false-tapered-true: [String("Shell 1: kernel shell face correspondence changed"), String("volume 2450.2322859981427 differs from expected 531.843248572855")]
+tube-shell-revolved-true-tapered-false: [String("Shell 1: kernel shell face correspondence changed"), String("volume 2858.558340777312 differs from expected 530.929158456675")]
+tube-shell-revolved-true-tapered-true: [String("Shell 1: kernel shell face correspondence changed"), String("volume 2450.2322859982187 differs from expected 531.843248572855")]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test equivalent_tubes_shell_and_blend ... FAILED
+
+failures:
+
+failures:
+    equivalent_tubes_shell_and_blend
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 6 filtered out; finished in 6.02s
+
+error: test failed, to rerun pass `-p cad-core --test workflow_audit`

@@ -1,0 +1,43 @@
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.02s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/blend_limits.rs (target/debug/deps/blend_limits-799505a5f2a73d8f)
+
+running 2 tests
+test near_limit_chamfer_preserves_miter_contract ... ok
+test near_limit_fillet_retains_valid_small_faces ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.98s
+
+     Running tests/curved_blend_representation.rs (target/debug/deps/curved_blend_representation-6a5063b1ec823ec4)
+
+running 4 tests
+test short_fillet_parameter_domains_do_not_panic_on_step_export ... ok
+test nurbs_cylinder_rim ... ok
+test analytic_cylinder_rim ... ok
+test reparameterized_nurbs_cylinder_rim ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 22.40s
+
+     Running tests/fillet_wire_representation.rs (target/debug/deps/fillet_wire_representation-067ee2b61ad88d24)
+
+running 4 tests
+test a_straight_spline_wire_fillets_without_panicking ... ok
+test adjacent_analytic_fillets_meet_at_a_valid_miter ... ok
+test adjacent_bspline_fillets_meet_at_a_valid_miter_without_panicking ... ok
+test adjacent_nurbs_fillets_meet_at_a_valid_miter ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.78s
+
+     Running tests/modeling_blends.rs (target/debug/deps/modeling_blends-e1a35522842d88d7)
+
+running 5 tests
+test unsupported_operations_leave_geometry_and_ids_unchanged ... ok
+test twelve_edges_with_spherical_corners_remain_modeling_solids ... ok
+test box_chamfer_and_chain_fillet_remain_modeling_solids ... ok
+test constant_and_variable_radius_tangent_chains ... ok
+test curved_chain_survives_transform_serialization_and_step ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.62s

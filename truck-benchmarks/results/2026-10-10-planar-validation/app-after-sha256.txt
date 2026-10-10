@@ -1,0 +1,2 @@
+bbfa791d1eac015c183dec5b0194e905e957821be2d296bdbb8e32e507de3e3a  ../PiezaCAD/cad-core/src/kernel/shell.rs
+d1e11a87cf07bfc77c692e0226a730ccecd962101a3847ae4eedcc982ce8c695  ../PiezaCAD/cad-core/tests/shell.rs

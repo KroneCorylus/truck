@@ -1,0 +1,229 @@
+    Blocking waiting for file lock on build directory
+    Checking truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Checking cad-core v0.1.0 (/home/krone/Development/Pieza_WS/PiezaCAD/cad-core)
+warning: very complex type used. Consider factoring parts into `type` definitions
+   --> cad-core/src/build.rs:118:16
+    |
+118 |     pub tools: HashMap<FeatureId, Arc<Vec<(Op, Vec<TaggedSolid>)>>>,
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#type_complexity
+    = note: `#[warn(clippy::type_complexity)]` on by default
+
+warning: very complex type used. Consider factoring parts into `type` definitions
+   --> cad-core/src/build.rs:195:23
+    |
+195 |     pub(crate) tools: HashMap<FeatureId, Arc<Vec<(Op, Vec<TaggedSolid>)>>>,
+    |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#type_complexity
+
+warning: manual implementation of `.is_multiple_of()`
+   --> cad-core/src/kernel/knurl.rs:262:12
+    |
+262 |         || spec.columns % 2 != 0
+    |            ^^^^^^^^^^^^^^^^^^^^^ help: replace with: `!spec.columns.is_multiple_of(2)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#manual_is_multiple_of
+    = note: `#[warn(clippy::manual_is_multiple_of)]` on by default
+
+warning: the loop variable `end` is used to index `rims`
+   --> cad-core/src/kernel/knurl.rs:428:16
+    |
+428 |     for end in 0..2 {
+    |                ^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#needless_range_loop
+    = note: `#[warn(clippy::needless_range_loop)]` on by default
+help: consider using an iterator and enumerate()
+    |
+428 -     for end in 0..2 {
+428 +     for (end, <item>) in rims.iter().enumerate() {
+    |
+
+warning: consider using `sort_by_key`
+   --> cad-core/src/metrics.rs:144:5
+    |
+144 |     stats.sort_by(|(_, a), (_, b)| b.total.cmp(&a.total));
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#unnecessary_sort_by
+    = note: `#[warn(clippy::unnecessary_sort_by)]` on by default
+help: try
+    |
+144 -     stats.sort_by(|(_, a), (_, b)| b.total.cmp(&a.total));
+144 +     stats.sort_by_key(|(_, a)| std::cmp::Reverse(a.total));
+    |
+
+warning: consider using `sort_by_key`
+   --> cad-core/src/metrics.rs:279:13
+    |
+279 |             children.sort_by(|a, b| b.us.cmp(&a.us));
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#unnecessary_sort_by
+help: try
+    |
+279 -             children.sort_by(|a, b| b.us.cmp(&a.us));
+279 +             children.sort_by_key(|a| std::cmp::Reverse(a.us));
+    |
+
+warning: the loop variable `i` is used to index `step`
+    --> cad-core/src/solve.rs:1184:26
+     |
+1184 |                 for i in 0..unknowns {
+     |                          ^^^^^^^^^^^
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#needless_range_loop
+help: consider using an iterator and enumerate()
+     |
+1184 -                 for i in 0..unknowns {
+1184 +                 for (i, <item>) in step.iter().enumerate().take(unknowns) {
+     |
+
+warning: the loop variable `unknown` is used to index `local`
+    --> cad-core/src/solve.rs:1356:24
+     |
+1356 |         for unknown in 0..unknowns {
+     |                        ^^^^^^^^^^^
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#needless_range_loop
+help: consider using an iterator and enumerate()
+     |
+1356 -         for unknown in 0..unknowns {
+1356 +         for (unknown, <item>) in local.iter_mut().enumerate().take(unknowns) {
+     |
+
+warning: items after a test module
+    --> cad-core/src/build.rs:1455:1
+     |
+1455 |   mod tests {
+     |   ^^^^^^^^^
+...
+3838 |   pub fn fingerprints(input: &impl crate::project::BuildInput, end: usize) -> Vec<Option<u64>> {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+3875 | / fn hash_linked_input(
+3876 | |     path: &std::path::Path,
+3877 | |     document: bool,
+3878 | |     hash: &mut impl std::hash::Hasher,
+3879 | |     visiting: &mut std::collections::HashSet<std::path::PathBuf>,
+3880 | | ) -> bool {
+     | |_________^
+...
+3919 |   pub fn axis_on(from: &Build, document: &Document, axis: &AxisRef) -> Result<(Point3, Vector3), String> {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+3924 |   pub fn point_on(from: &Build, document: &Document, point: &crate::datum::PointRef) -> Result<Point3, String> {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#items_after_test_module
+     = note: `#[warn(clippy::items_after_test_module)]` on by default
+     = help: move the items to before the test module was defined
+
+warning: using `chunks_exact` with a constant chunk size
+  --> cad-core/src/dxf.rs:20:10
+   |
+20 |         .chunks_exact(2)
+   |          ^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<2>().0.iter()`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#chunks_exact_to_as_chunks
+   = note: `#[warn(clippy::chunks_exact_to_as_chunks)]` on by default
+
+warning: items after a test module
+   --> cad-core/src/file.rs:260:1
+    |
+260 | mod tests {
+    | ^^^^^^^^^
+...
+638 | pub(crate) fn relative_path(base: &Path, target: &Path) -> std::path::PathBuf {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+676 | pub fn atomic_write(path: &Path, bytes: &[u8]) -> Result<(), String> {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#items_after_test_module
+    = help: move the items to before the test module was defined
+
+warning: `cad-core` (lib) generated 9 warnings (run `cargo clippy --fix --lib -p cad-core -- ` to apply 2 suggestions)
+warning: items after a test module
+    --> cad-core/src/solve.rs:1606:1
+     |
+1606 |   mod tests {
+     |   ^^^^^^^^^
+...
+2597 | / pub(crate) fn least_squares_step(
+2598 | |     jacobian: &DMatrix<f64>,
+2599 | |     residual: &[f64],
+2600 | |     damping: f64,
+2601 | | ) -> Option<Vec<f64>> {
+     | |_____________________^
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#items_after_test_module
+     = help: move the items to before the test module was defined
+
+warning: using `chunks_exact` with a constant chunk size
+   --> cad-core/src/plugin/tests.rs:242:10
+    |
+242 |         .chunks_exact(8)
+    |          ^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<8>().0.iter()`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#chunks_exact_to_as_chunks
+
+warning: using `chunks_exact` with a constant chunk size
+   --> cad-core/src/plugin/tests.rs:243:29
+    |
+243 |         .zip(mesh.triangles.chunks_exact(12))
+    |                             ^^^^^^^^^^^^^^^^
+    |
+help: consider using `as_chunks::<12>()` instead
+   --> cad-core/src/plugin/tests.rs:243:29
+    |
+243 |         .zip(mesh.triangles.chunks_exact(12))
+    |                             ^^^^^^^^^^^^^^^^
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#chunks_exact_to_as_chunks
+
+warning: useless use of `vec!`
+    --> cad-core/src/sketch/edit.rs:1828:19
+     |
+1828 |           let far = vec![
+     |  ___________________^
+1829 | |             line(&mut sketch, (50.0, 0.0), (70.0, 0.0)),
+1830 | |             line(&mut sketch, (70.0, 0.0), (70.0, 10.0)),
+1831 | |             line(&mut sketch, (70.0, 10.0), (50.0, 10.0)),
+1832 | |             line(&mut sketch, (50.0, 10.0), (50.0, 0.0)),
+1833 | |         ];
+     | |_________^
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#useless_vec
+     = note: `#[warn(clippy::useless_vec)]` on by default
+help: you can use an array directly
+     |
+1828 ~         let far = [line(&mut sketch, (50.0, 0.0), (70.0, 0.0)),
+1829 +             line(&mut sketch, (70.0, 0.0), (70.0, 10.0)),
+1830 +             line(&mut sketch, (70.0, 10.0), (50.0, 10.0)),
+1831 ~             line(&mut sketch, (50.0, 10.0), (50.0, 0.0))];
+     |
+
+warning: called `Iterator::last` on a `DoubleEndedIterator`; this will needlessly iterate the entire iterator
+   --> cad-core/tests/projects.rs:204:9
+    |
+204 | /         doc.resource_directory()
+205 | |             .join(path)
+206 | |             .components()
+207 | |             .last()
+    | |___________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#double_ended_iterator_last
+    = note: `#[warn(clippy::double_ended_iterator_last)]` on by default
+help: try
+    |
+207 -             .last()
+207 +             .next_back()
+    |
+
+warning: `cad-core` (test "projects") generated 1 warning (run `cargo clippy --fix --test "projects" -p cad-core -- ` to apply 1 suggestion)
+warning: `cad-core` (lib test) generated 15 warnings (9 duplicates) (run `cargo clippy --fix --lib -p cad-core --tests -- ` to apply 5 suggestions)
+    Finished `dev` profile [optimized + debuginfo] target(s) in 29.06s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 3`

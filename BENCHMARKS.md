@@ -1,5 +1,13 @@
 # CPU action benchmarks
 
+## Dense planar validation
+
+The [2026-10-10 validation report](truck-benchmarks/results/2026-10-10-planar-validation/REPORT.md)
+measures annular tube shelling from **3.554 s to 160.4 ms** with one worker. Conservative
+segment bounds and cached projection retain the existing geometric checks. The report
+includes the app timeout regression, corrected opening topology, NURBS blend STEP checks,
+adjacent operation measurements, source hashes and raw logs.
+
 ## Batch holes and fillet validation
 
 The [2026-10-10 batch and fillet report](truck-benchmarks/results/2026-10-10-batch-holes-fillet/REPORT.md)
