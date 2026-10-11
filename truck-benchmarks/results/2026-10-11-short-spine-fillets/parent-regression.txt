@@ -1,0 +1,21 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 1.78s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/short_spine_fillets.rs (target/release/deps/short_spine_fillets-05acaa66bfc8d7bb)
+
+running 1 test
+
+thread 'planar_end_faces_trim_a_fillet_wider_than_its_spine' (285215) panicked at truck-shapeops/tests/short_spine_fillets.rs:29:41:
+height=0.2, radius=0.5: Diagnostic { code: OutsideNeighbour, operation: "fillet_solid_edges", stage: "validate_input", message: "The moved boundary leaves its neighbouring face.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: Some("radius"), value: Some("0.5"), station: None }, cause: None, source: None }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test planar_end_faces_trim_a_fillet_wider_than_its_spine ... FAILED
+
+failures:
+
+failures:
+    planar_end_faces_trim_a_fillet_wider_than_its_spine
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-shapeops --test short_spine_fillets`

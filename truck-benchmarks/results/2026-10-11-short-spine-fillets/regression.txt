@@ -1,0 +1,11 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 6.56s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/short_spine_fillets.rs (target/release/deps/short_spine_fillets-05acaa66bfc8d7bb)
+
+running 1 test
+test planar_end_faces_trim_a_fillet_wider_than_its_spine ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.79s
+

@@ -1,0 +1,9 @@
+{
+  "parent": "73057e9a257b04734f01ae6c8f1e52d021943823",
+  "sha256": {
+    "truck-shapeops/src/fillet/edges.rs": "45b075cbad5bcd9523a7b17bf33fe282338acb139ee888ae0cdce828a243ec85",
+    "truck-shapeops/tests/short_spine_fillets.rs": "2edea33908df728e5e1d8b69da15e04add64706956efc7cb08970618bf8daba6",
+    "truck-shapeops/tests/SHORT_SPINE_FILLETS.md": "2f9e44381904d5ed8ca404cdb5edbf85a3e052dd862bce2758f3923e63f82dc8",
+    "audits/fillet-chamfer/probes/short_spine_fillets.cpp": "f24bb668143fdb552f556d5f77913fa17c79afbe41b43f0d844c00e8dc528b74"
+  }
+}

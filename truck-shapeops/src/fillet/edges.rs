@@ -10,6 +10,8 @@ use truck_base::diagnostics::{validate_tolerance, Code, Diagnostic};
 /// right-angle edges sharing a plane meet along an exact elliptical miter, including
 /// oblique outline corners: the rounds are tangent to their supporting planes,
 /// but meet with a crease along the miter. The third edge is only shortened, never rounded.
+/// Planar end faces trim the cylindrical patch; its radius may exceed the spine length
+/// when the trimmed patch remains inside the original convex shell.
 /// Collinear chain subdivisions are retained. Other junctions,
 /// curved faces, concave shells and radii that collapse an edge return `None`. Input topology
 /// and geometry are not modified. Planarity and straightness are checked at sampled points.
@@ -183,11 +185,12 @@ where
             )
         };
         for (f, &(n, d)) in planes.iter().enumerate() {
-            let offset = if faces.contains(&f) && !touched.contains(&f) {
-                0.0
-            } else {
-                radius
-            };
+            let offset =
+                if terminations[i].is_some() || (faces.contains(&f) && !touched.contains(&f)) {
+                    0.0
+                } else {
+                    radius
+                };
             if n.dot(center.to_vec()) > d - offset + TOLERANCE {
                 return Err(error(Code::OutsideNeighbour).parameter("radius", radius));
             }
@@ -287,6 +290,19 @@ where
         };
         let curve0 = arc_curve(v0);
         let curve1 = arc_curve(v1);
+        // End planes trim the rolling ball. Bound the actual rational patch by its
+        // positive-weight control hull instead of requiring the full ball to fit.
+        if ![&curve0, &curve1].iter().all(|curve| {
+            curve.control_points().iter().all(|p| {
+                p.w > 0.0
+                    && p.w.is_finite()
+                    && planes.iter().all(|&(normal, distance)| {
+                        normal.dot(p.truncate()) / p.w <= distance + TOLERANCE
+                    })
+            })
+        }) {
+            return Err(error(Code::OutsideNeighbour).parameter("radius", radius));
+        }
         let mut make_arc = |v: usize,
                             front: &Vertex<Point3>,
                             back: &Vertex<Point3>,
