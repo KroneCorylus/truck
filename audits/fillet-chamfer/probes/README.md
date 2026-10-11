@@ -123,3 +123,19 @@ are below the documented Truck modeling tolerance; exact surface identity is not
 claimed. Truck also checks exact NURBS/revolved representations, transforms, wire
 reversal, G1, meshes, history and STEP. Those additional OCCT outcomes are unprobed.
 See `truck-shapeops/tests/SPHERICAL_RIMS.md` for the task and exact volume derivation.
+
+## Short spines
+
+`short_spine_fillets.cpp` rounds the z-axis edge of a 100×100×h box, with h=0.2,
+1 or 10 and radius 0.5 or 10. Build like the cone probe, substituting
+`short_spine_fillets`. All six OCCT results are valid single solids with the
+expected cylinder and cap dimensions and volume
+`h * (10000 - (1 - pi/4) * r²)`. Maximum volume integration error is 1.2e-10.
+
+Truck previously rejected radii larger than the spine because it checked whether
+the entire rolling ball fit between the terminal planes. It now checks the
+trimmed patch's rational control hull. Truck additionally tests two oblique cap
+slopes and rigid transforms, with normals, history, mesh closure and STEP. Those
+additional native outcomes are unprobed. The exact task and validation are in
+`truck-shapeops/tests/SHORT_SPINE_FILLETS.md`; raw native output is
+`short_spine_fillets_occt.txt`.

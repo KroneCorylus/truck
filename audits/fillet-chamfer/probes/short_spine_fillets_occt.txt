@@ -1,0 +1,7 @@
+OCCT 7.9.3
+height=0.2 radius=0.5 done=true valid=1 solids=1 dimensions_match=1 volume=1999.98926990817 expected_volume=1999.98926990817 volume_error=4.54747350886464e-13
+height=0.2 radius=10 done=true valid=1 solids=1 dimensions_match=1 volume=1995.70796326795 expected_volume=1995.70796326795 volume_error=1.81898940354586e-12
+height=1 radius=0.5 done=true valid=1 solids=1 dimensions_match=1 volume=9999.94634954085 expected_volume=9999.94634954085 volume_error=0
+height=1 radius=10 done=true valid=1 solids=1 dimensions_match=1 volume=9978.53981633973 expected_volume=9978.53981633974 volume_error=9.09494701772928e-12
+height=10 radius=0.5 done=true valid=1 solids=1 dimensions_match=1 volume=99999.4634954085 expected_volume=99999.4634954085 volume_error=1.45519152283669e-11
+height=10 radius=10 done=true valid=1 solids=1 dimensions_match=1 volume=99785.3981633973 expected_volume=99785.3981633974 volume_error=1.16415321826935e-10
