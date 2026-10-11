@@ -109,3 +109,17 @@ Cavity volumes equal 6336 minus the corresponding exterior value. Truck addition
 checks exact NURBS supports, rigid transforms, reversed selections, closed meshes,
 history, unchanged inputs and STEP. Those additional OCCT outcomes were not probed.
 Oblique intersections, varied cone angles and apex collapse remain open.
+
+## Spherical rims
+
+`spherical_rim_blends.cpp` constructs a radius-5 sphere band between z=-4 and
+z=-3 or +3. A radius-0.5 fillet rounds its upper rim, either as an exterior solid
+or as a reversed cavity in the box `[-8,8]³`. Build like the cone probe, substituting
+`spherical_rim_blends`. All four native OCCT 7.9.3 results are valid single solids.
+
+The raw output records sampled radius residuals (about 3.91e-6 and 4.06e-6) and
+volume differences from the independent formula (about 1.27e-6 and 2.22e-6). These
+are below the documented Truck modeling tolerance; exact surface identity is not
+claimed. Truck also checks exact NURBS/revolved representations, transforms, wire
+reversal, G1, meshes, history and STEP. Those additional OCCT outcomes are unprobed.
+See `truck-shapeops/tests/SPHERICAL_RIMS.md` for the task and exact volume derivation.

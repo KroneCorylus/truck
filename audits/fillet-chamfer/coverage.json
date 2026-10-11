@@ -582,7 +582,7 @@
     {
       "id": "G03",
       "title": "Cylinder/cylinder, sphere, torus and spline support pairs",
-      "truck_status": "unverified",
+      "truck_status": "partial",
       "priority": "P1",
       "tags": [
         "cylinder",
@@ -591,8 +591,8 @@
         "freeform"
       ],
       "occt_scope": "Generic numerical construction extends beyond analytic special cases.",
-      "truck_scope": "Generic rolling-ball surfaces exist. A broad solid-level support-pair matrix has not been established.",
-      "next_case": "Pair each support type with each other type; convex/concave, isolated edge and corner, regular versus near singular.",
+      "truck_scope": "Plane/sphere circular rims now have independent validation for both meridian slopes, exterior/cavity orientation, exact Sphere/revolved-circle/NURBS representations, rigid transforms, reversed wires, G1, radius, volume, closed mesh, history and STEP. General cylinder/cylinder, toroidal and freeform support intersections remain unverified.",
+      "next_case": "Torus/plane rims and non-coaxial cylinder intersections, followed by arbitrary spline-support pairs and contact collapse.",
       "evidence": [
         {
           "repo": "occt",
@@ -611,9 +611,43 @@
           "path": "truck-shapeops/tests/fillet.rs",
           "find": "fn complex_surface",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/spherical_rim_blends.rs",
+          "find": "fn plane_sphere_rims_preserve_rolling_radius",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/spherical_rim_blends.rs",
+          "find": "fn spherical_cavity_rims_preserve_orientation",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/SPHERICAL_RIMS.md",
+          "find": "# Plane/sphere rim fillets",
+          "role": "validation"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/probes/spherical_rim_blends.cpp",
+          "find": "int main",
+          "role": "paired-probe"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/probes/spherical_rim_blends_occt.txt",
+          "find": "OCCT",
+          "role": "execution"
         }
       ],
-      "required_outcome": "Blend intersections between curved supports, including cylinders, cones, spheres, tori and spline surfaces, with valid contacts and trimmed output."
+      "required_outcome": "Blend intersections between curved supports, including cylinders, cones, spheres, tori and spline surfaces, with valid contacts and trimmed output.",
+      "verification": [
+        "At 20de5c08, 28 spherical-rim operations pass: two cut heights, Sphere/revolved-circle/exact-NURBS supports, rigid transforms and reversed wires, plus four cavity cases. Checks include independent radius/normal/volume equations, G1 joins, geometry, topology, closed meshes, history, unchanged inputs and STEP. No production change was needed. The final release target and corrected debug cavity target pass; exterior debug checks also passed, and Clippy is clean. Full scope and the corrected test-fixture orientation are documented in the spherical-rims report.",
+        "OCCT 7.9.3 returns valid single solids on the four paired native analytic sphere-band tasks. Maximum sampled rolling-radius residuals are approximately 3.91e-6 and 4.06e-6; volume differences from the exact independent formula are at most 2.22e-6. These are within the documented modeling tolerance, but exact surface identity and OCCT transform/NURBS/G1/mesh/STEP equivalence are not established."
+      ]
     },
     {
       "id": "G04",
@@ -740,6 +774,18 @@
           "path": "truck-modeling/tests/revolved_surface_inclusion.rs",
           "find": "fn transformed_revolved_boundaries_use_the_surface_coordinate_system",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/spherical_rim_blends.rs",
+          "find": "fn plane_sphere_rims_preserve_rolling_radius",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/spherical_rim_blends.rs",
+          "find": "fn spherical_cavity_rims_preserve_orientation",
+          "role": "test"
         }
       ],
       "required_outcome": "Handle equivalent physical geometry consistently when represented analytically, as exact NURBS, with split faces, or after STEP import.",
@@ -763,7 +809,8 @@
         "STEP fillet fitting now normalizes longitudinal knots before evaluation and interpolation. The parent rejects a 1e-9 domain; the strengthened regression requires successful export for scales 1e-9 through 1e9 and shifted domains, on original and rotated/translated/scaled solids. It checks sampled positional error at the requested tolerance, source solid validity, closed STEP meshes, analytic volume and unchanged input. This is export coverage; arbitrary support and boundary-curve parameterization remain separate gaps.",
         "Current kernel validation after STEP parameter normalization and correction of the obsolete pyramid-chamfer test contract: full shapeops suite 303 passed, 0 failed, 1 existing ignored; geometry 250 passed, 0 failed, 1 existing ignored; STEP 79 passed, 0 failed. Final R11 checks, all-targets Clippy, benchmark smoke, targeted nightly formatting and audit-generator tests pass. Export timings and raw validation logs are in truck-benchmarks/results/2026-10-10-fillet-parameter-domains/REPORT.md. The app was unchanged and was not rerun in this batch.",
         "Cone-rim regression: 32 exterior operations cover both draft directions, analytic/exact NURBS supports, rigid motion and reversed wires; four cavity operations cover reversed shell orientation. Independent radius/setback equations, normals and analytic volumes accompany geometry, topology, closed meshes, history, immutable inputs and STEP. OCCT 7.9.3 produces valid single solids with matching dimensions and volumes on the eight paired native-coordinate analytic tasks. Its transform/NURBS/reversal/mesh/STEP outcomes were not probed.",
-        "Validation at cc5be492: full geometry/modeling/shapeops/STEP suites total 723 passed, 0 failed, 4 existing ignored; all-targets Clippy and action benchmark smoke pass. Separate regressions reproduce coordinate-frame, periodic-contact and procedural-export failures with their respective old implementations. Raw logs, source hashes and scope are in truck-benchmarks/results/2026-10-11-revolved-inclusion/REPORT.md. App code is unchanged and app tests were not rerun."
+        "Validation at cc5be492: full geometry/modeling/shapeops/STEP suites total 723 passed, 0 failed, 4 existing ignored; all-targets Clippy and action benchmark smoke pass. Separate regressions reproduce coordinate-frame, periodic-contact and procedural-export failures with their respective old implementations. Raw logs, source hashes and scope are in truck-benchmarks/results/2026-10-11-revolved-inclusion/REPORT.md. App code is unchanged and app tests were not rerun.",
+        "At 20de5c08, 28 spherical-rim operations pass: two cut heights, Sphere/revolved-circle/exact-NURBS supports, rigid transforms and reversed wires, plus four cavity cases. Checks include independent radius/normal/volume equations, G1 joins, geometry, topology, closed meshes, history, unchanged inputs and STEP. No production change was needed. The final release target and corrected debug cavity target pass; exterior debug checks also passed, and Clippy is clean. Full scope and the corrected test-fixture orientation are documented in the spherical-rims report."
       ]
     },
     {
@@ -1873,6 +1920,18 @@
           "path": "truck-shapeops/tests/conical_blends.rs",
           "find": "fn plane_cone_rims_preserve_radius_and_distances",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/spherical_rim_blends.rs",
+          "find": "fn plane_sphere_rims_preserve_rolling_radius",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/spherical_rim_blends.rs",
+          "find": "fn spherical_cavity_rims_preserve_orientation",
+          "role": "test"
         }
       ],
       "required_outcome": "Deliver blend results usable for closed meshing, STEP interchange and further modeling while preserving dimensions and validity.",
@@ -1881,7 +1940,8 @@
         "Opened blind pockets now retain their two physical closed components. Explicit outer/inner face ancestry replaces positional shell naming; each component passes independent volume/STEP checks, and app references survive pocket-depth edits and save/load. Both components are recovered from the exported STEP file.",
         "STEP fillet fitting now normalizes longitudinal knots before evaluation and interpolation. The parent rejects a 1e-9 domain; the strengthened regression requires successful export for scales 1e-9 through 1e9 and shifted domains, on original and rotated/translated/scaled solids. It checks sampled positional error at the requested tolerance, source solid validity, closed STEP meshes, analytic volume and unchanged input. This is export coverage; arbitrary support and boundary-curve parameterization remain separate gaps.",
         "A reversed exact-NURBS cone fillet failed STEP preparation because a procedural boundary fit missed a localized deviation. Export now retries finer initial intervals and tighter point fitting error, retaining maximum dyadic depth 16 and the final export tolerance. A manufactured degree-six bulge reproduces the old failure and is checked at 4097 stations; all conical cases pass STEP round trips. Sampling is not a certified global error bound.",
-        "Validation at cc5be492: full geometry/modeling/shapeops/STEP suites total 723 passed, 0 failed, 4 existing ignored; all-targets Clippy and action benchmark smoke pass. Separate regressions reproduce coordinate-frame, periodic-contact and procedural-export failures with their respective old implementations. Raw logs, source hashes and scope are in truck-benchmarks/results/2026-10-11-revolved-inclusion/REPORT.md. App code is unchanged and app tests were not rerun."
+        "Validation at cc5be492: full geometry/modeling/shapeops/STEP suites total 723 passed, 0 failed, 4 existing ignored; all-targets Clippy and action benchmark smoke pass. Separate regressions reproduce coordinate-frame, periodic-contact and procedural-export failures with their respective old implementations. Raw logs, source hashes and scope are in truck-benchmarks/results/2026-10-11-revolved-inclusion/REPORT.md. App code is unchanged and app tests were not rerun.",
+        "At 20de5c08, 28 spherical-rim operations pass: two cut heights, Sphere/revolved-circle/exact-NURBS supports, rigid transforms and reversed wires, plus four cavity cases. Checks include independent radius/normal/volume equations, G1 joins, geometry, topology, closed meshes, history, unchanged inputs and STEP. No production change was needed. The final release target and corrected debug cavity target pass; exterior debug checks also passed, and Clippy is clean. Full scope and the corrected test-fixture orientation are documented in the spherical-rims report."
       ]
     },
     {

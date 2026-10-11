@@ -1,0 +1,5 @@
+OCCT 7.9.3
+cavity=0 top=-3 done=true valid=1 solids=1 volume=32.6961461978443 expected_volume=32.6961449239803 sampled_radius_error=3.90597420840688e-06 volume_error=1.2738640009502e-06
+cavity=0 top=3 done=true valid=1 solids=1 volume=454.227251642559 expected_volume=454.227249425782 sampled_radius_error=4.05900791983216e-06 volume_error=2.21677703393652e-06
+cavity=1 top=-3 done=true valid=1 solids=1 volume=4063.30385380216 expected_volume=4063.30385507602 sampled_radius_error=3.90597420840688e-06 volume_error=1.27386329040746e-06
+cavity=1 top=3 done=true valid=1 solids=1 volume=3641.77274835744 expected_volume=3641.77275057422 sampled_radius_error=4.05900791983216e-06 volume_error=2.21677646550233e-06
