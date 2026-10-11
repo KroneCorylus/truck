@@ -422,13 +422,19 @@ where
             .collect::<Option<Vec<_>>>()?;
 
         for _i in 0..16 {
-            let mut vec = Vec::with_capacity(ccs.len() + 3);
-            vec.extend([v0, v0, v0]);
-            vec.extend({
-                let n = ccs.len() - 1;
-                ccs[1..n].windows(2).map(move |v| (v[0].0 + v[1].0) / 2.0)
-            });
-            vec.extend([v1, v1, v1]);
+            // The section frame differentiates the contact curve once. Quartic
+            // interpolation therefore keeps the fillet C2 at its internal knots.
+            let degree = 4.min(ccs.len() - 1);
+            let mut vec = Vec::with_capacity(ccs.len() + degree + 1);
+            vec.extend(std::iter::repeat_n(v0, degree + 1));
+            vec.extend(ccs[1..ccs.len() - 1].windows(degree).map(|samples| {
+                let base = samples[0].0;
+                base + samples
+                    .iter()
+                    .map(|sample| (sample.0 - base) / degree as f64)
+                    .sum::<f64>()
+            }));
+            vec.extend(std::iter::repeat_n(v1, degree + 1));
             let knot_vec = KnotVec::try_from(vec).ok()?;
 
             let make_uv0 = move |&(v, cc): &(f64, ContactCircle)| (v, cc.contact_point0().uv);

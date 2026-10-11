@@ -6,6 +6,8 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Keep generated rolling-ball fillets smooth across longitudinal interpolation knots. Use quartic contact interpolation when internal knots are needed, so differentiating the contact curve to build the section frame retains C2 continuity on smooth supports. Preserve adaptive fitting tolerances and use stable averaged knots. The captured spherical-meridian fillet now exports through the existing STEP fitter; regressions check knot derivative limits, radius/normals, independent volume, closed STEP round trips, rigid transforms and reversed selection.
+
 - Preserve finite pole searches for spheres/revolutions and already-converged surface Newton seeds. Classify smooth polar tangencies from meridian derivatives, reject conical singularities, and scale contact refinement by mesh error and curvature. Keep the parameter-space winding of meridian facets whose orientation is numerically ambiguous relative to surface normals. Regressions preserve the tangent sphere/bore Boolean and rounded-box STEP mesh after correcting revolution sampling.
 
 - Correct revolution tessellation to use the radial distance rather than its square root, and reserve tolerance for profile, angular and mixed diagonal curvature. Use cancellation-resistant angular spacing and cover the sampled profile's chord error in the radius bound. Regressions check cylinder/sphere diagonal chords over four scales and independent volume/closed meshes for a large imported spherical sector.

@@ -74,9 +74,11 @@ error at a derivative magnitude near 2.83e9. The recorded difference is a few UL
 `pcurve-parent-existing-failure.txt` and `pcurve-replay-seed.txt` retain the failure
 and replay seed. Its code/assertions were not modified, ignored or weakened.
 
-D4's fillet STEP export remains a separate open issue: the intersection leader
-crosses a quadratic fillet support's knot, causing a derivative discontinuity that
-the current C1 cubic fitter does not split explicitly. The parked export probe's
-original failure is included in `parent-regression.txt`; this batch only claims
-its input tessellation repair. No full OCCT parity verdict follows from these
-regressions. The broader captured outcomes are recorded separately in the audit.
+At this snapshot, D4's fillet STEP export was still unresolved. Subsequent
+investigation established that the quadratic contact interpolation also produces
+position jumps in the intersection trim, larger than twice the export tolerance;
+splitting a continuous fitter cannot represent them faithfully. The construction
+repair and its separate validation are documented in
+`../2026-10-11-procedural-export-knots/REPORT.md`. This batch claims only the input
+tessellation/polar-contact repairs. No full OCCT parity verdict follows from these
+regressions; the broader captured outcomes remain separately recorded in the audit.
