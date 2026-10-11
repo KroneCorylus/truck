@@ -1,0 +1,72 @@
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 9.27s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/imported_conic_prisms.rs (target/release/deps/imported_conic_prisms-8d626139591c82a9)
+
+running 1 test
+test imported_parabolic_and_hyperbolic_profiles_make_exact_prisms ... FAILED
+
+failures:
+
+---- imported_parabolic_and_hyperbolic_profiles_make_exact_prisms stdout ----
+
+thread 'imported_parabolic_and_hyperbolic_profiles_make_exact_prisms' (488419) panicked at truck-shapeops/tests/imported_conic_prisms.rs:20:50:
+called `Result::unwrap()` on an `Err` value: "hyperbolas and parabolas have no curve in truck-modeling"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    imported_parabolic_and_hyperbolic_profiles_make_exact_prisms
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-shapeops --test imported_conic_prisms`
+     Running tests/import_nonelliptic_conics.rs (target/release/deps/import_nonelliptic_conics-543f1b706d3eeacb)
+
+running 5 tests
+test finite_hyperbolas_preserve_exact_geometry_and_orientation ... FAILED
+test invalid_nonelliptic_conics_return_errors ... ok
+test finite_parabolas_preserve_polynomial_geometry_and_orientation ... FAILED
+test step_parabola_edges_preserve_type_endpoints_and_sense ... FAILED
+test step_hyperbola_edges_preserve_type_endpoints_and_sense ... FAILED
+
+failures:
+
+---- finite_hyperbolas_preserve_exact_geometry_and_orientation stdout ----
+
+thread 'finite_hyperbolas_preserve_exact_geometry_and_orientation' (488421) panicked at truck-stepio/tests/import_nonelliptic_conics.rs:17:41:
+finite conic must convert to modeling geometry: "hyperbolas and parabolas have no curve in truck-modeling"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- finite_parabolas_preserve_polynomial_geometry_and_orientation stdout ----
+
+thread 'finite_parabolas_preserve_polynomial_geometry_and_orientation' (488422) panicked at truck-stepio/tests/import_nonelliptic_conics.rs:17:41:
+finite conic must convert to modeling geometry: "hyperbolas and parabolas have no curve in truck-modeling"
+
+---- step_parabola_edges_preserve_type_endpoints_and_sense stdout ----
+
+thread 'step_parabola_edges_preserve_type_endpoints_and_sense' (488425) panicked at truck-stepio/tests/import_nonelliptic_conics.rs:188:21:
+assertion `left == right` failed
+  left: true
+ right: false
+
+---- step_hyperbola_edges_preserve_type_endpoints_and_sense stdout ----
+
+thread 'step_hyperbola_edges_preserve_type_endpoints_and_sense' (488424) panicked at truck-stepio/tests/import_nonelliptic_conics.rs:192:21:
+assertion failed: curve.front().distance(Point2::from(&edge.edge_start.vertex_geometry)) < 1e-9
+
+
+failures:
+    finite_hyperbolas_preserve_exact_geometry_and_orientation
+    finite_parabolas_preserve_polynomial_geometry_and_orientation
+    step_hyperbola_edges_preserve_type_endpoints_and_sense
+    step_parabola_edges_preserve_type_endpoints_and_sense
+
+test result: FAILED. 1 passed; 4 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-stepio --test import_nonelliptic_conics`
+error: 2 targets failed:
+    `-p truck-shapeops --test imported_conic_prisms`
+    `-p truck-stepio --test import_nonelliptic_conics`

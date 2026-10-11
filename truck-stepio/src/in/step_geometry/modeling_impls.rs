@@ -2,7 +2,8 @@
 //!
 //! Circles, ellipses and elementary surfaces keep their exact form: a cylinder becomes a circle
 //! swept along its axis, a cone a revolved line, a sphere and a torus a revolved circle.
-//! Hyperbolas, parabolas and pcurves have no counterpart and are rejected.
+//! Finite parabolas and hyperbolas become exact quadratic splines on `[0, 1]`.
+//! Pcurves are rejected.
 //!
 //! ```
 //! use truck_modeling::{Curve, Point3, Surface};
@@ -42,14 +43,83 @@ impl TryFrom<&Curve3D> for ModelingCurve {
                 Self::BSplineCurve(BSplineCurve::new(knots, polyline.0.clone()))
             }
             Curve3D::Conic(Conic3D::Ellipse(ellipse)) => Self::Conic(*ellipse),
-            Curve3D::Conic(_) => {
-                return Err("hyperbolas and parabolas have no curve in truck-modeling".into())
+            Curve3D::Conic(Conic3D::Parabola(curve)) => {
+                let (a, b) = finite_conic_range(curve)?;
+                let p = curve.subs(a);
+                let points = vec![p, p + curve.der(a) * ((b - a) / 2.), curve.subs(b)];
+                if points
+                    .iter()
+                    .any(|p| ![p.x, p.y, p.z].iter().all(|x| x.is_finite()))
+                {
+                    return Err("non-finite parabola geometry".into());
+                }
+                Self::BSplineCurve(BSplineCurve::new(KnotVec::bezier_knot(2), points))
+            }
+            Curve3D::Conic(Conic3D::Hyperbola(curve)) => {
+                Self::NurbsCurve(hyperbola_to_nurbs(curve)?)
             }
             Curve3D::BSplineCurve(curve) => Self::BSplineCurve(curve.clone()),
             Curve3D::NurbsCurve(curve) => Self::NurbsCurve(curve.clone()),
             Curve3D::PCurve(_) => return Err("pcurves have no curve in truck-modeling".into()),
         })
     }
+}
+
+fn finite_conic_range(
+    curve: &impl BoundedCurve,
+) -> std::result::Result<(f64, f64), StepConvertingError> {
+    let (a, b) = curve.range_tuple();
+    if !a.is_finite() || !b.is_finite() || a >= b || !(b - a).is_finite() {
+        return Err("conic requires a finite increasing trim range".into());
+    }
+    Ok((a, b))
+}
+
+fn hyperbola_to_nurbs(
+    curve: &Hyperbola<Point3, Matrix4>,
+) -> std::result::Result<NurbsCurve<Vector4>, StepConvertingError> {
+    let (a, b) = finite_conic_range(curve)?;
+    if !a.cosh().is_finite() || !b.cosh().is_finite() {
+        return Err("non-finite hyperbola geometry".into());
+    }
+    let count = (((b - a) / 2.).ceil() as usize).max(1);
+    let mut knots = vec![0., 0., 0.];
+    let point = |t: f64| Vector4::new(t.cosh(), t.sinh(), 0., 1.);
+    let mut points = vec![point(a)];
+    for i in 0..count {
+        let start = a + (b - a) * i as f64 / count as f64;
+        let end = if i + 1 == count {
+            b
+        } else {
+            a + (b - a) * (i + 1) as f64 / count as f64
+        };
+        let middle = start + (end - start) / 2.;
+        // The tangent intersection has weight cosh(half-span); its weighted
+        // coordinates are the hyperbola's midpoint, giving an exact conic arc.
+        points.push(Vector4::new(
+            middle.cosh(),
+            middle.sinh(),
+            0.,
+            ((end - start) / 2.).cosh(),
+        ));
+        points.push(point(end));
+        knots.extend([(i + 1) as f64 / count as f64; 2]);
+    }
+    knots.push(1.);
+    for p in &mut points {
+        *p = curve.transform() * *p;
+    }
+    if points
+        .iter()
+        .any(|p| ![p.x, p.y, p.z, p.w].iter().all(|x| x.is_finite()) || p.w <= 0.)
+    {
+        return Err("non-finite hyperbola control geometry".into());
+    }
+    let mut result = NurbsCurve::new(BSplineCurve::new(KnotVec::from(knots), points));
+    if !curve.orientation() {
+        result.invert();
+    }
+    Ok(result)
 }
 
 impl TryFrom<&Surface> for ModelingSurface {

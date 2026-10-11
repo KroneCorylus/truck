@@ -2396,6 +2396,29 @@ pub struct EdgeCurve {
     pub same_sense: bool,
 }
 
+fn nonperiodic_conic_range<C, P: Copy>(
+    curve: C,
+    p: P,
+    q: P,
+) -> Result<(f64, f64), StepConvertingError>
+where
+    C: SearchParameter<D1, Point = P> + SearchNearestParameter<D1, Point = P>,
+{
+    let parameter = |p| {
+        curve
+            .search_parameter(p, None, 100)
+            .or_else(|| curve.search_nearest_parameter(p, None, 100))
+    };
+    let (u, v) = (
+        parameter(p).ok_or("cannot locate conic start")?,
+        parameter(q).ok_or("cannot locate conic end")?,
+    );
+    if !u.is_finite() || !v.is_finite() || u >= v {
+        return Err("nonperiodic conic endpoints must have increasing parameters".into());
+    }
+    Ok((u, v))
+}
+
 impl EdgeCurve {
     pub fn parse_curve2d(&self) -> Result<Curve2D, StepConvertingError> {
         let p = Point2::from(&self.edge_start.vertex_geometry);
@@ -2477,14 +2500,7 @@ impl EdgeCurve {
                         .invert()
                         .ok_or_else(|| "Failed to convert Hyperbola".to_string())?;
                     let (p, q) = (inv_mat.transform_point(p), inv_mat.transform_point(q));
-                    let (u, v) = (
-                        UnitHyperbola::<Point2>::new()
-                            .search_nearest_parameter(p, None, 0)
-                            .ok_or_else(|| "the point is not on hyperbola".to_string())?,
-                        UnitHyperbola::<Point2>::new()
-                            .search_nearest_parameter(q, None, 0)
-                            .ok_or_else(|| "the point is not on hyparbola".to_string())?,
-                    );
+                    let (u, v) = nonperiodic_conic_range(UnitHyperbola::<Point2>::new(), p, q)?;
                     let unit = TrimmedCurve::new(UnitHyperbola::<Point2>::new(), (u, v));
                     let mut hyperbola = Processor::new(unit);
                     hyperbola.transform_by(mat);
@@ -2497,18 +2513,11 @@ impl EdgeCurve {
                         .invert()
                         .ok_or_else(|| "Failed to convert Parabola".to_string())?;
                     let (p, q) = (inv_mat.transform_point(p), inv_mat.transform_point(q));
-                    let (u, v) = (
-                        UnitHyperbola::<Point2>::new()
-                            .search_nearest_parameter(p, None, 0)
-                            .ok_or_else(|| "the point is not on parabola".to_string())?,
-                        UnitHyperbola::<Point2>::new()
-                            .search_nearest_parameter(q, None, 0)
-                            .ok_or_else(|| "the point is not on parabola".to_string())?,
-                    );
-                    let unit = TrimmedCurve::new(UnitHyperbola::<Point2>::new(), (u, v));
+                    let (u, v) = nonperiodic_conic_range(UnitParabola::<Point2>::new(), p, q)?;
+                    let unit = TrimmedCurve::new(UnitParabola::<Point2>::new(), (u, v));
                     let mut parabola = Processor::new(unit);
                     parabola.transform_by(mat);
-                    Curve2D::Conic(Conic2D::Hyperbola(parabola))
+                    Curve2D::Conic(Conic2D::Parabola(parabola))
                 }
             },
             CurveAny::Pcurve(_) => return Err("Pcurves cannot be parsed to 2D curves.".into()),
@@ -2599,19 +2608,9 @@ impl EdgeCurve {
                         );
                     let inv_mat = mat
                         .invert()
-                        .ok_or_else(|| "Failed to convert Circle".to_string())?;
+                        .ok_or_else(|| "Failed to convert Hyperbola".to_string())?;
                     let (p, q) = (inv_mat.transform_point(p), inv_mat.transform_point(q));
-                    let (u, mut v) = (
-                        UnitHyperbola::<Point3>::new()
-                            .search_nearest_parameter(p, None, 0)
-                            .ok_or_else(|| "the point is not on circle".to_string())?,
-                        UnitHyperbola::<Point3>::new()
-                            .search_nearest_parameter(q, None, 0)
-                            .ok_or_else(|| "the point is not on circle".to_string())?,
-                    );
-                    if v <= u + TOLERANCE {
-                        v += 2.0 * PI;
-                    }
+                    let (u, v) = nonperiodic_conic_range(UnitHyperbola::<Point3>::new(), p, q)?;
                     let unit = TrimmedCurve::new(UnitHyperbola::<Point3>::new(), (u, v));
                     let mut hyperbola = Processor::new(unit);
                     hyperbola.transform_by(mat);
@@ -2624,18 +2623,11 @@ impl EdgeCurve {
                         .invert()
                         .ok_or_else(|| "Failed to convert Parabola".to_string())?;
                     let (p, q) = (inv_mat.transform_point(p), inv_mat.transform_point(q));
-                    let (u, v) = (
-                        UnitHyperbola::<Point3>::new()
-                            .search_nearest_parameter(p, None, 0)
-                            .ok_or_else(|| "the point is not on parabola".to_string())?,
-                        UnitHyperbola::<Point3>::new()
-                            .search_nearest_parameter(q, None, 0)
-                            .ok_or_else(|| "the point is not on parabola".to_string())?,
-                    );
-                    let unit = TrimmedCurve::new(UnitHyperbola::<Point3>::new(), (u, v));
+                    let (u, v) = nonperiodic_conic_range(UnitParabola::<Point3>::new(), p, q)?;
+                    let unit = TrimmedCurve::new(UnitParabola::<Point3>::new(), (u, v));
                     let mut parabola = Processor::new(unit);
                     parabola.transform_by(mat);
-                    Curve3D::Conic(Conic3D::Hyperbola(parabola))
+                    Curve3D::Conic(Conic3D::Parabola(parabola))
                 }
             },
             CurveAny::Pcurve(c) => {
