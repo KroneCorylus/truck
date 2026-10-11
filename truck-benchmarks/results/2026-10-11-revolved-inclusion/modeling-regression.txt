@@ -1,0 +1,10 @@
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-modeling)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.51s
+     Running tests/revolved_surface_inclusion.rs (target/debug/deps/revolved_surface_inclusion-fdd2244c4635ef5b)
+
+running 2 tests
+test singular_revolved_transform_rejects_inclusion_without_panicking ... ok
+test transformed_revolved_boundaries_use_the_surface_coordinate_system ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+

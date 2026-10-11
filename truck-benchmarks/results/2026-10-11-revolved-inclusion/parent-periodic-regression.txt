@@ -1,0 +1,19 @@
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.89s
+     Running unittests src/lib.rs (target/debug/deps/truck_geometry-f52eecc531426f0d)
+
+running 1 test
+
+thread 'decorators::af_surface::tests::approximation_crosses_periodic_support_seams' (147766) panicked at truck-geometry/src/decorators/af_surface.rs:550:40:
+support seam in 5.8..6.9
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test decorators::af_surface::tests::approximation_crosses_periodic_support_seams ... FAILED
+
+failures:
+
+failures:
+    decorators::af_surface::tests::approximation_crosses_periodic_support_seams
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 26 filtered out; finished in 0.23s
+
+error: test failed, to rerun pass `-p truck-geometry --lib`

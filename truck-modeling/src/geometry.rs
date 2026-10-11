@@ -227,21 +227,33 @@ impl IncludeCurve<Curve> for Surface {
             Surface::BSplineSurface(surface) => include_curve(surface, curve),
             Surface::NurbsSurface(surface) => include_curve(surface, curve),
             Surface::RevolutedCurve(surface) => {
+                let Some(inverse) = surface.transform().invert() else {
+                    return false;
+                };
+                let local_curve = curve.transformed(inverse);
                 let (origin, axis) = (surface.origin(), surface.axis());
                 match surface.entity_curve() {
                     &Curve::Line(entity) => {
                         let entity = BSplineCurve::from(entity);
-                        include_curve(&RevolutedCurve::by_revolution(&entity, origin, axis), curve)
+                        include_curve(
+                            &RevolutedCurve::by_revolution(&entity, origin, axis),
+                            &local_curve,
+                        )
                     }
-                    Curve::BSplineCurve(entity) => {
-                        include_curve(&RevolutedCurve::by_revolution(entity, origin, axis), curve)
-                    }
-                    Curve::NurbsCurve(entity) => {
-                        include_curve(&RevolutedCurve::by_revolution(entity, origin, axis), curve)
-                    }
+                    Curve::BSplineCurve(entity) => include_curve(
+                        &RevolutedCurve::by_revolution(entity, origin, axis),
+                        &local_curve,
+                    ),
+                    Curve::NurbsCurve(entity) => include_curve(
+                        &RevolutedCurve::by_revolution(entity, origin, axis),
+                        &local_curve,
+                    ),
                     Curve::Conic(entity) => {
                         let entity = conic_to_nurbs(entity);
-                        include_curve(&RevolutedCurve::by_revolution(&entity, origin, axis), curve)
+                        include_curve(
+                            &RevolutedCurve::by_revolution(&entity, origin, axis),
+                            &local_curve,
+                        )
                     }
                     Curve::IntersectionCurve(_) | Curve::PCurve(_) => {
                         sampled_include(surface, curve)

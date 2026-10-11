@@ -1,0 +1,141 @@
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.79s
+     Running unittests src/lib.rs (target/debug/deps/truck_geometry-f52eecc531426f0d)
+
+running 1 test
+test decorators::af_surface::tests::approximation_crosses_periodic_support_seams ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 26 filtered out; finished in 0.17s
+
+     Running tests/af_surface.rs (target/debug/deps/af_surface-d4368441d2ab4876)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests/bspcurve.rs (target/debug/deps/bspcurve-527dea7bb1e854c6)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.00s
+
+     Running tests/bspsurface.rs (target/debug/deps/bspsurface-5aa3d8ae9ee151fd)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.00s
+
+     Running tests/circle.rs (target/debug/deps/circle-f8ab31757cf290fd)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 11 filtered out; finished in 0.00s
+
+     Running tests/edge_blend.rs (target/debug/deps/edge_blend-3eb84efd00fcb895)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+
+     Running tests/hyperbola.rs (target/debug/deps/hyperbola-f43178826ed5c0e1)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
+     Running tests/intersection_cache.rs (target/debug/deps/intersection_cache-f39c0a6a806f0c8d)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests/intersection_curve.rs (target/debug/deps/intersection_curve-5fc8739fd0dcd36b)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s
+
+     Running tests/nurbscurve.rs (target/debug/deps/nurbscurve-b9e29e325da75e3f)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.00s
+
+     Running tests/nurbssurface.rs (target/debug/deps/nurbssurface-a3f1fff4be05dab4)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+
+     Running tests/offset.rs (target/debug/deps/offset-8eb229a521986490)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.00s
+
+     Running tests/pcurve.rs (target/debug/deps/pcurve-e2b7550d56ff63fd)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests/plane.rs (target/debug/deps/plane-6241de0e99d260b4)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests/processor.rs (target/debug/deps/processor-3b49379b949ead93)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.00s
+
+     Running tests/processor_curve_derivatives.rs (target/debug/deps/processor_curve_derivatives-793dc691ac3cdf97)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests/rbf_surface.rs (target/debug/deps/rbf_surface-645895f39b8a7b68)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s
+
+     Running tests/revolved_curve.rs (target/debug/deps/revolved_curve-508b4dcfd5cd9356)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 8 filtered out; finished in 0.00s
+
+     Running tests/ruled_search.rs (target/debug/deps/ruled_search-18d9fff2be8c35e8)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.00s
+
+     Running tests/sphere.rs (target/debug/deps/sphere-dd3e1e7521aca746)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s
+
+     Running tests/thin_surface_search.rs (target/debug/deps/thin_surface_search-feb773f10f426b29)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests/torus.rs (target/debug/deps/torus-aa468b3623947a78)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+
+     Running tests/trimmed_curve.rs (target/debug/deps/trimmed_curve-330912338edec5de)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+

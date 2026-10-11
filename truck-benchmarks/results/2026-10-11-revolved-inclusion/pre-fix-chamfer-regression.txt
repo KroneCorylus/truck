@@ -1,0 +1,24 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 7.03s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/conical_blends.rs (target/release/deps/conical_blends-0e0814ae3d292c2c)
+
+running 1 test
+cone case: slope=-0.25, analytic=true, transformed=false, reversed=false
+cone case: slope=-0.25, analytic=true, transformed=false, reversed=true
+cone case: slope=-0.25, analytic=true, transformed=true, reversed=false
+
+thread 'plane_cone_rims_preserve_radius_and_distances' (183338) panicked at truck-shapeops/tests/conical_blends.rs:178:29:
+slope=-0.25, analytic=true, reversed=false: Diagnostic { code: BlendConstructionFailed, operation: "chamfer_solid_along_wire", stage: "validate_contact", message: "Blend construction failed; the numerical or geometric constraint could not be resolved.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: Some(1), related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test plane_cone_rims_preserve_radius_and_distances ... FAILED
+
+failures:
+
+failures:
+    plane_cone_rims_preserve_radius_and_distances
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.47s
+
+error: test failed, to rerun pass `-p truck-shapeops --test conical_blends`

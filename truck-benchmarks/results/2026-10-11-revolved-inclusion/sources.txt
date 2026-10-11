@@ -1,0 +1,13 @@
+{
+  "parent": "886bf932be04c8ea08f843f0c83a6c446d06dc47",
+  "sha256": {
+    "truck-geometry/src/decorators/af_surface.rs": "fed26279ba0e5f2a865c9a7c799a25b8994021151bc9a0253a609ae4bac9b963",
+    "truck-modeling/src/geometry.rs": "14e02164493137191b719a03ff9122973c678af10f3f0dc3a7e860cc60316b66",
+    "truck-shapeops/src/fillet/chamfer.rs": "f6624f708d032490c5ac759fd2bfe360b9225825b0e91f7ec21fcd65f308712d",
+    "truck-stepio/src/out/modeling.rs": "4fbbf6979015d21b99d7f502649f6b78b9ad414523be2127b7911ef6bc9874c4",
+    "truck-modeling/tests/revolved_surface_inclusion.rs": "f9229c0538b6f8c0cc7b7e224a5b4675d7044a75457abeccdc6a4c303ee67d1d",
+    "truck-shapeops/tests/conical_blends.rs": "fc63ebf15788202173d0e88d4c0e086a79f5dec2c69ca82648cdf53dd84337f5",
+    "truck-shapeops/tests/CONICAL_BLENDS.md": "b9bc3b12e169100cd8f401a7dfa471494ea896969f320fb9a52d623231c518f0",
+    "audits/fillet-chamfer/probes/conical_blends.cpp": "c4df05529dc7d8ca241ba084a04d257a8f9b579ba64cb46da3757b791d404c67"
+  }
+}

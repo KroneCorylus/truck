@@ -1,0 +1,65 @@
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 9.73s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/conical_blends.rs (target/release/deps/conical_blends-0e0814ae3d292c2c)
+
+running 1 test
+cone case: slope=-0.25, analytic=true, transformed=false, reversed=false
+fillet STEP
+chamfer STEP
+cone case: slope=-0.25, analytic=true, transformed=false, reversed=true
+fillet STEP
+chamfer STEP
+cone case: slope=-0.25, analytic=true, transformed=true, reversed=false
+fillet STEP
+chamfer STEP
+cone case: slope=-0.25, analytic=true, transformed=true, reversed=true
+fillet STEP
+chamfer STEP
+cone case: slope=-0.25, analytic=false, transformed=false, reversed=false
+fillet STEP
+chamfer STEP
+cone case: slope=-0.25, analytic=false, transformed=false, reversed=true
+fillet STEP
+chamfer STEP
+cone case: slope=-0.25, analytic=false, transformed=true, reversed=false
+fillet STEP
+chamfer STEP
+cone case: slope=-0.25, analytic=false, transformed=true, reversed=true
+fillet STEP
+chamfer STEP
+cone case: slope=0.25, analytic=true, transformed=false, reversed=false
+fillet STEP
+chamfer STEP
+cone case: slope=0.25, analytic=true, transformed=false, reversed=true
+fillet STEP
+chamfer STEP
+cone case: slope=0.25, analytic=true, transformed=true, reversed=false
+fillet STEP
+chamfer STEP
+cone case: slope=0.25, analytic=true, transformed=true, reversed=true
+fillet STEP
+chamfer STEP
+cone case: slope=0.25, analytic=false, transformed=false, reversed=false
+fillet STEP
+chamfer STEP
+cone case: slope=0.25, analytic=false, transformed=false, reversed=true
+fillet STEP
+STEP curve fit residual=0.00012494442225423685 tolerance=0.00005 sample=228
+STEP curve failed: range=(0.0, 3.141592653589793)
+
+thread 'plane_cone_rims_preserve_radius_and_distances' (165444) panicked at truck-shapeops/tests/common/blend.rs:43:62:
+STEP preparation
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test plane_cone_rims_preserve_radius_and_distances ... FAILED
+
+failures:
+
+failures:
+    plane_cone_rims_preserve_radius_and_distances
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.57s
+
+error: test failed, to rerun pass `-p truck-shapeops --test conical_blends`

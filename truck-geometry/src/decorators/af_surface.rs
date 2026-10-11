@@ -400,11 +400,26 @@ where
                 && regular_contact(fillet_surface.surface1(), cc.contact_point1(), cc.center()))
             .then_some(cc)
         };
-        let v_5 = (v0 + v1) / 2.0;
-        let cc0 = contact_circle(v0)?;
-        let cc_5 = contact_circle(v_5)?;
-        let cc1 = contact_circle(v1)?;
-        let mut ccs = vec![(v0, cc0), (v_5, cc_5), (v1, cc1)];
+        let periodic = [
+            fillet_surface.surface0().u_period(),
+            fillet_surface.surface0().v_period(),
+            fillet_surface.surface1().u_period(),
+            fillet_surface.surface1().v_period(),
+        ]
+        .iter()
+        .any(Option::is_some);
+        // Quarter stations disambiguate a complete turn before fitting periodic contacts.
+        let divisions = if periodic { 4 } else { 2 };
+        let mut ccs = (0..=divisions)
+            .map(|i| {
+                let v = if i == divisions {
+                    v1
+                } else {
+                    v0 + (v1 - v0) * i as f64 / divisions as f64
+                };
+                Some((v, contact_circle(v)?))
+            })
+            .collect::<Option<Vec<_>>>()?;
 
         for _i in 0..16 {
             let mut vec = Vec::with_capacity(ccs.len() + 3);
@@ -417,12 +432,12 @@ where
             let knot_vec = KnotVec::try_from(vec).ok()?;
 
             let make_uv0 = move |&(v, cc): &(f64, ContactCircle)| (v, cc.contact_point0().uv);
-            let uv0s = ccs.iter().map(make_uv0).collect::<Vec<_>>();
+            let uv0s = continuous_parameters(fillet_surface.surface0(), ccs.iter().map(make_uv0));
             let parameter_curve0 = BSplineCurve::interpole(knot_vec.clone(), uv0s);
             let pcurve0 = PCurve::new(&parameter_curve0, fillet_surface.surface0());
 
             let make_uv1 = move |&(v, cc): &(f64, ContactCircle)| (v, cc.contact_point1().uv);
-            let uv1s = ccs.iter().map(make_uv1).collect::<Vec<_>>();
+            let uv1s = continuous_parameters(fillet_surface.surface1(), ccs.iter().map(make_uv1));
             let parameter_curve1 = BSplineCurve::interpole(knot_vec.clone(), uv1s);
             let pcurve1 = PCurve::new(&parameter_curve1, fillet_surface.surface1());
 
@@ -504,6 +519,28 @@ where
     }
 }
 
+fn continuous_parameters(
+    surface: &impl ParametricSurface,
+    samples: impl IntoIterator<Item = (f64, Point2)>,
+) -> Vec<(f64, Point2)> {
+    let periods = [surface.u_period(), surface.v_period()];
+    let mut previous: Option<Point2> = None;
+    samples
+        .into_iter()
+        .map(|(t, mut point)| {
+            if let Some(reference) = previous {
+                for (i, period) in periods.into_iter().enumerate() {
+                    if let Some(period) = period.filter(|p| p.is_finite() && *p > 0.) {
+                        point[i] += ((reference[i] - point[i]) / period).round() * period;
+                    }
+                }
+            }
+            previous = Some(point);
+            (t, point)
+        })
+        .collect()
+}
+
 fn regular_contact(
     surface: &impl ParametricSurface3D,
     contact: ContactPoint,
@@ -523,6 +560,56 @@ fn regular_contact(
 mod tests {
     use super::*;
     use proptest::{prelude::*, property_test};
+
+    #[test]
+    fn approximation_crosses_periodic_support_seams() {
+        use std::f64::consts::TAU;
+        for (start, end) in [(5.8, 6.9), (-0.4, 0.6), (0., TAU)] {
+            for transform in [
+                Matrix4::identity(),
+                Matrix4::from_translation(Vector3::new(13., -7., 23.))
+                    * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.73)),
+            ] {
+                let plane = Plane::new(
+                    Point3::new(0., 0., 8.),
+                    Point3::new(1., 0., 8.),
+                    Point3::new(0., 1., 8.),
+                )
+                .transformed(transform);
+                let mut cone = Processor::new(RevolutedCurve::by_revolution(
+                    Line(Point3::new(5., 0., 0.), Point3::new(3., 0., 8.)),
+                    Point3::origin(),
+                    Vector3::unit_z(),
+                ))
+                .transformed(transform);
+                cone.invert();
+                let curve = Processor::with_transform(
+                    TrimmedCurve::new(UnitCircle::<Point3>::new(), (start, end)),
+                    transform
+                        * Matrix4::from_translation(Vector3::new(0., 0., 8.))
+                        * Matrix4::from_nonuniform_scale(3., 3., 1.),
+                );
+                let fillet = RbfSurface::new(curve, plane, cone, 0.5);
+                let approx =
+                    ApproxFilletSurface::approx_rolling_ball_fillet(&fillet, (start, end), 0.0001)
+                        .unwrap_or_else(|| panic!("support seam in {start}..{end}"));
+                for i in 0..=64 {
+                    let v = start + (end - start) * i as f64 / 64.;
+                    let exact = fillet.contact_circle(v).unwrap();
+                    let exact_curve: NurbsCurve<Vector4> = exact.to_same_geometry();
+                    for j in 0..=8 {
+                        let u = j as f64 / 8.;
+                        let point = approx.subs(u, v);
+                        let parameter = exact_curve
+                            .search_nearest_parameter(point, None, 100)
+                            .unwrap()
+                            .clamp(0., 1.);
+                        assert!(point.distance(exact_curve.subs(parameter)) < 0.0001);
+                    }
+                }
+            }
+        }
+    }
 
     #[test]
     fn normalize_longitudinal_parameters_preserves_geometry() {

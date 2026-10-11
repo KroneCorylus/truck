@@ -6,6 +6,10 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Validate revolved-surface boundaries in the stored surface coordinate system, preserving valid translated, rotated, scaled and sheared geometry and rejecting singular transforms and wrong-frame curves. Keep fillet and chamfer contact parameters continuous across periodic seams, including full-turn fillet fitting. Cone-rim regressions cover analytic/NURBS supports, both draft directions, reversed wires, rigid transforms and cavity orientation with independent dimensions, volume, closed meshes, history and STEP.
+
+- Retry procedural STEP boundary fits that fail final geometric validation using finer initial intervals and tighter point fitting error. Preserve the original maximum dyadic depth of 16 and final export tolerance. A manufactured interior bulge and reversed NURBS cone-rim fillets now export successfully without relaxing the fitting check.
+
 - Support exact spherical fillet corners at convex vertices with four or more selected edges when all inward-offset support planes share a center. Check every plane before accepting the center. Four-, five-, six- and eight-edge pyramids have independent analytic-volume, G1 contact, topology, closed mesh, transform, selection-order, STEP and downstream Boolean regressions; incompatible offsets and excessive radii preserve the input on failure. General asymmetric and partially selected junctions remain outside this construction.
 
 - Verify existing square-pyramid chamfers with one through four selected ridges at the apex. Replace the outdated unsupported-chamfer expectation with independent setback planes, analytic volumes, convexity, history, transformed/reversed selections and STEP round trips; retain the unsupported four-edge fillet diagnostic. Construction behavior and diagnostic codes are unchanged.

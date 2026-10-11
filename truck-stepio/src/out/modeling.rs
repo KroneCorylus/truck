@@ -135,22 +135,45 @@ fn prepare_curve(curve: &Curve, tol: f64) -> Option<Curve> {
     }
     match curve {
         Curve::PCurve(_) | Curve::IntersectionCurve(_) => {
-            let spline = BSplineCurve::cubic_approximation(
-                curve,
-                curve.range_tuple(),
-                tol * 0.25,
-                tol.sqrt(),
-                16,
-            )?;
             let (a, b) = curve.range_tuple();
-            for i in 0..=256 {
-                let t = a + (b - a) * i as f64 / 256.0;
-                let error = spline.subs(t).distance(curve.subs(t));
-                if !error.is_finite() || error > tol {
-                    return None;
+            // A coarse adaptive fit can miss a localized deviation. Retry with finer
+            // initial intervals and tighter fitting error, keeping total dyadic depth 16.
+            for level in 0..=4 {
+                let segments = 1 << level;
+                let mut fitted: Option<BSplineCurve<Point3>> = None;
+                for i in 0..segments {
+                    let range = (
+                        a + (b - a) * i as f64 / segments as f64,
+                        if i + 1 == segments {
+                            b
+                        } else {
+                            a + (b - a) * (i + 1) as f64 / segments as f64
+                        },
+                    );
+                    let piece = BSplineCurve::cubic_approximation(
+                        curve,
+                        range,
+                        tol * 0.25 / 4.0_f64.powi(level as i32),
+                        tol.sqrt(),
+                        16 - level,
+                    );
+                    let piece = piece?;
+                    fitted = Some(match fitted {
+                        None => piece,
+                        Some(previous) => previous.try_concat(&piece).ok()?,
+                    });
+                }
+                let spline = fitted?;
+                let valid = (0..=256).all(|i| {
+                    let t = a + (b - a) * i as f64 / 256.;
+                    let error = spline.subs(t).distance(curve.subs(t));
+                    error.is_finite() && error <= tol
+                });
+                if valid {
+                    return Some(spline.into());
                 }
             }
-            Some(spline.into())
+            None
         }
         _ => Some(curve.clone()),
     }
@@ -406,6 +429,47 @@ fn fillet_to_nurbs(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn procedural_curve_export_refines_a_missed_interior_bulge() {
+        use truck_base::hash::HashGen;
+        let h: f64 = 0.5 + (0.2 * <Point3 as HashGen<f64>>::hash1(Point3::new(0.5, 0., 0.)) - 0.1);
+        // t²(1-t)²(t-h)² has matching endpoint tangents and a double root at h.
+        let heights = [
+            0.,
+            0.,
+            h * h / 15.,
+            -h * (1. - h) / 10.,
+            (1. - h).powi(2) / 15.,
+            0.,
+            0.,
+        ];
+        let surface = BSplineSurface::new(
+            (KnotVec::bezier_knot(6), KnotVec::bezier_knot(1)),
+            heights
+                .into_iter()
+                .enumerate()
+                .map(|(i, z)| {
+                    vec![
+                        Point3::new(i as f64 / 6., 0., z * 100.),
+                        Point3::new(i as f64 / 6., 1., z * 100.),
+                    ]
+                })
+                .collect(),
+        );
+        let curve = Curve::PCurve(PCurve::new(
+            BSplineCurve::from(Line(Point2::new(0., 0.), Point2::new(1., 0.))),
+            Box::new(Surface::BSplineSurface(surface)),
+        ));
+        let tol = 0.00001;
+        let prepared = prepare_curve(&curve, tol).expect("refined procedural boundary");
+        for i in 0..=4096 {
+            let t = i as f64 / 4096.;
+            assert!(curve.subs(t).distance(prepared.subs(t)) <= tol);
+        }
+        assert_eq!(prepared.front(), curve.front());
+        assert_eq!(prepared.back(), curve.back());
+    }
 
     #[test]
     fn noncircular_quadratics_remain_splines() {

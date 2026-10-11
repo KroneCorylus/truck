@@ -41,7 +41,15 @@ where
             let e = edge.der(t).normalize();
             let uv = surface.search_parameter(p, *hint, 100)?;
             let w = surface.normal(uv.0, uv.1).cross(e) * sign;
-            let uv = surface.search_nearest_parameter(p + w * distance, Some(uv), 100)?;
+            let mut uv = surface.search_nearest_parameter(p + w * distance, Some(uv), 100)?;
+            if let Some((u, v)) = *hint {
+                if let Some(period) = surface.u_period() {
+                    uv.0 += ((u - uv.0) / period).round() * period;
+                }
+                if let Some(period) = surface.v_period() {
+                    uv.1 += ((v - uv.1) / period).round() * period;
+                }
+            }
             *hint = Some(uv);
             samples.push((Point2::from(uv), surface.subs(uv.0, uv.1)));
         }
