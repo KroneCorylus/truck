@@ -1,0 +1,34 @@
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 9.00s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running unittests examples/replay_occt_blend.rs (target/release/examples/replay_occt_blend-bd2259d8fa5b09df)
+
+running 2 tests
+test curved_selection_tests::matching_endpoints_and_midpoint_do_not_establish_physical_coverage ... FAILED
+test curved_selection_tests::curved_selection_excludes_the_straight_chord_between_its_endpoints ... FAILED
+
+failures:
+
+---- curved_selection_tests::matching_endpoints_and_midpoint_do_not_establish_physical_coverage stdout ----
+
+thread 'curved_selection_tests::matching_endpoints_and_midpoint_do_not_establish_physical_coverage' (550115) panicked at truck-shapeops/examples/replay_occt_blend.rs:361:85:
+called `Result::unwrap()` on an `Err` value: "Ambiguous overlapping physical edges"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- curved_selection_tests::curved_selection_excludes_the_straight_chord_between_its_endpoints stdout ----
+
+thread 'curved_selection_tests::curved_selection_excludes_the_straight_chord_between_its_endpoints' (550114) panicked at truck-shapeops/examples/replay_occt_blend.rs:349:9:
+assertion `left == right` failed
+  left: 2
+ right: 1
+
+
+failures:
+    curved_selection_tests::curved_selection_excludes_the_straight_chord_between_its_endpoints
+    curved_selection_tests::matching_endpoints_and_midpoint_do_not_establish_physical_coverage
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p truck-shapeops --example replay_occt_blend`

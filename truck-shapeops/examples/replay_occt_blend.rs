@@ -36,19 +36,56 @@ fn import(path: &str) -> Result<Solid, String> {
     Solid::extract(modeling).map_err(|e| format!("{e:?}"))
 }
 
-fn polyline_distance(point: Point3, points: &[Point3]) -> f64 {
-    points
+fn segment_distance(point: Point3, a: Point3, b: Point3) -> f64 {
+    let delta = b - a;
+    let u = if delta.magnitude2() > 0. {
+        ((point - a).dot(delta) / delta.magnitude2()).clamp(0., 1.)
+    } else {
+        0.
+    };
+    point.distance(a + u * delta)
+}
+
+type SelectionStation = (Point3, f64, usize);
+
+fn nearest_selection_station(point: Point3, points: &[Point3]) -> SelectionStation {
+    let (index, distance) = points
         .windows(2)
-        .map(|p| {
-            let delta = p[1] - p[0];
-            let u = if delta.magnitude2() > 0. {
-                ((point - p[0]).dot(delta) / delta.magnitude2()).clamp(0., 1.)
-            } else {
-                0.
-            };
-            point.distance(p[0] + u * delta)
-        })
-        .fold(f64::INFINITY, f64::min)
+        .enumerate()
+        .map(|(i, p)| (i, segment_distance(point, p[0], p[1])))
+        .min_by(|a, b| a.1.total_cmp(&b.1))
+        .unwrap();
+    (point, distance, index)
+}
+
+fn selection_covers_chord(
+    a: SelectionStation,
+    b: SelectionStation,
+    points: &[Point3],
+    tol: f64,
+) -> bool {
+    let mut pending = vec![(a, b, 0)];
+    while let Some((a, b, depth)) = pending.pop() {
+        if !a.1.is_finite() || !b.1.is_finite() || a.1 > tol || b.1 > tol {
+            return false;
+        }
+        // A segment capsule is convex. Otherwise the distance to the complete
+        // polyline is 1-Lipschitz, giving a bound from both endpoint distances.
+        if segment_distance(b.0, points[a.2], points[a.2 + 1]) <= tol
+            || segment_distance(a.0, points[b.2], points[b.2 + 1]) <= tol
+            || a.1 + b.1 + a.0.distance(b.0) <= 2. * tol
+        {
+            continue;
+        }
+        let middle = a.0 + (b.0 - a.0) * 0.5;
+        if depth == 48 || middle == a.0 || middle == b.0 {
+            return false;
+        }
+        let middle = nearest_selection_station(middle, points);
+        pending.push((a, middle, depth + 1));
+        pending.push((middle, b, depth + 1));
+    }
+    true
 }
 
 fn match_selection(solid: &Solid, selection: &Value) -> Result<Vec<Edge>, String> {
@@ -79,9 +116,13 @@ fn match_edges(edges: Vec<Edge>, points: &[Point3]) -> Result<Vec<Edge>, String>
             let curve = e.oriented_curve();
             let (a, b) = curve.range_tuple();
             let (_, samples) = curve.parameter_division((a, b), TOL / 100.);
-            samples
-                .iter()
-                .all(|&p| polyline_distance(p, points) <= TOL / 10.)
+            let stations: Vec<_> = samples
+                .into_iter()
+                .map(|p| nearest_selection_station(p, points))
+                .collect();
+            stations
+                .windows(2)
+                .all(|p| selection_covers_chord(p[0], p[1], points, TOL * 0.09))
         })
         .collect();
     if candidates.is_empty() {
@@ -222,7 +263,7 @@ fn replay(prefix: &str, stage: &Cell<&'static str>) -> Result<Value, String> {
         Ok(result) => result,
         Err(error) => {
             return Ok(
-                json!({"status":"operation-failed","code":format!("{:?}",error.code),"error":error.to_string(),"input_unchanged":unchanged}),
+                json!({"status":"operation-failed","code":format!("{:?}",error.code),"error":error.to_string(),"input_unchanged":unchanged,"selected_edges":ids.len()}),
             )
         }
     };
@@ -329,5 +370,51 @@ mod tests {
             &builder::vertex(Point3::new(4., 0., 0.)),
         );
         assert!(as_wire(&[star[0].clone(), detached]).is_none());
+    }
+}
+
+#[cfg(test)]
+mod curved_selection_tests {
+    use super::*;
+
+    #[test]
+    fn curved_selection_excludes_the_straight_chord_between_its_endpoints() {
+        let curve = Curve::BSplineCurve(BSplineCurve::new(
+            KnotVec::bezier_knot(2),
+            vec![
+                Point3::new(1., -2., 0.),
+                Point3::new(-1., 0., 0.),
+                Point3::new(1., 2., 0.),
+            ],
+        ));
+        let a = builder::vertex(curve.front());
+        let b = builder::vertex(curve.back());
+        let points = curve.parameter_division(curve.range_tuple(), TOL / 1000.).1;
+        let arc = Edge::new(&a, &b, curve);
+        let selected = match_edges(vec![builder::line(&a, &b), arc.inverse()], &points).unwrap();
+        assert_eq!(selected.len(), 1);
+        assert_eq!(selected[0].id(), arc.id());
+        assert!(!as_wire(&selected).unwrap().is_cyclic());
+    }
+
+    #[test]
+    fn matching_endpoints_and_midpoint_do_not_establish_physical_coverage() {
+        let points = vec![
+            Point3::new(0., 0., 0.),
+            Point3::new(2., 1., 0.),
+            Point3::new(5., 0., 0.),
+            Point3::new(8., -1., 0.),
+            Point3::new(10., 0., 0.),
+        ];
+        let curve = Curve::BSplineCurve(BSplineCurve::new(
+            KnotVec::uniform_knot(1, 4),
+            points.clone(),
+        ));
+        let a = builder::vertex(curve.front());
+        let b = builder::vertex(curve.back());
+        let bent = Edge::new(&a, &b, curve);
+        let selected = match_edges(vec![builder::line(&a, &b), bent.clone()], &points).unwrap();
+        assert_eq!(selected.len(), 1);
+        assert_eq!(selected[0].id(), bent.id());
     }
 }

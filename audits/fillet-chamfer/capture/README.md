@@ -20,7 +20,9 @@ mapping STEP geometry into modeling types. It checks input consistency, matches
 physical edges in both directions within 1e-4, rejects detected overlapping
 matches, and permits split representations. Equal-radius selections first use
 the solid-edge route, then the wire route when the selection is one unbranched
-chain. Input import, selection mismatch, unhandled intent, operation failure,
+chain. Candidate polyline chords must be covered by the captured selection tolerance
+tube; endpoint-only matches cannot select a straight chord across a curved edge.
+Input import, selection mismatch, unhandled intent, operation failure,
 panic, timeout and constructed output are recorded separately.
 
 Successful output is checked for geometric consistency, closed tessellation,
@@ -58,7 +60,7 @@ cargo test -p truck-shapeops --example replay_occt_blend
 python3 -m unittest discover -s audits/fillet-chamfer/capture -p 'test_*.py'
 ```
 
-Three Rust tests cover split/reversed/repeated physical selections, incomplete
+Five Rust tests cover split/reversed/repeated physical selections, incomplete
 and ambiguous matches, invalid points, branches and disconnected wires. Two Tcl
 wrapper tests check caller scope and preservation of success/error behavior.
 

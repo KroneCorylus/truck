@@ -1,0 +1,15 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 0.51s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running unittests examples/replay_occt_blend.rs (target/release/examples/replay_occt_blend-bd2259d8fa5b09df)
+
+running 5 tests
+test curved_selection_tests::matching_endpoints_and_midpoint_do_not_establish_physical_coverage ... ok
+test tests::physical_selection_accepts_split_edges_and_ignores_order ... ok
+test tests::physical_selection_rejects_incomplete_and_ambiguous_matches ... ok
+test tests::wire_route_rejects_branches_and_disconnected_selection ... ok
+test curved_selection_tests::curved_selection_excludes_the_straight_chord_between_its_endpoints ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
