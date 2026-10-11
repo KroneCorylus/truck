@@ -1,0 +1,8 @@
+{
+  "parent": "c70452f40929123780c115bdec90283b3fff9fcd",
+  "sha256": {
+    "truck-shapeops/tests/spherical_rim_blends.rs": "9e6e27d2db3ee402de52a1dda89832e5af0b6400df964859f24251f9cf8ac367",
+    "truck-shapeops/tests/SPHERICAL_RIMS.md": "4b8a3c3832ed196476254e66867d59e77d43e9fd7cfab5e6d3f6d11299214b2e",
+    "audits/fillet-chamfer/probes/spherical_rim_blends.cpp": "46cb6004bb7e2514c7f948e101580ed9fdaaa25bdb61aeee1fa53a46590af195"
+  }
+}

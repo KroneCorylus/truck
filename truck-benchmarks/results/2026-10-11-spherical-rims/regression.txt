@@ -1,0 +1,30 @@
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-modeling)
+   Compiling truck-meshalgo v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-meshalgo)
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.75s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/spherical_rim_blends.rs (target/debug/deps/spherical_rim_blends-be1940a2aa3d91a0)
+
+running 2 tests
+test spherical_cavity_rims_preserve_orientation ... FAILED
+test plane_sphere_rims_preserve_rolling_radius has been running for over 60 seconds
+test plane_sphere_rims_preserve_rolling_radius ... ok
+
+failures:
+
+---- spherical_cavity_rims_preserve_orientation stdout ----
+
+thread 'spherical_cavity_rims_preserve_orientation' (274535) panicked at truck-shapeops/tests/common/mod.rs:77:5:
+volume 4135.779000134248 differs from expected 4056.2064930545293 by more than 0.03141167488288068
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    spherical_cavity_rims_preserve_orientation
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 159.94s
+
+error: test failed, to rerun pass `-p truck-shapeops --test spherical_rim_blends`
