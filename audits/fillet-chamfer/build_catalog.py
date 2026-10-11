@@ -331,8 +331,8 @@ def source_inventory(occt, revision):
     return files
 
 
-def apply_runs(cases, occt, directory):
-    """Validate native execution evidence; never infer a Truck result from it."""
+def apply_runs(cases, occt, directory, captured=False):
+    """Validate execution evidence without promoting construction to parity."""
     by_id = {case['id']: case for case in cases}
     runs = []
     statuses = {'passed', 'known-failure', 'failed', 'improvement', 'skipped',
@@ -354,10 +354,22 @@ def apply_runs(cases, occt, directory):
         for result in manifest['cases']:
             if result['id'] not in by_id:
                 raise ValueError(f'Unknown execution case: {result["id"]}')
-            if result.get('comparison') != 'unverified' or result.get('truck_run') != 'not-run':
-                raise ValueError('Native execution cannot establish Truck parity')
-            if result['status'] not in statuses:
-                raise ValueError(f'Unknown execution status: {result["status"]}')
+            if captured:
+                for capture in result['captures']:
+                    if capture.get('status') == 'capture-incomplete':
+                        continue
+                    if capture.get('comparison') != 'unverified' or capture.get('truck', {}).get('comparison', 'unverified') != 'unverified':
+                        raise ValueError('Captured replay cannot establish full parity')
+                    if capture.get('truck', {}).get('result', {}).get('status') not in {
+                            'operation-succeeded', 'input-inconsistent', 'input-import-failed',
+                            'operation-failed', 'unhandled-intent', 'selection-unmatched',
+                            'panic', 'timeout', 'process-failed', 'harness-error'}:
+                        raise ValueError('Unknown captured replay status')
+            else:
+                if result.get('comparison') != 'unverified' or result.get('truck_run') != 'not-run':
+                    raise ValueError('Native execution cannot establish Truck parity')
+                if result['status'] not in statuses:
+                    raise ValueError(f'Unknown execution status: {result["status"]}')
             case = by_id[result['id']]
             required = {case['source']['path']: case['sha256']}
             required.update((h['path'], h['sha256']) for h in case['helpers'])
@@ -379,8 +391,15 @@ def apply_runs(cases, occt, directory):
                 link = archive if archived is not None else artifact
                 artifacts.append({'path': name, 'url': Path(os.path.relpath(link, HERE)).as_posix(), 'sha256': digest})
             execution = {**result, 'manifest': run['manifest'], 'artifacts': artifacts}
-            case.setdefault('occt_executions', []).append(execution)
-            case['occt_run'] = result['status']
+            if captured:
+                case.setdefault('truck_executions', []).append(execution)
+                if any(c.get('truck') for c in result['captures']):
+                    case['truck_run'] = 'captured-replay'
+                elif result['captures']:
+                    case['truck_run'] = 'capture-incomplete'
+            else:
+                case.setdefault('occt_executions', []).append(execution)
+                case['occt_run'] = result['status']
     return runs
 
 
@@ -396,7 +415,8 @@ def build(occt, app):
     if len({c["id"] for c in cases}) != len(cases):
         raise ValueError("Duplicate logical case IDs")
     executions = apply_runs(cases, occt, HERE / 'runs')
-    counts = {key: dict(sorted(Counter(c[key] for c in cases).items())) for key in ["group", "relevance", "dependency_status", "comparison", "occt_run"]}
+    captured = apply_runs(cases, occt, HERE / 'capture', captured=True)
+    counts = {key: dict(sorted(Counter(c[key] for c in cases).items())) for key in ["group", "relevance", "dependency_status", "comparison", "occt_run", "truck_run"]}
     counts.update({"cases": len(cases), "registered_cases_scanned": all_count, "distinct_case_files": len({c["source"]["path"] for c in cases}), "cases_with_markers": sum(bool(c["markers"]) for c in cases), "mechanisms": len(coverage["families"]), "source_files": len(source_files), "commands": len(registry), "unexecuted": sum(c['occt_run'] == 'not-run' for c in cases)})
     counts["reference_topics"] = sum(f["truck_status"] == "reference-only" for f in coverage["families"])
     counts["capabilities"] = len(coverage["families"]) - counts["reference_topics"]
@@ -411,6 +431,7 @@ def build(occt, app):
         "validation_contract": coverage["validation_contract"], "variation_axes": coverage["variation_axes"],
         "counts": counts, "families": coverage["families"], "cases": cases,
         "occt_executions": executions,
+        "captured_executions": captured,
         "commands": registry, "source_files": source_files, "other_references": loose,
         "discovery": {
             "rules": "All dedicated grids; all registered grids whose case or begin/end helpers match topic tokens or discovered commands; remaining textual matches retained separately.",

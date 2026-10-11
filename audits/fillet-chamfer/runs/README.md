@@ -27,8 +27,10 @@ requested blend works; some TODO patterns also match incomplete fixture setup.
 Likewise, OK proves only that the upstream checks and their rule set passed. It
 does not independently certify dimensions, validity or a Truck equivalent.
 
-Every case-level Truck comparison remains unverified. Independent paired cone and
-pyramid probes are separate from this corpus. Missing fixtures remain needed for
+Every case-level full Truck parity verdict remains unverified. Captured physical
+replays now cover operations from 148 upstream entries; their import, construction,
+mesh and sampled STEP observations are attached separately. See
+`../capture/baseline/REPORT.md`. Independent paired probes supply additional evidence. Missing fixtures remain needed for
 701 native cases, including all 279 dedicated chamfer entries. There is ample
 primitive-based coverage to continue pairing and implementation meanwhile.
 

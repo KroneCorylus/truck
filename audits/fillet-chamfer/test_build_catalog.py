@@ -171,6 +171,38 @@ void registerCommands() {
         with self.assertRaisesRegex(ValueError, 'artifact archive'):
             audit.apply_runs([case], self.root / 'occt', self.root / 'runs')
 
+    def test_captured_construction_does_not_overwrite_native_verdict_or_parity(self):
+        case, _, _ = self.execution_fixture()
+        manifest = self.root / 'runs/first/results.json'
+        data = json.loads(manifest.read_text())
+        result = data['cases'][0]
+        result['captures'] = [dict(prefix='001', comparison='unverified',
+                                  truck=dict(comparison='unverified', result=dict(status='operation-succeeded')))]
+        manifest.write_text(json.dumps(data))
+        audit.apply_runs([case], self.root / 'occt', self.root / 'runs', captured=True)
+        self.assertEqual(case['truck_run'], 'captured-replay')
+        self.assertEqual(case['occt_run'], 'not-run')
+        self.assertEqual(case['comparison'], 'unverified')
+        self.assertEqual(len(case['truck_executions']), 1)
+        result['captures'][0]['comparison'] = 'equivalent'
+        manifest.write_text(json.dumps(data))
+        with self.assertRaisesRegex(ValueError, 'parity'):
+            audit.apply_runs([case], self.root / 'occt', self.root / 'runs', captured=True)
+
+    def test_empty_capture_and_incomplete_capture_are_not_replayed(self):
+        case, _, _ = self.execution_fixture()
+        manifest = self.root / 'runs/first/results.json'
+        data = json.loads(manifest.read_text())
+        data['cases'][0]['captures'] = []
+        manifest.write_text(json.dumps(data))
+        audit.apply_runs([case], self.root / 'occt', self.root / 'runs', captured=True)
+        self.assertEqual(case['truck_run'], 'not-run')
+        data['cases'][0]['captures'] = [dict(status='capture-incomplete')]
+        manifest.write_text(json.dumps(data))
+        audit.apply_runs([case], self.root / 'occt', self.root / 'runs', captured=True)
+        self.assertEqual(case['truck_run'], 'capture-incomplete')
+        self.assertEqual(case['comparison'], 'unverified')
+
 
 if __name__ == "__main__":
     unittest.main()
