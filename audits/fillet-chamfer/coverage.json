@@ -845,6 +845,18 @@
           "path": "audits/fillet-chamfer/capture/2026-10-11-cone-domain/REPORT.md",
           "find": "Maximum",
           "role": "replay-report"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-stepio/tests/import_nonelliptic_conics.rs",
+          "find": "fn step_parabola_edges_preserve_type_endpoints_and_sense",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-11-conic-import/REPORT.md",
+          "find": "F8/F9/G1/G2",
+          "role": "verification"
         }
       ],
       "required_outcome": "Handle equivalent physical geometry consistently when represented analytically, as exact NURBS, with split faces, or after STEP import.",
@@ -872,7 +884,8 @@
         "At 20de5c08, 28 spherical-rim operations pass: two cut heights, Sphere/revolved-circle/exact-NURBS supports, rigid transforms and reversed wires, plus four cavity cases. Checks include independent radius/normal/volume equations, G1 joins, geometry, topology, closed meshes, history, unchanged inputs and STEP. No production change was needed. The final release target and corrected debug cavity target pass; exterior debug checks also passed, and Clippy is clean. Full scope and the corrected test-fixture orientation are documented in the spherical-rims report.",
         "Captured replay at d1b2bade: 161 operation captures from 148 upstream entries, including 45 constructed results. Forty-two meet the combined limited geometry/input-preservation/mesh/STEP and bidirectional sample checks; none is classified as full parity. Other observations are import inconsistencies/rejections, route failures, unsupported replay intent, panics during preprocessing, timeouts and one incomplete capture. The retained physical fixtures identify cone STEP trimming, meshing, revolved inclusion and imported cylinder support bounds as concrete investigations. See capture/baseline/REPORT.md; native verdicts and replay outcomes remain separate.",
         "At 7414e3d9, signed atan2 angle recovery fixes loss of precision near coincident/opposite revolution meridians. Two parent-failing regressions cover point/nearest searches, three radii, small seam/antipodal angles and exact spherical boundaries across shifted domains, rigid transforms and reversed orientations; off-sphere curves remain rejected. Captured D2 input consistency now passes, without claiming subsequent blend support. Full geometry/modeling/shapeops/STEP: 728 passed, 0 failed, 4 existing ignored; Clippy and action smoke pass. See truck-benchmarks/results/2026-10-11-revolution-seams/REPORT.md.",
-        "At fa1a142d, STEP fitting covers curved fillet trims beyond their contact endpoints. The parent loses conical end geometry; four direct quarter-cone operations verify requested radius/normals, independent volume, native/transformed-reversed selections, finite fitted-domain coverage, closed meshes/STEP, history and immutable inputs. Full release shapeops/STEP: 391 passed, 0 failed, 1 existing ignored; Clippy and action smoke pass. A fresh physical C7 replay reduces the native-to-STEP sampled discrepancy from 4.2283 to below 2.76e-6 in both directions. Finite sampling does not certify global bounds or full parity. Raw comparison/STEP evidence is retained with the validation and capture reports."
+        "At fa1a142d, STEP fitting covers curved fillet trims beyond their contact endpoints. The parent loses conical end geometry; four direct quarter-cone operations verify requested radius/normals, independent volume, native/transformed-reversed selections, finite fitted-domain coverage, closed meshes/STEP, history and immutable inputs. Full release shapeops/STEP: 391 passed, 0 failed, 1 existing ignored; Clippy and action smoke pass. A fresh physical C7 replay reduces the native-to-STEP sampled discrepancy from 4.2283 to below 2.76e-6 in both directions. Finite sampling does not certify global bounds or full parity. Raw comparison/STEP evidence is retained with the validation and capture reports.",
+        "At 41e25f28, finite nonelliptic STEP conics convert to exact normalized polynomial/rational curves. The edge parser preserves parabola identity and nonperiodic hyperbola trims. Transformed/reversed arc, 2D/3D STEP edge and prism/STEP regressions pass; full release STEP/shapeops: 397 passed, 0 failed, 1 existing ignored, with Clippy/action smoke. Captured F8/F9/G1/G2 progress to input-consistency failure, with extrusion support domains still unresolved; no blend success or full parity is claimed. See capture/2026-10-11-conic-import/REPORT.md."
       ]
     },
     {
@@ -2109,6 +2122,18 @@
           "path": "audits/fillet-chamfer/capture/2026-10-11-transformed-division/REPORT.md",
           "find": "All five instrumented",
           "role": "verification"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-stepio/tests/import_nonelliptic_conics.rs",
+          "find": "fn step_parabola_edges_preserve_type_endpoints_and_sense",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-11-conic-import/REPORT.md",
+          "find": "F8/F9/G1/G2",
+          "role": "verification"
         }
       ],
       "required_outcome": "Deliver blend results usable for closed meshing, STEP interchange and further modeling while preserving dimensions and validity.",
@@ -2122,7 +2147,8 @@
         "At d1b2bade, planar-ended fillets can be wider than their spine when the trimmed positive-weight rational patch fits every original convex half-space. The parent fails the length-0.2/radius-0.5 case. Thirty-six operations cover lengths 0.2/1/10, radii 0.5/10, perpendicular and oblique caps, and rigid transforms, with independent radius/normal/end-bound/volume checks, topology, closed meshes, history, immutable inputs and STEP. Full shapeops: 310 passed, 0 failed, 1 existing ignored; Clippy and action benchmark smoke pass. Evidence: truck-benchmarks/results/2026-10-11-short-spine-fillets/REPORT.md.",
         "Captured replay at d1b2bade: 161 operation captures from 148 upstream entries, including 45 constructed results. Forty-two meet the combined limited geometry/input-preservation/mesh/STEP and bidirectional sample checks; none is classified as full parity. Other observations are import inconsistencies/rejections, route failures, unsupported replay intent, panics during preprocessing, timeouts and one incomplete capture. The retained physical fixtures identify cone STEP trimming, meshing, revolved inclusion and imported cylinder support bounds as concrete investigations. See capture/baseline/REPORT.md; native verdicts and replay outcomes remain separate.",
         "At fa1a142d, STEP fitting covers curved fillet trims beyond their contact endpoints. The parent loses conical end geometry; four direct quarter-cone operations verify requested radius/normals, independent volume, native/transformed-reversed selections, finite fitted-domain coverage, closed meshes/STEP, history and immutable inputs. Full release shapeops/STEP: 391 passed, 0 failed, 1 existing ignored; Clippy and action smoke pass. A fresh physical C7 replay reduces the native-to-STEP sampled discrepancy from 4.2283 to below 2.76e-6 in both directions. Finite sampling does not certify global bounds or full parity. Raw comparison/STEP evidence is retained with the validation and capture reports.",
-        "At dc055215, affine curve division preserves world tolerance through scale, shear and singular projections; positive finite local tolerances below 1e-6 no longer panic. Four regression tests and 747 full release tests pass (5 existing ignored), plus Clippy and action smoke. The five captured preprocessing panics now separate into four unsupported-conic import errors and one later closed-face divisor panic; no blend success or full parity is claimed. See capture/2026-10-11-transformed-division/REPORT.md and truck-benchmarks/results/2026-10-11-transformed-division/REPORT.md."
+        "At dc055215, affine curve division preserves world tolerance through scale, shear and singular projections; positive finite local tolerances below 1e-6 no longer panic. Four regression tests and 747 full release tests pass (5 existing ignored), plus Clippy and action smoke. The five captured preprocessing panics now separate into four unsupported-conic import errors and one later closed-face divisor panic; no blend success or full parity is claimed. See capture/2026-10-11-transformed-division/REPORT.md and truck-benchmarks/results/2026-10-11-transformed-division/REPORT.md.",
+        "At 41e25f28, finite nonelliptic STEP conics convert to exact normalized polynomial/rational curves. The edge parser preserves parabola identity and nonperiodic hyperbola trims. Transformed/reversed arc, 2D/3D STEP edge and prism/STEP regressions pass; full release STEP/shapeops: 397 passed, 0 failed, 1 existing ignored, with Clippy/action smoke. Captured F8/F9/G1/G2 progress to input-consistency failure, with extrusion support domains still unresolved; no blend success or full parity is claimed. See capture/2026-10-11-conic-import/REPORT.md."
       ]
     },
     {
@@ -2178,12 +2204,25 @@
           "path": "audits/fillet-chamfer/capture/2026-10-11-transformed-division/REPORT.md",
           "find": "All five instrumented",
           "role": "verification"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-stepio/tests/import_nonelliptic_conics.rs",
+          "find": "fn step_parabola_edges_preserve_type_endpoints_and_sense",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-11-conic-import/REPORT.md",
+          "find": "F8/F9/G1/G2",
+          "role": "verification"
         }
       ],
       "required_outcome": "Explain failed selections and stages clearly, preserve the model and allow the user to correct or retry a failed blend.",
       "verification": [
         "Captured replay at d1b2bade: 161 operation captures from 148 upstream entries, including 45 constructed results. Forty-two meet the combined limited geometry/input-preservation/mesh/STEP and bidirectional sample checks; none is classified as full parity. Other observations are import inconsistencies/rejections, route failures, unsupported replay intent, panics during preprocessing, timeouts and one incomplete capture. The retained physical fixtures identify cone STEP trimming, meshing, revolved inclusion and imported cylinder support bounds as concrete investigations. See capture/baseline/REPORT.md; native verdicts and replay outcomes remain separate.",
-        "At dc055215, affine curve division preserves world tolerance through scale, shear and singular projections; positive finite local tolerances below 1e-6 no longer panic. Four regression tests and 747 full release tests pass (5 existing ignored), plus Clippy and action smoke. The five captured preprocessing panics now separate into four unsupported-conic import errors and one later closed-face divisor panic; no blend success or full parity is claimed. See capture/2026-10-11-transformed-division/REPORT.md and truck-benchmarks/results/2026-10-11-transformed-division/REPORT.md."
+        "At dc055215, affine curve division preserves world tolerance through scale, shear and singular projections; positive finite local tolerances below 1e-6 no longer panic. Four regression tests and 747 full release tests pass (5 existing ignored), plus Clippy and action smoke. The five captured preprocessing panics now separate into four unsupported-conic import errors and one later closed-face divisor panic; no blend success or full parity is claimed. See capture/2026-10-11-transformed-division/REPORT.md and truck-benchmarks/results/2026-10-11-transformed-division/REPORT.md.",
+        "At 41e25f28, finite nonelliptic STEP conics convert to exact normalized polynomial/rational curves. The edge parser preserves parabola identity and nonperiodic hyperbola trims. Transformed/reversed arc, 2D/3D STEP edge and prism/STEP regressions pass; full release STEP/shapeops: 397 passed, 0 failed, 1 existing ignored, with Clippy/action smoke. Captured F8/F9/G1/G2 progress to input-consistency failure, with extrusion support domains still unresolved; no blend success or full parity is claimed. See capture/2026-10-11-conic-import/REPORT.md."
       ]
     },
     {
