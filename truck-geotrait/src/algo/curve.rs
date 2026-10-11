@@ -72,12 +72,16 @@ where
 ///
 /// # Panics
 ///
-/// `tol` must be greater than or equal to `TOLERANCE`.
+/// `tol` must be positive and finite. Transformed curves can require local
+/// tolerances smaller than the modeling tolerance.
 pub fn parameter_division<C>(curve: &C, range: (f64, f64), tol: f64) -> (Vec<f64>, Vec<C::Point>)
 where
     C: ParametricCurve,
     C::Point: EuclideanSpace<Scalar = f64> + MetricSpace<Metric = f64> + HashGen<f64>, {
-    nonpositive_tolerance!(tol);
+    assert!(
+        tol.is_finite() && tol > 0.0,
+        "tolerance must be positive and finite"
+    );
     sub_parameter_division(
         curve,
         range,
@@ -103,7 +107,7 @@ where
     let t = range.0 * (1.0 - p) + range.1 * p;
     let mid = ends.0 + (ends.1 - ends.0) * p;
     let dist2 = curve.subs(t).distance2(mid);
-    if dist2 < tol * tol || trials == 0 {
+    if dist2 <= tol * tol || trials == 0 {
         (vec![range.0, range.1], vec![ends.0, ends.1])
     } else {
         let mid_param = (range.0 + range.1) / 2.0;

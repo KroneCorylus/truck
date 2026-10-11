@@ -6,6 +6,8 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Preserve requested curve-division accuracy through affine scaling, shear and singular projections. Bound the complete linear transform instead of only its orthogonalized diagonal, and accept positive finite local sampling tolerances below the global modeling tolerance. Scaled parabolas, hyperbolas and splines no longer panic during STEP preprocessing; sheared 2D/3D circles meet world-space chord checks and reversed divisions retain their ordering.
+
 - Extend procedural fillet STEP fitting to cover curved end trims beyond the nominal contact range. Normalize parameters before measuring the trim, retain the requested fitting tolerance and preserve topology/input geometry. Quarter-cone regressions check exact radius/normals, independent volume, transformed/reversed selections, bounded surface coverage and closed STEP round trips.
 
 - Recover revolution angles with signed `atan2`, preserving point-search accuracy near the periodic seam and opposite meridian. Exact spherical boundary curves no longer fail inclusion from inverse-cosine cancellation; regressions cover small angular offsets, multiple radii, shifted curve domains, reversed orientations and rigid transforms.

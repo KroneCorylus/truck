@@ -1,0 +1,16 @@
+    Checking truck-geotrait v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-geotrait)
+    Checking truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+    Checking truck-topology v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-topology)
+    Checking truck-polymesh v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-polymesh)
+error: using `chunks_exact` with a constant chunk size
+  --> truck-geotrait/tests/curve.rs:65:10
+   |
+65 |         .chunks_exact(3)
+   |          ^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<3>().0.iter()`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#chunks_exact_to_as_chunks
+   = note: `-D clippy::chunks-exact-to-as-chunks` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::chunks_exact_to_as_chunks)]`
+
+error: could not compile `truck-geotrait` (test "curve") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

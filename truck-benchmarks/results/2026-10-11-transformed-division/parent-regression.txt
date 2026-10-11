@@ -1,0 +1,29 @@
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.46s
+     Running tests/transformed_curve_division.rs (target/debug/deps/transformed_curve_division-60e7f95f94331b73)
+
+running 2 tests
+test scaled_parabola_division_keeps_world_tolerance_without_panicking ... FAILED
+test sheared_and_flattened_circles_keep_world_chord_accuracy ... FAILED
+
+failures:
+
+---- scaled_parabola_division_keeps_world_tolerance_without_panicking stdout ----
+
+thread 'scaled_parabola_division_keeps_world_tolerance_without_panicking' (431430) panicked at truck-geotrait/src/algo/curve.rs:80:5:
+tolerance must be no less than 1e-6
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- sheared_and_flattened_circles_keep_world_chord_accuracy stdout ----
+
+thread 'sheared_and_flattened_circles_keep_world_chord_accuracy' (431431) panicked at truck-geometry/tests/transformed_curve_division.rs:23:13:
+world chord error 0.008550109553144824 exceeds 0.001
+
+
+failures:
+    scaled_parabola_division_keeps_world_tolerance_without_panicking
+    sheared_and_flattened_circles_keep_world_chord_accuracy
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-geometry --test transformed_curve_division`

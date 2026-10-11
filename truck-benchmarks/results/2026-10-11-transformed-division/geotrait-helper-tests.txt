@@ -1,0 +1,14 @@
+   Compiling truck-geotrait v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-geotrait)
+    Finished `release` profile [optimized] target(s) in 0.85s
+     Running tests/curve.rs (target/release/deps/curve-c151aa9949b709d4)
+
+running 6 tests
+test polycurve_presearch ... ok
+test polycurve_intersection_point ... ok
+test polycurve_closest_point ... ok
+test polycurve_snp_on_curve ... ok
+test polycurve_test ... ok
+test polycurve_division ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+

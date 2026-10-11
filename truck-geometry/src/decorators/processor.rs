@@ -346,18 +346,9 @@ where C: ParameterDivision1D<Point = Point2> + BoundedCurve<Point = Point2>
                 self.get_curve_parameter(range.0),
             ),
         };
-        let n = match a.iwasawa_decomposition() {
-            Some((_, k, _)) => f64::abs(k[0][0])
-                .max(f64::abs(k[1][1]))
-                .max(f64::abs(k[2][2])),
-            // An edge-on ellipse has a singular transform. Bound its linear scaling by
-            // the Frobenius norm; translation does not change the division tolerance.
-            None => (0..2)
-                .flat_map(|i| (0..2).map(move |j| a[i][j] * a[i][j]))
-                .sum::<f64>()
-                .sqrt()
-                .max(1.0),
-        };
+        let n = linear_scale_bound::<2>(std::array::from_fn(|i| {
+            std::array::from_fn(|j| a[i][j] / a[2][2])
+        }));
         let (mut params, mut points) = self.entity.parameter_division(range, tol / n);
         points
             .iter_mut()
@@ -386,13 +377,9 @@ where C: ParameterDivision1D<Point = Point3> + BoundedCurve<Point = Point3>
                 self.get_curve_parameter(range.0),
             ),
         };
-        let (_, k, _) = a
-            .iwasawa_decomposition()
-            .expect("transform matrix must be invertible!");
-        let n = f64::abs(k[0][0])
-            .max(f64::abs(k[1][1]))
-            .max(f64::abs(k[2][2]))
-            / f64::abs(k[3][3]);
+        let n = linear_scale_bound::<3>(std::array::from_fn(|i| {
+            std::array::from_fn(|j| a[i][j] / a[3][3])
+        }));
         let (mut params, mut points) = self.entity.parameter_division(range, tol / n);
         points
             .iter_mut()
@@ -405,6 +392,28 @@ where C: ParameterDivision1D<Point = Point3> + BoundedCurve<Point = Point3>
             points.reverse();
         }
         (params, points)
+    }
+}
+
+fn linear_scale_bound<const N: usize>(columns: [[f64; N]; N]) -> f64 {
+    // The maximum absolute row sum of AᵀA bounds its largest eigenvalue,
+    // including shear and singular projections, and stays tight for similarities.
+    let squared = (0..N)
+        .map(|i| {
+            (0..N)
+                .map(|j| {
+                    (0..N)
+                        .map(|k| columns[i][k] * columns[j][k])
+                        .sum::<f64>()
+                        .abs()
+                })
+                .sum::<f64>()
+        })
+        .fold(0.0_f64, f64::max);
+    if squared == 0. {
+        1.
+    } else {
+        squared.sqrt()
     }
 }
 

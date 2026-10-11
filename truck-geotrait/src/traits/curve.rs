@@ -184,7 +184,7 @@ pub trait ParameterDivision1D {
     ///
     /// # Panics
     ///
-    /// `tol` must be greater than or equal to `TOLERANCE`.
+    /// `tol` must be positive and finite. It is measured in the curve's coordinate system.
     fn parameter_division(&self, range: (f64, f64), tol: f64) -> (Vec<f64>, Vec<Self::Point>);
 }
 
