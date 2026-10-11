@@ -3,7 +3,7 @@
     "title": "Fillet and chamfer feature parity audit",
     "baseline": "OCCT V7_9_3 source inventory plus the recorded Truck/Pieza revisions. Includes 3D, 2D, related workflows and all textual candidates under the discovery rules.",
     "meaning_of_all": "Every dedicated test-grid entry, matching registered test/helper, discovered blend command and retained reference in this pinned checkout. This is not a claim about all mathematical configurations or current/future OCCT releases.",
-    "execution": "The OCCT case corpus has not been executed or paired here. Targeted Truck regression results are recorded on capability entries; case-level comparisons remain unverified.",
+    "execution": "All 1,026 inventoried entries have recorded native OCCT harness attempts. Passes, known failures, failures and missing-fixture skips remain separate. Source and log hashes are checked when building the catalog. These executions do not establish Truck comparison: all case-level parity remains unverified. Independent paired probes and targeted Truck regression results are recorded on capability entries.",
     "mapping": "Capability assessments describe observable outcomes supported or restricted by reviewed source evidence. Per-case tags and links are automated hints; they do not prove Truck handles that fixture.",
     "objective": "Achieve at least OCCT-level fillet/chamfer capabilities and robustness for equivalent modeling tasks in Truck/Pieza.",
     "equivalence": "Judge the requested geometry, dimensions, validity, editing behavior and practical performance. Different APIs, algorithms, languages, surface representations and internal operation sequences are acceptable. Missing a corresponding OCCT method is not evidence of a feature gap."

@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+import zipfile
 
 import build_catalog as audit
 
@@ -111,6 +112,64 @@ void registerCommands() {
         changed = commit()
         self.assertNotEqual(changed, baseline)
         self.assertEqual(audit.truck_revision(self.root), changed)
+
+    def execution_fixture(self):
+        source = self.put('occt/tests/bugs/grid/a', 'blend result s 1 e\n')
+        log = self.put('runs/first/bugs/grid/a/console.log', 'CASE bugs grid a: BAD (known problem)\n')
+        case = dict(id='bugs/grid/a', source={'path': 'tests/bugs/grid/a'},
+                    sha256=audit.sha(source), helpers=[], occt_run='not-run',
+                    truck_run='not-run', comparison='unverified')
+        result = dict(id=case['id'], status='known-failure', source_sha256={case['source']['path']: case['sha256']},
+                      artifacts={'bugs/grid/a/console.log': audit.sha(log)},
+                      comparison='unverified', truck_run='not-run')
+        self.put('runs/first/results.json', json.dumps(dict(schema_version=1, cases=[result], runtime='OCCT')))
+        return case, source, log
+
+    def test_native_run_does_not_promote_parity_or_known_failure_to_pass(self):
+        case, _, _ = self.execution_fixture()
+        runs = audit.apply_runs([case], self.root / 'occt', self.root / 'runs')
+        self.assertEqual(case['occt_run'], 'known-failure')
+        self.assertEqual(case['truck_run'], 'not-run')
+        self.assertEqual(case['comparison'], 'unverified')
+        self.assertEqual(len(runs), 1)
+
+    def test_execution_rejects_changed_source_and_missing_log(self):
+        case, source, log = self.execution_fixture()
+        log.unlink()
+        with self.assertRaisesRegex(ValueError, 'artifact'):
+            audit.apply_runs([case], self.root / 'occt', self.root / 'runs')
+        log.write_text('CASE bugs grid a: BAD (known problem)\n')
+        source.write_text('changed\n')
+        with self.assertRaisesRegex(ValueError, 'source'):
+            audit.apply_runs([case], self.root / 'occt', self.root / 'runs')
+
+    def test_native_run_rejects_unknown_cases_and_parity_claims(self):
+        case, _, _ = self.execution_fixture()
+        with self.assertRaisesRegex(ValueError, 'Unknown'):
+            audit.apply_runs([], self.root / 'occt', self.root / 'runs')
+        manifest = self.root / 'runs/first/results.json'
+        data = json.loads(manifest.read_text())
+        data['cases'][0]['comparison'] = 'equivalent'
+        manifest.write_text(json.dumps(data))
+        with self.assertRaisesRegex(ValueError, 'parity'):
+            audit.apply_runs([case], self.root / 'occt', self.root / 'runs')
+
+    def test_archived_logs_are_verified_without_extraction(self):
+        case, _, log = self.execution_fixture()
+        root = self.root / 'runs/first'
+        archive = root / 'artifacts.zip'
+        with zipfile.ZipFile(archive, 'w') as zipped:
+            zipped.write(log, str(log.relative_to(root)))
+        log.unlink()
+        manifest = root / 'results.json'
+        data = json.loads(manifest.read_text())
+        data.update(artifact_archive=archive.name, artifact_archive_sha256=audit.sha(archive))
+        manifest.write_text(json.dumps(data))
+        audit.apply_runs([case], self.root / 'occt', self.root / 'runs')
+        self.assertEqual(case['occt_run'], 'known-failure')
+        archive.write_bytes(b'changed')
+        with self.assertRaisesRegex(ValueError, 'artifact archive'):
+            audit.apply_runs([case], self.root / 'occt', self.root / 'runs')
 
 
 if __name__ == "__main__":

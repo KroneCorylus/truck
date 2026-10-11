@@ -1,0 +1,17 @@
+Open CASCADE Technology 7.9.3
+Tk enabled (HAVE_TK)
+Xlib enabled (HAVE_XLIB)
+TBB enabled (HAVE_TBB)
+FreeType enabled (HAVE_FREETYPE)
+FreeImage disabled
+FFmpeg disabled
+OpenGL: enabled (HAVE_OPENGL_EXT)
+OpenVR disabled
+RapidJSON enabled (HAVE_RAPIDJSON)
+Draco disabled
+VTK enabled (HAVE_VTK)
+Exceptions enabled
+Compiler: GCC 16.2.1
+Architecture: AMD64
+OS: Linux
+

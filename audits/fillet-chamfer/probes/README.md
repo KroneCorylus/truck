@@ -1,7 +1,8 @@
 # Independent OCCT outcome probes
 
 These probes express the same modeling tasks as Truck regressions. They are separate
-from the 1,026 inventoried OCCT test entries; those entries remain unexecuted.
+from the 1,026 inventoried OCCT test entries. Native corpus execution is recorded in
+`../runs`; those entries still have no measured Truck comparison.
 
 ## Pyramid chamfers
 

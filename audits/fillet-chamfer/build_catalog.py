@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Inventory OCCT blend tests without executing Tcl or claiming geometry parity.
+"""Inventory OCCT blend tests and attach recorded native runs without claiming parity.
 
 python3 audits/fillet-chamfer/build_catalog.py --occt /path/to/OCCT --app ../PiezaCAD
 Add --check to verify the checked-in catalog without writing files.
@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 import re
 import subprocess
+import zipfile
 
 HERE = Path(__file__).resolve().parent
 TRUCK = HERE.parent.parent
@@ -330,6 +331,59 @@ def source_inventory(occt, revision):
     return files
 
 
+def apply_runs(cases, occt, directory):
+    """Validate native execution evidence; never infer a Truck result from it."""
+    by_id = {case['id']: case for case in cases}
+    runs = []
+    statuses = {'passed', 'known-failure', 'failed', 'improvement', 'skipped',
+                'timeout', 'crash', 'harness-error'}
+    for path in sorted(directory.glob('*/results.json')):
+        manifest = json.loads(read(path))
+        if manifest.get('schema_version') != 1:
+            raise ValueError(f'Unknown execution schema: {path}')
+        run = {k: v for k, v in manifest.items() if k != 'cases'}
+        run['manifest'] = Path(os.path.relpath(path, HERE)).as_posix()
+        runs.append(run)
+        archived = None
+        if 'artifact_archive' in manifest:
+            archive = path.parent / manifest['artifact_archive']
+            if not archive.is_file() or sha(archive) != manifest['artifact_archive_sha256']:
+                raise ValueError(f'Missing or stale artifact archive: {archive}')
+            with zipfile.ZipFile(archive) as zipped:
+                archived = {name: hashlib.sha256(zipped.read(name)).hexdigest() for name in zipped.namelist()}
+        for result in manifest['cases']:
+            if result['id'] not in by_id:
+                raise ValueError(f'Unknown execution case: {result["id"]}')
+            if result.get('comparison') != 'unverified' or result.get('truck_run') != 'not-run':
+                raise ValueError('Native execution cannot establish Truck parity')
+            if result['status'] not in statuses:
+                raise ValueError(f'Unknown execution status: {result["status"]}')
+            case = by_id[result['id']]
+            required = {case['source']['path']: case['sha256']}
+            required.update((h['path'], h['sha256']) for h in case['helpers'])
+            recorded = result['source_sha256']
+            if any(recorded.get(p) != digest for p, digest in required.items()):
+                raise ValueError(f'Incomplete or stale execution source: {result["id"]}')
+            for name, digest in recorded.items():
+                source = (occt / name).resolve()
+                if not source.is_relative_to(occt.resolve()) or not source.is_file() or sha(source) != digest:
+                    raise ValueError(f'Stale execution source: {name}')
+            if not result['artifacts']:
+                raise ValueError(f'Missing execution artifacts: {result["id"]}')
+            artifacts = []
+            for name, digest in result['artifacts'].items():
+                artifact = (path.parent / name).resolve()
+                valid = archived.get(name) == digest if archived is not None else artifact.is_file() and sha(artifact) == digest
+                if not artifact.is_relative_to(path.parent.resolve()) or not valid:
+                    raise ValueError(f'Missing or stale execution artifact: {name}')
+                link = archive if archived is not None else artifact
+                artifacts.append({'path': name, 'url': Path(os.path.relpath(link, HERE)).as_posix(), 'sha256': digest})
+            execution = {**result, 'manifest': run['manifest'], 'artifacts': artifacts}
+            case.setdefault('occt_executions', []).append(execution)
+            case['occt_run'] = result['status']
+    return runs
+
+
 def build(occt, app):
     occt, app = occt.resolve(), app.resolve()
     revision = git(occt, "rev-parse", "HEAD")
@@ -341,8 +395,9 @@ def build(occt, app):
     source_files = source_inventory(occt, revision)
     if len({c["id"] for c in cases}) != len(cases):
         raise ValueError("Duplicate logical case IDs")
-    counts = {key: dict(sorted(Counter(c[key] for c in cases).items())) for key in ["group", "relevance", "dependency_status", "comparison"]}
-    counts.update({"cases": len(cases), "registered_cases_scanned": all_count, "distinct_case_files": len({c["source"]["path"] for c in cases}), "cases_with_markers": sum(bool(c["markers"]) for c in cases), "mechanisms": len(coverage["families"]), "source_files": len(source_files), "commands": len(registry), "unexecuted": len(cases)})
+    executions = apply_runs(cases, occt, HERE / 'runs')
+    counts = {key: dict(sorted(Counter(c[key] for c in cases).items())) for key in ["group", "relevance", "dependency_status", "comparison", "occt_run"]}
+    counts.update({"cases": len(cases), "registered_cases_scanned": all_count, "distinct_case_files": len({c["source"]["path"] for c in cases}), "cases_with_markers": sum(bool(c["markers"]) for c in cases), "mechanisms": len(coverage["families"]), "source_files": len(source_files), "commands": len(registry), "unexecuted": sum(c['occt_run'] == 'not-run' for c in cases)})
     counts["reference_topics"] = sum(f["truck_status"] == "reference-only" for f in coverage["families"])
     counts["capabilities"] = len(coverage["families"]) - counts["reference_topics"]
     return {
@@ -355,6 +410,7 @@ def build(occt, app):
         "scope": coverage["scope"], "status_definitions": coverage["status_definitions"],
         "validation_contract": coverage["validation_contract"], "variation_axes": coverage["variation_axes"],
         "counts": counts, "families": coverage["families"], "cases": cases,
+        "occt_executions": executions,
         "commands": registry, "source_files": source_files, "other_references": loose,
         "discovery": {
             "rules": "All dedicated grids; all registered grids whose case or begin/end helpers match topic tokens or discovered commands; remaining textual matches retained separately.",
