@@ -1,0 +1,5 @@
+Behavior parent: 7414e3d9; current HEAD d7467cdf adds replay metadata only.
+ccf68bcd09d6cfa8dfc5acc2b14b0a672591ce900d2c460245ab88d771ae4302  truck-stepio/src/out/modeling.rs
+10efd3f94d12cba9bf3fb968bd1e7dccbb830328b29f44f7648e85c8042a140f  truck-shapeops/tests/curved_fillet_step_domain.rs
+13f0b192e7b9f470b2c4900a869ba96e6cc67b2c1de2ab9bd30948bd703b279d  truck-shapeops/tests/CURVED_FILLET_STEP_DOMAIN.md
+Paired replay binary SHA-256: 3882f7c2786c8a356c238cc61250d86307b9a774b3132029ae5b873a6e23b42c

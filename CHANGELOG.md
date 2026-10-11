@@ -6,6 +6,8 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Extend procedural fillet STEP fitting to cover curved end trims beyond the nominal contact range. Normalize parameters before measuring the trim, retain the requested fitting tolerance and preserve topology/input geometry. Quarter-cone regressions check exact radius/normals, independent volume, transformed/reversed selections, bounded surface coverage and closed STEP round trips.
+
 - Recover revolution angles with signed `atan2`, preserving point-search accuracy near the periodic seam and opposite meridian. Exact spherical boundary curves no longer fail inclusion from inverse-cosine cancellation; regressions cover small angular offsets, multiple radii, shifted curve domains, reversed orientations and rigid transforms.
 
 - Allow a planar-ended fillet radius to exceed its straight spine length when the trimmed patch fits the convex body. Validate the positive-weight rational control hull against every input plane instead of requiring the entire rolling ball to fit between end planes. Thin prisms with perpendicular/oblique caps retain exact radius, normals, volume, history, closed meshes and STEP, including rigid transforms and immutable oversized rejection.

@@ -9,7 +9,8 @@ use truck_topology::compress::CompressedSolid;
 /// Contact and intersection curves become spatial splines (exact forms are retained when
 /// available); rolling-ball surfaces become rational B-spline surfaces. Exact circular
 /// quadratic splines become circles, and spherical octants align their parameter axes with
-/// their circular boundaries. Fillet surfaces use normalized longitudinal parameters.
+/// their circular boundaries. Fillet surfaces use normalized longitudinal parameters and
+/// include the sampled extent of curved trims beyond their contact endpoints.
 /// Other geometry stays exact. Topology, indices, face order and
 /// orientation are preserved, and the input is not modified. Use this before exporting a blend:
 /// the STEP formatter cannot directly represent [`Surface::Fillet`] or [`Curve::PCurve`].
@@ -28,13 +29,17 @@ pub fn prepare_for_step(
     if !tol.is_finite() || tol <= 0.0 {
         return None;
     }
-    let mut prepared = solid.try_mapped(
-        |p| Some(*p),
-        |c| prepare_curve(c, tol),
-        |s| prepare_surface(s, tol),
-    )?;
+    let mut prepared =
+        solid.try_mapped(|p| Some(*p), |c| prepare_curve(c, tol), |s| Some(s.clone()))?;
     for shell in &mut prepared.boundaries {
         for face in &mut shell.faces {
+            let curves: Vec<_> = face
+                .boundaries
+                .iter()
+                .flatten()
+                .map(|edge| &shell.edges[edge.index].curve)
+                .collect();
+            face.surface = prepare_surface(&face.surface, &curves, tol)?;
             let [boundary] = face.boundaries.as_slice() else {
                 continue;
             };
@@ -298,7 +303,7 @@ fn circular_intersection(curve: &Curve, a: &Surface, b: &Surface) -> Option<Curv
     )))
 }
 
-fn prepare_surface(surface: &Surface, tol: f64) -> Option<Surface> {
+fn prepare_surface(surface: &Surface, curves: &[&Curve], tol: f64) -> Option<Surface> {
     match surface {
         Surface::Fillet(processor) => {
             let transform = *processor.transform();
@@ -309,7 +314,10 @@ fn prepare_surface(surface: &Surface, tol: f64) -> Option<Surface> {
             if !scale.is_finite() || scale <= 0.0 {
                 return None;
             }
-            let mut nurbs = fillet_to_nurbs(processor.entity(), tol / scale)?;
+            let mut surface = processor.entity().clone();
+            surface.try_vknot_normalize()?;
+            let range = fillet_parameter_range(&surface, transform, curves, tol)?;
+            let mut nurbs = fillet_to_nurbs(&surface, range, tol / scale)?;
             nurbs.transform_by(transform);
             if !processor.orientation() {
                 nurbs.invert();
@@ -336,15 +344,65 @@ fn prepare_surface(surface: &Surface, tol: f64) -> Option<Surface> {
     }
 }
 
+fn fillet_parameter_range(
+    surface: &ApproxFilletSurface<Box<Surface>, Box<Surface>>,
+    transform: Matrix4,
+    curves: &[&Curve],
+    tol: f64,
+) -> Option<(f64, f64)> {
+    let inverse = transform.invert()?;
+    let (mut lo, mut hi, mut step) = (0.0_f64, 1.0_f64, 0.0_f64);
+    for curve in curves {
+        let (a, b) = curve.range_tuple();
+        let mut hint = None;
+        let mut previous: Option<f64> = None;
+        for i in 0..=256 {
+            let point = curve.subs(a + (b - a) * i as f64 / 256.);
+            let local = inverse.transform_point(point);
+            if !point.to_vec().is_finite() || !local.to_vec().is_finite() {
+                return None;
+            }
+            let (u, mut v) = surface
+                .search_nearest_parameter(local, hint, 100)
+                .or_else(|| surface.search_nearest_parameter(local, None, 100))?;
+            if !u.is_finite() || !v.is_finite() {
+                return None;
+            }
+            let u = u.clamp(0., 1.);
+            let bounded = surface.subs(u, v.clamp(0., 1.));
+            if transform.transform_point(bounded).distance(point) <= 2. * tol {
+                v = v.clamp(0., 1.);
+            } else {
+                let error = transform
+                    .transform_point(surface.subs(u, v))
+                    .distance(point);
+                if !error.is_finite() || error > 2. * tol {
+                    return None;
+                }
+            }
+            hint = Some((u, v));
+            lo = lo.min(v);
+            hi = hi.max(v);
+            if let Some(previous) = previous {
+                step = step.max((v - previous).abs());
+            }
+            previous = Some(v);
+        }
+    }
+    // Curved trims can turn beyond the contact endpoints. Leave one sample step
+    // beyond their measured extent; this remains a sampled fitting bound.
+    let range = (
+        if lo < 0. { lo - step } else { 0. },
+        if hi > 1. { hi + step } else { 1. },
+    );
+    (range.0.is_finite() && range.1.is_finite()).then_some(range)
+}
+
 fn fillet_to_nurbs(
     surface: &ApproxFilletSurface<Box<Surface>, Box<Surface>>,
+    (a, b): (f64, f64),
     tol: f64,
 ) -> Option<NurbsSurface<Vector4>> {
-    // Fit in dimensionless coordinates so knot evaluation and interpolation do not
-    // depend on the source parameter scale or lose precision to a large offset.
-    let mut surface = surface.clone();
-    surface.try_vknot_normalize()?;
-    let (_, (a, b)) = surface.range_tuple();
     // Interpolate the four homogeneous control points of each exact cross-section. Only the
     // longitudinal direction is approximated; the rational cubic across the fillet is retained.
     for (preserve_breaks, level) in [false, true]

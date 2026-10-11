@@ -1,0 +1,42 @@
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 12.25s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/conical_blends.rs (target/release/deps/conical_blends-0e0814ae3d292c2c)
+
+running 2 tests
+test concave_plane_cone_rims_preserve_cavity_orientation ... ok
+test plane_cone_rims_preserve_radius_and_distances ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 11.73s
+
+     Running tests/curved_blend_representation.rs (target/release/deps/curved_blend_representation-98426a1d2728b953)
+
+running 4 tests
+test analytic_cylinder_rim ... ok
+test nurbs_cylinder_rim ... ok
+test reparameterized_nurbs_cylinder_rim ... ok
+test fillet_parameter_domains_preserve_step_geometry ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.43s
+
+     Running tests/modeling_blends.rs (target/release/deps/modeling_blends-0011c974cc002620)
+
+running 5 tests
+test unsupported_operations_leave_geometry_and_ids_unchanged ... ok
+test twelve_edges_with_spherical_corners_remain_modeling_solids ... ok
+test box_chamfer_and_chain_fillet_remain_modeling_solids ... ok
+test constant_and_variable_radius_tangent_chains ... ok
+test curved_chain_survives_transform_serialization_and_step ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.56s
+
+     Running tests/spherical_rim_blends.rs (target/release/deps/spherical_rim_blends-4a9445b96bc0aded)
+
+running 2 tests
+test spherical_cavity_rims_preserve_orientation ... ok
+test plane_sphere_rims_preserve_rolling_radius ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 24.06s
+

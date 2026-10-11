@@ -1,0 +1,24 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 2.12s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/curved_fillet_step_domain.rs (target/release/deps/curved_fillet_step_domain-b887f088b431502d)
+
+running 1 test
+test curved_end_trims_fit_inside_the_exported_fillet_surface_domain ... FAILED
+
+failures:
+
+---- curved_end_trims_fit_inside_the_exported_fillet_surface_domain stdout ----
+
+thread 'curved_end_trims_fit_inside_the_exported_fillet_surface_domain' (389607) panicked at truck-shapeops/tests/curved_fillet_step_domain.rs:102:17:
+trim leaves prepared surface: 0.5040430288355537
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    curved_end_trims_fit_inside_the_exported_fillet_surface_domain
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.60s
+
+error: test failed, to rerun pass `-p truck-shapeops --test curved_fillet_step_domain`
