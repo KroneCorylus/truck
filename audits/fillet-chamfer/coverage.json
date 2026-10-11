@@ -76,10 +76,10 @@
     "composition": [
       "simultaneous vs sequential",
       "all selection orders",
-      "fillet\u2192fillet",
-      "fillet\u2192chamfer",
-      "chamfer\u2192fillet",
-      "chamfer\u2192chamfer",
+      "fillet→fillet",
+      "fillet→chamfer",
+      "chamfer→fillet",
+      "chamfer→chamfer",
       "Boolean-generated edges",
       "nearby hole/cavity"
     ]
@@ -1880,6 +1880,12 @@
           "path": "truck-benchmarks/results/2026-10-11-tangent-face-splitting/REPORT.md",
           "find": "# Tangent imported boundaries",
           "role": "verification"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-11-tangent-inputs/REPORT.md",
+          "find": "70 constructed outputs",
+          "role": "executed-capture"
         }
       ],
       "required_outcome": "Keep blend boundaries on both supports and close them correctly when surface parameters, orientations or seam positions change.",
@@ -1890,7 +1896,8 @@
         "Captured replay at d1b2bade: 161 operation captures from 148 upstream entries, including 45 constructed results. Forty-two meet the combined limited geometry/input-preservation/mesh/STEP and bidirectional sample checks; none is classified as full parity. Other observations are import inconsistencies/rejections, route failures, unsupported replay intent, panics during preprocessing, timeouts and one incomplete capture. The retained physical fixtures identify cone STEP trimming, meshing, revolved inclusion and imported cylinder support bounds as concrete investigations. See capture/baseline/REPORT.md; native verdicts and replay outcomes remain separate.",
         "At 7414e3d9, signed atan2 angle recovery fixes loss of precision near coincident/opposite revolution meridians. Two parent-failing regressions cover point/nearest searches, three radii, small seam/antipodal angles and exact spherical boundaries across shifted domains, rigid transforms and reversed orientations; off-sphere curves remain rejected. Captured D2 input consistency now passes, without claiming subsequent blend support. Full geometry/modeling/shapeops/STEP: 728 passed, 0 failed, 4 existing ignored; Clippy and action smoke pass. See truck-benchmarks/results/2026-10-11-revolution-seams/REPORT.md.",
         "At 4a3e11d4, imported cylinders and conic extrusions receive finite support domains bounded by their complete rational boundary control hulls. Affine conic inclusion/search preserves elliptical, sheared and oblique sweeps; cylinder conversion retains the fitted height and STEP export measures perpendicular radius. Native F8, eight cylinder variants, curved extrema and bounded/off-surface checks pass. Full release modeling/shapeops/STEP: 488 passed, 0 failed, 3 existing ignored; Clippy and action smoke pass. This resolves the previously recorded finite extrusion domain failures; unsupported boundary representations and other import failures remain open.",
-        "At 9285a3a0, exact coincident adjacent wire ends are connected, tangent face loops are split, generated plane/cylinder-generator pcurves become spatial lines, and complete affine-circle bounds fit cylinder supports. Native Z1 preprocessing passes both modes and rigid transforms with geometry consistency, independent volume, closed meshes and STEP round trips. Invalid crossing counts and failed conversions preserve the polyline cache; unrelated coincident vertices and nonzero gaps are retained. Full release shapeops/STEP: 408 passed, 0 failed, 1 existing ignored; Clippy and action smoke pass. Subsequent native Z1 fillet replay remains to be measured; preprocessing success alone is not blend parity."
+        "At 9285a3a0, exact coincident adjacent wire ends are connected, tangent face loops are split, generated plane/cylinder-generator pcurves become spatial lines, and complete affine-circle bounds fit cylinder supports. Native Z1 preprocessing passes both modes and rigid transforms with geometry consistency, independent volume, closed meshes and STEP round trips. Invalid crossing counts and failed conversions preserve the polyline cache; unrelated coincident vertices and nonzero gaps are retained. Full release shapeops/STEP: 408 passed, 0 failed, 1 existing ignored; Clippy and action smoke pass. Subsequent native Z1 fillet replay remains to be measured; preprocessing success alone is not blend parity.",
+        "At clean HEAD 6351c68b, the full tangent-input replay passes all 156 native entries and constructs 70 of 161 captured Truck tasks. All 70 preserve input and geometry consistency; 69 have closed Truck meshes, 69 prepare STEP, 68 yield native-valid single-solid STEP and 67 meet the combined limited checks including bidirectional sampled distance <=0.001. Z1 now succeeds, with maximum sampled distances about 3.48e-5. Newly reachable Q4 capture 2 has an open mesh, exports two solids and differs by 1.20840; D4 export, tolerance A1 and I3/J9 timeouts remain. Zero panics; no full parity verdict."
       ]
     },
     {
@@ -1979,7 +1986,7 @@
       ],
       "occt_scope": "Dedicated sequential chamfer grids and composition regressions.",
       "truck_scope": "Many feature orders are tested. Sequential single-edge rounds now form equal-radius miters for analytic, B-spline and weighted NURBS edges. Equal-radius rolling continuations around an earlier round still collapse a contact and need a different corner construction; general topology transitions remain limited.",
-      "next_case": "Fillet\u2192fillet, fillet\u2192chamfer, chamfer\u2192fillet and chamfer\u2192chamfer with nearby and intersecting selections.",
+      "next_case": "Fillet→fillet, fillet→chamfer, chamfer→fillet and chamfer→chamfer with nearby and intersecting selections.",
       "evidence": [
         {
           "repo": "occt",
@@ -2093,11 +2100,18 @@
           "path": "truck-benchmarks/results/2026-10-11-tangent-face-splitting/REPORT.md",
           "find": "# Tangent imported boundaries",
           "role": "verification"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-11-tangent-inputs/REPORT.md",
+          "find": "70 constructed outputs",
+          "role": "executed-capture"
         }
       ],
       "required_outcome": "Blend physically selected intersection edges created by Boolean operations and preserve valid solid geometry.",
       "verification": [
-        "At 9285a3a0, exact coincident adjacent wire ends are connected, tangent face loops are split, generated plane/cylinder-generator pcurves become spatial lines, and complete affine-circle bounds fit cylinder supports. Native Z1 preprocessing passes both modes and rigid transforms with geometry consistency, independent volume, closed meshes and STEP round trips. Invalid crossing counts and failed conversions preserve the polyline cache; unrelated coincident vertices and nonzero gaps are retained. Full release shapeops/STEP: 408 passed, 0 failed, 1 existing ignored; Clippy and action smoke pass. Subsequent native Z1 fillet replay remains to be measured; preprocessing success alone is not blend parity."
+        "At 9285a3a0, exact coincident adjacent wire ends are connected, tangent face loops are split, generated plane/cylinder-generator pcurves become spatial lines, and complete affine-circle bounds fit cylinder supports. Native Z1 preprocessing passes both modes and rigid transforms with geometry consistency, independent volume, closed meshes and STEP round trips. Invalid crossing counts and failed conversions preserve the polyline cache; unrelated coincident vertices and nonzero gaps are retained. Full release shapeops/STEP: 408 passed, 0 failed, 1 existing ignored; Clippy and action smoke pass. Subsequent native Z1 fillet replay remains to be measured; preprocessing success alone is not blend parity.",
+        "At clean HEAD 6351c68b, the full tangent-input replay passes all 156 native entries and constructs 70 of 161 captured Truck tasks. All 70 preserve input and geometry consistency; 69 have closed Truck meshes, 69 prepare STEP, 68 yield native-valid single-solid STEP and 67 meet the combined limited checks including bidirectional sampled distance <=0.001. Z1 now succeeds, with maximum sampled distances about 3.48e-5. Newly reachable Q4 capture 2 has an open mesh, exports two solids and differs by 1.20840; D4 export, tolerance A1 and I3/J9 timeouts remain. Zero panics; no full parity verdict."
       ]
     },
     {
@@ -2337,6 +2351,12 @@
           "path": "truck-benchmarks/results/2026-10-11-tangent-face-splitting/REPORT.md",
           "find": "# Tangent imported boundaries",
           "role": "verification"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-11-tangent-inputs/REPORT.md",
+          "find": "70 constructed outputs",
+          "role": "executed-capture"
         }
       ],
       "required_outcome": "Deliver blend results usable for closed meshing, STEP interchange and further modeling while preserving dimensions and validity.",
@@ -2355,7 +2375,8 @@
         "At 4a3e11d4, imported cylinders and conic extrusions receive finite support domains bounded by their complete rational boundary control hulls. Affine conic inclusion/search preserves elliptical, sheared and oblique sweeps; cylinder conversion retains the fitted height and STEP export measures perpendicular radius. Native F8, eight cylinder variants, curved extrema and bounded/off-surface checks pass. Full release modeling/shapeops/STEP: 488 passed, 0 failed, 3 existing ignored; Clippy and action smoke pass. This resolves the previously recorded finite extrusion domain failures; unsupported boundary representations and other import failures remain open.",
         "A fresh full capture at clean 4c764bef passes all 156 native entries and constructs 64 of 161 Truck operation captures, versus baseline 45. All 64 have consistent geometry, immutable inputs and closed meshes; 63 export valid single-solid STEP and 62 also meet the 0.001 bidirectional sampled boundary limit. A9, D2 and F8 now succeed; I1 mesh closure is resolved in this fixture. D4 still fails STEP preparation, tolerance-grid A1 differs by about 0.02238, I3/J9 time out, and Z1 still panics during preprocessing in this snapshot. Thirty-one imports fail, 23 inputs are inconsistent, 31 operations fail, eight intents are unhandled and one capture is incomplete. All full-parity verdicts remain unverified.",
         "At 4c764bef, physical-selection matching checks complete candidate polyline chords against the captured curve tube. Two parent-failing regressions prevent endpoint-only and shared-midpoint false matches. Captured G1 now selects its intended single parabolic edge and fails during face trimming; F9 selects two adjacent nontangent edges and G2 selects three mixed edges, with both tasks still unsupported by the attempted solid routes. No API matching is required; these are physical task failures.",
-        "At 9285a3a0, exact coincident adjacent wire ends are connected, tangent face loops are split, generated plane/cylinder-generator pcurves become spatial lines, and complete affine-circle bounds fit cylinder supports. Native Z1 preprocessing passes both modes and rigid transforms with geometry consistency, independent volume, closed meshes and STEP round trips. Invalid crossing counts and failed conversions preserve the polyline cache; unrelated coincident vertices and nonzero gaps are retained. Full release shapeops/STEP: 408 passed, 0 failed, 1 existing ignored; Clippy and action smoke pass. Subsequent native Z1 fillet replay remains to be measured; preprocessing success alone is not blend parity."
+        "At 9285a3a0, exact coincident adjacent wire ends are connected, tangent face loops are split, generated plane/cylinder-generator pcurves become spatial lines, and complete affine-circle bounds fit cylinder supports. Native Z1 preprocessing passes both modes and rigid transforms with geometry consistency, independent volume, closed meshes and STEP round trips. Invalid crossing counts and failed conversions preserve the polyline cache; unrelated coincident vertices and nonzero gaps are retained. Full release shapeops/STEP: 408 passed, 0 failed, 1 existing ignored; Clippy and action smoke pass. Subsequent native Z1 fillet replay remains to be measured; preprocessing success alone is not blend parity.",
+        "At clean HEAD 6351c68b, the full tangent-input replay passes all 156 native entries and constructs 70 of 161 captured Truck tasks. All 70 preserve input and geometry consistency; 69 have closed Truck meshes, 69 prepare STEP, 68 yield native-valid single-solid STEP and 67 meet the combined limited checks including bidirectional sampled distance <=0.001. Z1 now succeeds, with maximum sampled distances about 3.48e-5. Newly reachable Q4 capture 2 has an open mesh, exports two solids and differs by 1.20840; D4 export, tolerance A1 and I3/J9 timeouts remain. Zero panics; no full parity verdict."
       ]
     },
     {
@@ -2474,11 +2495,18 @@
           "path": "truck-benchmarks/results/2026-10-11-tangent-face-splitting/REPORT.md",
           "find": "# Tangent imported boundaries",
           "role": "verification"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-11-tangent-inputs/REPORT.md",
+          "find": "70 constructed outputs",
+          "role": "executed-capture"
         }
       ],
       "required_outcome": "Handle invalid, empty, duplicate or stale selections and invalid numeric parameters deterministically without panic or input mutation.",
       "verification": [
-        "At 9285a3a0, exact coincident adjacent wire ends are connected, tangent face loops are split, generated plane/cylinder-generator pcurves become spatial lines, and complete affine-circle bounds fit cylinder supports. Native Z1 preprocessing passes both modes and rigid transforms with geometry consistency, independent volume, closed meshes and STEP round trips. Invalid crossing counts and failed conversions preserve the polyline cache; unrelated coincident vertices and nonzero gaps are retained. Full release shapeops/STEP: 408 passed, 0 failed, 1 existing ignored; Clippy and action smoke pass. Subsequent native Z1 fillet replay remains to be measured; preprocessing success alone is not blend parity."
+        "At 9285a3a0, exact coincident adjacent wire ends are connected, tangent face loops are split, generated plane/cylinder-generator pcurves become spatial lines, and complete affine-circle bounds fit cylinder supports. Native Z1 preprocessing passes both modes and rigid transforms with geometry consistency, independent volume, closed meshes and STEP round trips. Invalid crossing counts and failed conversions preserve the polyline cache; unrelated coincident vertices and nonzero gaps are retained. Full release shapeops/STEP: 408 passed, 0 failed, 1 existing ignored; Clippy and action smoke pass. Subsequent native Z1 fillet replay remains to be measured; preprocessing success alone is not blend parity.",
+        "At clean HEAD 6351c68b, the full tangent-input replay passes all 156 native entries and constructs 70 of 161 captured Truck tasks. All 70 preserve input and geometry consistency; 69 have closed Truck meshes, 69 prepare STEP, 68 yield native-valid single-solid STEP and 67 meet the combined limited checks including bidirectional sampled distance <=0.001. Z1 now succeeds, with maximum sampled distances about 3.48e-5. Newly reachable Q4 capture 2 has an open mesh, exports two solids and differs by 1.20840; D4 export, tolerance A1 and I3/J9 timeouts remain. Zero panics; no full parity verdict."
       ]
     },
     {
