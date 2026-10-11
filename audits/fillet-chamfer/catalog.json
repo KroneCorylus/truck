@@ -7,9 +7,9 @@
       "tracked_changes": "M src/BOPAlgo/BOPAlgo_PaveFiller.cxx\n M src/BRepAlgoAPI/BRepAlgoAPI_BuilderAlgo.cxx\n M src/IntTools/IntTools_FaceFace.cxx"
     },
     "truck": {
-      "revision": "9285a3a0e84e713626643b556d81a97172a1c87b",
+      "revision": "b81cbedfb0daa32d2d1381ab92e4e150f06039f5",
       "revision_scope": "Latest commit outside audits/fillet-chamfer; audit-only commits do not change the kernel baseline.",
-      "tracked_changes_in_modeling": "M truck-geometry/src/decorators/revolved_curve.rs\n M truck-geometry/src/specifieds/sphere.rs\n M truck-shapeops/src/transversal/intersection_curve/mod.rs\n M truck-shapeops/src/transversal/intersection_curve/tests.rs"
+      "tracked_changes_in_modeling": ""
     },
     "app": {
       "revision": "f5a381704a12c8d93f02e7d79665d595dea55dd2",
@@ -2318,9 +2318,21 @@
           "line": 1013,
           "url": "../../truck-shapeops/src/fillet/along_wire.rs#L1013",
           "sha256": "1e45bbb0212009ae420958c5138ba6b27d1696189eb770895e8293a820c4fcd6"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-11-spherical-meridian-step/REPORT.md",
+          "find": "Revolution tessellation and smooth polar contacts",
+          "role": "regression-validation",
+          "line": 1,
+          "url": "../../truck-benchmarks/results/2026-10-11-spherical-meridian-step/REPORT.md#L1",
+          "sha256": "0ace1e069f05ff1fc000b6aa2c81e6c27fd1231e97ef9ea2fb6ec5a7c15eaef9"
         }
       ],
-      "required_outcome": "Find the intended valid contact solution near singularities and competing branches without unstable branch jumps or false failures."
+      "required_outcome": "Find the intended valid contact solution near singularities and competing branches without unstable branch jumps or false failures.",
+      "verification": [
+        "At b81cbedf, revolution sampling uses the actual radial distance and shared directional error budget. The native D4 spherical-sector input now meets the unchanged independent volume/closed-mesh check: error 134.3034 -> 28.0300, median mesh time 351.747 -> 1668.584 ms (4.74x). Pole search/Newton, smooth-pole curvature, mesh-scale bounded tangency refinement and ambiguous meridian-facet winding fixes preserve existing tangent sphere/bore, rounded-box STEP, thin-loft and periodic-seam tests. Full release: 865 passed, six existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy and action smoke pass. D4 fillet export still fails at an unsplit procedural derivative discontinuity; no full parity claim."
+      ]
     },
     {
       "id": "N02",
@@ -2370,11 +2382,21 @@
           "line": 3,
           "url": "capture/2026-10-11-transformed-division/REPORT.md#L3",
           "sha256": "fc2640eb4a2ae578008481d1d67902c3b5860065bd057f283123f0fdbb4602fa"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-11-spherical-meridian-step/REPORT.md",
+          "find": "Revolution tessellation and smooth polar contacts",
+          "role": "regression-validation",
+          "line": 1,
+          "url": "../../truck-benchmarks/results/2026-10-11-spherical-meridian-step/REPORT.md#L1",
+          "sha256": "0ace1e069f05ff1fc000b6aa2c81e6c27fd1231e97ef9ea2fb6ec5a7c15eaef9"
         }
       ],
       "required_outcome": "Maintain requested geometric accuracy through rapidly changing curvature and unequal feature scales without missed contact failures.",
       "verification": [
-        "At dc055215, affine curve division preserves world tolerance through scale, shear and singular projections; positive finite local tolerances below 1e-6 no longer panic. Four regression tests and 747 full release tests pass (5 existing ignored), plus Clippy and action smoke. The five captured preprocessing panics now separate into four unsupported-conic import errors and one later closed-face divisor panic; no blend success or full parity is claimed. See capture/2026-10-11-transformed-division/REPORT.md and truck-benchmarks/results/2026-10-11-transformed-division/REPORT.md."
+        "At dc055215, affine curve division preserves world tolerance through scale, shear and singular projections; positive finite local tolerances below 1e-6 no longer panic. Four regression tests and 747 full release tests pass (5 existing ignored), plus Clippy and action smoke. The five captured preprocessing panics now separate into four unsupported-conic import errors and one later closed-face divisor panic; no blend success or full parity is claimed. See capture/2026-10-11-transformed-division/REPORT.md and truck-benchmarks/results/2026-10-11-transformed-division/REPORT.md.",
+        "At b81cbedf, revolution sampling uses the actual radial distance and shared directional error budget. The native D4 spherical-sector input now meets the unchanged independent volume/closed-mesh check: error 134.3034 -> 28.0300, median mesh time 351.747 -> 1668.584 ms (4.74x). Pole search/Newton, smooth-pole curvature, mesh-scale bounded tangency refinement and ambiguous meridian-facet winding fixes preserve existing tangent sphere/bore, rounded-box STEP, thin-loft and periodic-seam tests. Full release: 865 passed, six existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy and action smoke pass. D4 fillet export still fails at an unsplit procedural derivative discontinuity; no full parity claim."
       ]
     },
     {
@@ -2541,6 +2563,15 @@
           "line": 5,
           "url": "capture/2026-10-11-tangent-inputs/REPORT.md#L5",
           "sha256": "d1f0812646b540299e8ed59209c5cca9bf7a8162297b89797076bc179f5cb7c3"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-11-spherical-meridian-step/REPORT.md",
+          "find": "Revolution tessellation and smooth polar contacts",
+          "role": "regression-validation",
+          "line": 1,
+          "url": "../../truck-benchmarks/results/2026-10-11-spherical-meridian-step/REPORT.md#L1",
+          "sha256": "0ace1e069f05ff1fc000b6aa2c81e6c27fd1231e97ef9ea2fb6ec5a7c15eaef9"
         }
       ],
       "required_outcome": "Keep blend boundaries on both supports and close them correctly when surface parameters, orientations or seam positions change.",
@@ -2552,7 +2583,8 @@
         "At 7414e3d9, signed atan2 angle recovery fixes loss of precision near coincident/opposite revolution meridians. Two parent-failing regressions cover point/nearest searches, three radii, small seam/antipodal angles and exact spherical boundaries across shifted domains, rigid transforms and reversed orientations; off-sphere curves remain rejected. Captured D2 input consistency now passes, without claiming subsequent blend support. Full geometry/modeling/shapeops/STEP: 728 passed, 0 failed, 4 existing ignored; Clippy and action smoke pass. See truck-benchmarks/results/2026-10-11-revolution-seams/REPORT.md.",
         "At 4a3e11d4, imported cylinders and conic extrusions receive finite support domains bounded by their complete rational boundary control hulls. Affine conic inclusion/search preserves elliptical, sheared and oblique sweeps; cylinder conversion retains the fitted height and STEP export measures perpendicular radius. Native F8, eight cylinder variants, curved extrema and bounded/off-surface checks pass. Full release modeling/shapeops/STEP: 488 passed, 0 failed, 3 existing ignored; Clippy and action smoke pass. This resolves the previously recorded finite extrusion domain failures; unsupported boundary representations and other import failures remain open.",
         "At 9285a3a0, exact coincident adjacent wire ends are connected, tangent face loops are split, generated plane/cylinder-generator pcurves become spatial lines, and complete affine-circle bounds fit cylinder supports. Native Z1 preprocessing passes both modes and rigid transforms with geometry consistency, independent volume, closed meshes and STEP round trips. Invalid crossing counts and failed conversions preserve the polyline cache; unrelated coincident vertices and nonzero gaps are retained. Full release shapeops/STEP: 408 passed, 0 failed, 1 existing ignored; Clippy and action smoke pass. Subsequent native Z1 fillet replay remains to be measured; preprocessing success alone is not blend parity.",
-        "At clean HEAD 6351c68b, the full tangent-input replay passes all 156 native entries and constructs 70 of 161 captured Truck tasks. All 70 preserve input and geometry consistency; 69 have closed Truck meshes, 69 prepare STEP, 68 yield native-valid single-solid STEP and 67 meet the combined limited checks including bidirectional sampled distance <=0.001. Z1 now succeeds, with maximum sampled distances about 3.48e-5. Newly reachable Q4 capture 2 has an open mesh, exports two solids and differs by 1.20840; D4 export, tolerance A1 and I3/J9 timeouts remain. Zero panics; no full parity verdict."
+        "At clean HEAD 6351c68b, the full tangent-input replay passes all 156 native entries and constructs 70 of 161 captured Truck tasks. All 70 preserve input and geometry consistency; 69 have closed Truck meshes, 69 prepare STEP, 68 yield native-valid single-solid STEP and 67 meet the combined limited checks including bidirectional sampled distance <=0.001. Z1 now succeeds, with maximum sampled distances about 3.48e-5. Newly reachable Q4 capture 2 has an open mesh, exports two solids and differs by 1.20840; D4 export, tolerance A1 and I3/J9 timeouts remain. Zero panics; no full parity verdict.",
+        "At b81cbedf, revolution sampling uses the actual radial distance and shared directional error budget. The native D4 spherical-sector input now meets the unchanged independent volume/closed-mesh check: error 134.3034 -> 28.0300, median mesh time 351.747 -> 1668.584 ms (4.74x). Pole search/Newton, smooth-pole curvature, mesh-scale bounded tangency refinement and ambiguous meridian-facet winding fixes preserve existing tangent sphere/bore, rounded-box STEP, thin-loft and periodic-seam tests. Full release: 865 passed, six existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy and action smoke pass. D4 fillet export still fails at an unsplit procedural derivative discontinuity; no full parity claim."
       ]
     },
     {
@@ -2824,12 +2856,22 @@
           "line": 5,
           "url": "capture/2026-10-11-tangent-inputs/REPORT.md#L5",
           "sha256": "d1f0812646b540299e8ed59209c5cca9bf7a8162297b89797076bc179f5cb7c3"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-11-spherical-meridian-step/REPORT.md",
+          "find": "Revolution tessellation and smooth polar contacts",
+          "role": "regression-validation",
+          "line": 1,
+          "url": "../../truck-benchmarks/results/2026-10-11-spherical-meridian-step/REPORT.md#L1",
+          "sha256": "0ace1e069f05ff1fc000b6aa2c81e6c27fd1231e97ef9ea2fb6ec5a7c15eaef9"
         }
       ],
       "required_outcome": "Blend physically selected intersection edges created by Boolean operations and preserve valid solid geometry.",
       "verification": [
         "At 9285a3a0, exact coincident adjacent wire ends are connected, tangent face loops are split, generated plane/cylinder-generator pcurves become spatial lines, and complete affine-circle bounds fit cylinder supports. Native Z1 preprocessing passes both modes and rigid transforms with geometry consistency, independent volume, closed meshes and STEP round trips. Invalid crossing counts and failed conversions preserve the polyline cache; unrelated coincident vertices and nonzero gaps are retained. Full release shapeops/STEP: 408 passed, 0 failed, 1 existing ignored; Clippy and action smoke pass. Subsequent native Z1 fillet replay remains to be measured; preprocessing success alone is not blend parity.",
-        "At clean HEAD 6351c68b, the full tangent-input replay passes all 156 native entries and constructs 70 of 161 captured Truck tasks. All 70 preserve input and geometry consistency; 69 have closed Truck meshes, 69 prepare STEP, 68 yield native-valid single-solid STEP and 67 meet the combined limited checks including bidirectional sampled distance <=0.001. Z1 now succeeds, with maximum sampled distances about 3.48e-5. Newly reachable Q4 capture 2 has an open mesh, exports two solids and differs by 1.20840; D4 export, tolerance A1 and I3/J9 timeouts remain. Zero panics; no full parity verdict."
+        "At clean HEAD 6351c68b, the full tangent-input replay passes all 156 native entries and constructs 70 of 161 captured Truck tasks. All 70 preserve input and geometry consistency; 69 have closed Truck meshes, 69 prepare STEP, 68 yield native-valid single-solid STEP and 67 meet the combined limited checks including bidirectional sampled distance <=0.001. Z1 now succeeds, with maximum sampled distances about 3.48e-5. Newly reachable Q4 capture 2 has an open mesh, exports two solids and differs by 1.20840; D4 export, tolerance A1 and I3/J9 timeouts remain. Zero panics; no full parity verdict.",
+        "At b81cbedf, revolution sampling uses the actual radial distance and shared directional error budget. The native D4 spherical-sector input now meets the unchanged independent volume/closed-mesh check: error 134.3034 -> 28.0300, median mesh time 351.747 -> 1668.584 ms (4.74x). Pole search/Newton, smooth-pole curvature, mesh-scale bounded tangency refinement and ambiguous meridian-facet winding fixes preserve existing tangent sphere/bore, rounded-box STEP, thin-loft and periodic-seam tests. Full release: 865 passed, six existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy and action smoke pass. D4 fillet export still fails at an unsplit procedural derivative discontinuity; no full parity claim."
       ]
     },
     {
@@ -2921,7 +2963,7 @@
           "role": "implementation",
           "line": 401,
           "url": "../../truck-stepio/src/out/modeling.rs#L401",
-          "sha256": "ccf68bcd09d6cfa8dfc5acc2b14b0a672591ce900d2c460245ab88d771ae4302"
+          "sha256": "a925e73c8d62e4c3ec328aa9ec45214ff734e580ae023c12991022e758dc4645"
         },
         {
           "repo": "truck",
@@ -2993,7 +3035,7 @@
           "role": "test",
           "line": 492,
           "url": "../../truck-stepio/src/out/modeling.rs#L492",
-          "sha256": "ccf68bcd09d6cfa8dfc5acc2b14b0a672591ce900d2c460245ab88d771ae4302"
+          "sha256": "a925e73c8d62e4c3ec328aa9ec45214ff734e580ae023c12991022e758dc4645"
         },
         {
           "repo": "truck",
@@ -3183,6 +3225,15 @@
           "line": 5,
           "url": "capture/2026-10-11-tangent-inputs/REPORT.md#L5",
           "sha256": "d1f0812646b540299e8ed59209c5cca9bf7a8162297b89797076bc179f5cb7c3"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-11-spherical-meridian-step/REPORT.md",
+          "find": "Revolution tessellation and smooth polar contacts",
+          "role": "regression-validation",
+          "line": 1,
+          "url": "../../truck-benchmarks/results/2026-10-11-spherical-meridian-step/REPORT.md#L1",
+          "sha256": "0ace1e069f05ff1fc000b6aa2c81e6c27fd1231e97ef9ea2fb6ec5a7c15eaef9"
         }
       ],
       "required_outcome": "Deliver blend results usable for closed meshing, STEP interchange and further modeling while preserving dimensions and validity.",
@@ -3202,7 +3253,8 @@
         "A fresh full capture at clean 4c764bef passes all 156 native entries and constructs 64 of 161 Truck operation captures, versus baseline 45. All 64 have consistent geometry, immutable inputs and closed meshes; 63 export valid single-solid STEP and 62 also meet the 0.001 bidirectional sampled boundary limit. A9, D2 and F8 now succeed; I1 mesh closure is resolved in this fixture. D4 still fails STEP preparation, tolerance-grid A1 differs by about 0.02238, I3/J9 time out, and Z1 still panics during preprocessing in this snapshot. Thirty-one imports fail, 23 inputs are inconsistent, 31 operations fail, eight intents are unhandled and one capture is incomplete. All full-parity verdicts remain unverified.",
         "At 4c764bef, physical-selection matching checks complete candidate polyline chords against the captured curve tube. Two parent-failing regressions prevent endpoint-only and shared-midpoint false matches. Captured G1 now selects its intended single parabolic edge and fails during face trimming; F9 selects two adjacent nontangent edges and G2 selects three mixed edges, with both tasks still unsupported by the attempted solid routes. No API matching is required; these are physical task failures.",
         "At 9285a3a0, exact coincident adjacent wire ends are connected, tangent face loops are split, generated plane/cylinder-generator pcurves become spatial lines, and complete affine-circle bounds fit cylinder supports. Native Z1 preprocessing passes both modes and rigid transforms with geometry consistency, independent volume, closed meshes and STEP round trips. Invalid crossing counts and failed conversions preserve the polyline cache; unrelated coincident vertices and nonzero gaps are retained. Full release shapeops/STEP: 408 passed, 0 failed, 1 existing ignored; Clippy and action smoke pass. Subsequent native Z1 fillet replay remains to be measured; preprocessing success alone is not blend parity.",
-        "At clean HEAD 6351c68b, the full tangent-input replay passes all 156 native entries and constructs 70 of 161 captured Truck tasks. All 70 preserve input and geometry consistency; 69 have closed Truck meshes, 69 prepare STEP, 68 yield native-valid single-solid STEP and 67 meet the combined limited checks including bidirectional sampled distance <=0.001. Z1 now succeeds, with maximum sampled distances about 3.48e-5. Newly reachable Q4 capture 2 has an open mesh, exports two solids and differs by 1.20840; D4 export, tolerance A1 and I3/J9 timeouts remain. Zero panics; no full parity verdict."
+        "At clean HEAD 6351c68b, the full tangent-input replay passes all 156 native entries and constructs 70 of 161 captured Truck tasks. All 70 preserve input and geometry consistency; 69 have closed Truck meshes, 69 prepare STEP, 68 yield native-valid single-solid STEP and 67 meet the combined limited checks including bidirectional sampled distance <=0.001. Z1 now succeeds, with maximum sampled distances about 3.48e-5. Newly reachable Q4 capture 2 has an open mesh, exports two solids and differs by 1.20840; D4 export, tolerance A1 and I3/J9 timeouts remain. Zero panics; no full parity verdict.",
+        "At b81cbedf, revolution sampling uses the actual radial distance and shared directional error budget. The native D4 spherical-sector input now meets the unchanged independent volume/closed-mesh check: error 134.3034 -> 28.0300, median mesh time 351.747 -> 1668.584 ms (4.74x). Pole search/Newton, smooth-pole curvature, mesh-scale bounded tangency refinement and ambiguous meridian-facet winding fixes preserve existing tangent sphere/bore, rounded-box STEP, thin-loft and periodic-seam tests. Full release: 865 passed, six existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy and action smoke pass. D4 fillet export still fails at an unsplit procedural derivative discontinuity; no full parity claim."
       ]
     },
     {
@@ -3442,9 +3494,21 @@
           "line": 19,
           "url": "../../truck-shapeops/tests/boolean_hole_fillet.rs#L19",
           "sha256": "c468243f521ae18e39c9c0bd5f8c00c17bf45545f04c240694d8bb1ee722bd22"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-11-spherical-meridian-step/REPORT.md",
+          "find": "Revolution tessellation and smooth polar contacts",
+          "role": "regression-validation",
+          "line": 1,
+          "url": "../../truck-benchmarks/results/2026-10-11-spherical-meridian-step/REPORT.md#L1",
+          "sha256": "0ace1e069f05ff1fc000b6aa2c81e6c27fd1231e97ef9ea2fb6ec5a7c15eaef9"
         }
       ],
-      "required_outcome": "Fuse or cut bodies, then blend the intended resulting intersection edges while preserving the modeling intent through edits."
+      "required_outcome": "Fuse or cut bodies, then blend the intended resulting intersection edges while preserving the modeling intent through edits.",
+      "verification": [
+        "At b81cbedf, revolution sampling uses the actual radial distance and shared directional error budget. The native D4 spherical-sector input now meets the unchanged independent volume/closed-mesh check: error 134.3034 -> 28.0300, median mesh time 351.747 -> 1668.584 ms (4.74x). Pole search/Newton, smooth-pole curvature, mesh-scale bounded tangency refinement and ambiguous meridian-facet winding fixes preserve existing tangent sphere/bore, rounded-box STEP, thin-loft and periodic-seam tests. Full release: 865 passed, six existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy and action smoke pass. D4 fillet export still fails at an unsplit procedural derivative discontinuity; no full parity claim."
+      ]
     },
     {
       "id": "S01",
