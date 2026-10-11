@@ -1660,9 +1660,24 @@
           "path": "truck-geometry/src/decorators/af_surface.rs",
           "find": "fn adaptive_contact_failure_is_propagated",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-geometry/tests/transformed_curve_division.rs",
+          "find": "fn scaled_parabola_division_keeps_world_tolerance_without_panicking",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-11-transformed-division/REPORT.md",
+          "find": "All five instrumented",
+          "role": "verification"
         }
       ],
-      "required_outcome": "Maintain requested geometric accuracy through rapidly changing curvature and unequal feature scales without missed contact failures."
+      "required_outcome": "Maintain requested geometric accuracy through rapidly changing curvature and unequal feature scales without missed contact failures.",
+      "verification": [
+        "At dc055215, affine curve division preserves world tolerance through scale, shear and singular projections; positive finite local tolerances below 1e-6 no longer panic. Four regression tests and 747 full release tests pass (5 existing ignored), plus Clippy and action smoke. The five captured preprocessing panics now separate into four unsupported-conic import errors and one later closed-face divisor panic; no blend success or full parity is claimed. See capture/2026-10-11-transformed-division/REPORT.md and truck-benchmarks/results/2026-10-11-transformed-division/REPORT.md."
+      ]
     },
     {
       "id": "N03",
@@ -2082,6 +2097,18 @@
           "path": "audits/fillet-chamfer/capture/2026-10-11-cone-domain/REPORT.md",
           "find": "Maximum",
           "role": "replay-report"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-geometry/tests/transformed_curve_division.rs",
+          "find": "fn scaled_parabola_division_keeps_world_tolerance_without_panicking",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-11-transformed-division/REPORT.md",
+          "find": "All five instrumented",
+          "role": "verification"
         }
       ],
       "required_outcome": "Deliver blend results usable for closed meshing, STEP interchange and further modeling while preserving dimensions and validity.",
@@ -2094,7 +2121,8 @@
         "At 20de5c08, 28 spherical-rim operations pass: two cut heights, Sphere/revolved-circle/exact-NURBS supports, rigid transforms and reversed wires, plus four cavity cases. Checks include independent radius/normal/volume equations, G1 joins, geometry, topology, closed meshes, history, unchanged inputs and STEP. No production change was needed. The final release target and corrected debug cavity target pass; exterior debug checks also passed, and Clippy is clean. Full scope and the corrected test-fixture orientation are documented in the spherical-rims report.",
         "At d1b2bade, planar-ended fillets can be wider than their spine when the trimmed positive-weight rational patch fits every original convex half-space. The parent fails the length-0.2/radius-0.5 case. Thirty-six operations cover lengths 0.2/1/10, radii 0.5/10, perpendicular and oblique caps, and rigid transforms, with independent radius/normal/end-bound/volume checks, topology, closed meshes, history, immutable inputs and STEP. Full shapeops: 310 passed, 0 failed, 1 existing ignored; Clippy and action benchmark smoke pass. Evidence: truck-benchmarks/results/2026-10-11-short-spine-fillets/REPORT.md.",
         "Captured replay at d1b2bade: 161 operation captures from 148 upstream entries, including 45 constructed results. Forty-two meet the combined limited geometry/input-preservation/mesh/STEP and bidirectional sample checks; none is classified as full parity. Other observations are import inconsistencies/rejections, route failures, unsupported replay intent, panics during preprocessing, timeouts and one incomplete capture. The retained physical fixtures identify cone STEP trimming, meshing, revolved inclusion and imported cylinder support bounds as concrete investigations. See capture/baseline/REPORT.md; native verdicts and replay outcomes remain separate.",
-        "At fa1a142d, STEP fitting covers curved fillet trims beyond their contact endpoints. The parent loses conical end geometry; four direct quarter-cone operations verify requested radius/normals, independent volume, native/transformed-reversed selections, finite fitted-domain coverage, closed meshes/STEP, history and immutable inputs. Full release shapeops/STEP: 391 passed, 0 failed, 1 existing ignored; Clippy and action smoke pass. A fresh physical C7 replay reduces the native-to-STEP sampled discrepancy from 4.2283 to below 2.76e-6 in both directions. Finite sampling does not certify global bounds or full parity. Raw comparison/STEP evidence is retained with the validation and capture reports."
+        "At fa1a142d, STEP fitting covers curved fillet trims beyond their contact endpoints. The parent loses conical end geometry; four direct quarter-cone operations verify requested radius/normals, independent volume, native/transformed-reversed selections, finite fitted-domain coverage, closed meshes/STEP, history and immutable inputs. Full release shapeops/STEP: 391 passed, 0 failed, 1 existing ignored; Clippy and action smoke pass. A fresh physical C7 replay reduces the native-to-STEP sampled discrepancy from 4.2283 to below 2.76e-6 in both directions. Finite sampling does not certify global bounds or full parity. Raw comparison/STEP evidence is retained with the validation and capture reports.",
+        "At dc055215, affine curve division preserves world tolerance through scale, shear and singular projections; positive finite local tolerances below 1e-6 no longer panic. Four regression tests and 747 full release tests pass (5 existing ignored), plus Clippy and action smoke. The five captured preprocessing panics now separate into four unsupported-conic import errors and one later closed-face divisor panic; no blend success or full parity is claimed. See capture/2026-10-11-transformed-division/REPORT.md and truck-benchmarks/results/2026-10-11-transformed-division/REPORT.md."
       ]
     },
     {
@@ -2138,11 +2166,24 @@
           "path": "audits/fillet-chamfer/capture/baseline/REPORT.md",
           "find": "Concrete findings for follow-up:",
           "role": "replay-report"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-geometry/tests/transformed_curve_division.rs",
+          "find": "fn scaled_parabola_division_keeps_world_tolerance_without_panicking",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-11-transformed-division/REPORT.md",
+          "find": "All five instrumented",
+          "role": "verification"
         }
       ],
       "required_outcome": "Explain failed selections and stages clearly, preserve the model and allow the user to correct or retry a failed blend.",
       "verification": [
-        "Captured replay at d1b2bade: 161 operation captures from 148 upstream entries, including 45 constructed results. Forty-two meet the combined limited geometry/input-preservation/mesh/STEP and bidirectional sample checks; none is classified as full parity. Other observations are import inconsistencies/rejections, route failures, unsupported replay intent, panics during preprocessing, timeouts and one incomplete capture. The retained physical fixtures identify cone STEP trimming, meshing, revolved inclusion and imported cylinder support bounds as concrete investigations. See capture/baseline/REPORT.md; native verdicts and replay outcomes remain separate."
+        "Captured replay at d1b2bade: 161 operation captures from 148 upstream entries, including 45 constructed results. Forty-two meet the combined limited geometry/input-preservation/mesh/STEP and bidirectional sample checks; none is classified as full parity. Other observations are import inconsistencies/rejections, route failures, unsupported replay intent, panics during preprocessing, timeouts and one incomplete capture. The retained physical fixtures identify cone STEP trimming, meshing, revolved inclusion and imported cylinder support bounds as concrete investigations. See capture/baseline/REPORT.md; native verdicts and replay outcomes remain separate.",
+        "At dc055215, affine curve division preserves world tolerance through scale, shear and singular projections; positive finite local tolerances below 1e-6 no longer panic. Four regression tests and 747 full release tests pass (5 existing ignored), plus Clippy and action smoke. The five captured preprocessing panics now separate into four unsupported-conic import errors and one later closed-face divisor panic; no blend success or full parity is claimed. See capture/2026-10-11-transformed-division/REPORT.md and truck-benchmarks/results/2026-10-11-transformed-division/REPORT.md."
       ]
     },
     {
