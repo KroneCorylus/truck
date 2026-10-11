@@ -10,7 +10,10 @@ The DRAW plugin copies shapes before STEP export. Its Tcl wrapper preserves the
 native command's caller scope, return value and error options even when capture
 fails. Captures contain BREP/STEP input and result shapes, selection polylines at
 1e-5 deflection, native validity, solid counts, integrated volume and area. Logs,
-source/binary hashes and physical selections accompany each replay.
+source/binary hashes and physical selections accompany each replay. New runs also
+record the actual kernel HEAD, tracked worktree changes and hashes of Rust sources
+and Cargo manifests/lockfile; the catalog snapshot is not assumed to be the runtime
+kernel revision. Replay reports retain the stage of a panic or failure.
 
 The replay uses the app's existing closed-edge/face splitting operation before
 mapping STEP geometry into modeling types. It checks input consistency, matches

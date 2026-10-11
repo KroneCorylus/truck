@@ -1,5 +1,6 @@
 //! Replays a captured physical selection; successful construction is not a parity verdict.
 use serde_json::{json, Value};
+use std::cell::Cell;
 use std::collections::HashSet;
 use std::path::Path;
 use std::result::Result;
@@ -163,7 +164,7 @@ fn as_wire(edges: &[Edge]) -> Option<Wire> {
     Some(wire)
 }
 
-fn replay(prefix: &str) -> Result<Value, String> {
+fn replay(prefix: &str, stage: &Cell<&'static str>) -> Result<Value, String> {
     let task: Value = serde_json::from_str(
         &std::fs::read_to_string(format!("{prefix}.input.json")).map_err(|e| e.to_string())?,
     )
@@ -171,10 +172,12 @@ fn replay(prefix: &str) -> Result<Value, String> {
     if task["operation"] != "fillet" {
         return Ok(json!({"status":"unhandled-intent","reason":"Only fillets are captured"}));
     }
+    stage.set("import-and-preprocess");
     let input = match import(&format!("{prefix}.input.step")) {
         Ok(solid) => solid,
         Err(error) => return Ok(json!({"status":"input-import-failed","error":error})),
     };
+    stage.set("input-consistency");
     if !input.is_geometric_consistent() {
         return Ok(json!({"status":"input-inconsistent"}));
     }
@@ -195,6 +198,7 @@ fn replay(prefix: &str) -> Result<Value, String> {
             json!({"status":"unhandled-intent","reason":"This replay route currently handles equal radii only"}),
         );
     }
+    stage.set("physical-selection");
     let mut edges = Vec::new();
     let mut seen = HashSet::new();
     for chosen in selection {
@@ -204,6 +208,7 @@ fn replay(prefix: &str) -> Result<Value, String> {
         }
     }
     let ids: Vec<_> = edges.iter().map(|e| e.id()).collect();
+    stage.set("blend");
     let result = try_fillet_solid_edges(&input, &ids, radius, TOL).or_else(|error| {
         if let Some(wire) = as_wire(&edges) {
             try_fillet_solid_along_wire(&input, &wire, radius, TOL)
@@ -221,10 +226,12 @@ fn replay(prefix: &str) -> Result<Value, String> {
             )
         }
     };
+    stage.set("mesh");
     let mut mesh = result.solid.triangulation(TOL).to_polygon();
     mesh.put_together_same_attrs(TOLERANCE)
         .remove_degenerate_faces()
         .remove_unused_attrs();
+    stage.set("step-export");
     let prepared = prepare_for_step(&result.solid.compress(), TOL / 20.);
     if let Some(prepared) = &prepared {
         let design = StepDesign::from_model(StepModel::from(prepared));
@@ -234,6 +241,7 @@ fn replay(prefix: &str) -> Result<Value, String> {
         )
         .map_err(|e| e.to_string())?;
     }
+    stage.set("output-consistency");
     Ok(
         json!({"status":"operation-succeeded","input_unchanged":unchanged,
         "geometry_consistent":result.solid.is_geometric_consistent(),
@@ -246,13 +254,14 @@ fn main() {
     let prefix = std::env::args()
         .nth(1)
         .expect("usage: replay_occt_blend captured-prefix");
-    let result = match std::panic::catch_unwind(|| replay(&prefix)) {
-        Ok(Ok(value)) => value,
-        Ok(Err(error)) => json!({"status":"harness-error","error":error}),
-        Err(_) => json!({"status":"panic"}),
-    };
-    let report =
-        json!({"schema_version":1,"tolerance":TOL,"comparison":"unverified","result":result});
+    let stage = Cell::new("read-intent");
+    let result =
+        match std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| replay(&prefix, &stage))) {
+            Ok(Ok(value)) => value,
+            Ok(Err(error)) => json!({"status":"harness-error","error":error}),
+            Err(_) => json!({"status":"panic"}),
+        };
+    let report = json!({"schema_version":1,"tolerance":TOL,"comparison":"unverified","stage":stage.get(),"result":result});
     std::fs::write(
         Path::new(&format!("{prefix}.truck.json")),
         serde_json::to_string_pretty(&report).unwrap(),

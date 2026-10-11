@@ -13,6 +13,7 @@ import json
 from pathlib import Path
 import shutil
 import sys
+import subprocess
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
@@ -113,7 +114,15 @@ def main():
         parser.error('No passing native blend cases selected')
     sources = {c['id']: case_sources(c, args.occt) for c in cases}
     args.output.mkdir(parents=True, exist_ok=False)
-    manifest = dict(schema_version=1, started_utc=datetime.now(timezone.utc).isoformat(),
+    truck_root = HERE.parents[2]
+    def git(*args):
+        return subprocess.check_output(['git', '-C', str(truck_root), *args], text=True).strip()
+    kernel_paths = git('ls-files', '--cached', '--others', '--exclude-standard', '--',
+                       '*.rs', '*/Cargo.toml', 'Cargo.toml', 'Cargo.lock').splitlines()
+    manifest = dict(kernel_revision=git('rev-parse', 'HEAD'),
+                    kernel_tracked_changes=git('status', '--porcelain', '--untracked-files=no'),
+                    kernel_source_sha256={name: sha(truck_root / name) for name in sorted(set(kernel_paths))},
+                    schema_version=1, started_utc=datetime.now(timezone.utc).isoformat(),
                     scope=__doc__, snapshots=catalog['snapshots'],
                     source_sha256={str(p): sha(p) for p in [Path(__file__),
                         HERE / 'blend_capture.cpp', HERE / 'blend_capture.tcl', HERE / 'compare_shapes.cpp',
