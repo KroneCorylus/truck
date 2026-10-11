@@ -1,0 +1,122 @@
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+    Finished `release` profile [optimized] target(s) in 1.65s
+     Running tests/pcurve.rs (target/release/deps/pcurve-a195f415439f072f)
+
+running 1 test
+test pcurve_derivation ... FAILED
+
+failures:
+
+---- pcurve_derivation stdout ----
+proptest: FileFailurePersistence::SourceParallel set, but failed to find lib.rs or main.rs
+
+thread 'pcurve_derivation' (645518) panicked at truck-geometry/tests/pcurve.rs:40:1:
+Test failed: assertion failed: `left` is near `right`
+left: Vector3 [0.0, -2829663063.761872, 0.0],
+right: Vector3 [0.0, -2829663063.7618704, 0.0] at truck-geometry/tests/pcurve.rs:24.
+minimal failing input: PcurveDerivationArgs = PcurveDerivationArgs {
+    curve_coef: [
+        [
+            0.0,
+            0.0,
+        ],
+        [
+            0.0,
+            0.0,
+        ],
+        [
+            0.0,
+            0.6134677748517301,
+        ],
+        [
+            0.508299564127126,
+            0.9819011403611299,
+        ],
+        [
+            -0.37024697194742484,
+            -0.933202768048588,
+        ],
+        [
+            0.8612228964410131,
+            0.4644466547997221,
+        ],
+    ],
+    curve_degree: 5,
+    surface_ucoef: [
+        [
+            0.0,
+            0.0,
+            0.0,
+        ],
+        [
+            0.0,
+            0.0,
+            0.0,
+        ],
+        [
+            0.0,
+            0.0,
+            0.0,
+        ],
+        [
+            0.0,
+            0.0,
+            0.0,
+        ],
+        [
+            0.0,
+            -0.6841706810781782,
+            0.0,
+        ],
+        [
+            0.0,
+            0.0,
+            0.0,
+        ],
+    ],
+    surface_vcoef: [
+        [
+            0.0,
+            0.0,
+            0.0,
+        ],
+        [
+            0.0,
+            0.0,
+            0.0,
+        ],
+        [
+            0.0,
+            0.0,
+            0.0,
+        ],
+        [
+            0.0,
+            0.0,
+            0.0,
+        ],
+        [
+            0.0,
+            0.0,
+            0.0,
+        ],
+        [
+            0.0,
+            0.5352710734426739,
+            0.0,
+        ],
+    ],
+    surface_udegree: 4,
+    surface_vdegree: 5,
+    n: 5,
+    t: -0.9907205852407387,
+}
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    pcurve_derivation
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-geometry --test pcurve`

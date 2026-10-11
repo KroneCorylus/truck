@@ -1,0 +1,24 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 2.21s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/spherical_meridian_step.rs (target/release/deps/spherical_meridian_step-10d62c0dcdc56384)
+
+running 1 test
+test spherical_meridian_fillet_exports_with_its_curved_cap_trims ... FAILED
+
+failures:
+
+---- spherical_meridian_fillet_exports_with_its_curved_cap_trims stdout ----
+
+thread 'spherical_meridian_fillet_exports_with_its_curved_cap_trims' (617425) panicked at truck-shapeops/tests/common/mod.rs:77:5:
+volume 3435652.369022748 differs from expected 3435781.0096835303 by more than 63.107427983959724
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    spherical_meridian_fillet_exports_with_its_curved_cap_trims
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 10.38s
+
+error: test failed, to rerun pass `-p truck-shapeops --test spherical_meridian_step`

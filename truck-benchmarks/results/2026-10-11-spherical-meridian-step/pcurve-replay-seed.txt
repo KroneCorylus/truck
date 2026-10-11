@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 50d8039d67926c66cab49548717f93cc44705eef4e2589403af17a82d14f9f68 # shrinks to PcurveDerivationArgs = PcurveDerivationArgs { curve_coef: [[0.0, 0.0], [0.0, 0.0], [0.0, 0.6134677748517301], [0.508299564127126, 0.9819011403611299], [-0.37024697194742484, -0.933202768048588], [0.8612228964410131, 0.4644466547997221]], curve_degree: 5, surface_ucoef: [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, -0.6841706810781782, 0.0], [0.0, 0.0, 0.0]], surface_vcoef: [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.5352710734426739, 0.0]], surface_udegree: 4, surface_vdegree: 5, n: 5, t: -0.9907205852407387 }

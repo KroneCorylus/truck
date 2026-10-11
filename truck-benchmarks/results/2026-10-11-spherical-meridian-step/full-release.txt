@@ -1,0 +1,309 @@
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-modeling)
+   Compiling truck-meshalgo v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-meshalgo)
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 1m 01s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running unittests src/lib.rs (target/release/deps/truck_geometry-7fc4c6be0495de55)
+
+running 27 tests
+****** test of the expressions of error messages ******
+
+This knot vector consists single value.
+
+Cannot concat two knot vectors whose the back of the first and the front of the second are different.
+the back of the first knot vector: 0
+the front of the second knot vector: 1
+
+This knot vector is not clamped.
+
+This knot vector is not sorted.
+
+This knot vector is too short compared to the degree.
+the length of knot_vec: 1
+the degree: 2
+
+The 7th knot in this knot vector cannot be removed.
+
+The control point must not be empty.
+
+The knot vector must be more than the control points.
+the length of knot_vec: 1
+the number of control points: 2
+
+The number of control points is irregular
+
+*******************************************************
+test decorators::af_surface::tests::adaptive_contact_failure_is_propagated ... ok
+test decorators::extruded_curve::extrude_line ... ok
+test decorators::af_surface::tests::search_reuses_cross_sections ... ok
+test decorators::af_surface::tests::normalize_longitudinal_parameters_preserves_geometry ... ok
+test decorators::rbf_surface::contact_circle::tests::invalid_contact_circles_return_none ... ok
+test decorators::intersection_curve::intersection_branch_at_a_tangent_endpoint ... ok
+test decorators::rbf_surface::contact_circle::tests::singular_contact_planes_return_none ... ok
+test decorators::intersection_curve::double_projection_tests::sphere_case ... ok
+test decorators::test_range_common_part ... ok
+test nurbs::bspcurve::cubic_bezier_interpolation_test ... ok
+test nurbs::knot_vec::tests::floor_is_the_last_knot_not_above ... ok
+test errors::print_messages ... ok
+test nurbs::knot_vec::tests::nan_knots_are_rejected ... ok
+test decorators::rbf_surface::algo::rot_der_n_test ... ok
+test specifieds::line::line ... ok
+test specifieds::parabola::snp_test ... ok
+test specifieds::parabola::sp_test ... ok
+test decorators::intersection_curve::double_projection_tests::plane_case ... ok
+test nurbs::bspsurface::test_include_bspcurve2 ... ok
+test nurbs::nurbssurface::test_include2d ... ok
+test decorators::rbf_surface::algo::fillet_between_two_spheres_deralgo ... ok
+test nurbs::bspsurface::test_include_bspcurve3 ... ok
+test nurbs::nurbssurface::test_include3d ... ok
+test decorators::af_surface::tests::plane_cylinder ... ok
+test decorators::af_surface::tests::test_ders ... ok
+test decorators::af_surface::tests::presearch_matches_the_original_grid ... ok
+test decorators::af_surface::tests::approximation_crosses_periodic_support_seams ... ok
+
+test result: ok. 27 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/af_surface.rs (target/release/deps/af_surface-839fe62785730781)
+
+running 1 test
+test approx_fillet_between_two_spheres ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/bspcurve.rs (target/release/deps/bspcurve-53916fb8fa99b633)
+
+running 10 tests
+test bsp_bench ... ignored
+test concat_negative_test ... ok
+test test_derivation ... ok
+test test_2nd_derivation ... ok
+test test_near_as_curve ... ok
+test test_invert ... ok
+test test_substitution ... ok
+test test_parameter_division ... ok
+test test_der_n ... ok
+test parameter_random_tests ... ok
+
+test result: ok. 9 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/bspsurface.rs (target/release/deps/bspsurface-ce6ebc7be77faf61)
+
+running 7 tests
+test test_substitution ... ok
+test test_uuderivation ... ok
+test test_vvderivation ... ok
+test test_uvderivation ... ok
+test test_vderivation ... ok
+test test_uderivation ... ok
+test test_der_mn ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/circle.rs (target/release/deps/circle-fb1fbad639691d91)
+
+running 11 tests
+test inverse_axes_and_signed_zero_stay_in_one_revolution ... ok
+test inverse_near_axes_preserves_parameter_precision ... ok
+test parameter_division ... ok
+test search_nearest_parameter ... ok
+test search_nearest_parameter_with_parameter_hint ... ok
+test search_parameter_with_parameter_hint ... ok
+test search_nearest_parameter_with_range ... ok
+test search_parameter ... ok
+test search_parameter_with_range ... ok
+test scaled_circle_accepts_submicron_local_chord_tolerance ... ok
+test to_nurbs ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/edge_blend.rs (target/release/deps/edge_blend-9120cc4241f80149)
+
+running 2 tests
+test test_edge_blend_ders_by_bspline_surface ... ok
+test test_edge_blend_ends_by_bezier_surface ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/hyperbola.rs (target/release/deps/hyperbola-e9570f792fb0f4ef)
+
+running 3 tests
+test snp_test ... ok
+test sp_negative_test ... ok
+test sp_test ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/intersection_cache.rs (target/release/deps/intersection_cache-0ca0b9113c27a013)
+
+running 1 test
+test unchanged_clones_reuse_division_and_mutations_detach ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/intersection_curve.rs (target/release/deps/intersection_curve-337825c56e9fbfbd)
+
+running 4 tests
+test a_misleading_hint_can_return_a_triple_that_does_not_name_its_point ... ok
+test hints_from_the_previous_sample_find_the_same_point_up_to_a_period ... ok
+test sphere_case ... ok
+test cylinder_case ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/nurbscurve.rs (target/release/deps/nurbscurve-b379e5ebef9616bd)
+
+running 5 tests
+test nurbs_circle ... ok
+test test_parameter_division ... ok
+test test_der_n ... ok
+test test_ders ... ok
+test concat_positive_test ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/nurbssurface.rs (target/release/deps/nurbssurface-3a519f3e33285c32)
+
+running 2 tests
+test nurbs_sphere ... ok
+test test_der_mn ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running tests/offset.rs (target/release/deps/offset-f5c73c2a27dcb181)
+
+running 5 tests
+test normal_field_line_with_variable_length ... ok
+test normal_field_surface_ders_on_plane ... ok
+test offset_curve_search_parameter ... ok
+test normal_field_unit_circle_with_fixed_length ... ok
+test offset_surface_search_parameter ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/pcurve.rs (target/release/deps/pcurve-071b9eda2eb2cd5c)
+
+running 1 test
+test pcurve_derivation ... FAILED
+
+failures:
+
+---- pcurve_derivation stdout ----
+proptest: FileFailurePersistence::SourceParallel set, but failed to find lib.rs or main.rs
+proptest: FileFailurePersistence::SourceParallel set, but failed to find lib.rs or main.rs
+proptest: Saving this and future failures in /home/krone/Development/Pieza_WS/truck/truck-geometry/tests/pcurve.proptest-regressions
+proptest: If this test was run on a CI system, you may wish to add the following line to your copy of the file. (You may need to create it.)
+cc 50d8039d67926c66cab49548717f93cc44705eef4e2589403af17a82d14f9f68
+
+thread 'pcurve_derivation' (641061) panicked at truck-geometry/tests/pcurve.rs:40:1:
+Test failed: assertion failed: `left` is near `right`
+left: Vector3 [0.0, -2829663063.761872, 0.0],
+right: Vector3 [0.0, -2829663063.7618704, 0.0] at truck-geometry/tests/pcurve.rs:24.
+minimal failing input: PcurveDerivationArgs = PcurveDerivationArgs {
+    curve_coef: [
+        [
+            0.0,
+            0.0,
+        ],
+        [
+            0.0,
+            0.0,
+        ],
+        [
+            0.0,
+            0.6134677748517301,
+        ],
+        [
+            0.508299564127126,
+            0.9819011403611299,
+        ],
+        [
+            -0.37024697194742484,
+            -0.933202768048588,
+        ],
+        [
+            0.8612228964410131,
+            0.4644466547997221,
+        ],
+    ],
+    curve_degree: 5,
+    surface_ucoef: [
+        [
+            0.0,
+            0.0,
+            0.0,
+        ],
+        [
+            0.0,
+            0.0,
+            0.0,
+        ],
+        [
+            0.0,
+            0.0,
+            0.0,
+        ],
+        [
+            0.0,
+            0.0,
+            0.0,
+        ],
+        [
+            0.0,
+            -0.6841706810781782,
+            0.0,
+        ],
+        [
+            0.0,
+            0.0,
+            0.0,
+        ],
+    ],
+    surface_vcoef: [
+        [
+            0.0,
+            0.0,
+            0.0,
+        ],
+        [
+            0.0,
+            0.0,
+            0.0,
+        ],
+        [
+            0.0,
+            0.0,
+            0.0,
+        ],
+        [
+            0.0,
+            0.0,
+            0.0,
+        ],
+        [
+            0.0,
+            0.0,
+            0.0,
+        ],
+        [
+            0.0,
+            0.5352710734426739,
+            0.0,
+        ],
+    ],
+    surface_udegree: 4,
+    surface_vdegree: 5,
+    n: 5,
+    t: -0.9907205852407387,
+}
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    pcurve_derivation
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-geometry --test pcurve`

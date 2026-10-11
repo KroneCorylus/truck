@@ -1,0 +1,23 @@
+   Compiling truck-geotrait v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-geotrait)
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+    Finished `release` profile [optimized] target(s) in 1.70s
+     Running tests/revolution_division.rs (target/release/deps/revolution_division-b511abbe399678c5)
+
+running 1 test
+test revolution_chords_use_world_radius_and_share_the_tolerance_between_directions ... FAILED
+
+failures:
+
+---- revolution_chords_use_world_radius_and_share_the_tolerance_between_directions stdout ----
+
+thread 'revolution_chords_use_world_radius_and_share_the_tolerance_between_directions' (622821) panicked at truck-geometry/tests/revolution_division.rs:45:21:
+chord error 0.0012552248109519526 exceeds 0.001
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    revolution_chords_use_world_radius_and_share_the_tolerance_between_directions
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-geometry --test revolution_division`

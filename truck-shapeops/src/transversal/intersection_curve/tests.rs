@@ -179,7 +179,7 @@ fn tangent_contact_refines_a_mesh_seed() {
         Point3::new(1.0, 0.0, 0.0),
         Point3::new(0.0, 1.0, 0.0),
     );
-    let contact = tangent_contact(&graph, &plane, Point3::new(0.01, -0.02, 0.003)).unwrap();
+    let contact = tangent_contact(&graph, &plane, Point3::new(0.01, -0.02, 0.003), 0.01).unwrap();
     assert_near!(contact, Point3::origin());
     assert_eq!(tangent_crossing_at(&graph, &plane, contact), Some(true));
 }
@@ -215,5 +215,89 @@ fn samples_crossing_a_periodic_seam_still_name_their_points() {
         leader
             .iter()
             .for_each(|p| assert_near!(p.to_vec().magnitude(), 1.0));
+    }
+}
+
+#[test]
+fn smooth_polar_tangency_has_the_same_curvature_classification_as_regular_contact() {
+    let sphere = Sphere::new(Point3::origin(), 1.);
+    let cylinder = RevolutedCurve::by_revolution(
+        Line(Point3::new(-1., 0., 1.), Point3::new(1., 0., 1.)),
+        Point3::origin(),
+        Vector3::unit_x(),
+    );
+    for point in [Point3::new(0., 0., 1.), Point3::new(0., 1., 0.)] {
+        assert_eq!(tangent_crossing_at(&sphere, &cylinder, point), Some(false));
+        assert_eq!(tangent_crossing_at(&cylinder, &sphere, point), Some(false));
+    }
+}
+
+#[test]
+fn tangency_refinement_scales_with_mesh_error_and_curvature() {
+    for radius in [0.2, 1., 150.] {
+        let sphere = Sphere::new(Point3::origin(), radius);
+        let cylinder = RevolutedCurve::by_revolution(
+            Line(
+                Point3::new(radius, 0., -radius),
+                Point3::new(radius, 0., radius),
+            ),
+            Point3::origin(),
+            Vector3::unit_z(),
+        );
+        let seed = Point3::new(
+            -0.12281558119533047,
+            0.984807753012208,
+            -0.12213432823907198,
+        ) * radius;
+        for contact in [
+            tangent_contact(&sphere, &cylinder, seed, radius * 0.01),
+            tangent_contact(&cylinder, &sphere, seed, radius * 0.01),
+        ] {
+            let contact = contact.expect("a mesh-scale seed must refine to the touching equator");
+            assert!(contact.z.abs() < 1e-7);
+            assert!((contact.to_vec().magnitude() - radius).abs() < 1e-7);
+            assert!(contact.distance(seed) < radius * 0.2);
+        }
+        assert!(tangent_contact(&sphere, &cylinder, seed, radius * 1e-6).is_none());
+    }
+}
+
+#[test]
+fn polar_curvature_preserves_crossings_and_rejects_a_cone_apex() {
+    let sphere = Processor::<_, Matrix4>::new(Sphere::new(Point3::origin(), 1.));
+    let saddle = Processor::with_transform(
+        quadratic_graph(-1., 0., 1.),
+        Matrix4::from_translation(Vector3::unit_z()),
+    );
+    for sphere in [sphere, sphere.inverse()] {
+        for saddle in [saddle.clone(), saddle.inverse()] {
+            assert_eq!(
+                tangent_crossing_at(&sphere, &saddle, Point3::new(0., 0., 1.)),
+                Some(true)
+            );
+            assert_eq!(
+                tangent_crossing_at(&saddle, &sphere, Point3::new(0., 0., 1.)),
+                Some(true)
+            );
+        }
+    }
+    let cone = RevolutedCurve::by_revolution(
+        Line(Point3::origin(), Point3::new(1., 0., 1.)),
+        Point3::origin(),
+        Vector3::unit_z(),
+    );
+    assert!(curvature_bound(&cone, (0., 0.)).is_none());
+}
+
+#[test]
+fn flat_contact_accepts_normal_roundoff_without_a_curvature_budget() {
+    let a = Point3::new(1., 2., 3.);
+    let b = Point3::new(-2., 1., 0.5);
+    let plane = Plane::new(Point3::origin(), a, b);
+    for scale in [0.2, 3., 7.] {
+        let other = Plane::new(Point3::origin(), a * scale, b * (scale + 0.7));
+        assert!(tangent_contact(&plane, &other, Point3::origin(), 0.001)
+            .unwrap()
+            .near(&Point3::origin()));
     }
 }

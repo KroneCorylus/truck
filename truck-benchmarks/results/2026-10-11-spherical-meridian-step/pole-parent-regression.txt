@@ -1,0 +1,22 @@
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+    Finished `release` profile [optimized] target(s) in 1.80s
+     Running tests/revolution_pole_search.rs (target/release/deps/revolution_pole_search-b463edbe72686a68)
+
+running 1 test
+test nearest_search_accepts_roundoff_just_inside_a_fixed_pole ... FAILED
+
+failures:
+
+---- nearest_search_accepts_roundoff_just_inside_a_fixed_pole stdout ----
+
+thread 'nearest_search_accepts_roundoff_just_inside_a_fixed_pole' (683336) panicked at truck-geometry/tests/revolution_pole_search.rs:23:18:
+one-ulp pole perturbation must have a nearest parameter
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    nearest_search_accepts_roundoff_just_inside_a_fixed_pole
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-geometry --test revolution_pole_search`

@@ -184,6 +184,10 @@ where
     P::Diff: SsnpVector<Point = P>,
     S: ParametricSurface<Point = P, Vector = P::Diff>,
 {
+    // A polar seed can already be converged even though its Jacobian is singular.
+    if surface.subs(hint.0, hint.1).distance2(point) < TOLERANCE2 * TOLERANCE2 {
+        return Some(hint);
+    }
     let function = move |param: P::Diff| SsnpVector::subs(surface, point, param);
     let res = newton::solve(function, P::Diff::from_param(hint), trials);
     res.ok().map(P::Diff::into_param)

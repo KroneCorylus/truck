@@ -351,7 +351,7 @@ impl<C: ParametricCurve3D + BoundedCurve> SearchNearestParameter<D2> for Revolut
         let (t0, t1) = self.curve.range_tuple();
         let on_axis = move |o: Point3, normal: Vector3| {
             let op = point - o;
-            op.cross(self.revolution.axis).so_small() && op.dot(normal) >= 0.0
+            point.near(&o) || (op.cross(self.revolution.axis).so_small() && op.dot(normal) >= 0.0)
         };
         if self.is_front_fixed() && on_axis(self.curve.front(), self.normal(t0, 0.0)) {
             match hint.into() {
@@ -488,17 +488,18 @@ where C: ParametricCurve3D + ParameterDivision1D<Point = Point3>
         (urange, vrange): ((f64, f64), (f64, f64)),
         tol: f64,
     ) -> (Vec<f64>, Vec<f64>) {
-        let curve_division = self.curve.parameter_division(urange, tol);
-        let max = curve_division
-            .1
-            .into_iter()
-            .fold(0.0, |max2, pt| {
-                let h = self.revolution.proj_point(pt).y;
-                f64::max(max2, h)
-            })
-            .sqrt();
-        let acos = f64::acos(1.0 - tol / max);
-        let div: usize = 1 + ((vrange.1 - vrange.0) / acos).floor() as usize;
+        assert!(
+            tol.is_finite() && tol > 0.0,
+            "tolerance must be positive and finite"
+        );
+        // Reserve error budget for both directions and their mixed curvature on diagonals.
+        let curve_division = self.curve.parameter_division(urange, tol * 0.5);
+        let max_radius = curve_division.1.iter().fold(0.0_f64, |max, &point| {
+            max.max(self.revolution.proj_point(point).y)
+        });
+        let radius_bound = max_radius + tol * 0.5;
+        let angle = 4.0 * (tol * 0.125 / radius_bound).min(0.4).sqrt().asin();
+        let div: usize = 1 + ((vrange.1 - vrange.0) / angle).floor() as usize;
         let circle_division = (0..=div)
             .map(|j| vrange.0 + (vrange.1 - vrange.0) * j as f64 / div as f64)
             .collect();

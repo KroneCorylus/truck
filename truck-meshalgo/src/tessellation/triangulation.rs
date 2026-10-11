@@ -1042,8 +1042,8 @@ fn insert_surface(
 }
 
 /// Turns each triangle to face the way the surface normals at its corners point. A triangle
-/// without area, such as one with two corners on a pole, faces no way at all: its normal is
-/// rounding noise, so it keeps the winding the triangulation gave it.
+/// without area, or perpendicular to the corner normals, has an uncertain orientation
+/// from rounding noise. Keep the parameter-space winding in those cases.
 fn orient_to_normals(mesh: &mut PolygonMesh) {
     let mut editor = mesh.debug_editor();
     let PolygonMeshEditor {
@@ -1067,7 +1067,7 @@ fn orient_to_normals(mesh: &mut PolygonMesh) {
         let normal = face.iter().fold(Vector3::zero(), |normal, v| {
             normal + v.nor.map(|i| normals[i]).unwrap_or_else(Vector3::zero)
         });
-        if normal.dot(area) < 0.0 {
+        if normal.dot(area) < -TOLERANCE * normal.magnitude() * area.magnitude() {
             face.reverse();
         }
     }

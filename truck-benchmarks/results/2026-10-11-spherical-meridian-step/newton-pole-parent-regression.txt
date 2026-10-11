@@ -1,0 +1,22 @@
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+    Finished `release` profile [optimized] target(s) in 0.46s
+     Running tests/revolution_pole_search.rs (target/release/deps/revolution_pole_search-b463edbe72686a68)
+
+running 1 test
+test surface_newton_preserves_an_already_converged_polar_seed ... FAILED
+
+failures:
+
+---- surface_newton_preserves_an_already_converged_polar_seed stdout ----
+
+thread 'surface_newton_preserves_an_already_converged_polar_seed' (702880) panicked at truck-geometry/tests/revolution_pole_search.rs:50:10:
+a converged seed does not require an invertible Jacobian
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    surface_newton_preserves_an_already_converged_polar_seed
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-geometry --test revolution_pole_search`

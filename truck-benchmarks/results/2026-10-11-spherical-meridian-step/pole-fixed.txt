@@ -1,0 +1,11 @@
+   Compiling truck-geotrait v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-geotrait)
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+    Finished `release` profile [optimized] target(s) in 1.83s
+     Running tests/revolution_pole_search.rs (target/release/deps/revolution_pole_search-b463edbe72686a68)
+
+running 3 tests
+test nearest_search_accepts_roundoff_just_inside_a_fixed_pole ... ok
+test sphere_nearest_search_has_finite_parameters_at_both_poles ... ok
+test surface_newton_preserves_an_already_converged_polar_seed ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

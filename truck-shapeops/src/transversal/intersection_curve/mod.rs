@@ -200,7 +200,7 @@ where
     let polylines = super::polyline_construction::construct_polylines(&interferences);
     polylines
         .into_iter()
-        .flat_map(|polyline| split_at_tangencies(&surface0, &surface1, polyline))
+        .flat_map(|polyline| split_at_tangencies(&surface0, &surface1, polyline, tol))
         .filter(|(_, grazes)| !grazes)
         .map(|(polyline, _)| {
             Some((
@@ -235,14 +235,21 @@ where
 /// Refines a mesh seed to coincidence with parallel normals. The six residuals constrain
 /// four parameters; a small diagonal regularization leaves a contact curve's free direction
 /// close to its seed instead of requiring an invertible coincidence-only Newton system.
-fn tangent_contact<S0, S1>(surface0: &S0, surface1: &S1, point: Point3) -> Option<Point3>
+fn tangent_contact<S0, S1>(
+    surface0: &S0,
+    surface1: &S1,
+    point: Point3,
+    tol: f64,
+) -> Option<Point3>
 where
     S0: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>,
-    S1: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>, {
+    S1: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>,
+{
     contact_from(
         surface0,
         surface1,
         nearest_parameters(surface0, surface1, point)?,
+        tol,
     )
 }
 
@@ -251,6 +258,7 @@ fn contact_from<S0, S1>(
     surface0: &S0,
     surface1: &S1,
     [(u, v), (s, t)]: [(f64, f64); 2],
+    tol: f64,
 ) -> Option<Point3>
 where
     S0: ParametricSurface3D,
@@ -259,9 +267,20 @@ where
     let mut parameters = Vector4::new(u, v, s, t);
     let normal0 = surface0.normal(u, v);
     let normal1 = surface1.normal(s, t);
-    if normal0.cross(normal1).magnitude2() > 0.01 {
+    let start0 = surface0.subs(u, v);
+    let start1 = surface1.subs(s, t);
+    let curvature = curvature_bound(surface0, (u, v))? + curvature_bound(surface1, (s, t))?;
+    // Chord error grows quadratically with distance from a tangency. Scale the
+    // angular gate and the refinement neighborhood by curvature and mesh error.
+    let angular_budget = 8. * tol * curvature;
+    if normal0.cross(normal1).magnitude2() > angular_budget.max(TOLERANCE2) {
         return None;
     }
+    let distance_budget2 = if curvature > 0. {
+        8. * tol / curvature
+    } else {
+        tol * tol
+    };
     let sign = if normal0.dot(normal1) > 0.0 {
         1.0
     } else {
@@ -282,11 +301,12 @@ where
         } = parameters;
         let p0 = surface0.subs(u, v);
         let p1 = surface1.subs(s, t);
+        if p0.distance2(start0) > distance_budget2 || p1.distance2(start1) > distance_budget2 {
+            return None;
+        }
         let difference = p0 - p1;
         let normals = surface0.normal(u, v) - sign * surface1.normal(s, t);
-        if difference.magnitude2() < TOLERANCE2 * TOLERANCE2
-            && normals.magnitude2() < TOLERANCE2 * TOLERANCE2
-        {
+        if difference.magnitude2() < TOLERANCE2 * 1e-4 && normals.magnitude2() < TOLERANCE2 * 1e-4 {
             return Some(p0.midpoint(p1));
         }
         let columns = [
@@ -313,8 +333,10 @@ where
             }
         }
         let scale = (0..4).map(|i| matrix[i][i]).fold(0.0_f64, f64::max);
+        // Scale damping per parameter so a free contact direction does not drift
+        // toward a pole merely because its angular derivative is small.
         for i in 0..4 {
-            matrix[i][i] += scale * 1.0e-12;
+            matrix[i][i] += 1e-3 * matrix[i][i] + scale * 1e-14;
         }
         parameters -= matrix.invert()? * rhs;
     }
@@ -334,12 +356,13 @@ struct Sample {
 
 /// The tangency tests of one polyline vertex. They start from the same nearest parameters,
 /// which are searched once.
-fn sample<S0, S1>(surface0: &S0, surface1: &S1, point: Point3) -> Sample
+fn sample<S0, S1>(surface0: &S0, surface1: &S1, point: Point3, tol: f64) -> Sample
 where
     S0: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>,
     S1: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>, {
     let parameters = nearest_parameters(surface0, surface1, point);
-    let contact = parameters.and_then(|parameters| contact_from(surface0, surface1, parameters));
+    let contact =
+        parameters.and_then(|parameters| contact_from(surface0, surface1, parameters, tol));
     let crossing = contact.map(|contact| tangent_crossing_at(surface0, surface1, contact));
     match contact {
         Some(contact) if crossing == Some(Some(true)) && contact.distance(point) < TOLERANCE => {
@@ -360,11 +383,11 @@ where
 }
 
 /// Whether the mesh interference at `point` refines to contact without crossing branches.
-fn grazes_at<S0, S1>(surface0: &S0, surface1: &S1, point: Point3) -> bool
+fn grazes_at<S0, S1>(surface0: &S0, surface1: &S1, point: Point3, tol: f64) -> bool
 where
     S0: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>,
     S1: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>, {
-    tangent_contact(surface0, surface1, point)
+    tangent_contact(surface0, surface1, point, tol)
         .is_some_and(|contact| tangent_crossing_at(surface0, surface1, contact) == Some(false))
 }
 
@@ -375,6 +398,7 @@ fn split_at_tangencies<S0, S1>(
     surface0: &S0,
     surface1: &S1,
     polyline: PolylineCurve<Point3>,
+    tol: f64,
 ) -> Vec<(PolylineCurve<Point3>, bool)>
 where
     S0: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>,
@@ -382,7 +406,7 @@ where
 {
     let mut samples: Vec<Sample> = polyline
         .iter()
-        .map(|&point| sample(surface0, surface1, point))
+        .map(|&point| sample(surface0, surface1, point, tol))
         .collect();
     if samples[0].point.near(&samples[samples.len() - 1].point) {
         if let Some(i) = samples.iter().position(|sample| sample.singular) {
@@ -399,7 +423,7 @@ where
             let grazes = piece.iter().all(|sample| {
                 sample
                     .grazes
-                    .unwrap_or_else(|| grazes_at(surface0, surface1, sample.point))
+                    .unwrap_or_else(|| grazes_at(surface0, surface1, sample.point, tol))
             });
             let points = piece.iter().map(|sample| sample.point).collect();
             pieces.push((PolylineCurve(points), grazes));
@@ -451,8 +475,7 @@ where
     {
         return Some(false);
     }
-    let tangent = surface0.uder(uv0.0, uv0.1).normalize();
-    let bitangent = normal.cross(tangent);
+    let (tangent, bitangent) = tangent_basis(surface0, uv0, normal);
     let curvature0 = curvature_form(surface0, uv0, normal, tangent, bitangent)?;
     let curvature1 = curvature_form(surface1, uv1, normal, tangent, bitangent)?;
     let [a, b, c] = std::array::from_fn(|i| curvature0[i] - curvature1[i]);
@@ -464,6 +487,29 @@ where
     Some(a * c - b * b < -TOLERANCE)
 }
 
+fn tangent_basis<S: ParametricSurface3D>(
+    surface: &S,
+    (u, v): (f64, f64),
+    normal: Vector3,
+) -> (Vector3, Vector3) {
+    let (du, dv) = (surface.uder(u, v), surface.vder(u, v));
+    let tangent = if du.magnitude2() >= dv.magnitude2() {
+        du
+    } else {
+        dv
+    };
+    let tangent = (tangent - normal * tangent.dot(normal)).normalize();
+    (tangent, normal.cross(tangent))
+}
+
+fn curvature_bound<S: ParametricSurface3D>(surface: &S, uv: (f64, f64)) -> Option<f64> {
+    let normal = surface.normal(uv.0, uv.1).normalize();
+    let (tangent, bitangent) = tangent_basis(surface, uv, normal);
+    let [a, b, c] = curvature_form(surface, uv, normal, tangent, bitangent)?;
+    let bound = (a * a + 2. * b * b + c * c).sqrt();
+    bound.is_finite().then_some(bound)
+}
+
 fn curvature_form<S: ParametricSurface3D>(
     surface: &S,
     (u, v): (f64, f64),
@@ -472,6 +518,15 @@ fn curvature_form<S: ParametricSurface3D>(
     bitangent: Vector3,
 ) -> Option<[f64; 3]> {
     let derivatives = surface.ders(2, u, v);
+    let du2 = derivatives[1][0].magnitude2();
+    let dv2 = derivatives[0][1].magnitude2();
+    if du2.min(dv2) <= 1e-24 * du2.max(dv2) {
+        if let Some(form) =
+            polar_curvature_form(surface, (u, v), normal, tangent, bitangent, du2 >= dv2)
+        {
+            return Some(form);
+        }
+    }
     let inverse = Matrix3::from_cols(derivatives[1][0], derivatives[0][1], normal).invert()?;
     let x = inverse * tangent;
     let y = inverse * bitangent;
@@ -483,6 +538,73 @@ fn curvature_form<S: ParametricSurface3D>(
     let form =
         |a: Vector3, b: Vector3| uu * a.x * b.x + uv * (a.x * b.y + a.y * b.x) + vv * a.y * b.y;
     Some([form(x, x), form(x, y), form(y, y)])
+}
+
+// At a smooth pole, the collapsed parameter line names one point but its meridians
+// supply different tangent directions. Their exact normal accelerations determine
+// the quadratic form without inverting the singular surface Jacobian.
+fn polar_curvature_form<S: ParametricSurface3D>(
+    surface: &S,
+    (u, v): (f64, f64),
+    normal: Vector3,
+    tangent: Vector3,
+    bitangent: Vector3,
+    collapse_v: bool,
+) -> Option<[f64; 3]> {
+    use std::ops::Bound::{Excluded, Included};
+    let ranges = surface.parameter_range();
+    let range = if collapse_v { ranges.1 } else { ranges.0 };
+    let (Included(start) | Excluded(start), Included(end) | Excluded(end)) = range else {
+        return None;
+    };
+    let point = surface.subs(u, v);
+    let mut equations = Vec::new();
+    for i in 0..8 {
+        let parameter = start + (end - start) * i as f64 / 8.;
+        let (u, v) = if collapse_v {
+            (u, parameter)
+        } else {
+            (parameter, v)
+        };
+        let n = surface.normal(u, v);
+        if !surface.subs(u, v).near(&point) || !n.cross(normal).so_small() {
+            return None;
+        }
+        let (direction, acceleration) = if collapse_v {
+            (surface.uder(u, v), surface.uuder(u, v))
+        } else {
+            (surface.vder(u, v), surface.vvder(u, v))
+        };
+        let speed2 = direction.magnitude2();
+        if !speed2.is_finite()
+            || speed2 == 0.
+            || direction.dot(normal).abs() > TOLERANCE * speed2.sqrt()
+        {
+            return None;
+        }
+        let direction = direction / speed2.sqrt();
+        let (x, y) = (direction.dot(tangent), direction.dot(bitangent));
+        equations.push((
+            Vector3::new(x * x, 2. * x * y, y * y),
+            normal.dot(acceleration) / speed2,
+        ));
+    }
+    let mut matrix = Matrix3::zero();
+    let mut rhs = Vector3::zero();
+    for &(row, curvature) in &equations {
+        matrix += Matrix3::from_cols(row * row.x, row * row.y, row * row.z);
+        rhs += row * curvature;
+    }
+    let form = matrix.invert()? * rhs;
+    let scale = form.x.abs().max(form.y.abs()).max(form.z.abs());
+    if !scale.is_finite()
+        || equations.iter().any(|(row, curvature)| {
+            (row.dot(form) - curvature).abs() > TOLERANCE * scale.max(TOLERANCE)
+        })
+    {
+        return None;
+    }
+    Some([form.x, form.y, form.z])
 }
 
 #[cfg(test)]

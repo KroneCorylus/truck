@@ -175,7 +175,8 @@ fn fitted_edge_endpoints_use_shared_topology_vertices() {
     use crate::filters::OptimizingFilter;
     use truck_modeling::{primitive, Curve, Matrix4, Solid};
     let solid: Solid = primitive::cuboid(BoundingBox::from_iter([
-        Point3::origin(), Point3::new(2.0, 3.0, 4.0),
+        Point3::origin(),
+        Point3::new(2.0, 3.0, 4.0),
     ]));
     let solid = solid.mapped(
         |p| *p,
@@ -190,5 +191,57 @@ fn fitted_edge_endpoints_use_shared_topology_vertices() {
         };
         mesh.put_together_same_attrs(1e-9).remove_degenerate_faces();
         assert_eq!(mesh.shell_condition(), shell::ShellCondition::Closed);
+    }
+}
+
+#[test]
+fn normal_orientation_preserves_ambiguous_meridian_facets_and_flips_reliable_ones() {
+    let positions = vec![
+        Point3::new(1.8011179551484724, 2.8000098658731867, 3.124827034989286e-6),
+        Point3::new(1.8022358753627803, 2.800019731438082, 1.2499210494482105e-5),
+        Point3::new(1.8, 2.8000000000000003, -5.551115123125783e-16),
+    ];
+    let normals = vec![
+        Vector3::new(
+            0.005589775742362419,
+            4.932936593385396e-5,
+            -0.9999843758648252,
+        ),
+        Vector3::new(
+            0.011179376813901243,
+            9.8657190410345e-5,
+            -0.9999375039475277,
+        ),
+        Vector3::new(0., 0., -1.),
+    ];
+    let triangle = [0, 1, 2].map(|pos| StandardVertex {
+        pos,
+        uv: None,
+        nor: Some(pos),
+    });
+    let check = |positions, normals, expected| {
+        let mut mesh = PolygonMesh::new(
+            StandardAttributes {
+                positions,
+                normals,
+                ..Default::default()
+            },
+            Faces::from_iter([triangle]),
+        );
+        orient_to_normals(&mut mesh);
+        let face = mesh.faces().triangle_iter().next().unwrap();
+        assert_eq!([face[0].pos, face[1].pos, face[2].pos], expected);
+    };
+    check(positions, normals, [0, 1, 2]);
+    for height in [0.0001, 0.1] {
+        check(
+            vec![
+                Point3::origin(),
+                Point3::new(1., 0., 0.),
+                Point3::new(0.5, height, 0.),
+            ],
+            vec![-Vector3::unit_z(); 3],
+            [2, 1, 0],
+        );
     }
 }
