@@ -1,0 +1,9 @@
+OCCT 7.9.3
+cavity=0 slope=-0.25 operation=fillet done=true valid=1 solids=1 volume=409.957836865135 expected_volume=409.957836865135 dimensions_match=1 volume_matches=1
+cavity=0 slope=-0.25 operation=chamfer done=true valid=1 solids=1 volume=409.195040260653 expected_volume=409.195040260653 dimensions_match=1 volume_matches=1
+cavity=0 slope=0.25 operation=fillet done=true valid=1 solids=1 volume=909.164428026251 expected_volume=909.164428026251 dimensions_match=1 volume_matches=1
+cavity=0 slope=0.25 operation=chamfer done=true valid=1 solids=1 volume=910.043365252328 expected_volume=910.043365252328 dimensions_match=1 volume_matches=1
+cavity=1 slope=-0.25 operation=fillet done=true valid=1 solids=1 volume=5926.04216313487 expected_volume=5926.04216313486 dimensions_match=1 volume_matches=1
+cavity=1 slope=-0.25 operation=chamfer done=true valid=1 solids=1 volume=5926.80495973935 expected_volume=5926.80495973935 dimensions_match=1 volume_matches=1
+cavity=1 slope=0.25 operation=fillet done=true valid=1 solids=1 volume=5426.83557197375 expected_volume=5426.83557197375 dimensions_match=1 volume_matches=1
+cavity=1 slope=0.25 operation=chamfer done=true valid=1 solids=1 volume=5425.95663474767 expected_volume=5425.95663474767 dimensions_match=1 volume_matches=1

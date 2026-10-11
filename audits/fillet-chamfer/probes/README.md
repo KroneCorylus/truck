@@ -86,3 +86,25 @@ mean either result is invalid. The paired probe establishes successful native
 operations for these dimensions, not identical corner geometry or full continuity,
 mesh, STEP or downstream-edit equivalence. Partially selected corners, inconsistent
 offset planes, unequal radii and general curved corner filling remain open.
+
+## Conical rims
+
+`conical_blends.cpp` constructs frusta of height 8 and bottom radius 5, with top
+radius 3 or 7. Each exterior solid and corresponding reversed cavity shell receives
+a radius-0.5 fillet or chamfer with setbacks 0.5 on the top plane and 0.3 down the
+cone meridian. Build with the pyramid command, substituting `conical_blends` and
+adding `-lTKPrim` before `-lTKFillet`. Raw output is `conical_blends_occt.txt`.
+
+All eight OCCT 7.9.3 tasks return valid single solids with the independently derived
+volumes and sampled dimension equations used by Truck. The formulas and physical
+selection are documented in `truck-shapeops/tests/CONICAL_BLENDS.md`.
+
+| Top radius | Exterior fillet volume | Exterior chamfer volume |
+| --- | ---: | ---: |
+| 3 | 409.957836865 | 409.195040261 |
+| 7 | 909.164428026 | 910.043365252 |
+
+Cavity volumes equal 6336 minus the corresponding exterior value. Truck additionally
+checks exact NURBS supports, rigid transforms, reversed selections, closed meshes,
+history, unchanged inputs and STEP. Those additional OCCT outcomes were not probed.
+Oblique intersections, varied cone angles and apex collapse remain open.
