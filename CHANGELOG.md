@@ -6,6 +6,8 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Fit imported cylindrical and conic extrusion supports to complete positive-weight rational boundary bounds, preserving analytic geometry while covering long, negative and oblique sweeps and extended nonperiodic profiles. Retain the fitted cylinder height during modeling conversion and compute STEP cylinder radius perpendicular to the axis, independent of generator height. Use affine conic coordinates for inclusion and search so elliptical, sheared and oblique extrusions preserve bounded trims. Regressions check native parabolic inputs, curved extrema beyond vertices, transformed cylinders, exact volume, closed meshes and STEP round trips.
+
 - Import finite STEP parabolas and hyperbolas as exact quadratic polynomial/rational curves with normalized parameter ranges. Preserve endpoints, tangents, orientation and swept geometry; reject non-finite or degenerate ranges. Correct the STEP edge parser that constructed hyperbolas for parabolas, prefer analytic conic point inversion, and remove periodic wrapping from hyperbolic edge trims. Regression coverage includes 2D/3D STEP edges, tiny spans, transformed/reversed arcs and closed prism/STEP volume checks.
 
 - Preserve requested curve-division accuracy through affine scaling, shear and singular projections. Bound the complete linear transform instead of only its orthogonalized diagonal, and accept positive finite local sampling tolerances below the global modeling tolerance. Scaled parabolas, hyperbolas and splines no longer panic during STEP preprocessing; sheared 2D/3D circles meet world-space chord checks and reversed divisions retain their ordering.

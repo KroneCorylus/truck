@@ -30,14 +30,15 @@ impl out::DisplayByStep for ElementarySurface {
                 let trans = processor.transform();
                 let o = trans.transform_point(revo.origin());
                 let p = trans.transform_point(revo.entity_curve().0);
-                let axis = trans.transform_vector(revo.axis());
+                let axis = trans.transform_vector(revo.axis()).normalize();
+                let radial = (p - o) - axis * (p - o).dot(axis);
 
                 let location = out::StepDataDisplay::new(o, location_idx);
                 let direction_axis = out::VectorAsDirection(axis);
                 let axis = out::StepDataDisplay::new(direction_axis, axis_idx);
-                let raw_ref_direction = out::VectorAsDirection((p - o).normalize());
+                let raw_ref_direction = out::VectorAsDirection(radial.normalize());
                 let ref_direction = out::StepDataDisplay::new(raw_ref_direction, ref_direction_idx);
-                let radius = (p - o).magnitude();
+                let radius = radial.magnitude();
 
                 f.write_fmt(format_args!(
                     "#{idx} = CYLINDRICAL_SURFACE('', #{position_idx}, {radius});

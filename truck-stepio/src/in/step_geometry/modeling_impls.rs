@@ -157,7 +157,9 @@ impl From<&ElementarySurface> for ModelingSurface {
                 let point = transform.transform_point(revolved.entity_curve().0);
                 let foot = origin + axis * (point - origin).dot(axis);
                 let circle = arc(foot, point - foot, axis, (0.0, 2.0 * PI));
-                let extruded = Self::Extruded(ExtrudedCurve::by_extrusion(circle, axis));
+                let vector = transform
+                    .transform_vector(revolved.entity_curve().1 - revolved.entity_curve().0);
+                let extruded = Self::Extruded(ExtrudedCurve::by_extrusion(circle, vector));
                 oriented_like(extruded, cylinder, |p| {
                     p - (origin + axis * (p - origin).dot(axis))
                 })

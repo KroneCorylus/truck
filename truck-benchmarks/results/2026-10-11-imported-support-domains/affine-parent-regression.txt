@@ -1,0 +1,30 @@
+   Compiling memchr v2.8.3
+   Compiling parking_lot_core v0.9.12
+   Compiling proptest v1.11.0
+   Compiling truck-geotrait v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-geotrait)
+   Compiling parking_lot v0.12.5
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+   Compiling truck-topology v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-topology)
+   Compiling serde_json v1.0.151
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-modeling)
+    Finished `release` profile [optimized] target(s) in 2.98s
+     Running tests/oblique_conic_extrusion_inclusion.rs (target/release/deps/oblique_conic_extrusion_inclusion-b5223540e6c204a5)
+
+running 1 test
+test affine_conic_extrusions_preserve_exact_inclusion_and_bounded_trims ... FAILED
+
+failures:
+
+---- affine_conic_extrusions_preserve_exact_inclusion_and_bounded_trims stdout ----
+
+thread 'affine_conic_extrusions_preserve_exact_inclusion_and_bounded_trims' (506272) panicked at truck-modeling/tests/oblique_conic_extrusion_inclusion.rs:22:21:
+assertion failed: !surface.include(&Curve::Line(Line(raw.subs(u, -0.1), raw.subs(u, 0.9))))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    affine_conic_extrusions_preserve_exact_inclusion_and_bounded_trims
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-modeling --test oblique_conic_extrusion_inclusion`

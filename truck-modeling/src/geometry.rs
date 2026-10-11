@@ -260,8 +260,8 @@ impl IncludeCurve<Curve> for Surface {
                     }
                 }
             }
-            Surface::Extruded(surface) if cylinder_inclusion_supported(surface) => {
-                cylinder_include(surface, curve)
+            Surface::Extruded(surface) if conic_extrusion_inclusion_supported(surface) => {
+                conic_extrusion_include(surface, curve)
             }
             Surface::Extruded(surface) => match surface.entity_curve().try_lift_up() {
                 Some(_) => include_curve(&extruded_to_nurbs(surface), curve),
@@ -342,7 +342,7 @@ impl SearchParameter<D2> for Surface {
                 SPHint2D::Range(_, _) => None,
             };
             if let Some(reference) = reference {
-                if let Some((u, v)) = cylinder_search_hint(surface, point, reference) {
+                if let Some((u, v)) = conic_extrusion_search_hint(surface, point, reference) {
                     if surface.subs(u, v).near(&point) {
                         return Some((u, v));
                     }
@@ -438,11 +438,15 @@ impl SearchNearestParameter<D2> for Surface {
             Surface::Extruded(surface) => {
                 let hint = hint.into();
                 if matches!(hint, SPHint2D::None) {
-                    if let Some(seed) = cylinder_search_hint(surface, point, None) {
-                        if let Some(parameter) =
-                            algo::surface::search_nearest_parameter(surface, point, seed, trials)
+                    if let Some(seed) = conic_extrusion_search_hint(surface, point, None) {
+                        if right_circular_extrusion(surface)
+                            || surface.subs(seed.0, seed.1).near(&point)
                         {
-                            return Some(parameter);
+                            if let Some(parameter) = algo::surface::search_nearest_parameter(
+                                surface, point, seed, trials,
+                            ) {
+                                return Some(parameter);
+                            }
                         }
                     }
                 }
@@ -473,8 +477,24 @@ fn similarity(transform: &Matrix4) -> bool {
             .all(|&(i, j)| columns[i].dot(columns[j]).abs() <= scale2 * 1.0e-12)
 }
 
-/// An analytic seed for a circular cylinder; other extrusions retain the general search.
-fn cylinder_search_hint(
+fn right_circular_extrusion(surface: &ExtrudedCurve<Curve, Vector3>) -> bool {
+    let Curve::Conic(conic) = surface.entity_curve() else {
+        return false;
+    };
+    let matrix = conic.transform();
+    let x = matrix.x.truncate() / matrix.w.w;
+    let y = matrix.y.truncate() / matrix.w.w;
+    let axis = surface.extruding_vector();
+    let (xx, yy, aa) = (x.magnitude2(), y.magnitude2(), axis.magnitude2());
+    [xx, yy, aa].iter().all(|v| v.is_finite() && *v > 0.)
+        && (xx - yy).abs() <= 1e-12 * xx.max(yy)
+        && x.dot(y).abs() <= 1e-12 * xx.sqrt() * yy.sqrt()
+        && x.dot(axis).abs() <= 1e-12 * xx.sqrt() * aa.sqrt()
+        && y.dot(axis).abs() <= 1e-12 * yy.sqrt() * aa.sqrt()
+}
+
+/// An affine conic-frame seed; other extrusions retain the general search.
+fn conic_extrusion_search_hint(
     surface: &ExtrudedCurve<Curve, Vector3>,
     point: Point3,
     reference: Option<f64>,
@@ -490,18 +510,11 @@ fn cylinder_search_hint(
     let x = matrix.x.truncate() / weight;
     let y = matrix.y.truncate() / weight;
     let axis = surface.extruding_vector();
-    let (xx, yy, aa) = (x.magnitude2(), y.magnitude2(), axis.magnitude2());
-    if ![xx, yy, aa].iter().all(|v| v.is_finite() && *v > 0.0)
-        || (xx - yy).abs() > 1.0e-12 * xx.max(yy)
-        || x.dot(y).abs() > 1.0e-12 * xx.sqrt() * yy.sqrt()
-        || x.dot(axis).abs() > 1.0e-12 * xx.sqrt() * aa.sqrt()
-        || y.dot(axis).abs() > 1.0e-12 * yy.sqrt() * aa.sqrt()
-    {
-        return None;
-    }
+    let inverse = Matrix3::from_cols(x, y, axis).invert()?;
     let delta = point - Point3::from_vec(matrix.w.truncate() / weight);
-    let (px, py) = (delta.dot(x), delta.dot(y));
-    if !px.is_finite() || !py.is_finite() || (px == 0.0 && py == 0.0) {
+    let local = inverse * delta;
+    let (px, py, v) = (local.x, local.y, local.z);
+    if ![px, py, v].iter().all(|v| v.is_finite()) || (px == 0.0 && py == 0.0) {
         return None;
     }
     let (a, b) = circle.range_tuple();
@@ -514,24 +527,23 @@ fn cylinder_search_hint(
         return None;
     }
     u = u.clamp(a, b);
-    let v = delta.dot(axis) / aa;
-    v.is_finite().then_some((u, v))
+    Some((u, v))
 }
 
-fn cylinder_inclusion_supported(surface: &ExtrudedCurve<Curve, Vector3>) -> bool {
+fn conic_extrusion_inclusion_supported(surface: &ExtrudedCurve<Curve, Vector3>) -> bool {
     let (a, b) = surface.entity_curve().range_tuple();
-    cylinder_search_hint(surface, surface.subs(a.midpoint(b), 0.5), None).is_some()
+    conic_extrusion_search_hint(surface, surface.subs(a.midpoint(b), 0.5), None).is_some()
 }
 
-fn cylinder_include(surface: &ExtrudedCurve<Curve, Vector3>, curve: &Curve) -> bool {
+fn conic_extrusion_include(surface: &ExtrudedCurve<Curve, Vector3>, curve: &Curve) -> bool {
     let includes = |point| {
-        cylinder_search_hint(surface, point, None).is_some_and(|(u, v)| {
+        conic_extrusion_search_hint(surface, point, None).is_some_and(|(u, v)| {
             (-TOLERANCE..=1.0 + TOLERANCE).contains(&v) && surface.subs(u, v).near(&point)
         })
     };
     if let Some(lifted) = curve.try_lift_up() {
         // Keep the NURBS inclusion test's knot-span sampling, but evaluate the
-        // exact cylinder directly to avoid an ill-conditioned surface solve.
+        // exact conic extrusion directly to avoid an ill-conditioned surface solve.
         let (knots, _) = lifted.knot_vec().to_single_multi();
         let degree = lifted.degree().max(1) * 6;
         includes(lifted.front().to_point())

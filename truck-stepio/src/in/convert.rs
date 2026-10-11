@@ -253,6 +253,7 @@ impl Table {
         id: u64,
         face: Option<FaceAnyHolder>,
         eidx_map: &HashMap<u64, usize>,
+        edges: &[CompressedEdge<Curve3D>],
     ) -> Result<CompressedFace<Surface>, StepConvertingError> {
         let (orientation, face) = self
             .face_any_to_orientation_and_face(face)
@@ -273,6 +274,7 @@ impl Table {
                 boundaries.push(edges);
             }
         }
+        support_domain::fit(&mut surface, &boundaries, edges);
         Ok(CompressedFace {
             surface,
             boundaries,
@@ -284,12 +286,13 @@ impl Table {
         &self,
         shell: &ShellHolder,
         eidx_map: &HashMap<u64, usize>,
+        edges: &[CompressedEdge<Curve3D>],
         skipped: &mut Vec<Skipped>,
     ) -> Vec<CompressedFace<Surface>> {
         let mut faces = Vec::new();
         for (place_holder, face) in shell.cfs_faces.iter().zip(shell.cfs_faces_holder(self)) {
             let id = ref_id(place_holder);
-            match self.compressed_face(id, face, eidx_map) {
+            match self.compressed_face(id, face, eidx_map, edges) {
                 Ok(face) => faces.push(face),
                 Err(reason) => skipped.push(Skipped {
                     id,
@@ -663,7 +666,7 @@ impl StepShell for ShellHolder {
         let mut skipped = Vec::new();
         let (vertices, vidx_map) = table.shell_vertices(self, &mut skipped);
         let (edges, eidx_map) = table.shell_edges(self, &vidx_map, &mut skipped);
-        let faces = table.shell_faces(self, &eidx_map, &mut skipped);
+        let faces = table.shell_faces(self, &eidx_map, &edges, &mut skipped);
         Ok((
             CompressedShell {
                 vertices,

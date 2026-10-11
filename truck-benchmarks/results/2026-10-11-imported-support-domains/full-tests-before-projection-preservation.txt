@@ -1,0 +1,72 @@
+    Blocking waiting for file lock on build directory
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-modeling)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/truck-stepio)
+    Finished `release` profile [optimized] target(s) in 51.84s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running unittests src/lib.rs (target/release/deps/truck_modeling-4c4847e016f578d9)
+
+running 12 tests
+****** test of the expressions of error messages ******
+
+Two same vertices cannot construct an edge.
+
+cannot attach a plane to a wire that is not on one plane.
+
+*******************************************************
+test errors::print_messages ... ok
+test geom_impls::test_geom_impl::test_take_one_axis_by_normal ... ok
+test geom_impls::test_geom_impl::test_circum_center ... ok
+test geom_impls::test_geom_impl::test_circle_arc ... ok
+test geom_impls::test_geom_impl::test_circle_arc_three_point ... ok
+test geom_impls::test_geom_impl::test_circle_arc_tangent0 ... ok
+test geometry::inclusion_tests::sampled_inclusion_reuses_searches_without_dropping_samples ... ok
+test geom_impls::test_geom_impl::test_attach_plane_with_multiple_boundary ... ok
+test builder::partial_torus::partial_torus ... ok
+test geometry::inclusion_tests::inclusion_preserves_periodic_seams_poles_and_transformed_curves ... ok
+test geom_impls::test_geom_impl::test_attach_plane_with_single_boundary ... ok
+test geometry::inclusion_tests::bad_seeded_results_fall_back_and_off_surface_curves_stay_rejected ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/conic.rs (target/release/deps/conic-1aed121302177672)
+
+running 3 tests
+test circle_arc_by_tangent_is_conic ... ok
+test circle_arc_by_transit_is_conic ... ok
+test inverted_conic_reverses_and_stays_exact ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/conic_extrusion_inclusion.rs (target/release/deps/conic_extrusion_inclusion-68648d8a3d14a698)
+
+running 1 test
+test exact_cylinder_boundaries_include_at_small_and_large_scales ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/cylinder_search.rs (target/release/deps/cylinder_search-94058fb52ee4d6b7)
+
+running 3 tests
+test explicit_hints_and_other_extrusions_keep_general_search ... FAILED
+test unsupported_cylinder_seeds_fall_back ... ok
+test round_cylinders_match_general_projection ... ok
+
+failures:
+
+---- explicit_hints_and_other_extrusions_keep_general_search stdout ----
+
+thread 'explicit_hints_and_other_extrusions_keep_general_search' (519157) panicked at truck-modeling/tests/cylinder_search.rs:110:21:
+assertion `left == right` failed
+  left: Some((0.4932064926674857, 0.7349172310626113))
+ right: Some((0.49320649266748795, 0.7349172310626114))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    explicit_hints_and_other_extrusions_keep_general_search
+
+test result: FAILED. 2 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p truck-modeling --test cylinder_search`

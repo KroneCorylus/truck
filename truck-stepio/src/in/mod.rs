@@ -23,6 +23,7 @@ pub mod convert;
 pub mod diagnostics;
 /// Geometry parsed from STEP that can be handled by truck
 pub mod step_geometry;
+mod support_domain;
 use step_geometry::*;
 
 /// the exchange structure corresponds to a graph in STEP file

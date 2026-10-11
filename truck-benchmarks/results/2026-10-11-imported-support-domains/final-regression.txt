@@ -1,0 +1,54 @@
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 9.66s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/cylinder_search.rs (target/release/deps/cylinder_search-94058fb52ee4d6b7)
+
+running 3 tests
+test unsupported_cylinder_seeds_fall_back ... ok
+test explicit_hints_and_other_extrusions_keep_general_search ... ok
+test round_cylinders_match_general_projection ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/oblique_conic_extrusion_inclusion.rs (target/release/deps/oblique_conic_extrusion_inclusion-2b9dc3006201e9b1)
+
+running 1 test
+test affine_conic_extrusions_preserve_exact_inclusion_and_bounded_trims ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/imported_support_domains.rs (target/release/deps/imported_support_domains-b3687e7ea3db4612)
+
+running 2 tests
+test native_parabolic_prism_import_has_bounded_consistent_supports ... ok
+test cylindrical_and_oblique_extrusion_imports_cover_the_face_boundaries ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/imported_support_bounds.rs (target/release/deps/imported_support_bounds-b13348f67321254f)
+
+running 2 tests
+test cylinder_step_export_uses_radial_distance_for_axially_shifted_generators ... ok
+test curved_trim_extrema_and_extended_parabola_parameters_are_inside_imported_support ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/io/main.rs (target/release/deps/io-32914bd29946d1cf)
+
+running 11 tests
+test modeling::elliptical_arc_is_written_as_ellipse ... ok
+test modeling::skewed_extrusion_stays_a_linear_extrusion ... ok
+test ioi::surface_curves_read_as_space_curves ... ok
+test oi::oi ... ok
+test ioi::assy_ioi ... ok
+test modeling::cylinder_survives_a_round_trip ... ok
+test modeling::cylinder_is_written_as_cylindrical_surface ... ok
+test modeling::conic_torus_round_trips_with_positive_volume ... ok
+test modeling::revolved_solid_is_written_with_elementary_surfaces ... ok
+test ioi::ioi ... ok
+test modeling::occt_primitives_map_onto_modeling ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+
