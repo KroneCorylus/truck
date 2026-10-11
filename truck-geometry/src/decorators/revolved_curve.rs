@@ -50,11 +50,10 @@ impl Revolution {
         let (p, q) = (p - self.origin, q - self.origin);
         let hp = (p - p.dot(self.axis) * self.axis).normalize();
         let hq = (q - q.dot(self.axis) * self.axis).normalize();
-        let t = f64::acos(f64::clamp(hp.dot(hq), -1.0, 1.0));
-        match hp.cross(hq).dot(self.axis) < 0.0 {
-            false => t,
-            true => 2.0 * PI - t,
-        }
+        hp.cross(hq)
+            .dot(self.axis)
+            .atan2(hp.dot(hq))
+            .rem_euclid(2.0 * PI)
     }
 }
 

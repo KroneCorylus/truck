@@ -1,0 +1,4 @@
+Behavior baseline: d1b2bade; current parent 1a423b92ac8d4df6616f1065adf3e29ff5f1ecfb
+d4b372dd184581265b8055348c612048b9b302031b465439c7adf4ac2c70a3d5  truck-geometry/src/decorators/revolved_curve.rs
+22d6550813adc6a893037e8cea100569abde8e63cf527712e5955ca1f525be67  truck-geometry/tests/revolution_seam_search.rs
+21a26c7a4984ffed956b7e440e1380ccfdbf4b53bd6f3d19cee5197bb2e51bf3  truck-modeling/tests/revolved_surface_inclusion.rs

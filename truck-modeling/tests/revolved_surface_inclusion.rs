@@ -85,3 +85,53 @@ fn singular_revolved_transform_rejects_inclusion_without_panicking() {
     ));
     assert!(!surface.include(&curve));
 }
+
+#[test]
+fn spherical_meridians_remain_included_across_the_periodic_seam() {
+    use std::f64::consts::{PI, TAU};
+    for radius in [1., 150., 1000.] {
+        for azimuth in [0.1, 0.73, PI / 2.] {
+            let radial = Vector3::new(azimuth.cos(), azimuth.sin(), 0.);
+            let meridian = Curve::Conic(Processor::with_transform(
+                TrimmedCurve::new(UnitCircle::new(), (0., PI)),
+                Matrix4::from_cols(
+                    (-radius * Vector3::unit_z()).extend(0.),
+                    (radius * radial).extend(0.),
+                    radial.cross(Vector3::unit_z()).extend(0.),
+                    Point3::origin().to_homogeneous(),
+                ),
+            ));
+            let sphere = Surface::RevolutedCurve(Processor::new(RevolutedCurve::by_revolution(
+                meridian,
+                Point3::origin(),
+                Vector3::unit_z(),
+            )));
+            for shift in [0., TAU] {
+                let boundary = Curve::Conic(Processor::with_transform(
+                    TrimmedCurve::new(UnitCircle::new(), (shift - PI / 3., shift + PI / 3.)),
+                    Matrix4::from_cols(
+                        (radius * radial).extend(0.),
+                        (radius * Vector3::unit_z()).extend(0.),
+                        radial.cross(Vector3::unit_z()).extend(0.),
+                        Point3::origin().to_homogeneous(),
+                    ),
+                ));
+                for transform in [
+                    Matrix4::identity(),
+                    Matrix4::from_translation(Vector3::new(13., -7., 23.))
+                        * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.73)),
+                ] {
+                    let curve = boundary.transformed(transform);
+                    let surface = sphere.transformed(transform);
+                    assert!(
+                        surface.include(&curve),
+                        "radius={radius}, azimuth={azimuth}, shift={shift}"
+                    );
+                    assert!(surface.inverse().include(&curve.inverse()));
+                    let off_surface = boundary.transformed(transform * Matrix4::from_scale(1.001));
+                    assert!(!surface.include(&off_surface));
+                }
+            }
+        }
+    }
+}

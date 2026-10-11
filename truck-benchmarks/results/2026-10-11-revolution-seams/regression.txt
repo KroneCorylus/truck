@@ -1,0 +1,9 @@
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.46s
+     Running tests/revolution_seam_search.rs (target/debug/deps/revolution_seam_search-578744836f4acc9a)
+
+running 1 test
+test revolution_search_resolves_small_angles_at_the_seam_and_antipode ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

@@ -6,6 +6,8 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Recover revolution angles with signed `atan2`, preserving point-search accuracy near the periodic seam and opposite meridian. Exact spherical boundary curves no longer fail inclusion from inverse-cosine cancellation; regressions cover small angular offsets, multiple radii, shifted curve domains, reversed orientations and rigid transforms.
+
 - Allow a planar-ended fillet radius to exceed its straight spine length when the trimmed patch fits the convex body. Validate the positive-weight rational control hull against every input plane instead of requiring the entire rolling ball to fit between end planes. Thin prisms with perpendicular/oblique caps retain exact radius, normals, volume, history, closed meshes and STEP, including rigid transforms and immutable oversized rejection.
 
 - Validate revolved-surface boundaries in the stored surface coordinate system, preserving valid translated, rotated, scaled and sheared geometry and rejecting singular transforms and wrong-frame curves. Keep fillet and chamfer contact parameters continuous across periodic seams, including full-turn fillet fitting. Cone-rim regressions cover analytic/NURBS supports, both draft directions, reversed wires, rigid transforms and cavity orientation with independent dimensions, volume, closed meshes, history and STEP.
