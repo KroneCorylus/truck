@@ -1,0 +1,11 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.47s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/fillet_edges.rs (target/debug/deps/fillet_edges-36b12d4f9289b7d1)
+
+running 1 test
+test all_pyramid_edges_with_four_edge_spherical_vertex ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.18s
+

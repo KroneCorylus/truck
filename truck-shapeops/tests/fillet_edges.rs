@@ -76,7 +76,7 @@ fn all_twelve_box_edges() {
 }
 
 #[test]
-fn unblendable_four_edge_vertex() {
+fn all_pyramid_edges_with_four_edge_spherical_vertex() {
     use truck_modeling::{builder, Edge as ModelingEdge, Wire as ModelingWire};
     let points = [
         Point3::new(0.0, 0.0, 0.0),
@@ -116,7 +116,22 @@ fn unblendable_four_edge_vertex() {
     assert_solid(&original, 8.0 / 3.0, &[0], TOL);
     let shell = &original.boundaries()[0];
     let before: Vec<_> = shell.vertex_iter().map(|v| v.point()).collect();
-    assert!(fillet_edges(shell, &edge_ids(shell), 0.1, TOL).is_none());
+    let radius: f64 = 0.1;
+    let result = fillet_edges(shell, &edge_ids(shell), radius, TOL).unwrap();
+    assert_eq!(result.len(), 18);
+    assert_tangent(&result);
+    // Steiner volume of the radius-r parallel body of the inset pyramid.
+    let area = 4. + 4. * 5.0_f64.sqrt();
+    let scale = 1. - radius * area / 8.;
+    let mean_curvature = 4. * (-1. / 5.0_f64.sqrt()).acos() + 2. * 6.0_f64.sqrt() * 0.2_f64.acos();
+    let volume = 8. / 3. * scale.powi(3)
+        + radius * area * scale.powi(2)
+        + radius.powi(2) * scale * mean_curvature
+        + 4. * PI * radius.powi(3) / 3.;
+    let result = Solid::new(vec![result]);
+    assert!(result.is_geometric_consistent());
+    assert_solid(&result, volume, &[0], TOL);
+    assert_step(&result, volume, TOL);
     assert_eq!(
         before,
         shell.vertex_iter().map(|v| v.point()).collect::<Vec<_>>()

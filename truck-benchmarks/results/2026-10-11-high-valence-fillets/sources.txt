@@ -1,0 +1,11 @@
+{
+  "parent": "d0c7a3bf24cded320b5540406d50fab7f2e990d3",
+  "sha256": {
+    "truck-shapeops/src/fillet/edges.rs": "9be8ff85999bc28e0a4db1c8d62c1d4ee0b170df6a6c480a7e7e6c2a786afbb2",
+    "truck-shapeops/src/fillet/modeling.rs": "92ebc4074ab386e0773596cc2863b3a32be2536d06f5bc23a43549e7a54899dd",
+    "truck-shapeops/tests/high_valence_fillets.rs": "c46b58b52c1606a0d98b3e235eb243c86280bdb8a67a633427f39fb19e67ea26",
+    "truck-shapeops/tests/fillet_edges.rs": "d6168e153d230ecc33993bcf89fe85bb1854c53e3bbea7fbdfa6df5a1ed1f6a0",
+    "truck-shapeops/tests/HIGH_VALENCE.md": "aeb6ad3eb9d119a19d4864256b1738af4b225d10cefbbbf27c36718c9908dbca",
+    "audits/fillet-chamfer/probes/high_valence_fillets.cpp": "e60680bc3eea2a9e1f3c227e65b00161d08dfd3a9f31c74377e0352a4f603e2a"
+  }
+}

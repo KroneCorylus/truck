@@ -4,7 +4,8 @@ use std::result::Result;
 use truck_base::diagnostics::{validate_tolerance, Code, Diagnostic};
 
 /// Fillets selected straight edges of a closed convex planar shell at a common radius.
-/// Three selected edges at a vertex receive an exact spherical corner; one selected edge
+/// All selected edges at a vertex receive an exact spherical corner when their supporting
+/// planes share an inward offset center (always for three independent planes). One selected edge
 /// ends on the remaining plane with an exact elliptical intersection. Two selected
 /// right-angle edges sharing a plane meet along an exact elliptical miter, including
 /// oblique outline corners: the rounds are tangent to their supporting planes,
@@ -13,7 +14,7 @@ use truck_base::diagnostics::{validate_tolerance, Code, Diagnostic};
 /// curved faces, concave shells and radii that collapse an edge return `None`. Input topology
 /// and geometry are not modified. Planarity and straightness are checked at sampled points.
 ///
-/// Planar contact faces, rational cylindrical fillets and spherical triangles are exact.
+/// Planar contact faces, rational cylindrical fillets and spherical corner patches are exact.
 /// `tol` is the geometric validation tolerance; the tessellated Steiner-volume error is
 /// bounded separately by the tessellation tolerance times the curved area.
 pub fn fillet_edges<C, S>(
@@ -116,7 +117,7 @@ where
                     .ok_or_else(failed)?;
                 terminations[i] = Some(planes[face]);
             }
-            (3, 3, 3) => {}
+            (n, edges, faces) if n >= 3 && n == edges && n == faces => {}
             (2, 3, 3) => {
                 let shared = sides[chosen[0]]
                     .into_iter()
@@ -156,13 +157,31 @@ where
             }
             _ => return Err(error(Code::UnsupportedTopology)),
         }
-        let center = Point3::from_vec(
-            Matrix3::from_cols(equations[0].0, equations[1].0, equations[2].0)
-                .transpose()
-                .invert()
-                .ok_or_else(failed)?
-                * Vector3::new(equations[0].1, equations[1].1, equations[2].1),
-        );
+        let center = if equations.len() > 3 {
+            let mut matrix = Matrix3::zero();
+            let mut rhs = Vector3::zero();
+            for &(normal, distance) in &equations {
+                matrix +=
+                    Matrix3::from_cols(normal * normal.x, normal * normal.y, normal * normal.z);
+                rhs += normal * (distance - normal.dot(vertex.point().to_vec()));
+            }
+            let center = vertex.point() + matrix.invert().ok_or_else(failed)? * rhs;
+            if equations
+                .iter()
+                .any(|&(n, d)| (n.dot(center.to_vec()) - d).abs() > tol.min(TOLERANCE))
+            {
+                return Err(error(Code::UnsupportedGeometry));
+            }
+            center
+        } else {
+            Point3::from_vec(
+                Matrix3::from_cols(equations[0].0, equations[1].0, equations[2].0)
+                    .transpose()
+                    .invert()
+                    .ok_or_else(failed)?
+                    * Vector3::new(equations[0].1, equations[1].1, equations[2].1),
+            )
+        };
         for (f, &(n, d)) in planes.iter().enumerate() {
             let offset = if faces.contains(&f) && !touched.contains(&f) {
                 0.0
@@ -358,7 +377,7 @@ where
     }
     result.extend(fillets);
     for (v, vertex) in vertices.iter().enumerate() {
-        if contacts[v].len() != 3 || miters[v].is_some() {
+        if contacts[v].len() < 3 || miters[v].is_some() {
             continue;
         }
         let mut remaining: Vec<_> = incident[v]
@@ -382,12 +401,16 @@ where
             boundary.push_back(remaining.remove(i));
         }
         let normals: Vec<_> = contacts[v].keys().map(|&f| planes[f].0).collect();
-        let y = (Matrix3::from_cols(normals[0], normals[1], normals[2])
-            .transpose()
-            .invert()
-            .ok_or_else(failed)?
-            * Vector3::new(1.0, 1.0, 1.0))
-        .normalize();
+        let y = if normals.len() > 3 {
+            (vertex.point() - centers[v]).normalize()
+        } else {
+            (Matrix3::from_cols(normals[0], normals[1], normals[2])
+                .transpose()
+                .invert()
+                .ok_or_else(failed)?
+                * Vector3::new(1.0, 1.0, 1.0))
+            .normalize()
+        };
         let z = normals[0].cross(y).normalize();
         let x = y.cross(z);
         let transform = Matrix4::from_cols(

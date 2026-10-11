@@ -6,6 +6,8 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Support exact spherical fillet corners at convex vertices with four or more selected edges when all inward-offset support planes share a center. Check every plane before accepting the center. Four-, five-, six- and eight-edge pyramids have independent analytic-volume, G1 contact, topology, closed mesh, transform, selection-order, STEP and downstream Boolean regressions; incompatible offsets and excessive radii preserve the input on failure. General asymmetric and partially selected junctions remain outside this construction.
+
 - Verify existing square-pyramid chamfers with one through four selected ridges at the apex. Replace the outdated unsupported-chamfer expectation with independent setback planes, analytic volumes, convexity, history, transformed/reversed selections and STEP round trips; retain the unsupported four-edge fillet diagnostic. Construction behavior and diagnostic codes are unchanged.
 
 - Normalize longitudinal fillet parameters during STEP fitting, so short and shifted domains can export at the requested geometric tolerance. `ApproxFilletSurface::try_vknot_normalize` preserves the geometry and rejects invalid knot ranges without mutation. The former no-panic regression now requires successful, closed STEP round trips with analytic volume and sampled surface accuracy at parameter scales `1e-9` and `1e9`, including rigid transforms and model scaling. See `truck-benchmarks/results/2026-10-10-fillet-parameter-domains/REPORT.md` for validation and export timings.

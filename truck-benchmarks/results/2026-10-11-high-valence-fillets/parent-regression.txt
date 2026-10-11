@@ -1,0 +1,21 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.64s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/high_valence_fillets.rs (target/debug/deps/high_valence_fillets-781a8ed17a4405a1)
+
+running 1 test
+
+thread 'equal_radius_fillets_share_high_valence_spherical_corners' (88764) panicked at truck-shapeops/tests/high_valence_fillets.rs:89:41:
+count=4, radius=0.2: Diagnostic { code: UnsupportedTopology, operation: "fillet_solid_edges", stage: "validate_input", message: "The topology is outside the supported scope of this operation.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test equal_radius_fillets_share_high_valence_spherical_corners ... FAILED
+
+failures:
+
+failures:
+    equal_radius_fillets_share_high_valence_spherical_corners
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-shapeops --test high_valence_fillets`
