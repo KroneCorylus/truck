@@ -53,3 +53,36 @@ face history, reversed selections, rigid transforms, immutable input and STEP ro
 The OCCT probe does not establish its mesh, STEP, transformed-input or downstream-edit
 behavior, nor does it establish parity of corner continuity. General high-valence fillets
 and alternative chamfer corner transitions remain open audit work.
+
+## High-valence fillets
+
+`high_valence_fillets.cpp` constructs regular pyramids with 4, 5, 6 and 8 sides,
+apothem 5 and height 10, and selects all apex ridges at radius 0.2 or 1.2. Build it
+with the command above, substituting `high_valence_fillets` for `pyramid_chamfers`
+in the source and output names. Recorded output is `high_valence_fillets_occt.txt`.
+Each input is checked for native validity and independent volume, and copied for
+each operation. Each successful result records native validity, solid/face counts,
+integrated volume and whether it contains the expected analytic sphere.
+
+Truck now supports an exact spherical corner on all eight tasks. Its tests also
+repeat them after a rigid transform, measure G1 contact and validate topology,
+mesh closure, STEP, order independence and input preservation. Two cases cut through
+the actual spherical corner and round-trip the cut through STEP. The independent
+volume derivation is in `truck-shapeops/tests/HIGH_VALENCE.md`.
+
+OCCT 7.9.3 also returns valid single solids on all eight tasks, with matching face
+counts, but its corner patches are not analytic spheres. Their integrated volumes
+differ from the spherical construction:
+
+| Ridges | Truck volume, r=1.2 | OCCT volume, r=1.2 |
+| --- | ---: | ---: |
+| 4 | 324.091282504 | 324.133589302 |
+| 5 | 296.800583654 | 296.953082926 |
+| 6 | 284.324800437 | 284.555630102 |
+| 8 | 273.227060569 | 273.557929759 |
+
+`matches_spherical_volume=false` records that geometric difference; it does not
+mean either result is invalid. The paired probe establishes successful native
+operations for these dimensions, not identical corner geometry or full continuity,
+mesh, STEP or downstream-edit equivalence. Partially selected corners, inconsistent
+offset planes, unequal radii and general curved corner filling remain open.

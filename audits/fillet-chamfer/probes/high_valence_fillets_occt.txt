@@ -1,0 +1,9 @@
+OCCT 7.9.3
+ridges=4 radius=0.2 done=true valid=1 solids=1 faces=10 matching_spheres=0 volume=333.075551270606 spherical_corner_volume=333.075354503938 matches_spherical_volume=0
+ridges=4 radius=1.2 done=true valid=1 solids=1 faces=10 matching_spheres=0 volume=324.133589301546 spherical_corner_volume=324.091282504417 matches_spherical_volume=0
+ridges=5 radius=0.2 done=true valid=1 solids=1 faces=12 matching_spheres=0 volume=302.573012787583 spherical_corner_volume=302.572325872906 matches_spherical_volume=0
+ridges=5 radius=1.2 done=true valid=1 solids=1 faces=12 matching_spheres=0 volume=296.953082926354 spherical_corner_volume=296.800583653664 matches_spherical_volume=0
+ridges=6 radius=0.2 done=true valid=1 solids=1 faces=14 matching_spheres=0 volume=288.572109982918 spherical_corner_volume=288.571041907982 matches_spherical_volume=0
+ridges=6 radius=1.2 done=true valid=1 solids=1 faces=14 matching_spheres=0 volume=284.555630101942 spherical_corner_volume=284.324800437267 matches_spherical_volume=0
+ridges=8 radius=0.2 done=true valid=1 solids=1 faces=18 matching_spheres=0 volume=276.085090763 spherical_corner_volume=276.083573590445 matches_spherical_volume=0
+ridges=8 radius=1.2 done=true valid=1 solids=1 faces=18 matching_spheres=0 volume=273.557929759168 spherical_corner_volume=273.227060569129 matches_spherical_volume=0

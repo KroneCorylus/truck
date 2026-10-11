@@ -7,7 +7,7 @@
       "tracked_changes": "M src/BOPAlgo/BOPAlgo_PaveFiller.cxx\n M src/BRepAlgoAPI/BRepAlgoAPI_BuilderAlgo.cxx\n M src/IntTools/IntTools_FaceFace.cxx"
     },
     "truck": {
-      "revision": "2a2906641b2443cd944429f5ed0b49e7589e57ed",
+      "revision": "b1cf28f920b080a9215403d417d9782ca3d0fc55",
       "revision_scope": "Latest commit outside audits/fillet-chamfer; audit-only commits do not change the kernel baseline.",
       "tracked_changes_in_modeling": ""
     },
@@ -173,9 +173,9 @@
           "path": "truck-shapeops/src/fillet/modeling.rs",
           "find": "pub fn fillet_solid_edges",
           "role": "implementation",
-          "line": 139,
-          "url": "../../truck-shapeops/src/fillet/modeling.rs#L139",
-          "sha256": "7336e64f0c44bf44be1e80f32ba0f83e98c619867ba0c176a498dae5c34f9528"
+          "line": 142,
+          "url": "../../truck-shapeops/src/fillet/modeling.rs#L142",
+          "sha256": "92ebc4074ab386e0773596cc2863b3a32be2536d06f5bc23a43549e7a54899dd"
         },
         {
           "repo": "truck",
@@ -184,7 +184,7 @@
           "role": "test",
           "line": 61,
           "url": "../../truck-shapeops/tests/fillet_edges.rs#L61",
-          "sha256": "88ff2fb50c3402e9bad86261307aa938b0ce5277302f2c69ac3c9fdc0de4bf10"
+          "sha256": "d6168e153d230ecc33993bcf89fe85bb1854c53e3bbea7fbdfa6df5a1ed1f6a0"
         },
         {
           "repo": "truck",
@@ -284,9 +284,9 @@
           "path": "truck-shapeops/src/fillet/modeling.rs",
           "find": "pub fn fillet_solid_edges",
           "role": "implementation",
-          "line": 139,
-          "url": "../../truck-shapeops/src/fillet/modeling.rs#L139",
-          "sha256": "7336e64f0c44bf44be1e80f32ba0f83e98c619867ba0c176a498dae5c34f9528"
+          "line": 142,
+          "url": "../../truck-shapeops/src/fillet/modeling.rs#L142",
+          "sha256": "92ebc4074ab386e0773596cc2863b3a32be2536d06f5bc23a43549e7a54899dd"
         }
       ],
       "required_outcome": "Create a valid joined corner where incident edge fillets have different specified radii, with the intended contacts and continuity."
@@ -361,14 +361,14 @@
     {
       "id": "F06",
       "title": "Smoothness within and between blend surfaces",
-      "truck_status": "unverified",
+      "truck_status": "partial",
       "priority": "P3",
       "tags": [
         "tangent"
       ],
       "occt_scope": "Configurable internal C0/C1/C2 and support angular tolerance; this is not a promise of G2 support-face blending.",
-      "truck_scope": "Truck has construction-specific smoothness contracts, including deliberately creased two-edge miters. Lack of a continuity-setting method does not establish a gap; evaluate the smoothness required for each result.",
-      "next_case": "Choose a corner or chain with a specified smoothness requirement, then measure internal joins and support-face tangency separately in each output.",
+      "truck_scope": "Exact spherical corners now have sampled G1 normal agreement with adjacent cylindrical fillets at four-, five-, six- and eight-edge vertices. Two-edge miter constructions deliberately retain a crease. Required smoothness on general corner patches and curved chains remains unverified.",
+      "next_case": "Measure continuity in paired partially selected and asymmetric corner cases. Distinguish smooth joins between fillets from tangency to supporting faces; do not infer G2 support contact from OCCT continuity settings.",
       "evidence": [
         {
           "repo": "occt",
@@ -384,9 +384,18 @@
           "path": "truck-shapeops/src/fillet/edges.rs",
           "find": "but meet with a crease",
           "role": "implementation",
-          "line": 11,
-          "url": "../../truck-shapeops/src/fillet/edges.rs#L11",
-          "sha256": "db6484b9d3f9bb2c65e31afef3ace560f79c88d90d551f5010e383fafc57af39"
+          "line": 12,
+          "url": "../../truck-shapeops/src/fillet/edges.rs#L12",
+          "sha256": "9be8ff85999bc28e0a4db1c8d62c1d4ee0b170df6a6c480a7e7e6c2a786afbb2"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/high_valence_fillets.rs",
+          "find": "G1 spherical/cylindrical contact",
+          "role": "test",
+          "line": 129,
+          "url": "../../truck-shapeops/tests/high_valence_fillets.rs#L129",
+          "sha256": "c46b58b52c1606a0d98b3e235eb243c86280bdb8a67a633427f39fb19e67ea26"
         }
       ],
       "required_outcome": "Achieve the required smoothness within blend surfaces and across their joins; distinguish that from tangency to the support faces."
@@ -418,9 +427,9 @@
           "path": "truck-shapeops/src/fillet/modeling.rs",
           "find": "pub fn chamfer_solid_edges",
           "role": "implementation",
-          "line": 237,
-          "url": "../../truck-shapeops/src/fillet/modeling.rs#L237",
-          "sha256": "7336e64f0c44bf44be1e80f32ba0f83e98c619867ba0c176a498dae5c34f9528"
+          "line": 240,
+          "url": "../../truck-shapeops/src/fillet/modeling.rs#L240",
+          "sha256": "92ebc4074ab386e0773596cc2863b3a32be2536d06f5bc23a43549e7a54899dd"
         },
         {
           "repo": "truck",
@@ -460,9 +469,9 @@
           "path": "truck-shapeops/src/fillet/modeling.rs",
           "find": "pub fn try_chamfer_solid_edges_with_distances",
           "role": "implementation",
-          "line": 303,
-          "url": "../../truck-shapeops/src/fillet/modeling.rs#L303",
-          "sha256": "7336e64f0c44bf44be1e80f32ba0f83e98c619867ba0c176a498dae5c34f9528"
+          "line": 306,
+          "url": "../../truck-shapeops/src/fillet/modeling.rs#L306",
+          "sha256": "92ebc4074ab386e0773596cc2863b3a32be2536d06f5bc23a43549e7a54899dd"
         },
         {
           "repo": "truck",
@@ -511,9 +520,9 @@
           "path": "truck-shapeops/src/fillet/modeling.rs",
           "find": "pub fn try_chamfer_solid_edges_with_distances",
           "role": "implementation",
-          "line": 303,
-          "url": "../../truck-shapeops/src/fillet/modeling.rs#L303",
-          "sha256": "7336e64f0c44bf44be1e80f32ba0f83e98c619867ba0c176a498dae5c34f9528"
+          "line": 306,
+          "url": "../../truck-shapeops/src/fillet/modeling.rs#L306",
+          "sha256": "92ebc4074ab386e0773596cc2863b3a32be2536d06f5bc23a43549e7a54899dd"
         },
         {
           "repo": "app",
@@ -553,9 +562,9 @@
           "path": "truck-shapeops/src/fillet/modeling.rs",
           "find": "pub fn chamfer_solid_edges",
           "role": "implementation",
-          "line": 237,
-          "url": "../../truck-shapeops/src/fillet/modeling.rs#L237",
-          "sha256": "7336e64f0c44bf44be1e80f32ba0f83e98c619867ba0c176a498dae5c34f9528"
+          "line": 240,
+          "url": "../../truck-shapeops/src/fillet/modeling.rs#L240",
+          "sha256": "92ebc4074ab386e0773596cc2863b3a32be2536d06f5bc23a43549e7a54899dd"
         }
       ],
       "required_outcome": "Produce a chamfer whose normal sections maintain the requested throat dimension along the selected edge."
@@ -586,9 +595,9 @@
           "path": "truck-shapeops/src/fillet/modeling.rs",
           "find": "pub fn chamfer_solid_edges",
           "role": "implementation",
-          "line": 237,
-          "url": "../../truck-shapeops/src/fillet/modeling.rs#L237",
-          "sha256": "7336e64f0c44bf44be1e80f32ba0f83e98c619867ba0c176a498dae5c34f9528"
+          "line": 240,
+          "url": "../../truck-shapeops/src/fillet/modeling.rs#L240",
+          "sha256": "92ebc4074ab386e0773596cc2863b3a32be2536d06f5bc23a43549e7a54899dd"
         }
       ],
       "required_outcome": "Produce the requested constant-throat chamfer with penetration, satisfying both the throat and offset-support constraints."
@@ -1151,7 +1160,7 @@
           "role": "implementation",
           "line": 55,
           "url": "../../truck-shapeops/src/fillet/modeling.rs#L55",
-          "sha256": "7336e64f0c44bf44be1e80f32ba0f83e98c619867ba0c176a498dae5c34f9528"
+          "sha256": "92ebc4074ab386e0773596cc2863b3a32be2536d06f5bc23a43549e7a54899dd"
         }
       ],
       "required_outcome": "Blend open-shell edges and terminate correctly on free boundaries for surface-modeling tasks."
@@ -1267,9 +1276,9 @@
           "path": "truck-shapeops/tests/fillet_edges.rs",
           "find": "fn rounded_tetrahedron",
           "role": "test",
-          "line": 209,
-          "url": "../../truck-shapeops/tests/fillet_edges.rs#L209",
-          "sha256": "88ff2fb50c3402e9bad86261307aa938b0ce5277302f2c69ac3c9fdc0de4bf10"
+          "line": 224,
+          "url": "../../truck-shapeops/tests/fillet_edges.rs#L224",
+          "sha256": "d6168e153d230ecc33993bcf89fe85bb1854c53e3bbea7fbdfa6df5a1ed1f6a0"
         },
         {
           "repo": "truck",
@@ -1318,9 +1327,9 @@
           "path": "truck-shapeops/src/fillet/edges.rs",
           "find": "but meet with a crease",
           "role": "implementation",
-          "line": 11,
-          "url": "../../truck-shapeops/src/fillet/edges.rs#L11",
-          "sha256": "db6484b9d3f9bb2c65e31afef3ace560f79c88d90d551f5010e383fafc57af39"
+          "line": 12,
+          "url": "../../truck-shapeops/src/fillet/edges.rs#L12",
+          "sha256": "9be8ff85999bc28e0a4db1c8d62c1d4ee0b170df6a6c480a7e7e6c2a786afbb2"
         },
         {
           "repo": "truck",
@@ -1400,8 +1409,8 @@
         "chamfer"
       ],
       "occt_scope": "General n-corner construction exists, with documented and implementation limitations. An independent OCCT 7.9.3 pyramid chamfer probe succeeds for one through four selected ridges, including the opposite pair, but constructs different corner geometry for adjacent selections.",
-      "truck_scope": "The equal-radius multi-edge fillet path rejects general high-valence corners. The solid-level planar intersection fallback already chamfers a square pyramid with one through four selected ridges, including opposite pairs. These are valid mitered bevels; OCCT adds a corner face in adjacent, three- and four-ridge cases. Single-fillet high-valence termination is a separate supported case.",
-      "next_case": "Investigate the extra corner-transition geometry produced by OCCT for adjacent pyramid chamfers, comparing continuity and local geometry rather than API signatures. Retain pyramid fillets as an open gap. Extend chamfers to skewed pyramids, five or more incident edges, unequal setbacks and mixed concavity.",
+      "truck_scope": "Convex planar vertices with all incident edges selected now support exact equal-radius spherical corners when their inward-offset planes share one center; four-, five-, six- and eight-edge pyramids are tested. Inconsistent offsets and partially selected high-valence fillets remain unsupported. Pyramid chamfers with one through four selected ridges, including opposite pairs, use valid mitered bevels. OCCT uses different curved corner patches on the paired adjacent-chamfer and all-ridge-fillet fixtures.",
+      "next_case": "Generalize corner transitions beyond a common spherical center, starting with a rectangular pyramid and partially selected ridges. Investigate required continuity of OCCT corner patches, then extend to unequal radii, curved supports and mixed concavity.",
       "evidence": [
         {
           "repo": "occt",
@@ -1415,11 +1424,11 @@
         {
           "repo": "truck",
           "path": "truck-shapeops/tests/fillet_edges.rs",
-          "find": "fn unblendable_four_edge_vertex",
+          "find": "fn all_pyramid_edges_with_four_edge_spherical_vertex",
           "role": "test",
           "line": 79,
           "url": "../../truck-shapeops/tests/fillet_edges.rs#L79",
-          "sha256": "88ff2fb50c3402e9bad86261307aa938b0ce5277302f2c69ac3c9fdc0de4bf10"
+          "sha256": "d6168e153d230ecc33993bcf89fe85bb1854c53e3bbea7fbdfa6df5a1ed1f6a0"
         },
         {
           "repo": "truck",
@@ -1456,12 +1465,50 @@
           "line": 1,
           "url": "probes/pyramid_chamfers_occt.txt#L1",
           "sha256": "de913c7ac6da75e2462d4cfc5ab548fb80497b8bec05dfcaacc8fd0a6b687be9"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/high_valence_fillets.rs",
+          "find": "fn equal_radius_fillets_share_high_valence_spherical_corners",
+          "role": "test",
+          "line": 73,
+          "url": "../../truck-shapeops/tests/high_valence_fillets.rs#L73",
+          "sha256": "c46b58b52c1606a0d98b3e235eb243c86280bdb8a67a633427f39fb19e67ea26"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/HIGH_VALENCE.md",
+          "find": "## Independent volume",
+          "role": "test",
+          "line": 26,
+          "url": "../../truck-shapeops/tests/HIGH_VALENCE.md#L26",
+          "sha256": "aeb6ad3eb9d119a19d4864256b1738af4b225d10cefbbbf27c36718c9908dbca"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/probes/high_valence_fillets.cpp",
+          "find": "int main()",
+          "role": "reference-probe",
+          "line": 43,
+          "url": "probes/high_valence_fillets.cpp#L43",
+          "sha256": "e60680bc3eea2a9e1f3c227e65b00161d08dfd3a9f31c74377e0352a4f603e2a"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/probes/high_valence_fillets_occt.txt",
+          "find": "OCCT 7.9.3",
+          "role": "reference-result",
+          "line": 1,
+          "url": "probes/high_valence_fillets_occt.txt#L1",
+          "sha256": "72d4bcd4415da085717f69f507e4cf31a12f79535bd297663b5394dfb1f04801"
         }
       ],
       "required_outcome": "Join four or more interacting blends at a vertex when the requested configuration has a valid solution.",
       "verification": [
         "One through four pyramid ridges, including both adjacent and opposite pairs, pass for setbacks 0.2 and 1.2 before/after rigid transforms, with independent bevel-plane equations, integrated analytic volume, closed topology and mesh, convexity, face history, reversed selection order, immutable input and STEP. The old UnsupportedTopology chamfer assertion failed because construction already succeeded; it is replaced by the stronger valid-solid contract, retaining the unsupported fillet diagnostic. No construction or diagnostic code changed. Derivations are in truck-shapeops/tests/R11.md.",
-        "Independent paired probe: installed OCCT 7.9.3 produces valid single solids with the requested bevel planes in all ten pyramid cases. Single-ridge and opposite-pair volumes match the analytic Truck miter construction; adjacent, three- and four-ridge cases add a face and remove extra material. This records a corner-geometry difference, not an invalid OCCT output or absence of Truck chamfer support. See audits/fillet-chamfer/probes/README.md. The 1,026 inventoried upstream cases remain unexecuted."
+        "Independent paired probe: installed OCCT 7.9.3 produces valid single solids with the requested bevel planes in all ten pyramid cases. Single-ridge and opposite-pair volumes match the analytic Truck miter construction; adjacent, three- and four-ridge cases add a face and remove extra material. This records a corner-geometry difference, not an invalid OCCT output or absence of Truck chamfer support. See audits/fillet-chamfer/probes/README.md. The 1,026 inventoried upstream cases remain unexecuted.",
+        "Equal-radius ridge fillets pass on regular pyramids with 4, 5, 6 and 8 sides at radii 0.2 and 1.2, before/after rigid transforms. Checks include exact independent volume, geometric consistency, topology, mesh closure, requested sphere radius/center, G1 contact, selection-order independence, face-history counts, immutable input, STEP, and cuts through a four-edge spherical corner. All eight edges of a square pyramid also pass with a separate Steiner-volume reference. The original all-edge rejection test now asserts the stronger supported contract. Incompatible offset planes and excessive radii return diagnostics without input changes.",
+        "Independent OCCT 7.9.3 probe succeeds with valid single solids in all eight regular-pyramid fillet cases. Its corner patches are not analytic spheres and integrated volumes differ from the exact spherical construction. This establishes shared task support within the tested dimensions, not identical corner geometry or complete continuity/robustness parity. The 1,026 inventoried upstream cases remain unexecuted."
       ]
     },
     {
@@ -1500,9 +1547,9 @@
           "path": "truck-shapeops/src/fillet/modeling.rs",
           "find": "Other mixed junctions",
           "role": "implementation",
-          "line": 122,
-          "url": "../../truck-shapeops/src/fillet/modeling.rs#L122",
-          "sha256": "7336e64f0c44bf44be1e80f32ba0f83e98c619867ba0c176a498dae5c34f9528"
+          "line": 125,
+          "url": "../../truck-shapeops/src/fillet/modeling.rs#L125",
+          "sha256": "92ebc4074ab386e0773596cc2863b3a32be2536d06f5bc23a43549e7a54899dd"
         }
       ],
       "required_outcome": "Close multi-blend corners on general curved supports with valid contact and continuity, independent of patch construction method."
@@ -1576,9 +1623,9 @@
           "path": "truck-shapeops/src/fillet/modeling.rs",
           "find": "Sizes that remove an original face",
           "role": "implementation",
-          "line": 230,
-          "url": "../../truck-shapeops/src/fillet/modeling.rs#L230",
-          "sha256": "7336e64f0c44bf44be1e80f32ba0f83e98c619867ba0c176a498dae5c34f9528"
+          "line": 233,
+          "url": "../../truck-shapeops/src/fillet/modeling.rs#L233",
+          "sha256": "92ebc4074ab386e0773596cc2863b3a32be2536d06f5bc23a43549e7a54899dd"
         },
         {
           "repo": "truck",
@@ -1618,9 +1665,9 @@
           "path": "truck-shapeops/src/fillet/modeling.rs",
           "find": "an unselected edge, or a bevel contact",
           "role": "implementation",
-          "line": 230,
-          "url": "../../truck-shapeops/src/fillet/modeling.rs#L230",
-          "sha256": "7336e64f0c44bf44be1e80f32ba0f83e98c619867ba0c176a498dae5c34f9528"
+          "line": 233,
+          "url": "../../truck-shapeops/src/fillet/modeling.rs#L233",
+          "sha256": "92ebc4074ab386e0773596cc2863b3a32be2536d06f5bc23a43549e7a54899dd"
         },
         {
           "repo": "truck",
@@ -1704,9 +1751,9 @@
           "path": "truck-shapeops/src/fillet/modeling.rs",
           "find": "avoid holes within twice",
           "role": "implementation",
-          "line": 123,
-          "url": "../../truck-shapeops/src/fillet/modeling.rs#L123",
-          "sha256": "7336e64f0c44bf44be1e80f32ba0f83e98c619867ba0c176a498dae5c34f9528"
+          "line": 126,
+          "url": "../../truck-shapeops/src/fillet/modeling.rs#L126",
+          "sha256": "92ebc4074ab386e0773596cc2863b3a32be2536d06f5bc23a43549e7a54899dd"
         },
         {
           "repo": "truck",
@@ -1923,7 +1970,7 @@
           "role": "implementation",
           "line": 39,
           "url": "../../truck-shapeops/src/fillet/modeling.rs#L39",
-          "sha256": "7336e64f0c44bf44be1e80f32ba0f83e98c619867ba0c176a498dae5c34f9528"
+          "sha256": "92ebc4074ab386e0773596cc2863b3a32be2536d06f5bc23a43549e7a54899dd"
         },
         {
           "repo": "truck",
@@ -2181,7 +2228,7 @@
           "role": "implementation",
           "line": 13,
           "url": "../../truck-shapeops/src/fillet/modeling.rs#L13",
-          "sha256": "7336e64f0c44bf44be1e80f32ba0f83e98c619867ba0c176a498dae5c34f9528"
+          "sha256": "92ebc4074ab386e0773596cc2863b3a32be2536d06f5bc23a43549e7a54899dd"
         },
         {
           "repo": "app",
@@ -2359,9 +2406,9 @@
           "path": "truck-shapeops/src/fillet/modeling.rs",
           "find": "map_err(|_| error)",
           "role": "implementation",
-          "line": 209,
-          "url": "../../truck-shapeops/src/fillet/modeling.rs#L209",
-          "sha256": "7336e64f0c44bf44be1e80f32ba0f83e98c619867ba0c176a498dae5c34f9528"
+          "line": 212,
+          "url": "../../truck-shapeops/src/fillet/modeling.rs#L212",
+          "sha256": "92ebc4074ab386e0773596cc2863b3a32be2536d06f5bc23a43549e7a54899dd"
         }
       ],
       "required_outcome": "Explain failed selections and stages clearly, preserve the model and allow the user to correct or retry a failed blend."

@@ -254,14 +254,14 @@
     {
       "id": "F06",
       "title": "Smoothness within and between blend surfaces",
-      "truck_status": "unverified",
+      "truck_status": "partial",
       "priority": "P3",
       "tags": [
         "tangent"
       ],
       "occt_scope": "Configurable internal C0/C1/C2 and support angular tolerance; this is not a promise of G2 support-face blending.",
-      "truck_scope": "Truck has construction-specific smoothness contracts, including deliberately creased two-edge miters. Lack of a continuity-setting method does not establish a gap; evaluate the smoothness required for each result.",
-      "next_case": "Choose a corner or chain with a specified smoothness requirement, then measure internal joins and support-face tangency separately in each output.",
+      "truck_scope": "Exact spherical corners now have sampled G1 normal agreement with adjacent cylindrical fillets at four-, five-, six- and eight-edge vertices. Two-edge miter constructions deliberately retain a crease. Required smoothness on general corner patches and curved chains remains unverified.",
+      "next_case": "Measure continuity in paired partially selected and asymmetric corner cases. Distinguish smooth joins between fillets from tangency to supporting faces; do not infer G2 support contact from OCCT continuity settings.",
       "evidence": [
         {
           "repo": "occt",
@@ -274,6 +274,12 @@
           "path": "truck-shapeops/src/fillet/edges.rs",
           "find": "but meet with a crease",
           "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/high_valence_fillets.rs",
+          "find": "G1 spherical/cylindrical contact",
+          "role": "test"
         }
       ],
       "required_outcome": "Achieve the required smoothness within blend surfaces and across their joins; distinguish that from tangency to the support faces."
@@ -1065,8 +1071,8 @@
         "chamfer"
       ],
       "occt_scope": "General n-corner construction exists, with documented and implementation limitations. An independent OCCT 7.9.3 pyramid chamfer probe succeeds for one through four selected ridges, including the opposite pair, but constructs different corner geometry for adjacent selections.",
-      "truck_scope": "The equal-radius multi-edge fillet path rejects general high-valence corners. The solid-level planar intersection fallback already chamfers a square pyramid with one through four selected ridges, including opposite pairs. These are valid mitered bevels; OCCT adds a corner face in adjacent, three- and four-ridge cases. Single-fillet high-valence termination is a separate supported case.",
-      "next_case": "Investigate the extra corner-transition geometry produced by OCCT for adjacent pyramid chamfers, comparing continuity and local geometry rather than API signatures. Retain pyramid fillets as an open gap. Extend chamfers to skewed pyramids, five or more incident edges, unequal setbacks and mixed concavity.",
+      "truck_scope": "Convex planar vertices with all incident edges selected now support exact equal-radius spherical corners when their inward-offset planes share one center; four-, five-, six- and eight-edge pyramids are tested. Inconsistent offsets and partially selected high-valence fillets remain unsupported. Pyramid chamfers with one through four selected ridges, including opposite pairs, use valid mitered bevels. OCCT uses different curved corner patches on the paired adjacent-chamfer and all-ridge-fillet fixtures.",
+      "next_case": "Generalize corner transitions beyond a common spherical center, starting with a rectangular pyramid and partially selected ridges. Investigate required continuity of OCCT corner patches, then extend to unequal radii, curved supports and mixed concavity.",
       "evidence": [
         {
           "repo": "occt",
@@ -1077,7 +1083,7 @@
         {
           "repo": "truck",
           "path": "truck-shapeops/tests/fillet_edges.rs",
-          "find": "fn unblendable_four_edge_vertex",
+          "find": "fn all_pyramid_edges_with_four_edge_spherical_vertex",
           "role": "test"
         },
         {
@@ -1103,12 +1109,38 @@
           "path": "audits/fillet-chamfer/probes/pyramid_chamfers_occt.txt",
           "find": "OCCT 7.9.3",
           "role": "reference-result"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/high_valence_fillets.rs",
+          "find": "fn equal_radius_fillets_share_high_valence_spherical_corners",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/HIGH_VALENCE.md",
+          "find": "## Independent volume",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/probes/high_valence_fillets.cpp",
+          "find": "int main()",
+          "role": "reference-probe"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/probes/high_valence_fillets_occt.txt",
+          "find": "OCCT 7.9.3",
+          "role": "reference-result"
         }
       ],
       "required_outcome": "Join four or more interacting blends at a vertex when the requested configuration has a valid solution.",
       "verification": [
         "One through four pyramid ridges, including both adjacent and opposite pairs, pass for setbacks 0.2 and 1.2 before/after rigid transforms, with independent bevel-plane equations, integrated analytic volume, closed topology and mesh, convexity, face history, reversed selection order, immutable input and STEP. The old UnsupportedTopology chamfer assertion failed because construction already succeeded; it is replaced by the stronger valid-solid contract, retaining the unsupported fillet diagnostic. No construction or diagnostic code changed. Derivations are in truck-shapeops/tests/R11.md.",
-        "Independent paired probe: installed OCCT 7.9.3 produces valid single solids with the requested bevel planes in all ten pyramid cases. Single-ridge and opposite-pair volumes match the analytic Truck miter construction; adjacent, three- and four-ridge cases add a face and remove extra material. This records a corner-geometry difference, not an invalid OCCT output or absence of Truck chamfer support. See audits/fillet-chamfer/probes/README.md. The 1,026 inventoried upstream cases remain unexecuted."
+        "Independent paired probe: installed OCCT 7.9.3 produces valid single solids with the requested bevel planes in all ten pyramid cases. Single-ridge and opposite-pair volumes match the analytic Truck miter construction; adjacent, three- and four-ridge cases add a face and remove extra material. This records a corner-geometry difference, not an invalid OCCT output or absence of Truck chamfer support. See audits/fillet-chamfer/probes/README.md. The 1,026 inventoried upstream cases remain unexecuted.",
+        "Equal-radius ridge fillets pass on regular pyramids with 4, 5, 6 and 8 sides at radii 0.2 and 1.2, before/after rigid transforms. Checks include exact independent volume, geometric consistency, topology, mesh closure, requested sphere radius/center, G1 contact, selection-order independence, face-history counts, immutable input, STEP, and cuts through a four-edge spherical corner. All eight edges of a square pyramid also pass with a separate Steiner-volume reference. The original all-edge rejection test now asserts the stronger supported contract. Incompatible offset planes and excessive radii return diagnostics without input changes.",
+        "Independent OCCT 7.9.3 probe succeeds with valid single solids in all eight regular-pyramid fillet cases. Its corner patches are not analytic spheres and integrated volumes differ from the exact spherical construction. This establishes shared task support within the tested dimensions, not identical corner geometry or complete continuity/robustness parity. The 1,026 inventoried upstream cases remain unexecuted."
       ]
     },
     {
