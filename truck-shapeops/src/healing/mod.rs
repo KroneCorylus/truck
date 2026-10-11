@@ -18,6 +18,46 @@ use split_closed_edges::split_closed_edges;
 mod split_closed_faces;
 use split_closed_faces::split_closed_faces;
 
+fn connect_coincident_wire_ends<C, S>(shell: &mut Shell<Point3, C, S>) {
+    fn root(parents: &[usize], mut i: usize) -> usize {
+        while parents[i] != i {
+            i = parents[i];
+        }
+        i
+    }
+    let mut parents: Vec<_> = (0..shell.vertices.len()).collect();
+    for boundary in shell.faces.iter().flat_map(|face| &face.boundaries) {
+        for (a, b) in boundary
+            .iter()
+            .zip(boundary.iter().cycle().skip(1))
+            .take(boundary.len())
+        {
+            let edge_a = &shell.edges[a.index];
+            let edge_b = &shell.edges[b.index];
+            let end = if a.orientation {
+                edge_a.vertices.1
+            } else {
+                edge_a.vertices.0
+            };
+            let start = if b.orientation {
+                edge_b.vertices.0
+            } else {
+                edge_b.vertices.1
+            };
+            if end != start && shell.vertices[end] == shell.vertices[start] {
+                let (a, b) = (root(&parents, end), root(&parents, start));
+                parents[a.max(b)] = a.min(b);
+            }
+        }
+    }
+    for edge in &mut shell.edges {
+        edge.vertices = (
+            root(&parents, edge.vertices.0),
+            root(&parents, edge.vertices.1),
+        );
+    }
+}
+
 /// Splits closed edges and faces
 ///
 /// # Details
@@ -52,6 +92,7 @@ where
         where S: SearchParameter<D2, Point = Point3> {
             surface.search_parameter(point, hint, 100)
         }
+        connect_coincident_wire_ends(self);
         split_closed_edges(self);
         split_closed_faces(self, tol, sp);
     }
@@ -105,6 +146,7 @@ where
                 .or_else(|| surface.search_nearest_parameter(point, hint, 100))
                 .or_else(|| surface.search_nearest_parameter(point, None, 100))
         }
+        connect_coincident_wire_ends(self);
         split_closed_edges(self);
         split_closed_faces(self, tol, sp);
     }

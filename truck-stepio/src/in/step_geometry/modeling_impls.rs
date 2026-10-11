@@ -3,7 +3,8 @@
 //! Circles, ellipses and elementary surfaces keep their exact form: a cylinder becomes a circle
 //! swept along its axis, a cone a revolved line, a sphere and a torus a revolved circle.
 //! Finite parabolas and hyperbolas become exact quadratic splines on `[0, 1]`.
-//! Pcurves are rejected.
+//! Linear pcurves on planes and cylindrical generators become exact spatial lines.
+//! Other pcurves are rejected.
 //!
 //! ```
 //! use truck_modeling::{Curve, Point3, Surface};
@@ -60,7 +61,52 @@ impl TryFrom<&Curve3D> for ModelingCurve {
             }
             Curve3D::BSplineCurve(curve) => Self::BSplineCurve(curve.clone()),
             Curve3D::NurbsCurve(curve) => Self::NurbsCurve(curve.clone()),
-            Curve3D::PCurve(_) => return Err("pcurves have no curve in truck-modeling".into()),
+            Curve3D::PCurve(pcurve) => {
+                let Curve2D::Line(line) = pcurve.curve().as_ref() else {
+                    return Err("unsupported imported pcurve".into());
+                };
+                let linear = match pcurve.surface().as_ref() {
+                    Surface::ElementarySurface(ElementarySurface::Plane(_)) => true,
+                    Surface::ElementarySurface(ElementarySurface::CylindricalSurface(surface)) => {
+                        let (a, b, curvature) = if surface.orientation() {
+                            (
+                                line.0.y,
+                                line.1.y,
+                                surface.vvder(line.0.x, line.0.y).magnitude()
+                                    + surface
+                                        .vvder(line.0.x, line.0.y + std::f64::consts::FRAC_PI_2)
+                                        .magnitude(),
+                            )
+                        } else {
+                            (
+                                line.0.x,
+                                line.1.x,
+                                surface.uuder(line.0.x, line.0.y).magnitude()
+                                    + surface
+                                        .uuder(line.0.x + std::f64::consts::FRAC_PI_2, line.0.y)
+                                        .magnitude(),
+                            )
+                        };
+                        // Allow seam-search roundoff only, with a bound on the chord error.
+                        let delta = (b - a).abs();
+                        delta <= 32. * f64::EPSILON * a.abs().max(b.abs()).max(1.)
+                            && delta <= 1e-6
+                            && curvature * delta * delta / 8. <= TOLERANCE
+                    }
+                    _ => false,
+                };
+                if !linear {
+                    return Err("unsupported imported pcurve".into());
+                }
+                let (front, back) = (pcurve.front(), pcurve.back());
+                if ![front.x, front.y, front.z, back.x, back.y, back.z]
+                    .iter()
+                    .all(|x| x.is_finite())
+                {
+                    return Err("non-finite imported pcurve".into());
+                }
+                Self::Line(Line(front, back))
+            }
         })
     }
 }

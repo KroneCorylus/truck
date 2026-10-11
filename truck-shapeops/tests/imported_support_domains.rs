@@ -96,3 +96,9 @@ fn native_parabolic_prism_import_has_bounded_consistent_supports() {
     let solid = read(text);
     check(&solid, 400_000_000. / 3., 0.01);
 }
+
+#[test]
+fn unsplit_full_circle_boundaries_receive_finite_cylinder_supports() {
+    let solid = read(include_str!("../../resources/step/occt-cylinder.step"));
+    check(&solid, 40. * PI, 0.001);
+}

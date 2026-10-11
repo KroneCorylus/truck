@@ -1534,3 +1534,44 @@ fn step_import() {
         });
     });
 }
+
+#[test]
+fn coincident_wire_repair_preserves_unrelated_vertices_and_nonzero_gaps() {
+    let mut shell = CompressedShell {
+        vertices: vec![
+            Point3::origin(),
+            Point3::origin(),
+            Point3::origin(),
+            Point3::new(TOLERANCE / 2., 0., 0.),
+        ],
+        edges: vec![
+            CompressedEdge {
+                vertices: (0, 1),
+                curve: (),
+            },
+            CompressedEdge {
+                vertices: (2, 2),
+                curve: (),
+            },
+            CompressedEdge {
+                vertices: (3, 1),
+                curve: (),
+            },
+        ],
+        faces: (0..3)
+            .map(|index| CompressedFace {
+                boundaries: vec![vec![CompressedEdgeIndex {
+                    index,
+                    orientation: true,
+                }]],
+                surface: (),
+                orientation: true,
+            })
+            .collect(),
+    };
+    connect_coincident_wire_ends(&mut shell);
+    assert_eq!(shell.edges[0].vertices, (0, 0));
+    assert_eq!(shell.edges[1].vertices, (2, 2));
+    assert_eq!(shell.edges[2].vertices, (3, 0));
+    assert_eq!(shell.vertices[3], Point3::new(TOLERANCE / 2., 0., 0.));
+}

@@ -1,0 +1,31 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 6.14s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running unittests src/lib.rs (target/release/deps/truck_shapeops-ee3a1558f73a21f9)
+
+running 2 tests
+test healing::split_closed_faces::tests::failed_curve_conversion_leaves_poly_edges_unchanged ... FAILED
+test healing::split_closed_faces::tests::odd_divisor_crossings_leave_poly_edges_unchanged ... FAILED
+
+failures:
+
+---- healing::split_closed_faces::tests::failed_curve_conversion_leaves_poly_edges_unchanged stdout ----
+
+thread 'healing::split_closed_faces::tests::failed_curve_conversion_leaves_poly_edges_unchanged' (588752) panicked at truck-shapeops/src/healing/split_closed_faces.rs:1053:9:
+assertion failed: poly_edges.is_empty()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- healing::split_closed_faces::tests::odd_divisor_crossings_leave_poly_edges_unchanged stdout ----
+
+thread 'healing::split_closed_faces::tests::odd_divisor_crossings_leave_poly_edges_unchanged' (588753) panicked at truck-shapeops/src/healing/split_closed_faces.rs:714:55:
+index out of bounds: the len is 1 but the index is 1
+
+
+failures:
+    healing::split_closed_faces::tests::failed_curve_conversion_leaves_poly_edges_unchanged
+    healing::split_closed_faces::tests::odd_divisor_crossings_leave_poly_edges_unchanged
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 39 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-shapeops --lib`

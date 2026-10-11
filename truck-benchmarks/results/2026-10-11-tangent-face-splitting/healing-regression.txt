@@ -1,0 +1,20 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 6.04s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running unittests src/lib.rs (target/release/deps/truck_shapeops-ee3a1558f73a21f9)
+
+running 11 tests
+test healing::split_closed_faces::tests::failed_curve_conversion_leaves_poly_edges_unchanged ... ok
+test healing::split_closed_faces::tests::odd_divisor_crossings_leave_poly_edges_unchanged ... ok
+test healing::tests::coincident_wire_repair_preserves_unrelated_vertices_and_nonzero_gaps ... ok
+test healing::tests::test_split_closed_edges ... ok
+test healing::tests::test_split_closed_face_cylinder_with_hole ... ok
+test healing::tests::test_split_closed_face_simple_cylinder_case ... ok
+test healing::tests::double_closed_boundary_cylinder ... ok
+test healing::tests::too_simple_cylinder ... ok
+test healing::tests::test_split_closed_face_cylinder_with_rotated_hole ... ok
+test healing::tests::many_closed_boundary_cylinder ... ok
+test healing::tests::step_import ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 31 filtered out; finished in 0.02s

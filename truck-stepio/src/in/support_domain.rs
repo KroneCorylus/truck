@@ -50,7 +50,29 @@ fn fitted(
     }
     let mut controls = Vec::new();
     for index in boundaries.iter().flatten() {
-        let curve = truck_modeling::Curve::try_from(&edges.get(index.index)?.curve).ok()?;
+        let source = &edges.get(index.index)?.curve;
+        if let Curve3D::Conic(Conic3D::Ellipse(ellipse)) = source {
+            let matrix = ellipse.transform();
+            if matrix.x.w == 0. && matrix.y.w == 0. && matrix.w.w != 0. {
+                let center = Point3::from_homogeneous(matrix.w);
+                let x = matrix.x.truncate() / matrix.w.w;
+                let y = matrix.y.truncate() / matrix.w.w;
+                // The affine circle lies inside this parallelogram, including full turns.
+                for point in [
+                    center + x + y,
+                    center + x - y,
+                    center - x + y,
+                    center - x - y,
+                ] {
+                    if ![point.x, point.y, point.z].iter().all(|x| x.is_finite()) {
+                        return None;
+                    }
+                    controls.push(point);
+                }
+                continue;
+            }
+        }
+        let curve = truck_modeling::Curve::try_from(source).ok()?;
         let lifted = curve.try_lift_up()?;
         for p in lifted.control_points() {
             if p.w <= 0. || ![p.x, p.y, p.z, p.w].iter().all(|x| x.is_finite()) {
@@ -62,8 +84,8 @@ fn fitted(
     if controls.is_empty() {
         return None;
     }
-    // Positive rational control hulls bound this linear sweep coordinate over
-    // the complete boundary curves, including extrema between vertices.
+    // The enclosing conic boxes and positive rational control hulls bound this
+    // sweep coordinate over complete curves, including extrema between vertices.
     let parameter = |p: Point3| (p - origin).dot(normal) / denominator;
     let (mut lo, mut hi) = (0_f64, 1_f64);
     for &p in &controls {

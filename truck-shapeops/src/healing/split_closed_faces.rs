@@ -73,7 +73,8 @@ where
     S: ParametricSurface3D,
 {
     let Face { boundaries, .. } = &shell.faces[face_index];
-    let divisor = find_non_simple_wire_divisor(boundaries, &shell.edges, &shell.vertices)?;
+    let divisor = find_non_simple_wire_divisor(boundaries, &shell.edges, &shell.vertices)
+        .or_else(|| find_touching_boundary_divisor(boundaries, &shell.edges, &shell.vertices))?;
     split_face_by_divisor(face_index, divisor, shell, poly_edges, sp, tol)
 }
 
@@ -86,6 +87,40 @@ fn find_non_simple_wire_divisor<C>(
 ) -> Option<(usize, usize)> {
     let closure = |boundary| non_simple_wire_divisor(boundary, edges, vertices);
     boundaries.iter().cloned().find_map(closure)
+}
+
+fn find_touching_boundary_divisor<C>(
+    boundaries: &[Wire],
+    edges: &[Edge<C>],
+    vertices: &[Point3],
+) -> Option<(usize, usize)> {
+    let front = closure_take_front(edges);
+    let loops: Vec<HashSet<_>> = boundaries
+        .iter()
+        .map(|wire| wire.iter().copied().map(&front).collect())
+        .collect();
+    for (i, a) in loops.iter().enumerate() {
+        for b in &loops[i + 1..] {
+            if a.is_disjoint(b) {
+                continue;
+            }
+            let candidates = a
+                .difference(b)
+                .flat_map(|&v0| b.difference(a).map(move |&v1| (v0, v1)));
+            if let Some(pair) = candidates
+                .filter(|&(a, b)| !vertices[a].near(&vertices[b]))
+                .min_by(|&(a, b), &(c, d)| {
+                    vertices[a]
+                        .distance2(vertices[b])
+                        .total_cmp(&vertices[c].distance2(vertices[d]))
+                        .then((a, b).cmp(&(c, d)))
+                })
+            {
+                return Some(pair);
+            }
+        }
+    }
+    None
 }
 
 fn non_simple_wire_divisor<C>(
@@ -675,16 +710,23 @@ where
     C: TryFrom<PCurve<Line<Point2>, S>>,
     S: ParametricSurface3D,
 {
-    let make_edge = move |p: &[(f64, (usize, Point2))]| {
+    let (pairs, remainder) = vertices_on_divisor.as_chunks::<2>();
+    if !remainder.is_empty() {
+        return None;
+    }
+    let mut new_polys = Vec::with_capacity(pairs.len());
+    let make_edge = |p: &[(f64, (usize, Point2)); 2]| {
         let ((_, (v0, uv0)), (_, (v1, uv1))) = (p[0], p[1]);
         let pcurve = PCurve::new(Line(uv0, uv1), surface.clone());
-        poly_edges.push(PolylineCurve::from_curve(&pcurve, (0.0, 1.0), tol));
+        new_polys.push(PolylineCurve::from_curve(&pcurve, (0.0, 1.0), tol));
         Some(Edge {
             vertices: (v0, v1),
             curve: C::try_from(pcurve).ok()?,
         })
     };
-    vertices_on_divisor.chunks(2).map(make_edge).collect()
+    let edges = pairs.iter().map(make_edge).collect::<Option<Vec<_>>>()?;
+    poly_edges.extend(new_polys);
+    Some(edges)
 }
 
 // --- signup new edges ---
@@ -968,4 +1010,55 @@ fn nearest_correction(
             .unwrap()
     })?;
     Some((v0, v1))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn plane() -> Plane {
+        Plane::new(
+            Point3::origin(),
+            Point3::new(1., 0., 0.),
+            Point3::new(0., 1., 0.),
+        )
+    }
+
+    #[test]
+    fn odd_divisor_crossings_leave_poly_edges_unchanged() {
+        let vertices = [
+            (0., (0, Point2::new(0., 0.))),
+            (0.5, (1, Point2::new(0.5, 0.))),
+            (1., (2, Point2::new(1., 0.))),
+        ];
+        let mut poly_edges = Vec::new();
+        let result = create_new_edges::<PCurve<Line<Point2>, Plane>, _>(
+            &vertices,
+            &mut poly_edges,
+            &plane(),
+            0.001,
+        );
+        assert!(result.is_none());
+        assert!(poly_edges.is_empty());
+    }
+
+    #[test]
+    fn failed_curve_conversion_leaves_poly_edges_unchanged() {
+        struct RejectedCurve;
+        impl TryFrom<PCurve<Line<Point2>, Plane>> for RejectedCurve {
+            type Error = ();
+            fn try_from(_: PCurve<Line<Point2>, Plane>) -> std::result::Result<Self, Self::Error> {
+                Err(())
+            }
+        }
+        let vertices = [
+            (0., (0, Point2::new(0., 0.))),
+            (1., (1, Point2::new(1., 0.))),
+        ];
+        let mut poly_edges = Vec::new();
+        let result =
+            create_new_edges::<RejectedCurve, _>(&vertices, &mut poly_edges, &plane(), 0.001);
+        assert!(result.is_none());
+        assert!(poly_edges.is_empty());
+    }
 }
