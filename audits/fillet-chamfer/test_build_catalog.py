@@ -203,6 +203,27 @@ void registerCommands() {
         self.assertEqual(case['truck_run'], 'capture-incomplete')
         self.assertEqual(case['comparison'], 'unverified')
 
+    def test_capture_runs_follow_recorded_time_instead_of_directory_names(self):
+        case, _, _ = self.execution_fixture()
+        first = self.root / 'runs/first'
+        first.rename(self.root / 'runs/baseline')
+        baseline = self.root / 'runs/baseline'
+        data = json.loads((baseline / 'results.json').read_text())
+        data['started_utc'] = '2026-10-11T01:00:00+00:00'
+        data['cases'][0]['captures'] = [dict(comparison='unverified',
+            truck=dict(result=dict(status='operation-failed')))]
+        (baseline / 'results.json').write_text(json.dumps(data))
+        newer = self.root / 'runs/2026-fix'
+        self.put('runs/2026-fix/bugs/grid/a/console.log',
+                 (baseline / 'bugs/grid/a/console.log').read_text())
+        data['started_utc'] = '2026-10-11T02:00:00+00:00'
+        data['cases'][0]['captures'][0]['truck']['result']['status'] = 'operation-succeeded'
+        (newer / 'results.json').write_text(json.dumps(data))
+        audit.apply_runs([case], self.root / 'occt', self.root / 'runs', captured=True)
+        observations = [r['captures'][0]['truck']['result']['status'] for r in case['truck_executions']]
+        self.assertEqual(observations, ['operation-failed', 'operation-succeeded'])
+        self.assertEqual(case['comparison'], 'unverified')
+
 
 if __name__ == "__main__":
     unittest.main()

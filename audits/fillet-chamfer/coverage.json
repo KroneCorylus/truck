@@ -833,6 +833,18 @@
           "path": "truck-modeling/tests/revolved_surface_inclusion.rs",
           "find": "fn spherical_meridians_remain_included_across_the_periodic_seam",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/curved_fillet_step_domain.rs",
+          "find": "fn curved_end_trims_fit_inside_the_exported_fillet_surface_domain",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-11-cone-domain/REPORT.md",
+          "find": "Maximum",
+          "role": "replay-report"
         }
       ],
       "required_outcome": "Handle equivalent physical geometry consistently when represented analytically, as exact NURBS, with split faces, or after STEP import.",
@@ -859,7 +871,8 @@
         "Validation at cc5be492: full geometry/modeling/shapeops/STEP suites total 723 passed, 0 failed, 4 existing ignored; all-targets Clippy and action benchmark smoke pass. Separate regressions reproduce coordinate-frame, periodic-contact and procedural-export failures with their respective old implementations. Raw logs, source hashes and scope are in truck-benchmarks/results/2026-10-11-revolved-inclusion/REPORT.md. App code is unchanged and app tests were not rerun.",
         "At 20de5c08, 28 spherical-rim operations pass: two cut heights, Sphere/revolved-circle/exact-NURBS supports, rigid transforms and reversed wires, plus four cavity cases. Checks include independent radius/normal/volume equations, G1 joins, geometry, topology, closed meshes, history, unchanged inputs and STEP. No production change was needed. The final release target and corrected debug cavity target pass; exterior debug checks also passed, and Clippy is clean. Full scope and the corrected test-fixture orientation are documented in the spherical-rims report.",
         "Captured replay at d1b2bade: 161 operation captures from 148 upstream entries, including 45 constructed results. Forty-two meet the combined limited geometry/input-preservation/mesh/STEP and bidirectional sample checks; none is classified as full parity. Other observations are import inconsistencies/rejections, route failures, unsupported replay intent, panics during preprocessing, timeouts and one incomplete capture. The retained physical fixtures identify cone STEP trimming, meshing, revolved inclusion and imported cylinder support bounds as concrete investigations. See capture/baseline/REPORT.md; native verdicts and replay outcomes remain separate.",
-        "At 7414e3d9, signed atan2 angle recovery fixes loss of precision near coincident/opposite revolution meridians. Two parent-failing regressions cover point/nearest searches, three radii, small seam/antipodal angles and exact spherical boundaries across shifted domains, rigid transforms and reversed orientations; off-sphere curves remain rejected. Captured D2 input consistency now passes, without claiming subsequent blend support. Full geometry/modeling/shapeops/STEP: 728 passed, 0 failed, 4 existing ignored; Clippy and action smoke pass. See truck-benchmarks/results/2026-10-11-revolution-seams/REPORT.md."
+        "At 7414e3d9, signed atan2 angle recovery fixes loss of precision near coincident/opposite revolution meridians. Two parent-failing regressions cover point/nearest searches, three radii, small seam/antipodal angles and exact spherical boundaries across shifted domains, rigid transforms and reversed orientations; off-sphere curves remain rejected. Captured D2 input consistency now passes, without claiming subsequent blend support. Full geometry/modeling/shapeops/STEP: 728 passed, 0 failed, 4 existing ignored; Clippy and action smoke pass. See truck-benchmarks/results/2026-10-11-revolution-seams/REPORT.md.",
+        "At fa1a142d, STEP fitting covers curved fillet trims beyond their contact endpoints. The parent loses conical end geometry; four direct quarter-cone operations verify requested radius/normals, independent volume, native/transformed-reversed selections, finite fitted-domain coverage, closed meshes/STEP, history and immutable inputs. Full release shapeops/STEP: 391 passed, 0 failed, 1 existing ignored; Clippy and action smoke pass. A fresh physical C7 replay reduces the native-to-STEP sampled discrepancy from 4.2283 to below 2.76e-6 in both directions. Finite sampling does not certify global bounds or full parity. Raw comparison/STEP evidence is retained with the validation and capture reports."
       ]
     },
     {
@@ -1069,12 +1082,25 @@
           "path": "audits/fillet-chamfer/probes/short_spine_fillets_occt.txt",
           "find": "height=0.2 radius=10",
           "role": "probe-result"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/curved_fillet_step_domain.rs",
+          "find": "fn curved_end_trims_fit_inside_the_exported_fillet_surface_domain",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-11-cone-domain/REPORT.md",
+          "find": "Maximum",
+          "role": "replay-report"
         }
       ],
       "required_outcome": "Terminate a blend correctly against oblique end faces while preserving the requested radius and a valid boundary.",
       "verification": [
         "At d1b2bade, planar-ended fillets can be wider than their spine when the trimmed positive-weight rational patch fits every original convex half-space. The parent fails the length-0.2/radius-0.5 case. Thirty-six operations cover lengths 0.2/1/10, radii 0.5/10, perpendicular and oblique caps, and rigid transforms, with independent radius/normal/end-bound/volume checks, topology, closed meshes, history, immutable inputs and STEP. Full shapeops: 310 passed, 0 failed, 1 existing ignored; Clippy and action benchmark smoke pass. Evidence: truck-benchmarks/results/2026-10-11-short-spine-fillets/REPORT.md.",
-        "OCCT 7.9.3 returns valid single solids for all six unsheared short-spine tasks, with sampled dimensions and the same independent volume formula (maximum integration error 1.2e-10). Native shear/transform, mesh, STEP and downstream behavior remain unprobed."
+        "OCCT 7.9.3 returns valid single solids for all six unsheared short-spine tasks, with sampled dimensions and the same independent volume formula (maximum integration error 1.2e-10). Native shear/transform, mesh, STEP and downstream behavior remain unprobed.",
+        "At fa1a142d, STEP fitting covers curved fillet trims beyond their contact endpoints. The parent loses conical end geometry; four direct quarter-cone operations verify requested radius/normals, independent volume, native/transformed-reversed selections, finite fitted-domain coverage, closed meshes/STEP, history and immutable inputs. Full release shapeops/STEP: 391 passed, 0 failed, 1 existing ignored; Clippy and action smoke pass. A fresh physical C7 replay reduces the native-to-STEP sampled discrepancy from 4.2283 to below 2.76e-6 in both directions. Finite sampling does not certify global bounds or full parity. Raw comparison/STEP evidence is retained with the validation and capture reports."
       ]
     },
     {
@@ -1941,7 +1967,7 @@
       ],
       "occt_scope": "Shape, property, tolerance and downstream operation checks across the corpus.",
       "truck_scope": "Common blend checks cover topology, meshes, volume, STEP and selected Boolean operations. These do not alone prove absence of all self-intersections.",
-      "next_case": "Resolve captured C7 cone STEP truncation and I1 open-mesh output, then validate the repaired geometry with independent dimensions/volume, native boundary comparison, STEP tolerance and downstream edits.",
+      "next_case": "Resolve captured I1 open-mesh output, investigate preprocessing failures and tolerance-grid shape differences, then validate downstream edits and broader trim extrema.",
       "evidence": [
         {
           "repo": "occt",
@@ -2044,6 +2070,18 @@
           "path": "audits/fillet-chamfer/capture/baseline/REPORT.md",
           "find": "Concrete findings for follow-up:",
           "role": "replay-report"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/curved_fillet_step_domain.rs",
+          "find": "fn curved_end_trims_fit_inside_the_exported_fillet_surface_domain",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-11-cone-domain/REPORT.md",
+          "find": "Maximum",
+          "role": "replay-report"
         }
       ],
       "required_outcome": "Deliver blend results usable for closed meshing, STEP interchange and further modeling while preserving dimensions and validity.",
@@ -2055,7 +2093,8 @@
         "Validation at cc5be492: full geometry/modeling/shapeops/STEP suites total 723 passed, 0 failed, 4 existing ignored; all-targets Clippy and action benchmark smoke pass. Separate regressions reproduce coordinate-frame, periodic-contact and procedural-export failures with their respective old implementations. Raw logs, source hashes and scope are in truck-benchmarks/results/2026-10-11-revolved-inclusion/REPORT.md. App code is unchanged and app tests were not rerun.",
         "At 20de5c08, 28 spherical-rim operations pass: two cut heights, Sphere/revolved-circle/exact-NURBS supports, rigid transforms and reversed wires, plus four cavity cases. Checks include independent radius/normal/volume equations, G1 joins, geometry, topology, closed meshes, history, unchanged inputs and STEP. No production change was needed. The final release target and corrected debug cavity target pass; exterior debug checks also passed, and Clippy is clean. Full scope and the corrected test-fixture orientation are documented in the spherical-rims report.",
         "At d1b2bade, planar-ended fillets can be wider than their spine when the trimmed positive-weight rational patch fits every original convex half-space. The parent fails the length-0.2/radius-0.5 case. Thirty-six operations cover lengths 0.2/1/10, radii 0.5/10, perpendicular and oblique caps, and rigid transforms, with independent radius/normal/end-bound/volume checks, topology, closed meshes, history, immutable inputs and STEP. Full shapeops: 310 passed, 0 failed, 1 existing ignored; Clippy and action benchmark smoke pass. Evidence: truck-benchmarks/results/2026-10-11-short-spine-fillets/REPORT.md.",
-        "Captured replay at d1b2bade: 161 operation captures from 148 upstream entries, including 45 constructed results. Forty-two meet the combined limited geometry/input-preservation/mesh/STEP and bidirectional sample checks; none is classified as full parity. Other observations are import inconsistencies/rejections, route failures, unsupported replay intent, panics during preprocessing, timeouts and one incomplete capture. The retained physical fixtures identify cone STEP trimming, meshing, revolved inclusion and imported cylinder support bounds as concrete investigations. See capture/baseline/REPORT.md; native verdicts and replay outcomes remain separate."
+        "Captured replay at d1b2bade: 161 operation captures from 148 upstream entries, including 45 constructed results. Forty-two meet the combined limited geometry/input-preservation/mesh/STEP and bidirectional sample checks; none is classified as full parity. Other observations are import inconsistencies/rejections, route failures, unsupported replay intent, panics during preprocessing, timeouts and one incomplete capture. The retained physical fixtures identify cone STEP trimming, meshing, revolved inclusion and imported cylinder support bounds as concrete investigations. See capture/baseline/REPORT.md; native verdicts and replay outcomes remain separate.",
+        "At fa1a142d, STEP fitting covers curved fillet trims beyond their contact endpoints. The parent loses conical end geometry; four direct quarter-cone operations verify requested radius/normals, independent volume, native/transformed-reversed selections, finite fitted-domain coverage, closed meshes/STEP, history and immutable inputs. Full release shapeops/STEP: 391 passed, 0 failed, 1 existing ignored; Clippy and action smoke pass. A fresh physical C7 replay reduces the native-to-STEP sampled discrepancy from 4.2283 to below 2.76e-6 in both directions. Finite sampling does not certify global bounds or full parity. Raw comparison/STEP evidence is retained with the validation and capture reports."
       ]
     },
     {

@@ -337,7 +337,10 @@ def apply_runs(cases, occt, directory, captured=False):
     runs = []
     statuses = {'passed', 'known-failure', 'failed', 'improvement', 'skipped',
                 'timeout', 'crash', 'harness-error'}
-    for path in sorted(directory.glob('*/results.json')):
+    paths = sorted(directory.glob('*/results.json'))
+    if captured:
+        paths.sort(key=lambda path: json.loads(read(path)).get('started_utc', ''))
+    for path in paths:
         manifest = json.loads(read(path))
         if manifest.get('schema_version') != 1:
             raise ValueError(f'Unknown execution schema: {path}')
@@ -392,6 +395,9 @@ def apply_runs(cases, occt, directory, captured=False):
                 artifacts.append({'path': name, 'url': Path(os.path.relpath(link, HERE)).as_posix(), 'sha256': digest})
             execution = {**result, 'manifest': run['manifest'], 'artifacts': artifacts}
             if captured:
+                report = path.parent / 'REPORT.md'
+                if report.is_file():
+                    execution['report'] = Path(os.path.relpath(report, HERE)).as_posix()
                 case.setdefault('truck_executions', []).append(execution)
                 if any(c.get('truck') for c in result['captures']):
                     case['truck_run'] = 'captured-replay'
