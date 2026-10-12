@@ -1,0 +1,19 @@
+{
+  "source_parent": "98f1fe32",
+  "source_state": "spline seam working implementation before commit; final finite-domain guard does not alter this valid fixture",
+  "input_step_sha256": "e402e7da1caff2e338ca6167a91d04a4bafd4a1893d4aa5fdb5de2e14e9c3f68",
+  "source_capture": "audits/fillet-chamfer/capture/2026-10-12-unclamped-domains/results.json",
+  "result": {
+    "comparison": "unverified",
+    "result": {
+      "code": "BlendConstructionFailed",
+      "error": "TRUCK_BLEND_CONSTRUCTION_FAILED: Blend construction failed; the numerical or geometric constraint could not be resolved. (fillet_solid_along_wire / trim_faces)",
+      "input_unchanged": true,
+      "selected_edges": 2,
+      "status": "operation-failed"
+    },
+    "schema_version": 1,
+    "stage": "blend",
+    "tolerance": 0.001
+  }
+}

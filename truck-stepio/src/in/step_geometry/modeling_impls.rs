@@ -4,6 +4,7 @@
 //! swept along its axis, a cone a revolved line, a sphere and a torus a revolved circle.
 //! Finite parabolas and hyperbolas become exact quadratic splines on `[0, 1]`.
 //! Linear pcurves on planes and cylindrical generators become exact spatial lines.
+//! Isoparametric pcurves on spline surfaces become exact spatial splines.
 //! Other pcurves are rejected.
 //!
 //! ```
@@ -65,6 +66,18 @@ impl TryFrom<&Curve3D> for ModelingCurve {
                 let Curve2D::Line(line) = pcurve.curve().as_ref() else {
                     return Err("unsupported imported pcurve".into());
                 };
+                match pcurve.surface().as_ref() {
+                    Surface::BSplineSurface(surface) => {
+                        return Ok(Self::BSplineCurve(spline_isoparameter(surface, line)?));
+                    }
+                    Surface::NurbsSurface(surface) => {
+                        return Ok(Self::NurbsCurve(NurbsCurve::new(spline_isoparameter(
+                            surface.non_rationalized(),
+                            line,
+                        )?)));
+                    }
+                    _ => {}
+                }
                 let linear = match pcurve.surface().as_ref() {
                     Surface::ElementarySurface(ElementarySurface::Plane(_)) => true,
                     Surface::ElementarySurface(ElementarySurface::CylindricalSurface(surface)) => {
@@ -109,6 +122,68 @@ impl TryFrom<&Curve3D> for ModelingCurve {
             }
         })
     }
+}
+
+fn spline_isoparameter<P: truck_base::cgmath64::control_point::ControlPoint<f64> + Tolerance>(
+    surface: &BSplineSurface<P>,
+    line: &Line<Point2>,
+) -> std::result::Result<BSplineCurve<P>, StepConvertingError> {
+    let (uk, vk) = surface.knot_vecs();
+    if [uk, vk].iter().any(|knots| {
+        let (a, b) = (knots[0], knots[knots.len() - 1]);
+        !a.is_finite() || !b.is_finite() || a >= b || !(b - a).is_finite()
+    }) {
+        return Err("spline pcurve requires a finite support domain".into());
+    }
+    let roundoff =
+        |a: f64, b: f64| (a - b).abs() <= 32. * f64::EPSILON * a.abs().max(b.abs()).max(1.);
+    let mut line = *line;
+    // Seam searches can leave endpoints a few ulps outside the support or off a constant parameter.
+    for p in [&mut line.0, &mut line.1] {
+        for (axis, knots) in [uk, vk].iter().enumerate() {
+            let clamped = p[axis].clamp(knots[0], knots[knots.len() - 1]);
+            if !p[axis].is_finite() || !roundoff(p[axis], clamped) {
+                return Err("spline pcurve is outside its finite support domain".into());
+            }
+            p[axis] = clamped;
+        }
+    }
+    let (knots, points, start, end) = if roundoff(line.0.x, line.1.x) {
+        let u = line.0.x + (line.1.x - line.0.x) / 2.;
+        let points = (0..surface.control_points()[0].len())
+            .map(|j| surface.row_curve(j).subs(u))
+            .collect();
+        (vk.clone(), points, line.0.y, line.1.y)
+    } else if roundoff(line.0.y, line.1.y) {
+        let v = line.0.y + (line.1.y - line.0.y) / 2.;
+        let points = (0..surface.control_points().len())
+            .map(|i| surface.column_curve(i).subs(v))
+            .collect();
+        (uk.clone(), points, line.0.x, line.1.x)
+    } else {
+        return Err("unsupported non-isoparametric spline pcurve".into());
+    };
+    if start == end {
+        return Err("degenerate spline pcurve".into());
+    }
+    let mut curve = BSplineCurve::new(knots, points);
+    let (a, b) = (start.min(end), start.max(end));
+    if a > curve.range_tuple().0 {
+        curve = curve.cut(a);
+    }
+    if b < curve.range_tuple().1 {
+        curve.cut(b);
+    }
+    if start > end {
+        curve.invert();
+    }
+    let (knots, points) = curve.destruct();
+    let (a, b) = (knots[0], knots[knots.len() - 1]);
+    if a >= b || !(b - a).is_finite() {
+        return Err("degenerate spline pcurve trim".into());
+    }
+    let knots = knots.iter().map(|t| (t - a) / (b - a)).collect();
+    Ok(BSplineCurve::try_new(knots, points)?)
 }
 
 fn finite_conic_range(

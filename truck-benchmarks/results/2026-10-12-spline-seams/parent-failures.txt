@@ -1,0 +1,58 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/target/two-edge-parent/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/target/two-edge-parent/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 12.92s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/imported_spline_pipe.rs (/home/krone/Development/Pieza_WS/truck/target/contact-parent-build/release/deps/imported_spline_pipe-250845f24c0f88f7)
+
+running 1 test
+test imported_closed_spline_pipe_preserves_its_seams_and_material ... FAILED
+
+failures:
+
+---- imported_closed_spline_pipe_preserves_its_seams_and_material stdout ----
+
+thread 'imported_closed_spline_pipe_preserves_its_seams_and_material' (377662) panicked at truck-shapeops/tests/imported_spline_pipe.rs:44:10:
+the split pipe seams must convert to modeling curves
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    imported_closed_spline_pipe_preserves_its_seams_and_material
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.69s
+
+error: test failed, to rerun pass `-p truck-shapeops --test imported_spline_pipe`
+     Running tests/spline_seam_pcurves.rs (/home/krone/Development/Pieza_WS/truck/target/contact-parent-build/release/deps/spline_seam_pcurves-368e045f24f846e8)
+
+running 2 tests
+test seam_search_roundoff_preserves_the_exact_section_but_real_offsets_are_rejected ... FAILED
+test spline_isoparametric_trims_preserve_geometry_and_parameter_speed ... FAILED
+
+failures:
+
+---- seam_search_roundoff_preserves_the_exact_section_but_real_offsets_are_rejected stdout ----
+
+thread 'seam_search_roundoff_preserves_the_exact_section_but_real_offsets_are_rejected' (377744) panicked at truck-stepio/tests/spline_seam_pcurves.rs:92:32:
+called `Result::unwrap()` on an `Err` value: "unsupported imported pcurve"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- spline_isoparametric_trims_preserve_geometry_and_parameter_speed stdout ----
+
+thread 'spline_isoparametric_trims_preserve_geometry_and_parameter_speed' (377745) panicked at truck-stepio/tests/spline_seam_pcurves.rs:55:55:
+called `Result::unwrap()` on an `Err` value: "unsupported imported pcurve"
+
+
+failures:
+    seam_search_roundoff_preserves_the_exact_section_but_real_offsets_are_rejected
+    spline_isoparametric_trims_preserve_geometry_and_parameter_speed
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-stepio --test spline_seam_pcurves`
+error: 2 targets failed:
+    `-p truck-shapeops --test imported_spline_pipe`
+    `-p truck-stepio --test spline_seam_pcurves`
