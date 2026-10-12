@@ -1,0 +1,10 @@
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+    Finished `release` profile [optimized] target(s) in 1.76s
+     Running tests/continued_fillet_contacts.rs (target/release/deps/continued_fillet_contacts-d0d337560c36c3da)
+
+running 2 tests
+test invalid_continuation_guesses_fail_without_panicking ... ok
+test rolling_ball_continues_from_a_plane_onto_a_cylindrical_roof ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

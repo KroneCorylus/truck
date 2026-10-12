@@ -40,19 +40,51 @@ impl ContactCircle {
         {
             return None;
         }
-        let (mut p0, mut p1) = (p, p);
-        let (mut u0, mut v0) = surface0.search_parameter(p0, None, 100)?;
-        let (mut u1, mut v1) = surface1.search_parameter(p1, None, 100)?;
-        let signed_radius = {
-            let (n0, n1) = (surface0.normal(u0, v0), surface1.normal(u1, v1));
-            let sign = -f64::signum(n0.cross(n1).dot(der));
-            sign * radius
-        };
+        let (u0, v0) = surface0.search_parameter(p, None, 100)?;
+        let (u1, v1) = surface1.search_parameter(p, None, 100)?;
+        let (n0, n1) = (surface0.normal(u0, v0), surface1.normal(u1, v1));
+        let sign = -f64::signum(n0.cross(n1).dot(der));
+        Self::try_from_contacts(
+            point_on_curve,
+            t,
+            surface0,
+            surface1,
+            sign * radius,
+            [(u0, v0).into(), (u1, v1).into()],
+        )
+    }
+
+    /// Solves a rolling-ball section from parameter guesses on its two supports.
+    /// The center lies in the plane through `guide.0` with normal `guide.1`.
+    /// `signed_radius` selects the normal side of both supports. Unlike edge-based
+    /// initialization, the guide point need not lie on either support surface.
+    pub fn try_from_contacts(
+        guide: (Point3, Vector3),
+        t: f64,
+        surface0: &impl ParametricSurface3D,
+        surface1: &impl ParametricSurface3D,
+        signed_radius: f64,
+        parameters: [Point2; 2],
+    ) -> Option<Self> {
+        let (p, der) = guide;
+        if !t.is_finite()
+            || !signed_radius.is_finite()
+            || signed_radius == 0.0
+            || (0..3).any(|i| !p[i].is_finite() || !der[i].is_finite())
+            || parameters
+                .iter()
+                .any(|p| !p.x.is_finite() || !p.y.is_finite())
+        {
+            return None;
+        }
+        let (mut u0, mut v0) = parameters[0].into();
+        let (mut u1, mut v1) = parameters[1].into();
+        let (mut p0, mut p1) = (surface0.subs(u0, v0), surface1.subs(u1, v1));
         let mut center = None;
         for _ in 0..100 {
             let (n0, n1) = (surface0.normal(u0, v0), surface1.normal(u1, v1));
             let (c, q0, q1) = contact_points((p, der), (p0, n0), (p1, n1), signed_radius)?;
-            if p0.near(&q0) && p1.near(&q1) {
+            if p0.near2(&q0) && p1.near2(&q1) {
                 center = Some(c);
                 break;
             }
@@ -147,7 +179,7 @@ fn contact_points(
 }
 
 fn next_point(
-    surface: &impl FilletableSurface,
+    surface: &impl ParametricSurface3D,
     (u, v): (f64, f64),
     (p, q): (Point3, Point3),
     signed_radius: f64,

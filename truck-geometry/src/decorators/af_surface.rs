@@ -390,21 +390,40 @@ where
         C: ParametricCurve3D,
         R: ScalarFunctionD1,
     {
+        Self::approx_contact_circles(
+            fillet_surface.surface0(),
+            fillet_surface.surface1(),
+            edge_parameter_range,
+            tol,
+            |v| fillet_surface.contact_circle(v),
+        )
+    }
+
+    /// Fits rolling-ball sections on fixed supports, including sections initialized
+    /// by continuing contacts from an adjacent support patch. Failed or collapsed
+    /// sections return `None`; the same adaptive fitting tolerance applies.
+    pub fn approx_contact_circles(
+        surface0: &S0,
+        surface1: &S1,
+        edge_parameter_range: (f64, f64),
+        tol: f64,
+        mut solve: impl FnMut(f64) -> Option<ContactCircle>,
+    ) -> Option<Self> {
         let (v0, v1) = edge_parameter_range;
         if !v0.is_finite() || !v1.is_finite() || v0 >= v1 || !tol.is_finite() || tol <= 0.0 {
             return None;
         }
-        let contact_circle = |v| {
-            let cc = fillet_surface.contact_circle(v)?;
-            (regular_contact(fillet_surface.surface0(), cc.contact_point0(), cc.center())
-                && regular_contact(fillet_surface.surface1(), cc.contact_point1(), cc.center()))
+        let mut contact_circle = |v| {
+            let cc = solve(v)?;
+            (regular_contact(surface0, cc.contact_point0(), cc.center())
+                && regular_contact(surface1, cc.contact_point1(), cc.center()))
             .then_some(cc)
         };
         let periodic = [
-            fillet_surface.surface0().u_period(),
-            fillet_surface.surface0().v_period(),
-            fillet_surface.surface1().u_period(),
-            fillet_surface.surface1().v_period(),
+            surface0.u_period(),
+            surface0.v_period(),
+            surface1.u_period(),
+            surface1.v_period(),
         ]
         .iter()
         .any(Option::is_some);
@@ -438,14 +457,14 @@ where
             let knot_vec = KnotVec::try_from(vec).ok()?;
 
             let make_uv0 = move |&(v, cc): &(f64, ContactCircle)| (v, cc.contact_point0().uv);
-            let uv0s = continuous_parameters(fillet_surface.surface0(), ccs.iter().map(make_uv0));
+            let uv0s = continuous_parameters(surface0, ccs.iter().map(make_uv0));
             let parameter_curve0 = BSplineCurve::interpole(knot_vec.clone(), uv0s);
-            let pcurve0 = PCurve::new(&parameter_curve0, fillet_surface.surface0());
+            let pcurve0 = PCurve::new(&parameter_curve0, surface0);
 
             let make_uv1 = move |&(v, cc): &(f64, ContactCircle)| (v, cc.contact_point1().uv);
-            let uv1s = continuous_parameters(fillet_surface.surface1(), ccs.iter().map(make_uv1));
+            let uv1s = continuous_parameters(surface1, ccs.iter().map(make_uv1));
             let parameter_curve1 = BSplineCurve::interpole(knot_vec.clone(), uv1s);
-            let pcurve1 = PCurve::new(&parameter_curve1, fillet_surface.surface1());
+            let pcurve1 = PCurve::new(&parameter_curve1, surface1);
 
             let mut raw_tangent_vecs0 = Vec::new();
             let mut raw_tangent_vecs1 = Vec::new();
@@ -458,7 +477,7 @@ where
                 let der0 = nurbs.der(0.0);
                 let cder0 = pcurve0.der(v).normalize();
                 let uv0 = cc.contact_point0().uv;
-                let n0 = fillet_surface.surface0.normal(uv0.x, uv0.y);
+                let n0 = surface0.normal(uv0.x, uv0.y);
                 let handle0 = cder0.cross(n0);
                 let mat0 = Matrix3::from_cols(handle0, cder0, n0);
                 let vec0 = mat0.invert()? * der0;
@@ -470,7 +489,7 @@ where
                 let der1 = -nurbs.der(1.0);
                 let cder1 = pcurve1.der(v).normalize();
                 let uv1 = cc.contact_point1().uv;
-                let n1 = fillet_surface.surface1.normal(uv1.x, uv1.y);
+                let n1 = surface1.normal(uv1.x, uv1.y);
                 let handle1 = cder1.cross(n1);
                 let mat1 = Matrix3::from_cols(handle1, cder1, n1);
                 let vec1 = mat1.invert()? * der1;
@@ -488,10 +507,10 @@ where
 
             let approx = ApproxFilletSurface {
                 knot_vec,
-                surface0: fillet_surface.surface0(),
+                surface0,
                 side_control_points0: parameter_curve0.destruct().1,
                 tangent_vecs0: tangent_curve0.destruct().1,
-                surface1: fillet_surface.surface1(),
+                surface1,
                 side_control_points1: parameter_curve1.destruct().1,
                 tangent_vecs1: tangent_curve1.destruct().1,
                 weights,

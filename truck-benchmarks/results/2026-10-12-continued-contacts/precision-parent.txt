@@ -1,0 +1,89 @@
+    Updating crates.io index
+    Blocking waiting for file lock on package cache
+     Locking 479 packages to latest compatible versions
+      Adding proc-macro-crate v3.3.0 (available: v3.5.0)
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+ Downloading crates ...
+  Downloaded bit-set v0.11.1
+  Downloaded borsh-derive v1.8.1
+  Downloaded rand_xorshift v0.5.0
+  Downloaded unicode-ident v1.0.27
+  Downloaded bit-vec v0.10.1
+  Downloaded proptest v1.12.0
+  Downloaded syn v3.0.8
+  Downloaded proptest-macro v0.6.0
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.27
+   Compiling quote v1.0.47
+   Compiling autocfg v1.5.1
+   Compiling libc v0.2.190
+   Compiling rand_core v0.10.1
+   Compiling version_check v0.9.5
+   Compiling getrandom v0.4.3
+   Compiling cfg-if v1.0.5
+   Compiling serde_core v1.0.229
+   Compiling serde v1.0.229
+   Compiling cgmath v0.18.0
+   Compiling syn v1.0.109
+   Compiling cpufeatures v0.3.1
+   Compiling rustix v1.1.5
+   Compiling linux-raw-sys v0.12.1
+   Compiling thiserror v2.0.21
+   Compiling bitflags v2.13.2
+   Compiling unicode-segmentation v1.13.3
+   Compiling rustc-hash v2.1.3
+   Compiling once_cell v1.21.4
+   Compiling fastrand v2.5.0
+   Compiling chacha20 v0.10.2
+   Compiling quick-error v1.2.3
+   Compiling fnv v1.0.7
+   Compiling bit-vec v0.10.1
+   Compiling rand_xorshift v0.5.0
+   Compiling core_detect v1.0.0
+   Compiling unarray v0.1.4
+   Compiling regex-syntax v0.8.11
+   Compiling proc-macro-error-attr v1.0.4
+   Compiling proc-macro-error v1.0.4
+   Compiling num-traits v0.2.19
+   Compiling bit-set v0.11.1
+   Compiling convert_case v0.11.0
+   Compiling syn v3.0.8
+   Compiling syn v2.0.119
+   Compiling approx v0.4.0
+   Compiling num-complex v0.4.6
+   Compiling wait-timeout v0.2.1
+   Compiling rand v0.10.3
+   Compiling tempfile v3.27.0
+   Compiling rusty-fork v0.3.1
+   Compiling serde_derive v1.0.229
+   Compiling thiserror-impl v2.0.21
+   Compiling truck-derivers v0.1.0 (/home/krone/Development/Pieza_WS/truck/target/contact-parent/truck-derivers)
+   Compiling proptest-macro v0.6.0
+   Compiling proptest v1.12.0
+   Compiling katexit v0.1.5
+   Compiling matext4cgmath v0.1.0
+   Compiling truck-base v0.5.0 (/home/krone/Development/Pieza_WS/truck/target/contact-parent/truck-base)
+   Compiling truck-geotrait v0.4.0 (/home/krone/Development/Pieza_WS/truck/target/contact-parent/truck-geotrait)
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/target/contact-parent/truck-geometry)
+    Finished `release` profile [optimized] target(s) in 12.40s
+     Running tests/contact_precision.rs (target/contact-parent-build/release/deps/contact_precision-89ef4fa705931a6d)
+
+running 1 test
+test small_spherical_contact_is_solved_before_fitting_the_blend ... FAILED
+
+failures:
+
+---- small_spherical_contact_is_solved_before_fitting_the_blend stdout ----
+
+thread 'small_spherical_contact_is_solved_before_fitting_the_blend' (152009) panicked at truck-geometry/tests/contact_precision.rs:31:13:
+assertion failed: (point - cc.center()).distance(normal * 0.2 * scale) < 1e-7 * scale
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    small_spherical_contact_is_solved_before_fitting_the_blend
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-geometry --test contact_precision`

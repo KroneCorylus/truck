@@ -1,0 +1,13 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+    Finished `release` profile [optimized] target(s) in 6.21s
+     Running tests/contact_precision.rs (target/release/deps/contact_precision-7e2c3667b08b8133)
+
+running 1 test
+test small_spherical_contact_is_solved_before_fitting_the_blend ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
