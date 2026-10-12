@@ -1,0 +1,238 @@
+FILLET / CHAMFER FEATURE-PARITY HANDOFF
+Checkpoint: 2026-10-12. User: Krone.
+
+STOP STATE
+The user explicitly requested: stop at the next checkpoint, commit, provide a
+simple HTML progress report and a separate handoff. That supersedes the earlier
+instruction to keep working indefinitely. Resume implementation only when asked.
+Report: report.html in this directory. The report and this handoff are committed.
+Production checkpoint: f6fa8d15.
+The following documentation-only commit refreshes the catalog and saves this handoff.
+No push or PR. PiezaCAD has no changes from this work; its dependency pin was not updated.
+
+OBJECTIVE AND RULES
+Achieve user-visible fillet/chamfer capability parity with OCCT, not a Rust port
+or matching APIs. The audit inventories reference behavior, implementation,
+regression cases and evidence. Successful sampled replay is not full parity.
+
+Workspace: /home/krone/Development/Pieza_WS/truck, branch master.
+Consumer: ../PiezaCAD. Read truck/AGENTS.md before working.
+- Fixes/capabilities need regressions that fail on the parent.
+- Do not delete, ignore or weaken existing assertions.
+- Use tests/common::assert_solid and common::blend::assert_step for modeled solids.
+- Run affected release suites, all-target Clippy and actions smoke.
+- Format touched files only with rustfmt +nightly --config skip_children=true.
+  NEVER run cargo fmt across this checkout.
+- CARGO_BUILD_JOBS=12. Avoid source edits while tests/builds are compiling them.
+- Performance claims need before/after medians in truck-benchmarks; failures are
+  not valid speedup baselines. Capture wall times are not performance benchmarks.
+- Force-add new *.json and *.step evidence; they are ignored globally/by the repo.
+  Preserve native STEP bytes; diff-check with: git diff --check -- . ':!*.step'
+- Commit incremental validated work when continuation is authorized. Do not push.
+- No subagents were authorized. Do not spawn them without authorization.
+- Questions are read-only requests; do not infer edits from a question.
+- Keep progress updates meaningful and no more than about a minute apart.
+
+WHAT IS COMMITTED
+1. 88f64f08: complete circular meridians use positive-weight rational quadratic
+   spans; horn-torus STEP orientation avoids a singular normal sample.
+   0d3a0259 and eeef4a3d record validation/catalog/native replay.
+   E5, E7 and F2 recovered; full replay moved from 74 to 77 constructions.
+2. 16958067: stable atan2 torus inverse and corrected normal derivative; exact
+   isoparametric toroidal pcurve conversion; preserve the continuous periodic
+   chart for cuts in 270-degree sectors. J3/J4/J5 imports retain material,
+   including J3 at original scale and rigidly transformed fixtures.
+   2099d2d8 records the input coverage. The newly archived clean 2099 replay
+   recovers J3/J4/J5 fillets: 80 constructions, 78 limited comparison passes.
+3. f6fa8d15: avoid choosing existing seam endpoints for a new divisor.
+   Safely reject incomplete/unsupported boundary graphs and discard new cut
+   edges if reconstruction fails. G9's second input no longer panics.
+   Its RAW STEP geometry has closed topology, closed tessellation and independent
+   volume through normal/robust preprocessing and rigid transforms. Modeling
+   conversion still rejects a diagonal surface curve. No G9 fillet success is claimed.
+
+Earlier relevant commits: f7f8f4f5 (closed spline rim continuation through displaced
+seams; J9), 4a156c4f (stable circumcenters), f6871a18 (exact spline join controls),
+aa6cfa65 (conical tessellation metric and tight fits), 6db16d09 (spherical-pole
+fillets and local STEP refinement; E3). Their proof directories remain committed.
+
+LATEST VALIDATION
+Final shapeops release suite: 349 passed, 0 failed, 1 existing ignored, 68 targets.
+All-target release Clippy (shapeops and benchmarks), action benchmark smoke and
+the final production replay build passed. Targeted G9 no longer panics.
+Exact commands/logs and parent failures are in:
+truck-benchmarks/results/2026-10-12-seam-junction/REPORT.md
+
+The periodic-torus batch previously ran five affected crates: 893 passes, one
+unchanged PCurve precision failure, five existing ignored tests, 139 targets.
+Do not "fix" that known failure by changing its assertion:
+  truck-geometry/tests/pcurve.rs::pcurve_derivation
+  seed: cc 50d8039d67926c66cab49548717f93cc44705eef4e2589403af17a82d14f9f68
+  values: -2829663063.761872 vs -2829663063.7618704 (n=5, t=-.9907205852407387)
+  parent proof: truck-benchmarks/results/2026-10-11-spherical-meridian-step/
+               pcurve-parent-existing-failure.txt and pcurve-replay-seed.txt
+No assertion was weakened, deleted or newly ignored.
+
+CATALOG / EVIDENCE STATE
+Sources: audits/fillet-chamfer/coverage.json plus OCCT discovery.
+Generated: catalog.json and catalog.html. viewer.html is the interactive viewer.
+51 families = 50 capabilities + one reference topic.
+1,026 catalog entries from 795 distinct files and 21,082 registered cases scanned.
+Original native execution: 295 pass, 11 known failures, 19 viewer-related failures,
+701 skipped. 713 entries have missing static references. The 701 runtime-skipped
+entries include all 279 dedicated chamfer cases; the fixture corpus is incomplete.
+There is no defensible overall completion percentage or current full-parity verdict.
+
+Latest FULL captured run is clean 2099d2d8, BEFORE the seam-junction fix:
+  audits/fillet-chamfer/capture/2026-10-12-periodic-tori/
+  REPORT.md, results.json, artifacts.zip (2,150 case artifact hashes verified).
+Raw copy: target/occt-capture-periodic-tori.
+156 native entries pass; 161 operation captures:
+  80 operation-succeeded; 37 operation-failed; 21 input-import-failed;
+  11 input-inconsistent; 8 unhandled-intent; 2 timeouts (H2/H4);
+  1 panic (G9 capture 002); 1 capture-incomplete.
+All 80 constructions preserve input and geometry consistency, close the Truck
+mesh, prepare STEP, and produce native-valid single solids.
+78 meet combined limited comparisons at tolerance .001. G1 and tolerance-grid
+A1 retain discrepancies. All full parity statuses remain unverified.
+The new G9 targeted replay returns input-import-failed, "Unsupported imported
+geometry", without panic. No full replay has been run after f6fa8d15;
+do not silently change the historical 80/78 totals or panic count.
+
+NEXT STEPS WHEN WORK RESUMES
+A. First run a clean full capture of this checkpoint. Compare every previously
+   constructed case, verify G9 now reports its conversion gap, retain H2/H4 as
+   unresolved, archive artifact hashes and refresh the catalog. This is the
+   first outstanding validation task, not an implementation task.
+B. Continue the two concrete gaps below. Neither proposed approach is a proven
+   fix; write parent-failing regressions before production changes.
+C. Then E9 trimming and nonplanar multi-edge/unequal-radius cases. Do not confuse
+   an import failure or replay expressiveness limit with a solver failure.
+
+G9: SEAM PANIC RESOLVED, MODELING PCURVE CONVERSION STILL OPEN
+Native tests/blend/complex/G9 creates cylinder r10/h20, fillets its upper rim r3,
+unites cylinder r5/h20 translated (4.9,0,10), then requests a radius-4.9 fillet.
+Old non_simple_wire_divisor chose vertices (0,4), already joined by seam edge 6.
+The new cut produced three outgoing edges and construct_boundaries panicked.
+Loop-interior candidates now exclude both seam endpoints; range checks also
+handle degenerate loops. The graph assembler returns Option and rolls back only
+its newly appended edges/polylines on unsupported reconstruction.
+
+Files:
+  truck-shapeops/src/healing/split_closed_faces.rs
+  truck-shapeops/tests/tangent_closed_face_split.rs
+  truck-shapeops/tests/fixtures/closed-face-splitting/rounded-offset-cylinders.step
+Fixture README explains the independent horizontal-circle-overlap volume integral
+(approximately 6965.56812665). Parent unit and fixture failures are committed.
+Current proof covers raw STEP preprocessing, not modeling conversion/STEP export.
+
+Conversion gap: truck-stepio/src/in/step_geometry/modeling_impls.rs accepts linear
+pcurves only on selected supports/directions. General diagonal cuts are rejected.
+Modeling already has Curve::PCurve<BSplineCurve<Point2>, Box<Surface>>. One possible
+route is to preserve the pcurve's support parameterization exactly instead of
+approximating it. For cylinder/cone, map the original Processor<RevolutedCurve<Line>>
+into ModelingSurface::RevolutedCurve, including its affine transform/orientation.
+For torus, a local circular meridian plus revolution is exact, but torus coordinates
+(major,minor) and revolution coordinates (meridian,major) differ. Preserve swaps,
+Processor inversion and transforms explicitly. Existing elementary-surface conversion
+can change parameterization; do not blindly reuse its UV values. This is only an
+implementation idea; it has not been coded or tested. Existing diagonal-rejection
+assertions would need an intentional contract update that tests at least as much.
+Require point/tangent comparisons, nonfinite/degenerate behavior, affine/reversed
+supports, modeled solid validation and STEP before calling this gap fixed.
+
+H2 / H4: ELLIPSOID TRIM AND POLE BRANCH INVESTIGATION
+No production changes from this investigation are in the checkpoint.
+Both native inputs revolve an elliptical/conical profile through 270 degrees.
+After the complete-circle fix they pass input checks but exceed 120 seconds.
+H2 debugging reaches construction completion quickly and stalls in tessellation.
+An ellipsoid face generates a 2152 x 1218 grid (2.6 million candidates) against
+6398 boundary points. Its UV bounds become major [0,7.85398] (450 degrees) and
+meridian [0,2*pi], instead of the intended 270-degree sector/quarter meridian.
+Other faces complete quickly. Fix the trim/branch correctness before optimizing
+this oversized grid.
+
+Portable diagnostics: ellipsoid-investigation.zip beside this handoff contains
+H2's compressed constructed solid, traces, stack, volume derivation and an explicitly
+UNVALIDATED mesher patch. The patch preserves the last regular projection seed
+through a pole; it DOES NOT fix the timeout and also contains logging. Do not merge it.
+Raw local files: target/elliptic-timeouts/{H2,H4}/001.*
+The original captured inputs/results are in the toroidal-sectors capture archive.
+
+New trace findings:
+- First H2 ellipse UV is (pi, 3.10453160765): the inverse picked the negative-radial
+  half of a full ellipse, instead of the positive sheet near meridian .037061.
+- Before the interior pole, major reaches 7.85398163397; at the pole it jumps to
+  6.26481765400, then 3.14159265359. The meridian reaches pi/2.
+- ProjectedCurve projects to (height, abs(radial)), so a full ellipse double-covers
+  the same physical surface. Default presearch can choose the other sheet through
+  roundoff. No-hint projection therefore changes orientation on this representation.
+- RevolutedCurve::search_parameter preserves angular hints only at front/back
+  poles, not interior poles. It normalizes tiny radial vectors at an interior pole.
+- PolyBoundaryPiece unwraps each periodic coordinate by the shortest difference.
+  A 270-degree pole transition can choose the complementary 90-degree jump.
+- PolyBoundary::new adds a full parameter-domain boundary if no positive outer
+  loop was found. On a double-covered ellipse this can add the wrong whole domain.
+- RevolutedCurve::normal also only special-cases endpoint poles.
+
+Relevant files:
+  truck-geometry/src/decorators/revolved_curve.rs
+  truck-meshalgo/src/tessellation/triangulation.rs (+ triangulation/tests.rs)
+  truck-stepio/src/in/step_geometry/modeling_impls.rs
+
+Useful regression idea: construct a full elliptical meridian revolved around Z,
+then a boundary comprising a 270-degree latitude and two meridians ending at the
+interior pole. Check UV domain, orientation, closure and represented material at
+multiple boundary starting positions/reversal before doing a costly full mesh.
+Do not blindly cut every full ellipse to a half ellipse: native trims on its
+other sheet may require opposite face orientation. Likewise, a global inverse
+branch tie-break is not by itself proof of correct face material.
+H2 has an independent rounded-profile volume derivation in the archive's
+volume-notes.txt. H4's actual selected edge still needs inspection.
+
+OTHER OPEN GAPS
+- E9 torus face trimming.
+- Nonplanar multi-edge joins: E6/E8/F1/F3/H3/H5, plus F9/G2 and general corners.
+- Eight unequal-radius intents not expressed by the capture replay (featlf E2/E3,
+  draftangle C4/B5/A2, tol_simple A2, simple P9/A4). A replay rejection does not
+  establish absence of an equivalent kernel route.
+- G1 and tolerance-grid A1 sampled shape discrepancies.
+- General contact/corner collapse, collisions, open contours and face-driven blends.
+- Distance-angle/throat/penetration chamfers, variable/zero/unequal radii, 2D cases,
+  and missing dedicated chamfer fixture corpus. See catalog for exact family scope.
+
+REPRODUCTION
+From the truck repository, with a CLEAN tracked checkout:
+  CARGO_BUILD_JOBS=12 cargo build --release -p truck-shapeops --example replay_occt_blend
+  python3 audits/fillet-chamfer/capture/run_capture.py \
+    --occt ../investigations/sequential-holes-2026-10-10/occt \
+    --library-path target/occt-sdk/usr/lib64 --plugin target/occt-capture-plugin \
+    --replay target/release/examples/replay_occt_blend \
+    --output target/NEW-CAPTURE-DIRECTORY --workers 4 --timeout 120
+Do not edit main source or rebuild the replay during capture. Await completion.
+Use a fresh output directory. Check nullable truck/sample comparison fields.
+Successful comparator JSON uses comparison="sampled-only", not a status field.
+Archive raw files except root results.json; verify every case.artifacts SHA-256;
+add artifact_archive and artifact_archive_sha256 to the archived manifest.
+The catalog selects captures by started_utc, not directory name.
+
+Catalog:
+  python3 audits/fillet-chamfer/build_catalog.py \
+    --occt ../investigations/sequential-holes-2026-10-10/occt --app ../PiezaCAD
+  # Repeat with --check after generation.
+  python3 -m unittest discover -s audits/fillet-chamfer -p 'test_*.py'
+  python3 -m unittest discover -s audits/fillet-chamfer/capture -p 'test_*.py'
+Commit implementation/proof first, then regenerate and commit audit-only changes.
+The builder records the latest non-audit-only commit as the kernel snapshot.
+
+SCRATCH WORKTREE / BINARY CAUTIONS
+Main target/release/examples/replay_occt_blend matches the final production source.
+target/toroidal-junction/parent-replay is the clean 2099 parent binary.
+target/full-circle-arcs is a detached 6db16d09 scratch worktree, not a clean branch.
+It contains copied newer production changes plus DEBUG examples/mesher logs and the
+failed regular_hint prototype. DO NOT merge or copy its files wholesale.
+Its build directory target/pole-build and replay binary are DEBUG, not official proof.
+Other old scratch worktrees (sphere-pole, cubic-join-parent, two-edge-parent, etc.)
+also contain experiments or obsolete code. Main committed source is authoritative.
+The old two-edge-parent has an incorrect unconditional tessellation metric; never merge it.
+No benchmark, replay, debugger or test processes should remain running at handoff.
