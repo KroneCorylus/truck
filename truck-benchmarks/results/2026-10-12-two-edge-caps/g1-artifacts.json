@@ -1,0 +1,16 @@
+{
+  "source_parent": "7f571cef",
+  "source_state": "two-edge cap implementation working tree, before commit",
+  "scope": "targeted G1 replay; full clean capture pending",
+  "artifacts": {
+    "001.input.brep": "8a9d2feb919c0fa1cd8b67251a53f6b65af66e8bc36a3e60452d24cdace5b79b",
+    "001.input.json": "cfbbf9456f8674c46fb3ef11eecf29e4d704978ba96741da76ab1145302905c8",
+    "001.input.step": "bc8bbcba24e30cc6bc6c3480997ce11f98fa7d2530cec754a9332fca102e4a2e",
+    "001.result.brep": "dfadffbf54cd35bd5384653648cf3e4e15c8a3542e240a2e0c5ffc463b132543",
+    "001.result.json": "4e8505b27d9119f0d98d9490ef2ba203dc13822832e3c83eb8f287189e7710dd",
+    "001.result.step": "c287ffd9573765ee9e34fd49e0636e22eb2549994878cdbe6f97a19b60c2a8e2",
+    "001.truck.json": "2513fde0e32d616f6ee37d2bc4d97c843ec3fe2e89b9f08308d4b97db3cf35c2",
+    "001.truck.step": "ea1fc8bc0b8d521913abc20337bdfb28f3f0f89e51bec14c3780afe2a13513d2"
+  },
+  "archive_sha256": "3a64fbc93cca7463d1ba54b3c82be5e0d05ed4fdf3c617225cfb7f5a96e8a6ae"
+}

@@ -1,0 +1,44 @@
+    Updating crates.io index
+     Locking 479 packages to latest compatible versions
+      Adding proc-macro-crate v3.3.0 (available: v3.5.0)
+   Compiling truck-derivers v0.1.0 (/home/krone/Development/Pieza_WS/truck/target/two-edge-parent/truck-derivers)
+   Compiling truck-base v0.5.0 (/home/krone/Development/Pieza_WS/truck/target/two-edge-parent/truck-base)
+   Compiling truck-assembly v0.1.0 (/home/krone/Development/Pieza_WS/truck/target/two-edge-parent/truck-assembly)
+   Compiling truck-geotrait v0.4.0 (/home/krone/Development/Pieza_WS/truck/target/two-edge-parent/truck-geotrait)
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/target/two-edge-parent/truck-geometry)
+   Compiling truck-topology v0.6.0 (/home/krone/Development/Pieza_WS/truck/target/two-edge-parent/truck-topology)
+   Compiling truck-polymesh v0.6.0 (/home/krone/Development/Pieza_WS/truck/target/two-edge-parent/truck-polymesh)
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/Pieza_WS/truck/target/two-edge-parent/truck-modeling)
+   Compiling truck-meshalgo v0.4.0 (/home/krone/Development/Pieza_WS/truck/target/two-edge-parent/truck-meshalgo)
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/target/two-edge-parent/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/target/two-edge-parent/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 17.76s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/two_edge_blend_caps.rs (/home/krone/Development/Pieza_WS/truck/target/contact-parent-build/release/deps/two_edge_blend_caps-9880dddf9e34758e)
+
+running 2 tests
+test curved_rim_trims_both_ends_of_one_cap_edge_and_one_end_face ... FAILED
+test parabolic_cap_preserves_the_rolling_radius_beyond_its_contact_endpoints ... FAILED
+
+failures:
+
+---- curved_rim_trims_both_ends_of_one_cap_edge_and_one_end_face stdout ----
+
+thread 'curved_rim_trims_both_ends_of_one_cap_edge_and_one_end_face' (278330) panicked at truck-shapeops/tests/two_edge_blend_caps.rs:41:77:
+called `Result::unwrap()` on an `Err` value: Diagnostic { code: BlendConstructionFailed, operation: "fillet_solid_along_wire", stage: "trim_faces", message: "Blend construction failed; the numerical or geometric constraint could not be resolved.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- parabolic_cap_preserves_the_rolling_radius_beyond_its_contact_endpoints stdout ----
+
+thread 'parabolic_cap_preserves_the_rolling_radius_beyond_its_contact_endpoints' (278331) panicked at truck-shapeops/tests/two_edge_blend_caps.rs:108:77:
+called `Result::unwrap()` on an `Err` value: Diagnostic { code: BlendConstructionFailed, operation: "fillet_solid_along_wire", stage: "trim_faces", message: "Blend construction failed; the numerical or geometric constraint could not be resolved.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+
+
+failures:
+    curved_rim_trims_both_ends_of_one_cap_edge_and_one_end_face
+    parabolic_cap_preserves_the_rolling_radius_beyond_its_contact_endpoints
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p truck-shapeops --test two_edge_blend_caps`

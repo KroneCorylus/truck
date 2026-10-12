@@ -1,0 +1,12 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 2.32s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/two_edge_blend_caps.rs (target/release/deps/two_edge_blend_caps-d683bb99638bce04)
+
+running 2 tests
+test curved_rim_trims_both_ends_of_one_cap_edge_and_one_end_face ... ok
+test parabolic_cap_preserves_the_rolling_radius_beyond_its_contact_endpoints ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.04s
+

@@ -440,6 +440,8 @@ where
     }
 
     if !closed {
+        let mut end_pieces: HashMap<EdgeID<C>, Option<Edge<Point3, C>>> = HashMap::new();
+        let mut end_edges: HashMap<usize, Vec<Edge<Point3, C>>> = HashMap::new();
         for (which, j, k) in [(0, 0, 0), (1, n, n - 1)] {
             let walk = ends[which].take().ok_or_else(failed)?;
             let vertex = if j == 0 {
@@ -465,6 +467,20 @@ where
             }
             points.push((vertices[j][1].clone(), (u1, v_end)));
             pieces.push(cuts.piece(&walk.edges[m]).ok_or_else(failed)?);
+            for (edge, piece) in walk.edges.iter().zip(&pieces) {
+                let canonical = piece.as_ref().map(|piece| {
+                    if edge.orientation() {
+                        piece.clone()
+                    } else {
+                        piece.inverse()
+                    }
+                });
+                if let Some(previous) = end_pieces.insert(edge.id(), canonical.clone()) {
+                    if previous != canonical {
+                        return Err(failed().stage("trim_end_faces"));
+                    }
+                }
+            }
 
             let blend = &blend_surfaces[k];
             for i in 0..m {
@@ -483,46 +499,59 @@ where
                 } else {
                     piece.inverse()
                 };
-                let mut loops = Vec::new();
-                for boundary in faces[idx].boundaries() {
-                    let kept: Vec<_> = boundary
-                        .into_iter()
-                        .filter_map(|edge| {
-                            for index in [i, i + 1] {
-                                if edge.id() == walk.edges[index].id() {
-                                    return pieces[index].as_ref().map(|piece| {
-                                        if edge.orientation() == walk.edges[index].orientation() {
-                                            piece.clone()
-                                        } else {
-                                            piece.inverse()
-                                        }
-                                    });
-                                }
-                            }
-                            Some(edge)
-                        })
-                        .collect();
-                    let mut boundary = Wire::new();
-                    for index in 0..kept.len() {
-                        boundary.push_back(kept[index].clone());
-                        let (a, b) = (kept[index].back(), kept[(index + 1) % kept.len()].front());
-                        if a != b {
-                            if fillet_edge.back() != a || fillet_edge.front() != b {
-                                return Err(failed().stage("trim_end_faces"));
-                            }
-                            boundary.push_back(fillet_edge.inverse());
-                        }
-                    }
-                    loops.push(boundary);
-                }
                 piece.set_curve(
                     IntersectionCurve::new(face_surface, blend.clone(), piece.curve())
                         .to_same_geometry(),
                 );
-                faces[idx] = Face::try_new(loops, faces[idx].oriented_surface())
-                    .map_err(|_| failed().stage("trim_end_faces"))?;
+                end_edges
+                    .entry(idx)
+                    .or_default()
+                    .push(fillet_edge.inverse());
                 cross[j].push(piece);
             }
+        }
+        // Both ends may trim the same face, so close its gaps only after collecting both.
+        for (idx, bridges) in end_edges {
+            let mut used = vec![false; bridges.len()];
+            let mut loops = Vec::new();
+            for boundary in faces[idx].boundaries() {
+                let kept: Vec<_> = boundary
+                    .into_iter()
+                    .filter_map(|edge| match end_pieces.get(&edge.id()) {
+                        Some(piece) => piece.as_ref().map(|piece| {
+                            if edge.orientation() {
+                                piece.clone()
+                            } else {
+                                piece.inverse()
+                            }
+                        }),
+                        None => Some(edge),
+                    })
+                    .collect();
+                if kept.is_empty() {
+                    return Err(failed().stage("trim_end_faces"));
+                }
+                let mut boundary = Wire::new();
+                for index in 0..kept.len() {
+                    boundary.push_back(kept[index].clone());
+                    let (a, b) = (kept[index].back(), kept[(index + 1) % kept.len()].front());
+                    if a != b {
+                        let (i, edge) = bridges
+                            .iter()
+                            .enumerate()
+                            .find(|(i, edge)| !used[*i] && edge.front() == a && edge.back() == b)
+                            .ok_or_else(|| failed().stage("trim_end_faces"))?;
+                        boundary.push_back(edge.clone());
+                        used[i] = true;
+                    }
+                }
+                loops.push(boundary);
+            }
+            if used.iter().any(|used| !used) {
+                return Err(failed().stage("trim_end_faces"));
+            }
+            faces[idx] = Face::try_new(loops, faces[idx].oriented_surface())
+                .map_err(|_| failed().stage("trim_end_faces"))?;
         }
     }
 
@@ -607,7 +636,7 @@ where
         let len = boundary.len();
         let m = run.chain.len();
         let whole = run.whole(len);
-        if !whole && len < m + 2 {
+        if !whole && len < m + 1 {
             return None;
         }
         let mut curves: Vec<C> = run
@@ -622,7 +651,29 @@ where
 
         let mut piece_prev = None;
         let mut piece_next = None;
-        if !whole {
+        if !whole && len == m + 1 {
+            if cuts.vertices[start_vertex][side].is_some()
+                || cuts.vertices[end_vertex][side].is_some()
+            {
+                return None;
+            }
+            let adjacent = &boundary[(run.start + len - 1) % len];
+            let (before, start) = trim_contact_edge(&mut curves[0], adjacent, true)?;
+            let (_, end) = trim_contact_edge(&mut curves[m - 1], adjacent, false)?;
+            let before = before?;
+            let middle = if before.front() == &end {
+                before
+            } else {
+                let parameter = before
+                    .curve()
+                    .search_nearest_parameter(end.point(), None, 100)?;
+                before.cut_with_parameter(&end, parameter)?.1
+            };
+            cuts.insert(adjacent, Some(middle.clone()))?;
+            cuts.vertices[start_vertex][side] = Some(start);
+            cuts.vertices[end_vertex][side] = Some(end);
+            piece_prev = Some(Some(middle));
+        } else if !whole {
             let prev = &boundary[(run.start + len - 1) % len];
             let next = &boundary[(run.start + m) % len];
             piece_prev = Some(match cuts.vertices[start_vertex][side].clone() {
