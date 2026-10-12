@@ -7,9 +7,9 @@
       "tracked_changes": "M src/BOPAlgo/BOPAlgo_PaveFiller.cxx\n M src/BRepAlgoAPI/BRepAlgoAPI_BuilderAlgo.cxx\n M src/IntTools/IntTools_FaceFace.cxx"
     },
     "truck": {
-      "revision": "4a156c4fbc08755ef658b42e7b50e932f03fdc56",
+      "revision": "f7f8f4f569fbb101554a6a31cc05ca95dc04d35b",
       "revision_scope": "Latest commit outside audits/fillet-chamfer; audit-only commits do not change the kernel baseline.",
-      "tracked_changes_in_modeling": "M truck-geometry/src/decorators/rbf_surface/contact_circle.rs\n M truck-shapeops/src/fillet/along_wire.rs\n M truck-shapeops/tests/fixtures/spline-pipe/README.md"
+      "tracked_changes_in_modeling": ""
     },
     "app": {
       "revision": "f5a381704a12c8d93f02e7d79665d595dea55dd2",
