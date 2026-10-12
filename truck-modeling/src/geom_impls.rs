@@ -35,9 +35,9 @@ pub(super) fn circle_arc_by_tangent0(
 
 fn circum_center(pt0: Point3, pt1: Point3, pt2: Point3) -> Point3 {
     let (vec0, vec1) = (pt1 - pt0, pt2 - pt0);
-    let (a2, ab, b2) = (vec0.dot(vec0), vec0.dot(vec1), vec1.dot(vec1));
-    let (det, u, v) = (a2 * b2 - ab * ab, a2 * b2 - ab * b2, a2 * b2 - ab * a2);
-    pt0 + u / (2.0 * det) * vec0 + v / (2.0 * det) * vec1
+    let normal = vec0.cross(vec1);
+    let offset = (vec0.magnitude2() * vec1 - vec1.magnitude2() * vec0).cross(normal);
+    pt0 + offset / (2.0 * normal.magnitude2())
 }
 
 pub(super) fn circle_arc(
@@ -221,6 +221,30 @@ mod test_geom_impl {
         let angle2 = (p2 - p1).angle(p2 - p0);
         let angle3 = (p3 - p1).angle(p3 - p0);
         prop_assert_near!(angle2, angle3);
+    }
+
+    #[test]
+    fn circum_center_is_stable_for_a_station_near_an_arc_endpoint() {
+        let p0 = Point3::new(0., -8.211163071339715, 0.);
+        let p1 = Point3::new(0., 9.613692926721406, -5.646549845685374);
+        let curve = circle_arc_by_tangent0(p0, p1, Vector3::new(0., 0., 6.055509164114065));
+        let (a, b) = curve.range_tuple();
+        let p2 = curve.subs(a + (b - a) * 0.9999065048496926);
+        let expected = curve.transform()[3].to_point();
+        for [a, b, c] in [
+            [p0, p1, p2],
+            [p0, p2, p1],
+            [p1, p0, p2],
+            [p1, p2, p0],
+            [p2, p0, p1],
+            [p2, p1, p0],
+        ] {
+            let center = circum_center(a, b, c);
+            assert!(
+                center.distance(expected) < 1e-9,
+                "center {center:?}, expected {expected:?}"
+            );
+        }
     }
 
     #[property_test]

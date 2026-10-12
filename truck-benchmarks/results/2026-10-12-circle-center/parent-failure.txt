@@ -1,0 +1,25 @@
+   Compiling truck-geotrait v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-geotrait)
+   Compiling truck-topology v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-topology)
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-modeling)
+    Finished `release` profile [optimized] target(s) in 2.99s
+     Running unittests src/lib.rs (target/release/deps/truck_modeling-cd403b47d5ae25bb)
+
+running 1 test
+test geom_impls::test_geom_impl::circum_center_is_stable_for_a_station_near_an_arc_endpoint ... FAILED
+
+failures:
+
+---- geom_impls::test_geom_impl::circum_center_is_stable_for_a_station_near_an_arc_endpoint stdout ----
+
+thread 'geom_impls::test_geom_impl::circum_center_is_stable_for_a_station_near_an_arc_endpoint' (540640) panicked at truck-modeling/src/geom_impls.rs:243:13:
+center Point3 [0.0, 1.5956206512528297, -6.6092979977838695e-9], expected Point3 [0.0, 1.5956206847100773, 0.0]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    geom_impls::test_geom_impl::circum_center_is_stable_for_a_station_near_an_arc_endpoint
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 12 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-modeling --lib`

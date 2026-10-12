@@ -1,0 +1,7 @@
+{
+  "parent": "49ddd2fb",
+  "source_sha256": {
+    "truck-modeling/src/geom_impls.rs": "c24dcd97060811692a4eae7968f29a72f220f9318975b59bd0ee24efecab658a"
+  },
+  "scope": "Cross-product circumcenter calculation and deterministic regression; no other production changes."
+}

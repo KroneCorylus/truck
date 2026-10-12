@@ -1881,13 +1881,26 @@
           "path": "audits/fillet-chamfer/capture/2026-10-11-smooth-fillets/REPORT.md",
           "find": "The full run",
           "role": "executed-capture"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-modeling/src/geom_impls.rs",
+          "find": "fn circum_center_is_stable_for_a_station_near_an_arc_endpoint",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-12-circle-center/REPORT.md",
+          "find": "# Stable circle centers",
+          "role": "replay-report"
         }
       ],
       "required_outcome": "Find the intended valid contact solution near singularities and competing branches without unstable branch jumps or false failures.",
       "verification": [
         "At b81cbedf, revolution sampling uses the actual radial distance and shared directional error budget. The native D4 spherical-sector input now meets the unchanged independent volume/closed-mesh check: error 134.3034 -> 28.0300, median mesh time 351.747 -> 1668.584 ms (4.74x). Pole search/Newton, smooth-pole curvature, mesh-scale bounded tangency refinement and ambiguous meridian-facet winding fixes preserve existing tangent sphere/bore, rounded-box STEP, thin-loft and periodic-seam tests. Full release: 865 passed, six existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy and action smoke pass. D4 fillet export still fails at an unsplit procedural derivative discontinuity; no full parity claim.",
         "At 012ace79, quartic contact interpolation keeps rolling-ball section frames C2 at internal interpolation knots on smooth supports. The captured D4 spherical-meridian fillet now prepares STEP at the unchanged tolerance and passes independent radius/normals, first/second derivative limits, volume, closed meshes, STEP round trips, rigid transforms and reversed selection. Parent interpolation produced trim position jumps exceeding twice the export tolerance; the exporter is unchanged. Construction median 20.006 -> 17.626 ms; STEP now succeeds in 134.153 ms. Full release: 852 passed, five existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy/action smoke pass.",
-        "Fresh full replay at clean 012ace79 passes all 156 native entries, with 70 constructed Truck outputs and zero panics. All 70 now prepare STEP, 69 produce native-valid single-solid STEP and 68 meet the combined limited checks; the sole improvement is D4, with sampled distances 5.78e-5/3.12e-5. Q4 capture 2 remains open/two-solid with discrepancy 1.20849; tolerance A1, G1 trim failure and I3/J9 timeouts remain. All full-parity verdicts stay unverified."
+        "Fresh full replay at clean 012ace79 passes all 156 native entries, with 70 constructed Truck outputs and zero panics. All 70 now prepare STEP, 69 produce native-valid single-solid STEP and 68 meet the combined limited checks; the sole improvement is D4, with sampled distances 5.78e-5/3.12e-5. Q4 capture 2 remains open/two-solid with discrepancy 1.20849; tolerance A1, G1 trim failure and I3/J9 timeouts remain. All full-parity verdicts stay unverified.",
+        "Three-point circle centers now use a cross-product form that avoids cancellation when a station is close to an arc endpoint. The deterministic regression fails on 49ddd2fb and checks all six point orders; the existing saved circular-arc property failure also passes unchanged. Full release: 870 passed, one unchanged PCurve derivative property failure, five existing ignored; Clippy/action smoke pass. This is a supporting numerical fix, not another captured blend success. See truck-benchmarks/results/2026-10-12-circle-center/REPORT.md."
       ]
     },
     {
