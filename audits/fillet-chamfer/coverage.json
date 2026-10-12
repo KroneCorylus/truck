@@ -289,9 +289,25 @@
           "path": "truck-shapeops/tests/high_valence_fillets.rs",
           "find": "G1 spherical/cylindrical contact",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-11-procedural-export-knots/REPORT.md",
+          "find": "Smooth longitudinal fillets",
+          "role": "regression-validation"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-11-smooth-fillets/REPORT.md",
+          "find": "The full run",
+          "role": "executed-capture"
         }
       ],
-      "required_outcome": "Achieve the required smoothness within blend surfaces and across their joins; distinguish that from tangency to the support faces."
+      "required_outcome": "Achieve the required smoothness within blend surfaces and across their joins; distinguish that from tangency to the support faces.",
+      "verification": [
+        "At 012ace79, quartic contact interpolation keeps rolling-ball section frames C2 at internal interpolation knots on smooth supports. The captured D4 spherical-meridian fillet now prepares STEP at the unchanged tolerance and passes independent radius/normals, first/second derivative limits, volume, closed meshes, STEP round trips, rigid transforms and reversed selection. Parent interpolation produced trim position jumps exceeding twice the export tolerance; the exporter is unchanged. Construction median 20.006 -> 17.626 ms; STEP now succeeds in 134.153 ms. Full release: 852 passed, five existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy/action smoke pass.",
+        "Fresh full replay at clean 012ace79 passes all 156 native entries, with 70 constructed Truck outputs and zero panics. All 70 now prepare STEP, 69 produce native-valid single-solid STEP and 68 meet the combined limited checks; the sole improvement is D4, with sampled distances 5.78e-5/3.12e-5. Q4 capture 2 remains open/two-solid with discrepancy 1.20849; tolerance A1, G1 trim failure and I3/J9 timeouts remain. All full-parity verdicts stay unverified."
+      ]
     },
     {
       "id": "C01",
@@ -701,6 +717,18 @@
           "path": "audits/fillet-chamfer/capture/2026-10-11-support-domains/REPORT.md",
           "find": "# Full captured replay",
           "role": "verification"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-11-procedural-export-knots/REPORT.md",
+          "find": "Smooth longitudinal fillets",
+          "role": "regression-validation"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-11-smooth-fillets/REPORT.md",
+          "find": "The full run",
+          "role": "executed-capture"
         }
       ],
       "required_outcome": "Blend intersections between curved supports, including cylinders, cones, spheres, tori and spline surfaces, with valid contacts and trimmed output.",
@@ -709,7 +737,9 @@
         "OCCT 7.9.3 returns valid single solids on the four paired native analytic sphere-band tasks. Maximum sampled rolling-radius residuals are approximately 3.91e-6 and 4.06e-6; volume differences from the exact independent formula are at most 2.22e-6. These are within the documented modeling tolerance, but exact surface identity and OCCT transform/NURBS/G1/mesh/STEP equivalence are not established.",
         "Captured replay at d1b2bade: 161 operation captures from 148 upstream entries, including 45 constructed results. Forty-two meet the combined limited geometry/input-preservation/mesh/STEP and bidirectional sample checks; none is classified as full parity. Other observations are import inconsistencies/rejections, route failures, unsupported replay intent, panics during preprocessing, timeouts and one incomplete capture. The retained physical fixtures identify cone STEP trimming, meshing, revolved inclusion and imported cylinder support bounds as concrete investigations. See capture/baseline/REPORT.md; native verdicts and replay outcomes remain separate.",
         "At 7414e3d9, signed atan2 angle recovery fixes loss of precision near coincident/opposite revolution meridians. Two parent-failing regressions cover point/nearest searches, three radii, small seam/antipodal angles and exact spherical boundaries across shifted domains, rigid transforms and reversed orientations; off-sphere curves remain rejected. Captured D2 input consistency now passes, without claiming subsequent blend support. Full geometry/modeling/shapeops/STEP: 728 passed, 0 failed, 4 existing ignored; Clippy and action smoke pass. See truck-benchmarks/results/2026-10-11-revolution-seams/REPORT.md.",
-        "A fresh full capture at clean 4c764bef passes all 156 native entries and constructs 64 of 161 Truck operation captures, versus baseline 45. All 64 have consistent geometry, immutable inputs and closed meshes; 63 export valid single-solid STEP and 62 also meet the 0.001 bidirectional sampled boundary limit. A9, D2 and F8 now succeed; I1 mesh closure is resolved in this fixture. D4 still fails STEP preparation, tolerance-grid A1 differs by about 0.02238, I3/J9 time out, and Z1 still panics during preprocessing in this snapshot. Thirty-one imports fail, 23 inputs are inconsistent, 31 operations fail, eight intents are unhandled and one capture is incomplete. All full-parity verdicts remain unverified."
+        "A fresh full capture at clean 4c764bef passes all 156 native entries and constructs 64 of 161 Truck operation captures, versus baseline 45. All 64 have consistent geometry, immutable inputs and closed meshes; 63 export valid single-solid STEP and 62 also meet the 0.001 bidirectional sampled boundary limit. A9, D2 and F8 now succeed; I1 mesh closure is resolved in this fixture. D4 still fails STEP preparation, tolerance-grid A1 differs by about 0.02238, I3/J9 time out, and Z1 still panics during preprocessing in this snapshot. Thirty-one imports fail, 23 inputs are inconsistent, 31 operations fail, eight intents are unhandled and one capture is incomplete. All full-parity verdicts remain unverified.",
+        "At 012ace79, quartic contact interpolation keeps rolling-ball section frames C2 at internal interpolation knots on smooth supports. The captured D4 spherical-meridian fillet now prepares STEP at the unchanged tolerance and passes independent radius/normals, first/second derivative limits, volume, closed meshes, STEP round trips, rigid transforms and reversed selection. Parent interpolation produced trim position jumps exceeding twice the export tolerance; the exporter is unchanged. Construction median 20.006 -> 17.626 ms; STEP now succeeds in 134.153 ms. Full release: 852 passed, five existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy/action smoke pass.",
+        "Fresh full replay at clean 012ace79 passes all 156 native entries, with 70 constructed Truck outputs and zero panics. All 70 now prepare STEP, 69 produce native-valid single-solid STEP and 68 meet the combined limited checks; the sole improvement is D4, with sampled distances 5.78e-5/3.12e-5. Q4 capture 2 remains open/two-solid with discrepancy 1.20849; tolerance A1, G1 trim failure and I3/J9 timeouts remain. All full-parity verdicts stay unverified."
       ]
     },
     {
@@ -1732,11 +1762,25 @@
           "path": "truck-benchmarks/results/2026-10-11-spherical-meridian-step/REPORT.md",
           "find": "Revolution tessellation and smooth polar contacts",
           "role": "regression-validation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-11-procedural-export-knots/REPORT.md",
+          "find": "Smooth longitudinal fillets",
+          "role": "regression-validation"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-11-smooth-fillets/REPORT.md",
+          "find": "The full run",
+          "role": "executed-capture"
         }
       ],
       "required_outcome": "Find the intended valid contact solution near singularities and competing branches without unstable branch jumps or false failures.",
       "verification": [
-        "At b81cbedf, revolution sampling uses the actual radial distance and shared directional error budget. The native D4 spherical-sector input now meets the unchanged independent volume/closed-mesh check: error 134.3034 -> 28.0300, median mesh time 351.747 -> 1668.584 ms (4.74x). Pole search/Newton, smooth-pole curvature, mesh-scale bounded tangency refinement and ambiguous meridian-facet winding fixes preserve existing tangent sphere/bore, rounded-box STEP, thin-loft and periodic-seam tests. Full release: 865 passed, six existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy and action smoke pass. D4 fillet export still fails at an unsplit procedural derivative discontinuity; no full parity claim."
+        "At b81cbedf, revolution sampling uses the actual radial distance and shared directional error budget. The native D4 spherical-sector input now meets the unchanged independent volume/closed-mesh check: error 134.3034 -> 28.0300, median mesh time 351.747 -> 1668.584 ms (4.74x). Pole search/Newton, smooth-pole curvature, mesh-scale bounded tangency refinement and ambiguous meridian-facet winding fixes preserve existing tangent sphere/bore, rounded-box STEP, thin-loft and periodic-seam tests. Full release: 865 passed, six existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy and action smoke pass. D4 fillet export still fails at an unsplit procedural derivative discontinuity; no full parity claim.",
+        "At 012ace79, quartic contact interpolation keeps rolling-ball section frames C2 at internal interpolation knots on smooth supports. The captured D4 spherical-meridian fillet now prepares STEP at the unchanged tolerance and passes independent radius/normals, first/second derivative limits, volume, closed meshes, STEP round trips, rigid transforms and reversed selection. Parent interpolation produced trim position jumps exceeding twice the export tolerance; the exporter is unchanged. Construction median 20.006 -> 17.626 ms; STEP now succeeds in 134.153 ms. Full release: 852 passed, five existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy/action smoke pass.",
+        "Fresh full replay at clean 012ace79 passes all 156 native entries, with 70 constructed Truck outputs and zero panics. All 70 now prepare STEP, 69 produce native-valid single-solid STEP and 68 meet the combined limited checks; the sole improvement is D4, with sampled distances 5.78e-5/3.12e-5. Q4 capture 2 remains open/two-solid with discrepancy 1.20849; tolerance A1, G1 trim failure and I3/J9 timeouts remain. All full-parity verdicts stay unverified."
       ]
     },
     {
@@ -1781,12 +1825,26 @@
           "path": "truck-benchmarks/results/2026-10-11-spherical-meridian-step/REPORT.md",
           "find": "Revolution tessellation and smooth polar contacts",
           "role": "regression-validation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-11-procedural-export-knots/REPORT.md",
+          "find": "Smooth longitudinal fillets",
+          "role": "regression-validation"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-11-smooth-fillets/REPORT.md",
+          "find": "The full run",
+          "role": "executed-capture"
         }
       ],
       "required_outcome": "Maintain requested geometric accuracy through rapidly changing curvature and unequal feature scales without missed contact failures.",
       "verification": [
         "At dc055215, affine curve division preserves world tolerance through scale, shear and singular projections; positive finite local tolerances below 1e-6 no longer panic. Four regression tests and 747 full release tests pass (5 existing ignored), plus Clippy and action smoke. The five captured preprocessing panics now separate into four unsupported-conic import errors and one later closed-face divisor panic; no blend success or full parity is claimed. See capture/2026-10-11-transformed-division/REPORT.md and truck-benchmarks/results/2026-10-11-transformed-division/REPORT.md.",
-        "At b81cbedf, revolution sampling uses the actual radial distance and shared directional error budget. The native D4 spherical-sector input now meets the unchanged independent volume/closed-mesh check: error 134.3034 -> 28.0300, median mesh time 351.747 -> 1668.584 ms (4.74x). Pole search/Newton, smooth-pole curvature, mesh-scale bounded tangency refinement and ambiguous meridian-facet winding fixes preserve existing tangent sphere/bore, rounded-box STEP, thin-loft and periodic-seam tests. Full release: 865 passed, six existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy and action smoke pass. D4 fillet export still fails at an unsplit procedural derivative discontinuity; no full parity claim."
+        "At b81cbedf, revolution sampling uses the actual radial distance and shared directional error budget. The native D4 spherical-sector input now meets the unchanged independent volume/closed-mesh check: error 134.3034 -> 28.0300, median mesh time 351.747 -> 1668.584 ms (4.74x). Pole search/Newton, smooth-pole curvature, mesh-scale bounded tangency refinement and ambiguous meridian-facet winding fixes preserve existing tangent sphere/bore, rounded-box STEP, thin-loft and periodic-seam tests. Full release: 865 passed, six existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy and action smoke pass. D4 fillet export still fails at an unsplit procedural derivative discontinuity; no full parity claim.",
+        "At 012ace79, quartic contact interpolation keeps rolling-ball section frames C2 at internal interpolation knots on smooth supports. The captured D4 spherical-meridian fillet now prepares STEP at the unchanged tolerance and passes independent radius/normals, first/second derivative limits, volume, closed meshes, STEP round trips, rigid transforms and reversed selection. Parent interpolation produced trim position jumps exceeding twice the export tolerance; the exporter is unchanged. Construction median 20.006 -> 17.626 ms; STEP now succeeds in 134.153 ms. Full release: 852 passed, five existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy/action smoke pass.",
+        "Fresh full replay at clean 012ace79 passes all 156 native entries, with 70 constructed Truck outputs and zero panics. All 70 now prepare STEP, 69 produce native-valid single-solid STEP and 68 meet the combined limited checks; the sole improvement is D4, with sampled distances 5.78e-5/3.12e-5. Q4 capture 2 remains open/two-solid with discrepancy 1.20849; tolerance A1, G1 trim failure and I3/J9 timeouts remain. All full-parity verdicts stay unverified."
       ]
     },
     {
@@ -1908,6 +1966,18 @@
           "path": "truck-benchmarks/results/2026-10-11-spherical-meridian-step/REPORT.md",
           "find": "Revolution tessellation and smooth polar contacts",
           "role": "regression-validation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-11-procedural-export-knots/REPORT.md",
+          "find": "Smooth longitudinal fillets",
+          "role": "regression-validation"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-11-smooth-fillets/REPORT.md",
+          "find": "The full run",
+          "role": "executed-capture"
         }
       ],
       "required_outcome": "Keep blend boundaries on both supports and close them correctly when surface parameters, orientations or seam positions change.",
@@ -1920,7 +1990,9 @@
         "At 4a3e11d4, imported cylinders and conic extrusions receive finite support domains bounded by their complete rational boundary control hulls. Affine conic inclusion/search preserves elliptical, sheared and oblique sweeps; cylinder conversion retains the fitted height and STEP export measures perpendicular radius. Native F8, eight cylinder variants, curved extrema and bounded/off-surface checks pass. Full release modeling/shapeops/STEP: 488 passed, 0 failed, 3 existing ignored; Clippy and action smoke pass. This resolves the previously recorded finite extrusion domain failures; unsupported boundary representations and other import failures remain open.",
         "At 9285a3a0, exact coincident adjacent wire ends are connected, tangent face loops are split, generated plane/cylinder-generator pcurves become spatial lines, and complete affine-circle bounds fit cylinder supports. Native Z1 preprocessing passes both modes and rigid transforms with geometry consistency, independent volume, closed meshes and STEP round trips. Invalid crossing counts and failed conversions preserve the polyline cache; unrelated coincident vertices and nonzero gaps are retained. Full release shapeops/STEP: 408 passed, 0 failed, 1 existing ignored; Clippy and action smoke pass. Subsequent native Z1 fillet replay remains to be measured; preprocessing success alone is not blend parity.",
         "At clean HEAD 6351c68b, the full tangent-input replay passes all 156 native entries and constructs 70 of 161 captured Truck tasks. All 70 preserve input and geometry consistency; 69 have closed Truck meshes, 69 prepare STEP, 68 yield native-valid single-solid STEP and 67 meet the combined limited checks including bidirectional sampled distance <=0.001. Z1 now succeeds, with maximum sampled distances about 3.48e-5. Newly reachable Q4 capture 2 has an open mesh, exports two solids and differs by 1.20840; D4 export, tolerance A1 and I3/J9 timeouts remain. Zero panics; no full parity verdict.",
-        "At b81cbedf, revolution sampling uses the actual radial distance and shared directional error budget. The native D4 spherical-sector input now meets the unchanged independent volume/closed-mesh check: error 134.3034 -> 28.0300, median mesh time 351.747 -> 1668.584 ms (4.74x). Pole search/Newton, smooth-pole curvature, mesh-scale bounded tangency refinement and ambiguous meridian-facet winding fixes preserve existing tangent sphere/bore, rounded-box STEP, thin-loft and periodic-seam tests. Full release: 865 passed, six existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy and action smoke pass. D4 fillet export still fails at an unsplit procedural derivative discontinuity; no full parity claim."
+        "At b81cbedf, revolution sampling uses the actual radial distance and shared directional error budget. The native D4 spherical-sector input now meets the unchanged independent volume/closed-mesh check: error 134.3034 -> 28.0300, median mesh time 351.747 -> 1668.584 ms (4.74x). Pole search/Newton, smooth-pole curvature, mesh-scale bounded tangency refinement and ambiguous meridian-facet winding fixes preserve existing tangent sphere/bore, rounded-box STEP, thin-loft and periodic-seam tests. Full release: 865 passed, six existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy and action smoke pass. D4 fillet export still fails at an unsplit procedural derivative discontinuity; no full parity claim.",
+        "At 012ace79, quartic contact interpolation keeps rolling-ball section frames C2 at internal interpolation knots on smooth supports. The captured D4 spherical-meridian fillet now prepares STEP at the unchanged tolerance and passes independent radius/normals, first/second derivative limits, volume, closed meshes, STEP round trips, rigid transforms and reversed selection. Parent interpolation produced trim position jumps exceeding twice the export tolerance; the exporter is unchanged. Construction median 20.006 -> 17.626 ms; STEP now succeeds in 134.153 ms. Full release: 852 passed, five existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy/action smoke pass.",
+        "Fresh full replay at clean 012ace79 passes all 156 native entries, with 70 constructed Truck outputs and zero panics. All 70 now prepare STEP, 69 produce native-valid single-solid STEP and 68 meet the combined limited checks; the sole improvement is D4, with sampled distances 5.78e-5/3.12e-5. Q4 capture 2 remains open/two-solid with discrepancy 1.20849; tolerance A1, G1 trim failure and I3/J9 timeouts remain. All full-parity verdicts stay unverified."
       ]
     },
     {
@@ -2135,13 +2207,27 @@
           "path": "truck-benchmarks/results/2026-10-11-spherical-meridian-step/REPORT.md",
           "find": "Revolution tessellation and smooth polar contacts",
           "role": "regression-validation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-11-procedural-export-knots/REPORT.md",
+          "find": "Smooth longitudinal fillets",
+          "role": "regression-validation"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-11-smooth-fillets/REPORT.md",
+          "find": "The full run",
+          "role": "executed-capture"
         }
       ],
       "required_outcome": "Blend physically selected intersection edges created by Boolean operations and preserve valid solid geometry.",
       "verification": [
         "At 9285a3a0, exact coincident adjacent wire ends are connected, tangent face loops are split, generated plane/cylinder-generator pcurves become spatial lines, and complete affine-circle bounds fit cylinder supports. Native Z1 preprocessing passes both modes and rigid transforms with geometry consistency, independent volume, closed meshes and STEP round trips. Invalid crossing counts and failed conversions preserve the polyline cache; unrelated coincident vertices and nonzero gaps are retained. Full release shapeops/STEP: 408 passed, 0 failed, 1 existing ignored; Clippy and action smoke pass. Subsequent native Z1 fillet replay remains to be measured; preprocessing success alone is not blend parity.",
         "At clean HEAD 6351c68b, the full tangent-input replay passes all 156 native entries and constructs 70 of 161 captured Truck tasks. All 70 preserve input and geometry consistency; 69 have closed Truck meshes, 69 prepare STEP, 68 yield native-valid single-solid STEP and 67 meet the combined limited checks including bidirectional sampled distance <=0.001. Z1 now succeeds, with maximum sampled distances about 3.48e-5. Newly reachable Q4 capture 2 has an open mesh, exports two solids and differs by 1.20840; D4 export, tolerance A1 and I3/J9 timeouts remain. Zero panics; no full parity verdict.",
-        "At b81cbedf, revolution sampling uses the actual radial distance and shared directional error budget. The native D4 spherical-sector input now meets the unchanged independent volume/closed-mesh check: error 134.3034 -> 28.0300, median mesh time 351.747 -> 1668.584 ms (4.74x). Pole search/Newton, smooth-pole curvature, mesh-scale bounded tangency refinement and ambiguous meridian-facet winding fixes preserve existing tangent sphere/bore, rounded-box STEP, thin-loft and periodic-seam tests. Full release: 865 passed, six existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy and action smoke pass. D4 fillet export still fails at an unsplit procedural derivative discontinuity; no full parity claim."
+        "At b81cbedf, revolution sampling uses the actual radial distance and shared directional error budget. The native D4 spherical-sector input now meets the unchanged independent volume/closed-mesh check: error 134.3034 -> 28.0300, median mesh time 351.747 -> 1668.584 ms (4.74x). Pole search/Newton, smooth-pole curvature, mesh-scale bounded tangency refinement and ambiguous meridian-facet winding fixes preserve existing tangent sphere/bore, rounded-box STEP, thin-loft and periodic-seam tests. Full release: 865 passed, six existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy and action smoke pass. D4 fillet export still fails at an unsplit procedural derivative discontinuity; no full parity claim.",
+        "At 012ace79, quartic contact interpolation keeps rolling-ball section frames C2 at internal interpolation knots on smooth supports. The captured D4 spherical-meridian fillet now prepares STEP at the unchanged tolerance and passes independent radius/normals, first/second derivative limits, volume, closed meshes, STEP round trips, rigid transforms and reversed selection. Parent interpolation produced trim position jumps exceeding twice the export tolerance; the exporter is unchanged. Construction median 20.006 -> 17.626 ms; STEP now succeeds in 134.153 ms. Full release: 852 passed, five existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy/action smoke pass.",
+        "Fresh full replay at clean 012ace79 passes all 156 native entries, with 70 constructed Truck outputs and zero panics. All 70 now prepare STEP, 69 produce native-valid single-solid STEP and 68 meet the combined limited checks; the sole improvement is D4, with sampled distances 5.78e-5/3.12e-5. Q4 capture 2 remains open/two-solid with discrepancy 1.20849; tolerance A1, G1 trim failure and I3/J9 timeouts remain. All full-parity verdicts stay unverified."
       ]
     },
     {
@@ -2393,6 +2479,18 @@
           "path": "truck-benchmarks/results/2026-10-11-spherical-meridian-step/REPORT.md",
           "find": "Revolution tessellation and smooth polar contacts",
           "role": "regression-validation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-11-procedural-export-knots/REPORT.md",
+          "find": "Smooth longitudinal fillets",
+          "role": "regression-validation"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-11-smooth-fillets/REPORT.md",
+          "find": "The full run",
+          "role": "executed-capture"
         }
       ],
       "required_outcome": "Deliver blend results usable for closed meshing, STEP interchange and further modeling while preserving dimensions and validity.",
@@ -2413,7 +2511,9 @@
         "At 4c764bef, physical-selection matching checks complete candidate polyline chords against the captured curve tube. Two parent-failing regressions prevent endpoint-only and shared-midpoint false matches. Captured G1 now selects its intended single parabolic edge and fails during face trimming; F9 selects two adjacent nontangent edges and G2 selects three mixed edges, with both tasks still unsupported by the attempted solid routes. No API matching is required; these are physical task failures.",
         "At 9285a3a0, exact coincident adjacent wire ends are connected, tangent face loops are split, generated plane/cylinder-generator pcurves become spatial lines, and complete affine-circle bounds fit cylinder supports. Native Z1 preprocessing passes both modes and rigid transforms with geometry consistency, independent volume, closed meshes and STEP round trips. Invalid crossing counts and failed conversions preserve the polyline cache; unrelated coincident vertices and nonzero gaps are retained. Full release shapeops/STEP: 408 passed, 0 failed, 1 existing ignored; Clippy and action smoke pass. Subsequent native Z1 fillet replay remains to be measured; preprocessing success alone is not blend parity.",
         "At clean HEAD 6351c68b, the full tangent-input replay passes all 156 native entries and constructs 70 of 161 captured Truck tasks. All 70 preserve input and geometry consistency; 69 have closed Truck meshes, 69 prepare STEP, 68 yield native-valid single-solid STEP and 67 meet the combined limited checks including bidirectional sampled distance <=0.001. Z1 now succeeds, with maximum sampled distances about 3.48e-5. Newly reachable Q4 capture 2 has an open mesh, exports two solids and differs by 1.20840; D4 export, tolerance A1 and I3/J9 timeouts remain. Zero panics; no full parity verdict.",
-        "At b81cbedf, revolution sampling uses the actual radial distance and shared directional error budget. The native D4 spherical-sector input now meets the unchanged independent volume/closed-mesh check: error 134.3034 -> 28.0300, median mesh time 351.747 -> 1668.584 ms (4.74x). Pole search/Newton, smooth-pole curvature, mesh-scale bounded tangency refinement and ambiguous meridian-facet winding fixes preserve existing tangent sphere/bore, rounded-box STEP, thin-loft and periodic-seam tests. Full release: 865 passed, six existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy and action smoke pass. D4 fillet export still fails at an unsplit procedural derivative discontinuity; no full parity claim."
+        "At b81cbedf, revolution sampling uses the actual radial distance and shared directional error budget. The native D4 spherical-sector input now meets the unchanged independent volume/closed-mesh check: error 134.3034 -> 28.0300, median mesh time 351.747 -> 1668.584 ms (4.74x). Pole search/Newton, smooth-pole curvature, mesh-scale bounded tangency refinement and ambiguous meridian-facet winding fixes preserve existing tangent sphere/bore, rounded-box STEP, thin-loft and periodic-seam tests. Full release: 865 passed, six existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy and action smoke pass. D4 fillet export still fails at an unsplit procedural derivative discontinuity; no full parity claim.",
+        "At 012ace79, quartic contact interpolation keeps rolling-ball section frames C2 at internal interpolation knots on smooth supports. The captured D4 spherical-meridian fillet now prepares STEP at the unchanged tolerance and passes independent radius/normals, first/second derivative limits, volume, closed meshes, STEP round trips, rigid transforms and reversed selection. Parent interpolation produced trim position jumps exceeding twice the export tolerance; the exporter is unchanged. Construction median 20.006 -> 17.626 ms; STEP now succeeds in 134.153 ms. Full release: 852 passed, five existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy/action smoke pass.",
+        "Fresh full replay at clean 012ace79 passes all 156 native entries, with 70 constructed Truck outputs and zero panics. All 70 now prepare STEP, 69 produce native-valid single-solid STEP and 68 meet the combined limited checks; the sole improvement is D4, with sampled distances 5.78e-5/3.12e-5. Q4 capture 2 remains open/two-solid with discrepancy 1.20849; tolerance A1, G1 trim failure and I3/J9 timeouts remain. All full-parity verdicts stay unverified."
       ]
     },
     {
@@ -2602,11 +2702,25 @@
           "path": "truck-benchmarks/results/2026-10-11-spherical-meridian-step/REPORT.md",
           "find": "Revolution tessellation and smooth polar contacts",
           "role": "regression-validation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-11-procedural-export-knots/REPORT.md",
+          "find": "Smooth longitudinal fillets",
+          "role": "regression-validation"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-11-smooth-fillets/REPORT.md",
+          "find": "The full run",
+          "role": "executed-capture"
         }
       ],
       "required_outcome": "Fuse or cut bodies, then blend the intended resulting intersection edges while preserving the modeling intent through edits.",
       "verification": [
-        "At b81cbedf, revolution sampling uses the actual radial distance and shared directional error budget. The native D4 spherical-sector input now meets the unchanged independent volume/closed-mesh check: error 134.3034 -> 28.0300, median mesh time 351.747 -> 1668.584 ms (4.74x). Pole search/Newton, smooth-pole curvature, mesh-scale bounded tangency refinement and ambiguous meridian-facet winding fixes preserve existing tangent sphere/bore, rounded-box STEP, thin-loft and periodic-seam tests. Full release: 865 passed, six existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy and action smoke pass. D4 fillet export still fails at an unsplit procedural derivative discontinuity; no full parity claim."
+        "At b81cbedf, revolution sampling uses the actual radial distance and shared directional error budget. The native D4 spherical-sector input now meets the unchanged independent volume/closed-mesh check: error 134.3034 -> 28.0300, median mesh time 351.747 -> 1668.584 ms (4.74x). Pole search/Newton, smooth-pole curvature, mesh-scale bounded tangency refinement and ambiguous meridian-facet winding fixes preserve existing tangent sphere/bore, rounded-box STEP, thin-loft and periodic-seam tests. Full release: 865 passed, six existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy and action smoke pass. D4 fillet export still fails at an unsplit procedural derivative discontinuity; no full parity claim.",
+        "At 012ace79, quartic contact interpolation keeps rolling-ball section frames C2 at internal interpolation knots on smooth supports. The captured D4 spherical-meridian fillet now prepares STEP at the unchanged tolerance and passes independent radius/normals, first/second derivative limits, volume, closed meshes, STEP round trips, rigid transforms and reversed selection. Parent interpolation produced trim position jumps exceeding twice the export tolerance; the exporter is unchanged. Construction median 20.006 -> 17.626 ms; STEP now succeeds in 134.153 ms. Full release: 852 passed, five existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy/action smoke pass.",
+        "Fresh full replay at clean 012ace79 passes all 156 native entries, with 70 constructed Truck outputs and zero panics. All 70 now prepare STEP, 69 produce native-valid single-solid STEP and 68 meet the combined limited checks; the sole improvement is D4, with sampled distances 5.78e-5/3.12e-5. Q4 capture 2 remains open/two-solid with discrepancy 1.20849; tolerance A1, G1 trim failure and I3/J9 timeouts remain. All full-parity verdicts stay unverified."
       ]
     },
     {
