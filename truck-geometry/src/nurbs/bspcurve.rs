@@ -1382,12 +1382,8 @@ where
     {
         let ends = (curve.subs(range.0), curve.subs(range.1));
         let enders = (curve.der(range.0), curve.der(range.1));
-        Self::sub_cubic_approximation(curve, range, ends, enders, p_tol, d_tol, trials).map(
-            |mut x| {
-                x.optimize();
-                x
-            },
-        )
+        // Knot removal uses the global tolerance and can undo a tighter fit.
+        Self::sub_cubic_approximation(curve, range, ends, enders, p_tol, d_tol, trials)
     }
 }
 

@@ -12,7 +12,49 @@ use rustc_hash::FxHashMap as HashMap;
 use rayon::prelude::*;
 
 type SPoint2 = spade::Point2<f64>;
-type Cdt = ConstrainedDelaunayTriangulation<SPoint2>;
+#[derive(Clone, Copy)]
+struct MeshVertex {
+    uv: SPoint2,
+    metric: SPoint2,
+}
+impl HasPosition for MeshVertex {
+    type Scalar = f64;
+    fn position(&self) -> SPoint2 { self.metric }
+}
+struct MeshMetric {
+    origin: Point2,
+    scale: Vector2,
+}
+impl MeshMetric {
+    fn new(surface: &impl PreMeshableSurface, bounds: BoundingBox<Point2>, refine: bool) -> Self {
+        if !refine {
+            return Self {
+                origin: Point2::origin(),
+                scale: Vector2::new(1., 1.),
+            };
+        }
+        let origin = bounds.min().midpoint(bounds.max());
+        let lengths = Vector2::new(
+            surface.uder(origin.x, origin.y).magnitude(),
+            surface.vder(origin.x, origin.y).magnitude(),
+        );
+        let mut scale = lengths / lengths.x.max(lengths.y);
+        if !scale.x.is_finite() || !scale.y.is_finite() || scale.x <= 0. || scale.y <= 0. {
+            scale = Vector2::new(1., 1.);
+        }
+        Self { origin, scale }
+    }
+    fn vertex(&self, u: f64, v: f64) -> MeshVertex {
+        MeshVertex {
+            uv: SPoint2::new(u, v),
+            metric: SPoint2::new(
+                (u - self.origin.x) * self.scale.x,
+                (v - self.origin.y) * self.scale.y,
+            ),
+        }
+    }
+}
+type Cdt = ConstrainedDelaunayTriangulation<MeshVertex>;
 type MeshedShell = Shell<Point3, PolylineCurve, Option<PolygonMesh>>;
 type MeshedCShell = CompressedShell<Point3, PolylineCurve, Option<PolygonMesh>>;
 
@@ -842,6 +884,7 @@ impl PolyBoundary {
         &self,
         triangulation: &mut Cdt,
         boundary_map: &mut HashMap<FixedVertexHandle, Point3>,
+        metric: &MeshMetric,
     ) {
         let poly2tri: Vec<_> = self
             .loops
@@ -849,7 +892,7 @@ impl PolyBoundary {
             .flatten()
             .map(|pt| {
                 let p = [spade_round(pt.x), spade_round(pt.y)];
-                match triangulation.insert(SPoint2::from(p)) {
+                match triangulation.insert(metric.vertex(p[0], p[1])) {
                     Err(_) => None,
                     Ok(idx) => {
                         boundary_map.insert(idx, pt.point);
@@ -900,9 +943,31 @@ fn trimming_tessellation<S>(surface: &S, polyboundary: &PolyBoundary, tol: f64) 
 where S: PreMeshableSurface {
     let mut triangulation = Cdt::new();
     let mut boundary_map = HashMap::<FixedVertexHandle, Point3>::default();
-    polyboundary.insert_to(&mut triangulation, &mut boundary_map);
-    if insert_surface(&mut triangulation, surface, polyboundary, tol) {
-        refine_interior(&mut triangulation, surface, polyboundary, tol);
+    let bounds: BoundingBox<Point2> = polyboundary.loops.iter().flatten().map(|p| p.uv).collect();
+    let divisions = surface.parameter_division(
+        (
+            (bounds.min().x, bounds.max().x),
+            (bounds.min().y, bounds.max().y),
+        ),
+        tol,
+    );
+    let (udiv, vdiv) = (&divisions.0, &divisions.1);
+    let single_direction =
+        (udiv.len() > 2 && vdiv.len() == 2) || (udiv.len() == 2 && vdiv.len() > 2);
+    // When one axis has no interior grid lines, trim gaps need free refinement.
+    // Balance those triangles in physical space to avoid repeated UV slivers.
+    let metric = MeshMetric::new(surface, bounds, single_direction);
+    polyboundary.insert_to(&mut triangulation, &mut boundary_map, &metric);
+    insert_surface(
+        &mut triangulation,
+        surface,
+        polyboundary,
+        tol,
+        &metric,
+        divisions,
+    );
+    if single_direction {
+        refine_interior(&mut triangulation, surface, polyboundary, tol, &metric);
     }
     let mut mesh = triangulation_into_polymesh(
         triangulation.vertices(),
@@ -923,11 +988,12 @@ fn refine_interior(
     surface: &impl PreMeshableSurface,
     boundary: &PolyBoundary,
     tol: f64,
+    metric: &MeshMetric,
 ) {
     for _ in 0..20 {
         let mut positions = vec![Point3::origin(); triangulation.num_vertices()];
         for vertex in triangulation.vertices() {
-            let uv = vertex.as_ref();
+            let uv = vertex.as_ref().uv;
             positions[vertex.index()] = surface.subs(uv.x, uv.y);
         }
         let points: Vec<_> = triangulation
@@ -936,7 +1002,7 @@ fn refine_interior(
                 !edge.is_constraint_edge() && !edge.as_directed().is_part_of_convex_hull()
             })
             .filter_map(|edge| {
-                let [a, b] = edge.vertices().map(|v| *v.as_ref());
+                let [a, b] = edge.vertices().map(|v| v.as_ref().uv);
                 let uv = Point2::new((a.x + b.x) / 2.0, (a.y + b.y) / 2.0);
                 let point = surface.subs(uv.x, uv.y);
                 let directed = edge.as_directed();
@@ -951,7 +1017,7 @@ fn refine_interior(
                     let distance = (point - p).dot(normal);
                     distance * distance > tol * tol * normal.magnitude2()
                 });
-                (curved && boundary.include(uv)).then_some(SPoint2::new(uv.x, uv.y))
+                (curved && boundary.include(uv)).then_some(metric.vertex(uv.x, uv.y))
             })
             .collect();
         if points.is_empty() {
@@ -967,23 +1033,15 @@ fn refine_interior(
     }
 }
 
-/// Inserts parameter divisions and reports whether only one axis was subdivided.
+/// Inserts the surface parameter grid.
 fn insert_surface(
     triangulation: &mut Cdt,
     surface: impl PreMeshableSurface,
     polyline: &PolyBoundary,
     tol: f64,
-) -> bool {
-    let bdb: BoundingBox<Point2> = polyline
-        .loops
-        .iter()
-        .flatten()
-        .map(std::ops::Deref::deref)
-        .collect();
-    let range = ((bdb.min()[0], bdb.max()[0]), (bdb.min()[1], bdb.max()[1]));
-    let (udiv, vdiv) = surface.parameter_division(range, tol);
-    let single_direction =
-        (udiv.len() > 2 && vdiv.len() == 2) || (udiv.len() == 2 && vdiv.len() > 2);
+    metric: &MeshMetric,
+    (udiv, vdiv): (Vec<f64>, Vec<f64>),
+) {
     let crosses_boundary_chord = |uv: Point2| {
         let point = surface.subs(uv.x, uv.y);
         polyline.loops.iter().any(|boundary| {
@@ -1009,7 +1067,7 @@ fn insert_surface(
                     match polyline.include(Point2::new(u, *v))
                         && !crosses_boundary_chord(Point2::new(u, *v))
                     {
-                        true => triangulation.insert(SPoint2::new(u, *v)).ok(),
+                        true => triangulation.insert(metric.vertex(u, *v)).ok(),
                         false => None,
                     }
                 })
@@ -1038,7 +1096,6 @@ fn insert_surface(
             }
         }
     });
-    single_direction
 }
 
 /// Turns each triangle to face the way the surface normals at its corners point. A triangle
@@ -1075,8 +1132,8 @@ fn orient_to_normals(mesh: &mut PolygonMesh) {
 
 /// Converts triangulation into `PolygonMesh`.
 fn triangulation_into_polymesh<'a>(
-    vertices: VertexIterator<'a, SPoint2, (), CdtEdge<()>, ()>,
-    triangles: InnerFaceIterator<'a, SPoint2, (), CdtEdge<()>, ()>,
+    vertices: VertexIterator<'a, MeshVertex, (), CdtEdge<()>, ()>,
+    triangles: InnerFaceIterator<'a, MeshVertex, (), CdtEdge<()>, ()>,
     surface: &impl ParametricSurface3D,
     polyline: &PolyBoundary,
     boundary_map: &HashMap<FixedVertexHandle, Point3>,
@@ -1087,7 +1144,7 @@ fn triangulation_into_polymesh<'a>(
     let vmap: HashMap<_, _> = vertices
         .enumerate()
         .map(|(i, v)| {
-            let p = *v.as_ref();
+            let p = v.as_ref().uv;
             let idx = v.fix();
             let point = match boundary_map.get(&idx) {
                 Some(point) => *point,
@@ -1103,7 +1160,7 @@ fn triangulation_into_polymesh<'a>(
         .map(|tri| tri.vertices())
         .filter(|tri| {
             fn sp2cg(p: SPoint2) -> Point2 { Point2::new(p.x, p.y) }
-            let tri = array![i => sp2cg(*tri[i].as_ref()); 3];
+            let tri = array![i => sp2cg(tri[i].as_ref().uv); 3];
             let (a, b) = (tri[1] - tri[0], tri[2] - tri[0]);
             let c = tri[0] + (a + b) / 3.0;
             let area = a.x * b.y - a.y * b.x;

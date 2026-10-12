@@ -1,0 +1,29 @@
+{
+  "parent_commit": "713f0c9a",
+  "binaries": {
+    "parent": {
+      "path": "target/conical-parent-build/release/examples/blend_output",
+      "sha256": "6ef9f714555b8110587d20be0d4fe8ff4d8581e415620207af40fce5ec6f7f5f"
+    },
+    "after": {
+      "path": "target/release/examples/blend_output",
+      "sha256": "8a33a29923b9898776ffb9f025fd22fdfbc90afa7c29d941dc7893dc09ab042d"
+    }
+  },
+  "fixture_sha256": "2c38d2d1d49714a6528bd3a2e0795e7aca4de01e27bb0a16851dd52e702eedeb",
+  "cpu": "AMD Ryzen 9 7950X3D 16-Core Processor",
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.1\nLLVM version: 22.1.8\n",
+  "notes": "Sequential processes, one warmup then five samples; geometry setup and final mesh checks excluded from timer. Parent fine mesh timeout includes setup/warmup, not an operation-latency bound.",
+  "governor": "powersave",
+  "source_scope": "Working implementation over 713f0c9a; production source and benchmark binary unchanged throughout measurements. Captured replay validation follows in a clean committed run.",
+  "source_sha256": {
+    "truck-geometry/src/nurbs/bspcurve.rs": "bb29763f783a5f9ef1176f97df1a70685bb8d9f3bfdf3b9b08ee65f451dec042",
+    "truck-meshalgo/src/tessellation/triangulation.rs": "b905f350af3c3673f65afe47bf483e9bcd65c66f08a62fb92ba74013ef08d1a4",
+    "truck-benchmarks/examples/blend_output.rs": "a7787830458192dfe33923d58d359684e41e92db453d9a82b3abbe947f041586",
+    "truck-geometry/tests/cubic_approximation_tolerance.rs": "0d22e73849e3586cd9eded8d61b6477933ee0ac2b04293b789a7cbe269226738",
+    "truck-shapeops/tests/parameter_scaled_fillet_mesh.rs": "e30c325c69fd57ff8527eb15c7fde0ed6a911197b1af068912c4d36786a4d63c",
+    "truck-shapeops/tests/fixtures/conical-pipe/input.step": "828699b89cdd9c8c3bb85690ad6c6777c1eaeef8da7a3a7b1d2eeca15d2239a6"
+  },
+  "fixture_archive_sha256": "eddcd228f6427efa4a771927365ae1c20b8ece3462938456225e5c129996792d",
+  "source_patch_sha256": "c1c3bd8ddb9b8f6f6287262d683e70cb44ac140211a555116bf88e7fb174645c"
+}

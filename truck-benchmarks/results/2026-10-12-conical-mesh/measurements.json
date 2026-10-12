@@ -1,0 +1,888 @@
+[
+  {
+    "revision": "parent",
+    "workers": 1,
+    "cpus": "0",
+    "mode": "mesh",
+    "tolerance": 10,
+    "scale": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/conical-parent-build/release/examples/blend_output",
+      "/home/krone/Development/Pieza_WS/truck/target/timeout-traces/I3/001.solid.json",
+      "mesh",
+      "10",
+      "1"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "result": {
+      "checks": [
+        {
+          "closed": false,
+          "triangles": 135914,
+          "vertices": 67959,
+          "volume": 924271.3581364346
+        },
+        {
+          "closed": false,
+          "triangles": 135914,
+          "vertices": 67959,
+          "volume": 924271.3581364346
+        },
+        {
+          "closed": false,
+          "triangles": 135914,
+          "vertices": 67959,
+          "volume": 924271.3581364346
+        },
+        {
+          "closed": false,
+          "triangles": 135914,
+          "vertices": 67959,
+          "volume": 924271.3581364346
+        },
+        {
+          "closed": false,
+          "triangles": 135914,
+          "vertices": 67959,
+          "volume": 924271.3581364346
+        }
+      ],
+      "median_ms": 467.241405,
+      "milliseconds": [
+        477.98614200000003,
+        467.61542299999996,
+        464.393605,
+        466.683383,
+        467.241405
+      ],
+      "mode": "mesh",
+      "scale": 1.0,
+      "tolerance": 10.0
+    },
+    "wall_seconds": 6.832859844000268
+  },
+  {
+    "revision": "after",
+    "workers": 1,
+    "cpus": "0",
+    "mode": "mesh",
+    "tolerance": 10,
+    "scale": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/blend_output",
+      "/home/krone/Development/Pieza_WS/truck/target/timeout-traces/I3/001.solid.json",
+      "mesh",
+      "10",
+      "1"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "result": {
+      "checks": [
+        {
+          "closed": true,
+          "triangles": 24,
+          "vertices": 14,
+          "volume": 934085.0061461581
+        },
+        {
+          "closed": true,
+          "triangles": 24,
+          "vertices": 14,
+          "volume": 934085.0061461581
+        },
+        {
+          "closed": true,
+          "triangles": 24,
+          "vertices": 14,
+          "volume": 934085.0061461581
+        },
+        {
+          "closed": true,
+          "triangles": 24,
+          "vertices": 14,
+          "volume": 934085.0061461581
+        },
+        {
+          "closed": true,
+          "triangles": 24,
+          "vertices": 14,
+          "volume": 934085.0061461581
+        }
+      ],
+      "median_ms": 0.043974000000000006,
+      "milliseconds": [
+        0.051689,
+        0.046239,
+        0.043974000000000006,
+        0.041940000000000005,
+        0.043283
+      ],
+      "mode": "mesh",
+      "scale": 1.0,
+      "tolerance": 10.0
+    },
+    "wall_seconds": 0.0036269959982746514
+  },
+  {
+    "revision": "parent",
+    "workers": 1,
+    "cpus": "0",
+    "mode": "mesh",
+    "tolerance": 0.001,
+    "scale": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/conical-parent-build/release/examples/blend_output",
+      "/home/krone/Development/Pieza_WS/truck/target/timeout-traces/I3/001.solid.json",
+      "mesh",
+      "0.001",
+      "1"
+    ],
+    "status": "timeout",
+    "timeout_seconds": 30,
+    "wall_seconds": 30.0452420040001
+  },
+  {
+    "revision": "after",
+    "workers": 1,
+    "cpus": "0",
+    "mode": "mesh",
+    "tolerance": 0.001,
+    "scale": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/blend_output",
+      "/home/krone/Development/Pieza_WS/truck/target/timeout-traces/I3/001.solid.json",
+      "mesh",
+      "0.001",
+      "1"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "result": {
+      "checks": [
+        {
+          "closed": true,
+          "triangles": 161772,
+          "vertices": 80888,
+          "volume": 979691.1574499073
+        },
+        {
+          "closed": true,
+          "triangles": 161772,
+          "vertices": 80888,
+          "volume": 979691.1574499073
+        },
+        {
+          "closed": true,
+          "triangles": 161772,
+          "vertices": 80888,
+          "volume": 979691.1574499073
+        },
+        {
+          "closed": true,
+          "triangles": 161772,
+          "vertices": 80888,
+          "volume": 979691.1574499073
+        },
+        {
+          "closed": true,
+          "triangles": 161772,
+          "vertices": 80888,
+          "volume": 979691.1574499073
+        }
+      ],
+      "median_ms": 416.48924700000003,
+      "milliseconds": [
+        416.48924700000003,
+        410.73341200000004,
+        416.68341,
+        412.47542799999997,
+        423.906512
+      ],
+      "mode": "mesh",
+      "scale": 1.0,
+      "tolerance": 0.001
+    },
+    "wall_seconds": 8.9657008890008
+  },
+  {
+    "revision": "parent",
+    "workers": 1,
+    "cpus": "0",
+    "mode": "step",
+    "tolerance": 5e-05,
+    "scale": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/conical-parent-build/release/examples/blend_output",
+      "/home/krone/Development/Pieza_WS/truck/target/timeout-traces/I3/001.solid.json",
+      "step",
+      "5e-05",
+      "1"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "result": {
+      "checks": [
+        {
+          "prepared": true,
+          "spline_control_points": 64
+        },
+        {
+          "prepared": true,
+          "spline_control_points": 64
+        },
+        {
+          "prepared": true,
+          "spline_control_points": 64
+        },
+        {
+          "prepared": true,
+          "spline_control_points": 64
+        },
+        {
+          "prepared": true,
+          "spline_control_points": 64
+        }
+      ],
+      "median_ms": 1.4481220000000001,
+      "milliseconds": [
+        1.467709,
+        1.4481220000000001,
+        1.4716969999999998,
+        1.441629,
+        1.44741
+      ],
+      "mode": "step",
+      "scale": 1.0,
+      "tolerance": 5e-05
+    },
+    "wall_seconds": 0.011926556999242166
+  },
+  {
+    "revision": "after",
+    "workers": 1,
+    "cpus": "0",
+    "mode": "step",
+    "tolerance": 5e-05,
+    "scale": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/blend_output",
+      "/home/krone/Development/Pieza_WS/truck/target/timeout-traces/I3/001.solid.json",
+      "step",
+      "5e-05",
+      "1"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "result": {
+      "checks": [
+        {
+          "prepared": true,
+          "spline_control_points": 128
+        },
+        {
+          "prepared": true,
+          "spline_control_points": 128
+        },
+        {
+          "prepared": true,
+          "spline_control_points": 128
+        },
+        {
+          "prepared": true,
+          "spline_control_points": 128
+        },
+        {
+          "prepared": true,
+          "spline_control_points": 128
+        }
+      ],
+      "median_ms": 1.429586,
+      "milliseconds": [
+        1.442601,
+        1.427301,
+        1.433634,
+        1.424376,
+        1.429586
+      ],
+      "mode": "step",
+      "scale": 1.0,
+      "tolerance": 5e-05
+    },
+    "wall_seconds": 0.010988244999680319
+  },
+  {
+    "revision": "parent",
+    "workers": 1,
+    "cpus": "0",
+    "mode": "step",
+    "tolerance": 5e-07,
+    "scale": 0.01,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/conical-parent-build/release/examples/blend_output",
+      "/home/krone/Development/Pieza_WS/truck/target/timeout-traces/I3/001.solid.json",
+      "step",
+      "5e-07",
+      "0.01"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "result": {
+      "checks": [
+        {
+          "prepared": false,
+          "spline_control_points": 0
+        },
+        {
+          "prepared": false,
+          "spline_control_points": 0
+        },
+        {
+          "prepared": false,
+          "spline_control_points": 0
+        },
+        {
+          "prepared": false,
+          "spline_control_points": 0
+        },
+        {
+          "prepared": false,
+          "spline_control_points": 0
+        }
+      ],
+      "median_ms": 2.496285,
+      "milliseconds": [
+        2.502476,
+        2.496285,
+        2.493439,
+        2.49383,
+        2.5118940000000003
+      ],
+      "mode": "step",
+      "scale": 0.01,
+      "tolerance": 5e-07
+    },
+    "wall_seconds": 0.03019713799949386
+  },
+  {
+    "revision": "after",
+    "workers": 1,
+    "cpus": "0",
+    "mode": "step",
+    "tolerance": 5e-07,
+    "scale": 0.01,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/blend_output",
+      "/home/krone/Development/Pieza_WS/truck/target/timeout-traces/I3/001.solid.json",
+      "step",
+      "5e-07",
+      "0.01"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "result": {
+      "checks": [
+        {
+          "prepared": true,
+          "spline_control_points": 128
+        },
+        {
+          "prepared": true,
+          "spline_control_points": 128
+        },
+        {
+          "prepared": true,
+          "spline_control_points": 128
+        },
+        {
+          "prepared": true,
+          "spline_control_points": 128
+        },
+        {
+          "prepared": true,
+          "spline_control_points": 128
+        }
+      ],
+      "median_ms": 1.4350859999999999,
+      "milliseconds": [
+        1.4350859999999999,
+        1.4323409999999999,
+        1.449945,
+        1.43203,
+        1.436358
+      ],
+      "mode": "step",
+      "scale": 0.01,
+      "tolerance": 5e-07
+    },
+    "wall_seconds": 0.02404765800019959
+  },
+  {
+    "revision": "parent",
+    "workers": 4,
+    "cpus": "0,1,2,3",
+    "mode": "mesh",
+    "tolerance": 10,
+    "scale": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck/target/conical-parent-build/release/examples/blend_output",
+      "/home/krone/Development/Pieza_WS/truck/target/timeout-traces/I3/001.solid.json",
+      "mesh",
+      "10",
+      "1"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "result": {
+      "checks": [
+        {
+          "closed": false,
+          "triangles": 135914,
+          "vertices": 67959,
+          "volume": 924271.3581364346
+        },
+        {
+          "closed": false,
+          "triangles": 135914,
+          "vertices": 67959,
+          "volume": 924271.3581364346
+        },
+        {
+          "closed": false,
+          "triangles": 135914,
+          "vertices": 67959,
+          "volume": 924271.3581364346
+        },
+        {
+          "closed": false,
+          "triangles": 135914,
+          "vertices": 67959,
+          "volume": 924271.3581364346
+        },
+        {
+          "closed": false,
+          "triangles": 135914,
+          "vertices": 67959,
+          "volume": 924271.3581364346
+        }
+      ],
+      "median_ms": 268.253716,
+      "milliseconds": [
+        270.366854,
+        264.326032,
+        265.660525,
+        268.357886,
+        268.253716
+      ],
+      "mode": "mesh",
+      "scale": 1.0,
+      "tolerance": 10.0
+    },
+    "wall_seconds": 5.6716823800015845
+  },
+  {
+    "revision": "after",
+    "workers": 4,
+    "cpus": "0,1,2,3",
+    "mode": "mesh",
+    "tolerance": 10,
+    "scale": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/blend_output",
+      "/home/krone/Development/Pieza_WS/truck/target/timeout-traces/I3/001.solid.json",
+      "mesh",
+      "10",
+      "1"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "result": {
+      "checks": [
+        {
+          "closed": true,
+          "triangles": 24,
+          "vertices": 14,
+          "volume": 934085.0061461581
+        },
+        {
+          "closed": true,
+          "triangles": 24,
+          "vertices": 14,
+          "volume": 934085.0061461581
+        },
+        {
+          "closed": true,
+          "triangles": 24,
+          "vertices": 14,
+          "volume": 934085.0061461581
+        },
+        {
+          "closed": true,
+          "triangles": 24,
+          "vertices": 14,
+          "volume": 934085.0061461581
+        },
+        {
+          "closed": true,
+          "triangles": 24,
+          "vertices": 14,
+          "volume": 934085.0061461581
+        }
+      ],
+      "median_ms": 0.08609599999999999,
+      "milliseconds": [
+        0.091746,
+        0.082288,
+        0.08609599999999999,
+        0.07409299999999999,
+        0.09260800000000001
+      ],
+      "mode": "mesh",
+      "scale": 1.0,
+      "tolerance": 10.0
+    },
+    "wall_seconds": 0.004243020001013065
+  },
+  {
+    "revision": "parent",
+    "workers": 4,
+    "cpus": "0,1,2,3",
+    "mode": "mesh",
+    "tolerance": 0.001,
+    "scale": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck/target/conical-parent-build/release/examples/blend_output",
+      "/home/krone/Development/Pieza_WS/truck/target/timeout-traces/I3/001.solid.json",
+      "mesh",
+      "0.001",
+      "1"
+    ],
+    "status": "timeout",
+    "timeout_seconds": 30,
+    "wall_seconds": 30.10086817299998
+  },
+  {
+    "revision": "after",
+    "workers": 4,
+    "cpus": "0,1,2,3",
+    "mode": "mesh",
+    "tolerance": 0.001,
+    "scale": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/blend_output",
+      "/home/krone/Development/Pieza_WS/truck/target/timeout-traces/I3/001.solid.json",
+      "mesh",
+      "0.001",
+      "1"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "result": {
+      "checks": [
+        {
+          "closed": true,
+          "triangles": 161772,
+          "vertices": 80888,
+          "volume": 979691.1574499073
+        },
+        {
+          "closed": true,
+          "triangles": 161772,
+          "vertices": 80888,
+          "volume": 979691.1574499073
+        },
+        {
+          "closed": true,
+          "triangles": 161772,
+          "vertices": 80888,
+          "volume": 979691.1574499073
+        },
+        {
+          "closed": true,
+          "triangles": 161772,
+          "vertices": 80888,
+          "volume": 979691.1574499073
+        },
+        {
+          "closed": true,
+          "triangles": 161772,
+          "vertices": 80888,
+          "volume": 979691.1574499073
+        }
+      ],
+      "median_ms": 164.231074,
+      "milliseconds": [
+        160.098827,
+        164.231074,
+        173.823186,
+        166.825937,
+        161.758815
+      ],
+      "mode": "mesh",
+      "scale": 1.0,
+      "tolerance": 0.001
+    },
+    "wall_seconds": 7.6303897830002825
+  },
+  {
+    "revision": "parent",
+    "workers": 4,
+    "cpus": "0,1,2,3",
+    "mode": "step",
+    "tolerance": 5e-05,
+    "scale": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck/target/conical-parent-build/release/examples/blend_output",
+      "/home/krone/Development/Pieza_WS/truck/target/timeout-traces/I3/001.solid.json",
+      "step",
+      "5e-05",
+      "1"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "result": {
+      "checks": [
+        {
+          "prepared": true,
+          "spline_control_points": 64
+        },
+        {
+          "prepared": true,
+          "spline_control_points": 64
+        },
+        {
+          "prepared": true,
+          "spline_control_points": 64
+        },
+        {
+          "prepared": true,
+          "spline_control_points": 64
+        },
+        {
+          "prepared": true,
+          "spline_control_points": 64
+        }
+      ],
+      "median_ms": 1.480664,
+      "milliseconds": [
+        1.480664,
+        1.459203,
+        1.446989,
+        1.752856,
+        1.57756
+      ],
+      "mode": "step",
+      "scale": 1.0,
+      "tolerance": 5e-05
+    },
+    "wall_seconds": 0.012339259001237224
+  },
+  {
+    "revision": "after",
+    "workers": 4,
+    "cpus": "0,1,2,3",
+    "mode": "step",
+    "tolerance": 5e-05,
+    "scale": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/blend_output",
+      "/home/krone/Development/Pieza_WS/truck/target/timeout-traces/I3/001.solid.json",
+      "step",
+      "5e-05",
+      "1"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "result": {
+      "checks": [
+        {
+          "prepared": true,
+          "spline_control_points": 128
+        },
+        {
+          "prepared": true,
+          "spline_control_points": 128
+        },
+        {
+          "prepared": true,
+          "spline_control_points": 128
+        },
+        {
+          "prepared": true,
+          "spline_control_points": 128
+        },
+        {
+          "prepared": true,
+          "spline_control_points": 128
+        }
+      ],
+      "median_ms": 1.420479,
+      "milliseconds": [
+        1.442981,
+        1.445106,
+        1.417743,
+        1.420479,
+        1.411762
+      ],
+      "mode": "step",
+      "scale": 1.0,
+      "tolerance": 5e-05
+    },
+    "wall_seconds": 0.011379936999219353
+  },
+  {
+    "revision": "parent",
+    "workers": 4,
+    "cpus": "0,1,2,3",
+    "mode": "step",
+    "tolerance": 5e-07,
+    "scale": 0.01,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck/target/conical-parent-build/release/examples/blend_output",
+      "/home/krone/Development/Pieza_WS/truck/target/timeout-traces/I3/001.solid.json",
+      "step",
+      "5e-07",
+      "0.01"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "result": {
+      "checks": [
+        {
+          "prepared": false,
+          "spline_control_points": 0
+        },
+        {
+          "prepared": false,
+          "spline_control_points": 0
+        },
+        {
+          "prepared": false,
+          "spline_control_points": 0
+        },
+        {
+          "prepared": false,
+          "spline_control_points": 0
+        },
+        {
+          "prepared": false,
+          "spline_control_points": 0
+        }
+      ],
+      "median_ms": 2.476817,
+      "milliseconds": [
+        2.4580409999999997,
+        2.581087,
+        2.476817,
+        2.468792,
+        2.547793
+      ],
+      "mode": "step",
+      "scale": 0.01,
+      "tolerance": 5e-07
+    },
+    "wall_seconds": 0.03076677199896949
+  },
+  {
+    "revision": "after",
+    "workers": 4,
+    "cpus": "0,1,2,3",
+    "mode": "step",
+    "tolerance": 5e-07,
+    "scale": 0.01,
+    "command": [
+      "taskset",
+      "-c",
+      "0,1,2,3",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/blend_output",
+      "/home/krone/Development/Pieza_WS/truck/target/timeout-traces/I3/001.solid.json",
+      "step",
+      "5e-07",
+      "0.01"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "result": {
+      "checks": [
+        {
+          "prepared": true,
+          "spline_control_points": 128
+        },
+        {
+          "prepared": true,
+          "spline_control_points": 128
+        },
+        {
+          "prepared": true,
+          "spline_control_points": 128
+        },
+        {
+          "prepared": true,
+          "spline_control_points": 128
+        },
+        {
+          "prepared": true,
+          "spline_control_points": 128
+        }
+      ],
+      "median_ms": 1.44213,
+      "milliseconds": [
+        1.446949,
+        1.529939,
+        1.44213,
+        1.417001,
+        1.420729
+      ],
+      "mode": "step",
+      "scale": 0.01,
+      "tolerance": 5e-07
+    },
+    "wall_seconds": 0.02411275300073612
+  }
+]
