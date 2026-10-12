@@ -199,6 +199,27 @@ impl<C: ParametricCurve3D> ParametricCurve for ProjectedCurve<C> {
 
 impl<C: ParametricCurve3D + BoundedCurve> BoundedCurve for ProjectedCurve<C> {}
 
+impl<C: ParametricCurve3D + BoundedCurve> ProjectedCurve<C> {
+    fn regular_hint(&self, point: Point2, hint: f64) -> f64 {
+        if self.der(hint).magnitude2().is_finite() && self.der2(hint).magnitude2().is_finite() {
+            return hint;
+        }
+        let (a, b) = self.range_tuple();
+        // Midpoints avoid the undefined radial derivative at a revolution pole.
+        (0..PRESEARCH_DIVISION)
+            .map(|i| a + (b - a) * (i as f64 + 0.5) / PRESEARCH_DIVISION as f64)
+            .filter(|&t| {
+                self.der(t).magnitude2().is_finite() && self.der2(t).magnitude2().is_finite()
+            })
+            .min_by(|&x, &y| {
+                self.subs(x)
+                    .distance2(point)
+                    .total_cmp(&self.subs(y).distance2(point))
+            })
+            .unwrap_or(hint)
+    }
+}
+
 impl<C: ParametricCurve3D + BoundedCurve> SearchParameter<D1> for ProjectedCurve<C> {
     type Point = Point2;
     fn search_parameter<H: Into<SPHint1D>>(
@@ -216,7 +237,7 @@ impl<C: ParametricCurve3D + BoundedCurve> SearchParameter<D1> for ProjectedCurve
                 algo::curve::presearch(self, point, self.range_tuple(), PRESEARCH_DIVISION)
             }
         };
-        algo::curve::search_parameter(self, point, hint, trials)
+        algo::curve::search_parameter(self, point, self.regular_hint(point, hint), trials)
     }
 }
 
@@ -237,7 +258,7 @@ impl<C: ParametricCurve3D + BoundedCurve> SearchNearestParameter<D1> for Project
                 algo::curve::presearch(self, point, self.range_tuple(), PRESEARCH_DIVISION)
             }
         };
-        algo::curve::search_nearest_parameter(self, point, hint, trials)
+        algo::curve::search_nearest_parameter(self, point, self.regular_hint(point, hint), trials)
     }
 }
 

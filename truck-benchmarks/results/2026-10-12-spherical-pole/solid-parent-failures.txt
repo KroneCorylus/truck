@@ -1,0 +1,42 @@
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/target/sphere-pole/truck-geometry)
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/Pieza_WS/truck/target/sphere-pole/truck-modeling)
+   Compiling truck-meshalgo v0.4.0 (/home/krone/Development/Pieza_WS/truck/target/sphere-pole/truck-meshalgo)
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/target/sphere-pole/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/target/sphere-pole/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 12.66s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/spherical_pole_blend.rs (target/pole-build/release/deps/spherical_pole_blend-ba6f23bcc48d64d8)
+
+running 3 tests
+test polar_contacts_survive_scale_rotation_and_reversed_selection ... FAILED
+test spherical_meridian_fillet_reaches_the_polar_end_face ... FAILED
+test original_scale_spherical_pole_fillet_preserves_step_accuracy ... FAILED
+
+failures:
+
+---- polar_contacts_survive_scale_rotation_and_reversed_selection stdout ----
+
+thread 'polar_contacts_survive_scale_rotation_and_reversed_selection' (810463) panicked at truck-shapeops/tests/spherical_pole_blend.rs:79:86:
+called `Result::unwrap()` on an `Err` value: Diagnostic { code: BlendConstructionFailed, operation: "fillet_solid_along_wire", stage: "find_contact", message: "Blend construction failed; the numerical or geometric constraint could not be resolved.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: Some(0), related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+
+---- spherical_meridian_fillet_reaches_the_polar_end_face stdout ----
+
+thread 'spherical_meridian_fillet_reaches_the_polar_end_face' (810464) panicked at truck-shapeops/tests/spherical_pole_blend.rs:79:86:
+called `Result::unwrap()` on an `Err` value: Diagnostic { code: BlendConstructionFailed, operation: "fillet_solid_along_wire", stage: "find_contact", message: "Blend construction failed; the numerical or geometric constraint could not be resolved.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: Some(0), related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+
+---- original_scale_spherical_pole_fillet_preserves_step_accuracy stdout ----
+
+thread 'original_scale_spherical_pole_fillet_preserves_step_accuracy' (810462) panicked at truck-shapeops/tests/spherical_pole_blend.rs:79:86:
+called `Result::unwrap()` on an `Err` value: Diagnostic { code: BlendConstructionFailed, operation: "fillet_solid_along_wire", stage: "find_contact", message: "Blend construction failed; the numerical or geometric constraint could not be resolved.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: Some(0), related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    original_scale_spherical_pole_fillet_preserves_step_accuracy
+    polar_contacts_survive_scale_rotation_and_reversed_selection
+    spherical_meridian_fillet_reaches_the_polar_end_face
+
+test result: FAILED. 0 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-shapeops --test spherical_pole_blend`

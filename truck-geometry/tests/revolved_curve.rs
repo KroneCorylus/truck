@@ -176,3 +176,36 @@ fn include_curve_abnormal1() {
     let line = BSplineCurve::new(KnotVec::bezier_knot(1), vec![pt0, pt1]);
     assert!(!surface.include(&line));
 }
+
+#[test]
+fn projection_near_a_revolution_pole_uses_a_regular_seed() {
+    for radius in [3., 150.] {
+        let meridian = Processor::with_transform(
+            TrimmedCurve::new(UnitCircle::<Point3>::new(), (0., PI)),
+            Matrix4::from_cols(
+                Vector4::new(0., 0., -radius, 0.),
+                Vector4::new(0., radius, 0., 0.),
+                Vector4::unit_x(),
+                Vector4::unit_w(),
+            ),
+        );
+        let surface = RevolutedCurve::by_revolution(meridian, Point3::origin(), Vector3::unit_z());
+        for u in [0.0001, 0.00729246205568768] {
+            for v in [0., PI / 2., 5.3] {
+                let point = surface.subs(u, v);
+                for hint in [None, Some((0., v))] {
+                    let uv = surface
+                        .search_parameter(point, hint, 100)
+                        .expect("regular point near pole");
+                    assert!(surface.subs(uv.0, uv.1).distance(point) < 1e-9);
+                    let displaced = Point3::from_vec(point.to_vec() * 1.001);
+                    assert!(surface.search_parameter(displaced, hint, 100).is_none());
+                    let uv = surface
+                        .search_nearest_parameter(displaced, hint, 100)
+                        .unwrap();
+                    assert!(surface.subs(uv.0, uv.1).distance(point) < 1e-9);
+                }
+            }
+        }
+    }
+}

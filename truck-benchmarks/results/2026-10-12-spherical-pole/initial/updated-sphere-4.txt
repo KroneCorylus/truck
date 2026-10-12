@@ -1,0 +1,7 @@
+sample_ms=87.849806000 status=ok
+sample_ms=87.829556000 status=ok
+sample_ms=87.814057000 status=ok
+sample_ms=87.932594000 status=ok
+sample_ms=87.890894000 status=ok
+median_ms=87.849806000
+closed=true volume=3479455.724002516

@@ -405,33 +405,10 @@ fn fillet_to_nurbs(
 ) -> Option<NurbsSurface<Vector4>> {
     // Interpolate the four homogeneous control points of each exact cross-section. Only the
     // longitudinal direction is approximated; the rational cubic across the fillet is retained.
-    for (preserve_breaks, level) in [false, true]
-        .into_iter()
-        .flat_map(|breaks| (0..7).map(move |level| (breaks, level)))
-    {
+    for level in 0..7 {
         let n = 3 * (1 << level) + 1;
         let mut knots = KnotVec::uniform_knot(3, n - 3);
         knots.transform(b - a, a);
-        if preserve_breaks {
-            // Contact tangents can change derivative at the source knots. Preserve those
-            // breaks instead of forcing a C2 fit across them.
-            let mut breaks = surface.vknot_vec().as_slice().to_vec();
-            breaks.dedup();
-            // Keep the fallback within the uniform fitter's 193-control-point limit.
-            if breaks.len().saturating_sub(2) * 3 + 4 > 193 {
-                return None;
-            }
-            for &knot in breaks.iter().filter(|&&knot| a < knot && knot < b) {
-                let count = knots.iter().filter(|&&value| value == knot).count();
-                for _ in count..3 {
-                    knots.add_knot(knot);
-                }
-            }
-        }
-        let n = knots.len() - 4;
-        if n > 193 {
-            continue;
-        }
         // Greville stations keep the clamped cubic interpolation system well-conditioned.
         let params: Vec<_> = (0..n)
             .map(|i| (knots[i + 1] + knots[i + 2] + knots[i + 3]) / 3.0)
@@ -481,12 +458,131 @@ fn fillet_to_nurbs(
             return Some(nurbs);
         }
     }
-    None
+    // Retain source derivative breaks and spend the same 193-control budget only
+    // on spans that miss the tolerance. Each cubic interpolates four exact sections.
+    let mut breaks = vec![a];
+    breaks.extend(
+        surface
+            .vknot_vec()
+            .iter()
+            .copied()
+            .filter(|&v| a < v && v < b),
+    );
+    breaks.push(b);
+    breaks.dedup();
+    let mut spans: Vec<_> = breaks.windows(2).map(|v| (v[0], v[1])).rev().collect();
+    let mut pieces = Vec::new();
+    while let Some((left, right)) = spans.pop() {
+        if (pieces.len() + spans.len() + 1) * 3 + 1 > 193 {
+            return None;
+        }
+        let sections: Vec<_> = (0..=3)
+            .map(|i| {
+                let v = match i {
+                    0 => left,
+                    3 => right,
+                    _ => left + (right - left) * i as f64 / 3.,
+                };
+                surface
+                    .fillet_bezier(v)
+                    .non_rationalized()
+                    .control_points()
+                    .to_vec()
+            })
+            .collect();
+        let rows: Vec<_> = (0..4)
+            .map(|i| {
+                let (p, q, r, s) = (
+                    sections[0][i],
+                    sections[1][i],
+                    sections[2][i],
+                    sections[3][i],
+                );
+                vec![
+                    p,
+                    (-5. * p + 18. * q - 9. * r + 2. * s) / 6.,
+                    (2. * p - 9. * q + 18. * r - 5. * s) / 6.,
+                    s,
+                ]
+            })
+            .collect();
+        let mut knots = KnotVec::bezier_knot(3);
+        knots.transform(right - left, left);
+        let patch = NurbsSurface::new(BSplineSurface::new(
+            (KnotVec::bezier_knot(3), knots),
+            rows.clone(),
+        ));
+        let valid = (0..=16).all(|j| {
+            let v = left + (right - left) * j as f64 / 16.;
+            (0..=8).all(|i| {
+                let u = i as f64 / 8.;
+                let error = patch.subs(u, v).distance(surface.subs(u, v));
+                error.is_finite() && error <= tol
+            })
+        });
+        if valid {
+            pieces.push((left, right, rows));
+        } else {
+            let mid = (left + right) / 2.;
+            if mid == left || mid == right {
+                return None;
+            }
+            spans.push((mid, right));
+            spans.push((left, mid));
+        }
+    }
+    let mut knots = vec![a; 4];
+    let mut rows = vec![Vec::new(); 4];
+    for (i, (_, right, piece)) in pieces.iter().enumerate() {
+        for row in 0..4 {
+            rows[row].extend(piece[row].iter().skip(usize::from(i != 0)).copied());
+        }
+        knots.extend(std::iter::repeat_n(
+            *right,
+            if i + 1 == pieces.len() { 4 } else { 3 },
+        ));
+    }
+    Some(NurbsSurface::new(BSplineSurface::new(
+        (KnotVec::bezier_knot(3), knots.into()),
+        rows,
+    )))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn fillet_export_refines_local_error_without_relaxing_tolerance() {
+        let Surface::Fillet(surface) = serde_json::from_str(include_str!(
+            "../../tests/fixtures/spherical-pole-fillet.json"
+        ))
+        .unwrap() else {
+            panic!("expected procedural fillet");
+        };
+        let mut surface = surface.entity().clone();
+        surface.try_vknot_normalize().unwrap();
+        let tol = 0.00005 / 3_f64.sqrt();
+        let fitted = fillet_to_nurbs(&surface, (0., 1.), tol).expect("locally refined fillet");
+        let knots = fitted.non_rationalized().vknot_vec();
+        assert!(knots.len() - 4 <= 193);
+        let (unique, counts) = knots.to_single_multi();
+        assert!(counts[1..counts.len() - 1].iter().all(|&count| count <= 3));
+        let samples = (0..=4096)
+            .map(|i| i as f64 / 4096.)
+            .chain(unique.windows(2).flat_map(|span| {
+                (0..=32).map(move |i| span[0] + (span[1] - span[0]) * i as f64 / 32.)
+            }));
+        for v in samples {
+            for i in 0..=16 {
+                let u = i as f64 / 16.;
+                assert!(
+                    fitted.subs(u, v).distance(surface.subs(u, v)) <= tol,
+                    "{u} {v}"
+                );
+            }
+        }
+    }
 
     #[test]
     fn procedural_curve_export_refines_a_missed_interior_bulge() {

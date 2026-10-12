@@ -1,0 +1,22 @@
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+    Finished `release` profile [optimized] target(s) in 2.30s
+     Running unittests src/lib.rs (target/release/deps/truck_geometry-1891d54d2db2d612)
+
+running 1 test
+test decorators::rbf_surface::contact_circle::tests::contact_circle_at_spherical_pole_uses_a_regular_contact_chart ... FAILED
+
+failures:
+
+---- decorators::rbf_surface::contact_circle::tests::contact_circle_at_spherical_pole_uses_a_regular_contact_chart stdout ----
+
+thread 'decorators::rbf_surface::contact_circle::tests::contact_circle_at_spherical_pole_uses_a_regular_contact_chart' (697673) panicked at truck-geometry/src/decorators/rbf_surface/contact_circle.rs:310:25:
+the contacts leave the singular guide station on regular supports
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    decorators::rbf_surface::contact_circle::tests::contact_circle_at_spherical_pole_uses_a_regular_contact_chart
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 28 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-geometry --lib`

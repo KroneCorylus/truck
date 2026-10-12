@@ -1,0 +1,386 @@
+[
+  {
+    "version": "parent",
+    "fixture": "cylinder",
+    "workers": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/spherical-pole-parent-rim-blend",
+      "cylinder"
+    ],
+    "returncode": 0,
+    "log": "parent-cylinder-1.txt",
+    "median_ms": 2.643286
+  },
+  {
+    "version": "updated",
+    "fixture": "cylinder",
+    "workers": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/rim_blend",
+      "cylinder"
+    ],
+    "returncode": 0,
+    "log": "updated-cylinder-1.txt",
+    "median_ms": 2.468029
+  },
+  {
+    "version": "parent",
+    "fixture": "spline",
+    "workers": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/spherical-pole-parent-rim-blend",
+      "spline"
+    ],
+    "returncode": 0,
+    "log": "parent-spline-1.txt",
+    "median_ms": 25.71887
+  },
+  {
+    "version": "updated",
+    "fixture": "spline",
+    "workers": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/rim_blend",
+      "spline"
+    ],
+    "returncode": 0,
+    "log": "updated-spline-1.txt",
+    "median_ms": 25.464081
+  },
+  {
+    "version": "parent",
+    "fixture": "sphere",
+    "workers": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/spherical-pole-parent-rim-blend",
+      "sphere"
+    ],
+    "returncode": 0,
+    "log": "parent-sphere-1.txt",
+    "median_ms": 0.094261
+  },
+  {
+    "version": "updated",
+    "fixture": "sphere",
+    "workers": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/rim_blend",
+      "sphere"
+    ],
+    "returncode": 0,
+    "log": "updated-sphere-1.txt",
+    "median_ms": 87.589845
+  },
+  {
+    "version": "parent",
+    "fixture": "step",
+    "workers": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/pole-build/release/examples/blend_output",
+      "/home/krone/Development/Pieza_WS/truck/truck-benchmarks/results/2026-10-12-spherical-pole/constructed-solid.json",
+      "step",
+      "0.00005"
+    ],
+    "returncode": 0,
+    "log": "parent-step-1.txt",
+    "result": {
+      "checks": [
+        {
+          "prepared": false,
+          "spline_control_points": 0
+        },
+        {
+          "prepared": false,
+          "spline_control_points": 0
+        },
+        {
+          "prepared": false,
+          "spline_control_points": 0
+        },
+        {
+          "prepared": false,
+          "spline_control_points": 0
+        },
+        {
+          "prepared": false,
+          "spline_control_points": 0
+        }
+      ],
+      "median_ms": 132.26243200000002,
+      "milliseconds": [
+        132.26243200000002,
+        132.45419,
+        132.486131,
+        132.0999,
+        132.042279
+      ],
+      "mode": "step",
+      "scale": 1.0,
+      "tolerance": 5e-05
+    }
+  },
+  {
+    "version": "updated",
+    "fixture": "step",
+    "workers": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/blend_output",
+      "/home/krone/Development/Pieza_WS/truck/truck-benchmarks/results/2026-10-12-spherical-pole/constructed-solid.json",
+      "step",
+      "0.00005"
+    ],
+    "returncode": 0,
+    "log": "updated-step-1.txt",
+    "result": {
+      "checks": [
+        {
+          "prepared": true,
+          "spline_control_points": 420
+        },
+        {
+          "prepared": true,
+          "spline_control_points": 420
+        },
+        {
+          "prepared": true,
+          "spline_control_points": 420
+        },
+        {
+          "prepared": true,
+          "spline_control_points": 420
+        },
+        {
+          "prepared": true,
+          "spline_control_points": 420
+        }
+      ],
+      "median_ms": 126.797077,
+      "milliseconds": [
+        127.31652399999999,
+        126.70204400000001,
+        126.797077,
+        126.69177400000001,
+        126.94280699999999
+      ],
+      "mode": "step",
+      "scale": 1.0,
+      "tolerance": 5e-05
+    }
+  },
+  {
+    "version": "updated",
+    "fixture": "cylinder",
+    "workers": 4,
+    "command": [
+      "taskset",
+      "-c",
+      "0-3",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/rim_blend",
+      "cylinder"
+    ],
+    "returncode": 0,
+    "log": "updated-cylinder-4.txt",
+    "median_ms": 2.469813
+  },
+  {
+    "version": "parent",
+    "fixture": "cylinder",
+    "workers": 4,
+    "command": [
+      "taskset",
+      "-c",
+      "0-3",
+      "/home/krone/Development/Pieza_WS/truck/target/spherical-pole-parent-rim-blend",
+      "cylinder"
+    ],
+    "returncode": 0,
+    "log": "parent-cylinder-4.txt",
+    "median_ms": 2.602458
+  },
+  {
+    "version": "updated",
+    "fixture": "spline",
+    "workers": 4,
+    "command": [
+      "taskset",
+      "-c",
+      "0-3",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/rim_blend",
+      "spline"
+    ],
+    "returncode": 0,
+    "log": "updated-spline-4.txt",
+    "median_ms": 26.158173
+  },
+  {
+    "version": "parent",
+    "fixture": "spline",
+    "workers": 4,
+    "command": [
+      "taskset",
+      "-c",
+      "0-3",
+      "/home/krone/Development/Pieza_WS/truck/target/spherical-pole-parent-rim-blend",
+      "spline"
+    ],
+    "returncode": 0,
+    "log": "parent-spline-4.txt",
+    "median_ms": 25.688912
+  },
+  {
+    "version": "updated",
+    "fixture": "sphere",
+    "workers": 4,
+    "command": [
+      "taskset",
+      "-c",
+      "0-3",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/rim_blend",
+      "sphere"
+    ],
+    "returncode": 0,
+    "log": "updated-sphere-4.txt",
+    "median_ms": 88.836728
+  },
+  {
+    "version": "parent",
+    "fixture": "sphere",
+    "workers": 4,
+    "command": [
+      "taskset",
+      "-c",
+      "0-3",
+      "/home/krone/Development/Pieza_WS/truck/target/spherical-pole-parent-rim-blend",
+      "sphere"
+    ],
+    "returncode": 0,
+    "log": "parent-sphere-4.txt",
+    "median_ms": 0.094511
+  },
+  {
+    "version": "updated",
+    "fixture": "step",
+    "workers": 4,
+    "command": [
+      "taskset",
+      "-c",
+      "0-3",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/blend_output",
+      "/home/krone/Development/Pieza_WS/truck/truck-benchmarks/results/2026-10-12-spherical-pole/constructed-solid.json",
+      "step",
+      "0.00005"
+    ],
+    "returncode": 0,
+    "log": "updated-step-4.txt",
+    "result": {
+      "checks": [
+        {
+          "prepared": true,
+          "spline_control_points": 420
+        },
+        {
+          "prepared": true,
+          "spline_control_points": 420
+        },
+        {
+          "prepared": true,
+          "spline_control_points": 420
+        },
+        {
+          "prepared": true,
+          "spline_control_points": 420
+        },
+        {
+          "prepared": true,
+          "spline_control_points": 420
+        }
+      ],
+      "median_ms": 126.63787100000002,
+      "milliseconds": [
+        126.520876,
+        126.652198,
+        126.65333100000001,
+        126.63787100000002,
+        126.472823
+      ],
+      "mode": "step",
+      "scale": 1.0,
+      "tolerance": 5e-05
+    }
+  },
+  {
+    "version": "parent",
+    "fixture": "step",
+    "workers": 4,
+    "command": [
+      "taskset",
+      "-c",
+      "0-3",
+      "/home/krone/Development/Pieza_WS/truck/target/pole-build/release/examples/blend_output",
+      "/home/krone/Development/Pieza_WS/truck/truck-benchmarks/results/2026-10-12-spherical-pole/constructed-solid.json",
+      "step",
+      "0.00005"
+    ],
+    "returncode": 0,
+    "log": "parent-step-4.txt",
+    "result": {
+      "checks": [
+        {
+          "prepared": false,
+          "spline_control_points": 0
+        },
+        {
+          "prepared": false,
+          "spline_control_points": 0
+        },
+        {
+          "prepared": false,
+          "spline_control_points": 0
+        },
+        {
+          "prepared": false,
+          "spline_control_points": 0
+        },
+        {
+          "prepared": false,
+          "spline_control_points": 0
+        }
+      ],
+      "median_ms": 137.376232,
+      "milliseconds": [
+        137.142573,
+        137.717779,
+        137.094491,
+        138.153515,
+        137.376232
+      ],
+      "mode": "step",
+      "scale": 1.0,
+      "tolerance": 5e-05
+    }
+  }
+]

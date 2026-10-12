@@ -1,0 +1,8 @@
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+    Finished `release` profile [optimized] target(s) in 1.84s
+     Running tests/revolved_curve.rs (target/release/deps/revolved_curve-8c6c9f22ad2ea91e)
+
+running 1 test
+test projection_near_a_revolution_pole_uses_a_regular_seed ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 8 filtered out; finished in 0.00s

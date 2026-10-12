@@ -570,7 +570,17 @@ where
                 return Err(failed().stage("find_contact").selection(k));
             }
         }
-        let continued = closed && ranges[k] != (a, b);
+        let polar = !closed
+            && [rbf.surface0(), rbf.surface1()].into_iter().any(|surface| {
+                [a, b].into_iter().any(|t| {
+                    surface
+                        .search_parameter(spine.subs(t), None, 100)
+                        .is_some_and(|(u, v)| {
+                            surface.uder(u, v).so_small() || surface.vder(u, v).so_small()
+                        })
+                })
+            });
+        let continued = polar || closed && ranges[k] != (a, b);
         let mut contacts = if continued {
             vec![rbf
                 .contact_circle((a + b) / 2.0)
@@ -588,7 +598,7 @@ where
                     if !continued {
                         return rbf.contact_circle(t);
                     }
-                    // Follow one UV branch even when a closed spline does not advertise a period.
+                    // Follow one UV branch through guide poles and displaced closed seams.
                     let mut previous = *contacts.iter().min_by(|x, y| {
                         (x.curve_parameter() - t)
                             .abs()
@@ -598,7 +608,8 @@ where
                     if start == t {
                         return Some(previous);
                     }
-                    let step = (b - a).max(ranges[k].1 - ranges[k].0) / 8.0;
+                    let divisions = if polar { 64.0 } else { 8.0 };
+                    let step = (b - a).max(ranges[k].1 - ranges[k].0) / divisions;
                     let steps = ((t - start).abs() / step).ceil().max(1.0) as usize;
                     for i in 1..=steps {
                         let v = start + (t - start) * i as f64 / steps as f64;

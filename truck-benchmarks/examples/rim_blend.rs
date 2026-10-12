@@ -6,13 +6,15 @@ use truck_shapeops::{fillet::try_fillet_solid_along_wire, SplitClosedEdgesAndFac
 use truck_stepio::r#in::Table;
 
 fn main() {
-    let fixture = std::env::args().nth(1).expect("spline or cylinder");
+    let fixture = std::env::args().nth(1).expect("spline, sphere or cylinder");
     let input = match fixture.as_str() {
-        "spline" => {
-            let table = Table::from_step(include_str!(
-                "../../truck-shapeops/tests/fixtures/spline-pipe/input.step"
-            ))
-            .unwrap();
+        "spline" | "sphere" => {
+            let step = if fixture == "sphere" {
+                include_str!("../../truck-shapeops/tests/fixtures/spherical-pole/input.step")
+            } else {
+                include_str!("../../truck-shapeops/tests/fixtures/spline-pipe/input.step")
+            };
+            let table = Table::from_step(step).unwrap();
             let (mut solid, skipped) = table
                 .to_compressed_solid(table.manifold_solid_brep.values().next().unwrap())
                 .unwrap();
@@ -35,20 +37,31 @@ fn main() {
             let face = builder::try_attach_plane(&[rim]).unwrap();
             builder::tsweep(&face, Vector3::unit_x() * 100.)
         }
-        _ => panic!("spline or cylinder"),
+        _ => panic!("spline, sphere or cylinder"),
     };
     assert!(input.is_geometric_consistent());
-    let cap = input
-        .face_iter()
-        .find(|face| {
-            matches!(face.surface(), Surface::Plane(_))
-                && face
-                    .oriented_surface()
-                    .search_parameter(Point3::origin(), None, 100)
+    let wire = if fixture == "sphere" {
+        wire![input
+            .edge_iter()
+            .find(|edge| {
+                edge.curve()
+                    .search_parameter(Point3::new(-150., 0., 0.), None, 100)
                     .is_some()
-        })
-        .unwrap();
-    let wire = cap.boundaries()[0].clone();
+            })
+            .unwrap()]
+    } else {
+        let cap = input
+            .face_iter()
+            .find(|face| {
+                matches!(face.surface(), Surface::Plane(_))
+                    && face
+                        .oriented_surface()
+                        .search_parameter(Point3::origin(), None, 100)
+                        .is_some()
+            })
+            .unwrap();
+        cap.boundaries()[0].clone()
+    };
     let before = serde_json::to_string(&input.compress()).unwrap();
     let mut samples = Vec::new();
     let mut last = None;

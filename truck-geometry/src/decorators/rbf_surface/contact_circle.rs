@@ -276,6 +276,56 @@ mod tests {
     }
 
     #[test]
+    fn contact_circle_at_spherical_pole_uses_a_regular_contact_chart() {
+        let radius = 3_f64;
+        for round in [0.2_f64, -0.2] {
+            let curve = Processor::with_transform(
+                TrimmedCurve::new(UnitCircle::<Point3>::new(), (PI / 6., PI)),
+                Matrix4::from_cols(
+                    Vector4::new(0., 0., radius, 0.),
+                    Vector4::new(-radius, 0., 0., 0.),
+                    Vector4::new(0., -radius, 0., 0.),
+                    Vector4::unit_w(),
+                ),
+            );
+            let plane = Plane::new(
+                Point3::origin(),
+                Point3::new(1., 0., 0.),
+                Point3::new(0., 0., 1.),
+            );
+            let sphere = Sphere::new(Point3::origin(), radius);
+            let forward = RbfSurface::new(curve, plane, sphere, round);
+            let reverse = curve.inverse();
+            let pole = reverse.range_tuple().0;
+            let backward = RbfSurface::new(reverse, sphere, plane, round);
+            let rho = (radius * radius - 2. * radius * round).sqrt();
+            let center = Point3::new(0., round, -rho);
+            let contacts = [
+                Point3::new(0., 0., -rho),
+                Point3::from_vec(center.to_vec() * radius / (radius - round)),
+            ];
+            for (reversed, cc) in [
+                (false, forward.contact_circle(PI)),
+                (true, backward.contact_circle(pole)),
+            ] {
+                let cc =
+                    cc.expect("the contacts leave the singular guide station on regular supports");
+                assert!(cc.center().distance(center) < 1e-10);
+                let mut actual = [cc.contact_point0().point, cc.contact_point1().point];
+                if reversed {
+                    actual.swap(0, 1);
+                }
+                for (actual, expected) in actual.into_iter().zip(contacts) {
+                    assert!(actual.distance(expected) < 1e-10);
+                }
+                for i in 0..=16 {
+                    assert!((cc.subs(i as f64 / 16.).distance(center) - round.abs()).abs() < 1e-10);
+                }
+            }
+        }
+    }
+
+    #[test]
     fn singular_contact_planes_return_none() {
         let line = Line(Point3::origin(), Point3::new(1.0, 0.0, 0.0));
         let fillet = RbfSurface::new(line, Plane::xy(), Plane::xy(), 0.2);
