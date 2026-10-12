@@ -6,6 +6,10 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Continue closed-wire fillets from a planar support onto a tangent adjacent face. Split patches at solved contact crossings, reuse shared trim vertices, and reconnect the surviving face loops. Validate planar regions after loop-count changes and check continued contacts against periodic trimmed support regions and holes. The captured post-root fillet over a rounded roof now produces a closed solid and a native-valid single-solid STEP export; regressions cover independent volume, radius/normals, three scales, rigid transforms and reversed selection.
+
+- Initialize rolling-ball sections from contact parameter guesses when the guide does not lie on both supports, and fit those sections through the existing adaptive fillet construction. Converge contact solves before fitting so small spherical contacts preserve their radius and normal offsets. Existing edge-based APIs retain their behavior and signatures.
+
 - Keep generated rolling-ball fillets smooth across longitudinal interpolation knots. Use quartic contact interpolation when internal knots are needed, so differentiating the contact curve to build the section frame retains C2 continuity on smooth supports. Preserve adaptive fitting tolerances and use stable averaged knots. The captured spherical-meridian fillet now exports through the existing STEP fitter; regressions check knot derivative limits, radius/normals, independent volume, closed STEP round trips, rigid transforms and reversed selection.
 
 - Preserve finite pole searches for spheres/revolutions and already-converged surface Newton seeds. Classify smooth polar tangencies from meridian derivatives, reject conical singularities, and scale contact refinement by mesh error and curvature. Keep the parameter-space winding of meridian facets whose orientation is numerically ambiguous relative to surface normals. Regressions preserve the tangent sphere/bore Boolean and rounded-box STEP mesh after correcting revolution sampling.

@@ -8,11 +8,11 @@ type LoopReplacement<C> = Vec<Option<Vec<Edge<Point3, C>>>>;
 
 /// The radius function of the wire restricted to chain edge `k`: `t ↦ R(k + (t − t0) · scale)`.
 #[derive(Clone, Debug)]
-struct EdgeRadius<R> {
-    radius: R,
-    k: f64,
-    t0: f64,
-    scale: f64,
+pub(super) struct EdgeRadius<R> {
+    pub(super) radius: R,
+    pub(super) k: f64,
+    pub(super) t0: f64,
+    pub(super) scale: f64,
 }
 
 impl<R: ScalarFunctionD1> ScalarFunctionD1 for EdgeRadius<R> {
@@ -888,22 +888,40 @@ fn trim_contact_edge<C: FilletedCurve<S>, S>(
 fn intersect_trimmed_curves<C: ParametricCurve3D + BoundedCurve>(
     curve0: &C,
     curve1: &C,
-    (t, s): (f64, f64),
+    hint: (f64, f64),
 ) -> Option<(f64, f64)> {
-    let (a, b) = curve0.range_tuple();
-    let (c, d) = curve1.range_tuple();
+    intersect_samples(
+        curve0.range_tuple(),
+        curve1.range_tuple(),
+        hint,
+        |t| Some(curve0.subs(t)),
+        |t| Some(curve1.subs(t)),
+        |t| Some(curve0.der(t)),
+        |t| Some(curve1.der(t)),
+    )
+}
+
+pub(super) fn intersect_samples(
+    (a, b): (f64, f64),
+    (c, d): (f64, f64),
+    (t, s): (f64, f64),
+    curve0: impl Fn(f64) -> Option<Point3>,
+    curve1: impl Fn(f64) -> Option<Point3>,
+    tangent0: impl Fn(f64) -> Option<Vector3>,
+    tangent1: impl Fn(f64) -> Option<Vector3>,
+) -> Option<(f64, f64)> {
     if ![a, b, c, d, t, s].iter().all(|x| x.is_finite()) || a >= b || c >= d {
         return None;
     }
     let clamp = |p: Vector2| Vector2::new(p.x.clamp(a, b), p.y.clamp(c, d));
     let solve = |mut param: Vector2| {
         for _ in 0..=100 {
-            let (p, q) = (curve0.subs(param.x), curve1.subs(param.y));
+            let (p, q) = (curve0(param.x)?, curve1(param.y)?);
             if p.near2(&q) {
                 return Some(param.into());
             }
             let diff = p - q;
-            let (du, dv) = (curve0.der(param.x), -curve1.der(param.y));
+            let (du, dv) = (tangent0(param.x)?, -tangent1(param.y)?);
             let uv = du.dot(dv);
             let jacobian = Matrix2::new(du.dot(du), uv, uv, dv.dot(dv));
             let Some(inverse) = jacobian.invert() else {
@@ -918,7 +936,7 @@ fn intersect_trimmed_curves<C: ParametricCurve3D + BoundedCurve>(
             let mut fraction = 1.;
             for _ in 0..16 {
                 let candidate = clamp(param - fraction * step);
-                let residual = curve0.subs(candidate.x) - curve1.subs(candidate.y);
+                let residual = curve0(candidate.x)? - curve1(candidate.y)?;
                 if residual.magnitude2() < diff.magnitude2() {
                     next = Some(candidate);
                     break;
@@ -933,17 +951,23 @@ fn intersect_trimmed_curves<C: ParametricCurve3D + BoundedCurve>(
         None
     };
     solve(clamp(Vector2::new(t, s))).or_else(|| {
-        let samples = |curve: &C, a: f64, b: f64| {
-            std::array::from_fn::<_, 5, _>(|i| {
+        fn samples(
+            curve: impl Fn(f64) -> Option<Point3>,
+            a: f64,
+            b: f64,
+        ) -> Option<[(f64, Point3); 5]> {
+            let mut result = [(0., Point3::origin()); 5];
+            for (i, item) in result.iter_mut().enumerate() {
                 let t = (a + (b - a) * i as f64 / 4.).clamp(a, b);
-                (t, curve.subs(t))
-            })
-        };
-        let samples0 = samples(curve0, a, b);
-        let samples1 = samples(curve1, c, d);
+                *item = (t, curve(t)?);
+            }
+            Some(result)
+        }
+        let samples0 = samples(&curve0, a, b)?;
+        let samples1 = samples(&curve1, c, d)?;
         let mut nearest = (f64::INFINITY, Vector2::new(a, c));
         for (t, p) in samples0 {
-            for (s, q) in samples1 {
+            for &(s, q) in &samples1 {
                 let distance = p.distance2(q);
                 if distance < nearest.0 {
                     nearest = (distance, Vector2::new(t, s));

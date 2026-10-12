@@ -1,0 +1,15 @@
+   Compiling rustix v1.1.4
+    Checking truck-drafting v0.1.0 (/home/krone/Development/Pieza_WS/truck/truck-drafting)
+    Checking truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Checking truck-hlr v0.1.0 (/home/krone/Development/Pieza_WS/truck/truck-hlr)
+    Checking tempfile v3.27.0
+    Checking terminal_size v0.4.4
+    Checking clap_builder v4.6.6
+    Checking rusty-fork v0.3.1
+    Checking proptest v1.11.0
+    Checking clap v4.6.6
+    Checking divan v0.1.21
+    Checking truck-benchmarks v0.1.0 (/home/krone/Development/Pieza_WS/truck/truck-benchmarks)
+    Finished `release` profile [optimized] target(s) in 3.51s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`

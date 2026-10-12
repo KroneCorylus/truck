@@ -476,11 +476,13 @@ where
 }
 
 mod along_wire;
+mod continued_support;
 pub use along_wire::{fillet_along_wire, try_fillet_along_wire};
 mod chamfer;
 mod chamfer_collapse;
 pub use chamfer::{chamfer_along_wire, chamfer_with_side, simple_chamfer, try_chamfer_along_wire};
 
+mod additive;
 mod chamfer_edges;
 mod chamfer_miter;
 mod convex;
@@ -488,7 +490,6 @@ mod edges;
 pub(crate) mod planar;
 mod planar_edge;
 mod planar_fillet;
-mod additive;
 mod projected_section;
 pub use edges::{fillet_edges, try_fillet_edges};
 

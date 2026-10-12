@@ -48,9 +48,7 @@ fn finish(solid: &Solid, index: usize, shell: Shell, tol: f64) -> Result<BlendRe
         }
         if let Surface::Plane(plane) = old.oriented_surface() {
             let boundaries = face.boundaries();
-            if old.boundaries().len() == boundaries.len()
-                && !super::planar::valid_boundaries(old, &boundaries, plane.normal(), tol)
-            {
+            if !super::planar::valid_boundaries(old, &boundaries, plane.normal(), tol) {
                 return Err(
                     Diagnostic::new(Code::OutsideNeighbour, "blend", "validate_trims")
                         .shell(index)
@@ -84,7 +82,10 @@ fn finish(solid: &Solid, index: usize, shell: Shell, tol: f64) -> Result<BlendRe
 /// The scope and radius parameterization are those of [`super::fillet_along_wire`]. In
 /// particular, the radius covers `[0, wire.len()]`, with one unit per edge, and must supply
 /// derivatives up to second order and extend beyond the endpoints. Radius positivity and finite
-/// derivatives are checked at sampled stations. Intersecting distant faces or another boundary
+/// derivatives are checked at sampled stations. Closed-wire contacts can continue across a
+/// planar outer boundary onto one tangent adjacent support per selected edge and side. The
+/// continued contacts must remain inside their supporting faces; their shared trim vertices
+/// reconnect the original boundary loops. Intersecting distant faces or another boundary
 /// of the solid is outside the supported scope. Returns `None` on unsupported selections,
 /// invalid parameters, failed construction, or non-closed output. The input is never modified.
 /// Rounding the rim where an existing convex cylindrical fillet meets a perpendicular plane
@@ -122,9 +123,19 @@ pub fn try_fillet_solid_along_wire<R: ScalarFunctionD1>(
             "validate_input",
         ));
     }
-    let shell = super::try_fillet_along_wire(&solid.boundaries()[index], wire, radius, tol)
+    let shell = super::try_fillet_along_wire(&solid.boundaries()[index], wire, radius.clone(), tol)
         .map_err(|e| e.operation(operation).shell(index))?;
-    finish(solid, index, shell, tol).map_err(|e| e.operation(operation))
+    finish(solid, index, shell, tol)
+        .or_else(|error| {
+            if error.code != Code::OutsideNeighbour {
+                return Err(error);
+            }
+            let shell =
+                super::continued_support::fillet(&solid.boundaries()[index], wire, radius, tol)
+                    .ok_or(error)?;
+            finish(solid, index, shell, tol)
+        })
+        .map_err(|e| e.operation(operation))
 }
 
 /// Equal-radius blends on selected edges of a modeling solid, including spherical corners.

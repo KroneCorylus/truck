@@ -137,7 +137,7 @@ fn loops_intersect(a: &[Point3], b: &[Point3], normal: Vector3, epsilon: f64) ->
     })
 }
 
-fn inside(p: Point3, original: &[Point3], normal: Vector3, epsilon: f64) -> bool {
+pub(super) fn inside(p: Point3, original: &[Point3], normal: Vector3, epsilon: f64) -> bool {
     all_inside(std::iter::once(p), original, normal, epsilon)
 }
 
@@ -355,22 +355,26 @@ pub(crate) fn valid_boundaries(
     let epsilon = tol.min(TOLERANCE);
     let original = face.boundaries();
     let loops: Vec<_> = boundaries.iter().map(|w| sample_wire(w, tol)).collect();
+    let changed = |i| original.get(i) != boundaries.get(i);
     for (i, points) in loops.iter().enumerate() {
-        let old = sample_wire(&original[i], tol);
-        let orientation = polygon_area(&old).dot(normal).signum();
-        if boundaries[i] != original[i] && !valid_polygon(points, normal * orientation, epsilon) {
+        let orientation = original
+            .get(i)
+            .map_or(if i == 0 { 1. } else { -1. }, |wire| {
+                polygon_area(&sample_wire(wire, tol)).dot(normal).signum()
+            });
+        if changed(i) && !valid_polygon(points, normal * orientation, epsilon) {
             return false;
         }
     }
     for i in 1..loops.len() {
-        if (boundaries[i] != original[i] || boundaries[0] != original[0])
+        if (changed(i) || changed(0))
             && (!contained(&loops[i], &loops[0], normal, epsilon)
                 || loops_touch(&loops[i], &loops[0], normal, 2.0 * tol))
         {
             return false;
         }
         for j in 1..i {
-            if (boundaries[i] != original[i] || boundaries[j] != original[j])
+            if (changed(i) || changed(j))
                 && (loops_touch(&loops[i], &loops[j], normal, 2.0 * tol)
                     || inside(loops[i][0], &loops[j], normal, epsilon)
                     || inside(loops[j][0], &loops[i], normal, epsilon))
