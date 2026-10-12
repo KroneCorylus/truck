@@ -1,0 +1,107 @@
+{
+  "kernel_revision": "946914f8b3b744806a2586463dacaeea9a767917",
+  "native": {
+    "passed": 156
+  },
+  "captures": 161,
+  "before_statuses": {
+    "input-import-failed": 21,
+    "operation-succeeded": 80,
+    "panic": 1,
+    "unhandled-intent": 8,
+    "operation-failed": 37,
+    "input-inconsistent": 11,
+    "timeout": 2,
+    "capture-incomplete": 1
+  },
+  "after_statuses": {
+    "input-import-failed": 22,
+    "operation-succeeded": 80,
+    "unhandled-intent": 8,
+    "operation-failed": 37,
+    "input-inconsistent": 11,
+    "timeout": 2,
+    "capture-incomplete": 1
+  },
+  "successful_checks": {
+    "constructed": 80,
+    "input_unchanged": 80,
+    "geometry_consistent": 80,
+    "mesh_closed": 80,
+    "step_prepared": 80,
+    "native_valid": 80,
+    "truck_step_valid": 80,
+    "single_solid": 80,
+    "sampled_distance": 78
+  },
+  "limited_comparison_passes": 78,
+  "status_changes": [
+    {
+      "case": "blend/complex/G9",
+      "capture": "002",
+      "before": "panic",
+      "after": "input-import-failed",
+      "result": {
+        "error": "Unsupported imported geometry",
+        "status": "input-import-failed"
+      }
+    }
+  ],
+  "regressions": [],
+  "numeric_changes": [],
+  "distance_discrepancies": [
+    {
+      "case": "blend/simple/G1",
+      "capture": "001",
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 132189932.40065464,
+        "truck_volume": 132185649.9747912,
+        "native_to_truck_max_distance": 0.9874986974855128,
+        "native_to_truck_samples": 921,
+        "truck_to_native_max_distance": 0.018545749048141102,
+        "truck_to_native_samples": 886
+      }
+    },
+    {
+      "case": "blend/tolblend_simple/A1",
+      "capture": "001",
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 29055.053293964895,
+        "truck_volume": 29055.062123632302,
+        "native_to_truck_max_distance": 0.022376472569611394,
+        "native_to_truck_samples": 1874,
+        "truck_to_native_max_distance": 0.022376472569611394,
+        "truck_to_native_samples": 1862
+      }
+    }
+  ],
+  "unresolved": [
+    {
+      "case": "blend/simple/H2",
+      "capture": "001",
+      "status": "timeout"
+    },
+    {
+      "case": "blend/simple/H4",
+      "capture": "001",
+      "status": "timeout"
+    },
+    {
+      "case": "bugs/moddata_1/bug119",
+      "capture": "001",
+      "status": "capture-incomplete"
+    }
+  ]
+}

@@ -5,9 +5,11 @@ STOP STATE
 The user explicitly requested: stop at the next checkpoint, commit, provide a
 simple HTML progress report and a separate handoff. That supersedes the earlier
 instruction to keep working indefinitely. Resume implementation only when asked.
+The user subsequently requested the full comparison, which is now complete.
+No new implementation was started. Implementation remains paused.
 Report: report.html in this directory. The report and this handoff are committed.
 Production checkpoint: f6fa8d15.
-The following documentation-only commit refreshes the catalog and saves this handoff.
+Documentation-only commits refresh the catalog and save this handoff.
 No push or PR. PiezaCAD has no changes from this work; its dependency pin was not updated.
 
 OBJECTIVE AND RULES
@@ -83,27 +85,28 @@ Original native execution: 295 pass, 11 known failures, 19 viewer-related failur
 entries include all 279 dedicated chamfer cases; the fixture corpus is incomplete.
 There is no defensible overall completion percentage or current full-parity verdict.
 
-Latest FULL captured run is clean 2099d2d8, BEFORE the seam-junction fix:
-  audits/fillet-chamfer/capture/2026-10-12-periodic-tori/
-  REPORT.md, results.json, artifacts.zip (2,150 case artifact hashes verified).
-Raw copy: target/occt-capture-periodic-tori.
+Latest FULL captured run is clean 946914f8, AFTER the seam-junction fix:
+  audits/fillet-chamfer/capture/2026-10-12-seam-junction/
+  REPORT.md, results.json, artifacts.zip, comparison-summary.json.
+Raw copy: target/occt-capture-seam-junction.
 156 native entries pass; 161 operation captures:
-  80 operation-succeeded; 37 operation-failed; 21 input-import-failed;
+  80 operation-succeeded; 37 operation-failed; 22 input-import-failed;
   11 input-inconsistent; 8 unhandled-intent; 2 timeouts (H2/H4);
-  1 panic (G9 capture 002); 1 capture-incomplete.
+  ZERO panics; 1 capture-incomplete (bugs/moddata_1/bug119 capture 001).
 All 80 constructions preserve input and geometry consistency, close the Truck
 mesh, prepare STEP, and produce native-valid single solids.
 78 meet combined limited comparisons at tolerance .001. G1 and tolerance-grid
 A1 retain discrepancies. All full parity statuses remain unverified.
-The new G9 targeted replay returns input-import-failed, "Unsupported imported
-geometry", without panic. No full replay has been run after f6fa8d15;
-do not silently change the historical 80/78 totals or panic count.
+G9 capture 002 changing from panic to input-import-failed is the ONLY operation-
+status change. No prior successful output/check regresses. All 80 retain exactly
+the same reported mesh volumes, STEP volumes and sampled maximum distances.
+Source and executable hashes were checked before/after the run. All artifact
+hashes were verified for the archive. The previous 2099d2d8 run remains unchanged
+under capture/2026-10-12-periodic-tori/, including its historical G9 panic.
 
 NEXT STEPS WHEN WORK RESUMES
-A. First run a clean full capture of this checkpoint. Compare every previously
-   constructed case, verify G9 now reports its conversion gap, retain H2/H4 as
-   unresolved, archive artifact hashes and refresh the catalog. This is the
-   first outstanding validation task, not an implementation task.
+A. The full-capture validation task is DONE. Do not repeat it before changing
+   kernel source or finding a specific reason to rerun it.
 B. Continue the two concrete gaps below. Neither proposed approach is a proven
    fix; write parent-failing regressions before production changes.
 C. Then E9 trimming and nonplanar multi-edge/unequal-radius cases. Do not confuse

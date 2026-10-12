@@ -13,15 +13,15 @@
 <header>
 <p class="eyebrow">Kernel audit · 12 October 2026</p>
 <h1>Fillet and chamfer progress</h1>
-<p>Six more captured torus fillets now construct, and a newly exposed import crash has been fixed. Full OpenCascade feature parity is still unfinished.</p>
-<span class="status">Stopped at your requested checkpoint · committed locally</span>
+<p>The full comparison confirms that G9 no longer crashes. All 80 previously constructed operations remain successful, with 78 passing the limited comparison checks. Full OpenCascade feature parity is still unfinished.</p>
+<span class="status">Full comparison complete · implementation remains paused</span>
 </header>
 <div class="stats" aria-label="Latest full replay results">
 <div class="stat"><strong>80</strong><span>constructed operations<br>up from 74 before these torus fixes</span></div>
 <div class="stat"><strong>78</strong><span>passed the limited<br>native comparison checks</span></div>
 <div class="stat"><strong>161</strong><span>operation captures<br>in the latest full replay</span></div>
 </div>
-<p class="note">These are results for the captured subset, not a percentage of overall feature parity. The full replay predates the final G9 crash fix.</p>
+<p class="note">These are results for all 161 captures in the available comparison suite, not a percentage of overall feature parity. This run includes the G9 crash fix and recorded zero panics.</p>
 <section>
 <h2>What changed</h2>
 <div class="table-wrap"><table>
@@ -38,6 +38,7 @@
 <h2>What was verified</h2>
 <ul>
 <li>All 80 constructed replay outputs preserve the input, have consistent geometry and closed meshes, and export as native-valid single solids.</li>
+<li>The 80 outputs retain the same reported mesh volumes, STEP volumes and sampled distances as the previous run.</li>
 <li>78 satisfy the combined limited comparisons, including sampled distances of at most 0.001 in both directions. This is sampled evidence, not proof of complete equivalence.</li>
 <li>The torus batch’s five-crate validation recorded <strong>893 passes</strong>, one previously reproduced PCurve precision failure and five existing ignored tests.</li>
 <li><span id="checkpoint-validation">The final crash-fix checkpoint passed <strong>349 shape-operations tests</strong>, with no failures and one existing ignored test.</span> All-target Clippy and the action benchmark smoke check passed.</li>
@@ -47,8 +48,8 @@
 </section>
 <section>
 <h2>What remains</h2>
-<p>The last full replay also recorded 37 construction failures, 21 import failures, 11 inconsistent inputs, eight unhandled requests, two timeouts, one panic and one incomplete capture.</p>
-<p class="callout"><strong>The panic is historical:</strong> it is G9’s crash from the full run. The committed fix passes its targeted checks and now reports unsupported imported geometry. A new full replay is the next validation step.</p>
+<p>The full replay also recorded 37 construction failures, 22 import failures, 11 inconsistent inputs, eight unhandled requests, two timeouts and one incomplete capture. No panics were recorded.</p>
+<p class="callout"><strong>G9’s crash is fixed; its fillet still needs work.</strong> In this full run, G9 returned “unsupported imported geometry” during conversion. This was the only operation-status change. No previously successful case regressed.</p>
 <ul>
 <li><strong>H2/H4 timeouts:</strong> H2 constructs, then tessellation expands an ellipsoid’s parameter region incorrectly near a pole. The investigation is saved; no fix is claimed.</li>
 <li><strong>Geometry gaps:</strong> G9 surface-curve conversion, E9 torus trimming, joins across multiple curved faces, unequal radii, and more general corner collapse and collision cases.</li>
@@ -59,10 +60,10 @@
 </section>
 <section>
 <h2>Checkpoint and continuation</h2>
-<p>Latest kernel commit: <code>f6fa8d15</code>. The catalog and these documents are saved in the following documentation commit. Nothing was pushed, and PiezaCAD’s dependency pin was not changed.</p>
-<p>The next agent should run a clean full replay, then continue the documented G9 conversion and H2/H4 investigations.</p>
+<p>Kernel commit: <code>f6fa8d15</code>. The full comparison ran from clean commit <code>946914f8</code>, with all 156 native test entries passing. The catalog and these documents now include that run. Nothing was pushed, and PiezaCAD’s dependency pin was not changed.</p>
+<p>The full replay is complete. When implementation resumes, the next agent can continue the documented G9 conversion and H2/H4 investigations.</p>
 <p><a href="HANDOFF.txt">Read the separate agent handoff</a> · <a href="../../catalog.html">Open the audit catalog</a></p>
-<p class="note">Evidence: <a href="../../capture/2026-10-12-periodic-tori/REPORT.md">latest full replay</a> · <a href="../../../../truck-benchmarks/results/2026-10-12-periodic-tori/REPORT.md">torus validation and timings</a> · <a href="../../../../truck-benchmarks/results/2026-10-12-seam-junction/REPORT.md">G9 checkpoint validation</a></p>
+<p class="note">Evidence: <a href="../../capture/2026-10-12-seam-junction/REPORT.md">latest full replay</a> · <a href="../../../../truck-benchmarks/results/2026-10-12-periodic-tori/REPORT.md">torus validation and timings</a> · <a href="../../../../truck-benchmarks/results/2026-10-12-seam-junction/REPORT.md">G9 checkpoint validation</a></p>
 </section>
-<footer>Objective: user-visible feature parity with OpenCascade, without requiring matching APIs. Work is paused at your request.</footer>
+<footer>Objective: user-visible feature parity with OpenCascade, without requiring matching APIs. Implementation remains paused; the requested full comparison is complete.</footer>
 </main></body></html>
