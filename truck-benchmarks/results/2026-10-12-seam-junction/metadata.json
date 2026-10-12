@@ -1,0 +1,29 @@
+{
+  "parent": "2099d2d87ea32e18b00f5d51e7080c88d26e8f4f",
+  "platform": "Linux-7.2.9-200.fc44.x86_64-x86_64-with-glibc2.43",
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.1\nLLVM version: 22.1.8\n",
+  "source_sha256": {
+    "truck-shapeops/src/healing/split_closed_faces.rs": "19cc1d809047727d432d03ad0dbed678974e384a4ebc35245f22616c2ac6d213",
+    "truck-shapeops/tests/tangent_closed_face_split.rs": "42041c38d0de2438a3fdb7c9c604c1d85848e442798a6f4a623c61f74a967b80",
+    "truck-shapeops/tests/fixtures/closed-face-splitting/rounded-offset-cylinders.step": "2e5bf0c2f4f722763a412c6e44796029846d51ae6ddb3dc678aa841339644de8"
+  },
+  "replay_sha256": "756366f5d4416c770f9278650c83684b930da542a85d4ab0d1c0042af7c01ddf",
+  "commands": [
+    "CARGO_BUILD_JOBS=12 cargo test --release -p truck-shapeops --lib divisor_avoids_existing_seam_endpoints (parent: expected failure)",
+    "CARGO_BUILD_JOBS=12 cargo test --release -p truck-shapeops --test tangent_closed_face_split rounded_offset (parent: expected panic)",
+    "CARGO_BUILD_JOBS=12 cargo test --release -p truck-shapeops --no-fail-fast",
+    "CARGO_BUILD_JOBS=12 cargo clippy --release -p truck-shapeops -p truck-benchmarks --all-targets",
+    "RAYON_NUM_THREADS=1 CARGO_BUILD_JOBS=12 cargo bench -p truck-benchmarks --bench actions -- --test",
+    "CARGO_BUILD_JOBS=12 cargo build --release -p truck-shapeops --example replay_occt_blend",
+    "target/release/examples/replay_occt_blend target/toroidal-junction/002"
+  ],
+  "release_tests": {
+    "passed": 349,
+    "failed": 0,
+    "ignored": 1,
+    "targets": 68
+  },
+  "targeted_replay": "input-import-failed: Unsupported imported geometry; no panic",
+  "full_capture_after_this_change": false,
+  "performance_claim": "None; benchmark action smoke only."
+}

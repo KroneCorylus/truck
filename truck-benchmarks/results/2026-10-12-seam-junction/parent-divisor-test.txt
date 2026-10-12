@@ -1,0 +1,24 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 6.56s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running unittests src/lib.rs (target/release/deps/truck_shapeops-ee3a1558f73a21f9)
+
+running 1 test
+test healing::split_closed_faces::tests::divisor_avoids_existing_seam_endpoints ... FAILED
+
+failures:
+
+---- healing::split_closed_faces::tests::divisor_avoids_existing_seam_endpoints stdout ----
+
+thread 'healing::split_closed_faces::tests::divisor_avoids_existing_seam_endpoints' (1048393) panicked at truck-shapeops/src/healing/split_closed_faces.rs:1080:17:
+divisor starts at seam endpoint: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    healing::split_closed_faces::tests::divisor_avoids_existing_seam_endpoints
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 47 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-shapeops --lib`

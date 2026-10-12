@@ -1,0 +1,1 @@
+{"comparison":"unverified","result":{"error":"Unsupported imported geometry","status":"input-import-failed"},"schema_version":1,"stage":"import-and-preprocess","tolerance":0.001}

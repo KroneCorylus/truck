@@ -1,0 +1,15 @@
+
+thread 'main' (1040983) panicked at truck-shapeops/src/healing/split_closed_faces.rs:821:22:
+something wrong!
+stack backtrace:
+   0: __rustc::rust_begin_unwind
+   1: core::panicking::panic_fmt
+   2: truck_shapeops::healing::split_closed_faces::split_boundaries_by_divisor::<truck_stepio::in::step_geometry::Curve3D, truck_stepio::in::step_geometry::Surface, &&<truck_topology::compress::CompressedShell<cgmath::point::Point3<f64>, _, _> as truck_shapeops::healing::SplitClosedEdgesAndFaces>::split_closed_edges_and_faces::sp<truck_stepio::in::step_geometry::Surface>>
+   3: <&mut truck_shapeops::healing::split_closed_faces::split_closed_faces<truck_stepio::in::step_geometry::Curve3D, truck_stepio::in::step_geometry::Surface, <truck_topology::compress::CompressedShell<cgmath::point::Point3<f64>, _, _> as truck_shapeops::healing::SplitClosedEdgesAndFaces>::split_closed_edges_and_faces::sp<truck_stepio::in::step_geometry::Surface>>::{closure#1} as core::ops::function::FnMut<(usize,)>>::call_mut
+   4: <core::iter::adapters::flatten::Flatten<core::iter::adapters::filter_map::FilterMap<core::ops::range::Range<usize>, truck_shapeops::healing::split_closed_faces::split_closed_faces<truck_stepio::in::step_geometry::Curve3D, truck_stepio::in::step_geometry::Surface, <truck_topology::compress::CompressedShell<cgmath::point::Point3<f64>, _, _> as truck_shapeops::healing::SplitClosedEdgesAndFaces>::split_closed_edges_and_faces::sp<truck_stepio::in::step_geometry::Surface>>::{closure#1}>> as core::iter::traits::iterator::Iterator>::next
+   5: <alloc::vec::Vec<truck_topology::compress::CompressedFace<truck_stepio::in::step_geometry::Surface>> as alloc::vec::spec_from_iter::SpecFromIter<truck_topology::compress::CompressedFace<truck_stepio::in::step_geometry::Surface>, core::iter::adapters::flatten::Flatten<core::iter::adapters::filter_map::FilterMap<core::ops::range::Range<usize>, truck_shapeops::healing::split_closed_faces::split_closed_faces<truck_stepio::in::step_geometry::Curve3D, truck_stepio::in::step_geometry::Surface, <truck_topology::compress::CompressedShell<cgmath::point::Point3<f64>, _, _> as truck_shapeops::healing::SplitClosedEdgesAndFaces>::split_closed_edges_and_faces::sp<truck_stepio::in::step_geometry::Surface>>::{closure#1}>>>>::from_iter
+   6: <truck_topology::compress::CompressedSolid<cgmath::point::Point3<f64>, truck_stepio::in::step_geometry::Curve3D, truck_stepio::in::step_geometry::Surface> as truck_shapeops::healing::SplitClosedEdgesAndFaces>::split_closed_edges_and_faces
+   7: replay_occt_blend::replay
+   8: replay_occt_blend::main
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
+{"comparison":"unverified","result":{"status":"panic"},"schema_version":1,"stage":"import-and-preprocess","tolerance":0.001}

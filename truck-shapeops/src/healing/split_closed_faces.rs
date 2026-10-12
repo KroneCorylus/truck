@@ -139,13 +139,16 @@ fn non_simple_wire_divisor<C>(
         .find_map(find_loop())
         .unwrap_or((j0, boundary.len()));
 
+    // Attach the new cut inside each loop, away from the existing seam endpoints.
+    let wire0 = boundary.as_slice().get(2..j0)?;
+    let wire1 = boundary.as_slice().get(i1 + 2..j1)?;
     let (k0, k1) = (j0.div_ceil(2), (i1 + j1).div_ceil(2));
     let f = closure_take_front(edges);
     let pre_divisor = (f(boundary[k0]), f(boundary[k1]));
     nearest_correction(
         pre_divisor,
-        &boundary[1..j0],
-        &boundary[i1 + 1..j1],
+        wire0,
+        wire1,
         vertices,
         closure_take_front(edges),
     )
@@ -559,12 +562,19 @@ where
     let mut duplicated_edges = duplicated_edges(boundaries.iter().flatten().map(|ei| ei.index));
     let line = divisor_parameter_line(divisor, boundaries, &param_boundaries, edges, surface)?;
     let vertices_on_divisor = enumerate_vertices_on_divisor(line, &param_vertices, surface)?;
+    let old_len = edges.len();
+    let old_poly_len = poly_edges.len();
     let new_edges = create_new_edges(&vertices_on_divisor, poly_edges, surface, tol)?;
     let (new_edge_range, new_edge_indices) = signup_new_edges(edges, new_edges);
     duplicated_edges.extend(new_edge_range);
     let edge_iter = closed.iter().flatten().copied().chain(new_edge_indices);
     let vemap = create_vemap(edges, edge_iter);
-    Some(construct_boundaries(vemap, edges, &duplicated_edges))
+    let result = construct_boundaries(vemap, edges, &duplicated_edges);
+    if result.is_none() {
+        edges.truncate(old_len);
+        poly_edges.truncate(old_poly_len);
+    }
+    result
 }
 
 // --- create_param_boundaries ---
@@ -787,13 +797,13 @@ fn construct_boundaries<C>(
     mut vemap: HashMap<usize, Vec<EdgeIndex>>,
     edges: &[Edge<C>],
     new_edge_range: &HashSet<usize>,
-) -> Vec<Wire> {
+) -> Option<Vec<Wire>> {
     let take_back = closure_take_back(edges);
     let mut new_boundaries = Vec::new();
     while !vemap.is_empty() {
         let (start, vec) = vemap.iter_mut().min_by_key(|(idx, _)| *idx).unwrap();
         let start = *start;
-        let mut edge_index = vec.pop().unwrap();
+        let mut edge_index = vec.pop()?;
         if vec.is_empty() {
             vemap.remove(&start);
         }
@@ -804,9 +814,7 @@ fn construct_boundaries<C>(
             if v == start {
                 break;
             }
-            let Some(vec) = vemap.get_mut(&v) else {
-                unreachable!();
-            };
+            let vec = vemap.get_mut(&v)?;
             match vec.len() {
                 1 => {
                     edge_index = vec.pop().unwrap();
@@ -818,12 +826,12 @@ fn construct_boundaries<C>(
                     let i = if is_new0 != is_new1 { 0 } else { 1 };
                     edge_index = vec.remove(i);
                 }
-                _ => panic!("something wrong!"),
+                _ => return None,
             }
         }
         new_boundaries.push(wire);
     }
-    new_boundaries
+    Some(new_boundaries)
 }
 
 // --- divide_face ---
@@ -1044,6 +1052,88 @@ mod tests {
             Point3::new(1., 0., 0.),
             Point3::new(0., 1., 0.),
         )
+    }
+
+    #[test]
+    fn divisor_avoids_existing_seam_endpoints() {
+        let vertices = [
+            Point3::new(0., 0., 0.),
+            Point3::new(0., 0., 1.),
+            Point3::new(10., 0., 1.),
+            Point3::new(-10., 0., 1.),
+            Point3::new(20., 0., 0.),
+        ];
+        let edges: Vec<_> = [(0, 1), (1, 2), (2, 3), (3, 1), (0, 4), (4, 0)]
+            .into_iter()
+            .map(|vertices| Edge {
+                vertices,
+                curve: (),
+            })
+            .collect();
+        let mut boundary: Wire = [
+            (0, true),
+            (1, true),
+            (2, true),
+            (3, true),
+            (0, false),
+            (4, true),
+            (5, true),
+        ]
+        .into_iter()
+        .map(|(index, orientation)| EdgeIndex { index, orientation })
+        .collect();
+        for reversed in [false, true] {
+            for _ in 0..boundary.len() {
+                let (a, b) = non_simple_wire_divisor(boundary.clone(), &edges, &vertices).unwrap();
+                assert!(![0, 1].contains(&a), "divisor starts at seam endpoint: {a}");
+                assert!(![0, 1].contains(&b), "divisor ends at seam endpoint: {b}");
+                assert_ne!(a, b);
+                boundary.rotate_left(1);
+            }
+            if !reversed {
+                boundary.reverse();
+                boundary
+                    .iter_mut()
+                    .for_each(|e| e.orientation = !e.orientation);
+            }
+        }
+    }
+
+    #[test]
+    fn degenerate_seam_has_no_divisor() {
+        let vertices = [Point3::origin(), Point3::new(1., 0., 0.)];
+        let edges = [Edge {
+            vertices: (0, 1),
+            curve: (),
+        }];
+        let boundary = [true, false].map(|orientation| EdgeIndex {
+            index: 0,
+            orientation,
+        });
+        assert!(non_simple_wire_divisor(boundary.to_vec(), &edges, &vertices).is_none());
+    }
+
+    #[test]
+    fn incomplete_or_branching_boundary_graph_is_rejected() {
+        let edges: Vec<_> = [(0, 1), (1, 0), (1, 2), (1, 3)]
+            .into_iter()
+            .map(|vertices| Edge {
+                vertices,
+                curve: (),
+            })
+            .collect();
+        for indices in [vec![0], vec![0, 1, 2, 3]] {
+            let directed = indices.into_iter().map(|index| EdgeIndex {
+                index,
+                orientation: true,
+            });
+            assert!(construct_boundaries(
+                create_vemap(&edges, directed),
+                &edges,
+                &HashSet::default()
+            )
+            .is_none());
+        }
     }
 
     #[test]
