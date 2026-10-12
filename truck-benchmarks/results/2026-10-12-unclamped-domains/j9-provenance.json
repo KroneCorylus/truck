@@ -1,0 +1,20 @@
+{
+  "source_parent": "0d8bface",
+  "source_state": "unclamped-domain working implementation before commit",
+  "case": "blend/simple/J9",
+  "input_sha256": {
+    "input.json": "9d4303f440827249fc1ff2588f2852d28a84cf328b8902e8faa2d0fac209afb0",
+    "input.step": "e402e7da1caff2e338ca6167a91d04a4bafd4a1893d4aa5fdb5de2e14e9c3f68"
+  },
+  "prior_evidence": "audits/fillet-chamfer/capture/2026-10-12-two-edge-caps/results.json",
+  "result": {
+    "comparison": "unverified",
+    "result": {
+      "error": "Unsupported imported geometry",
+      "status": "input-import-failed"
+    },
+    "schema_version": 1,
+    "stage": "import-and-preprocess",
+    "tolerance": 0.001
+  }
+}

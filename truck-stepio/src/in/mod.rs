@@ -1512,14 +1512,42 @@ pub enum BSplineCurveAny {
     RationalBSplineCurve(Box<RationalBSplineCurve>),
 }
 
+fn active_spline_range(knots: &KnotVec, degree: usize) -> Result<(f64, f64), StepConvertingError> {
+    let (a, b) = (knots[degree], knots[knots.len() - degree - 1]);
+    if !a.is_finite() || !b.is_finite() || a >= b {
+        return Err("B-spline has no finite active parameter interval".into());
+    }
+    Ok((a, b))
+}
+
+fn active_spline_domain<P: truck_base::cgmath64::control_point::ControlPoint<f64> + Tolerance>(
+    mut curve: BSplineCurve<P>,
+) -> Result<BSplineCurve<P>, StepConvertingError> {
+    let (a, b) = active_spline_range(curve.knot_vec(), curve.degree())?;
+    if a > curve.range_tuple().0 {
+        curve = curve.cut(a);
+    }
+    if b < curve.range_tuple().1 {
+        curve.cut(b);
+    }
+    Ok(curve)
+}
+
 impl TryFrom<&BSplineCurveAny> for Curve2D {
     type Error = StepConvertingError;
     #[inline(always)]
     fn try_from(value: &BSplineCurveAny) -> Result<Self, Self::Error> {
         use BSplineCurveAny::*;
         Ok(match value {
-            NonRationalBSplineCurve(bsp) => Self::BSplineCurve(bsp.as_ref().try_into()?),
-            RationalBSplineCurve(bsp) => Self::NurbsCurve(bsp.as_ref().try_into()?),
+            NonRationalBSplineCurve(bsp) => {
+                Self::BSplineCurve(active_spline_domain(bsp.as_ref().try_into()?)?)
+            }
+            RationalBSplineCurve(bsp) => {
+                let curve: NurbsCurve<Vector3> = bsp.as_ref().try_into()?;
+                Self::NurbsCurve(NurbsCurve::new(active_spline_domain(
+                    curve.into_non_rationalized(),
+                )?))
+            }
         })
     }
 }
@@ -1530,8 +1558,15 @@ impl TryFrom<&BSplineCurveAny> for Curve3D {
     fn try_from(value: &BSplineCurveAny) -> Result<Self, Self::Error> {
         use BSplineCurveAny::*;
         Ok(match value {
-            NonRationalBSplineCurve(bsp) => Self::BSplineCurve(bsp.as_ref().try_into()?),
-            RationalBSplineCurve(bsp) => Self::NurbsCurve(bsp.as_ref().try_into()?),
+            NonRationalBSplineCurve(bsp) => {
+                Self::BSplineCurve(active_spline_domain(bsp.as_ref().try_into()?)?)
+            }
+            RationalBSplineCurve(bsp) => {
+                let curve: NurbsCurve<Vector4> = bsp.as_ref().try_into()?;
+                Self::NurbsCurve(NurbsCurve::new(active_spline_domain(
+                    curve.into_non_rationalized(),
+                )?))
+            }
         })
     }
 }
@@ -2044,14 +2079,41 @@ pub enum BSplineSurfaceAny {
     RationalBSplineSurface(RationalBSplineSurface),
 }
 
+fn active_spline_surface<P: truck_base::cgmath64::control_point::ControlPoint<f64> + Tolerance>(
+    mut surface: BSplineSurface<P>,
+) -> Result<BSplineSurface<P>, StepConvertingError> {
+    let (u0, u1) = active_spline_range(surface.uknot_vec(), surface.udegree())?;
+    let (v0, v1) = active_spline_range(surface.vknot_vec(), surface.vdegree())?;
+    if u0 > surface.uknot_vec()[0] {
+        surface = surface.ucut(u0);
+    }
+    if u1 < *surface.uknot_vec().last().unwrap() {
+        surface.ucut(u1);
+    }
+    if v0 > surface.vknot_vec()[0] {
+        surface = surface.vcut(v0);
+    }
+    if v1 < *surface.vknot_vec().last().unwrap() {
+        surface.vcut(v1);
+    }
+    Ok(surface)
+}
+
 impl TryFrom<&BSplineSurfaceAny> for Surface {
     type Error = StepConvertingError;
     #[inline(always)]
     fn try_from(value: &BSplineSurfaceAny) -> Result<Self, Self::Error> {
         use BSplineSurfaceAny::*;
         Ok(match value {
-            NonRationalBSplineSurface(bsp) => Surface::BSplineSurface(bsp.try_into()?),
-            RationalBSplineSurface(bsp) => Surface::NurbsSurface(bsp.try_into()?),
+            NonRationalBSplineSurface(bsp) => {
+                Surface::BSplineSurface(active_spline_surface(bsp.try_into()?)?)
+            }
+            RationalBSplineSurface(bsp) => {
+                let surface: NurbsSurface<Vector4> = bsp.try_into()?;
+                Surface::NurbsSurface(NurbsSurface::new(active_spline_surface(
+                    surface.into_non_rationalized(),
+                )?))
+            }
         })
     }
 }
