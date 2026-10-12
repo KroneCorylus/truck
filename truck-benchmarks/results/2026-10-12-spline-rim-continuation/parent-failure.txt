@@ -1,0 +1,28 @@
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-modeling)
+   Compiling truck-meshalgo v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-meshalgo)
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 12.14s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/spline_pipe_blend.rs (target/release/deps/spline_pipe_blend-e6eb0a16df185bae)
+
+running 1 test
+test closed_spline_pipe_rims_follow_the_support_seams_at_their_contacts ... FAILED
+
+failures:
+
+---- closed_spline_pipe_rims_follow_the_support_seams_at_their_contacts stdout ----
+
+thread 'closed_spline_pipe_rims_follow_the_support_seams_at_their_contacts' (591105) panicked at truck-shapeops/tests/spline_pipe_blend.rs:55:14:
+closed rim contacts must reach the displaced side-face seams: Diagnostic { code: BlendConstructionFailed, operation: "fillet_solid_along_wire", stage: "trim_faces", message: "Blend construction failed; the numerical or geometric constraint could not be resolved.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    closed_spline_pipe_rims_follow_the_support_seams_at_their_contacts
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.41s
+
+error: test failed, to rerun pass `-p truck-shapeops --test spline_pipe_blend`

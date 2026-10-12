@@ -1,0 +1,59 @@
+Command: python3 audits/fillet-chamfer/build_catalog.py --occt ../investigations/sequential-holes-2026-10-10/occt --app ../PiezaCAD --check
+Exit: 0
+{
+  "group": {
+    "blend": 475,
+    "boolean": 22,
+    "bugs": 132,
+    "caf": 26,
+    "chamfer": 279,
+    "de_mesh": 2,
+    "draft": 6,
+    "feat": 12,
+    "fillet2d": 10,
+    "heal": 9,
+    "hlr": 2,
+    "opengl": 12,
+    "opengles2": 5,
+    "opengles3": 12,
+    "perf": 4,
+    "sewing": 7,
+    "v3d": 1,
+    "xcaf": 10
+  },
+  "relevance": {
+    "command-candidate": 185,
+    "dedicated-suite": 764,
+    "reference-only": 77
+  },
+  "dependency_status": {
+    "missing-in-checkout": 713,
+    "no-static-reference": 304,
+    "static-references-found": 9
+  },
+  "comparison": {
+    "unverified": 1026
+  },
+  "occt_run": {
+    "failed": 19,
+    "known-failure": 11,
+    "passed": 295,
+    "skipped": 701
+  },
+  "truck_run": {
+    "capture-incomplete": 1,
+    "captured-replay": 147,
+    "not-run": 878
+  },
+  "cases": 1026,
+  "registered_cases_scanned": 21082,
+  "distinct_case_files": 795,
+  "cases_with_markers": 335,
+  "mechanisms": 51,
+  "source_files": 286,
+  "commands": 33,
+  "unexecuted": 0,
+  "reference_topics": 1,
+  "capabilities": 50
+}
+Catalog verified.

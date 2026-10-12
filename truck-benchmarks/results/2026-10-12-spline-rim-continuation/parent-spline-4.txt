@@ -1,0 +1,7 @@
+sample_ms=45.487902000 status=failed
+sample_ms=45.416956000 status=failed
+sample_ms=45.456492000 status=failed
+sample_ms=45.184310000 status=failed
+sample_ms=45.449919000 status=failed
+median_ms=45.449919000
+diagnostic=Diagnostic { code: BlendConstructionFailed, operation: "fillet_solid_along_wire", stage: "trim_faces", message: "Blend construction failed; the numerical or geometric constraint could not be resolved.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }

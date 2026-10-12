@@ -1,0 +1,114 @@
+[
+  {
+    "version": "parent",
+    "fixture": "cylinder",
+    "workers": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/rim-parent-build/release/examples/rim_blend",
+      "cylinder"
+    ],
+    "returncode": 0,
+    "log": "parent-cylinder-1.txt"
+  },
+  {
+    "version": "updated",
+    "fixture": "cylinder",
+    "workers": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/rim_blend",
+      "cylinder"
+    ],
+    "returncode": 0,
+    "log": "updated-cylinder-1.txt"
+  },
+  {
+    "version": "parent",
+    "fixture": "spline",
+    "workers": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/rim-parent-build/release/examples/rim_blend",
+      "spline"
+    ],
+    "returncode": 0,
+    "log": "parent-spline-1.txt"
+  },
+  {
+    "version": "updated",
+    "fixture": "spline",
+    "workers": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/rim_blend",
+      "spline"
+    ],
+    "returncode": 0,
+    "log": "updated-spline-1.txt"
+  },
+  {
+    "version": "updated",
+    "fixture": "cylinder",
+    "workers": 4,
+    "command": [
+      "taskset",
+      "-c",
+      "0-3",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/rim_blend",
+      "cylinder"
+    ],
+    "returncode": 0,
+    "log": "updated-cylinder-4.txt"
+  },
+  {
+    "version": "parent",
+    "fixture": "cylinder",
+    "workers": 4,
+    "command": [
+      "taskset",
+      "-c",
+      "0-3",
+      "/home/krone/Development/Pieza_WS/truck/target/rim-parent-build/release/examples/rim_blend",
+      "cylinder"
+    ],
+    "returncode": 0,
+    "log": "parent-cylinder-4.txt"
+  },
+  {
+    "version": "updated",
+    "fixture": "spline",
+    "workers": 4,
+    "command": [
+      "taskset",
+      "-c",
+      "0-3",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/rim_blend",
+      "spline"
+    ],
+    "returncode": 0,
+    "log": "updated-spline-4.txt"
+  },
+  {
+    "version": "parent",
+    "fixture": "spline",
+    "workers": 4,
+    "command": [
+      "taskset",
+      "-c",
+      "0-3",
+      "/home/krone/Development/Pieza_WS/truck/target/rim-parent-build/release/examples/rim_blend",
+      "spline"
+    ],
+    "returncode": 0,
+    "log": "parent-spline-4.txt"
+  }
+]

@@ -643,7 +643,7 @@
         "freeform"
       ],
       "occt_scope": "Generic numerical construction extends beyond analytic special cases.",
-      "truck_scope": "Plane/sphere circular rims now have independent validation for both meridian slopes, exterior/cavity orientation, exact Sphere/revolved-circle/NURBS representations, rigid transforms, reversed wires, G1, radius, volume, closed mesh, history and STEP. General cylinder/cylinder, toroidal and freeform support intersections remain unverified.",
+      "truck_scope": "Plane/sphere circular rims now have independent validation for both meridian slopes, exterior/cavity orientation, exact Sphere/revolved-circle/NURBS representations, rigid transforms, reversed wires, G1, radius, volume, closed mesh, history and STEP. General cylinder/cylinder, toroidal and freeform support intersections remain unverified. Constant-radius plane/NURBS spline-pipe rims now also have independent contact, volume and STEP checks at two radii, with scaling and reversal.",
       "next_case": "Torus/plane rims and non-coaxial cylinder intersections, followed by arbitrary spline-support pairs and contact collapse.",
       "evidence": [
         {
@@ -729,6 +729,18 @@
           "path": "audits/fillet-chamfer/capture/2026-10-11-smooth-fillets/REPORT.md",
           "find": "The full run",
           "role": "executed-capture"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/spline_pipe_blend.rs",
+          "find": "fn closed_spline_pipe_rims_follow_the_support_seams_at_their_contacts",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-12-spline-rim-continuation/REPORT.md",
+          "find": "# Closed spline-rim contact continuation",
+          "role": "verification"
         }
       ],
       "required_outcome": "Blend intersections between curved supports, including cylinders, cones, spheres, tori and spline surfaces, with valid contacts and trimmed output.",
@@ -739,7 +751,8 @@
         "At 7414e3d9, signed atan2 angle recovery fixes loss of precision near coincident/opposite revolution meridians. Two parent-failing regressions cover point/nearest searches, three radii, small seam/antipodal angles and exact spherical boundaries across shifted domains, rigid transforms and reversed orientations; off-sphere curves remain rejected. Captured D2 input consistency now passes, without claiming subsequent blend support. Full geometry/modeling/shapeops/STEP: 728 passed, 0 failed, 4 existing ignored; Clippy and action smoke pass. See truck-benchmarks/results/2026-10-11-revolution-seams/REPORT.md.",
         "A fresh full capture at clean 4c764bef passes all 156 native entries and constructs 64 of 161 Truck operation captures, versus baseline 45. All 64 have consistent geometry, immutable inputs and closed meshes; 63 export valid single-solid STEP and 62 also meet the 0.001 bidirectional sampled boundary limit. A9, D2 and F8 now succeed; I1 mesh closure is resolved in this fixture. D4 still fails STEP preparation, tolerance-grid A1 differs by about 0.02238, I3/J9 time out, and Z1 still panics during preprocessing in this snapshot. Thirty-one imports fail, 23 inputs are inconsistent, 31 operations fail, eight intents are unhandled and one capture is incomplete. All full-parity verdicts remain unverified.",
         "At 012ace79, quartic contact interpolation keeps rolling-ball section frames C2 at internal interpolation knots on smooth supports. The captured D4 spherical-meridian fillet now prepares STEP at the unchanged tolerance and passes independent radius/normals, first/second derivative limits, volume, closed meshes, STEP round trips, rigid transforms and reversed selection. Parent interpolation produced trim position jumps exceeding twice the export tolerance; the exporter is unchanged. Construction median 20.006 -> 17.626 ms; STEP now succeeds in 134.153 ms. Full release: 852 passed, five existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy/action smoke pass.",
-        "Fresh full replay at clean 012ace79 passes all 156 native entries, with 70 constructed Truck outputs and zero panics. All 70 now prepare STEP, 69 produce native-valid single-solid STEP and 68 meet the combined limited checks; the sole improvement is D4, with sampled distances 5.78e-5/3.12e-5. Q4 capture 2 remains open/two-solid with discrepancy 1.20849; tolerance A1, G1 trim failure and I3/J9 timeouts remain. All full-parity verdicts stay unverified."
+        "Fresh full replay at clean 012ace79 passes all 156 native entries, with 70 constructed Truck outputs and zero panics. All 70 now prepare STEP, 69 produce native-valid single-solid STEP and 68 meet the combined limited checks; the sole improvement is D4, with sampled distances 5.78e-5/3.12e-5. Q4 capture 2 remains open/two-solid with discrepancy 1.20849; tolerance A1, G1 trim failure and I3/J9 timeouts remain. All full-parity verdicts stay unverified.",
+        "Closed spline-pipe rim regressions now cover displaced longitudinal contact seams, two constant radii, rigid transformation, scale 0.01, reversed wire and unequal rim parameter spans. Contact fitting follows one UV branch across closed NURBS seams without treating support parameter bounds as face trims. Both end-to-end tests fail on parent 4a156c4f; they check radius/normals, independent volume, topology/mesh closure, STEP and immutable input. This is targeted capability evidence; the latest archived native replay still predates this change. See truck-benchmarks/results/2026-10-12-spline-rim-continuation/REPORT.md."
       ]
     },
     {
@@ -945,6 +958,18 @@
           "path": "truck-benchmarks/results/2026-10-11-imported-support-domains/REPORT.md",
           "find": "# Imported extrusion support domains",
           "role": "verification"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/spline_pipe_blend.rs",
+          "find": "fn closed_spline_pipe_rims_follow_the_support_seams_at_their_contacts",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-12-spline-rim-continuation/REPORT.md",
+          "find": "# Closed spline-rim contact continuation",
+          "role": "verification"
         }
       ],
       "required_outcome": "Handle equivalent physical geometry consistently when represented analytically, as exact NURBS, with split faces, or after STEP import.",
@@ -974,7 +999,8 @@
         "At 7414e3d9, signed atan2 angle recovery fixes loss of precision near coincident/opposite revolution meridians. Two parent-failing regressions cover point/nearest searches, three radii, small seam/antipodal angles and exact spherical boundaries across shifted domains, rigid transforms and reversed orientations; off-sphere curves remain rejected. Captured D2 input consistency now passes, without claiming subsequent blend support. Full geometry/modeling/shapeops/STEP: 728 passed, 0 failed, 4 existing ignored; Clippy and action smoke pass. See truck-benchmarks/results/2026-10-11-revolution-seams/REPORT.md.",
         "At fa1a142d, STEP fitting covers curved fillet trims beyond their contact endpoints. The parent loses conical end geometry; four direct quarter-cone operations verify requested radius/normals, independent volume, native/transformed-reversed selections, finite fitted-domain coverage, closed meshes/STEP, history and immutable inputs. Full release shapeops/STEP: 391 passed, 0 failed, 1 existing ignored; Clippy and action smoke pass. A fresh physical C7 replay reduces the native-to-STEP sampled discrepancy from 4.2283 to below 2.76e-6 in both directions. Finite sampling does not certify global bounds or full parity. Raw comparison/STEP evidence is retained with the validation and capture reports.",
         "At 41e25f28, finite nonelliptic STEP conics convert to exact normalized polynomial/rational curves. The edge parser preserves parabola identity and nonperiodic hyperbola trims. Transformed/reversed arc, 2D/3D STEP edge and prism/STEP regressions pass; full release STEP/shapeops: 397 passed, 0 failed, 1 existing ignored, with Clippy/action smoke. Captured F8/F9/G1/G2 progress to input-consistency failure, with extrusion support domains still unresolved; no blend success or full parity is claimed. See capture/2026-10-11-conic-import/REPORT.md.",
-        "At 4a3e11d4, imported cylinders and conic extrusions receive finite support domains bounded by their complete rational boundary control hulls. Affine conic inclusion/search preserves elliptical, sheared and oblique sweeps; cylinder conversion retains the fitted height and STEP export measures perpendicular radius. Native F8, eight cylinder variants, curved extrema and bounded/off-surface checks pass. Full release modeling/shapeops/STEP: 488 passed, 0 failed, 3 existing ignored; Clippy and action smoke pass. This resolves the previously recorded finite extrusion domain failures; unsupported boundary representations and other import failures remain open."
+        "At 4a3e11d4, imported cylinders and conic extrusions receive finite support domains bounded by their complete rational boundary control hulls. Affine conic inclusion/search preserves elliptical, sheared and oblique sweeps; cylinder conversion retains the fitted height and STEP export measures perpendicular radius. Native F8, eight cylinder variants, curved extrema and bounded/off-surface checks pass. Full release modeling/shapeops/STEP: 488 passed, 0 failed, 3 existing ignored; Clippy and action smoke pass. This resolves the previously recorded finite extrusion domain failures; unsupported boundary representations and other import failures remain open.",
+        "Closed spline-pipe rim regressions now cover displaced longitudinal contact seams, two constant radii, rigid transformation, scale 0.01, reversed wire and unequal rim parameter spans. Contact fitting follows one UV branch across closed NURBS seams without treating support parameter bounds as face trims. Both end-to-end tests fail on parent 4a156c4f; they check radius/normals, independent volume, topology/mesh closure, STEP and immutable input. This is targeted capability evidence; the latest archived native replay still predates this change. See truck-benchmarks/results/2026-10-12-spline-rim-continuation/REPORT.md."
       ]
     },
     {
@@ -987,8 +1013,8 @@
         "periodic-seam"
       ],
       "occt_scope": "Closed Bezier/spline spine regressions and general walking.",
-      "truck_scope": "A generic curved-surface test exists; closed spline seam, inflection and tiny-edge variants remain unverified.",
-      "next_case": "Resolve captured G1 single-parabolic-edge face trimming, then exercise the six bug30940 cases including a closed single-edge Bezier spine.",
+      "truck_scope": "Generic curved supports, parabolic extrusion cap trimming and closed spline-pipe rim seams have targeted regressions. G1 constructs a valid independently checked result but still differs from the native captured surface. J9 rim contacts now continue through displaced support seams in original and transformed/reversed/reparameterized tests. General inflection, tiny-edge and freeform configurations remain unverified.",
+      "next_case": "Investigate the G1 native shape discrepancy and F9/G2 adjacent curved-edge failures, then exercise the six bug30940 cases including a closed single-edge Bezier spine.",
       "evidence": [
         {
           "repo": "occt",
@@ -1025,12 +1051,25 @@
           "path": "truck-benchmarks/results/2026-10-11-physical-selection-chords/REPORT.md",
           "find": "#",
           "role": "verification"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/spline_pipe_blend.rs",
+          "find": "fn closed_spline_pipe_rims_follow_the_support_seams_at_their_contacts",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-12-spline-rim-continuation/REPORT.md",
+          "find": "# Closed spline-rim contact continuation",
+          "role": "verification"
         }
       ],
       "required_outcome": "Blend along open and closed curved edges, including spline inflections and high curvature, with valid closure and contacts.",
       "verification": [
         "A fresh full capture at clean 4c764bef passes all 156 native entries and constructs 64 of 161 Truck operation captures, versus baseline 45. All 64 have consistent geometry, immutable inputs and closed meshes; 63 export valid single-solid STEP and 62 also meet the 0.001 bidirectional sampled boundary limit. A9, D2 and F8 now succeed; I1 mesh closure is resolved in this fixture. D4 still fails STEP preparation, tolerance-grid A1 differs by about 0.02238, I3/J9 time out, and Z1 still panics during preprocessing in this snapshot. Thirty-one imports fail, 23 inputs are inconsistent, 31 operations fail, eight intents are unhandled and one capture is incomplete. All full-parity verdicts remain unverified.",
-        "At 4c764bef, physical-selection matching checks complete candidate polyline chords against the captured curve tube. Two parent-failing regressions prevent endpoint-only and shared-midpoint false matches. Captured G1 now selects its intended single parabolic edge and fails during face trimming; F9 selects two adjacent nontangent edges and G2 selects three mixed edges, with both tasks still unsupported by the attempted solid routes. No API matching is required; these are physical task failures."
+        "At 4c764bef, physical-selection matching checks complete candidate polyline chords against the captured curve tube. Two parent-failing regressions prevent endpoint-only and shared-midpoint false matches. Captured G1 now selects its intended single parabolic edge and fails during face trimming; F9 selects two adjacent nontangent edges and G2 selects three mixed edges, with both tasks still unsupported by the attempted solid routes. No API matching is required; these are physical task failures.",
+        "Closed spline-pipe rim regressions now cover displaced longitudinal contact seams, two constant radii, rigid transformation, scale 0.01, reversed wire and unequal rim parameter spans. Contact fitting follows one UV branch across closed NURBS seams without treating support parameter bounds as face trims. Both end-to-end tests fail on parent 4a156c4f; they check radius/normals, independent volume, topology/mesh closure, STEP and immutable input. This is targeted capability evidence; the latest archived native replay still predates this change. See truck-benchmarks/results/2026-10-12-spline-rim-continuation/REPORT.md."
       ]
     },
     {
@@ -1110,8 +1149,8 @@
         "periodic-seam"
       ],
       "occt_scope": "Closed/tangent states, periodic surface handling and seam-related regressions, including expected failures.",
-      "truck_scope": "Cylinder-rim seam crossings are tested; broader seam interactions are unverified.",
-      "next_case": "Move cylinder/torus seams through a termination, then repeat with a closed spline edge.",
+      "truck_scope": "Cylinder rims and displaced longitudinal seams on a closed spline pipe have solid and STEP regressions. The spline case preserves a consistent contact parameter branch without requiring declared surface periodicity, including reversal and independent edge reparameterization. Broader torus and seam/termination interactions remain unverified.",
+      "next_case": "Move toroidal seams through terminations and exercise closed single-edge spline contours with curvature and radius-law variation.",
       "evidence": [
         {
           "repo": "occt",
@@ -1130,9 +1169,24 @@
           "path": "tests/bugs/modalg_7/bug26655",
           "find": "TODO",
           "role": "expected-failure-marker"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/spline_pipe_blend.rs",
+          "find": "fn closed_spline_pipe_rims_follow_the_support_seams_at_their_contacts",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-12-spline-rim-continuation/REPORT.md",
+          "find": "# Closed spline-rim contact continuation",
+          "role": "verification"
         }
       ],
-      "required_outcome": "Complete a closed blend without gaps or invalid topology, regardless of where periodic seams lie."
+      "required_outcome": "Complete a closed blend without gaps or invalid topology, regardless of where periodic seams lie.",
+      "verification": [
+        "Closed spline-pipe rim regressions now cover displaced longitudinal contact seams, two constant radii, rigid transformation, scale 0.01, reversed wire and unequal rim parameter spans. Contact fitting follows one UV branch across closed NURBS seams without treating support parameter bounds as face trims. Both end-to-end tests fail on parent 4a156c4f; they check radius/normals, independent volume, topology/mesh closure, STEP and immutable input. This is targeted capability evidence; the latest archived native replay still predates this change. See truck-benchmarks/results/2026-10-12-spline-rim-continuation/REPORT.md."
+      ]
     },
     {
       "id": "T03",
@@ -2009,7 +2063,7 @@
         "periodic-seam"
       ],
       "occt_scope": "Dedicated periodic/singular extrema and parameter repairs.",
-      "truck_scope": "Some exact conic seam handling and reversed-curve fixes exist. STEP fitting normalizes longitudinal fillet domains, including sub-tolerance ranges; general support, boundary-curve and paired seam coverage remains open. Periodic fillet contacts now retain continuous parameter branches, with quarter stations disambiguating full turns; chamfer contact sampling also preserves the previous periodic branch. Direct and conical solid regressions cover the exposed failures.",
+      "truck_scope": "Some exact conic seam handling and reversed-curve fixes exist. STEP fitting normalizes longitudinal fillet domains, including sub-tolerance ranges; general support, boundary-curve and paired seam coverage remains open. Periodic fillet contacts now retain continuous parameter branches, with quarter stations disambiguating full turns; chamfer contact sampling also preserves the previous periodic branch. Direct and conical solid regressions cover the exposed failures. Closed spline-pipe contacts now continue from neighboring solved sections across undeclared NURBS seams; displaced seam guide stations follow adjacent rim segments with matching speed.",
       "next_case": "Reverse surface parameters and move the seam through the same physical geometry; verify every edge lies on both supports.",
       "evidence": [
         {
@@ -2155,6 +2209,18 @@
           "path": "audits/fillet-chamfer/capture/2026-10-12-exact-joins/REPORT.md",
           "find": "The full run",
           "role": "executed-capture"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/spline_pipe_blend.rs",
+          "find": "fn closed_spline_pipe_rims_follow_the_support_seams_at_their_contacts",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-12-spline-rim-continuation/REPORT.md",
+          "find": "# Closed spline-rim contact continuation",
+          "role": "verification"
         }
       ],
       "required_outcome": "Keep blend boundaries on both supports and close them correctly when surface parameters, orientations or seam positions change.",
@@ -2174,7 +2240,8 @@
         "The clean 83eccc89 full capture passes all 156 native entries. Of 161 captures, 71 construct (up from 70), 31 fail construction, 25 fail import, 23 have inconsistent inputs, eight have unhandled intent, two time out and one is incomplete. All 71 constructed results preserve input and geometry consistency, close their Truck meshes and yield native-valid single-solid STEP. Sixty-nine meet the combined limited comparisons. G1 is the sole construction-status change: its independently checked result still differs from the captured OCCT surface (sampled distances 0.98750/0.01855). Tolerance-grid A1 also differs; I3/J9 still time out. Zero panics and no full parity verdict. Evidence: audits/fillet-chamfer/capture/2026-10-12-two-edge-caps/REPORT.md.",
         "At eaa603bb, STEP spline curve/surface conversion trims padded knot vectors to their finite active intervals after rational weighting. Parent-failing polynomial/rational 2D/3D curve and surface regressions preserve independent exact geometry, normals, orientation and finite sampling. Full release STEP/shapeops: 422 passed, zero failed, one existing ignored; all-target Clippy and action smoke pass. The clean full capture passes all 156 native cases. J9 changes from timeout to an explicit unsupported imported spline-pcurve rejection; I3 is now the only timeout. Of 161 captures, 71 construct, 31 fail construction, 26 fail import, 23 have inconsistent inputs, eight have unhandled intent and one is incomplete. All 71 results are consistent, immutable-input, closed-mesh and native-valid single-solid STEP; 69 meet the limited comparisons. G1 and tolerance A1 discrepancies remain. No full parity verdict. Evidence: audits/fillet-chamfer/capture/2026-10-12-unclamped-domains/REPORT.md and truck-benchmarks/results/2026-10-12-unclamped-domains/REPORT.md.",
         "At aece8e35, constant-parameter pcurves on B-spline/NURBS supports convert to exact spatial splines, with bounded seam-search roundoff. Three parent-failing regressions verify analytic positions/derivatives, orientation, exact section geometry and J9 pipe material/closed meshes/STEP at two scales. Full release STEP/shapeops: 425 passed, zero failed, one existing ignored; Clippy and action smoke pass. The clean full capture passes all 156 native cases. J9 now imports and reaches face trimming, which fails with unchanged input; I3 remains the sole timeout. Of 161 captures, 71 construct, 32 fail construction, 25 fail import, 23 have inconsistent inputs, eight have unhandled intent and one is incomplete. All 71 constructed results remain consistent, closed-mesh and native-valid single-solid STEP; 69 meet the limited comparisons. G1 and tolerance A1 discrepancies remain. No full parity verdict. Evidence: audits/fillet-chamfer/capture/2026-10-12-spline-seams/REPORT.md and truck-benchmarks/results/2026-10-12-spline-seams/REPORT.md.",
-        "Fresh full capture at clean f6871a18 passes all 156 native entries. All 72 constructed outputs preserve input/geometry, have closed Truck meshes and native-valid single-solid STEP; 70 meet the combined limited checks including bidirectional sampled distance <=0.001. I3 now succeeds with distances 1.13905e-5/8.42998e-6, and all 21 native STEP read regressions from the initial conical-mesh capture are recovered. No timeouts or panics remain in this captured subset. The 32 construction failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents, one incomplete capture, G1 and tolerance-grid A1 shape discrepancies remain. J9 still fails at trim_faces. No full-parity verdict is assigned. See capture/2026-10-12-exact-joins/REPORT.md."
+        "Fresh full capture at clean f6871a18 passes all 156 native entries. All 72 constructed outputs preserve input/geometry, have closed Truck meshes and native-valid single-solid STEP; 70 meet the combined limited checks including bidirectional sampled distance <=0.001. I3 now succeeds with distances 1.13905e-5/8.42998e-6, and all 21 native STEP read regressions from the initial conical-mesh capture are recovered. No timeouts or panics remain in this captured subset. The 32 construction failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents, one incomplete capture, G1 and tolerance-grid A1 shape discrepancies remain. J9 still fails at trim_faces. No full-parity verdict is assigned. See capture/2026-10-12-exact-joins/REPORT.md.",
+        "Closed spline-pipe rim regressions now cover displaced longitudinal contact seams, two constant radii, rigid transformation, scale 0.01, reversed wire and unequal rim parameter spans. Contact fitting follows one UV branch across closed NURBS seams without treating support parameter bounds as face trims. Both end-to-end tests fail on parent 4a156c4f; they check radius/normals, independent volume, topology/mesh closure, STEP and immutable input. This is targeted capability evidence; the latest archived native replay still predates this change. See truck-benchmarks/results/2026-10-12-spline-rim-continuation/REPORT.md."
       ]
     },
     {
@@ -2456,7 +2523,7 @@
       ],
       "occt_scope": "Shape, property, tolerance and downstream operation checks across the corpus.",
       "truck_scope": "Common blend checks cover topology, meshes, volume, STEP and selected Boolean operations. These do not alone prove absence of all self-intersections.",
-      "next_case": "Resolve captured D4 STEP preparation, remaining preprocessing failures and tolerance-grid A1 shape differences; I1 mesh closure now passes. Then validate downstream edits and broader trim extrema.",
+      "next_case": "Investigate G1 and tolerance-grid A1 shape differences, remaining import/input failures and downstream edits. D4 STEP preparation, I1 mesh closure, I3 construction/STEP and the 21 interim exact-join interoperability regressions are resolved in archived captures; J9 has new targeted construction regressions awaiting a clean capture.",
       "evidence": [
         {
           "repo": "occt",
@@ -2703,6 +2770,18 @@
           "path": "audits/fillet-chamfer/capture/2026-10-12-exact-joins/REPORT.md",
           "find": "The full run",
           "role": "executed-capture"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/spline_pipe_blend.rs",
+          "find": "fn closed_spline_pipe_rims_follow_the_support_seams_at_their_contacts",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-12-spline-rim-continuation/REPORT.md",
+          "find": "# Closed spline-rim contact continuation",
+          "role": "verification"
         }
       ],
       "required_outcome": "Deliver blend results usable for closed meshing, STEP interchange and further modeling while preserving dimensions and validity.",
@@ -2728,7 +2807,8 @@
         "Fresh full replay at clean 012ace79 passes all 156 native entries, with 70 constructed Truck outputs and zero panics. All 70 now prepare STEP, 69 produce native-valid single-solid STEP and 68 meet the combined limited checks; the sole improvement is D4, with sampled distances 5.78e-5/3.12e-5. Q4 capture 2 remains open/two-solid with discrepancy 1.20849; tolerance A1, G1 trim failure and I3/J9 timeouts remain. All full-parity verdicts stay unverified.",
         "Conical pipe I3 now passes bounded coarse mesh, closed fine mesh, independent volume and STEP at original scale and at 0.01 with rigid transform/reversed selection. One-direction refinement uses physical derivative lengths while retaining raw geometry parameters. Tight cubic fitting no longer loses precision to global-tolerance knot removal. Both new regressions fail on parent 713f0c9a. Full release: 868 passed, one unchanged PCurve property failure, five existing ignored; Clippy/action smoke pass. Fine mesh medians are 416.489/164.231 ms with one/four workers; parent processes time out at 30 seconds, so no speedup ratio is assigned. See truck-benchmarks/results/2026-10-12-conical-mesh/REPORT.md. Clean full capture follows separately; family status remains partial.",
         "The initial clean aa6cfa65 replay constructs 72 outputs without timeouts, but native STEP reading rejects 21 fitted-curve exports with duplicated join knots; the failed capture is retained in capture/2026-10-12-conical-mesh-initial/REPORT.md. Exact endpoint sharing now removes only redundant join controls/knots while retaining tight accuracy and distinct nearby endpoints. Both regressions fail on aa6cfa65; targeted I3 STEP is native-valid, one solid, with sampled differences below 0.000012. Full release: 868 passed, two pre-existing numerical property failures reproduced on parents, five existing ignored; Clippy/action smoke pass. Full capture recovery is checked separately. See truck-benchmarks/results/2026-10-12-exact-spline-joins/REPORT.md.",
-        "Fresh full capture at clean f6871a18 passes all 156 native entries. All 72 constructed outputs preserve input/geometry, have closed Truck meshes and native-valid single-solid STEP; 70 meet the combined limited checks including bidirectional sampled distance <=0.001. I3 now succeeds with distances 1.13905e-5/8.42998e-6, and all 21 native STEP read regressions from the initial conical-mesh capture are recovered. No timeouts or panics remain in this captured subset. The 32 construction failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents, one incomplete capture, G1 and tolerance-grid A1 shape discrepancies remain. J9 still fails at trim_faces. No full-parity verdict is assigned. See capture/2026-10-12-exact-joins/REPORT.md."
+        "Fresh full capture at clean f6871a18 passes all 156 native entries. All 72 constructed outputs preserve input/geometry, have closed Truck meshes and native-valid single-solid STEP; 70 meet the combined limited checks including bidirectional sampled distance <=0.001. I3 now succeeds with distances 1.13905e-5/8.42998e-6, and all 21 native STEP read regressions from the initial conical-mesh capture are recovered. No timeouts or panics remain in this captured subset. The 32 construction failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents, one incomplete capture, G1 and tolerance-grid A1 shape discrepancies remain. J9 still fails at trim_faces. No full-parity verdict is assigned. See capture/2026-10-12-exact-joins/REPORT.md.",
+        "Closed spline-pipe rim regressions now cover displaced longitudinal contact seams, two constant radii, rigid transformation, scale 0.01, reversed wire and unequal rim parameter spans. Contact fitting follows one UV branch across closed NURBS seams without treating support parameter bounds as face trims. Both end-to-end tests fail on parent 4a156c4f; they check radius/normals, independent volume, topology/mesh closure, STEP and immutable input. This is targeted capability evidence; the latest archived native replay still predates this change. See truck-benchmarks/results/2026-10-12-spline-rim-continuation/REPORT.md."
       ]
     },
     {

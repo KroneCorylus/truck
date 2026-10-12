@@ -211,6 +211,71 @@ mod tests {
     use super::*;
 
     #[test]
+    fn contact_continuation_preserves_valid_surface_extensions_at_a_seam() {
+        let w = std::f64::consts::FRAC_1_SQRT_2;
+        let cylinder = NurbsSurface::new(BSplineSurface::new(
+            (KnotVec::bezier_knot(2), KnotVec::bezier_knot(1)),
+            vec![
+                vec![Vector4::new(1., 0., 0., 1.), Vector4::new(1., 0., 1., 1.)],
+                vec![Vector4::new(w, w, 0., w), Vector4::new(w, w, w, w)],
+                vec![Vector4::new(0., 1., 0., 1.), Vector4::new(0., 1., 1., 1.)],
+            ],
+        ));
+        let plane = Plane::new(
+            Point3::origin(),
+            Point3::new(0., 1., 0.),
+            Point3::new(1., 0., 0.),
+        );
+        let solve = |y| {
+            ContactCircle::try_from_contacts(
+                (Point3::new(1., y, 0.), Vector3::unit_y()),
+                0.,
+                &plane,
+                &cylinder,
+                -0.2,
+                [Point2::new(0., 0.8), Point2::new(0.1, 0.2)],
+            )
+        };
+        let circle = solve(0.).expect("the contact is on the u=0 boundary");
+        assert!(circle.center().distance(Point3::new(0.8, 0., 0.2)) < 1e-12);
+        assert!(
+            circle
+                .contact_point0()
+                .point
+                .distance(Point3::new(0.8, 0., 0.))
+                < 1e-12
+        );
+        assert!(
+            circle
+                .contact_point1()
+                .point
+                .distance(Point3::new(1., 0., 0.2))
+                < 1e-12
+        );
+        let continued = solve(-0.2).expect("parameter bounds do not trim the support");
+        let x = (0.8_f64.powi(2) - 0.2_f64.powi(2)).sqrt();
+        assert!(continued.center().distance(Point3::new(x, -0.2, 0.2)) < 1e-12);
+        assert!(
+            continued
+                .contact_point0()
+                .point
+                .distance(Point3::new(x, -0.2, 0.))
+                < 1e-12
+        );
+        assert!(
+            continued
+                .contact_point1()
+                .point
+                .distance(Point3::new(x / 0.8, -0.25, 0.2))
+                < 1e-12
+        );
+        assert!(
+            solve(-1.).is_none(),
+            "the guide misses the inward-offset cylinder"
+        );
+    }
+
+    #[test]
     fn singular_contact_planes_return_none() {
         let line = Line(Point3::origin(), Point3::new(1.0, 0.0, 0.0));
         let fillet = RbfSurface::new(line, Plane::xy(), Plane::xy(), 0.2);

@@ -3,6 +3,63 @@ use std::collections::HashMap;
 use std::result::Result;
 use truck_base::diagnostics::{validate_tolerance, Code, Diagnostic};
 
+/// Continues a closed rim through neighboring edges with matching parameter speed.
+#[derive(Clone)]
+struct ExtendedSpine<C> {
+    current: C,
+    neighbors: Option<[(C, f64); 2]>,
+}
+
+impl<C: ParametricCurve3D + BoundedCurve> ExtendedSpine<C> {
+    fn station(&self, t: f64) -> (&C, f64, f64) {
+        let (a, b) = self.current.range_tuple();
+        if let Some([(previous, before), (next, after)]) = &self.neighbors {
+            if t < a {
+                return (
+                    previous,
+                    previous.range_tuple().1 + (t - a) * before,
+                    *before,
+                );
+            }
+            if t > b {
+                return (next, next.range_tuple().0 + (t - b) * after, *after);
+            }
+        }
+        (&self.current, t, 1.0)
+    }
+}
+
+impl<C: ParametricCurve3D + BoundedCurve> ParametricCurve for ExtendedSpine<C> {
+    type Point = Point3;
+    type Vector = Vector3;
+    fn subs(&self, t: f64) -> Point3 {
+        let (curve, t, _) = self.station(t);
+        curve.subs(t)
+    }
+    fn der(&self, t: f64) -> Vector3 { self.der_n(1, t) }
+    fn der2(&self, t: f64) -> Vector3 { self.der_n(2, t) }
+    fn der_n(&self, n: usize, t: f64) -> Vector3 {
+        let (curve, t, scale) = self.station(t);
+        curve.der_n(n, t) * scale.powi(n as i32)
+    }
+    fn parameter_range(&self) -> ParameterRange { self.current.parameter_range() }
+}
+impl<C: ParametricCurve3D + BoundedCurve> BoundedCurve for ExtendedSpine<C> {}
+impl<C> SearchNearestParameter<D1> for ExtendedSpine<C>
+where C: ParametricCurve3D + BoundedCurve + SearchNearestParameter<D1, Point = Point3>
+{
+    type Point = Point3;
+    fn search_nearest_parameter<H: Into<SPHint1D>>(
+        &self,
+        point: Point3,
+        hint: H,
+        trials: usize,
+    ) -> Option<f64> {
+        let hint = self.current.search_nearest_parameter(point, hint, trials)?;
+        algo::curve::search_nearest_parameter(self, point, hint, trials)
+    }
+}
+
 /// Edges of a boundary loop after trimming: one entry per original edge, `None` to keep it.
 type LoopReplacement<C> = Vec<Option<Vec<Edge<Point3, C>>>>;
 
@@ -19,6 +76,24 @@ impl<R: ScalarFunctionD1> ScalarFunctionD1 for EdgeRadius<R> {
     fn der_n(&self, n: usize, t: f64) -> f64 {
         let t = self.k + (t - self.t0) * self.scale;
         self.radius.der_n(n, t) * self.scale.powi(n as i32)
+    }
+}
+
+#[derive(Clone)]
+struct ContinuedRadius<R> {
+    current: EdgeRadius<R>,
+    range: (f64, f64),
+    neighbors: Option<[EdgeRadius<R>; 2]>,
+}
+
+impl<R: ScalarFunctionD1> ScalarFunctionD1 for ContinuedRadius<R> {
+    fn der_n(&self, n: usize, t: f64) -> f64 {
+        let law = match &self.neighbors {
+            Some([previous, _]) if t < self.range.0 => previous,
+            Some([_, next]) if t > self.range.1 => next,
+            _ => &self.current,
+        };
+        law.der_n(n, t)
     }
 }
 
@@ -179,7 +254,8 @@ impl<C: Clone> Cuts<C> {
 /// parameter scaled to unit length. A constant `f64` is such a function. The rolling ball uses
 /// derivatives of the radius up to second order, so the function must supply them. At the open
 /// ends of a chain the fillet is extended to meet the end faces, and the radius is evaluated a
-/// little beyond `[0, n]`.
+/// little beyond `[0, n]`. At closed-chain seams, the guide and radius law continue on the
+/// neighboring chain edge until the contacts meet the side-face seam.
 ///
 /// `wire` must be continuous and simple, and consecutive edges must share their tangent at the
 /// common vertex. It may be closed. Every edge of the chain must be shared by two faces of the
@@ -335,19 +411,62 @@ where
         .map(|k| {
             let curve = wire[k].oriented_curve();
             let (t0, t1) = curve.range_tuple();
-            RbfSurface::new(
-                curve,
+            if !t0.is_finite() || !t1.is_finite() || t0 >= t1 {
+                return Err(failed().stage("validate_wire").selection(k));
+            }
+            let neighbors = if closed {
+                let previous = wire[(k + n - 1) % n].oriented_curve();
+                let next = wire[(k + 1) % n].oriented_curve();
+                let before =
+                    curve.der(t0).magnitude() / previous.der(previous.range_tuple().1).magnitude();
+                let after = curve.der(t1).magnitude() / next.der(next.range_tuple().0).magnitude();
+                if [before, after].iter().any(|s| !s.is_finite() || *s <= 0.0) {
+                    return Err(failed().stage("validate_wire").selection(k));
+                }
+                Some([(previous, before), (next, after)])
+            } else {
+                None
+            };
+            let neighbor_radii = neighbors
+                .as_ref()
+                .map(|[(previous, before), (next, after)]| {
+                    let (p0, p1) = previous.range_tuple();
+                    let (n0, n1) = next.range_tuple();
+                    [
+                        EdgeRadius {
+                            radius: radius.clone(),
+                            k: ((k + n - 1) % n) as f64,
+                            t0: t0 - (p1 - p0) / before,
+                            scale: before / (p1 - p0),
+                        },
+                        EdgeRadius {
+                            radius: radius.clone(),
+                            k: ((k + 1) % n) as f64,
+                            t0: t1,
+                            scale: after / (n1 - n0),
+                        },
+                    ]
+                });
+            Ok(RbfSurface::new(
+                ExtendedSpine {
+                    current: curve,
+                    neighbors,
+                },
                 shell[sides[k][0]].oriented_surface(),
                 shell[sides[k][1]].oriented_surface(),
-                EdgeRadius {
-                    radius: radius.clone(),
-                    k: k as f64,
-                    t0,
-                    scale: 1.0 / (t1 - t0),
+                ContinuedRadius {
+                    current: EdgeRadius {
+                        radius: radius.clone(),
+                        k: k as f64,
+                        t0,
+                        scale: 1.0 / (t1 - t0),
+                    },
+                    range: (t0, t1),
+                    neighbors: neighbor_radii,
                 },
-            )
+            ))
         })
-        .collect();
+        .collect::<Result<_, _>>()?;
     let mut ranges: Vec<(f64, f64)> = rbfs
         .iter()
         .map(|rbf| rbf.edge_curve().range_tuple())
@@ -403,11 +522,104 @@ where
             ends[which] = Some(walk);
         }
     }
+    if closed {
+        for k in 0..n {
+            for (at_start, j) in [(true, k), (false, (k + 1) % n)] {
+                let edges = [adjacent_edge(j, 0), adjacent_edge(j, 1)];
+                let (side, edge) = match &edges {
+                    [Some(edge), None] => (0, edge),
+                    [None, Some(edge)] => (1, edge),
+                    _ => continue,
+                };
+                let vertex = if at_start {
+                    wire[k].front()
+                } else {
+                    wire[k].back()
+                };
+                let (curve, hint) = adjacent_hint(edge, vertex);
+                let t = if at_start { ranges[k].0 } else { ranges[k].1 };
+                let crossing = if side == 0 {
+                    rbfs[k]
+                        .search_contact_curve0_cross_point_with_adjacent_edge(t, &curve, hint, 100)
+                } else {
+                    rbfs[k]
+                        .search_contact_curve1_cross_point_with_adjacent_edge(t, &curve, hint, 100)
+                };
+                if let Some((_, _, parameter, _)) = crossing {
+                    let spine = rbfs[k].edge_curve();
+                    if !spine.subs(parameter).near2(&spine.subs(t)) {
+                        if at_start {
+                            ranges[k].0 = parameter;
+                        } else {
+                            ranges[k].1 = parameter;
+                        }
+                    }
+                }
+            }
+        }
+    }
     let mut surfaces = Vec::with_capacity(n);
     for k in 0..n {
+        let rbf = &rbfs[k];
+        let spine = rbf.edge_curve();
+        let (a, b) = spine.range_tuple();
+        if let Some([(previous, before), (next, after)]) = &spine.neighbors {
+            let (p0, p1) = previous.range_tuple();
+            let (n0, n1) = next.range_tuple();
+            if ranges[k].0 < a - (p1 - p0) / before || ranges[k].1 > b + (n1 - n0) / after {
+                return Err(failed().stage("find_contact").selection(k));
+            }
+        }
+        let continued = closed && ranges[k] != (a, b);
+        let mut contacts = if continued {
+            vec![rbf
+                .contact_circle((a + b) / 2.0)
+                .ok_or_else(|| failed().stage("find_contact").selection(k))?]
+        } else {
+            Vec::new()
+        };
         surfaces.push(
-            ApproxFilletSurface::approx_rolling_ball_fillet(&rbfs[k], ranges[k], tol)
-                .ok_or_else(|| failed().stage("approximate_surface").selection(k))?,
+            ApproxFilletSurface::approx_contact_circles(
+                rbf.surface0(),
+                rbf.surface1(),
+                ranges[k],
+                tol,
+                |t| {
+                    if !continued {
+                        return rbf.contact_circle(t);
+                    }
+                    // Follow one UV branch even when a closed spline does not advertise a period.
+                    let mut previous = *contacts.iter().min_by(|x, y| {
+                        (x.curve_parameter() - t)
+                            .abs()
+                            .total_cmp(&(y.curve_parameter() - t).abs())
+                    })?;
+                    let start = previous.curve_parameter();
+                    if start == t {
+                        return Some(previous);
+                    }
+                    let step = (b - a).max(ranges[k].1 - ranges[k].0) / 8.0;
+                    let steps = ((t - start).abs() / step).ceil().max(1.0) as usize;
+                    for i in 1..=steps {
+                        let v = start + (t - start) * i as f64 / steps as f64;
+                        let [cp0, cp1] = [previous.contact_point0(), previous.contact_point1()];
+                        let sign = (previous.center() - cp0.point)
+                            .dot(rbf.surface0().normal(cp0.uv.x, cp0.uv.y))
+                            .signum();
+                        previous = ContactCircle::try_from_contacts(
+                            (rbf.edge_curve().subs(v), rbf.edge_curve().der(v)),
+                            v,
+                            rbf.surface0(),
+                            rbf.surface1(),
+                            sign * rbf.radius().subs(v),
+                            [cp0.uv, cp1.uv],
+                        )?;
+                    }
+                    contacts.push(previous);
+                    Some(previous)
+                },
+            )
+            .ok_or_else(|| failed().stage("approximate_surface").selection(k))?,
         );
     }
 
