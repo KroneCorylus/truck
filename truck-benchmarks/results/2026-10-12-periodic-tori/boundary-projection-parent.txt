@@ -1,0 +1,2 @@
+input=/home/krone/Development/Pieza_WS/truck/truck-shapeops/tests/fixtures/toroidal-sectors/E5.step face=0 samples=6541 rejected=144 first=Some(Point3 [170.71067811865, -4.181205710765577e-14, 70.710678118655])
+input=/home/krone/Development/Pieza_WS/truck/truck-shapeops/tests/fixtures/toroidal-sectors/E9.step face=0 samples=9370 rejected=387 first=Some(Point3 [249.99996001137114, 0.0, 0.0632365502429508])

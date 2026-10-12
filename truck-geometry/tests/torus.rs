@@ -94,3 +94,48 @@ fn test_der_mn(
     };
     prop_assert!((der0 - der1).magnitude() < 0.01 * der0.magnitude());
 }
+
+#[test]
+fn torus_point_search_preserves_axis_and_near_seam_accuracy() {
+    for scale in [0.01, 1., 100.] {
+        let center = Point3::new(13., -7., 23.);
+        let torus = Torus::new(center, 200. * scale, 50. * scale);
+        for u0 in [0., PI / 2., PI, 3. * PI / 2., 2. * PI] {
+            for v0 in [0., PI / 2., PI, 3. * PI / 2., 2. * PI] {
+                for delta in [-1e-8, 0., 1e-8, -0.001264731342027] {
+                    let (u, v) = (u0 + delta, v0 + delta);
+                    let point = torus.subs(u, v);
+                    let (a, b) = torus
+                        .search_parameter(point, None, 100)
+                        .expect("a regular torus point must project onto its support");
+                    assert!(torus.subs(a, b).distance(point) <= 1e-10 * scale);
+                    let displaced = point + torus.normal(u, v) * scale;
+                    let (a, b) = torus
+                        .search_nearest_parameter(displaced, None, 100)
+                        .unwrap();
+                    assert!(torus.subs(a, b).distance(point) <= 1e-10 * scale);
+                    assert!(torus.search_parameter(displaced, None, 100).is_none());
+                }
+            }
+        }
+        let point = center + Vector3::new(249.99996001137114, 0., -0.06323655024303196) * scale;
+        let (u, v) = torus.search_parameter(point, None, 100).unwrap();
+        assert!(torus.subs(u, v).distance(point) <= 1e-10 * scale);
+    }
+}
+
+#[test]
+fn torus_normal_derivatives_match_independent_finite_differences() {
+    let torus = Torus::new(Point3::new(13., -7., 23.), 200., 50.);
+    let step = 1e-5;
+    for u in [0.1, 0.7, 2.1, 4.3] {
+        for v in [0.2, 0.9, 2.3, 5.4] {
+            let uder = (torus.normal(u + step, v) - torus.normal(u - step, v)) / (2. * step);
+            let vder = (torus.normal(u, v + step) - torus.normal(u, v - step)) / (2. * step);
+            assert!(torus.normal_uder(u, v).distance(uder) < 1e-9);
+            assert!(torus.normal_vder(u, v).distance(vder) < 1e-9);
+            assert!(torus.normal(u, v).dot(torus.normal_uder(u, v)).abs() < 1e-12);
+            assert!(torus.normal(u, v).dot(torus.normal_vder(u, v)).abs() < 1e-12);
+        }
+    }
+}

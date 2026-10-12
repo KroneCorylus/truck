@@ -1,0 +1,7 @@
+sample_ms=5.599043000 status=failed
+sample_ms=6.128490000 status=failed
+sample_ms=5.793205000 status=failed
+sample_ms=5.688324000 status=failed
+sample_ms=5.647696000 status=failed
+median_ms=5.688324000
+diagnostic=NotSimpleWire

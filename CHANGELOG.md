@@ -6,6 +6,8 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Import periodic torus sectors without losing their trimmed material. Use stable signed-angle inversion near torus seams, correct the torus normal derivative, convert isoparametric toroidal trims to exact circles, and retain a closed boundary’s continuous parameter chart when splitting it. Regressions cover transformed/reversed trims, bounded seam roundoff, J3/J4/J5 inputs, independent volumes, closed meshes and STEP round trips.
+
 - Preserve complete and large circular arcs when converting to NURBS, using positive-weight rational quadratic spans and legal knot multiplicities. Determine elementary-surface orientation at a regular sample when the midpoint is singular, preventing reversed horn-torus STEP faces. Imported torus-sector regressions check consistent geometry, independent volume, closed meshes and STEP round trips, including scaling and rigid motion.
 
 - Fillet meridians ending at a spherical parameter pole. Seed singular guide sections from neighboring contacts, continue one contact branch near polar endpoints, and avoid undefined projected-curve Newton seeds when meshing revolutions. Refine procedural STEP surfaces locally within the existing fitting tolerance and 193-control budget. Regressions cover the original OCCT E3 scale, rigid transforms, reversed selection, signed contact radii, analytic radius/normals, independent volume, closed meshes, immutable inputs and STEP round trips.

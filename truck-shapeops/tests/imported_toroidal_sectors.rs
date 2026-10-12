@@ -8,6 +8,9 @@ fn sector(case: &str) -> Solid {
     let text = match case {
         "E5" => include_str!("fixtures/toroidal-sectors/E5.step"),
         "E9" => include_str!("fixtures/toroidal-sectors/E9.step"),
+        "J3" => include_str!("fixtures/toroidal-sectors/J3.step"),
+        "J4" => include_str!("fixtures/toroidal-sectors/J4.step"),
+        "J5" => include_str!("fixtures/toroidal-sectors/J5.step"),
         _ => unreachable!(),
     };
     let table = Table::from_step(text).unwrap();
@@ -27,18 +30,21 @@ fn sector(case: &str) -> Solid {
     .unwrap()
 }
 
-fn volume(major: f64, minor: f64, meridian: f64) -> f64 {
+fn volume(major: f64, minor: f64, meridian: f64, rotation: f64) -> f64 {
     let s = meridian.sin();
-    PI / 4.
+    rotation / 2.
         * (minor * major * major * s
             + major * minor * minor * (meridian + (2. * meridian).sin() / 2.)
             + minor.powi(3) * (s - s.powi(3) / 3.))
 }
 
 fn verify(case: &str, scale: f64, transformed: bool) {
-    let (major, minor, angle) = match case {
-        "E5" => (100., 100., PI / 4.),
-        "E9" => (200., 50., 8. * PI / 9.),
+    let (major, minor, angle, rotation) = match case {
+        "E5" => (100., 100., PI / 4., PI / 2.),
+        "E9" => (200., 50., 8. * PI / 9., PI / 2.),
+        "J3" => (200., 50., 2. * PI, 1.5 * PI),
+        "J4" => (200., 50., PI / 2., 2. * PI),
+        "J5" => (200., 50., 5. * PI / 6., 2. * PI),
         _ => unreachable!(),
     };
     let transform = if transformed {
@@ -52,7 +58,7 @@ fn verify(case: &str, scale: f64, transformed: bool) {
         solid.is_geometric_consistent(),
         "toroidal boundaries lie on the complete revolved meridian"
     );
-    let expected = volume(major * scale, minor * scale, angle);
+    let expected = volume(major * scale, minor * scale, angle, rotation);
     common::assert_solid(&solid, expected, &[0], 0.001);
     common::blend::assert_step(&solid, expected, 0.001);
 }
@@ -67,3 +73,12 @@ fn transformed_ring_torus_sector_keeps_its_curved_boundary_and_material() {
 fn original_scale_ring_torus_sector_is_consistent_closed_and_exportable() {
     verify("E9", 1., false);
 }
+
+#[test]
+fn periodic_torus_import_preserves_transformed_open_ring_material() { verify("J3", 0.01, true); }
+#[test]
+fn periodic_torus_import_preserves_original_scale_open_ring_material() { verify("J3", 1., false); }
+#[test]
+fn periodic_torus_import_preserves_complete_major_revolution() { verify("J4", 0.01, false); }
+#[test]
+fn periodic_torus_import_preserves_reentrant_meridian_material() { verify("J5", 0.01, true); }

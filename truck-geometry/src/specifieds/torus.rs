@@ -110,7 +110,7 @@ impl ParametricSurface3D for Torus {
     #[inline(always)]
     fn normal_uder(&self, u: f64, v: f64) -> Vector3 {
         let sv = Vector2::new(f64::cos(v), f64::sin(v));
-        Vector3::new(-sv.x * f64::sin(u), sv.x * f64::cos(u), sv.y)
+        Vector3::new(-sv.x * f64::sin(u), sv.x * f64::cos(u), 0.0)
     }
     #[inline(always)]
     fn normal_vder(&self, u: f64, v: f64) -> Vector3 {
@@ -130,20 +130,12 @@ impl SearchParameter<D2> for Torus {
         _: usize,
     ) -> Option<(f64, f64)> {
         let r = point - self.center();
-        let rxy = Vector2::new(r.x, r.y);
-        let v = f64::asin(f64::clamp(r.z / self.small_radius(), -1.0, 1.0));
-        let minus = rxy.magnitude2() < self.large_radius() * self.large_radius();
-        let v = match (minus, v < 0.0) {
-            (true, _) => PI - v,
-            (false, false) => v,
-            (false, true) => 2.0 * PI + v,
-        };
-        let rxy_n = rxy.normalize();
-        let u = f64::acos(f64::clamp(rxy_n.x, -1.0, 1.0));
-        let u = match rxy_n.y < 0.0 {
-            true => 2.0 * PI - u,
-            false => u,
-        };
+        let radial = r.x.hypot(r.y);
+        if radial == 0.0 || ![r.x, r.y, r.z, radial].iter().all(|x| x.is_finite()) {
+            return None;
+        }
+        let u = torus_angle(r.y, r.x);
+        let v = torus_angle(r.z, radial - self.large_radius());
         match self.subs(u, v).near(&point) {
             true => Some((u, v)),
             false => None,
@@ -160,30 +152,27 @@ impl SearchNearestParameter<D2> for Torus {
         _: usize,
     ) -> Option<(f64, f64)> {
         let r = point - self.center();
-        let rxy = Vector2::new(r.x, r.y);
-        if rxy.so_small() {
+        let radial = r.x.hypot(r.y);
+        if radial.so_small() || ![r.x, r.y, r.z, radial].iter().all(|x| x.is_finite()) {
             return None;
         }
-        let rxy_n = rxy.normalize();
-        let large_r = self.large_radius() * rxy_n.extend(0.0);
-        let diff = r - large_r;
-        if diff.so_small() {
+        let offset = Vector2::new(radial - self.large_radius(), r.z);
+        if offset.so_small() {
             return None;
         }
-        let small_r = diff.normalize();
-
-        let u = f64::acos(f64::clamp(rxy_n.x, -1.0, 1.0));
-        let u = match rxy_n.y < 0.0 {
-            true => 2.0 * PI - u,
-            false => u,
-        };
-        let v = f64::asin(f64::clamp(small_r.z, -1.0, 1.0));
-        let v = match (small_r.dot(large_r) < 0.0, v < 0.0) {
-            (true, _) => PI - v,
-            (false, false) => v,
-            (false, true) => 2.0 * PI + v,
-        };
+        let u = torus_angle(r.y, r.x);
+        let v = torus_angle(offset.y, offset.x);
         Some((u, v))
+    }
+}
+
+fn torus_angle(y: f64, x: f64) -> f64 {
+    let angle = y.atan2(x);
+    let angle = if angle < 0.0 { 2.0 * PI + angle } else { angle };
+    if angle == 2.0 * PI {
+        0.0
+    } else {
+        angle
     }
 }
 

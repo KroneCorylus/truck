@@ -318,20 +318,8 @@ where
         ..
     } = faces[face_index];
     let param_boundaries = create_param_boundaries(boundaries, surface, poly_edges, &sp)?;
-    let (v0, v1) = divisor;
-    let p = zip_boundaries(boundaries, &param_boundaries)
-        .find_map(closure_find_vertex_parameter(v0, edges))?;
-    let q = zip_boundaries(boundaries, &param_boundaries)
-        .find_map(closure_find_vertex_parameter(v1, edges))?;
-    let Face {
-        ref boundaries,
-        ref surface,
-        ..
-    } = faces[face_index];
-    let periods = (surface.u_period(), surface.v_period());
-    let q = periodic_iterator(q, periods)
-        .min_by(|q, r| p.distance2(*q).partial_cmp(&p.distance2(*r)).unwrap())?;
-    let pcurve = PCurve::new(Line(p, q), surface.clone());
+    let line = divisor_parameter_line(divisor, boundaries, &param_boundaries, edges, surface)?;
+    let pcurve = PCurve::new(line, surface.clone());
     let cut_edge = |(edge_index, param_edge): ZippedEdge<'_>| {
         let index = edge_index.index;
         let vec = enumerate_intersections(&edges[index], param_edge, &pcurve)?;
@@ -352,6 +340,44 @@ where
     };
     new_edges.into_iter().flatten().for_each(insert);
     Some(())
+}
+
+fn divisor_parameter_line<C, S: ParametricSurface>(
+    (v0, v1): (usize, usize),
+    boundaries: &[Wire],
+    param_boundaries: &[Vec<PolylineCurve<Point2>>],
+    edges: &[Edge<C>],
+    surface: &S,
+) -> Option<Line<Point2>> {
+    // A closed, continued UV boundary fixes the branch; the shortest periodic arc may be outside it.
+    let in_chart = boundaries
+        .iter()
+        .zip(param_boundaries)
+        .find_map(|(wire, polys)| {
+            if !polys.first()?.first()?.near(polys.last()?.last()?) {
+                return None;
+            }
+            let p = wire
+                .iter()
+                .zip(polys)
+                .find_map(closure_find_vertex_parameter(v0, edges))?;
+            let q = wire
+                .iter()
+                .zip(polys)
+                .find_map(closure_find_vertex_parameter(v1, edges))?;
+            Some(Line(p, q))
+        });
+    if in_chart.is_some() {
+        return in_chart;
+    }
+    let p = zip_boundaries(boundaries, param_boundaries)
+        .find_map(closure_find_vertex_parameter(v0, edges))?;
+    let q = zip_boundaries(boundaries, param_boundaries)
+        .find_map(closure_find_vertex_parameter(v1, edges))?;
+    let periods = (surface.u_period(), surface.v_period());
+    let q =
+        periodic_iterator(q, periods).min_by(|q, r| p.distance2(*q).total_cmp(&p.distance2(*r)))?;
+    Some(Line(p, q))
 }
 
 fn closure_find_vertex_parameter<C>(
@@ -531,7 +557,8 @@ where
     let param_boundaries = create_param_boundaries(boundaries, surface, poly_edges, &sp)?;
     let param_vertices = create_param_vertices(boundaries, &param_boundaries, edges);
     let mut duplicated_edges = duplicated_edges(boundaries.iter().flatten().map(|ei| ei.index));
-    let vertices_on_divisor = enumerate_vertices_on_divisor(divisor, &param_vertices, surface)?;
+    let line = divisor_parameter_line(divisor, boundaries, &param_boundaries, edges, surface)?;
+    let vertices_on_divisor = enumerate_vertices_on_divisor(line, &param_vertices, surface)?;
     let new_edges = create_new_edges(&vertices_on_divisor, poly_edges, surface, tol)?;
     let (new_edge_range, new_edge_indices) = signup_new_edges(edges, new_edges);
     duplicated_edges.extend(new_edge_range);
@@ -678,16 +705,11 @@ fn duplicated_edges(edges: impl Iterator<Item = usize>) -> HashSet<usize> {
 // --- enumerate_vertices_on_divisor ---
 
 fn enumerate_vertices_on_divisor<S: ParametricSurface>(
-    divisor: (usize, usize),
+    line: Line<Point2>,
     param_vertices: &HashMap<usize, Point2>,
     surface: &S,
 ) -> Option<Vec<(f64, (usize, Point2))>> {
-    let (v0, v1) = divisor;
-    let (p, q) = (*param_vertices.get(&v0)?, *param_vertices.get(&v1)?);
     let periods = (surface.u_period(), surface.v_period());
-    let q = periodic_iterator(q, periods)
-        .min_by(|q, r| p.distance2(*q).partial_cmp(&p.distance2(*r)).unwrap())?;
-    let line = Line(p, q);
     let iter = param_vertices.iter().filter_map(move |(v, uv)| {
         periodic_iterator(*uv, periods)
             .find(move |uv| line.distance_to_point_as_segment(*uv).so_small())

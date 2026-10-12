@@ -1,0 +1,11 @@
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/target/full-circle-arcs/truck-geometry)
+    Finished `release` profile [optimized] target(s) in 1.83s
+     Running tests/torus.rs (/home/krone/Development/Pieza_WS/truck/target/pole-build/release/deps/torus-0835cc9b0061ddce)
+
+running 4 tests
+test torus_normal_derivatives_match_independent_finite_differences ... ok
+test torus_point_search_preserves_axis_and_near_seam_accuracy ... ok
+test surface ... ok
+test test_der_mn ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

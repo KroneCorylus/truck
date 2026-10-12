@@ -36,3 +36,26 @@ For E9 the meridian passes its maximum height; the descending inner branch
 subtracts the correct annular hole. The formula yields 2027710.030094768
 for E5 and 1539924.109587615 for E9, independently of either kernel's
 output. Native input volumes are 2027710.0300947938 and 1539924.1095876284.
+
+
+## Periodic inputs
+
+J3/J4/J5 are unchanged inputs from the native cases with those names,
+archived in `capture/2026-10-12-toroidal-sectors/artifacts.zip` under the
+audit directory. All have major/minor radii 200/50. J3 has a complete
+meridian and a 270-degree major revolution. J4/J5 have complete major
+revolutions and meridians of 90/150 degrees, respectively.
+
+For arbitrary major revolution theta, replace pi/4 in the formula above
+by theta/2. Independent volumes are 7402203.300817017 (J3),
+9012385.795251075 (J4), and 6753740.138234442 (J5). J3 is checked at
+scales 0.01 and 1, with rigid motion in the smaller case; J4/J5 at scale
+0.01, with rigid motion for J5. All require consistent closed geometry,
+meshes, independent material volume and STEP round trips.
+
+The previous torus inverse projected exact axis points off their support
+because normalizing and applying inverse cosine amplified rounding error.
+After projection is repaired, preprocessing generates circular toroidal
+pcurves that must become exact modeling conics. J3 additionally requires
+a 270-degree split in its existing closed parameter chart: choosing the
+shortest periodic arc instead cuts the complementary 90-degree region.

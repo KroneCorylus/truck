@@ -4,6 +4,7 @@
 //! swept along its axis, a cone a revolved line, a sphere and a torus a revolved circle.
 //! Finite parabolas and hyperbolas become exact quadratic splines on `[0, 1]`.
 //! Linear pcurves on planes and cylindrical generators become exact spatial lines.
+//! Isoparametric pcurves on toroidal surfaces become exact spatial circles.
 //! Isoparametric pcurves on spline surfaces become exact spatial splines.
 //! Other pcurves are rejected.
 //!
@@ -67,6 +68,9 @@ impl TryFrom<&Curve3D> for ModelingCurve {
                     return Err("unsupported imported pcurve".into());
                 };
                 match pcurve.surface().as_ref() {
+                    Surface::ElementarySurface(ElementarySurface::ToroidalSurface(surface)) => {
+                        return toroidal_isoparameter(surface, line);
+                    }
                     Surface::BSplineSurface(surface) => {
                         return Ok(Self::BSplineCurve(spline_isoparameter(surface, line)?));
                     }
@@ -122,6 +126,76 @@ impl TryFrom<&Curve3D> for ModelingCurve {
             }
         })
     }
+}
+
+fn toroidal_isoparameter(
+    surface: &ToroidalSurface,
+    line: &Line<Point2>,
+) -> std::result::Result<ModelingCurve, StepConvertingError> {
+    let mut line = *line;
+    if ![line.0.x, line.0.y, line.1.x, line.1.y]
+        .iter()
+        .all(|x| x.is_finite())
+    {
+        return Err("non-finite toroidal pcurve".into());
+    }
+    if !surface.orientation() {
+        line = Line(
+            Point2::new(line.0.y, line.0.x),
+            Point2::new(line.1.y, line.1.x),
+        );
+    }
+    let entity = surface.entity();
+    let (major, minor) = (entity.large_radius(), entity.small_radius());
+    let transform = surface.transform();
+    let scale = [transform.x, transform.y, transform.z]
+        .into_iter()
+        .map(|v| v.truncate().magnitude2())
+        .sum::<f64>()
+        .sqrt();
+    // Bound the spatial error from flattening seam-search roundoff after the affine transform.
+    let constant = |a: f64, b: f64, radius: f64| {
+        let delta = (b - a).abs();
+        delta <= 32. * f64::EPSILON * a.abs().max(b.abs()).max(1.)
+            && delta * radius * scale / 2. <= TOLERANCE
+    };
+    let (center, radial, axis, start, end) = if constant(line.0.x, line.1.x, major + minor) {
+        let u = line.0.x + (line.1.x - line.0.x) / 2.;
+        let radial = Vector3::new(u.cos(), u.sin(), 0.);
+        (
+            entity.center() + major * radial,
+            minor * radial,
+            radial.cross(Vector3::unit_z()),
+            line.0.y,
+            line.1.y,
+        )
+    } else if constant(line.0.y, line.1.y, minor) {
+        let v = line.0.y + (line.1.y - line.0.y) / 2.;
+        (
+            entity.center() + minor * v.sin() * Vector3::unit_z(),
+            (major + minor * v.cos()) * Vector3::unit_x(),
+            Vector3::unit_z(),
+            line.0.x,
+            line.1.x,
+        )
+    } else {
+        return Err("unsupported non-isoparametric toroidal pcurve".into());
+    };
+    if start == end || !(end - start).is_finite() || radial.magnitude2() == 0. {
+        return Err("degenerate toroidal pcurve".into());
+    }
+    let mut curve =
+        arc(center, radial, axis, (start.min(end), start.max(end))).transformed(*transform);
+    if start > end {
+        curve.invert();
+    }
+    if [curve.front(), curve.back()]
+        .iter()
+        .any(|p| ![p.x, p.y, p.z].iter().all(|x| x.is_finite()))
+    {
+        return Err("non-finite toroidal pcurve geometry".into());
+    }
+    Ok(curve)
 }
 
 fn spline_isoparameter<P: truck_base::cgmath64::control_point::ControlPoint<f64> + Tolerance>(

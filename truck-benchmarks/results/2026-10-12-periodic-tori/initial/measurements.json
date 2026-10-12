@@ -1,0 +1,336 @@
+[
+  {
+    "version": "parent",
+    "fixture": "E5",
+    "workers": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/torus-import-parent",
+      "E5"
+    ],
+    "returncode": 0,
+    "log": "parent-E5-1.txt",
+    "scaled_mesh_volume": 2.027599317165113,
+    "median_ms": 1.966967,
+    "status": "ok"
+  },
+  {
+    "version": "updated",
+    "fixture": "E5",
+    "workers": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/import_torus",
+      "E5"
+    ],
+    "returncode": 0,
+    "log": "updated-E5-1.txt",
+    "scaled_mesh_volume": 2.027599317165113,
+    "median_ms": 2.485162,
+    "status": "ok"
+  },
+  {
+    "version": "parent",
+    "fixture": "E9",
+    "workers": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/torus-import-parent",
+      "E9"
+    ],
+    "returncode": 0,
+    "log": "parent-E9-1.txt",
+    "scaled_mesh_volume": 1.539753139356214,
+    "median_ms": 2.261663,
+    "status": "ok"
+  },
+  {
+    "version": "updated",
+    "fixture": "E9",
+    "workers": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/import_torus",
+      "E9"
+    ],
+    "returncode": 0,
+    "log": "updated-E9-1.txt",
+    "scaled_mesh_volume": 1.539753139356214,
+    "median_ms": 2.957891,
+    "status": "ok"
+  },
+  {
+    "version": "parent",
+    "fixture": "J3",
+    "workers": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/torus-import-parent",
+      "J3"
+    ],
+    "returncode": 0,
+    "log": "parent-J3-1.txt",
+    "median_ms": 4.708453,
+    "status": "failed"
+  },
+  {
+    "version": "updated",
+    "fixture": "J3",
+    "workers": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/import_torus",
+      "J3"
+    ],
+    "returncode": 0,
+    "log": "updated-J3-1.txt",
+    "scaled_mesh_volume": 7.401131470623452,
+    "median_ms": 17.2041,
+    "status": "ok"
+  },
+  {
+    "version": "parent",
+    "fixture": "J4",
+    "workers": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/torus-import-parent",
+      "J4"
+    ],
+    "returncode": 0,
+    "log": "parent-J4-1.txt",
+    "median_ms": 6.004621,
+    "status": "failed"
+  },
+  {
+    "version": "updated",
+    "fixture": "J4",
+    "workers": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/import_torus",
+      "J4"
+    ],
+    "returncode": 0,
+    "log": "updated-J4-1.txt",
+    "scaled_mesh_volume": 9.011886900153929,
+    "median_ms": 12.584698,
+    "status": "ok"
+  },
+  {
+    "version": "parent",
+    "fixture": "J5",
+    "workers": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/torus-import-parent",
+      "J5"
+    ],
+    "returncode": 0,
+    "log": "parent-J5-1.txt",
+    "median_ms": 5.758789,
+    "status": "failed"
+  },
+  {
+    "version": "updated",
+    "fixture": "J5",
+    "workers": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/import_torus",
+      "J5"
+    ],
+    "returncode": 0,
+    "log": "updated-J5-1.txt",
+    "scaled_mesh_volume": 6.753079522281555,
+    "median_ms": 14.019635,
+    "status": "ok"
+  },
+  {
+    "version": "updated",
+    "fixture": "E5",
+    "workers": 4,
+    "command": [
+      "taskset",
+      "-c",
+      "0-3",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/import_torus",
+      "E5"
+    ],
+    "returncode": 0,
+    "log": "updated-E5-4.txt",
+    "scaled_mesh_volume": 2.027599317165113,
+    "median_ms": 2.397935,
+    "status": "ok"
+  },
+  {
+    "version": "parent",
+    "fixture": "E5",
+    "workers": 4,
+    "command": [
+      "taskset",
+      "-c",
+      "0-3",
+      "/home/krone/Development/Pieza_WS/truck/target/torus-import-parent",
+      "E5"
+    ],
+    "returncode": 0,
+    "log": "parent-E5-4.txt",
+    "scaled_mesh_volume": 2.027599317165113,
+    "median_ms": 1.921651,
+    "status": "ok"
+  },
+  {
+    "version": "updated",
+    "fixture": "E9",
+    "workers": 4,
+    "command": [
+      "taskset",
+      "-c",
+      "0-3",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/import_torus",
+      "E9"
+    ],
+    "returncode": 0,
+    "log": "updated-E9-4.txt",
+    "scaled_mesh_volume": 1.539753139356214,
+    "median_ms": 2.981426,
+    "status": "ok"
+  },
+  {
+    "version": "parent",
+    "fixture": "E9",
+    "workers": 4,
+    "command": [
+      "taskset",
+      "-c",
+      "0-3",
+      "/home/krone/Development/Pieza_WS/truck/target/torus-import-parent",
+      "E9"
+    ],
+    "returncode": 0,
+    "log": "parent-E9-4.txt",
+    "scaled_mesh_volume": 1.539753139356214,
+    "median_ms": 2.177132,
+    "status": "ok"
+  },
+  {
+    "version": "updated",
+    "fixture": "J3",
+    "workers": 4,
+    "command": [
+      "taskset",
+      "-c",
+      "0-3",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/import_torus",
+      "J3"
+    ],
+    "returncode": 0,
+    "log": "updated-J3-4.txt",
+    "scaled_mesh_volume": 7.401131470623452,
+    "median_ms": 16.394475,
+    "status": "ok"
+  },
+  {
+    "version": "parent",
+    "fixture": "J3",
+    "workers": 4,
+    "command": [
+      "taskset",
+      "-c",
+      "0-3",
+      "/home/krone/Development/Pieza_WS/truck/target/torus-import-parent",
+      "J3"
+    ],
+    "returncode": 0,
+    "log": "parent-J3-4.txt",
+    "median_ms": 4.718321,
+    "status": "failed"
+  },
+  {
+    "version": "updated",
+    "fixture": "J4",
+    "workers": 4,
+    "command": [
+      "taskset",
+      "-c",
+      "0-3",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/import_torus",
+      "J4"
+    ],
+    "returncode": 0,
+    "log": "updated-J4-4.txt",
+    "scaled_mesh_volume": 9.011886900153929,
+    "median_ms": 12.7154,
+    "status": "ok"
+  },
+  {
+    "version": "parent",
+    "fixture": "J4",
+    "workers": 4,
+    "command": [
+      "taskset",
+      "-c",
+      "0-3",
+      "/home/krone/Development/Pieza_WS/truck/target/torus-import-parent",
+      "J4"
+    ],
+    "returncode": 0,
+    "log": "parent-J4-4.txt",
+    "median_ms": 6.04534,
+    "status": "failed"
+  },
+  {
+    "version": "updated",
+    "fixture": "J5",
+    "workers": 4,
+    "command": [
+      "taskset",
+      "-c",
+      "0-3",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/import_torus",
+      "J5"
+    ],
+    "returncode": 0,
+    "log": "updated-J5-4.txt",
+    "scaled_mesh_volume": 6.753079522281555,
+    "median_ms": 14.169363,
+    "status": "ok"
+  },
+  {
+    "version": "parent",
+    "fixture": "J5",
+    "workers": 4,
+    "command": [
+      "taskset",
+      "-c",
+      "0-3",
+      "/home/krone/Development/Pieza_WS/truck/target/torus-import-parent",
+      "J5"
+    ],
+    "returncode": 0,
+    "log": "parent-J5-4.txt",
+    "median_ms": 5.74313,
+    "status": "failed"
+  }
+]

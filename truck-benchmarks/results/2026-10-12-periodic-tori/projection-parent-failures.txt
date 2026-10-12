@@ -1,0 +1,29 @@
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/target/full-circle-arcs/truck-geometry)
+    Finished `release` profile [optimized] target(s) in 1.81s
+     Running tests/torus.rs (/home/krone/Development/Pieza_WS/truck/target/pole-build/release/deps/torus-0835cc9b0061ddce)
+
+running 2 tests
+test torus_point_search_preserves_axis_and_near_seam_accuracy ... FAILED
+test torus_normal_derivatives_match_independent_finite_differences ... FAILED
+
+failures:
+
+---- torus_point_search_preserves_axis_and_near_seam_accuracy stdout ----
+
+thread 'torus_point_search_preserves_axis_and_near_seam_accuracy' (924854) panicked at truck-geometry/tests/torus.rs:110:21:
+assertion failed: torus.subs(a, b).distance(point) <= 1e-10 * scale
+
+---- torus_normal_derivatives_match_independent_finite_differences stdout ----
+
+thread 'torus_normal_derivatives_match_independent_finite_differences' (924853) panicked at truck-geometry/tests/torus.rs:132:13:
+assertion failed: torus.normal_uder(u, v).distance(uder) < 1e-9
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    torus_normal_derivatives_match_independent_finite_differences
+    torus_point_search_preserves_axis_and_near_seam_accuracy
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-geometry --test torus`
