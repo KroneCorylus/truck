@@ -1,0 +1,27 @@
+{
+  "parent_commit": "713f0c9a",
+  "binaries": {
+    "parent": {
+      "path": "target/conical-parent-build/release/examples/blend_output",
+      "sha256": "6ef9f714555b8110587d20be0d4fe8ff4d8581e415620207af40fce5ec6f7f5f"
+    },
+    "after": {
+      "path": "target/release/examples/blend_output",
+      "sha256": "12fa232d1ad76db60e78b1f911970155f6a6230c05614a24a8f7882126058bca"
+    }
+  },
+  "fixture_sha256": "2c38d2d1d49714a6528bd3a2e0795e7aca4de01e27bb0a16851dd52e702eedeb",
+  "cpu": "AMD Ryzen 9 7950X3D 16-Core Processor",
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.1\nLLVM version: 22.1.8\n",
+  "notes": "Sequential processes, one warmup then five samples; geometry setup and final mesh checks excluded from timer. Parent fine mesh timeout includes setup/warmup, not an operation-latency bound.",
+  "regression_parent": "aa6cfa65",
+  "source_scope": "Exact-join working implementation over aa6cfa65; benchmark baseline binary remains 713f0c9a. Source/binaries unchanged throughout measurements.",
+  "source_sha256": {
+    "truck-geometry/src/nurbs/bspcurve.rs": "8e6af2ae489617f7f5ccc4eab9bf5f1b3cf1ca786efdd3bc3ccddaf7de0caffe",
+    "truck-geometry/tests/cubic_approximation_tolerance.rs": "14f0e7e6fc5281d7ced9dca0239bb2c4521b2be6f5f1c50b7ab4dd4b2362d67c",
+    "truck-benchmarks/examples/blend_output.rs": "a7787830458192dfe33923d58d359684e41e92db453d9a82b3abbe947f041586"
+  },
+  "governor": "powersave",
+  "i3_targeted_archive_sha256": "7ce743c991e8c3b20591f6333164ffdcf73cadbb15dd2a9200331b990dbbb3a1",
+  "replay_sha256": "1d35553280cbe5f89effbce8e2d1d9fcb1636e447e45bb1decc1a3a0238f52bd"
+}

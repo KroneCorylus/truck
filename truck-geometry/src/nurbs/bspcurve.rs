@@ -1055,6 +1055,11 @@ impl<P: ControlPoint<f64> + Tolerance> Concat<BSplineCurve<P>> for BSplineCurve<
         if !front.near(back) {
             return Err(ConcatError::DisconnectedPoints(*front, *back));
         }
+        if front == back {
+            // Identical join controls share one knot without any fitting error.
+            curve0.knot_vec.remove(curve0.control_points.len());
+            curve0.control_points.pop();
+        }
         curve0.control_points.extend(curve1.control_points);
         Ok(curve0)
     }

@@ -1,0 +1,47 @@
+   Compiling memchr v2.8.3
+   Compiling parking_lot_core v0.9.12
+   Compiling truck-geotrait v0.4.0 (/home/krone/Development/Pieza_WS/truck/target/cubic-join-parent/truck-geotrait)
+   Compiling parking_lot v0.12.5
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/target/cubic-join-parent/truck-geometry)
+   Compiling truck-topology v0.6.0 (/home/krone/Development/Pieza_WS/truck/target/cubic-join-parent/truck-topology)
+   Compiling serde_json v1.0.154
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/Pieza_WS/truck/target/cubic-join-parent/truck-modeling)
+    Finished `release` profile [optimized] target(s) in 3.38s
+     Running unittests src/lib.rs (target/conical-parent-build/release/deps/truck_modeling-ae5c2fab5749e306)
+
+running 1 test
+test geom_impls::test_geom_impl::test_circle_arc_tangent0 ... FAILED
+
+failures:
+
+---- geom_impls::test_geom_impl::test_circle_arc_tangent0 stdout ----
+
+thread 'geom_impls::test_geom_impl::test_circle_arc_tangent0' (512112) panicked at truck-modeling/src/geom_impls.rs:226:5:
+Test failed: assertion failed: r0.near(&r1) && r1.near(&r2) at truck-modeling/src/geom_impls.rs:251.
+minimal failing input: TestCircleArcTangent0Args = TestCircleArcTangent0Args {
+    p0: [
+        0.0,
+        -8.211163071339715,
+        0.0,
+    ],
+    p1: [
+        0.0,
+        9.613692926721406,
+        -5.646549845685374,
+    ],
+    tangent0: [
+        0.0,
+        0.0,
+        6.055509164114065,
+    ],
+    t: 0.9999065048496926,
+}
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    geom_impls::test_geom_impl::test_circle_arc_tangent0
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 11 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-modeling --lib`

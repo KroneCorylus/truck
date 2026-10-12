@@ -61,3 +61,10 @@ all executed commands and both coarse and fine settings.
 This establishes the regression and bounded completion for this fixture.
 The subsequent clean full capture records native shape comparisons and
 remaining gaps; no complete fillet/chamfer parity is claimed here.
+
+The initial clean capture at aa6cfa65 subsequently exposed a STEP
+interoperability regression: 21 native reads reject duplicated cubic join
+knots despite successful Truck round trips. Failure evidence is retained in
+`audits/fillet-chamfer/capture/2026-10-12-conical-mesh-initial/REPORT.md`.
+The exact-join follow-up corrects this representation while retaining the
+tighter fit; the timings above describe the initial implementation.

@@ -1,0 +1,53 @@
+    Updating crates.io index
+    Blocking waiting for file lock on package cache
+     Locking 479 packages to latest compatible versions
+      Adding proc-macro-crate v3.3.0 (available: v3.5.0)
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+   Compiling libc v0.2.190
+   Compiling syn v1.0.109
+   Compiling syn v2.0.119
+   Compiling proc-macro-error v1.0.4
+   Compiling truck-derivers v0.1.0 (/home/krone/Development/Pieza_WS/truck/target/cubic-join-parent/truck-derivers)
+   Compiling getrandom v0.4.3
+   Compiling wait-timeout v0.2.1
+   Compiling rand v0.10.3
+   Compiling tempfile v3.27.0
+   Compiling rusty-fork v0.3.1
+   Compiling proptest v1.12.0
+   Compiling katexit v0.1.5
+   Compiling matext4cgmath v0.1.0
+   Compiling truck-base v0.5.0 (/home/krone/Development/Pieza_WS/truck/target/cubic-join-parent/truck-base)
+   Compiling truck-geotrait v0.4.0 (/home/krone/Development/Pieza_WS/truck/target/cubic-join-parent/truck-geotrait)
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/target/cubic-join-parent/truck-geometry)
+    Finished `release` profile [optimized] target(s) in 9.18s
+     Running tests/cubic_approximation_tolerance.rs (/home/krone/Development/Pieza_WS/truck/target/conical-parent-build/release/deps/cubic_approximation_tolerance-f0461024cf71c8fe)
+
+running 2 tests
+test concatenation_removes_only_identical_join_controls ... FAILED
+test cubic_fitting_preserves_tolerances_below_default_knot_removal_precision ... FAILED
+
+failures:
+
+---- concatenation_removes_only_identical_join_controls stdout ----
+
+thread 'concatenation_removes_only_identical_join_controls' (507033) panicked at truck-geometry/tests/cubic_approximation_tolerance.rs:19:9:
+assertion `left == right` failed
+  left: [4, 4, 4]
+ right: [4, 3, 4]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- cubic_fitting_preserves_tolerances_below_default_knot_removal_precision stdout ----
+
+thread 'cubic_fitting_preserves_tolerances_below_default_knot_removal_precision' (507034) panicked at truck-geometry/tests/cubic_approximation_tolerance.rs:46:13:
+assertion failed: multiplicities[1..multiplicities.len() -
+                    1].iter().all(|&m| m <= fitted.degree())
+
+
+failures:
+    concatenation_removes_only_identical_join_controls
+    cubic_fitting_preserves_tolerances_below_default_knot_removal_precision
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-geometry --test cubic_approximation_tolerance`
