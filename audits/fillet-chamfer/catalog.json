@@ -7,7 +7,7 @@
       "tracked_changes": "M src/BOPAlgo/BOPAlgo_PaveFiller.cxx\n M src/BRepAlgoAPI/BRepAlgoAPI_BuilderAlgo.cxx\n M src/IntTools/IntTools_FaceFace.cxx"
     },
     "truck": {
-      "revision": "6db16d09996bfedb1189542aca5eec2ff345d33e",
+      "revision": "88f64f0842dbad74e83a5272699c8b0e7ebdb611",
       "revision_scope": "Latest commit outside audits/fillet-chamfer; audit-only commits do not change the kernel baseline.",
       "tracked_changes_in_modeling": ""
     },
@@ -875,7 +875,7 @@
         "freeform"
       ],
       "occt_scope": "Generic numerical construction extends beyond analytic special cases.",
-      "truck_scope": "Plane/sphere circular rims now have independent validation for both meridian slopes, exterior/cavity orientation, exact Sphere/revolved-circle/NURBS representations, rigid transforms, reversed wires, G1, radius, volume, closed mesh, history and STEP. General cylinder/cylinder, toroidal and freeform support intersections remain unverified. Constant-radius plane/NURBS spline-pipe rims now also have independent contact, volume and STEP checks at two radii, with scaling and reversal. Open spherical-meridian fillets ending at a parameter pole now have original-scale, transformed/reversed, radius/normal, independent-volume and STEP regressions.",
+      "truck_scope": "Plane/sphere circular rims now have independent validation for both meridian slopes, exterior/cavity orientation, exact Sphere/revolved-circle/NURBS representations, rigid transforms, reversed wires, G1, radius, volume, closed mesh, history and STEP. General cylinder/cylinder, toroidal and freeform support intersections remain unverified. Constant-radius plane/NURBS spline-pipe rims now also have independent contact, volume and STEP checks at two radii, with scaling and reversal. Open spherical-meridian fillets ending at a parameter pole now have original-scale, transformed/reversed, radius/normal, independent-volume and STEP regressions. Complete-circle toroidal inputs E5/E9 now retain consistent boundaries, independent material volume, closed meshes and STEP orientation; this does not establish all requested torus fillets.",
       "next_case": "Torus/plane rims and non-coaxial cylinder intersections, followed by arbitrary spline-support pairs and contact collapse.",
       "evidence": [
         {
@@ -1057,6 +1057,42 @@
           "line": 1,
           "url": "capture/2026-10-12-spherical-pole/REPORT.md#L1",
           "sha256": "279a30217dfd4f7070ce7f8d7c42c91babd63f2850dcc76f0dea3068d134c9e7"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-geometry/tests/circle.rs",
+          "find": "fn complete_and_nearly_complete_circles_have_regular_nurbs_images",
+          "role": "test",
+          "line": 174,
+          "url": "../../truck-geometry/tests/circle.rs#L174",
+          "sha256": "9337102f22518fac74db2b0600f224eb491f7df7e1d9de644e4b411bb652a137"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-modeling/tests/elementary.rs",
+          "find": "fn horn_torus_orientation_is_classified_away_from_its_singular_midpoint",
+          "role": "test",
+          "line": 380,
+          "url": "../../truck-modeling/tests/elementary.rs#L380",
+          "sha256": "4b058d3cca5da840895b5db1420a62ebb76a82b3d775ac246d7f74d671d5723f"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/imported_toroidal_sectors.rs",
+          "find": "fn horn_torus_sector_keeps_its_curved_boundary_and_material",
+          "role": "test",
+          "line": 61,
+          "url": "../../truck-shapeops/tests/imported_toroidal_sectors.rs#L61",
+          "sha256": "7139264cc0c81b4124b6b288fca40860017ebc83e50d7223dcf54e97eb10dbdd"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-12-toroidal-sectors/REPORT.md",
+          "find": "# Complete circular arcs and toroidal input round trips",
+          "role": "executed-probe",
+          "line": 1,
+          "url": "../../truck-benchmarks/results/2026-10-12-toroidal-sectors/REPORT.md#L1",
+          "sha256": "a8dcf6f69cb99ffadb8457c166549fbb9387930c8124e89bacdb05fc9b5e07c0"
         }
       ],
       "required_outcome": "Blend intersections between curved supports, including cylinders, cones, spheres, tori and spline surfaces, with valid contacts and trimmed output.",
@@ -1071,7 +1107,8 @@
         "Closed spline-pipe rim regressions now cover displaced longitudinal contact seams, two constant radii, rigid transformation, scale 0.01, reversed wire and unequal rim parameter spans. Contact fitting follows one UV branch across closed NURBS seams without treating support parameter bounds as face trims. Both end-to-end tests fail on parent 4a156c4f; they check radius/normals, independent volume, topology/mesh closure, STEP and immutable input. This is targeted capability evidence, supplemented by the subsequent clean 99c9d487 native capture. See truck-benchmarks/results/2026-10-12-spline-rim-continuation/REPORT.md.",
         "Clean full capture at 99c9d487 (kernel f7f8f4f5) passes all 156 native entries. J9 is the sole construction-status change: it now succeeds, with maximum sampled distances 9.41989e-5/1.09879e-4. All 73 constructed outputs preserve input and geometry, close their meshes and yield native-valid single-solid STEP; 71 meet the combined limited comparisons. The 31 construction failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents, one incomplete capture, G1 and tolerance-grid A1 discrepancies remain. No panic, timeout or full-parity verdict. See capture/2026-10-12-spline-rim/REPORT.md.",
         "At 6db16d09, spherical-meridian fillets with open polar guide endpoints seed regular offset contacts and continue one parameter branch. Singular projected-revolution seeds are replaced by regular samples, restoring the original input mesh. STEP fitting refines local source spans at the unchanged tolerance and 193-control budget. Three parent-failing solid regressions cover scales 0.02/0.04/1, rigid motion, reversed selection, radius/normals, independent volume, closed meshes, STEP and immutable inputs; separate regressions cover signed contacts, near-pole projection and concentrated export error. Five-crate release: 879 passed, one unchanged PCurve property failure, five existing ignored; final affected shapeops rerun: 338 passed, one existing ignored. Clippy/action smoke pass. Successful E3 construction medians are 87.590/88.837 ms and STEP 126.797/126.638 ms at one/four workers; cylinder and spline controls retain their geometry and prior timing range. These regressions do not establish general polar or feature parity; the clean full replay is recorded below.",
-        "Clean full replay at 3f16afc9 (kernel 6db16d09) passes all 156 native entries and constructs 74 of 161 Truck captures, with no timeouts or panics. E3 is the sole construction-status improvement. All 74 outputs preserve input/geometry consistency, close their Truck meshes, prepare STEP and produce native-valid single solids; 72 meet combined limited checks including bidirectional distances <=0.001. E3 distances are 0.0001213415/0.0000218593, STEP volume 3479486.1878489405 versus independent 3479486.1779266507. G1 and tolerance A1 differences remain. Other outcomes are 30 operation failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents and one incomplete capture. All full-parity verdicts remain unverified."
+        "Clean full replay at 3f16afc9 (kernel 6db16d09) passes all 156 native entries and constructs 74 of 161 Truck captures, with no timeouts or panics. E3 is the sole construction-status improvement. All 74 outputs preserve input/geometry consistency, close their Truck meshes, prepare STEP and produce native-valid single solids; 72 meet combined limited checks including bidirectional distances <=0.001. E3 distances are 0.0001213415/0.0000218593, STEP volume 3479486.1878489405 versus independent 3479486.1779266507. G1 and tolerance A1 differences remain. Other outcomes are 30 operation failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents and one incomplete capture. All full-parity verdicts remain unverified.",
+        "At 88f64f08, complete/large circular arcs convert to positive-weight quadratic NURBS spans with legal knots, restoring toroidal boundary inclusion. Elementary orientation retries regular samples when a horn-torus midpoint has an undefined normal, preventing reversed STEP faces. Six parent-failing regressions cover exact circle image/derivatives, affine transforms/reversal, horn-torus orientation and E5/E9 imported solids with independent volume, closed meshes and STEP. Five-crate release: 885 passed, one unchanged PCurve precision failure, five existing ignored tests; Clippy and action smoke pass. Cylinder/spline/sphere construction controls preserve identical volumes and show no material timing regression. This establishes input and round-trip repair; fresh captured fillet outcomes follow separately. See truck-benchmarks/results/2026-10-12-toroidal-sectors/REPORT.md."
       ]
     },
     {
@@ -1145,9 +1182,9 @@
           "path": "truck-modeling/src/geometry.rs",
           "find": "fn spline_plane",
           "role": "implementation",
-          "line": 696,
-          "url": "../../truck-modeling/src/geometry.rs#L696",
-          "sha256": "adfdc6309ea9f04165b52608497c44838f0d1252ae665f0e441d54a116b938ba"
+          "line": 699,
+          "url": "../../truck-modeling/src/geometry.rs#L699",
+          "sha256": "49bed173ee736e7c4f8426cc818ab52cf66dfec9bf3b9d8f6600a27a5a0ebfd5"
         },
         {
           "repo": "truck",
@@ -2632,7 +2669,7 @@
         "fillet"
       ],
       "occt_scope": "Start-solution failure is distinct from walking failure.",
-      "truck_scope": "Contact solvers have guards and diagnostics. Along-wire contact trimming now constrains Newton evaluations to both curve domains, damps nonconvergent steps and retries a sampled seed when endpoint tangents are parallel. Competing branches across general supports remain unverified. Open polar guide endpoints now use regular offset-contact seeds and contact continuation; revolution point searches avoid undefined projected derivatives at pole seeds.",
+      "truck_scope": "Contact solvers have guards and diagnostics. Along-wire contact trimming now constrains Newton evaluations to both curve domains, damps nonconvergent steps and retries a sampled seed when endpoint tangents are parallel. Competing branches across general supports remain unverified. Open polar guide endpoints now use regular offset-contact seeds and contact continuation; revolution point searches avoid undefined projected derivatives at pole seeds. Complete-circle toroidal inputs E5/E9 now retain consistent boundaries, independent material volume, closed meshes and STEP orientation; this does not establish all requested torus fillets.",
       "next_case": "Vary polar radius ratios and guide parameterizations, then compare competing contact branches and tangent end contacts on general supports.",
       "evidence": [
         {
@@ -2760,6 +2797,42 @@
           "line": 1,
           "url": "capture/2026-10-12-spherical-pole/REPORT.md#L1",
           "sha256": "279a30217dfd4f7070ce7f8d7c42c91babd63f2850dcc76f0dea3068d134c9e7"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-geometry/tests/circle.rs",
+          "find": "fn complete_and_nearly_complete_circles_have_regular_nurbs_images",
+          "role": "test",
+          "line": 174,
+          "url": "../../truck-geometry/tests/circle.rs#L174",
+          "sha256": "9337102f22518fac74db2b0600f224eb491f7df7e1d9de644e4b411bb652a137"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-modeling/tests/elementary.rs",
+          "find": "fn horn_torus_orientation_is_classified_away_from_its_singular_midpoint",
+          "role": "test",
+          "line": 380,
+          "url": "../../truck-modeling/tests/elementary.rs#L380",
+          "sha256": "4b058d3cca5da840895b5db1420a62ebb76a82b3d775ac246d7f74d671d5723f"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/imported_toroidal_sectors.rs",
+          "find": "fn horn_torus_sector_keeps_its_curved_boundary_and_material",
+          "role": "test",
+          "line": 61,
+          "url": "../../truck-shapeops/tests/imported_toroidal_sectors.rs#L61",
+          "sha256": "7139264cc0c81b4124b6b288fca40860017ebc83e50d7223dcf54e97eb10dbdd"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-12-toroidal-sectors/REPORT.md",
+          "find": "# Complete circular arcs and toroidal input round trips",
+          "role": "executed-probe",
+          "line": 1,
+          "url": "../../truck-benchmarks/results/2026-10-12-toroidal-sectors/REPORT.md#L1",
+          "sha256": "a8dcf6f69cb99ffadb8457c166549fbb9387930c8124e89bacdb05fc9b5e07c0"
         }
       ],
       "required_outcome": "Find the intended valid contact solution near singularities and competing branches without unstable branch jumps or false failures.",
@@ -2769,7 +2842,8 @@
         "Fresh full replay at clean 012ace79 passes all 156 native entries, with 70 constructed Truck outputs and zero panics. All 70 now prepare STEP, 69 produce native-valid single-solid STEP and 68 meet the combined limited checks; the sole improvement is D4, with sampled distances 5.78e-5/3.12e-5. Q4 capture 2 remains open/two-solid with discrepancy 1.20849; tolerance A1, G1 trim failure and I3/J9 timeouts remain. All full-parity verdicts stay unverified.",
         "Three-point circle centers now use a cross-product form that avoids cancellation when a station is close to an arc endpoint. The deterministic regression fails on 49ddd2fb and checks all six point orders; the existing saved circular-arc property failure also passes unchanged. Full release: 870 passed, one unchanged PCurve derivative property failure, five existing ignored; Clippy/action smoke pass. This is a supporting numerical fix, not another captured blend success. See truck-benchmarks/results/2026-10-12-circle-center/REPORT.md.",
         "At 6db16d09, spherical-meridian fillets with open polar guide endpoints seed regular offset contacts and continue one parameter branch. Singular projected-revolution seeds are replaced by regular samples, restoring the original input mesh. STEP fitting refines local source spans at the unchanged tolerance and 193-control budget. Three parent-failing solid regressions cover scales 0.02/0.04/1, rigid motion, reversed selection, radius/normals, independent volume, closed meshes, STEP and immutable inputs; separate regressions cover signed contacts, near-pole projection and concentrated export error. Five-crate release: 879 passed, one unchanged PCurve property failure, five existing ignored; final affected shapeops rerun: 338 passed, one existing ignored. Clippy/action smoke pass. Successful E3 construction medians are 87.590/88.837 ms and STEP 126.797/126.638 ms at one/four workers; cylinder and spline controls retain their geometry and prior timing range. These regressions do not establish general polar or feature parity; the clean full replay is recorded below.",
-        "Clean full replay at 3f16afc9 (kernel 6db16d09) passes all 156 native entries and constructs 74 of 161 Truck captures, with no timeouts or panics. E3 is the sole construction-status improvement. All 74 outputs preserve input/geometry consistency, close their Truck meshes, prepare STEP and produce native-valid single solids; 72 meet combined limited checks including bidirectional distances <=0.001. E3 distances are 0.0001213415/0.0000218593, STEP volume 3479486.1878489405 versus independent 3479486.1779266507. G1 and tolerance A1 differences remain. Other outcomes are 30 operation failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents and one incomplete capture. All full-parity verdicts remain unverified."
+        "Clean full replay at 3f16afc9 (kernel 6db16d09) passes all 156 native entries and constructs 74 of 161 Truck captures, with no timeouts or panics. E3 is the sole construction-status improvement. All 74 outputs preserve input/geometry consistency, close their Truck meshes, prepare STEP and produce native-valid single solids; 72 meet combined limited checks including bidirectional distances <=0.001. E3 distances are 0.0001213415/0.0000218593, STEP volume 3479486.1878489405 versus independent 3479486.1779266507. G1 and tolerance A1 differences remain. Other outcomes are 30 operation failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents and one incomplete capture. All full-parity verdicts remain unverified.",
+        "At 88f64f08, complete/large circular arcs convert to positive-weight quadratic NURBS spans with legal knots, restoring toroidal boundary inclusion. Elementary orientation retries regular samples when a horn-torus midpoint has an undefined normal, preventing reversed STEP faces. Six parent-failing regressions cover exact circle image/derivatives, affine transforms/reversal, horn-torus orientation and E5/E9 imported solids with independent volume, closed meshes and STEP. Five-crate release: 885 passed, one unchanged PCurve precision failure, five existing ignored tests; Clippy and action smoke pass. Cylinder/spline/sphere construction controls preserve identical volumes and show no material timing regression. This establishes input and round-trip repair; fresh captured fillet outcomes follow separately. See truck-benchmarks/results/2026-10-12-toroidal-sectors/REPORT.md."
       ]
     },
     {
@@ -2934,7 +3008,7 @@
         "periodic-seam"
       ],
       "occt_scope": "Dedicated periodic/singular extrema and parameter repairs.",
-      "truck_scope": "Some exact conic seam handling and reversed-curve fixes exist. STEP fitting normalizes longitudinal fillet domains, including sub-tolerance ranges; general support, boundary-curve and paired seam coverage remains open. Periodic fillet contacts now retain continuous parameter branches, with quarter stations disambiguating full turns; chamfer contact sampling also preserves the previous periodic branch. Direct and conical solid regressions cover the exposed failures. Closed spline-pipe contacts now continue from neighboring solved sections across undeclared NURBS seams; displaced seam guide stations follow adjacent rim segments with matching speed. Open polar endpoint fitting now continues contacts to avoid switching between equivalent surface parameter branches.",
+      "truck_scope": "Some exact conic seam handling and reversed-curve fixes exist. STEP fitting normalizes longitudinal fillet domains, including sub-tolerance ranges; general support, boundary-curve and paired seam coverage remains open. Periodic fillet contacts now retain continuous parameter branches, with quarter stations disambiguating full turns; chamfer contact sampling also preserves the previous periodic branch. Direct and conical solid regressions cover the exposed failures. Closed spline-pipe contacts now continue from neighboring solved sections across undeclared NURBS seams; displaced seam guide stations follow adjacent rim segments with matching speed. Open polar endpoint fitting now continues contacts to avoid switching between equivalent surface parameter branches. Complete-circle toroidal inputs E5/E9 now retain consistent boundaries, independent material volume, closed meshes and STEP orientation; this does not establish all requested torus fillets.",
       "next_case": "Reverse surface parameters and move the seam through the same physical geometry; verify every edge lies on both supports.",
       "evidence": [
         {
@@ -3206,6 +3280,42 @@
           "line": 1,
           "url": "capture/2026-10-12-spherical-pole/REPORT.md#L1",
           "sha256": "279a30217dfd4f7070ce7f8d7c42c91babd63f2850dcc76f0dea3068d134c9e7"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-geometry/tests/circle.rs",
+          "find": "fn complete_and_nearly_complete_circles_have_regular_nurbs_images",
+          "role": "test",
+          "line": 174,
+          "url": "../../truck-geometry/tests/circle.rs#L174",
+          "sha256": "9337102f22518fac74db2b0600f224eb491f7df7e1d9de644e4b411bb652a137"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-modeling/tests/elementary.rs",
+          "find": "fn horn_torus_orientation_is_classified_away_from_its_singular_midpoint",
+          "role": "test",
+          "line": 380,
+          "url": "../../truck-modeling/tests/elementary.rs#L380",
+          "sha256": "4b058d3cca5da840895b5db1420a62ebb76a82b3d775ac246d7f74d671d5723f"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/imported_toroidal_sectors.rs",
+          "find": "fn horn_torus_sector_keeps_its_curved_boundary_and_material",
+          "role": "test",
+          "line": 61,
+          "url": "../../truck-shapeops/tests/imported_toroidal_sectors.rs#L61",
+          "sha256": "7139264cc0c81b4124b6b288fca40860017ebc83e50d7223dcf54e97eb10dbdd"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-12-toroidal-sectors/REPORT.md",
+          "find": "# Complete circular arcs and toroidal input round trips",
+          "role": "executed-probe",
+          "line": 1,
+          "url": "../../truck-benchmarks/results/2026-10-12-toroidal-sectors/REPORT.md#L1",
+          "sha256": "a8dcf6f69cb99ffadb8457c166549fbb9387930c8124e89bacdb05fc9b5e07c0"
         }
       ],
       "required_outcome": "Keep blend boundaries on both supports and close them correctly when surface parameters, orientations or seam positions change.",
@@ -3229,7 +3339,8 @@
         "Closed spline-pipe rim regressions now cover displaced longitudinal contact seams, two constant radii, rigid transformation, scale 0.01, reversed wire and unequal rim parameter spans. Contact fitting follows one UV branch across closed NURBS seams without treating support parameter bounds as face trims. Both end-to-end tests fail on parent 4a156c4f; they check radius/normals, independent volume, topology/mesh closure, STEP and immutable input. This is targeted capability evidence, supplemented by the subsequent clean 99c9d487 native capture. See truck-benchmarks/results/2026-10-12-spline-rim-continuation/REPORT.md.",
         "Clean full capture at 99c9d487 (kernel f7f8f4f5) passes all 156 native entries. J9 is the sole construction-status change: it now succeeds, with maximum sampled distances 9.41989e-5/1.09879e-4. All 73 constructed outputs preserve input and geometry, close their meshes and yield native-valid single-solid STEP; 71 meet the combined limited comparisons. The 31 construction failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents, one incomplete capture, G1 and tolerance-grid A1 discrepancies remain. No panic, timeout or full-parity verdict. See capture/2026-10-12-spline-rim/REPORT.md.",
         "At 6db16d09, spherical-meridian fillets with open polar guide endpoints seed regular offset contacts and continue one parameter branch. Singular projected-revolution seeds are replaced by regular samples, restoring the original input mesh. STEP fitting refines local source spans at the unchanged tolerance and 193-control budget. Three parent-failing solid regressions cover scales 0.02/0.04/1, rigid motion, reversed selection, radius/normals, independent volume, closed meshes, STEP and immutable inputs; separate regressions cover signed contacts, near-pole projection and concentrated export error. Five-crate release: 879 passed, one unchanged PCurve property failure, five existing ignored; final affected shapeops rerun: 338 passed, one existing ignored. Clippy/action smoke pass. Successful E3 construction medians are 87.590/88.837 ms and STEP 126.797/126.638 ms at one/four workers; cylinder and spline controls retain their geometry and prior timing range. These regressions do not establish general polar or feature parity; the clean full replay is recorded below.",
-        "Clean full replay at 3f16afc9 (kernel 6db16d09) passes all 156 native entries and constructs 74 of 161 Truck captures, with no timeouts or panics. E3 is the sole construction-status improvement. All 74 outputs preserve input/geometry consistency, close their Truck meshes, prepare STEP and produce native-valid single solids; 72 meet combined limited checks including bidirectional distances <=0.001. E3 distances are 0.0001213415/0.0000218593, STEP volume 3479486.1878489405 versus independent 3479486.1779266507. G1 and tolerance A1 differences remain. Other outcomes are 30 operation failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents and one incomplete capture. All full-parity verdicts remain unverified."
+        "Clean full replay at 3f16afc9 (kernel 6db16d09) passes all 156 native entries and constructs 74 of 161 Truck captures, with no timeouts or panics. E3 is the sole construction-status improvement. All 74 outputs preserve input/geometry consistency, close their Truck meshes, prepare STEP and produce native-valid single solids; 72 meet combined limited checks including bidirectional distances <=0.001. E3 distances are 0.0001213415/0.0000218593, STEP volume 3479486.1878489405 versus independent 3479486.1779266507. G1 and tolerance A1 differences remain. Other outcomes are 30 operation failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents and one incomplete capture. All full-parity verdicts remain unverified.",
+        "At 88f64f08, complete/large circular arcs convert to positive-weight quadratic NURBS spans with legal knots, restoring toroidal boundary inclusion. Elementary orientation retries regular samples when a horn-torus midpoint has an undefined normal, preventing reversed STEP faces. Six parent-failing regressions cover exact circle image/derivatives, affine transforms/reversal, horn-torus orientation and E5/E9 imported solids with independent volume, closed meshes and STEP. Five-crate release: 885 passed, one unchanged PCurve precision failure, five existing ignored tests; Clippy and action smoke pass. Cylinder/spline/sphere construction controls preserve identical volumes and show no material timing regression. This establishes input and round-trip repair; fresh captured fillet outcomes follow separately. See truck-benchmarks/results/2026-10-12-toroidal-sectors/REPORT.md."
       ]
     },
     {
@@ -3591,7 +3702,7 @@
         "chamfer"
       ],
       "occt_scope": "Shape, property, tolerance and downstream operation checks across the corpus.",
-      "truck_scope": "Common blend checks cover topology, meshes, volume, STEP and selected Boolean operations. These do not alone prove absence of all self-intersections.",
+      "truck_scope": "Common blend checks cover topology, meshes, volume, STEP and selected Boolean operations. These do not alone prove absence of all self-intersections. Complete-circle toroidal inputs E5/E9 now retain consistent boundaries, independent material volume, closed meshes and STEP orientation; this does not establish all requested torus fillets.",
       "next_case": "Investigate G1 and tolerance-grid A1 shape differences, remaining import/input failures and downstream edits. E3 polar construction and STEP, D4 STEP preparation, I1 mesh closure, I3 and J9 construction/STEP and the 21 interim exact-join interoperability regressions are resolved in archived captures.",
       "evidence": [
         {
@@ -4016,6 +4127,42 @@
           "line": 1,
           "url": "capture/2026-10-12-spherical-pole/REPORT.md#L1",
           "sha256": "279a30217dfd4f7070ce7f8d7c42c91babd63f2850dcc76f0dea3068d134c9e7"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-geometry/tests/circle.rs",
+          "find": "fn complete_and_nearly_complete_circles_have_regular_nurbs_images",
+          "role": "test",
+          "line": 174,
+          "url": "../../truck-geometry/tests/circle.rs#L174",
+          "sha256": "9337102f22518fac74db2b0600f224eb491f7df7e1d9de644e4b411bb652a137"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-modeling/tests/elementary.rs",
+          "find": "fn horn_torus_orientation_is_classified_away_from_its_singular_midpoint",
+          "role": "test",
+          "line": 380,
+          "url": "../../truck-modeling/tests/elementary.rs#L380",
+          "sha256": "4b058d3cca5da840895b5db1420a62ebb76a82b3d775ac246d7f74d671d5723f"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/imported_toroidal_sectors.rs",
+          "find": "fn horn_torus_sector_keeps_its_curved_boundary_and_material",
+          "role": "test",
+          "line": 61,
+          "url": "../../truck-shapeops/tests/imported_toroidal_sectors.rs#L61",
+          "sha256": "7139264cc0c81b4124b6b288fca40860017ebc83e50d7223dcf54e97eb10dbdd"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-12-toroidal-sectors/REPORT.md",
+          "find": "# Complete circular arcs and toroidal input round trips",
+          "role": "executed-probe",
+          "line": 1,
+          "url": "../../truck-benchmarks/results/2026-10-12-toroidal-sectors/REPORT.md#L1",
+          "sha256": "a8dcf6f69cb99ffadb8457c166549fbb9387930c8124e89bacdb05fc9b5e07c0"
         }
       ],
       "required_outcome": "Deliver blend results usable for closed meshing, STEP interchange and further modeling while preserving dimensions and validity.",
@@ -4045,7 +4192,8 @@
         "Closed spline-pipe rim regressions now cover displaced longitudinal contact seams, two constant radii, rigid transformation, scale 0.01, reversed wire and unequal rim parameter spans. Contact fitting follows one UV branch across closed NURBS seams without treating support parameter bounds as face trims. Both end-to-end tests fail on parent 4a156c4f; they check radius/normals, independent volume, topology/mesh closure, STEP and immutable input. This is targeted capability evidence, supplemented by the subsequent clean 99c9d487 native capture. See truck-benchmarks/results/2026-10-12-spline-rim-continuation/REPORT.md.",
         "Clean full capture at 99c9d487 (kernel f7f8f4f5) passes all 156 native entries. J9 is the sole construction-status change: it now succeeds, with maximum sampled distances 9.41989e-5/1.09879e-4. All 73 constructed outputs preserve input and geometry, close their meshes and yield native-valid single-solid STEP; 71 meet the combined limited comparisons. The 31 construction failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents, one incomplete capture, G1 and tolerance-grid A1 discrepancies remain. No panic, timeout or full-parity verdict. See capture/2026-10-12-spline-rim/REPORT.md.",
         "At 6db16d09, spherical-meridian fillets with open polar guide endpoints seed regular offset contacts and continue one parameter branch. Singular projected-revolution seeds are replaced by regular samples, restoring the original input mesh. STEP fitting refines local source spans at the unchanged tolerance and 193-control budget. Three parent-failing solid regressions cover scales 0.02/0.04/1, rigid motion, reversed selection, radius/normals, independent volume, closed meshes, STEP and immutable inputs; separate regressions cover signed contacts, near-pole projection and concentrated export error. Five-crate release: 879 passed, one unchanged PCurve property failure, five existing ignored; final affected shapeops rerun: 338 passed, one existing ignored. Clippy/action smoke pass. Successful E3 construction medians are 87.590/88.837 ms and STEP 126.797/126.638 ms at one/four workers; cylinder and spline controls retain their geometry and prior timing range. These regressions do not establish general polar or feature parity; the clean full replay is recorded below.",
-        "Clean full replay at 3f16afc9 (kernel 6db16d09) passes all 156 native entries and constructs 74 of 161 Truck captures, with no timeouts or panics. E3 is the sole construction-status improvement. All 74 outputs preserve input/geometry consistency, close their Truck meshes, prepare STEP and produce native-valid single solids; 72 meet combined limited checks including bidirectional distances <=0.001. E3 distances are 0.0001213415/0.0000218593, STEP volume 3479486.1878489405 versus independent 3479486.1779266507. G1 and tolerance A1 differences remain. Other outcomes are 30 operation failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents and one incomplete capture. All full-parity verdicts remain unverified."
+        "Clean full replay at 3f16afc9 (kernel 6db16d09) passes all 156 native entries and constructs 74 of 161 Truck captures, with no timeouts or panics. E3 is the sole construction-status improvement. All 74 outputs preserve input/geometry consistency, close their Truck meshes, prepare STEP and produce native-valid single solids; 72 meet combined limited checks including bidirectional distances <=0.001. E3 distances are 0.0001213415/0.0000218593, STEP volume 3479486.1878489405 versus independent 3479486.1779266507. G1 and tolerance A1 differences remain. Other outcomes are 30 operation failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents and one incomplete capture. All full-parity verdicts remain unverified.",
+        "At 88f64f08, complete/large circular arcs convert to positive-weight quadratic NURBS spans with legal knots, restoring toroidal boundary inclusion. Elementary orientation retries regular samples when a horn-torus midpoint has an undefined normal, preventing reversed STEP faces. Six parent-failing regressions cover exact circle image/derivatives, affine transforms/reversal, horn-torus orientation and E5/E9 imported solids with independent volume, closed meshes and STEP. Five-crate release: 885 passed, one unchanged PCurve precision failure, five existing ignored tests; Clippy and action smoke pass. Cylinder/spline/sphere construction controls preserve identical volumes and show no material timing regression. This establishes input and round-trip repair; fresh captured fillet outcomes follow separately. See truck-benchmarks/results/2026-10-12-toroidal-sectors/REPORT.md."
       ]
     },
     {
