@@ -684,12 +684,15 @@ impl Surface {
             _ => return None,
         };
         let (urange, vrange) = self.try_range_tuple();
-        let mid = |range: Option<(f64, f64)>| range.map_or(0.5, |(a, b)| (a + b) / 2.0);
-        let (u, v) = (mid(urange), mid(vrange));
-        let outward = self
-            .normal(u, v)
-            .dot(elementary.canonical_direction(self.subs(u, v)));
-        Some((elementary, outward > 0.0))
+        let sample = |range: Option<(f64, f64)>, t| range.map_or(t, |(a, b)| a + (b - a) * t);
+        // A horn torus has an undefined normal at the parameter midpoint.
+        [0.5, 0.25, 0.75].into_iter().find_map(|t| {
+            let (u, v) = (sample(urange, t), sample(vrange, t));
+            let outward = self
+                .normal(u, v)
+                .dot(elementary.canonical_direction(self.subs(u, v)));
+            (outward.is_finite() && outward != 0.0).then_some((elementary, outward > 0.0))
+        })
     }
 }
 

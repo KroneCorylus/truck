@@ -176,17 +176,26 @@ impl SearchParameter<D1> for UnitCircle<Point3> {
 impl ToSameGeometry<NurbsCurve<Vector3>> for TrimmedCurve<UnitCircle<Point2>> {
     fn to_same_geometry(&self) -> NurbsCurve<Vector3> {
         let (t0, t1) = self.range_tuple();
-        let angle = t1 - t0;
-        let (cos2, sin2) = (f64::cos(angle / 2.0), f64::sin(angle / 2.0));
+        // A full turn covers the circle; additional windings have the same image.
+        let angle = (t1 - t0).clamp(-TAU, TAU);
+        let pieces = (4. * angle.abs() / TAU).ceil() as usize;
+        let pieces = pieces.max(1);
         let rot = Matrix3::from(Matrix2::from_angle(Rad(t0)));
-        NurbsCurve::new(BSplineCurve::new_unchecked(
-            KnotVec::bezier_knot(2),
-            vec![
-                rot * Vector3::new(1.0, 0.0, 1.0),
-                rot * Vector3::new(cos2, sin2, cos2),
-                rot * Vector3::new(f64::cos(angle), f64::sin(angle), 1.0),
-            ],
-        ))
+        let mut knots = vec![0.; 3];
+        let mut points = vec![rot * Vector3::new(1., 0., 1.)];
+        for i in 1..=pieces {
+            let a = angle * (i - 1) as f64 / pieces as f64;
+            let b = angle * i as f64 / pieces as f64;
+            let middle = (a + b) / 2.;
+            let weight = ((b - a) / 2.).cos();
+            points.push(rot * Vector3::new(middle.cos(), middle.sin(), weight));
+            points.push(rot * Vector3::new(b.cos(), b.sin(), 1.));
+            knots.extend(std::iter::repeat_n(
+                i as f64 / pieces as f64,
+                if i == pieces { 3 } else { 2 },
+            ));
+        }
+        NurbsCurve::new(BSplineCurve::new_unchecked(knots.into(), points))
     }
 }
 
@@ -198,15 +207,15 @@ impl ToSameGeometry<NurbsCurve<Vector4>> for TrimmedCurve<UnitCircle<Point3>> {
         let (knot_vec, pts) = bsp.into_non_rationalized().destruct();
         let mut curve = NurbsCurve::new(BSplineCurve::new_unchecked(
             knot_vec,
-            vec![
-                Vector4::new(pts[0].x, pts[0].y, 0.0, pts[0].z),
-                Vector4::new(pts[1].x, pts[1].y, 0.0, pts[1].z),
-                Vector4::new(pts[2].x, pts[2].y, 0.0, pts[2].z),
-            ],
+            pts.into_iter()
+                .map(|p| Vector4::new(p.x, p.y, 0., p.z))
+                .collect(),
         ));
-        curve.add_knot(0.25);
-        curve.add_knot(0.5);
-        curve.add_knot(0.75);
+        for knot in [0.25, 0.5, 0.75] {
+            if !curve.knot_vec().contains(&knot) {
+                curve.add_knot(knot);
+            }
+        }
         curve
     }
 }

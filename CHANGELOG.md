@@ -6,6 +6,8 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Preserve complete and large circular arcs when converting to NURBS, using positive-weight rational quadratic spans and legal knot multiplicities. Determine elementary-surface orientation at a regular sample when the midpoint is singular, preventing reversed horn-torus STEP faces. Imported torus-sector regressions check consistent geometry, independent volume, closed meshes and STEP round trips, including scaling and rigid motion.
+
 - Fillet meridians ending at a spherical parameter pole. Seed singular guide sections from neighboring contacts, continue one contact branch near polar endpoints, and avoid undefined projected-curve Newton seeds when meshing revolutions. Refine procedural STEP surfaces locally within the existing fitting tolerance and 193-control budget. Regressions cover the original OCCT E3 scale, rigid transforms, reversed selection, signed contact radii, analytic radius/normals, independent volume, closed meshes, immutable inputs and STEP round trips.
 
 - Continue closed-wire fillets from a planar support onto a tangent adjacent face. Split patches at solved contact crossings, reuse shared trim vertices, and reconnect the surviving face loops. Validate planar regions after loop-count changes and check continued contacts against periodic trimmed support regions and holes. The captured post-root fillet over a rounded roof now produces a closed solid and a native-valid single-solid STEP export; regressions cover independent volume, radius/normals, three scales, rigid transforms and reversed selection.

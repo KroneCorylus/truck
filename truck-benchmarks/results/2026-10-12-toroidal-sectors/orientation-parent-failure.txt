@@ -1,0 +1,28 @@
+   Compiling parking_lot_core v0.9.12
+   Compiling truck-geotrait v0.4.0 (/home/krone/Development/Pieza_WS/truck/target/full-circle-arcs/truck-geotrait)
+   Compiling memchr v2.8.3
+   Compiling parking_lot v0.12.5
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/target/full-circle-arcs/truck-geometry)
+   Compiling truck-topology v0.6.0 (/home/krone/Development/Pieza_WS/truck/target/full-circle-arcs/truck-topology)
+   Compiling serde_json v1.0.154
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/Pieza_WS/truck/target/full-circle-arcs/truck-modeling)
+    Finished `release` profile [optimized] target(s) in 3.58s
+     Running tests/elementary.rs (/home/krone/Development/Pieza_WS/truck/target/pole-build/release/deps/elementary-8115fec087072677)
+
+running 1 test
+
+thread 'horn_torus_orientation_is_classified_away_from_its_singular_midpoint' (885302) panicked at truck-modeling/tests/elementary.rs:405:17:
+assertion `left == right` failed
+  left: false
+ right: true
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test horn_torus_orientation_is_classified_away_from_its_singular_midpoint ... FAILED
+
+failures:
+
+failures:
+    horn_torus_orientation_is_classified_away_from_its_singular_midpoint
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 8 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-modeling --test elementary`

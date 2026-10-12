@@ -169,3 +169,70 @@ fn scaled_circle_accepts_submicron_local_chord_tolerance() {
     assert_near!(points[0], Point3::new(100.0, 0.0, 0.0));
     assert_near!(*points.last().unwrap(), Point3::new(0.0, 100.0, 0.0));
 }
+
+#[test]
+fn complete_and_nearly_complete_circles_have_regular_nurbs_images() {
+    for start in [0., 0.37, -9.1] {
+        for span in [TAU, TAU - 1e-8, 1.5 * PI, PI, 1e-9, 0.]
+            .into_iter()
+            .flat_map(|span| [span, -span])
+        {
+            let arc = TrimmedCurve::new(UnitCircle::<Point2>::new(), (start, start + span));
+            let curve: NurbsCurve<Vector3> = arc.to_same_geometry();
+            assert!(curve.front().distance(arc.front()) < 1e-12);
+            assert!(curve.back().distance(arc.back()) < 1e-12);
+            let mut previous = curve.front().to_vec();
+            let mut turn = 0.;
+            for i in 0..=128 {
+                let t = i as f64 / 128.;
+                let point = curve.subs(t).to_vec();
+                assert!(
+                    (point.magnitude2() - 1.).abs() < 1e-12,
+                    "{start} {span} {t}: {point:?}"
+                );
+                let tangent = curve.der(t);
+                assert!(point.dot(tangent).abs() < 1e-11);
+                turn += (previous.x * point.y - previous.y * point.x).atan2(previous.dot(point));
+                previous = point;
+            }
+            assert!((turn - span).abs() < 1e-11, "turn {turn} span {span}");
+            assert!(curve
+                .non_rationalized()
+                .control_points()
+                .iter()
+                .all(|p| p.z > 0.));
+        }
+    }
+}
+
+#[test]
+fn full_circle_images_survive_spatial_affine_maps_and_reversal() {
+    let transform = Matrix4::from_cols(
+        Vector4::new(150., 20., -30., 0.),
+        Vector4::new(-50., 70., 90., 0.),
+        Vector4::new(0., 0., 1., 0.),
+        Vector4::new(13., -7., 23., 1.),
+    );
+    let inverse = transform.invert().unwrap();
+    let arc = Processor::with_transform(
+        TrimmedCurve::new(UnitCircle::<Point3>::new(), (0.37, 0.37 + TAU)),
+        transform,
+    );
+    for arc in [arc, arc.inverse()] {
+        let curve: NurbsCurve<Vector4> = arc.to_same_geometry();
+        assert!(curve.front().distance(arc.front()) < 1e-10);
+        assert!(curve.back().distance(arc.back()) < 1e-10);
+        for i in 0..=128 {
+            let p = inverse.transform_point(curve.subs(i as f64 / 128.));
+            assert!((p.x * p.x + p.y * p.y - 1.).abs() < 1e-12);
+            assert!(p.z.abs() < 1e-10);
+        }
+        let (knots, counts) = curve.knot_vec().to_single_multi();
+        assert!(counts[1..knots.len() - 1].iter().all(|&n| n <= 2));
+        assert!(curve
+            .non_rationalized()
+            .control_points()
+            .iter()
+            .all(|p| p.w > 0.));
+    }
+}

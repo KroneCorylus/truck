@@ -1,0 +1,20 @@
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+    Finished `release` profile [optimized] target(s) in 2.36s
+     Running tests/circle.rs (target/release/deps/circle-bb4828f022fe1d46)
+
+running 13 tests
+test inverse_axes_and_signed_zero_stay_in_one_revolution ... ok
+test full_circle_images_survive_spatial_affine_maps_and_reversal ... ok
+test inverse_near_axes_preserves_parameter_precision ... ok
+test parameter_division ... ok
+test search_nearest_parameter ... ok
+test search_nearest_parameter_with_parameter_hint ... ok
+test search_parameter ... ok
+test search_parameter_with_parameter_hint ... ok
+test scaled_circle_accepts_submicron_local_chord_tolerance ... ok
+test search_nearest_parameter_with_range ... ok
+test search_parameter_with_range ... ok
+test complete_and_nearly_complete_circles_have_regular_nurbs_images ... ok
+test to_nurbs ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

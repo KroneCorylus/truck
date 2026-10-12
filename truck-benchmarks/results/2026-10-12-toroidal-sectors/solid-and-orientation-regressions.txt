@@ -1,0 +1,29 @@
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/Pieza_WS/truck/target/full-circle-arcs/truck-modeling)
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/target/full-circle-arcs/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/target/full-circle-arcs/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 10.71s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/elementary.rs (/home/krone/Development/Pieza_WS/truck/target/pole-build/release/deps/elementary-24679c504872b6a8)
+
+running 9 tests
+test horn_torus_orientation_is_classified_away_from_its_singular_midpoint ... ok
+test extruded_disk_gives_cylinder ... ok
+test other_surfaces_are_not_elementary ... ok
+test planar_splines_keep_their_plane_under_weights_transforms_and_orientation ... ok
+test transformed_and_inverted_surface_keeps_its_kind ... ok
+test warped_degenerate_and_singular_splines_are_not_planes ... ok
+test revolved_profile_gives_planes_cylinder_and_cone ... ok
+test revolved_disk_gives_torus ... ok
+test revolved_half_circle_gives_sphere ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/imported_toroidal_sectors.rs (/home/krone/Development/Pieza_WS/truck/target/pole-build/release/deps/imported_toroidal_sectors-a434fa9384da385f)
+
+running 3 tests
+test horn_torus_sector_keeps_its_curved_boundary_and_material ... ok
+test transformed_ring_torus_sector_keeps_its_curved_boundary_and_material ... ok
+test original_scale_ring_torus_sector_is_consistent_closed_and_exportable ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 13.24s

@@ -375,3 +375,47 @@ fn warped_degenerate_and_singular_splines_are_not_planes() {
         assert!(Surface::NurbsSurface(singular).elementary().is_none());
     }
 }
+
+#[test]
+fn horn_torus_orientation_is_classified_away_from_its_singular_midpoint() {
+    let meridian = Curve::Conic(Processor::with_transform(
+        TrimmedCurve::new(UnitCircle::<Point3>::new(), (0., 2. * PI)),
+        Matrix4::from_cols(
+            Vector4::new(1., 0., 0., 0.),
+            Vector4::new(0., 0., 1., 0.),
+            Vector4::new(0., -1., 0., 0.),
+            Vector4::new(1., 0., 0., 1.),
+        ),
+    ));
+    let surface = Surface::RevolutedCurve(Processor::new(RevolutedCurve::by_revolution(
+        meridian,
+        Point3::origin(),
+        Vector3::unit_z(),
+    )));
+    assert!(!surface.normal(PI, PI).magnitude2().is_finite());
+    let transform = Matrix4::from_translation(Vector3::new(13., -7., 23.))
+        * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.73))
+        * Matrix4::from_scale(100.);
+    for surface in [surface.clone(), surface.transformed(transform)] {
+        for surface in [surface.clone(), surface.inverse()] {
+            let (
+                Elementary::Torus {
+                    center,
+                    axis,
+                    major,
+                    minor,
+                },
+                outward,
+            ) = surface.elementary().unwrap()
+            else {
+                panic!("torus not recognized")
+            };
+            assert!((major - minor).abs() < EPS);
+            for (u, v) in [(0.3, 0.7), (1.1, 2.3), (4.1, 5.2)] {
+                let point = surface.subs(u, v);
+                let canonical = point - (center + major * radial(point, center, axis).normalize());
+                assert_eq!(outward, surface.normal(u, v).dot(canonical) > 0.);
+            }
+        }
+    }
+}

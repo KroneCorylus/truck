@@ -1,0 +1,18 @@
+    Checking truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+error: using `contains()` instead of `iter().any()` is more efficient
+   --> truck-geometry/src/specifieds/circle.rs:215:17
+    |
+215 |             if !curve.knot_vec().iter().any(|&value| value == knot) {
+    |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: try: `curve.knot_vec().contains(&knot)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#manual_contains
+note: the lint level is defined here
+   --> truck-geometry/src/lib.rs:4:9
+    |
+  4 | #![deny(clippy::all, rust_2018_idioms)]
+    |         ^^^^^^^^^^^
+    = note: `#[deny(clippy::manual_contains)]` implied by `#[deny(clippy::all)]`
+
+error: could not compile `truck-geometry` (lib) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `truck-geometry` (lib test) due to 1 previous error

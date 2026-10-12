@@ -1,0 +1,30 @@
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/target/full-circle-arcs/truck-geometry)
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/Pieza_WS/truck/target/full-circle-arcs/truck-modeling)
+   Compiling truck-meshalgo v0.4.0 (/home/krone/Development/Pieza_WS/truck/target/full-circle-arcs/truck-meshalgo)
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/target/full-circle-arcs/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/target/full-circle-arcs/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 11.59s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/imported_toroidal_sectors.rs (target/pole-build/release/deps/imported_toroidal_sectors-a434fa9384da385f)
+
+running 3 tests
+test horn_torus_sector_keeps_its_curved_boundary_and_material ... FAILED
+test transformed_ring_torus_sector_keeps_its_curved_boundary_and_material ... ok
+test original_scale_ring_torus_sector_is_consistent_closed_and_exportable ... ok
+
+failures:
+
+---- horn_torus_sector_keeps_its_curved_boundary_and_material stdout ----
+
+thread 'horn_torus_sector_keeps_its_curved_boundary_and_material' (870523) panicked at truck-meshalgo/src/filters/optimizing.rs:364:1:
+failed to cast: Vector3 [NaN, NaN, NaN]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    horn_torus_sector_keeps_its_curved_boundary_and_material
+
+test result: FAILED. 2 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 12.92s
+
+error: test failed, to rerun pass `-p truck-shapeops --test imported_toroidal_sectors`

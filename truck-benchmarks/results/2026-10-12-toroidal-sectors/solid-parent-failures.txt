@@ -1,0 +1,48 @@
+   Compiling truck-derivers v0.1.0 (/home/krone/Development/Pieza_WS/truck/target/full-circle-arcs/truck-derivers)
+   Compiling truck-base v0.5.0 (/home/krone/Development/Pieza_WS/truck/target/full-circle-arcs/truck-base)
+   Compiling truck-assembly v0.1.0 (/home/krone/Development/Pieza_WS/truck/target/full-circle-arcs/truck-assembly)
+   Compiling truck-geotrait v0.4.0 (/home/krone/Development/Pieza_WS/truck/target/full-circle-arcs/truck-geotrait)
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/target/full-circle-arcs/truck-geometry)
+   Compiling truck-topology v0.6.0 (/home/krone/Development/Pieza_WS/truck/target/full-circle-arcs/truck-topology)
+   Compiling truck-polymesh v0.6.0 (/home/krone/Development/Pieza_WS/truck/target/full-circle-arcs/truck-polymesh)
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/Pieza_WS/truck/target/full-circle-arcs/truck-modeling)
+   Compiling truck-meshalgo v0.4.0 (/home/krone/Development/Pieza_WS/truck/target/full-circle-arcs/truck-meshalgo)
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/target/full-circle-arcs/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/target/full-circle-arcs/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 12.56s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/imported_toroidal_sectors.rs (target/pole-build/release/deps/imported_toroidal_sectors-a434fa9384da385f)
+
+running 3 tests
+test horn_torus_sector_keeps_its_curved_boundary_and_material ... FAILED
+test original_scale_ring_torus_sector_is_consistent_closed_and_exportable ... FAILED
+test transformed_ring_torus_sector_keeps_its_curved_boundary_and_material ... FAILED
+
+failures:
+
+---- horn_torus_sector_keeps_its_curved_boundary_and_material stdout ----
+
+thread 'horn_torus_sector_keeps_its_curved_boundary_and_material' (869405) panicked at truck-shapeops/tests/imported_toroidal_sectors.rs:51:5:
+toroidal boundaries lie on the complete revolved meridian
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- original_scale_ring_torus_sector_is_consistent_closed_and_exportable stdout ----
+
+thread 'original_scale_ring_torus_sector_is_consistent_closed_and_exportable' (869406) panicked at truck-shapeops/tests/imported_toroidal_sectors.rs:51:5:
+toroidal boundaries lie on the complete revolved meridian
+
+---- transformed_ring_torus_sector_keeps_its_curved_boundary_and_material stdout ----
+
+thread 'transformed_ring_torus_sector_keeps_its_curved_boundary_and_material' (869407) panicked at truck-shapeops/tests/imported_toroidal_sectors.rs:51:5:
+toroidal boundaries lie on the complete revolved meridian
+
+
+failures:
+    horn_torus_sector_keeps_its_curved_boundary_and_material
+    original_scale_ring_torus_sector_is_consistent_closed_and_exportable
+    transformed_ring_torus_sector_keeps_its_curved_boundary_and_material
+
+test result: FAILED. 0 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-shapeops --test imported_toroidal_sectors`

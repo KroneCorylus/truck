@@ -1,0 +1,194 @@
+[
+  {
+    "version": "parent",
+    "fixture": "cylinder",
+    "workers": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/toroidal-parent-rim-blend",
+      "cylinder"
+    ],
+    "returncode": 0,
+    "log": "parent-cylinder-1.txt",
+    "median_ms": 2.667273,
+    "mesh_volume": 778940.4009174608
+  },
+  {
+    "version": "updated",
+    "fixture": "cylinder",
+    "workers": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/rim_blend",
+      "cylinder"
+    ],
+    "returncode": 0,
+    "log": "updated-cylinder-1.txt",
+    "median_ms": 2.529979,
+    "mesh_volume": 778940.4009174608
+  },
+  {
+    "version": "parent",
+    "fixture": "spline",
+    "workers": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/toroidal-parent-rim-blend",
+      "spline"
+    ],
+    "returncode": 0,
+    "log": "parent-spline-1.txt",
+    "median_ms": 25.409702,
+    "mesh_volume": 1808712.393059274
+  },
+  {
+    "version": "updated",
+    "fixture": "spline",
+    "workers": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/rim_blend",
+      "spline"
+    ],
+    "returncode": 0,
+    "log": "updated-spline-1.txt",
+    "median_ms": 25.4971,
+    "mesh_volume": 1808712.393059274
+  },
+  {
+    "version": "parent",
+    "fixture": "sphere",
+    "workers": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/toroidal-parent-rim-blend",
+      "sphere"
+    ],
+    "returncode": 0,
+    "log": "parent-sphere-1.txt",
+    "median_ms": 87.187524,
+    "mesh_volume": 3479455.724002516
+  },
+  {
+    "version": "updated",
+    "fixture": "sphere",
+    "workers": 1,
+    "command": [
+      "taskset",
+      "-c",
+      "0",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/rim_blend",
+      "sphere"
+    ],
+    "returncode": 0,
+    "log": "updated-sphere-1.txt",
+    "median_ms": 86.549929,
+    "mesh_volume": 3479455.724002516
+  },
+  {
+    "version": "updated",
+    "fixture": "cylinder",
+    "workers": 4,
+    "command": [
+      "taskset",
+      "-c",
+      "0-3",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/rim_blend",
+      "cylinder"
+    ],
+    "returncode": 0,
+    "log": "updated-cylinder-4.txt",
+    "median_ms": 2.462931,
+    "mesh_volume": 778940.4009174608
+  },
+  {
+    "version": "parent",
+    "fixture": "cylinder",
+    "workers": 4,
+    "command": [
+      "taskset",
+      "-c",
+      "0-3",
+      "/home/krone/Development/Pieza_WS/truck/target/toroidal-parent-rim-blend",
+      "cylinder"
+    ],
+    "returncode": 0,
+    "log": "parent-cylinder-4.txt",
+    "median_ms": 2.516844,
+    "mesh_volume": 778940.4009174608
+  },
+  {
+    "version": "updated",
+    "fixture": "spline",
+    "workers": 4,
+    "command": [
+      "taskset",
+      "-c",
+      "0-3",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/rim_blend",
+      "spline"
+    ],
+    "returncode": 0,
+    "log": "updated-spline-4.txt",
+    "median_ms": 26.044101,
+    "mesh_volume": 1808712.393059274
+  },
+  {
+    "version": "parent",
+    "fixture": "spline",
+    "workers": 4,
+    "command": [
+      "taskset",
+      "-c",
+      "0-3",
+      "/home/krone/Development/Pieza_WS/truck/target/toroidal-parent-rim-blend",
+      "spline"
+    ],
+    "returncode": 0,
+    "log": "parent-spline-4.txt",
+    "median_ms": 25.879464,
+    "mesh_volume": 1808712.393059274
+  },
+  {
+    "version": "updated",
+    "fixture": "sphere",
+    "workers": 4,
+    "command": [
+      "taskset",
+      "-c",
+      "0-3",
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/rim_blend",
+      "sphere"
+    ],
+    "returncode": 0,
+    "log": "updated-sphere-4.txt",
+    "median_ms": 87.510914,
+    "mesh_volume": 3479455.724002516
+  },
+  {
+    "version": "parent",
+    "fixture": "sphere",
+    "workers": 4,
+    "command": [
+      "taskset",
+      "-c",
+      "0-3",
+      "/home/krone/Development/Pieza_WS/truck/target/toroidal-parent-rim-blend",
+      "sphere"
+    ],
+    "returncode": 0,
+    "log": "parent-sphere-4.txt",
+    "median_ms": 87.830508,
+    "mesh_volume": 3479455.724002516
+  }
+]
