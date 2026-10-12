@@ -7,7 +7,7 @@
       "tracked_changes": "M src/BOPAlgo/BOPAlgo_PaveFiller.cxx\n M src/BRepAlgoAPI/BRepAlgoAPI_BuilderAlgo.cxx\n M src/IntTools/IntTools_FaceFace.cxx"
     },
     "truck": {
-      "revision": "012ace796b5eec77b48794befc05a3d5f9bbfbcb",
+      "revision": "11fea9e81313f5a96197eebfe48b884ac5c4c60a",
       "revision_scope": "Latest commit outside audits/fillet-chamfer; audit-only commits do not change the kernel baseline.",
       "tracked_changes_in_modeling": ""
     },
@@ -184,9 +184,9 @@
           "path": "truck-shapeops/src/fillet/modeling.rs",
           "find": "pub fn fillet_solid_edges",
           "role": "implementation",
-          "line": 142,
-          "url": "../../truck-shapeops/src/fillet/modeling.rs#L142",
-          "sha256": "92ebc4074ab386e0773596cc2863b3a32be2536d06f5bc23a43549e7a54899dd"
+          "line": 170,
+          "url": "../../truck-shapeops/src/fillet/modeling.rs#L170",
+          "sha256": "3fff397700a206e1ff611e767d4b74f7c7b70f584a180ddbf44d4b36d65647c3"
         },
         {
           "repo": "truck",
@@ -249,7 +249,7 @@
           "role": "implementation",
           "line": 9,
           "url": "../../truck-shapeops/src/fillet/along_wire.rs#L9",
-          "sha256": "1e45bbb0212009ae420958c5138ba6b27d1696189eb770895e8293a820c4fcd6"
+          "sha256": "3a7ff55927dc93f6272814080428ec0184a746a54a9f9ba8b4f1e31463a96844"
         },
         {
           "repo": "truck",
@@ -307,9 +307,9 @@
           "path": "truck-shapeops/src/fillet/modeling.rs",
           "find": "pub fn fillet_solid_edges",
           "role": "implementation",
-          "line": 142,
-          "url": "../../truck-shapeops/src/fillet/modeling.rs#L142",
-          "sha256": "92ebc4074ab386e0773596cc2863b3a32be2536d06f5bc23a43549e7a54899dd"
+          "line": 170,
+          "url": "../../truck-shapeops/src/fillet/modeling.rs#L170",
+          "sha256": "3fff397700a206e1ff611e767d4b74f7c7b70f584a180ddbf44d4b36d65647c3"
         }
       ],
       "required_outcome": "Create a valid joined corner where incident edge fillets have different specified radii, with the intended contacts and continuity."
@@ -343,7 +343,7 @@
           "role": "implementation",
           "line": 260,
           "url": "../../truck-shapeops/src/fillet/along_wire.rs#L260",
-          "sha256": "1e45bbb0212009ae420958c5138ba6b27d1696189eb770895e8293a820c4fcd6"
+          "sha256": "3a7ff55927dc93f6272814080428ec0184a746a54a9f9ba8b4f1e31463a96844"
         }
       ],
       "required_outcome": "Taper a blend continuously to zero radius at an endpoint without leaving an invalid seam or degenerate solid."
@@ -376,7 +376,7 @@
           "role": "implementation",
           "line": 40,
           "url": "../../truck-shapeops/src/fillet/mod.rs#L40",
-          "sha256": "8ddac57620b53a6debda8c586608610a6ac33d17bfeb1a125e90a1854f122bec"
+          "sha256": "450f6900c48c620b68938520425120f63b26e937aeb371cab2512a2b35e096a7"
         }
       ],
       "required_outcome": "No independent representation-selector requirement. The resulting shape must satisfy geometric accuracy and downstream use regardless of its internal representation."
@@ -472,9 +472,9 @@
           "path": "truck-shapeops/src/fillet/modeling.rs",
           "find": "pub fn chamfer_solid_edges",
           "role": "implementation",
-          "line": 240,
-          "url": "../../truck-shapeops/src/fillet/modeling.rs#L240",
-          "sha256": "92ebc4074ab386e0773596cc2863b3a32be2536d06f5bc23a43549e7a54899dd"
+          "line": 268,
+          "url": "../../truck-shapeops/src/fillet/modeling.rs#L268",
+          "sha256": "3fff397700a206e1ff611e767d4b74f7c7b70f584a180ddbf44d4b36d65647c3"
         },
         {
           "repo": "truck",
@@ -514,9 +514,9 @@
           "path": "truck-shapeops/src/fillet/modeling.rs",
           "find": "pub fn try_chamfer_solid_edges_with_distances",
           "role": "implementation",
-          "line": 306,
-          "url": "../../truck-shapeops/src/fillet/modeling.rs#L306",
-          "sha256": "92ebc4074ab386e0773596cc2863b3a32be2536d06f5bc23a43549e7a54899dd"
+          "line": 334,
+          "url": "../../truck-shapeops/src/fillet/modeling.rs#L334",
+          "sha256": "3fff397700a206e1ff611e767d4b74f7c7b70f584a180ddbf44d4b36d65647c3"
         },
         {
           "repo": "truck",
@@ -565,9 +565,9 @@
           "path": "truck-shapeops/src/fillet/modeling.rs",
           "find": "pub fn try_chamfer_solid_edges_with_distances",
           "role": "implementation",
-          "line": 306,
-          "url": "../../truck-shapeops/src/fillet/modeling.rs#L306",
-          "sha256": "92ebc4074ab386e0773596cc2863b3a32be2536d06f5bc23a43549e7a54899dd"
+          "line": 334,
+          "url": "../../truck-shapeops/src/fillet/modeling.rs#L334",
+          "sha256": "3fff397700a206e1ff611e767d4b74f7c7b70f584a180ddbf44d4b36d65647c3"
         },
         {
           "repo": "app",
@@ -607,9 +607,9 @@
           "path": "truck-shapeops/src/fillet/modeling.rs",
           "find": "pub fn chamfer_solid_edges",
           "role": "implementation",
-          "line": 240,
-          "url": "../../truck-shapeops/src/fillet/modeling.rs#L240",
-          "sha256": "92ebc4074ab386e0773596cc2863b3a32be2536d06f5bc23a43549e7a54899dd"
+          "line": 268,
+          "url": "../../truck-shapeops/src/fillet/modeling.rs#L268",
+          "sha256": "3fff397700a206e1ff611e767d4b74f7c7b70f584a180ddbf44d4b36d65647c3"
         }
       ],
       "required_outcome": "Produce a chamfer whose normal sections maintain the requested throat dimension along the selected edge."
@@ -640,9 +640,9 @@
           "path": "truck-shapeops/src/fillet/modeling.rs",
           "find": "pub fn chamfer_solid_edges",
           "role": "implementation",
-          "line": 240,
-          "url": "../../truck-shapeops/src/fillet/modeling.rs#L240",
-          "sha256": "92ebc4074ab386e0773596cc2863b3a32be2536d06f5bc23a43549e7a54899dd"
+          "line": 268,
+          "url": "../../truck-shapeops/src/fillet/modeling.rs#L268",
+          "sha256": "3fff397700a206e1ff611e767d4b74f7c7b70f584a180ddbf44d4b36d65647c3"
         }
       ],
       "required_outcome": "Produce the requested constant-throat chamfer with penetration, satisfying both the throat and offset-support constraints."
@@ -809,7 +809,7 @@
           "role": "implementation",
           "line": 338,
           "url": "../../truck-shapeops/src/fillet/along_wire.rs#L338",
-          "sha256": "1e45bbb0212009ae420958c5138ba6b27d1696189eb770895e8293a820c4fcd6"
+          "sha256": "3a7ff55927dc93f6272814080428ec0184a746a54a9f9ba8b4f1e31463a96844"
         },
         {
           "repo": "truck",
@@ -894,7 +894,7 @@
           "role": "implementation",
           "line": 338,
           "url": "../../truck-shapeops/src/fillet/along_wire.rs#L338",
-          "sha256": "1e45bbb0212009ae420958c5138ba6b27d1696189eb770895e8293a820c4fcd6"
+          "sha256": "3a7ff55927dc93f6272814080428ec0184a746a54a9f9ba8b4f1e31463a96844"
         },
         {
           "repo": "truck",
@@ -1125,7 +1125,7 @@
           "role": "implementation",
           "line": 888,
           "url": "../../truck-shapeops/src/fillet/along_wire.rs#L888",
-          "sha256": "1e45bbb0212009ae420958c5138ba6b27d1696189eb770895e8293a820c4fcd6"
+          "sha256": "3a7ff55927dc93f6272814080428ec0184a746a54a9f9ba8b4f1e31463a96844"
         },
         {
           "repo": "truck",
@@ -1385,7 +1385,7 @@
           "role": "implementation",
           "line": 269,
           "url": "../../truck-shapeops/src/fillet/along_wire.rs#L269",
-          "sha256": "1e45bbb0212009ae420958c5138ba6b27d1696189eb770895e8293a820c4fcd6"
+          "sha256": "3a7ff55927dc93f6272814080428ec0184a746a54a9f9ba8b4f1e31463a96844"
         },
         {
           "repo": "truck",
@@ -1424,14 +1424,14 @@
     {
       "id": "T01",
       "title": "Tangent propagation across support changes",
-      "truck_status": "implemented-with-tests",
+      "truck_status": "partial",
       "priority": "P2",
       "tags": [
         "tangent"
       ],
       "occt_scope": "Contours propagate along tangent edges and tangent support series.",
-      "truck_scope": "Application propagation checks edge tangents and both face normals; the kernel accepts explicitly supplied chains.",
-      "next_case": "Vary tangency around the threshold and split one support into multiple patches.",
+      "truck_scope": "Application propagation checks edge tangents and both face normals; the kernel accepts explicitly supplied chains. Closed-wire contacts can now leave a planar outer boundary and continue onto one tangent adjacent support per original edge and side, with Q4 post/rounded-roof solid and STEP regression coverage. General open-wire and multi-neighbor support propagation remains incomplete.",
+      "next_case": "Extend support continuation to open contours and multiple neighboring supports within one original edge; vary tangent continuity and contact clearance around the threshold.",
       "evidence": [
         {
           "repo": "occt",
@@ -1459,9 +1459,49 @@
           "line": 133,
           "url": "../../truck-shapeops/tests/fillet_chain.rs#L133",
           "sha256": "ff34e11bc4c36aa08ffb5aa6fa14c5cf0d5f1f8e4f7e7da25ce1440f3a9dfce8"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/rounded_roof_post.rs",
+          "find": "fn post_fillet_continues_across",
+          "role": "test",
+          "line": 56,
+          "url": "../../truck-shapeops/tests/rounded_roof_post.rs#L56",
+          "sha256": "a00dac3593a6e117cd020e1d467726b9808685355a5eb7ae797ec04bb067cef2"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-12-roof-contact-guard/REPORT.md",
+          "find": "# Planar trim",
+          "role": "test",
+          "line": 1,
+          "url": "../../truck-benchmarks/results/2026-10-12-roof-contact-guard/REPORT.md#L1",
+          "sha256": "669f797ef06affac3739958d2e7624edc1137dbef6e479965cd95fd54a7d8058"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/continued_support.rs",
+          "find": "pub(super) fn fillet",
+          "role": "implementation",
+          "line": 88,
+          "url": "../../truck-shapeops/src/fillet/continued_support.rs#L88",
+          "sha256": "c344c88d3dc6cb4ad353688c1f2c79cef30fe6cf30cde0e576efd86303173600"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-12-roof-support-continuation/REPORT.md",
+          "find": "# Closed-wire continuation",
+          "role": "test",
+          "line": 1,
+          "url": "../../truck-benchmarks/results/2026-10-12-roof-support-continuation/REPORT.md#L1",
+          "sha256": "0dc2c315280b321f9e2d4a24f635649ec855c3f096061443863274a706837d9c"
         }
       ],
-      "required_outcome": "Round or bevel a tangent chain continuously across edge splits and changes of support face."
+      "required_outcome": "Round or bevel a tangent chain continuously across edge splits and changes of support face.",
+      "verification": [
+        "At 67cf761f, captured Q4 operation 2 no longer returns an invalid success: intersecting planar contact loops fail with OutsideNeighbour at validate_trims, preserving the input. Native OCCT rolls the ball onto the existing cylindrical roof and adds two BSpline transition patches; that construction remains missing. The imported input passes independent volume and closed-mesh checks, and a smaller radius-0.2 fillet passes solid and STEP checks. Full shapeops: 328 passed, zero failed, one existing ignored; Clippy and action smoke pass. Evidence: truck-benchmarks/results/2026-10-12-roof-contact-guard/REPORT.md. This targeted replay postdates the 012ace79 full capture and does not change its historical counts.",
+        "At 11fea9e8, Q4 operation 2 now succeeds through closed-wire continuation from the flat roof onto its tangent cylindrical neighbor. The regression replaces the intermediate rejection with a stronger successful-solid contract: independently integrated volume, contact radius/normals, input preservation, closed meshes and STEP at scales 0.25/1/10 with transforms/reversal. A periodic trim/hole unit prevents contacts leaving the new support. Targeted native comparison yields one valid solid, Truck STEP volume 149.08379605764409 versus native 149.08377356777387, and bidirectional sampled distances below 0.00033. Full shapeops: 329 passed, zero failed, one existing ignored; Clippy and action smoke pass. Construction median 3.815339 ms, STEP 189.600051 ms; the parent rejects. Open-wire propagation, multiple neighboring supports within one original edge, holes and global collisions remain outside the new verified scope. Evidence: truck-benchmarks/results/2026-10-12-roof-support-continuation/REPORT.md. Historical 012ace79 full-capture counts are unchanged until a fresh corpus replay is recorded."
+      ]
     },
     {
       "id": "T02",
@@ -1566,16 +1606,16 @@
           "role": "implementation",
           "line": 400,
           "url": "../../truck-shapeops/src/fillet/mod.rs#L400",
-          "sha256": "8ddac57620b53a6debda8c586608610a6ac33d17bfeb1a125e90a1854f122bec"
+          "sha256": "450f6900c48c620b68938520425120f63b26e937aeb371cab2512a2b35e096a7"
         },
         {
           "repo": "truck",
           "path": "truck-shapeops/src/fillet/modeling.rs",
           "find": "Solid::try_new",
           "role": "implementation",
-          "line": 55,
-          "url": "../../truck-shapeops/src/fillet/modeling.rs#L55",
-          "sha256": "92ebc4074ab386e0773596cc2863b3a32be2536d06f5bc23a43549e7a54899dd"
+          "line": 70,
+          "url": "../../truck-shapeops/src/fillet/modeling.rs#L70",
+          "sha256": "3fff397700a206e1ff611e767d4b74f7c7b70f584a180ddbf44d4b36d65647c3"
         }
       ],
       "required_outcome": "Blend open-shell edges and terminate correctly on free boundaries for surface-modeling tasks."
@@ -1902,7 +1942,7 @@
           "role": "implementation",
           "line": 190,
           "url": "../../truck-shapeops/src/fillet/along_wire.rs#L190",
-          "sha256": "1e45bbb0212009ae420958c5138ba6b27d1696189eb770895e8293a820c4fcd6"
+          "sha256": "3a7ff55927dc93f6272814080428ec0184a746a54a9f9ba8b4f1e31463a96844"
         },
         {
           "repo": "truck",
@@ -2005,16 +2045,16 @@
           "role": "implementation",
           "line": 190,
           "url": "../../truck-shapeops/src/fillet/along_wire.rs#L190",
-          "sha256": "1e45bbb0212009ae420958c5138ba6b27d1696189eb770895e8293a820c4fcd6"
+          "sha256": "3a7ff55927dc93f6272814080428ec0184a746a54a9f9ba8b4f1e31463a96844"
         },
         {
           "repo": "truck",
           "path": "truck-shapeops/src/fillet/modeling.rs",
           "find": "Other mixed junctions",
           "role": "implementation",
-          "line": 125,
-          "url": "../../truck-shapeops/src/fillet/modeling.rs#L125",
-          "sha256": "92ebc4074ab386e0773596cc2863b3a32be2536d06f5bc23a43549e7a54899dd"
+          "line": 153,
+          "url": "../../truck-shapeops/src/fillet/modeling.rs#L153",
+          "sha256": "3fff397700a206e1ff611e767d4b74f7c7b70f584a180ddbf44d4b36d65647c3"
         }
       ],
       "required_outcome": "Close multi-blend corners on general curved supports with valid contact and continuity, independent of patch construction method."
@@ -2088,9 +2128,9 @@
           "path": "truck-shapeops/src/fillet/modeling.rs",
           "find": "Sizes that remove an original face",
           "role": "implementation",
-          "line": 233,
-          "url": "../../truck-shapeops/src/fillet/modeling.rs#L233",
-          "sha256": "92ebc4074ab386e0773596cc2863b3a32be2536d06f5bc23a43549e7a54899dd"
+          "line": 261,
+          "url": "../../truck-shapeops/src/fillet/modeling.rs#L261",
+          "sha256": "3fff397700a206e1ff611e767d4b74f7c7b70f584a180ddbf44d4b36d65647c3"
         },
         {
           "repo": "truck",
@@ -2130,9 +2170,9 @@
           "path": "truck-shapeops/src/fillet/modeling.rs",
           "find": "an unselected edge, or a bevel contact",
           "role": "implementation",
-          "line": 233,
-          "url": "../../truck-shapeops/src/fillet/modeling.rs#L233",
-          "sha256": "92ebc4074ab386e0773596cc2863b3a32be2536d06f5bc23a43549e7a54899dd"
+          "line": 261,
+          "url": "../../truck-shapeops/src/fillet/modeling.rs#L261",
+          "sha256": "3fff397700a206e1ff611e767d4b74f7c7b70f584a180ddbf44d4b36d65647c3"
         },
         {
           "repo": "truck",
@@ -2173,9 +2213,9 @@
           "path": "truck-geometry/src/decorators/af_surface.rs",
           "find": "fn regular_contact",
           "role": "implementation",
-          "line": 550,
-          "url": "../../truck-geometry/src/decorators/af_surface.rs#L550",
-          "sha256": "9cc3fb7ca2f07d749afd7455d9f82896b154096e5d70dc9d230b99ee56013f12"
+          "line": 569,
+          "url": "../../truck-geometry/src/decorators/af_surface.rs#L569",
+          "sha256": "b7000bb75958bb519c20413dba31c22cb9f15faec8915867bf8a8bd229528596"
         },
         {
           "repo": "truck",
@@ -2199,7 +2239,7 @@
         "fillet"
       ],
       "occt_scope": "Walking uses domains, restrictions and endpoint intersections; boundary crossing has limitations.",
-      "truck_scope": "Some neighboring patch traversal works; planar contacts approaching holes are rejected. Dense trim loops use conservative projected segment bounds and cached point projection while retaining the sampled contact and clearance predicates.",
+      "truck_scope": "Some neighboring patch traversal works; planar contacts approaching holes are rejected. Dense trim loops use conservative projected segment bounds and cached point projection while retaining the sampled contact and clearance predicates. Q4 now continues contacts across a planar outer trim onto a tangent curved support and reconnects the resulting face loops; continued contacts are checked against periodic trimmed domains and holes.",
       "next_case": "Put a hole or split trim boundary directly in the contact path, varying clearance across tolerance.",
       "evidence": [
         {
@@ -2216,9 +2256,9 @@
           "path": "truck-shapeops/src/fillet/modeling.rs",
           "find": "avoid holes within twice",
           "role": "implementation",
-          "line": 126,
-          "url": "../../truck-shapeops/src/fillet/modeling.rs#L126",
-          "sha256": "92ebc4074ab386e0773596cc2863b3a32be2536d06f5bc23a43549e7a54899dd"
+          "line": 154,
+          "url": "../../truck-shapeops/src/fillet/modeling.rs#L154",
+          "sha256": "3fff397700a206e1ff611e767d4b74f7c7b70f584a180ddbf44d4b36d65647c3"
         },
         {
           "repo": "truck",
@@ -2236,7 +2276,7 @@
           "role": "implementation",
           "line": 12,
           "url": "../../truck-shapeops/src/fillet/planar.rs#L12",
-          "sha256": "74e92e77381cfce876a84c00d00cc170341730e94ba0b20bb5b09827fe5e973b"
+          "sha256": "050a124d00899b7e43df36edd9c84cf9ea7fa6305c9a93124df791de791fccd6"
         },
         {
           "repo": "truck",
@@ -2255,11 +2295,49 @@
           "line": 97,
           "url": "../../truck-shapeops/src/fillet/planar/tests.rs#L97",
           "sha256": "21448b125bfe843008d846765db414bafa184fcc86320220cc9346ae0fc13914"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/rounded_roof_post.rs",
+          "find": "fn post_fillet_continues_across",
+          "role": "test",
+          "line": 56,
+          "url": "../../truck-shapeops/tests/rounded_roof_post.rs#L56",
+          "sha256": "a00dac3593a6e117cd020e1d467726b9808685355a5eb7ae797ec04bb067cef2"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-12-roof-contact-guard/REPORT.md",
+          "find": "# Planar trim",
+          "role": "test",
+          "line": 1,
+          "url": "../../truck-benchmarks/results/2026-10-12-roof-contact-guard/REPORT.md#L1",
+          "sha256": "669f797ef06affac3739958d2e7624edc1137dbef6e479965cd95fd54a7d8058"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/continued_support.rs",
+          "find": "pub(super) fn fillet",
+          "role": "implementation",
+          "line": 88,
+          "url": "../../truck-shapeops/src/fillet/continued_support.rs#L88",
+          "sha256": "c344c88d3dc6cb4ad353688c1f2c79cef30fe6cf30cde0e576efd86303173600"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-12-roof-support-continuation/REPORT.md",
+          "find": "# Closed-wire continuation",
+          "role": "test",
+          "line": 1,
+          "url": "../../truck-benchmarks/results/2026-10-12-roof-support-continuation/REPORT.md#L1",
+          "sha256": "0dc2c315280b321f9e2d4a24f635649ec855c3f096061443863274a706837d9c"
         }
       ],
       "required_outcome": "Handle blend contacts that reach trim boundaries or holes, producing the intended material boundary or an accurate geometric rejection.",
       "verification": [
-        "The accelerated validator agrees with the retained exhaustive predicates on short/dense, concave/crossing/repeated-point loops, near-tolerance contacts, rotated inputs and all qualifying pairs in deterministic spatial fixtures. The existing trim sampling and hole clearance remain unchanged. This improves dense-loop latency; it does not add support for a blend crossing through a hole."
+        "The accelerated validator agrees with the retained exhaustive predicates on short/dense, concave/crossing/repeated-point loops, near-tolerance contacts, rotated inputs and all qualifying pairs in deterministic spatial fixtures. The existing trim sampling and hole clearance remain unchanged. This improves dense-loop latency; it does not add support for a blend crossing through a hole.",
+        "At 67cf761f, captured Q4 operation 2 no longer returns an invalid success: intersecting planar contact loops fail with OutsideNeighbour at validate_trims, preserving the input. Native OCCT rolls the ball onto the existing cylindrical roof and adds two BSpline transition patches; that construction remains missing. The imported input passes independent volume and closed-mesh checks, and a smaller radius-0.2 fillet passes solid and STEP checks. Full shapeops: 328 passed, zero failed, one existing ignored; Clippy and action smoke pass. Evidence: truck-benchmarks/results/2026-10-12-roof-contact-guard/REPORT.md. This targeted replay postdates the 012ace79 full capture and does not change its historical counts.",
+        "At 11fea9e8, Q4 operation 2 now succeeds through closed-wire continuation from the flat roof onto its tangent cylindrical neighbor. The regression replaces the intermediate rejection with a stronger successful-solid contract: independently integrated volume, contact radius/normals, input preservation, closed meshes and STEP at scales 0.25/1/10 with transforms/reversal. A periodic trim/hole unit prevents contacts leaving the new support. Targeted native comparison yields one valid solid, Truck STEP volume 149.08379605764409 versus native 149.08377356777387, and bidirectional sampled distances below 0.00033. Full shapeops: 329 passed, zero failed, one existing ignored; Clippy and action smoke pass. Construction median 3.815339 ms, STEP 189.600051 ms; the parent rejects. Open-wire propagation, multiple neighboring supports within one original edge, holes and global collisions remain outside the new verified scope. Evidence: truck-benchmarks/results/2026-10-12-roof-support-continuation/REPORT.md. Historical 012ace79 full-capture counts are unchanged until a fresh corpus replay is recorded."
       ]
     },
     {
@@ -2290,7 +2368,7 @@
           "role": "implementation",
           "line": 38,
           "url": "../../truck-shapeops/src/fillet/mod.rs#L38",
-          "sha256": "8ddac57620b53a6debda8c586608610a6ac33d17bfeb1a125e90a1854f122bec"
+          "sha256": "450f6900c48c620b68938520425120f63b26e937aeb371cab2512a2b35e096a7"
         }
       ],
       "required_outcome": "Detect or resolve collisions with distant faces and cavities so a successful blend cannot silently leave an invalid or self-intersecting body."
@@ -2321,9 +2399,9 @@
           "path": "truck-geometry/src/decorators/rbf_surface/contact_circle.rs",
           "find": "fn next_point",
           "role": "implementation",
-          "line": 149,
-          "url": "../../truck-geometry/src/decorators/rbf_surface/contact_circle.rs#L149",
-          "sha256": "3e3ffdb3c3ae722b94291368303773c66e901496b1fe6aa0d6c1fc49c3b51bf0"
+          "line": 181,
+          "url": "../../truck-geometry/src/decorators/rbf_surface/contact_circle.rs#L181",
+          "sha256": "31f424bf6e19192d601e9e4dee59ac8cfad12fdcb42f5768ba52506fb5958f51"
         },
         {
           "repo": "truck",
@@ -2332,34 +2410,34 @@
           "role": "implementation",
           "line": 379,
           "url": "../../truck-shapeops/src/fillet/along_wire.rs#L379",
-          "sha256": "1e45bbb0212009ae420958c5138ba6b27d1696189eb770895e8293a820c4fcd6"
+          "sha256": "3a7ff55927dc93f6272814080428ec0184a746a54a9f9ba8b4f1e31463a96844"
         },
         {
           "repo": "truck",
           "path": "truck-shapeops/src/fillet/along_wire.rs",
           "find": "fn contact_intersections_stay_inside_trimmed_domains",
           "role": "test",
-          "line": 989,
-          "url": "../../truck-shapeops/src/fillet/along_wire.rs#L989",
-          "sha256": "1e45bbb0212009ae420958c5138ba6b27d1696189eb770895e8293a820c4fcd6"
+          "line": 1013,
+          "url": "../../truck-shapeops/src/fillet/along_wire.rs#L1013",
+          "sha256": "3a7ff55927dc93f6272814080428ec0184a746a54a9f9ba8b4f1e31463a96844"
         },
         {
           "repo": "truck",
           "path": "truck-shapeops/src/fillet/along_wire.rs",
           "find": "fn contact_intersections_reseed_parallel_endpoint_tangents",
           "role": "test",
-          "line": 1004,
-          "url": "../../truck-shapeops/src/fillet/along_wire.rs#L1004",
-          "sha256": "1e45bbb0212009ae420958c5138ba6b27d1696189eb770895e8293a820c4fcd6"
+          "line": 1028,
+          "url": "../../truck-shapeops/src/fillet/along_wire.rs#L1028",
+          "sha256": "3a7ff55927dc93f6272814080428ec0184a746a54a9f9ba8b4f1e31463a96844"
         },
         {
           "repo": "truck",
           "path": "truck-shapeops/src/fillet/along_wire.rs",
           "find": "fn contact_intersections_reject_disjoint_curves_and_invalid_hints",
           "role": "test",
-          "line": 1013,
-          "url": "../../truck-shapeops/src/fillet/along_wire.rs#L1013",
-          "sha256": "1e45bbb0212009ae420958c5138ba6b27d1696189eb770895e8293a820c4fcd6"
+          "line": 1037,
+          "url": "../../truck-shapeops/src/fillet/along_wire.rs#L1037",
+          "sha256": "3a7ff55927dc93f6272814080428ec0184a746a54a9f9ba8b4f1e31463a96844"
         },
         {
           "repo": "truck",
@@ -2423,9 +2501,9 @@
           "path": "truck-geometry/src/decorators/af_surface.rs",
           "find": "fn adaptive_contact_failure_is_propagated",
           "role": "test",
-          "line": 750,
-          "url": "../../truck-geometry/src/decorators/af_surface.rs#L750",
-          "sha256": "9cc3fb7ca2f07d749afd7455d9f82896b154096e5d70dc9d230b99ee56013f12"
+          "line": 769,
+          "url": "../../truck-geometry/src/decorators/af_surface.rs#L769",
+          "sha256": "b7000bb75958bb519c20413dba31c22cb9f15faec8915867bf8a8bd229528596"
         },
         {
           "repo": "truck",
@@ -2518,7 +2596,7 @@
           "role": "implementation",
           "line": 39,
           "url": "../../truck-shapeops/src/fillet/modeling.rs#L39",
-          "sha256": "92ebc4074ab386e0773596cc2863b3a32be2536d06f5bc23a43549e7a54899dd"
+          "sha256": "3fff397700a206e1ff611e767d4b74f7c7b70f584a180ddbf44d4b36d65647c3"
         },
         {
           "repo": "truck",
@@ -2534,9 +2612,9 @@
           "path": "truck-geometry/src/decorators/af_surface.rs",
           "find": "fn approximation_crosses_periodic_support_seams",
           "role": "test",
-          "line": 571,
-          "url": "../../truck-geometry/src/decorators/af_surface.rs#L571",
-          "sha256": "9cc3fb7ca2f07d749afd7455d9f82896b154096e5d70dc9d230b99ee56013f12"
+          "line": 590,
+          "url": "../../truck-geometry/src/decorators/af_surface.rs#L590",
+          "sha256": "b7000bb75958bb519c20413dba31c22cb9f15faec8915867bf8a8bd229528596"
         },
         {
           "repo": "truck",
@@ -3024,7 +3102,7 @@
           "role": "implementation",
           "line": 13,
           "url": "../../truck-shapeops/src/fillet/modeling.rs#L13",
-          "sha256": "92ebc4074ab386e0773596cc2863b3a32be2536d06f5bc23a43549e7a54899dd"
+          "sha256": "3fff397700a206e1ff611e767d4b74f7c7b70f584a180ddbf44d4b36d65647c3"
         },
         {
           "repo": "app",
@@ -3443,9 +3521,9 @@
           "path": "truck-shapeops/src/fillet/modeling.rs",
           "find": "map_err(|_| error)",
           "role": "implementation",
-          "line": 212,
-          "url": "../../truck-shapeops/src/fillet/modeling.rs#L212",
-          "sha256": "92ebc4074ab386e0773596cc2863b3a32be2536d06f5bc23a43549e7a54899dd"
+          "line": 240,
+          "url": "../../truck-shapeops/src/fillet/modeling.rs#L240",
+          "sha256": "3fff397700a206e1ff611e767d4b74f7c7b70f584a180ddbf44d4b36d65647c3"
         },
         {
           "repo": "truck",
@@ -3663,13 +3741,51 @@
           "line": 3,
           "url": "capture/2026-10-11-smooth-fillets/REPORT.md#L3",
           "sha256": "185ad60584253fcb03eb3e02d9b938c9423d89f4ad7cb29d46a3c8b758811ed3"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/rounded_roof_post.rs",
+          "find": "fn post_fillet_continues_across",
+          "role": "test",
+          "line": 56,
+          "url": "../../truck-shapeops/tests/rounded_roof_post.rs#L56",
+          "sha256": "a00dac3593a6e117cd020e1d467726b9808685355a5eb7ae797ec04bb067cef2"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-12-roof-contact-guard/REPORT.md",
+          "find": "# Planar trim",
+          "role": "test",
+          "line": 1,
+          "url": "../../truck-benchmarks/results/2026-10-12-roof-contact-guard/REPORT.md#L1",
+          "sha256": "669f797ef06affac3739958d2e7624edc1137dbef6e479965cd95fd54a7d8058"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/continued_support.rs",
+          "find": "pub(super) fn fillet",
+          "role": "implementation",
+          "line": 88,
+          "url": "../../truck-shapeops/src/fillet/continued_support.rs#L88",
+          "sha256": "c344c88d3dc6cb4ad353688c1f2c79cef30fe6cf30cde0e576efd86303173600"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-12-roof-support-continuation/REPORT.md",
+          "find": "# Closed-wire continuation",
+          "role": "test",
+          "line": 1,
+          "url": "../../truck-benchmarks/results/2026-10-12-roof-support-continuation/REPORT.md#L1",
+          "sha256": "0dc2c315280b321f9e2d4a24f635649ec855c3f096061443863274a706837d9c"
         }
       ],
       "required_outcome": "Fuse or cut bodies, then blend the intended resulting intersection edges while preserving the modeling intent through edits.",
       "verification": [
         "At b81cbedf, revolution sampling uses the actual radial distance and shared directional error budget. The native D4 spherical-sector input now meets the unchanged independent volume/closed-mesh check: error 134.3034 -> 28.0300, median mesh time 351.747 -> 1668.584 ms (4.74x). Pole search/Newton, smooth-pole curvature, mesh-scale bounded tangency refinement and ambiguous meridian-facet winding fixes preserve existing tangent sphere/bore, rounded-box STEP, thin-loft and periodic-seam tests. Full release: 865 passed, six existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy and action smoke pass. D4 fillet export still fails at an unsplit procedural derivative discontinuity; no full parity claim.",
         "At 012ace79, quartic contact interpolation keeps rolling-ball section frames C2 at internal interpolation knots on smooth supports. The captured D4 spherical-meridian fillet now prepares STEP at the unchanged tolerance and passes independent radius/normals, first/second derivative limits, volume, closed meshes, STEP round trips, rigid transforms and reversed selection. Parent interpolation produced trim position jumps exceeding twice the export tolerance; the exporter is unchanged. Construction median 20.006 -> 17.626 ms; STEP now succeeds in 134.153 ms. Full release: 852 passed, five existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy/action smoke pass.",
-        "Fresh full replay at clean 012ace79 passes all 156 native entries, with 70 constructed Truck outputs and zero panics. All 70 now prepare STEP, 69 produce native-valid single-solid STEP and 68 meet the combined limited checks; the sole improvement is D4, with sampled distances 5.78e-5/3.12e-5. Q4 capture 2 remains open/two-solid with discrepancy 1.20849; tolerance A1, G1 trim failure and I3/J9 timeouts remain. All full-parity verdicts stay unverified."
+        "Fresh full replay at clean 012ace79 passes all 156 native entries, with 70 constructed Truck outputs and zero panics. All 70 now prepare STEP, 69 produce native-valid single-solid STEP and 68 meet the combined limited checks; the sole improvement is D4, with sampled distances 5.78e-5/3.12e-5. Q4 capture 2 remains open/two-solid with discrepancy 1.20849; tolerance A1, G1 trim failure and I3/J9 timeouts remain. All full-parity verdicts stay unverified.",
+        "At 67cf761f, captured Q4 operation 2 no longer returns an invalid success: intersecting planar contact loops fail with OutsideNeighbour at validate_trims, preserving the input. Native OCCT rolls the ball onto the existing cylindrical roof and adds two BSpline transition patches; that construction remains missing. The imported input passes independent volume and closed-mesh checks, and a smaller radius-0.2 fillet passes solid and STEP checks. Full shapeops: 328 passed, zero failed, one existing ignored; Clippy and action smoke pass. Evidence: truck-benchmarks/results/2026-10-12-roof-contact-guard/REPORT.md. This targeted replay postdates the 012ace79 full capture and does not change its historical counts.",
+        "At 11fea9e8, Q4 operation 2 now succeeds through closed-wire continuation from the flat roof onto its tangent cylindrical neighbor. The regression replaces the intermediate rejection with a stronger successful-solid contract: independently integrated volume, contact radius/normals, input preservation, closed meshes and STEP at scales 0.25/1/10 with transforms/reversal. A periodic trim/hole unit prevents contacts leaving the new support. Targeted native comparison yields one valid solid, Truck STEP volume 149.08379605764409 versus native 149.08377356777387, and bidirectional sampled distances below 0.00033. Full shapeops: 329 passed, zero failed, one existing ignored; Clippy and action smoke pass. Construction median 3.815339 ms, STEP 189.600051 ms; the parent rejects. Open-wire propagation, multiple neighboring supports within one original edge, holes and global collisions remain outside the new verified scope. Evidence: truck-benchmarks/results/2026-10-12-roof-support-continuation/REPORT.md. Historical 012ace79 full-capture counts are unchanged until a fresh corpus replay is recorded."
       ]
     },
     {

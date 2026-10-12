@@ -76,10 +76,10 @@
     "composition": [
       "simultaneous vs sequential",
       "all selection orders",
-      "fillet→fillet",
-      "fillet→chamfer",
-      "chamfer→fillet",
-      "chamfer→chamfer",
+      "fillet\u2192fillet",
+      "fillet\u2192chamfer",
+      "chamfer\u2192fillet",
+      "chamfer\u2192chamfer",
       "Boolean-generated edges",
       "nearby hole/cavity"
     ]
@@ -1036,14 +1036,14 @@
     {
       "id": "T01",
       "title": "Tangent propagation across support changes",
-      "truck_status": "implemented-with-tests",
+      "truck_status": "partial",
       "priority": "P2",
       "tags": [
         "tangent"
       ],
       "occt_scope": "Contours propagate along tangent edges and tangent support series.",
-      "truck_scope": "Application propagation checks edge tangents and both face normals; the kernel accepts explicitly supplied chains.",
-      "next_case": "Vary tangency around the threshold and split one support into multiple patches.",
+      "truck_scope": "Application propagation checks edge tangents and both face normals; the kernel accepts explicitly supplied chains. Closed-wire contacts can now leave a planar outer boundary and continue onto one tangent adjacent support per original edge and side, with Q4 post/rounded-roof solid and STEP regression coverage. General open-wire and multi-neighbor support propagation remains incomplete.",
+      "next_case": "Extend support continuation to open contours and multiple neighboring supports within one original edge; vary tangent continuity and contact clearance around the threshold.",
       "evidence": [
         {
           "repo": "occt",
@@ -1062,9 +1062,37 @@
           "path": "truck-shapeops/tests/fillet_chain.rs",
           "find": "fn fillet_open_chain_around_rounded_corners",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/rounded_roof_post.rs",
+          "find": "fn post_fillet_continues_across",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-12-roof-contact-guard/REPORT.md",
+          "find": "# Planar trim",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/continued_support.rs",
+          "find": "pub(super) fn fillet",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-12-roof-support-continuation/REPORT.md",
+          "find": "# Closed-wire continuation",
+          "role": "test"
         }
       ],
-      "required_outcome": "Round or bevel a tangent chain continuously across edge splits and changes of support face."
+      "required_outcome": "Round or bevel a tangent chain continuously across edge splits and changes of support face.",
+      "verification": [
+        "At 67cf761f, captured Q4 operation 2 no longer returns an invalid success: intersecting planar contact loops fail with OutsideNeighbour at validate_trims, preserving the input. Native OCCT rolls the ball onto the existing cylindrical roof and adds two BSpline transition patches; that construction remains missing. The imported input passes independent volume and closed-mesh checks, and a smaller radius-0.2 fillet passes solid and STEP checks. Full shapeops: 328 passed, zero failed, one existing ignored; Clippy and action smoke pass. Evidence: truck-benchmarks/results/2026-10-12-roof-contact-guard/REPORT.md. This targeted replay postdates the 012ace79 full capture and does not change its historical counts.",
+        "At 11fea9e8, Q4 operation 2 now succeeds through closed-wire continuation from the flat roof onto its tangent cylindrical neighbor. The regression replaces the intermediate rejection with a stronger successful-solid contract: independently integrated volume, contact radius/normals, input preservation, closed meshes and STEP at scales 0.25/1/10 with transforms/reversal. A periodic trim/hole unit prevents contacts leaving the new support. Targeted native comparison yields one valid solid, Truck STEP volume 149.08379605764409 versus native 149.08377356777387, and bidirectional sampled distances below 0.00033. Full shapeops: 329 passed, zero failed, one existing ignored; Clippy and action smoke pass. Construction median 3.815339 ms, STEP 189.600051 ms; the parent rejects. Open-wire propagation, multiple neighboring supports within one original edge, holes and global collisions remain outside the new verified scope. Evidence: truck-benchmarks/results/2026-10-12-roof-support-continuation/REPORT.md. Historical 012ace79 full-capture counts are unchanged until a fresh corpus replay is recorded."
+      ]
     },
     {
       "id": "T02",
@@ -1637,7 +1665,7 @@
         "fillet"
       ],
       "occt_scope": "Walking uses domains, restrictions and endpoint intersections; boundary crossing has limitations.",
-      "truck_scope": "Some neighboring patch traversal works; planar contacts approaching holes are rejected. Dense trim loops use conservative projected segment bounds and cached point projection while retaining the sampled contact and clearance predicates.",
+      "truck_scope": "Some neighboring patch traversal works; planar contacts approaching holes are rejected. Dense trim loops use conservative projected segment bounds and cached point projection while retaining the sampled contact and clearance predicates. Q4 now continues contacts across a planar outer trim onto a tangent curved support and reconnects the resulting face loops; continued contacts are checked against periodic trimmed domains and holes.",
       "next_case": "Put a hole or split trim boundary directly in the contact path, varying clearance across tolerance.",
       "evidence": [
         {
@@ -1675,11 +1703,37 @@
           "path": "truck-shapeops/src/fillet/planar/tests.rs",
           "find": "fn bounds_retain_every_contact_pair",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/rounded_roof_post.rs",
+          "find": "fn post_fillet_continues_across",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-12-roof-contact-guard/REPORT.md",
+          "find": "# Planar trim",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/continued_support.rs",
+          "find": "pub(super) fn fillet",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-12-roof-support-continuation/REPORT.md",
+          "find": "# Closed-wire continuation",
+          "role": "test"
         }
       ],
       "required_outcome": "Handle blend contacts that reach trim boundaries or holes, producing the intended material boundary or an accurate geometric rejection.",
       "verification": [
-        "The accelerated validator agrees with the retained exhaustive predicates on short/dense, concave/crossing/repeated-point loops, near-tolerance contacts, rotated inputs and all qualifying pairs in deterministic spatial fixtures. The existing trim sampling and hole clearance remain unchanged. This improves dense-loop latency; it does not add support for a blend crossing through a hole."
+        "The accelerated validator agrees with the retained exhaustive predicates on short/dense, concave/crossing/repeated-point loops, near-tolerance contacts, rotated inputs and all qualifying pairs in deterministic spatial fixtures. The existing trim sampling and hole clearance remain unchanged. This improves dense-loop latency; it does not add support for a blend crossing through a hole.",
+        "At 67cf761f, captured Q4 operation 2 no longer returns an invalid success: intersecting planar contact loops fail with OutsideNeighbour at validate_trims, preserving the input. Native OCCT rolls the ball onto the existing cylindrical roof and adds two BSpline transition patches; that construction remains missing. The imported input passes independent volume and closed-mesh checks, and a smaller radius-0.2 fillet passes solid and STEP checks. Full shapeops: 328 passed, zero failed, one existing ignored; Clippy and action smoke pass. Evidence: truck-benchmarks/results/2026-10-12-roof-contact-guard/REPORT.md. This targeted replay postdates the 012ace79 full capture and does not change its historical counts.",
+        "At 11fea9e8, Q4 operation 2 now succeeds through closed-wire continuation from the flat roof onto its tangent cylindrical neighbor. The regression replaces the intermediate rejection with a stronger successful-solid contract: independently integrated volume, contact radius/normals, input preservation, closed meshes and STEP at scales 0.25/1/10 with transforms/reversal. A periodic trim/hole unit prevents contacts leaving the new support. Targeted native comparison yields one valid solid, Truck STEP volume 149.08379605764409 versus native 149.08377356777387, and bidirectional sampled distances below 0.00033. Full shapeops: 329 passed, zero failed, one existing ignored; Clippy and action smoke pass. Construction median 3.815339 ms, STEP 189.600051 ms; the parent rejects. Open-wire propagation, multiple neighboring supports within one original edge, holes and global collisions remain outside the new verified scope. Evidence: truck-benchmarks/results/2026-10-12-roof-support-continuation/REPORT.md. Historical 012ace79 full-capture counts are unchanged until a fresh corpus replay is recorded."
       ]
     },
     {
@@ -2081,7 +2135,7 @@
       ],
       "occt_scope": "Dedicated sequential chamfer grids and composition regressions.",
       "truck_scope": "Many feature orders are tested. Sequential single-edge rounds now form equal-radius miters for analytic, B-spline and weighted NURBS edges. Equal-radius rolling continuations around an earlier round still collapse a contact and need a different corner construction; general topology transitions remain limited.",
-      "next_case": "Fillet→fillet, fillet→chamfer, chamfer→fillet and chamfer→chamfer with nearby and intersecting selections.",
+      "next_case": "Fillet\u2192fillet, fillet\u2192chamfer, chamfer\u2192fillet and chamfer\u2192chamfer with nearby and intersecting selections.",
       "evidence": [
         {
           "repo": "occt",
@@ -2714,13 +2768,39 @@
           "path": "audits/fillet-chamfer/capture/2026-10-11-smooth-fillets/REPORT.md",
           "find": "The full run",
           "role": "executed-capture"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/rounded_roof_post.rs",
+          "find": "fn post_fillet_continues_across",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-12-roof-contact-guard/REPORT.md",
+          "find": "# Planar trim",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/continued_support.rs",
+          "find": "pub(super) fn fillet",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-12-roof-support-continuation/REPORT.md",
+          "find": "# Closed-wire continuation",
+          "role": "test"
         }
       ],
       "required_outcome": "Fuse or cut bodies, then blend the intended resulting intersection edges while preserving the modeling intent through edits.",
       "verification": [
         "At b81cbedf, revolution sampling uses the actual radial distance and shared directional error budget. The native D4 spherical-sector input now meets the unchanged independent volume/closed-mesh check: error 134.3034 -> 28.0300, median mesh time 351.747 -> 1668.584 ms (4.74x). Pole search/Newton, smooth-pole curvature, mesh-scale bounded tangency refinement and ambiguous meridian-facet winding fixes preserve existing tangent sphere/bore, rounded-box STEP, thin-loft and periodic-seam tests. Full release: 865 passed, six existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy and action smoke pass. D4 fillet export still fails at an unsplit procedural derivative discontinuity; no full parity claim.",
         "At 012ace79, quartic contact interpolation keeps rolling-ball section frames C2 at internal interpolation knots on smooth supports. The captured D4 spherical-meridian fillet now prepares STEP at the unchanged tolerance and passes independent radius/normals, first/second derivative limits, volume, closed meshes, STEP round trips, rigid transforms and reversed selection. Parent interpolation produced trim position jumps exceeding twice the export tolerance; the exporter is unchanged. Construction median 20.006 -> 17.626 ms; STEP now succeeds in 134.153 ms. Full release: 852 passed, five existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy/action smoke pass.",
-        "Fresh full replay at clean 012ace79 passes all 156 native entries, with 70 constructed Truck outputs and zero panics. All 70 now prepare STEP, 69 produce native-valid single-solid STEP and 68 meet the combined limited checks; the sole improvement is D4, with sampled distances 5.78e-5/3.12e-5. Q4 capture 2 remains open/two-solid with discrepancy 1.20849; tolerance A1, G1 trim failure and I3/J9 timeouts remain. All full-parity verdicts stay unverified."
+        "Fresh full replay at clean 012ace79 passes all 156 native entries, with 70 constructed Truck outputs and zero panics. All 70 now prepare STEP, 69 produce native-valid single-solid STEP and 68 meet the combined limited checks; the sole improvement is D4, with sampled distances 5.78e-5/3.12e-5. Q4 capture 2 remains open/two-solid with discrepancy 1.20849; tolerance A1, G1 trim failure and I3/J9 timeouts remain. All full-parity verdicts stay unverified.",
+        "At 67cf761f, captured Q4 operation 2 no longer returns an invalid success: intersecting planar contact loops fail with OutsideNeighbour at validate_trims, preserving the input. Native OCCT rolls the ball onto the existing cylindrical roof and adds two BSpline transition patches; that construction remains missing. The imported input passes independent volume and closed-mesh checks, and a smaller radius-0.2 fillet passes solid and STEP checks. Full shapeops: 328 passed, zero failed, one existing ignored; Clippy and action smoke pass. Evidence: truck-benchmarks/results/2026-10-12-roof-contact-guard/REPORT.md. This targeted replay postdates the 012ace79 full capture and does not change its historical counts.",
+        "At 11fea9e8, Q4 operation 2 now succeeds through closed-wire continuation from the flat roof onto its tangent cylindrical neighbor. The regression replaces the intermediate rejection with a stronger successful-solid contract: independently integrated volume, contact radius/normals, input preservation, closed meshes and STEP at scales 0.25/1/10 with transforms/reversal. A periodic trim/hole unit prevents contacts leaving the new support. Targeted native comparison yields one valid solid, Truck STEP volume 149.08379605764409 versus native 149.08377356777387, and bidirectional sampled distances below 0.00033. Full shapeops: 329 passed, zero failed, one existing ignored; Clippy and action smoke pass. Construction median 3.815339 ms, STEP 189.600051 ms; the parent rejects. Open-wire propagation, multiple neighboring supports within one original edge, holes and global collisions remain outside the new verified scope. Evidence: truck-benchmarks/results/2026-10-12-roof-support-continuation/REPORT.md. Historical 012ace79 full-capture counts are unchanged until a fresh corpus replay is recorded."
       ]
     },
     {
