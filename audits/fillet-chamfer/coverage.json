@@ -643,7 +643,7 @@
         "freeform"
       ],
       "occt_scope": "Generic numerical construction extends beyond analytic special cases.",
-      "truck_scope": "Plane/sphere circular rims now have independent validation for both meridian slopes, exterior/cavity orientation, exact Sphere/revolved-circle/NURBS representations, rigid transforms, reversed wires, G1, radius, volume, closed mesh, history and STEP. General cylinder/cylinder, toroidal and freeform support intersections remain unverified. Constant-radius plane/NURBS spline-pipe rims now also have independent contact, volume and STEP checks at two radii, with scaling and reversal.",
+      "truck_scope": "Plane/sphere circular rims now have independent validation for both meridian slopes, exterior/cavity orientation, exact Sphere/revolved-circle/NURBS representations, rigid transforms, reversed wires, G1, radius, volume, closed mesh, history and STEP. General cylinder/cylinder, toroidal and freeform support intersections remain unverified. Constant-radius plane/NURBS spline-pipe rims now also have independent contact, volume and STEP checks at two radii, with scaling and reversal. Open spherical-meridian fillets ending at a parameter pole now have original-scale, transformed/reversed, radius/normal, independent-volume and STEP regressions.",
       "next_case": "Torus/plane rims and non-coaxial cylinder intersections, followed by arbitrary spline-support pairs and contact collapse.",
       "evidence": [
         {
@@ -747,6 +747,18 @@
           "path": "audits/fillet-chamfer/capture/2026-10-12-spline-rim/REPORT.md",
           "find": "# Captured replay after closed spline-rim continuation",
           "role": "verification"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-12-spherical-pole/REPORT.md",
+          "find": "# Spherical-pole fillets and local STEP fitting",
+          "role": "regression-validation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/spherical_pole_blend.rs",
+          "find": "fn original_scale_spherical_pole_fillet_preserves_step_accuracy",
+          "role": "test"
         }
       ],
       "required_outcome": "Blend intersections between curved supports, including cylinders, cones, spheres, tori and spline surfaces, with valid contacts and trimmed output.",
@@ -759,7 +771,8 @@
         "At 012ace79, quartic contact interpolation keeps rolling-ball section frames C2 at internal interpolation knots on smooth supports. The captured D4 spherical-meridian fillet now prepares STEP at the unchanged tolerance and passes independent radius/normals, first/second derivative limits, volume, closed meshes, STEP round trips, rigid transforms and reversed selection. Parent interpolation produced trim position jumps exceeding twice the export tolerance; the exporter is unchanged. Construction median 20.006 -> 17.626 ms; STEP now succeeds in 134.153 ms. Full release: 852 passed, five existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy/action smoke pass.",
         "Fresh full replay at clean 012ace79 passes all 156 native entries, with 70 constructed Truck outputs and zero panics. All 70 now prepare STEP, 69 produce native-valid single-solid STEP and 68 meet the combined limited checks; the sole improvement is D4, with sampled distances 5.78e-5/3.12e-5. Q4 capture 2 remains open/two-solid with discrepancy 1.20849; tolerance A1, G1 trim failure and I3/J9 timeouts remain. All full-parity verdicts stay unverified.",
         "Closed spline-pipe rim regressions now cover displaced longitudinal contact seams, two constant radii, rigid transformation, scale 0.01, reversed wire and unequal rim parameter spans. Contact fitting follows one UV branch across closed NURBS seams without treating support parameter bounds as face trims. Both end-to-end tests fail on parent 4a156c4f; they check radius/normals, independent volume, topology/mesh closure, STEP and immutable input. This is targeted capability evidence, supplemented by the subsequent clean 99c9d487 native capture. See truck-benchmarks/results/2026-10-12-spline-rim-continuation/REPORT.md.",
-        "Clean full capture at 99c9d487 (kernel f7f8f4f5) passes all 156 native entries. J9 is the sole construction-status change: it now succeeds, with maximum sampled distances 9.41989e-5/1.09879e-4. All 73 constructed outputs preserve input and geometry, close their meshes and yield native-valid single-solid STEP; 71 meet the combined limited comparisons. The 31 construction failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents, one incomplete capture, G1 and tolerance-grid A1 discrepancies remain. No panic, timeout or full-parity verdict. See capture/2026-10-12-spline-rim/REPORT.md."
+        "Clean full capture at 99c9d487 (kernel f7f8f4f5) passes all 156 native entries. J9 is the sole construction-status change: it now succeeds, with maximum sampled distances 9.41989e-5/1.09879e-4. All 73 constructed outputs preserve input and geometry, close their meshes and yield native-valid single-solid STEP; 71 meet the combined limited comparisons. The 31 construction failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents, one incomplete capture, G1 and tolerance-grid A1 discrepancies remain. No panic, timeout or full-parity verdict. See capture/2026-10-12-spline-rim/REPORT.md.",
+        "At 6db16d09, spherical-meridian fillets with open polar guide endpoints seed regular offset contacts and continue one parameter branch. Singular projected-revolution seeds are replaced by regular samples, restoring the original input mesh. STEP fitting refines local source spans at the unchanged tolerance and 193-control budget. Three parent-failing solid regressions cover scales 0.02/0.04/1, rigid motion, reversed selection, radius/normals, independent volume, closed meshes, STEP and immutable inputs; separate regressions cover signed contacts, near-pole projection and concentrated export error. Five-crate release: 879 passed, one unchanged PCurve property failure, five existing ignored; final affected shapeops rerun: 338 passed, one existing ignored. Clippy/action smoke pass. Successful E3 construction medians are 87.590/88.837 ms and STEP 126.797/126.638 ms at one/four workers; cylinder and spline controls retain their geometry and prior timing range. A clean full native replay is pending; these regressions do not establish general polar or feature parity."
       ]
     },
     {
@@ -1083,6 +1096,18 @@
           "path": "audits/fillet-chamfer/capture/2026-10-12-spline-rim/REPORT.md",
           "find": "# Captured replay after closed spline-rim continuation",
           "role": "verification"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-12-spherical-pole/REPORT.md",
+          "find": "# Spherical-pole fillets and local STEP fitting",
+          "role": "regression-validation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/spherical_pole_blend.rs",
+          "find": "fn original_scale_spherical_pole_fillet_preserves_step_accuracy",
+          "role": "test"
         }
       ],
       "required_outcome": "Blend along open and closed curved edges, including spline inflections and high curvature, with valid closure and contacts.",
@@ -1090,7 +1115,8 @@
         "A fresh full capture at clean 4c764bef passes all 156 native entries and constructs 64 of 161 Truck operation captures, versus baseline 45. All 64 have consistent geometry, immutable inputs and closed meshes; 63 export valid single-solid STEP and 62 also meet the 0.001 bidirectional sampled boundary limit. A9, D2 and F8 now succeed; I1 mesh closure is resolved in this fixture. D4 still fails STEP preparation, tolerance-grid A1 differs by about 0.02238, I3/J9 time out, and Z1 still panics during preprocessing in this snapshot. Thirty-one imports fail, 23 inputs are inconsistent, 31 operations fail, eight intents are unhandled and one capture is incomplete. All full-parity verdicts remain unverified.",
         "At 4c764bef, physical-selection matching checks complete candidate polyline chords against the captured curve tube. Two parent-failing regressions prevent endpoint-only and shared-midpoint false matches. Captured G1 now selects its intended single parabolic edge and fails during face trimming; F9 selects two adjacent nontangent edges and G2 selects three mixed edges, with both tasks still unsupported by the attempted solid routes. No API matching is required; these are physical task failures.",
         "Closed spline-pipe rim regressions now cover displaced longitudinal contact seams, two constant radii, rigid transformation, scale 0.01, reversed wire and unequal rim parameter spans. Contact fitting follows one UV branch across closed NURBS seams without treating support parameter bounds as face trims. Both end-to-end tests fail on parent 4a156c4f; they check radius/normals, independent volume, topology/mesh closure, STEP and immutable input. This is targeted capability evidence, supplemented by the subsequent clean 99c9d487 native capture. See truck-benchmarks/results/2026-10-12-spline-rim-continuation/REPORT.md.",
-        "Clean full capture at 99c9d487 (kernel f7f8f4f5) passes all 156 native entries. J9 is the sole construction-status change: it now succeeds, with maximum sampled distances 9.41989e-5/1.09879e-4. All 73 constructed outputs preserve input and geometry, close their meshes and yield native-valid single-solid STEP; 71 meet the combined limited comparisons. The 31 construction failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents, one incomplete capture, G1 and tolerance-grid A1 discrepancies remain. No panic, timeout or full-parity verdict. See capture/2026-10-12-spline-rim/REPORT.md."
+        "Clean full capture at 99c9d487 (kernel f7f8f4f5) passes all 156 native entries. J9 is the sole construction-status change: it now succeeds, with maximum sampled distances 9.41989e-5/1.09879e-4. All 73 constructed outputs preserve input and geometry, close their meshes and yield native-valid single-solid STEP; 71 meet the combined limited comparisons. The 31 construction failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents, one incomplete capture, G1 and tolerance-grid A1 discrepancies remain. No panic, timeout or full-parity verdict. See capture/2026-10-12-spline-rim/REPORT.md.",
+        "At 6db16d09, spherical-meridian fillets with open polar guide endpoints seed regular offset contacts and continue one parameter branch. Singular projected-revolution seeds are replaced by regular samples, restoring the original input mesh. STEP fitting refines local source spans at the unchanged tolerance and 193-control budget. Three parent-failing solid regressions cover scales 0.02/0.04/1, rigid motion, reversed selection, radius/normals, independent volume, closed meshes, STEP and immutable inputs; separate regressions cover signed contacts, near-pole projection and concentrated export error. Five-crate release: 879 passed, one unchanged PCurve property failure, five existing ignored; final affected shapeops rerun: 338 passed, one existing ignored. Clippy/action smoke pass. Successful E3 construction medians are 87.590/88.837 ms and STEP 126.797/126.638 ms at one/four workers; cylinder and spline controls retain their geometry and prior timing range. A clean full native replay is pending; these regressions do not establish general polar or feature parity."
       ]
     },
     {
@@ -1907,7 +1933,7 @@
         "fillet"
       ],
       "occt_scope": "Start-solution failure is distinct from walking failure.",
-      "truck_scope": "Contact solvers have guards and diagnostics. Along-wire contact trimming now constrains Newton evaluations to both curve domains, damps nonconvergent steps and retries a sampled seed when endpoint tangents are parallel. Competing branches across general supports remain unverified.",
+      "truck_scope": "Contact solvers have guards and diagnostics. Along-wire contact trimming now constrains Newton evaluations to both curve domains, damps nonconvergent steps and retries a sampled seed when endpoint tangents are parallel. Competing branches across general supports remain unverified. Open polar guide endpoints now use regular offset-contact seeds and contact continuation; revolution point searches avoid undefined projected derivatives at pole seeds.",
       "next_case": "Multiple possible contact branches, tangent end contacts and seeds near a singularity.",
       "evidence": [
         {
@@ -1975,6 +2001,18 @@
           "path": "truck-benchmarks/results/2026-10-12-circle-center/REPORT.md",
           "find": "# Stable circle centers",
           "role": "replay-report"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-12-spherical-pole/REPORT.md",
+          "find": "# Spherical-pole fillets and local STEP fitting",
+          "role": "regression-validation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/spherical_pole_blend.rs",
+          "find": "fn original_scale_spherical_pole_fillet_preserves_step_accuracy",
+          "role": "test"
         }
       ],
       "required_outcome": "Find the intended valid contact solution near singularities and competing branches without unstable branch jumps or false failures.",
@@ -1982,7 +2020,8 @@
         "At b81cbedf, revolution sampling uses the actual radial distance and shared directional error budget. The native D4 spherical-sector input now meets the unchanged independent volume/closed-mesh check: error 134.3034 -> 28.0300, median mesh time 351.747 -> 1668.584 ms (4.74x). Pole search/Newton, smooth-pole curvature, mesh-scale bounded tangency refinement and ambiguous meridian-facet winding fixes preserve existing tangent sphere/bore, rounded-box STEP, thin-loft and periodic-seam tests. Full release: 865 passed, six existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy and action smoke pass. D4 fillet export still fails at an unsplit procedural derivative discontinuity; no full parity claim.",
         "At 012ace79, quartic contact interpolation keeps rolling-ball section frames C2 at internal interpolation knots on smooth supports. The captured D4 spherical-meridian fillet now prepares STEP at the unchanged tolerance and passes independent radius/normals, first/second derivative limits, volume, closed meshes, STEP round trips, rigid transforms and reversed selection. Parent interpolation produced trim position jumps exceeding twice the export tolerance; the exporter is unchanged. Construction median 20.006 -> 17.626 ms; STEP now succeeds in 134.153 ms. Full release: 852 passed, five existing ignored, one unchanged PCurve property failure reproduced on parent; Clippy/action smoke pass.",
         "Fresh full replay at clean 012ace79 passes all 156 native entries, with 70 constructed Truck outputs and zero panics. All 70 now prepare STEP, 69 produce native-valid single-solid STEP and 68 meet the combined limited checks; the sole improvement is D4, with sampled distances 5.78e-5/3.12e-5. Q4 capture 2 remains open/two-solid with discrepancy 1.20849; tolerance A1, G1 trim failure and I3/J9 timeouts remain. All full-parity verdicts stay unverified.",
-        "Three-point circle centers now use a cross-product form that avoids cancellation when a station is close to an arc endpoint. The deterministic regression fails on 49ddd2fb and checks all six point orders; the existing saved circular-arc property failure also passes unchanged. Full release: 870 passed, one unchanged PCurve derivative property failure, five existing ignored; Clippy/action smoke pass. This is a supporting numerical fix, not another captured blend success. See truck-benchmarks/results/2026-10-12-circle-center/REPORT.md."
+        "Three-point circle centers now use a cross-product form that avoids cancellation when a station is close to an arc endpoint. The deterministic regression fails on 49ddd2fb and checks all six point orders; the existing saved circular-arc property failure also passes unchanged. Full release: 870 passed, one unchanged PCurve derivative property failure, five existing ignored; Clippy/action smoke pass. This is a supporting numerical fix, not another captured blend success. See truck-benchmarks/results/2026-10-12-circle-center/REPORT.md.",
+        "At 6db16d09, spherical-meridian fillets with open polar guide endpoints seed regular offset contacts and continue one parameter branch. Singular projected-revolution seeds are replaced by regular samples, restoring the original input mesh. STEP fitting refines local source spans at the unchanged tolerance and 193-control budget. Three parent-failing solid regressions cover scales 0.02/0.04/1, rigid motion, reversed selection, radius/normals, independent volume, closed meshes, STEP and immutable inputs; separate regressions cover signed contacts, near-pole projection and concentrated export error. Five-crate release: 879 passed, one unchanged PCurve property failure, five existing ignored; final affected shapeops rerun: 338 passed, one existing ignored. Clippy/action smoke pass. Successful E3 construction medians are 87.590/88.837 ms and STEP 126.797/126.638 ms at one/four workers; cylinder and spline controls retain their geometry and prior timing range. A clean full native replay is pending; these regressions do not establish general polar or feature parity."
       ]
     },
     {
@@ -1995,7 +2034,7 @@
         "tolerance"
       ],
       "occt_scope": "Walking controls steps/deflection and approximation tolerances.",
-      "truck_scope": "Adaptive contact sampling and fitting exist; failed inserted samples propagate.",
+      "truck_scope": "Adaptive contact sampling and fitting exist; failed inserted samples propagate. Procedural STEP surface fitting now locally refines concentrated error while retaining source breaks, export tolerance and the existing control budget.",
       "next_case": "High-curvature spike between initial samples, long/short edge ratios and tight tolerance.",
       "evidence": [
         {
@@ -2069,6 +2108,12 @@
           "path": "audits/fillet-chamfer/capture/2026-10-12-exact-joins/REPORT.md",
           "find": "The full run",
           "role": "executed-capture"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-12-spherical-pole/REPORT.md",
+          "find": "# Spherical-pole fillets and local STEP fitting",
+          "role": "regression-validation"
         }
       ],
       "required_outcome": "Maintain requested geometric accuracy through rapidly changing curvature and unequal feature scales without missed contact failures.",
@@ -2079,7 +2124,8 @@
         "Fresh full replay at clean 012ace79 passes all 156 native entries, with 70 constructed Truck outputs and zero panics. All 70 now prepare STEP, 69 produce native-valid single-solid STEP and 68 meet the combined limited checks; the sole improvement is D4, with sampled distances 5.78e-5/3.12e-5. Q4 capture 2 remains open/two-solid with discrepancy 1.20849; tolerance A1, G1 trim failure and I3/J9 timeouts remain. All full-parity verdicts stay unverified.",
         "Conical pipe I3 now passes bounded coarse mesh, closed fine mesh, independent volume and STEP at original scale and at 0.01 with rigid transform/reversed selection. One-direction refinement uses physical derivative lengths while retaining raw geometry parameters. Tight cubic fitting no longer loses precision to global-tolerance knot removal. Both new regressions fail on parent 713f0c9a. Full release: 868 passed, one unchanged PCurve property failure, five existing ignored; Clippy/action smoke pass. Fine mesh medians are 416.489/164.231 ms with one/four workers; parent processes time out at 30 seconds, so no speedup ratio is assigned. See truck-benchmarks/results/2026-10-12-conical-mesh/REPORT.md. Clean full capture follows separately; family status remains partial.",
         "The initial clean aa6cfa65 replay constructs 72 outputs without timeouts, but native STEP reading rejects 21 fitted-curve exports with duplicated join knots; the failed capture is retained in capture/2026-10-12-conical-mesh-initial/REPORT.md. Exact endpoint sharing now removes only redundant join controls/knots while retaining tight accuracy and distinct nearby endpoints. Both regressions fail on aa6cfa65; targeted I3 STEP is native-valid, one solid, with sampled differences below 0.000012. Full release: 868 passed, two pre-existing numerical property failures reproduced on parents, five existing ignored; Clippy/action smoke pass. Full capture recovery is checked separately. See truck-benchmarks/results/2026-10-12-exact-spline-joins/REPORT.md.",
-        "Fresh full capture at clean f6871a18 passes all 156 native entries. All 72 constructed outputs preserve input/geometry, have closed Truck meshes and native-valid single-solid STEP; 70 meet the combined limited checks including bidirectional sampled distance <=0.001. I3 now succeeds with distances 1.13905e-5/8.42998e-6, and all 21 native STEP read regressions from the initial conical-mesh capture are recovered. No timeouts or panics remain in this captured subset. The 32 construction failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents, one incomplete capture, G1 and tolerance-grid A1 shape discrepancies remain. J9 still fails at trim_faces. No full-parity verdict is assigned. See capture/2026-10-12-exact-joins/REPORT.md."
+        "Fresh full capture at clean f6871a18 passes all 156 native entries. All 72 constructed outputs preserve input/geometry, have closed Truck meshes and native-valid single-solid STEP; 70 meet the combined limited checks including bidirectional sampled distance <=0.001. I3 now succeeds with distances 1.13905e-5/8.42998e-6, and all 21 native STEP read regressions from the initial conical-mesh capture are recovered. No timeouts or panics remain in this captured subset. The 32 construction failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents, one incomplete capture, G1 and tolerance-grid A1 shape discrepancies remain. J9 still fails at trim_faces. No full-parity verdict is assigned. See capture/2026-10-12-exact-joins/REPORT.md.",
+        "At 6db16d09, spherical-meridian fillets with open polar guide endpoints seed regular offset contacts and continue one parameter branch. Singular projected-revolution seeds are replaced by regular samples, restoring the original input mesh. STEP fitting refines local source spans at the unchanged tolerance and 193-control budget. Three parent-failing solid regressions cover scales 0.02/0.04/1, rigid motion, reversed selection, radius/normals, independent volume, closed meshes, STEP and immutable inputs; separate regressions cover signed contacts, near-pole projection and concentrated export error. Five-crate release: 879 passed, one unchanged PCurve property failure, five existing ignored; final affected shapeops rerun: 338 passed, one existing ignored. Clippy/action smoke pass. Successful E3 construction medians are 87.590/88.837 ms and STEP 126.797/126.638 ms at one/four workers; cylinder and spline controls retain their geometry and prior timing range. A clean full native replay is pending; these regressions do not establish general polar or feature parity."
       ]
     },
     {
@@ -2091,7 +2137,7 @@
         "periodic-seam"
       ],
       "occt_scope": "Dedicated periodic/singular extrema and parameter repairs.",
-      "truck_scope": "Some exact conic seam handling and reversed-curve fixes exist. STEP fitting normalizes longitudinal fillet domains, including sub-tolerance ranges; general support, boundary-curve and paired seam coverage remains open. Periodic fillet contacts now retain continuous parameter branches, with quarter stations disambiguating full turns; chamfer contact sampling also preserves the previous periodic branch. Direct and conical solid regressions cover the exposed failures. Closed spline-pipe contacts now continue from neighboring solved sections across undeclared NURBS seams; displaced seam guide stations follow adjacent rim segments with matching speed.",
+      "truck_scope": "Some exact conic seam handling and reversed-curve fixes exist. STEP fitting normalizes longitudinal fillet domains, including sub-tolerance ranges; general support, boundary-curve and paired seam coverage remains open. Periodic fillet contacts now retain continuous parameter branches, with quarter stations disambiguating full turns; chamfer contact sampling also preserves the previous periodic branch. Direct and conical solid regressions cover the exposed failures. Closed spline-pipe contacts now continue from neighboring solved sections across undeclared NURBS seams; displaced seam guide stations follow adjacent rim segments with matching speed. Open polar endpoint fitting now continues contacts to avoid switching between equivalent surface parameter branches.",
       "next_case": "Reverse surface parameters and move the seam through the same physical geometry; verify every edge lies on both supports.",
       "evidence": [
         {
@@ -2255,6 +2301,18 @@
           "path": "audits/fillet-chamfer/capture/2026-10-12-spline-rim/REPORT.md",
           "find": "# Captured replay after closed spline-rim continuation",
           "role": "verification"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-12-spherical-pole/REPORT.md",
+          "find": "# Spherical-pole fillets and local STEP fitting",
+          "role": "regression-validation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/spherical_pole_blend.rs",
+          "find": "fn original_scale_spherical_pole_fillet_preserves_step_accuracy",
+          "role": "test"
         }
       ],
       "required_outcome": "Keep blend boundaries on both supports and close them correctly when surface parameters, orientations or seam positions change.",
@@ -2276,7 +2334,8 @@
         "At aece8e35, constant-parameter pcurves on B-spline/NURBS supports convert to exact spatial splines, with bounded seam-search roundoff. Three parent-failing regressions verify analytic positions/derivatives, orientation, exact section geometry and J9 pipe material/closed meshes/STEP at two scales. Full release STEP/shapeops: 425 passed, zero failed, one existing ignored; Clippy and action smoke pass. The clean full capture passes all 156 native cases. J9 now imports and reaches face trimming, which fails with unchanged input; I3 remains the sole timeout. Of 161 captures, 71 construct, 32 fail construction, 25 fail import, 23 have inconsistent inputs, eight have unhandled intent and one is incomplete. All 71 constructed results remain consistent, closed-mesh and native-valid single-solid STEP; 69 meet the limited comparisons. G1 and tolerance A1 discrepancies remain. No full parity verdict. Evidence: audits/fillet-chamfer/capture/2026-10-12-spline-seams/REPORT.md and truck-benchmarks/results/2026-10-12-spline-seams/REPORT.md.",
         "Fresh full capture at clean f6871a18 passes all 156 native entries. All 72 constructed outputs preserve input/geometry, have closed Truck meshes and native-valid single-solid STEP; 70 meet the combined limited checks including bidirectional sampled distance <=0.001. I3 now succeeds with distances 1.13905e-5/8.42998e-6, and all 21 native STEP read regressions from the initial conical-mesh capture are recovered. No timeouts or panics remain in this captured subset. The 32 construction failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents, one incomplete capture, G1 and tolerance-grid A1 shape discrepancies remain. J9 still fails at trim_faces. No full-parity verdict is assigned. See capture/2026-10-12-exact-joins/REPORT.md.",
         "Closed spline-pipe rim regressions now cover displaced longitudinal contact seams, two constant radii, rigid transformation, scale 0.01, reversed wire and unequal rim parameter spans. Contact fitting follows one UV branch across closed NURBS seams without treating support parameter bounds as face trims. Both end-to-end tests fail on parent 4a156c4f; they check radius/normals, independent volume, topology/mesh closure, STEP and immutable input. This is targeted capability evidence, supplemented by the subsequent clean 99c9d487 native capture. See truck-benchmarks/results/2026-10-12-spline-rim-continuation/REPORT.md.",
-        "Clean full capture at 99c9d487 (kernel f7f8f4f5) passes all 156 native entries. J9 is the sole construction-status change: it now succeeds, with maximum sampled distances 9.41989e-5/1.09879e-4. All 73 constructed outputs preserve input and geometry, close their meshes and yield native-valid single-solid STEP; 71 meet the combined limited comparisons. The 31 construction failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents, one incomplete capture, G1 and tolerance-grid A1 discrepancies remain. No panic, timeout or full-parity verdict. See capture/2026-10-12-spline-rim/REPORT.md."
+        "Clean full capture at 99c9d487 (kernel f7f8f4f5) passes all 156 native entries. J9 is the sole construction-status change: it now succeeds, with maximum sampled distances 9.41989e-5/1.09879e-4. All 73 constructed outputs preserve input and geometry, close their meshes and yield native-valid single-solid STEP; 71 meet the combined limited comparisons. The 31 construction failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents, one incomplete capture, G1 and tolerance-grid A1 discrepancies remain. No panic, timeout or full-parity verdict. See capture/2026-10-12-spline-rim/REPORT.md.",
+        "At 6db16d09, spherical-meridian fillets with open polar guide endpoints seed regular offset contacts and continue one parameter branch. Singular projected-revolution seeds are replaced by regular samples, restoring the original input mesh. STEP fitting refines local source spans at the unchanged tolerance and 193-control budget. Three parent-failing solid regressions cover scales 0.02/0.04/1, rigid motion, reversed selection, radius/normals, independent volume, closed meshes, STEP and immutable inputs; separate regressions cover signed contacts, near-pole projection and concentrated export error. Five-crate release: 879 passed, one unchanged PCurve property failure, five existing ignored; final affected shapeops rerun: 338 passed, one existing ignored. Clippy/action smoke pass. Successful E3 construction medians are 87.590/88.837 ms and STEP 126.797/126.638 ms at one/four workers; cylinder and spline controls retain their geometry and prior timing range. A clean full native replay is pending; these regressions do not establish general polar or feature parity."
       ]
     },
     {
@@ -2823,6 +2882,18 @@
           "path": "audits/fillet-chamfer/capture/2026-10-12-spline-rim/REPORT.md",
           "find": "# Captured replay after closed spline-rim continuation",
           "role": "verification"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-12-spherical-pole/REPORT.md",
+          "find": "# Spherical-pole fillets and local STEP fitting",
+          "role": "regression-validation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/spherical_pole_blend.rs",
+          "find": "fn original_scale_spherical_pole_fillet_preserves_step_accuracy",
+          "role": "test"
         }
       ],
       "required_outcome": "Deliver blend results usable for closed meshing, STEP interchange and further modeling while preserving dimensions and validity.",
@@ -2850,7 +2921,8 @@
         "The initial clean aa6cfa65 replay constructs 72 outputs without timeouts, but native STEP reading rejects 21 fitted-curve exports with duplicated join knots; the failed capture is retained in capture/2026-10-12-conical-mesh-initial/REPORT.md. Exact endpoint sharing now removes only redundant join controls/knots while retaining tight accuracy and distinct nearby endpoints. Both regressions fail on aa6cfa65; targeted I3 STEP is native-valid, one solid, with sampled differences below 0.000012. Full release: 868 passed, two pre-existing numerical property failures reproduced on parents, five existing ignored; Clippy/action smoke pass. Full capture recovery is checked separately. See truck-benchmarks/results/2026-10-12-exact-spline-joins/REPORT.md.",
         "Fresh full capture at clean f6871a18 passes all 156 native entries. All 72 constructed outputs preserve input/geometry, have closed Truck meshes and native-valid single-solid STEP; 70 meet the combined limited checks including bidirectional sampled distance <=0.001. I3 now succeeds with distances 1.13905e-5/8.42998e-6, and all 21 native STEP read regressions from the initial conical-mesh capture are recovered. No timeouts or panics remain in this captured subset. The 32 construction failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents, one incomplete capture, G1 and tolerance-grid A1 shape discrepancies remain. J9 still fails at trim_faces. No full-parity verdict is assigned. See capture/2026-10-12-exact-joins/REPORT.md.",
         "Closed spline-pipe rim regressions now cover displaced longitudinal contact seams, two constant radii, rigid transformation, scale 0.01, reversed wire and unequal rim parameter spans. Contact fitting follows one UV branch across closed NURBS seams without treating support parameter bounds as face trims. Both end-to-end tests fail on parent 4a156c4f; they check radius/normals, independent volume, topology/mesh closure, STEP and immutable input. This is targeted capability evidence, supplemented by the subsequent clean 99c9d487 native capture. See truck-benchmarks/results/2026-10-12-spline-rim-continuation/REPORT.md.",
-        "Clean full capture at 99c9d487 (kernel f7f8f4f5) passes all 156 native entries. J9 is the sole construction-status change: it now succeeds, with maximum sampled distances 9.41989e-5/1.09879e-4. All 73 constructed outputs preserve input and geometry, close their meshes and yield native-valid single-solid STEP; 71 meet the combined limited comparisons. The 31 construction failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents, one incomplete capture, G1 and tolerance-grid A1 discrepancies remain. No panic, timeout or full-parity verdict. See capture/2026-10-12-spline-rim/REPORT.md."
+        "Clean full capture at 99c9d487 (kernel f7f8f4f5) passes all 156 native entries. J9 is the sole construction-status change: it now succeeds, with maximum sampled distances 9.41989e-5/1.09879e-4. All 73 constructed outputs preserve input and geometry, close their meshes and yield native-valid single-solid STEP; 71 meet the combined limited comparisons. The 31 construction failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents, one incomplete capture, G1 and tolerance-grid A1 discrepancies remain. No panic, timeout or full-parity verdict. See capture/2026-10-12-spline-rim/REPORT.md.",
+        "At 6db16d09, spherical-meridian fillets with open polar guide endpoints seed regular offset contacts and continue one parameter branch. Singular projected-revolution seeds are replaced by regular samples, restoring the original input mesh. STEP fitting refines local source spans at the unchanged tolerance and 193-control budget. Three parent-failing solid regressions cover scales 0.02/0.04/1, rigid motion, reversed selection, radius/normals, independent volume, closed meshes, STEP and immutable inputs; separate regressions cover signed contacts, near-pole projection and concentrated export error. Five-crate release: 879 passed, one unchanged PCurve property failure, five existing ignored; final affected shapeops rerun: 338 passed, one existing ignored. Clippy/action smoke pass. Successful E3 construction medians are 87.590/88.837 ms and STEP 126.797/126.638 ms at one/four workers; cylinder and spline controls retain their geometry and prior timing range. A clean full native replay is pending; these regressions do not establish general polar or feature parity."
       ]
     },
     {
