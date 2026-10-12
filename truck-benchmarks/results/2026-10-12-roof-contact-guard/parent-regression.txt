@@ -1,0 +1,26 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 2.99s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/rounded_roof_post.rs (target/release/deps/rounded_roof_post-e13b0e18a151cecb)
+
+running 3 tests
+test post_fillet_cannot_return_a_contact_loop_crossing_the_roof_boundary ... FAILED
+test rounded_roof_post_import_preserves_its_material ... ok
+test post_fillet_that_fits_the_roof_remains_supported ... ok
+
+failures:
+
+---- post_fillet_cannot_return_a_contact_loop_crossing_the_roof_boundary stdout ----
+
+thread 'post_fillet_cannot_return_a_contact_loop_crossing_the_roof_boundary' (98755) panicked at truck-shapeops/tests/rounded_roof_post.rs:55:9:
+an overlapping planar contact loop must not be accepted as a solid
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    post_fillet_cannot_return_a_contact_loop_crossing_the_roof_boundary
+
+test result: FAILED. 2 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s
+
+error: test failed, to rerun pass `-p truck-shapeops --test rounded_roof_post`

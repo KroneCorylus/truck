@@ -1,0 +1,1 @@
+{"comparison":"unverified","result":{"code":"OutsideNeighbour","error":"TRUCK_OUTSIDE_NEIGHBOUR: The moved boundary leaves its neighbouring face. (fillet_solid_along_wire / validate_trims)","input_unchanged":true,"selected_edges":2,"status":"operation-failed"},"schema_version":1,"stage":"blend","tolerance":0.001}

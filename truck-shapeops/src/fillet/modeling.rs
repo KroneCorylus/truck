@@ -1,7 +1,7 @@
 //! Blend operations on modeling solids.
 
 use truck_base::diagnostics::{validate_tolerance, Code, Diagnostic};
-use truck_modeling::{EdgeID, Face, FaceID, ScalarFunctionD1, Shell, Solid, Wire};
+use truck_modeling::{EdgeID, Face, FaceID, ScalarFunctionD1, Shell, Solid, Surface, Wire};
 
 /// A modeling solid after a blend, with face correspondence for downstream naming.
 ///
@@ -26,7 +26,7 @@ fn shell_index(solid: &Solid, edge: EdgeID) -> Option<usize> {
         .position(|s| s.edge_iter().any(|e| e.id() == edge))
 }
 
-fn finish(solid: &Solid, index: usize, shell: Shell) -> Result<BlendResult, Diagnostic> {
+fn finish(solid: &Solid, index: usize, shell: Shell, tol: f64) -> Result<BlendResult, Diagnostic> {
     let original = &solid.boundaries()[index];
     for (i, face) in shell.iter().enumerate() {
         if original.get(i).is_some_and(|old| old.id() == face.id()) {
@@ -40,6 +40,23 @@ fn finish(solid: &Solid, index: usize, shell: Shell) -> Result<BlendResult, Diag
             )
             .shell(index)
             .face(i));
+        }
+    }
+    for (i, (old, face)) in original.iter().zip(&shell).enumerate() {
+        if old.id() == face.id() {
+            continue;
+        }
+        if let Surface::Plane(plane) = old.oriented_surface() {
+            let boundaries = face.boundaries();
+            if old.boundaries().len() == boundaries.len()
+                && !super::planar::valid_boundaries(old, &boundaries, plane.normal(), tol)
+            {
+                return Err(
+                    Diagnostic::new(Code::OutsideNeighbour, "blend", "validate_trims")
+                        .shell(index)
+                        .face(i),
+                );
+            }
         }
     }
     let modified_faces = original
@@ -107,7 +124,7 @@ pub fn try_fillet_solid_along_wire<R: ScalarFunctionD1>(
     }
     let shell = super::try_fillet_along_wire(&solid.boundaries()[index], wire, radius, tol)
         .map_err(|e| e.operation(operation).shell(index))?;
-    finish(solid, index, shell).map_err(|e| e.operation(operation))
+    finish(solid, index, shell, tol).map_err(|e| e.operation(operation))
 }
 
 /// Equal-radius blends on selected edges of a modeling solid, including spherical corners.
@@ -208,7 +225,7 @@ pub fn try_fillet_solid_edges(
         })
         .map_err(|e| e.operation(operation).shell(index));
     match shell {
-        Ok(shell) => finish(solid, index, shell).map_err(|e| e.operation(operation)),
+        Ok(shell) => finish(solid, index, shell, tol).map_err(|e| e.operation(operation)),
         Err(error) => super::additive::fillet(solid, edges, radius, tol).map_err(|_| error),
     }
 }
@@ -289,7 +306,7 @@ pub fn try_chamfer_solid_edges(
                 }
             })
             .map_err(|e| e.shell(index))?;
-    finish(solid, index, shell).map_err(|e| e.operation(operation))
+    finish(solid, index, shell, tol).map_err(|e| e.operation(operation))
 }
 
 /// Chamfers selected straight edges with separate distances on their two adjacent faces.
@@ -348,7 +365,7 @@ pub fn try_chamfer_solid_edges_with_distances(
                 }
             })
             .map_err(|e| e.shell(index))?;
-    finish(solid, index, shell).map_err(|e| e.operation(operation))
+    finish(solid, index, shell, tol).map_err(|e| e.operation(operation))
 }
 
 /// Chamfers an open or closed tangent-continuous wire of a modeling solid.
@@ -402,7 +419,7 @@ pub fn try_chamfer_solid_along_wire(
                 .ok_or(error)
         })
         .map_err(|e| e.operation(operation).shell(index))?;
-    finish(solid, index, shell).map_err(|e| e.operation(operation))
+    finish(solid, index, shell, tol).map_err(|e| e.operation(operation))
 }
 
 /// Chamfers a single edge of a modeling solid, trimming both end faces.
@@ -460,7 +477,7 @@ pub fn try_chamfer_solid_edge(
         super::planar_edge::Blend::Chamfer([d0, d1]),
         tol,
     ) {
-        Ok(result) => return finish(solid, index, result),
+        Ok(result) => return finish(solid, index, result, tol),
         Err(error) if error.code == Code::OutsideNeighbour => return Err(error),
         Err(_) => {}
     }
@@ -517,7 +534,7 @@ pub fn try_chamfer_solid_edge(
     result[ends[0]] = blend.side0.ok_or_else(failed)?;
     result[ends[1]] = blend.side1.ok_or_else(failed)?;
     result.push(blend.simple_fillet.fillet);
-    finish(solid, index, result).map_err(|e| e.operation(operation))
+    finish(solid, index, result, tol).map_err(|e| e.operation(operation))
 }
 
 fn positive(
@@ -582,7 +599,7 @@ mod output_tests {
         shell[0] = Face::new(shell[0].boundaries(), surface);
         assert_eq!(shell.shell_condition(), ShellCondition::Closed);
         assert!(!shell.is_geometric_consistent());
-        let error = finish(&input, 0, shell).unwrap_err();
+        let error = finish(&input, 0, shell, 0.001).unwrap_err();
         assert_eq!(error.code, Code::BlendConstructionFailed);
         assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
     }
