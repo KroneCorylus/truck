@@ -6,6 +6,7 @@
 //! Linear pcurves on planes and cylindrical generators become exact spatial lines.
 //! Isoparametric pcurves on toroidal surfaces become exact spatial circles.
 //! Isoparametric pcurves on spline surfaces become exact spatial splines.
+//! Other linear pcurves on cylinders, cones and tori retain their exact surface coordinates.
 //! Other pcurves are rejected.
 //!
 //! ```
@@ -67,9 +68,25 @@ impl TryFrom<&Curve3D> for ModelingCurve {
                 let Curve2D::Line(line) = pcurve.curve().as_ref() else {
                     return Err("unsupported imported pcurve".into());
                 };
+                if ![
+                    line.0.x,
+                    line.0.y,
+                    line.1.x,
+                    line.1.y,
+                    line.1.x - line.0.x,
+                    line.1.y - line.0.y,
+                ]
+                .iter()
+                .all(|x| x.is_finite())
+                {
+                    return Err("non-finite imported pcurve".into());
+                }
+                if line.0 == line.1 {
+                    return Err("degenerate imported pcurve".into());
+                }
                 match pcurve.surface().as_ref() {
                     Surface::ElementarySurface(ElementarySurface::ToroidalSurface(surface)) => {
-                        return toroidal_isoparameter(surface, line);
+                        return toroidal_pcurve(surface, line);
                     }
                     Surface::BSplineSurface(surface) => {
                         return Ok(Self::BSplineCurve(spline_isoparameter(surface, line)?));
@@ -113,7 +130,10 @@ impl TryFrom<&Curve3D> for ModelingCurve {
                     _ => false,
                 };
                 if !linear {
-                    return Err("unsupported imported pcurve".into());
+                    return match pcurve.surface().as_ref() {
+                        Surface::ElementarySurface(surface) => elementary_pcurve(surface, line),
+                        _ => Err("unsupported imported pcurve".into()),
+                    };
                 }
                 let (front, back) = (pcurve.front(), pcurve.back());
                 if ![front.x, front.y, front.z, back.x, back.y, back.z]
@@ -128,17 +148,66 @@ impl TryFrom<&Curve3D> for ModelingCurve {
     }
 }
 
-fn toroidal_isoparameter(
-    surface: &ToroidalSurface,
+fn elementary_pcurve(
+    surface: &ElementarySurface,
     line: &Line<Point2>,
 ) -> std::result::Result<ModelingCurve, StepConvertingError> {
-    let mut line = *line;
-    if ![line.0.x, line.0.y, line.1.x, line.1.y]
-        .iter()
-        .all(|x| x.is_finite())
+    let revolved = match surface {
+        ElementarySurface::CylindricalSurface(surface)
+        | ElementarySurface::ConicalSurface(surface) => surface.map_ref(|revolved| {
+            RevolutedCurve::by_revolution(
+                ModelingCurve::Line(*revolved.entity_curve()),
+                revolved.origin(),
+                revolved.axis(),
+            )
+        }),
+        ElementarySurface::ToroidalSurface(surface) => {
+            let mut revolved = surface.map_ref(|torus| {
+                let center = torus.center();
+                let meridian = arc(
+                    center + torus.large_radius() * Vector3::unit_x(),
+                    torus.small_radius() * Vector3::unit_x(),
+                    -Vector3::unit_y(),
+                    (0., 2. * PI),
+                );
+                RevolutedCurve::by_revolution(meridian, center, Vector3::unit_z())
+            });
+            // Torus coordinates are (major, minor); revolution coordinates are (meridian, major).
+            revolved.invert();
+            revolved
+        }
+        _ => return Err("unsupported imported pcurve".into()),
+    };
+    let transform = revolved.transform();
+    if (0..4).any(|i| (0..4).any(|j| !transform[i][j].is_finite())) || transform.invert().is_none()
     {
-        return Err("non-finite toroidal pcurve".into());
+        return Err("invalid imported pcurve transform".into());
     }
+    let curve = ModelingCurve::PCurve(truck_modeling::PCurve::new(
+        BSplineCurve::from(*line),
+        Box::new(ModelingSurface::RevolutedCurve(revolved)),
+    ));
+    let mut regular = false;
+    for t in [0., 0.5, 1.] {
+        regular |= curve.der(t) != Vector3::zero();
+        if [curve.subs(t).to_vec(), curve.der(t), curve.der2(t)]
+            .iter()
+            .any(|v| ![v.x, v.y, v.z].iter().all(|x| x.is_finite()))
+        {
+            return Err("non-finite imported pcurve geometry".into());
+        }
+    }
+    if !regular {
+        return Err("degenerate imported pcurve geometry".into());
+    }
+    Ok(curve)
+}
+
+fn toroidal_pcurve(
+    surface: &ToroidalSurface,
+    source_line: &Line<Point2>,
+) -> std::result::Result<ModelingCurve, StepConvertingError> {
+    let mut line = *source_line;
     if !surface.orientation() {
         line = Line(
             Point2::new(line.0.y, line.0.x),
@@ -179,7 +248,7 @@ fn toroidal_isoparameter(
             line.1.x,
         )
     } else {
-        return Err("unsupported non-isoparametric toroidal pcurve".into());
+        return elementary_pcurve(&ElementarySurface::ToroidalSurface(*surface), source_line);
     };
     if start == end || !(end - start).is_finite() || radial.magnitude2() == 0. {
         return Err("degenerate toroidal pcurve".into());

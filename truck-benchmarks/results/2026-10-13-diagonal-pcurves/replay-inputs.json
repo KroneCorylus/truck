@@ -1,0 +1,10 @@
+{
+  "archive": "audits/fillet-chamfer/capture/2026-10-12-seam-junction/artifacts.zip",
+  "sha256": {
+    "blend/complex/G9/capture/002.input.brep": "3ec6d9ed76c94923755bb55720662db57c38835acbee404af1882b51dbc9c795",
+    "blend/complex/G9/capture/002.input.json": "ff12837f408d8f012630629f8560001dd788bde0c59befe6b4452147ad42f5a3",
+    "blend/complex/G9/capture/002.input.step": "cb9cfba62ae084e19db9959bf8bbfd7dada8332401ef1aa27cc6831598a0cb9e",
+    "blend/complex/G9/capture/002.result.brep": "4ebaba581c516ddec40ed2f80acb0ca538753d2a3eb2d4f765b8e1d55db71491",
+    "blend/complex/G9/capture/002.result.json": "a2bf47129d98d611a64fbb049f1e2a9f4425e4a3fe16a99e2bf124fb046494b9"
+  }
+}

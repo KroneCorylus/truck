@@ -22,9 +22,12 @@ is united with a radius-5, height-20 cylinder based at (4.9,0,10).
 The original preprocessor chose the endpoints of its existing toroidal seam
 as a new divisor, then panicked on the resulting three-way junction. The
 regression checks the raw imported topology, closed tessellation and independent
-volume for ordinary/robust preprocessing with and without rigid motion.
-Modeling conversion and STEP re-export remain unsupported for the diagonal
-surface curves created here; this regression does not assert fillet parity.
+volume for ordinary/robust preprocessing with and without rigid motion. It also
+checks exact modeling conversion of the generated diagonal surface curves,
+geometric consistency, closed tessellation and volume, and STEP round trips.
+The requested radius-4.9 fillet remains unsupported: the regression requires a
+diagnostic without a panic or input mutation, including reversed selection.
+This regression does not assert fillet parity.
 
 The large cylinder's horizontal radius is 10 below z=17 and
 `7+sqrt(9-(z-17)^2)` above it. Its exact rounded volume is

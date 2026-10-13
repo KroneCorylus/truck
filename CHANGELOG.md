@@ -6,6 +6,8 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Preserve diagonal linear STEP pcurves on cylinders, cones and tori as exact modeling pcurves, retaining the support's parameterization, affine transform and orientation. Keep existing generator lines and isoparametric torus circles; reject non-finite and collapsed trims. Point/derivative regressions cover reversed and affine supports, and the native rounded-offset-cylinder input now passes modeling consistency, independent volume, closed tessellation and STEP round trips through both preprocessing modes and rigid transforms. End-trim intersection searches return a diagnostic when rolling contacts disappear instead of panicking. G9's radius-4.9 fillet remains unsupported and preserves its input on failure, including reversed selections.
+
 - Import periodic torus sectors without losing their trimmed material. Use stable signed-angle inversion near torus seams, correct the torus normal derivative, convert isoparametric toroidal trims to exact circles, and retain a closed boundary’s continuous parameter chart when splitting it. Regressions cover transformed/reversed trims, bounded seam roundoff, J3/J4/J5 inputs, independent volumes, closed meshes and STEP round trips.
 
 - Preserve complete and large circular arcs when converting to NURBS, using positive-weight rational quadratic spans and legal knot multiplicities. Determine elementary-surface orientation at a regular sample when the midpoint is singular, preventing reversed horn-torus STEP faces. Imported torus-sector regressions check consistent geometry, independent volume, closed meshes and STEP round trips, including scaling and rigid motion.

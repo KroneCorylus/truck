@@ -55,7 +55,7 @@ fn planar_and_cylindrical_generator_pcurves_preserve_exact_spatial_lines() {
 }
 
 #[test]
-fn numerical_seam_offsets_preserve_generators_but_curved_pcurves_are_rejected() {
+fn numerical_seam_offsets_preserve_generators_and_curved_pcurves_stay_exact() {
     let cylinder = Surface::ElementarySurface(ElementarySurface::CylindricalSurface(
         Processor::new(RevolutedCurve::by_revolution(
             Line(Point3::new(10., 0., 0.), Point3::new(10., 0., 20.)),
@@ -80,7 +80,14 @@ fn numerical_seam_offsets_preserve_generators_but_curved_pcurves_are_rejected() 
                 assert!(mapped.der(t).distance(source.der(t)) < 1e-12);
             }
         } else {
-            assert!(mapped.is_err());
+            let mapped = mapped.unwrap();
+            assert!(matches!(mapped, Curve::PCurve(_)));
+            for i in 0..=64 {
+                let t = i as f64 / 64.;
+                assert!(mapped.subs(t).distance(source.subs(t)) < 1e-12);
+                assert!(mapped.der(t).distance(source.der(t)) < 1e-12);
+                assert!(mapped.der2(t).distance(source.der2(t)) < 1e-12);
+            }
         }
     }
 }

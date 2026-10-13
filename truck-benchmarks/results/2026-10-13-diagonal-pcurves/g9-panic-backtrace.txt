@@ -1,0 +1,16 @@
+
+thread 'main' (99050) panicked at truck-geometry/src/decorators/rbf_surface/mod.rs:137:71:
+called `Option::unwrap()` on a `None` value
+stack backtrace:
+   0: __rustc::rust_begin_unwind
+   1: core::panicking::panic_fmt
+   2: core::panicking::panic
+   3: core::option::unwrap_failed
+   4: truck_geotrait::algo::surface::search_intersection_parameter::<truck_modeling::geometry::Curve, truck_geometry::decorators::RbfSurface<truck_shapeops::fillet::along_wire::ExtendedSpine<truck_modeling::geometry::Curve>, truck_modeling::geometry::Surface, truck_modeling::geometry::Surface, truck_shapeops::fillet::along_wire::ContinuedRadius<f64>>>
+   5: truck_shapeops::fillet::along_wire::try_fillet_along_wire::<truck_modeling::geometry::Curve, truck_modeling::geometry::Surface, f64>
+   6: truck_shapeops::fillet::modeling::try_fillet_solid_along_wire::<f64>
+   7: replay_occt_blend::replay::{closure#7}
+   8: replay_occt_blend::replay
+   9: replay_occt_blend::main
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
+{"comparison":"unverified","result":{"status":"panic"},"schema_version":1,"stage":"blend","tolerance":0.001}

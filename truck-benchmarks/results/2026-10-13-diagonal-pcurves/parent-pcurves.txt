@@ -1,0 +1,36 @@
+Command: CARGO_BUILD_JOBS=12 cargo test --release -p truck-stepio --test diagonal_import_pcurves --test linear_import_pcurves --test toroidal_seam_pcurves
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-modeling)
+   Compiling truck-meshalgo v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-meshalgo)
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 10.66s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/diagonal_import_pcurves.rs (target/release/deps/diagonal_import_pcurves-7079c91c86e03701)
+
+running 2 tests
+test diagonal_elementary_pcurves_reject_nonfinite_and_collapsed_geometry ... FAILED
+test diagonal_elementary_pcurves_preserve_coordinates_and_derivatives ... FAILED
+
+failures:
+
+---- diagonal_elementary_pcurves_reject_nonfinite_and_collapsed_geometry stdout ----
+
+thread 'diagonal_elementary_pcurves_reject_nonfinite_and_collapsed_geometry' (75243) panicked at truck-stepio/tests/diagonal_import_pcurves.rs:114:13:
+assertion failed: Curve::try_from(&source(elementary, line)).is_err()
+
+---- diagonal_elementary_pcurves_preserve_coordinates_and_derivatives stdout ----
+
+thread 'diagonal_elementary_pcurves_preserve_coordinates_and_derivatives' (75242) panicked at truck-stepio/tests/diagonal_import_pcurves.rs:68:62:
+called `Result::unwrap()` on an `Err` value: "unsupported imported pcurve"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    diagonal_elementary_pcurves_preserve_coordinates_and_derivatives
+    diagonal_elementary_pcurves_reject_nonfinite_and_collapsed_geometry
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-stepio --test diagonal_import_pcurves`

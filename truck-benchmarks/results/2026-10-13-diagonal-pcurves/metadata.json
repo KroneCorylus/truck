@@ -1,0 +1,42 @@
+{
+  "parent": "4a50894918c17907cb5135df52d6fac69e0fb36f",
+  "source_sha256": {
+    "CHANGELOG.md": "70cebe44d95b54099505c9c0a68ac018dc3f7f7e20728eb9c4b8aa1cb2f13515",
+    "truck-shapeops/src/fillet/along_wire.rs": "c7a18c660f846515732087521ac0289cba0df6bff4fb3499b46243753e9c4cf1",
+    "truck-shapeops/tests/fixtures/closed-face-splitting/README.md": "1009709c330efcb731d46ed1c3ad40e88e8a061f67cdd6f6e8781b99ee900d2c",
+    "truck-shapeops/tests/tangent_closed_face_split.rs": "9f5a9dc89635d10d489077088633f984f96221f6681cf9a65d888918d9396b22",
+    "truck-stepio/src/in/step_geometry/modeling_impls.rs": "7d3b75513f22c40670c6de8c2741caaeb388fc7a47706648e2a7da76ba566a59",
+    "truck-stepio/tests/linear_import_pcurves.rs": "fbc5684900c03a409e00ef911e0db658330a9dc42feee85548c2e725f8160773",
+    "truck-stepio/tests/toroidal_seam_pcurves.rs": "572ab4f8528de1ad346e6cb17cc9cc23cc6331c6c6ec4af2877f605af50de655",
+    "truck-stepio/tests/diagonal_import_pcurves.rs": "da83d5a915a1077bcb9f3e6ecb3ed60986cb3c332919b10eca56fe111fc3a06a"
+  },
+  "fixture_sha256": "2e5bf0c2f4f722763a412c6e44796029846d51ae6ddb3dc678aa841339644de8",
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.1\nLLVM version: 22.1.8\n",
+  "performance_claim": "None; action benchmark smoke only.",
+  "release_tests": {
+    "passed": 447,
+    "failed": 0,
+    "ignored": 1,
+    "targets": 84
+  },
+  "replay_sha256": "743d8e635fb7f42533fb57e03c9f9829625e2c3a439cff833435f94cf9e21357",
+  "final_checks": {
+    "release-tests": "passed",
+    "clippy": "passed",
+    "actions-smoke": "passed",
+    "replay-build": "passed"
+  },
+  "targeted_replay": {
+    "comparison": "unverified",
+    "result": {
+      "code": "BlendConstructionFailed",
+      "error": "TRUCK_BLEND_CONSTRUCTION_FAILED: Blend construction failed; the numerical or geometric constraint could not be resolved. (fillet_solid_along_wire / construct_blend)",
+      "input_unchanged": true,
+      "selected_edges": 1,
+      "status": "operation-failed"
+    },
+    "schema_version": 1,
+    "stage": "blend",
+    "tolerance": 0.001
+  }
+}

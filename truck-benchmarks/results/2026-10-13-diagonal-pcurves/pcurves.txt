@@ -1,0 +1,28 @@
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 9.04s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/diagonal_import_pcurves.rs (target/release/deps/diagonal_import_pcurves-7079c91c86e03701)
+
+running 2 tests
+test diagonal_elementary_pcurves_reject_nonfinite_and_collapsed_geometry ... ok
+test diagonal_elementary_pcurves_preserve_coordinates_and_derivatives ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/linear_import_pcurves.rs (target/release/deps/linear_import_pcurves-925a63f3f6f01bae)
+
+running 2 tests
+test planar_and_cylindrical_generator_pcurves_preserve_exact_spatial_lines ... ok
+test numerical_seam_offsets_preserve_generators_and_curved_pcurves_stay_exact ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/toroidal_seam_pcurves.rs (target/release/deps/toroidal_seam_pcurves-d8baf56321eab898)
+
+running 2 tests
+test toroidal_seam_roundoff_is_bounded_and_real_diagonals_stay_exact ... ok
+test toroidal_isoparametric_trims_preserve_exact_images_and_tangents ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

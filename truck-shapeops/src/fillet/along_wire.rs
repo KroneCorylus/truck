@@ -509,8 +509,7 @@ where
                     s1
                 };
                 let ((u, v), s) =
-                    algo::surface::search_intersection_parameter(rbf, (0.5, t), &curve, hint, 100)
-                        .ok_or_else(failed)?;
+                    intersect_rolling_fillet(rbf, (0.5, t), &curve, hint).ok_or_else(failed)?;
                 walk.crossings.push((Vertex::new(curve.subs(s)), s, (u, v)));
                 vs.push(v);
             }
@@ -1114,6 +1113,37 @@ where
 }
 
 type TrimmedContact<C> = (Option<Edge<Point3, C>>, Vertex<Point3>);
+
+fn intersect_rolling_fillet<C, S, R, E>(
+    surface: &RbfSurface<C, S, S, R>,
+    (u, v): (f64, f64),
+    curve: &E,
+    t: f64,
+) -> Option<((f64, f64), f64)>
+where
+    C: ParametricCurve3D,
+    S: ParametricSurface3D + SearchParameter<D2, Point = Point3>,
+    R: ScalarFunctionD1,
+    E: ParametricCurve3D,
+{
+    let mut parameters = Vector3::new(u, v, t);
+    for _ in 0..=100 {
+        if !parameters.is_finite() {
+            return None;
+        }
+        let Vector3 { x: u, y: v, z: t } = parameters;
+        // A Newton step can leave the part of the guide where rolling contacts exist.
+        let circle = surface.contact_circle(v)?;
+        let residual = circle.subs(u) - curve.subs(t);
+        let jacobian = Matrix3::from_cols(circle.der(u), surface.vder(u, v), -curve.der(t));
+        let next = parameters - jacobian.invert()? * residual;
+        if next.near2(&parameters) {
+            return residual.so_small().then_some(((u, v), t));
+        }
+        parameters = next;
+    }
+    None
+}
 
 fn trim_contact_edge<C: FilletedCurve<S>, S>(
     curve: &mut C,

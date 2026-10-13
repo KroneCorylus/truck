@@ -1,0 +1,24 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 3.57s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/tangent_closed_face_split.rs (target/release/deps/tangent_closed_face_split-967fca558e6efe58)
+
+running 1 test
+test rounded_offset_cylinders_preprocess_without_reusing_the_seam ... FAILED
+
+failures:
+
+---- rounded_offset_cylinders_preprocess_without_reusing_the_seam stdout ----
+
+thread 'rounded_offset_cylinders_preprocess_without_reusing_the_seam' (102052) panicked at truck-geometry/src/decorators/rbf_surface/mod.rs:137:71:
+called `Option::unwrap()` on a `None` value
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    rounded_offset_cylinders_preprocess_without_reusing_the_seam
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 1.89s
+
+error: test failed, to rerun pass `-p truck-shapeops --test tangent_closed_face_split`

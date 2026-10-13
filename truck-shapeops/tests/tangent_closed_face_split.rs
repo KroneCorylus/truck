@@ -127,6 +127,46 @@ fn rounded_offset_cylinders_preprocess_without_reusing_the_seam() {
             }
             let solid = truck_topology::Solid::extract(raw).unwrap();
             common::assert_solid(&solid, rounded_offset_cylinder_volume(), &[0], 0.001);
+            let model = solid
+                .compress()
+                .try_mapped(
+                    |p| Some(*p),
+                    |c| Curve::try_from(c).ok(),
+                    |s| Surface::try_from(s).ok(),
+                )
+                .expect("diagonal seam cuts must convert to modeling geometry");
+            let model = Solid::extract(model).unwrap();
+            assert!(model.is_geometric_consistent());
+            common::assert_solid(&model, rounded_offset_cylinder_volume(), &[0], 0.001);
+            common::blend::assert_step(&model, rounded_offset_cylinder_volume(), 0.001);
+            let transform = if transformed {
+                Matrix4::from_translation(Vector3::new(13., -7., 23.))
+                    * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.73))
+            } else {
+                Matrix4::identity()
+            };
+            let middle = transform.transform_point(Point3::new(
+                8.712777563069068,
+                3.2346139307999753,
+                18.933483314875918,
+            ));
+            let selected = common::blend::edge_through(&model.boundaries()[0], middle);
+            for reversed in [false, true] {
+                let edge = if reversed {
+                    selected.inverse()
+                } else {
+                    selected.clone()
+                };
+                let wire: Wire = [edge].into_iter().collect();
+                let before = serde_json::to_string(&model.compress()).unwrap();
+                let result =
+                    truck_shapeops::fillet::try_fillet_solid_along_wire(&model, &wire, 4.9, 0.001);
+                assert_eq!(
+                    result.unwrap_err().code,
+                    truck_base::diagnostics::Code::BlendConstructionFailed
+                );
+                assert_eq!(serde_json::to_string(&model.compress()).unwrap(), before);
+            }
         }
     }
 }

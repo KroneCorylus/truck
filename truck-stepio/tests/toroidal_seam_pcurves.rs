@@ -56,11 +56,11 @@ fn toroidal_isoparametric_trims_preserve_exact_images_and_tangents() {
 }
 
 #[test]
-fn toroidal_seam_roundoff_is_bounded_and_real_diagonals_are_rejected() {
+fn toroidal_seam_roundoff_is_bounded_and_real_diagonals_stay_exact() {
     let surface = Surface::ElementarySurface(ElementarySurface::ToroidalSurface(Processor::new(
         Torus::new(Point3::origin(), 200., 50.),
     )));
-    for (delta, success) in [(4. * f64::EPSILON, true), (0.001, false)] {
+    for delta in [4. * f64::EPSILON, 0.001] {
         let source = Curve3D::PCurve(PCurve::new(
             Box::new(Curve2D::Line(Line(
                 Point2::new(0.7, 0.),
@@ -68,27 +68,33 @@ fn toroidal_seam_roundoff_is_bounded_and_real_diagonals_are_rejected() {
             ))),
             Box::new(surface.clone()),
         ));
-        let curve = Curve::try_from(&source);
-        if success {
-            let curve = curve.unwrap();
-            let (a, b) = curve.range_tuple();
-            for i in 0..=64 {
-                let t = i as f64 / 64.;
-                assert!(curve.subs(a + (b - a) * t).distance(source.subs(t)) < 1e-10);
-            }
-        } else {
-            assert!(curve.is_err());
+        let curve = Curve::try_from(&source).unwrap();
+        assert_eq!(matches!(curve, Curve::Conic(_)), delta < 1e-12);
+        let (a, b) = curve.range_tuple();
+        for i in 0..=64 {
+            let t = i as f64 / 64.;
+            let s = a + (b - a) * t;
+            assert!(curve.subs(s).distance(source.subs(t)) < 1e-10);
+            assert!((curve.der(s) * (b - a)).distance(source.der(t)) < 1e-9);
+            assert!((curve.der2(s) * (b - a).powi(2)).distance(source.der2(t)) < 1e-8);
         }
     }
+    let source = Curve3D::PCurve(PCurve::new(
+        Box::new(Curve2D::Line(Line(
+            Point2::new(0.7, 0.),
+            Point2::new(0.7 + 4. * f64::EPSILON, PI),
+        ))),
+        Box::new(surface.transformed(Matrix4::from_scale(1e12))),
+    ));
+    let curve = Curve::try_from(&source).unwrap();
+    assert!(matches!(curve, Curve::PCurve(_)));
+    for i in 0..=64 {
+        let t = i as f64 / 64.;
+        assert!((curve.subs(t).to_vec() / 1e12).distance(source.subs(t).to_vec() / 1e12) < 1e-10);
+        assert!((curve.der(t) / 1e12).distance(source.der(t) / 1e12) < 1e-9);
+        assert!((curve.der2(t) / 1e12).distance(source.der2(t) / 1e12) < 1e-8);
+    }
     for (torus, transform, line) in [
-        (
-            Torus::new(Point3::origin(), 200., 50.),
-            Matrix4::from_scale(1e12),
-            Line(
-                Point2::new(0.7, 0.),
-                Point2::new(0.7 + 4. * f64::EPSILON, PI),
-            ),
-        ),
         (
             Torus::new(Point3::origin(), 1., 1.),
             Matrix4::identity(),

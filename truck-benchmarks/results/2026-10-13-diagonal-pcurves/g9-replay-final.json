@@ -1,0 +1,13 @@
+{
+  "comparison": "unverified",
+  "result": {
+    "code": "BlendConstructionFailed",
+    "error": "TRUCK_BLEND_CONSTRUCTION_FAILED: Blend construction failed; the numerical or geometric constraint could not be resolved. (fillet_solid_along_wire / construct_blend)",
+    "input_unchanged": true,
+    "selected_edges": 1,
+    "status": "operation-failed"
+  },
+  "schema_version": 1,
+  "stage": "blend",
+  "tolerance": 0.001
+}
