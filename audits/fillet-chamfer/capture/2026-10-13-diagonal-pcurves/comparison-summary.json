@@ -1,0 +1,274 @@
+{
+  "kernel_revision": "2978d651e5586578dc349642522ec1fd69326f5b",
+  "native": {
+    "passed": 156
+  },
+  "captures": 161,
+  "before_statuses": {
+    "input-import-failed": 22,
+    "operation-succeeded": 80,
+    "unhandled-intent": 8,
+    "operation-failed": 37,
+    "input-inconsistent": 11,
+    "timeout": 2,
+    "capture-incomplete": 1
+  },
+  "after_statuses": {
+    "input-import-failed": 11,
+    "operation-succeeded": 85,
+    "operation-failed": 43,
+    "unhandled-intent": 8,
+    "input-inconsistent": 11,
+    "timeout": 2,
+    "capture-incomplete": 1
+  },
+  "successful_checks": {
+    "constructed": 85,
+    "input_unchanged": 85,
+    "geometry_consistent": 85,
+    "mesh_closed": 85,
+    "step_prepared": 84,
+    "native_valid": 84,
+    "truck_step_valid": 84,
+    "single_solid": 84,
+    "sampled_distance": 80
+  },
+  "limited_comparison_passes": 80,
+  "status_changes": [
+    {
+      "case": "blend/complex/G9",
+      "capture": "002",
+      "before": "input-import-failed",
+      "after": "operation-failed",
+      "result": {
+        "code": "BlendConstructionFailed",
+        "error": "TRUCK_BLEND_CONSTRUCTION_FAILED: Blend construction failed; the numerical or geometric constraint could not be resolved. (fillet_solid_along_wire / construct_blend)",
+        "input_unchanged": true,
+        "selected_edges": 1,
+        "status": "operation-failed"
+      }
+    },
+    {
+      "case": "blend/simple/J1",
+      "capture": "001",
+      "before": "input-import-failed",
+      "after": "operation-succeeded",
+      "result": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 3661531.0258563827,
+        "selected_edges": 2,
+        "status": "operation-succeeded",
+        "step_prepared": true
+      }
+    },
+    {
+      "case": "blend/simple/K2",
+      "capture": "001",
+      "before": "input-import-failed",
+      "after": "operation-succeeded",
+      "result": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 905612.8350111032,
+        "selected_edges": 2,
+        "status": "operation-succeeded",
+        "step_prepared": true
+      }
+    },
+    {
+      "case": "blend/simple/K3",
+      "capture": "001",
+      "before": "input-import-failed",
+      "after": "operation-succeeded",
+      "result": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 905613.0148815837,
+        "selected_edges": 2,
+        "status": "operation-succeeded",
+        "step_prepared": true
+      }
+    },
+    {
+      "case": "blend/simple/K4",
+      "capture": "001",
+      "before": "input-import-failed",
+      "after": "operation-succeeded",
+      "result": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 214207.02817010845,
+        "selected_edges": 2,
+        "status": "operation-succeeded",
+        "step_prepared": false
+      }
+    },
+    {
+      "case": "bugs/heal/bug26244",
+      "capture": "001",
+      "before": "input-import-failed",
+      "after": "operation-succeeded",
+      "result": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 182328.67843766965,
+        "selected_edges": 2,
+        "status": "operation-succeeded",
+        "step_prepared": true
+      }
+    },
+    {
+      "case": "bugs/modalg_5/bug25657_1",
+      "capture": "001",
+      "before": "input-import-failed",
+      "after": "operation-failed",
+      "result": {
+        "code": "BlendConstructionFailed",
+        "error": "TRUCK_BLEND_CONSTRUCTION_FAILED: Blend construction failed; the numerical or geometric constraint could not be resolved. (fillet_solid_along_wire / construct_blend)",
+        "input_unchanged": true,
+        "selected_edges": 1,
+        "status": "operation-failed"
+      }
+    },
+    {
+      "case": "feat/featrf/A4",
+      "capture": "001",
+      "before": "input-import-failed",
+      "after": "operation-failed",
+      "result": {
+        "code": "NonPlanarFace",
+        "error": "TRUCK_FILLET_NON_PLANAR_FACE: This fillet operation requires planar faces. (fillet_solid_edges / validate_input)",
+        "input_unchanged": true,
+        "selected_edges": 4,
+        "status": "operation-failed"
+      }
+    },
+    {
+      "case": "feat/featrf/A5",
+      "capture": "001",
+      "before": "input-import-failed",
+      "after": "operation-failed",
+      "result": {
+        "code": "NonPlanarFace",
+        "error": "TRUCK_FILLET_NON_PLANAR_FACE: This fillet operation requires planar faces. (fillet_solid_edges / validate_input)",
+        "input_unchanged": true,
+        "selected_edges": 4,
+        "status": "operation-failed"
+      }
+    },
+    {
+      "case": "feat/featrf/A6",
+      "capture": "001",
+      "before": "input-import-failed",
+      "after": "operation-failed",
+      "result": {
+        "code": "NonPlanarFace",
+        "error": "TRUCK_FILLET_NON_PLANAR_FACE: This fillet operation requires planar faces. (fillet_solid_edges / validate_input)",
+        "input_unchanged": true,
+        "selected_edges": 4,
+        "status": "operation-failed"
+      }
+    },
+    {
+      "case": "feat/featrf/B4",
+      "capture": "001",
+      "before": "input-import-failed",
+      "after": "operation-failed",
+      "result": {
+        "code": "NonPlanarFace",
+        "error": "TRUCK_FILLET_NON_PLANAR_FACE: This fillet operation requires planar faces. (fillet_solid_edges / validate_input)",
+        "input_unchanged": true,
+        "selected_edges": 4,
+        "status": "operation-failed"
+      }
+    }
+  ],
+  "regressions": [],
+  "numeric_changes": [],
+  "distance_discrepancies": [
+    {
+      "case": "blend/simple/G1",
+      "capture": "001",
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 132189932.40065464,
+        "truck_volume": 132185649.9747912,
+        "native_to_truck_max_distance": 0.9874986974855128,
+        "native_to_truck_samples": 921,
+        "truck_to_native_max_distance": 0.018545749048141102,
+        "truck_to_native_samples": 886
+      }
+    },
+    {
+      "case": "blend/simple/K2",
+      "capture": "001",
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 905598.5267387221,
+        "truck_volume": 905623.4537860147,
+        "native_to_truck_max_distance": 0.03269215818217927,
+        "native_to_truck_samples": 877,
+        "truck_to_native_max_distance": 0.04583577492595724,
+        "truck_to_native_samples": 1587
+      }
+    },
+    {
+      "case": "blend/simple/K3",
+      "capture": "001",
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 905598.5270888987,
+        "truck_volume": 905623.4534851363,
+        "native_to_truck_max_distance": 0.03269215868376121,
+        "native_to_truck_samples": 877,
+        "truck_to_native_max_distance": 0.045839215216337506,
+        "truck_to_native_samples": 1587
+      }
+    },
+    {
+      "case": "blend/tolblend_simple/A1",
+      "capture": "001",
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 29055.053293964895,
+        "truck_volume": 29055.062123632302,
+        "native_to_truck_max_distance": 0.022376472569611394,
+        "native_to_truck_samples": 1874,
+        "truck_to_native_max_distance": 0.022376472569611394,
+        "truck_to_native_samples": 1862
+      }
+    }
+  ],
+  "step_preparation_failures": [
+    {
+      "case": "blend/simple/K4",
+      "capture": "001"
+    }
+  ]
+}
