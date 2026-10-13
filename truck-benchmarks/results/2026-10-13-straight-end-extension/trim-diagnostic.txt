@@ -1,0 +1,22 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 8.14s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/imported_toroidal_sectors.rs (target/release/deps/imported_toroidal_sectors-3ca40022b9f8e1fc)
+
+running 1 test
+FAILED TRIM at_start=false, adjacent=Line(Line(Point3 [0.0, 0.0, 0.17101007166283], Point3 [1.5301536896069998, 0.0, 0.17101007166283])), hints=9.075712110370553,1, contact_start=Point3 [2.397915761656359, 0.0, -9.74612527685484e-17], contact_end=Point3 [1.6210414436997145, 0.0, 0.1368080573302518]
+
+thread 'torus_meridian_fillet_extends_its_reentrant_straight_end_boundary' (303369) panicked at truck-shapeops/tests/imported_toroidal_sectors.rs:92:80:
+called `Result::unwrap()` on an `Err` value: Diagnostic { code: BlendConstructionFailed, operation: "fillet_solid_along_wire", stage: "trim_faces", message: "Blend construction failed; the numerical or geometric constraint could not be resolved.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test torus_meridian_fillet_extends_its_reentrant_straight_end_boundary ... FAILED
+
+failures:
+
+failures:
+    torus_meridian_fillet_extends_its_reentrant_straight_end_boundary
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-shapeops --test imported_toroidal_sectors`

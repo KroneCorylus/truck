@@ -6,6 +6,10 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Extend exact straight end boundaries toward an open fillet chain when a reentrant contact lies beyond the old vertex. Curved boundaries, interior seams, closed chains and the opposite straight-edge endpoint retain their trimmed domains. E9's torus meridian fillet now passes independent radius/normal, volume, closed-mesh and STEP checks at original scale and with transformed/reversed selections.
+
+- Breaking: generic `fillet_along_wire` and `try_fillet_along_wire` now require `C: TryInto<Line<Point3>>` so end trimming can recognize exact straight supports. Use `truck_modeling::Curve`, or implement a fallible conversion that succeeds only for exact lines. The modeling-solid APIs are unchanged; PiezaCAD's call in `cad-core/src/kernel/blend.rs` needs no migration.
+
 - Preserve exact requested parameter endpoints when constructing cubic Hermite pieces. Reconstructing the final knot through a width calculation could introduce a one-ulp overlap and reject an otherwise valid adaptive fit. Regressions cover exact ranges, shared internal knots, endpoint controls, dense position/derivative accuracy, reversed curves, rigid motion and scaling; fitting tolerances and subdivision budgets are unchanged. K4's cylindrical contact curve now exports, producing a native-valid single-solid STEP result; its sampled reference discrepancy remains unresolved.
 
 - Close polar cap meshes without replacing shared meridian samples, and use identical spatial samples on both sides of artificial periodic seams. Export an enclosed surface pole as a degenerate STEP vertex loop while preserving the modeling topology. H4's central-axis ellipsoid fillet now passes independent radius, normal, volume, closed-mesh and STEP checks, including opposite meridian sheets and transformed/reversed selections; its inaccurate native reference still disagrees with the output.

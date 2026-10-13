@@ -82,3 +82,66 @@ fn periodic_torus_import_preserves_original_scale_open_ring_material() { verify(
 fn periodic_torus_import_preserves_complete_major_revolution() { verify("J4", 0.01, false); }
 #[test]
 fn periodic_torus_import_preserves_reentrant_meridian_material() { verify("J5", 0.01, true); }
+
+fn verify_meridian_fillet(scale: f64, transformed: bool, reversed: bool) {
+    use truck_shapeops::fillet::try_fillet_solid_along_wire;
+    let matrix = if transformed {
+        Matrix4::from_translation(Vector3::new(13., -7., 23.))
+            * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.73))
+    } else {
+        Matrix4::identity()
+    } * Matrix4::from_scale(scale);
+    let inverse = matrix.invert().unwrap();
+    let solid = builder::transformed(&sector("E9"), matrix);
+    let before = serde_json::to_string(&solid.compress()).unwrap();
+    let point = matrix.transform_point(Point3::new(200., 0., 50.));
+    let edge = common::blend::edge_through(&solid.boundaries()[0], point);
+    let edge = if reversed { edge.inverse() } else { edge };
+    let result = try_fillet_solid_along_wire(&solid, &wire![edge], 10. * scale, 0.001).unwrap();
+    assert_eq!(before, serde_json::to_string(&solid.compress()).unwrap());
+    assert!(result.solid.is_geometric_consistent());
+    assert_eq!(result.generated_faces.len(), 1);
+    let surface = result.generated_faces[0].oriented_surface();
+    let (u, v) = surface.try_range_tuple();
+    let ((a, b), (c, d)) = (u.unwrap(), v.unwrap());
+    for i in 0..=16 {
+        for j in 0..=64 {
+            let u = a + (b - a) * i as f64 / 16.;
+            let v = c + (d - c) * j as f64 / 64.;
+            let p = inverse.transform_point(surface.subs(u, v));
+            let normal = inverse.transform_vector(surface.normal(u, v)).normalize();
+            let center = p - 10. * normal;
+            assert!((center.y - 10.).abs() * scale < 0.002, "{center:?}");
+            assert!(
+                ((center.x.hypot(center.y) - 200.).hypot(center.z) - 40.).abs() * scale < 0.002,
+                "{center:?}"
+            );
+        }
+    }
+    let cap_height = 50. * (8. * PI / 9.).sin();
+    let extended_x = ((200. - (40_f64.powi(2) - cap_height.powi(2)).sqrt()).powi(2) - 100.).sqrt();
+    assert!(result.solid.vertex_iter().any(|vertex| {
+        inverse
+            .transform_point(vertex.point())
+            .distance(Point3::new(extended_x, 0., cap_height))
+            * scale
+            < 0.001
+    }));
+    let expected = 1_537_066.457_433_423_7 * scale.powi(3);
+    common::assert_solid(&result.solid, expected, &[0], 0.001);
+    common::blend::assert_step(&result.solid, expected, 0.001);
+}
+
+#[test]
+fn torus_meridian_fillet_extends_its_reentrant_straight_end_boundary() {
+    for reversed in [false, true] {
+        for transformed in [false, true] {
+            verify_meridian_fillet(0.01, transformed, reversed);
+        }
+    }
+}
+
+#[test]
+fn original_scale_torus_meridian_fillet_preserves_radius_material_and_step() {
+    verify_meridian_fillet(1., false, false);
+}

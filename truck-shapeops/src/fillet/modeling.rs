@@ -88,6 +88,8 @@ fn finish(solid: &Solid, index: usize, shell: Shell, tol: f64) -> Result<BlendRe
 /// reconnect the original boundary loops. Intersecting distant faces or another boundary
 /// of the solid is outside the supported scope. Returns `None` on unsupported selections,
 /// invalid parameters, failed construction, or non-closed output. The input is never modified.
+/// Exact straight boundaries at open ends may extend toward the selected endpoint to meet
+/// a reentrant contact; curved end boundaries retain their existing trimmed domains.
 /// Rounding the rim where an existing convex cylindrical fillet meets a perpendicular plane
 /// requires a smaller radius; collapsed contact curves (equal radii) and folded offsets
 /// (larger radii) are unsupported.

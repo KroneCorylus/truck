@@ -1,0 +1,84 @@
+{
+  "parent": "7114bf482689ebde112a182e863894191b13024e",
+  "source_sha256": {
+    "CHANGELOG.md": "bc29845e64865ccc19c2eef1c2416e05cfe7c88bc95bb30ac0069d2fff461a27",
+    "truck-shapeops/src/fillet/along_wire.rs": "4622c08950cdbc6afc5e0be1a2b5432bd3489f9a62f06bb804e7de9ad7e10ff5",
+    "truck-shapeops/src/fillet/modeling.rs": "bd9dcdaff9adc32710c259865559015968d3afe033ba6f3d418d0aca5cb5194e",
+    "truck-shapeops/tests/imported_toroidal_sectors.rs": "bd48bacaa48e85cefb7c38d54ea9b23e2e78d12043103f7a62864133e87d902e"
+  },
+  "fixture_sha256": {
+    "truck-shapeops/tests/fixtures/toroidal-sectors/E9.step": "80e04e970b5ad7090d560f90ced78f32759a5888a7d5d9356863d5e0a45c3505"
+  },
+  "replay_sha256": "e9078f4cfefff5c21c6392bd9bb32f5b88bf49f7ece666d5ccae65f44e6a7e68",
+  "native_archive": "audits/fillet-chamfer/capture/2026-10-13-polar-cap-seams/artifacts.zip",
+  "native_archive_sha256": "21b60b7a9e8a72d759e86b25299ca30cfd97bde1ba0ba0dd39912a2f40dedc71",
+  "native_artifact_sha256": {
+    "blend/simple/E9/capture/001.input.brep": "2273506830b3f9e4a795455b64f7313f2018cfbe5d1f12eebe8dc20f18b10762",
+    "blend/simple/E9/capture/001.input.json": "810e33757ff86ed9c68092d897e3aad4860d4c0ffcba93d0a1c99879ce765b57",
+    "blend/simple/E9/capture/001.input.step": "4921d0cd5ada16212e601da044cf4be6e76c80d933979d3eed86519ca85ba885",
+    "blend/simple/E9/capture/001.result.brep": "4846840b980f511028a49a80fba281733f6aba00db51b3163ed2ba6baae2fa48",
+    "blend/simple/E9/capture/001.result.json": "266f95104ed3f7dd3df5f9a4849e0fef8e56bf2d0276ef78fa8383494f2c06f2",
+    "blend/simple/E9/capture/001.result.step": "e2f82f437cbd40ea1ae2da20b1f2ce9b8efc7be0c68f7c2c881b5477bb8912d8"
+  },
+  "replay_artifact_sha256": {
+    "E9/001.input.brep": "2273506830b3f9e4a795455b64f7313f2018cfbe5d1f12eebe8dc20f18b10762",
+    "E9/001.input.json": "810e33757ff86ed9c68092d897e3aad4860d4c0ffcba93d0a1c99879ce765b57",
+    "E9/001.input.step": "4921d0cd5ada16212e601da044cf4be6e76c80d933979d3eed86519ca85ba885",
+    "E9/001.result.brep": "4846840b980f511028a49a80fba281733f6aba00db51b3163ed2ba6baae2fa48",
+    "E9/001.result.json": "266f95104ed3f7dd3df5f9a4849e0fef8e56bf2d0276ef78fa8383494f2c06f2",
+    "E9/001.result.step": "e2f82f437cbd40ea1ae2da20b1f2ce9b8efc7be0c68f7c2c881b5477bb8912d8",
+    "E9/001.truck.step": "529b72eacc3ad2b142bcd68815f83a09d9cd5ce86c46fd51b8cdfcccd52aab8d",
+    "E9/001.truck.json": "5f25bd8ba5839eccccbdaf6517c48ace065d57d0a0b984d602c8c41b0fa62d33",
+    "E9/001.comparison.json": "d4372ca333913fcc32eac4957b755a8b5253bacb07f8eaaecd748035eec996ff"
+  },
+  "replay_archive_sha256": "297f4737a0d1242cb10eeea0cb3a89fc8074578719053d4a7a9715900e08a364",
+  "targeted_replay": {
+    "comparison": "unverified",
+    "result": {
+      "geometry_consistent": true,
+      "input_unchanged": true,
+      "mesh_closed": true,
+      "mesh_volume": 1537049.2430197133,
+      "selected_edges": 1,
+      "status": "operation-succeeded",
+      "step_prepared": true
+    },
+    "schema_version": 1,
+    "stage": "output-consistency",
+    "tolerance": 0.001
+  },
+  "targeted_comparison": {
+    "schema_version": 1,
+    "comparison": "sampled-only",
+    "native_valid": true,
+    "truck_step_valid": true,
+    "native_solids": 1,
+    "truck_solids": 1,
+    "native_volume": 1537066.4819177703,
+    "truck_volume": 1537066.4526273177,
+    "native_to_truck_max_distance": 4.164703942225627e-05,
+    "native_to_truck_samples": 1157,
+    "truck_to_native_max_distance": 4.164557972574163e-05,
+    "truck_to_native_samples": 1106
+  },
+  "independent_volume": 1537066.4574334237,
+  "independent_native_diagnostic_sha256": "7281a40d2d00f601932f4a98d5b7559e137e966e382602a3ac76a762fe99035d",
+  "checks": {
+    "all_target_release_clippy": "passed",
+    "actions_smoke": "passed",
+    "replay_build": "passed"
+  },
+  "performance_claim": "None; action benchmark smoke only.",
+  "release_tests": {
+    "passed": 358,
+    "failed": 0,
+    "ignored": 1,
+    "targets": 69
+  },
+  "validation_commands": [
+    "CARGO_BUILD_JOBS=12 cargo test --release -p truck-shapeops --no-fail-fast",
+    "CARGO_BUILD_JOBS=12 cargo clippy --release -p truck-shapeops -p truck-benchmarks --all-targets",
+    "RAYON_NUM_THREADS=1 CARGO_BUILD_JOBS=12 cargo bench -p truck-benchmarks --bench actions -- --test",
+    "CARGO_BUILD_JOBS=12 cargo build --release -p truck-shapeops --example replay_occt_blend"
+  ]
+}

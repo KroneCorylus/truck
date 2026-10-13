@@ -1,0 +1,6 @@
+valid 1
+solids 1
+volume 1537066.4526492232
+expected 1537066.4574334237
+absolute_error 0.0047842005733400583
+max_edge_vertex_tolerance 8.2342610410790634e-06

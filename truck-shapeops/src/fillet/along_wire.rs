@@ -264,6 +264,9 @@ impl<C: Clone> Cuts<C> {
 /// number of faces: the fillet is trimmed against every face between the two side faces, and the
 /// edges between those faces are cut where they meet the fillet. An existing round can serve as
 /// an end face for a miter; tangent junction patches between meeting rounds are not constructed.
+/// An exact straight edge leaving an open end may extend toward that end to meet a contact.
+/// The curve's `TryInto<Line<Point3>>` conversion must succeed only for exact lines; curved
+/// edges retain their trimmed domains. Interior seams and closed chains are never extended.
 ///
 /// Contact curves must remain regular: rounding the rim where an existing convex cylindrical
 /// fillet meets a perpendicular plane requires a smaller radius. Equal radii collapse one
@@ -281,7 +284,7 @@ pub fn fillet_along_wire<C, S, R>(
     tol: f64,
 ) -> Option<Shell<Point3, C, S>>
 where
-    C: FilletedCurve<S>,
+    C: FilletedCurve<S> + TryInto<Line<Point3>>,
     S: FilletedSurface<C>,
     R: ScalarFunctionD1,
     PCurve<BSplineCurve<Point2>, S>: ToSameGeometry<C>,
@@ -300,7 +303,7 @@ pub fn try_fillet_along_wire<C, S, R>(
     tol: f64,
 ) -> Result<Shell<Point3, C, S>, Diagnostic>
 where
-    C: FilletedCurve<S>,
+    C: FilletedCurve<S> + TryInto<Line<Point3>>,
     S: FilletedSurface<C>,
     R: ScalarFunctionD1,
     PCurve<BSplineCurve<Point2>, S>: ToSameGeometry<C>,
@@ -647,8 +650,19 @@ where
         contacts,
         vertices,
         cuts,
-    } = trim_runs(shell, wire, &runs, &contact_curves)
-        .ok_or_else(|| failed().stage("trim_faces"))?;
+    } = trim_runs(shell, wire, &runs, &contact_curves, |curve, edge, start| {
+        let open_end = ends.iter().flatten().any(|walk| {
+            [0, walk.faces.len()]
+                .into_iter()
+                .any(|i| walk.edges[i].id() == edge.id())
+        });
+        if open_end {
+            trim_extended_contact_edge(curve, edge, start)
+        } else {
+            trim_contact_edge(curve, edge, start)
+        }
+    })
+    .ok_or_else(|| failed().stage("trim_faces"))?;
     let blend_surfaces: Vec<S> = surfaces.iter().map(|af| af.to_same_geometry()).collect();
 
     let mut cross: Vec<Vec<Edge<Point3, C>>> = vec![Vec::new(); nv];
@@ -821,7 +835,7 @@ where
         .into_iter()
         .flatten()
         .collect::<Vec<_>>();
-    let trimmed = trim_runs(shell, wire, &runs, contact_curves)?;
+    let trimmed = trim_runs(shell, wire, &runs, contact_curves, trim_contact_edge)?;
     trimmed
         .cuts
         .pieces
@@ -835,6 +849,7 @@ fn trim_runs<C, S>(
     wire: &Wire<Point3, C>,
     runs: &[Run],
     contact_curves: &[[C; 2]],
+    trim: impl Fn(&mut C, &Edge<Point3, C>, bool) -> Option<TrimmedContact<C>>,
 ) -> Option<TrimmedChain<C, S>>
 where
     C: FilletedCurve<S>,
@@ -880,8 +895,8 @@ where
                 return None;
             }
             let adjacent = &boundary[(run.start + len - 1) % len];
-            let (before, start) = trim_contact_edge(&mut curves[0], adjacent, true)?;
-            let (_, end) = trim_contact_edge(&mut curves[m - 1], adjacent, false)?;
+            let (before, start) = trim(&mut curves[0], adjacent, true)?;
+            let (_, end) = trim(&mut curves[m - 1], adjacent, false)?;
             let before = before?;
             let middle = if before.front() == &end {
                 before
@@ -908,7 +923,7 @@ where
                     piece
                 }
                 None => {
-                    let (piece, vertex) = trim_contact_edge(&mut curves[0], prev, true)?;
+                    let (piece, vertex) = trim(&mut curves[0], prev, true)?;
                     cuts.insert(prev, piece.clone())?;
                     cuts.vertices[start_vertex][side] = Some(vertex);
                     piece
@@ -924,7 +939,7 @@ where
                     piece
                 }
                 None => {
-                    let (piece, vertex) = trim_contact_edge(&mut curves[m - 1], next, false)?;
+                    let (piece, vertex) = trim(&mut curves[m - 1], next, false)?;
                     cuts.insert(next, piece.clone())?;
                     cuts.vertices[end_vertex][side] = Some(vertex);
                     piece
@@ -1145,6 +1160,88 @@ where
     None
 }
 
+fn trim_extended_contact_edge<C, S>(
+    curve: &mut C,
+    edge: &Edge<Point3, C>,
+    at_start: bool,
+) -> Option<TrimmedContact<C>>
+where
+    C: FilletedCurve<S> + TryInto<Line<Point3>>,
+    NurbsCurve<Vector4>: ToSameGeometry<C>,
+{
+    let mut trimmed = curve.clone();
+    if let Some(result) = trim_contact_edge(&mut trimmed, edge, at_start) {
+        *curve = trimmed;
+        return Some(result);
+    }
+    let line: Line<Point3> = edge.curve().try_into().ok()?;
+    let axis = line.1 - line.0;
+    let length2 = axis.magnitude2();
+    if !length2.is_finite() || length2 <= TOLERANCE2 {
+        return None;
+    }
+    let range = curve.range_tuple();
+    let mut bounds = (0.0_f64, 1.0_f64);
+    // Only the end next to the chain may extend; contact evaluations remain inside their trim.
+    for i in 0..=16 {
+        let point = curve.subs(range.0 + (range.1 - range.0) * i as f64 / 16.);
+        let s = (point - line.0).dot(axis) / length2;
+        if !s.is_finite() {
+            return None;
+        }
+        if edge.orientation() == at_start {
+            bounds.1 = bounds.1.max(s);
+        } else {
+            bounds.0 = bounds.0.min(s);
+        }
+    }
+    if bounds == (0., 1.) {
+        return None;
+    }
+    let hint = if at_start { range.0 } else { range.1 };
+    let end = if edge.orientation() == at_start {
+        1.
+    } else {
+        0.
+    };
+    let (t, s) = intersect_samples(
+        range,
+        bounds,
+        (hint, end),
+        |t| Some(curve.subs(t)),
+        |s| Some(line.subs(s)),
+        |t| Some(curve.der(t)),
+        |_| Some(axis),
+    )?;
+    if (0. ..=1.).contains(&s) {
+        return None;
+    }
+    let vertex = Vertex::new(curve.subs(t).midpoint(line.subs(s)));
+    if !t.near(&hint) {
+        if at_start {
+            *curve = curve.cut(t);
+        } else {
+            curve.cut(t);
+        }
+    }
+    let (front, back) = if at_start {
+        (edge.front(), &vertex)
+    } else {
+        (&vertex, edge.back())
+    };
+    let extended = NurbsCurve::new(BSplineCurve::new(
+        KnotVec::bezier_knot(1),
+        vec![
+            front.point().to_homogeneous(),
+            back.point().to_homogeneous(),
+        ],
+    ));
+    Some((
+        Some(Edge::new(front, back, extended.to_same_geometry())),
+        vertex,
+    ))
+}
+
 fn trim_contact_edge<C: FilletedCurve<S>, S>(
     curve: &mut C,
     edge: &Edge<Point3, C>,
@@ -1285,6 +1382,70 @@ pub(super) fn intersect_samples(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn straight_contact_edges_extend_only_toward_the_chain_endpoint() {
+        use truck_modeling::{Curve, Surface};
+        let a = Vertex::new(Point3::origin());
+        let b = Vertex::new(Point3::new(1., 0., 0.));
+        for orientation in [false, true] {
+            for at_start in [false, true] {
+                let edge = Edge::new(&a, &b, Curve::Line(Line(a.point(), b.point())));
+                let edge = if orientation { edge } else { edge.inverse() };
+                let toward_end = orientation == at_start;
+                for allowed in [false, true] {
+                    let x = if toward_end == allowed { 1.2 } else { -0.2 };
+                    let mut contact =
+                        Curve::Line(Line(Point3::new(x, -0.2, 0.), Point3::new(x, 0.2, 0.)));
+                    let before = serde_json::to_string(&contact).unwrap();
+                    let result =
+                        trim_extended_contact_edge::<_, Surface>(&mut contact, &edge, at_start);
+                    if !allowed {
+                        assert!(result.is_none());
+                        assert_eq!(before, serde_json::to_string(&contact).unwrap());
+                        continue;
+                    }
+                    let (piece, vertex) = result.unwrap();
+                    let piece = piece.unwrap();
+                    assert_near!(vertex.point(), Point3::new(x, 0., 0.));
+                    let bounds = contact.range_tuple();
+                    assert_near!(
+                        contact.subs(if at_start { bounds.0 } else { bounds.1 }),
+                        vertex.point()
+                    );
+                    assert!(piece.is_geometric_consistent());
+                    if at_start {
+                        assert_eq!(piece.front(), edge.front());
+                        assert_eq!(piece.back(), &vertex);
+                    } else {
+                        assert_eq!(piece.front(), &vertex);
+                        assert_eq!(piece.back(), edge.back());
+                    }
+                    assert_near!(edge.absolute_front().point(), Point3::origin());
+                    assert_near!(edge.absolute_back().point(), Point3::new(1., 0., 0.));
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn curved_contact_edges_keep_their_trimmed_domains() {
+        use truck_modeling::{Curve, Surface};
+        let a = Vertex::new(Point3::origin());
+        let b = Vertex::new(Point3::new(1., 0., 0.));
+        let edge = Edge::new(
+            &a,
+            &b,
+            Curve::BSplineCurve(BSplineCurve::new(
+                KnotVec::bezier_knot(2),
+                vec![a.point(), Point3::new(0.5, 0.01, 0.), b.point()],
+            )),
+        );
+        let mut contact = Curve::Line(Line(Point3::new(1.2, -0.2, 0.), Point3::new(1.2, 0.2, 0.)));
+        let before = serde_json::to_string(&contact).unwrap();
+        assert!(trim_extended_contact_edge::<_, Surface>(&mut contact, &edge, true).is_none());
+        assert_eq!(before, serde_json::to_string(&contact).unwrap());
+    }
 
     #[derive(Clone)]
     struct Trimmed(BSplineCurve<Point3>);
