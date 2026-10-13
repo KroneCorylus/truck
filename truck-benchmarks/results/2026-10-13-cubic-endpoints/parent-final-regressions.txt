@@ -1,0 +1,36 @@
+Production parent: fef04fef2e5fee8ea5f051840f039c1ee3f21693
+Command: CARGO_BUILD_JOBS=12 cargo test --release -p truck-geometry --test cubic_approximation_tolerance
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+    Finished `release` profile [optimized] target(s) in 1.77s
+     Running tests/cubic_approximation_tolerance.rs (target/release/deps/cubic_approximation_tolerance-3499d5fae62dcd88)
+
+running 4 tests
+test cubic_segments_preserve_requested_parameter_endpoints ... FAILED
+test adaptive_cubic_pieces_share_exact_parameter_boundaries ... FAILED
+test concatenation_removes_only_identical_join_controls ... ok
+test cubic_fitting_preserves_tolerances_below_default_knot_removal_precision ... ok
+
+failures:
+
+---- cubic_segments_preserve_requested_parameter_endpoints stdout ----
+
+thread 'cubic_segments_preserve_requested_parameter_endpoints' (263523) panicked at truck-geometry/tests/cubic_approximation_tolerance.rs:12:9:
+assertion `left == right` failed
+  left: (-0.014358461080567665, -0.005752014283787984)
+ right: (-0.014358461080567665, -0.005752014283787985)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- adaptive_cubic_pieces_share_exact_parameter_boundaries stdout ----
+
+thread 'adaptive_cubic_pieces_share_exact_parameter_boundaries' (263520) panicked at truck-geometry/tests/cubic_approximation_tolerance.rs:50:18:
+adjacent adaptive pieces share their boundary exactly
+
+
+failures:
+    adaptive_cubic_pieces_share_exact_parameter_boundaries
+    cubic_segments_preserve_requested_parameter_endpoints
+
+test result: FAILED. 2 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-geometry --test cubic_approximation_tolerance`
+Exit status: 101

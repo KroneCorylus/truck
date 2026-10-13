@@ -1,0 +1,2 @@
+Command: target/occt-capture-plugin/compare_shapes target/cubic-endpoint-replay/K4/001.result.brep target/cubic-endpoint-replay/K4/001.truck.step target/cubic-endpoint-replay/K4/001.comparison.json
+Exit status: 0

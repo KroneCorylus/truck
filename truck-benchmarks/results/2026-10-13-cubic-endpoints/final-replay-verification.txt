@@ -1,0 +1,2 @@
+Every source and executable hash in frozen-replay-hashes.json matches the final validated source and rebuilt replay binary.
+No replay was repeated because the binary and sources are byte-identical.

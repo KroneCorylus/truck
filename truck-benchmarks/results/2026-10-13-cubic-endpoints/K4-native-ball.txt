@@ -1,0 +1,3 @@
+Command: LD_LIBRARY_PATH=target/occt-sdk/usr/lib64 target/check-cylinder-ball target/cubic-endpoint-replay/K4/001.result.brep K4
+face 1 samples 3969 max_center_offset_error 0.073691316764588066 at 79.014975157701429,43.25442193504891,23.880603877330376
+Exit status: 0

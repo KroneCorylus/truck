@@ -1,0 +1,108 @@
+{
+  "parent": "fef04fef2e5fee8ea5f051840f039c1ee3f21693",
+  "source_sha256": {
+    "CHANGELOG.md": "cff30c3c6ebecb7feb6bec8552e305518fc00597294d84f959d741dadea35a8c",
+    "truck-geometry/src/nurbs/bspcurve.rs": "adbee883da46e615780025e9eb7c70a18485288f48a34db4847036636c4f55a2",
+    "truck-geometry/tests/cubic_approximation_tolerance.rs": "fcfcf96abceec5d0a65694546b9f73de3ad97facf1bce56c9542d36d0673b2dd"
+  },
+  "replay_sha256": "e157742df1591e1e95a437a5f63af442848a8570ba6eed35a56fe1a79f7148f3",
+  "native_archive": "audits/fillet-chamfer/capture/2026-10-13-ellipsoid-domains/artifacts.zip",
+  "native_archive_sha256": "dc71196e5a3dc76ebe287bce0b301f3b34cf124fbe1d8fd245d7dc9f8841128a",
+  "native_artifact_sha256": {
+    "blend/simple/K2/capture/001.input.json": "52509bbb5c578381ecf932a2d1c00b40b82901f9f0698dab682f30cc8dafd1b4",
+    "blend/simple/K2/capture/001.input.step": "d8f1267a3ac74c5dc7acc8f5dcd8fc793a892f0541bb93eff843f95b4fb8b8c6",
+    "blend/simple/K2/capture/001.input.brep": "4d735ecb4b9d6f83bfc4833f23b16280ea70b8e5620ef629b9cc2bef85c04772",
+    "blend/simple/K2/capture/001.result.json": "255787db83f51a229441642b629490fa0f58a0c6826d651d0c31d83c7d6ca378",
+    "blend/simple/K2/capture/001.result.brep": "24f4ab09c388e86da2a203994d9b23929ca3c56cbc067e6162889248a54941bb",
+    "blend/simple/K2/capture/001.truck.json": "3731c01c095c027c15d54c0b9cee65ee4e01f976b7ba1553fec597803319efd7",
+    "blend/simple/K2/capture/001.truck.step": "349a7e4b35cf729f8ea4883c9216600ace74d993d849a0620b002a9ccbbe8d18",
+    "blend/simple/K2/capture/001.comparison.json": "3cd598ddbce0e2ac852f303db089f8415d9b2e1a812cdf7ce56f884d07465efb",
+    "blend/simple/K4/capture/001.input.json": "b74a1bda8a62bb9860d6bea025081ddb3990678eafe6bb84496ee882ca6d95e5",
+    "blend/simple/K4/capture/001.input.step": "1df1501bac1def3e9d825fd0a0addf3cb9d6a8cd73bf26e7948f445fc409f1a6",
+    "blend/simple/K4/capture/001.input.brep": "97a95c627691119e151d7f869e646bbce5d61e9b62846870bc91b65701380237",
+    "blend/simple/K4/capture/001.result.json": "8e1f459a7f46a11e4076a513e955a0ff7f336ff664056405b79112f95d8a4919",
+    "blend/simple/K4/capture/001.result.brep": "b1ec1cdd0ba5ab5a6fe685d67b8777d2afa456a80fe67d11a172fc730cf29a37"
+  },
+  "replay_artifact_sha256": {
+    "K2/001.comparison.json": "3cd598ddbce0e2ac852f303db089f8415d9b2e1a812cdf7ce56f884d07465efb",
+    "K2/001.input.brep": "4d735ecb4b9d6f83bfc4833f23b16280ea70b8e5620ef629b9cc2bef85c04772",
+    "K2/001.input.json": "52509bbb5c578381ecf932a2d1c00b40b82901f9f0698dab682f30cc8dafd1b4",
+    "K2/001.input.step": "d8f1267a3ac74c5dc7acc8f5dcd8fc793a892f0541bb93eff843f95b4fb8b8c6",
+    "K2/001.result.brep": "24f4ab09c388e86da2a203994d9b23929ca3c56cbc067e6162889248a54941bb",
+    "K2/001.result.json": "255787db83f51a229441642b629490fa0f58a0c6826d651d0c31d83c7d6ca378",
+    "K2/001.truck.json": "3731c01c095c027c15d54c0b9cee65ee4e01f976b7ba1553fec597803319efd7",
+    "K2/001.truck.step": "349a7e4b35cf729f8ea4883c9216600ace74d993d849a0620b002a9ccbbe8d18",
+    "K4/001.comparison.json": "bf16d3fcc396ae44857ad7199dfcc2a5e49e688e8abc8fb0324e2afa2a9a4c0c",
+    "K4/001.input.brep": "97a95c627691119e151d7f869e646bbce5d61e9b62846870bc91b65701380237",
+    "K4/001.input.json": "b74a1bda8a62bb9860d6bea025081ddb3990678eafe6bb84496ee882ca6d95e5",
+    "K4/001.input.step": "1df1501bac1def3e9d825fd0a0addf3cb9d6a8cd73bf26e7948f445fc409f1a6",
+    "K4/001.result.brep": "b1ec1cdd0ba5ab5a6fe685d67b8777d2afa456a80fe67d11a172fc730cf29a37",
+    "K4/001.result.json": "8e1f459a7f46a11e4076a513e955a0ff7f336ff664056405b79112f95d8a4919",
+    "K4/001.truck.json": "03580b01ea66315013c1c38e247129e564272b37b25eefe0cf208cb6edd4907b",
+    "K4/001.truck.step": "5da4d193d7fe9ca11c5d99116d2295e1cf174f7b05f9b71cc98f9c9ce859265f"
+  },
+  "replay_archive_sha256": "84de66dfa33bbff31bd8ca2d04da2eca846ce84b08b4fef8d8efcd1a455a193e",
+  "release_tests": {
+    "passed": 912,
+    "failed": 1,
+    "ignored": 5,
+    "targets": 142,
+    "known_failure": "truck-geometry/tests/pcurve.rs::pcurve_derivation; same input and values as parent-precision-test.txt"
+  },
+  "checks": {
+    "all_target_release_clippy": "passed",
+    "actions_smoke": "passed",
+    "replay_build": "passed"
+  },
+  "performance_claim": "None; action benchmark smoke only.",
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.1\nLLVM version: 22.1.8\n",
+  "targeted_replay": {
+    "comparison": "unverified",
+    "result": {
+      "geometry_consistent": true,
+      "input_unchanged": true,
+      "mesh_closed": true,
+      "mesh_volume": 214207.02817010845,
+      "selected_edges": 2,
+      "status": "operation-succeeded",
+      "step_prepared": true
+    },
+    "schema_version": 1,
+    "stage": "output-consistency",
+    "tolerance": 0.001
+  },
+  "targeted_comparison": {
+    "schema_version": 1,
+    "comparison": "sampled-only",
+    "native_valid": true,
+    "truck_step_valid": true,
+    "native_solids": 1,
+    "truck_solids": 1,
+    "native_volume": 214190.18597261963,
+    "truck_volume": 214210.88280914773,
+    "native_to_truck_max_distance": 0.04617208169705975,
+    "native_to_truck_samples": 633,
+    "truck_to_native_max_distance": 0.05617813045504337,
+    "truck_to_native_samples": 1088
+  },
+  "independent_diagnostics": {
+    "K2-native": {
+      "max_sampled_offset_residual": 0.05543514186260268,
+      "log_sha256": "e07739fe5f37668fc1e200b49e979e48ab09a23799240b49c09febede055aa7a"
+    },
+    "K2-truck-step": {
+      "max_sampled_offset_residual": 0.00020378825825417834,
+      "log_sha256": "3474b920226c35bd3b00f02a03ec92a7d2677d6b9f8158ad5a2af937e95b8d36"
+    },
+    "K4-native": {
+      "max_sampled_offset_residual": 0.07369131676458807,
+      "log_sha256": "fa99512622495765f2c668673a7f01fc256224310c67d58331cc8ee16bae7bfc"
+    },
+    "K4-truck-step": {
+      "max_sampled_offset_residual": 0.0003781660314388091,
+      "log_sha256": "c9d9811e155310ffecaaced2d5c034626ec72d9988b16ba2fb5a36b7e9a12c39"
+    }
+  },
+  "diagnostic_source_sha256": "e983022be0737932318fac4ffc504e270a5c51c0e063a2ce998160c0d9b902b2",
+  "diagnostic_executable_sha256": "b4da07704ebc30b22a25d8b4db4a3e17fec7100377473fc9d38d3e4b22d06c6e"
+}

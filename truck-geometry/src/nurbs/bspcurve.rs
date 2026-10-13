@@ -1296,9 +1296,10 @@ where
         der1: <P as EuclideanSpace>::Diff,
         range: (f64, f64),
     ) -> Self {
-        let width = range.1 - range.0;
-        let mut knot_vec = KnotVec::bezier_knot(3);
-        knot_vec.transform(width, range.0);
+        let (a, b) = range;
+        let width = b - a;
+        // Reconstructing b as a + width can overlap the next adaptive piece by one ulp.
+        let knot_vec = KnotVec::from(vec![a, a, a, a, b, b, b, b]);
         Self::debug_new(
             knot_vec,
             vec![pt0, pt0 + der0 * width / 3.0, pt1 - der1 * width / 3.0, pt1],
@@ -1360,6 +1361,7 @@ where
     }
 
     /// C^1-approximation for `curve` by cubic Bspline curve.
+    /// The requested parameter endpoints are retained exactly in the clamped knots.
     /// # Examples
     /// ```
     /// use truck_geometry::prelude::*;

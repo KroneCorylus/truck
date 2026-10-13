@@ -1,0 +1,4 @@
+Command: LD_LIBRARY_PATH=target/occt-sdk/usr/lib64 target/check-cylinder-ball target/cubic-endpoint-replay/K4/001.truck.step K4
+face 4 samples 3969 max_center_offset_error 0.00037816603143880911 at 26.565809181534597,46.468828753153723,19.712851493108868
+face 5 samples 3969 max_center_offset_error 0.00015433134301190421 at 67.435720028696849,33.510373825027223,25.33414993583316
+Exit status: 0

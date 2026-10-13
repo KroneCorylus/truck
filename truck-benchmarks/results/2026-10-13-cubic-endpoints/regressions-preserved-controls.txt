@@ -1,0 +1,11 @@
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+    Finished `release` profile [optimized] target(s) in 0.45s
+     Running tests/cubic_approximation_tolerance.rs (target/release/deps/cubic_approximation_tolerance-3499d5fae62dcd88)
+
+running 4 tests
+test cubic_segments_preserve_requested_parameter_endpoints ... ok
+test concatenation_removes_only_identical_join_controls ... ok
+test cubic_fitting_preserves_tolerances_below_default_knot_removal_precision ... ok
+test adaptive_cubic_pieces_share_exact_parameter_boundaries ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

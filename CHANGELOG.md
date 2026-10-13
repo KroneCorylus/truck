@@ -6,6 +6,8 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Preserve exact requested parameter endpoints when constructing cubic Hermite pieces. Reconstructing the final knot through a width calculation could introduce a one-ulp overlap and reject an otherwise valid adaptive fit. Regressions cover exact ranges, shared internal knots, endpoint controls, dense position/derivative accuracy, reversed curves, rigid motion and scaling; fitting tolerances and subdivision budgets are unchanged. K4's cylindrical contact curve now exports, producing a native-valid single-solid STEP result; its sampled reference discrepancy remains unresolved.
+
 - Close polar cap meshes without replacing shared meridian samples, and use identical spatial samples on both sides of artificial periodic seams. Export an enclosed surface pole as a degenerate STEP vertex loop while preserving the modeling topology. H4's central-axis ellipsoid fillet now passes independent radius, normal, volume, closed-mesh and STEP checks, including opposite meridian sheets and transformed/reversed selections; its inaccurate native reference still disagrees with the output.
 
 - Breaking: constructing `StepModel` from compressed shells/solids, including `FromIterator`, now requires curve bounds `ParametricCurve3D + BoundedCurve + ParameterDivision1D<Point = Point3>` and surface bounds `ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>` in addition to `StepLength`, so STEP export can identify enclosed poles. Add these bounds to generic wrappers. PiezaCAD's exports in `cad-core/src/kernel/mod.rs`, `cad-core/src/kernel/assembly.rs`, and `cad-core/tests/healing.rs` use concrete modeling geometry and need no call-site changes.

@@ -1,0 +1,4 @@
+Command: LD_LIBRARY_PATH=target/occt-sdk/usr/lib64 target/check-cylinder-ball target/cylinder-junction-investigation/K2/001.truck.step K2
+face 6 samples 3969 max_center_offset_error 0.00020378825825417834 at 25.061630281224129,6.6650262935356164,96.702619098431725
+face 7 samples 3969 max_center_offset_error 0.00010438840372728464 at 43.526238324641007,0.42213479166979839,35.601938837325733
+Exit status: 0
