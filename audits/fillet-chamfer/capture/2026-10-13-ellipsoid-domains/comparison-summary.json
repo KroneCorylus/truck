@@ -1,0 +1,174 @@
+{
+  "kernel_revision": "2b25a964e68cdfb41a3d01fdd8532c8fa74de5f1",
+  "native": {
+    "passed": 156
+  },
+  "captures": 161,
+  "before_statuses": {
+    "input-import-failed": 11,
+    "operation-succeeded": 85,
+    "operation-failed": 43,
+    "unhandled-intent": 8,
+    "input-inconsistent": 11,
+    "timeout": 2,
+    "capture-incomplete": 1
+  },
+  "after_statuses": {
+    "input-import-failed": 11,
+    "operation-succeeded": 87,
+    "operation-failed": 43,
+    "unhandled-intent": 8,
+    "input-inconsistent": 11,
+    "capture-incomplete": 1
+  },
+  "successful_checks": {
+    "constructed": 87,
+    "input_unchanged": 87,
+    "geometry_consistent": 87,
+    "mesh_closed": 86,
+    "step_prepared": 86,
+    "native_valid": 86,
+    "truck_step_valid": 85,
+    "single_solid": 86,
+    "sampled_distance": 81
+  },
+  "limited_comparison_passes": 81,
+  "status_changes": [
+    {
+      "case": "blend/simple/H2",
+      "capture": "001",
+      "before": "timeout",
+      "after": "operation-succeeded",
+      "result": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 13156661.50397187,
+        "selected_edges": 1,
+        "status": "operation-succeeded",
+        "step_prepared": true
+      }
+    },
+    {
+      "case": "blend/simple/H4",
+      "capture": "001",
+      "before": "timeout",
+      "after": "operation-succeeded",
+      "result": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": false,
+        "mesh_volume": 13159628.450343022,
+        "selected_edges": 1,
+        "status": "operation-succeeded",
+        "step_prepared": true
+      }
+    }
+  ],
+  "regressions": [],
+  "numeric_changes": [],
+  "distance_discrepancies": [
+    {
+      "case": "blend/simple/G1",
+      "capture": "001",
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 132189932.40065464,
+        "truck_volume": 132185649.9747912,
+        "native_to_truck_max_distance": 0.9874986974855128,
+        "native_to_truck_samples": 921,
+        "truck_to_native_max_distance": 0.018545749048141102,
+        "truck_to_native_samples": 886
+      }
+    },
+    {
+      "case": "blend/simple/H4",
+      "capture": "001",
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": false,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 13151259.698596016,
+        "truck_volume": -7856963.248838655,
+        "native_to_truck_max_distance": 93.70980027845584,
+        "native_to_truck_samples": 1104,
+        "truck_to_native_max_distance": 88.16778784387078,
+        "truck_to_native_samples": 1081
+      }
+    },
+    {
+      "case": "blend/simple/K2",
+      "capture": "001",
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 905598.5267387221,
+        "truck_volume": 905623.4537860147,
+        "native_to_truck_max_distance": 0.03269215818217927,
+        "native_to_truck_samples": 877,
+        "truck_to_native_max_distance": 0.04583577492595724,
+        "truck_to_native_samples": 1587
+      }
+    },
+    {
+      "case": "blend/simple/K3",
+      "capture": "001",
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 905598.5270888987,
+        "truck_volume": 905623.4534851363,
+        "native_to_truck_max_distance": 0.03269215868376121,
+        "native_to_truck_samples": 877,
+        "truck_to_native_max_distance": 0.045839215216337506,
+        "truck_to_native_samples": 1587
+      }
+    },
+    {
+      "case": "blend/simple/K4",
+      "capture": "001",
+      "comparison": null
+    },
+    {
+      "case": "blend/tolblend_simple/A1",
+      "capture": "001",
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 29055.053293964895,
+        "truck_volume": 29055.062123632302,
+        "native_to_truck_max_distance": 0.022376472569611394,
+        "native_to_truck_samples": 1874,
+        "truck_to_native_max_distance": 0.022376472569611394,
+        "truck_to_native_samples": 1862
+      }
+    }
+  ],
+  "unresolved": [
+    {
+      "case": "bugs/moddata_1/bug119",
+      "capture": "001",
+      "status": "capture-incomplete"
+    }
+  ]
+}
