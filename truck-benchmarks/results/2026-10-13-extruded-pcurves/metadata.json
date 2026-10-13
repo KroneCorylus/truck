@@ -1,0 +1,204 @@
+{
+  "parent": "6fae58ae623b9b1c528b73486f3ff2ff46bbe61f",
+  "source_sha256": {
+    "CHANGELOG.md": "a3eaa3fe9c72cd62a9642f5bf181ba24b80466104bff3a7e3124040011baedae",
+    "truck-stepio/src/in/step_geometry/modeling_impls.rs": "ac41462122f005557eed696aa4884a10bd4662069010edf9eae7b71b5f66bba9",
+    "truck-stepio/src/out/geometry.rs": "e3e585f0b9dc9f1743ea9d3c2d97295b6be251fc46c4555a97eeb5de89ab70db",
+    "truck-stepio/src/out/modeling.rs": "9b1db705c6357ce60e0456f5defcf1b612a0f1d73a17628d966dfbcf857379c3",
+    "truck-stepio/tests/extruded_import_pcurves.rs": "208f538b6b697813e9c9b84ce879e361da4da1e97b4159e0c0bf7ee59ed0a52c",
+    "truck-shapeops/tests/imported_oblique_extrusions.rs": "2c741ae74e67d6b46bef6f7d3d9856263119d7780ea0ecd726c6f5b8fa189c51",
+    "truck-shapeops/tests/fixtures/oblique-extrusions/J6.step": "cb784f1d18e2005110c36b8dd25195c7bd1bd4872123ce8af5a3f3861ac91698",
+    "truck-shapeops/tests/fixtures/oblique-extrusions/J8.step": "03126b75fd1eb4aa31d99f6ab5a039bfef4d472f84ed0e8a8e69efc988cecaa3",
+    "truck-shapeops/tests/fixtures/oblique-extrusions/independent-rim-volume.py": "0d91c038fb5298a765f538d4c3d35806ab2a809e8e8a3f7062879a32e53eba74",
+    "truck-shapeops/tests/fixtures/oblique-extrusions/README.md": "b8061e6e50c977eadc491ecbe168a3bd13e7677877e12b143415072c4a40fc5d"
+  },
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--release",
+        "-p",
+        "truck-stepio",
+        "-p",
+        "truck-shapeops",
+        "-p",
+        "truck-benchmarks",
+        "--all-targets"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "truck-stepio",
+        "-p",
+        "truck-shapeops",
+        "--no-fail-fast"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "bench",
+        "-p",
+        "truck-benchmarks",
+        "--bench",
+        "actions",
+        "--",
+        "--test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--release",
+        "-p",
+        "truck-shapeops",
+        "--example",
+        "replay_occt_blend"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "replay_sha256": "36702fc0a247966e4a8f4ec24e6764c25f51db62c50a6b149488c0b1debd6564",
+  "release_tests": {
+    "passed": 472,
+    "failed": 0,
+    "ignored": 1,
+    "targets": 90
+  },
+  "native_archive": "audits/fillet-chamfer/capture/2026-10-13-conical-domains/artifacts.zip",
+  "native_archive_sha256": "f1d7b5780e586ba4eec326be606d273b687d27cb419b4565f6547c94569a2afc",
+  "native_artifact_sha256": {
+    "blend/simple/J6/capture/001.input.step": "cb784f1d18e2005110c36b8dd25195c7bd1bd4872123ce8af5a3f3861ac91698",
+    "blend/simple/J6/capture/001.input.json": "ea71a87552eb287889145c6b055f998ad8b1d88957609b2f68f03b64956eba22",
+    "blend/simple/J6/capture/001.input.brep": "1f85404177987ca2c642dbe12a790d0b3e11834866ab466e7476abbe4d2d22fe",
+    "blend/simple/J6/capture/001.result.step": "8671ab8d071cf8fab5fd87c836d51ffdeda711a2aeb8e6a34b5300f75fff325f",
+    "blend/simple/J6/capture/001.result.json": "7957b09d23db2e4ec57d2df28bc3f254e3a286363e5d3509283f97e80c9f3cec",
+    "blend/simple/J6/capture/001.result.brep": "56513e2cc7be1367c0dcfa0a7a565fab15ecb7081ca129673013fc29ab4eb45f",
+    "blend/simple/J8/capture/001.input.step": "03126b75fd1eb4aa31d99f6ab5a039bfef4d472f84ed0e8a8e69efc988cecaa3",
+    "blend/simple/J8/capture/001.input.json": "405da042e9e361b4956ca1765f721d8b90a83a8df9f98ee4e68c3241f8c213f2",
+    "blend/simple/J8/capture/001.input.brep": "60a9c734f88db7fddbf642835d72c08922005512f7cd52b5e560b230c3aa0d76",
+    "blend/simple/J8/capture/001.result.step": "af66c6780c1005f3c369ad429776bc770219eacd11171536d2885bee1c145714",
+    "blend/simple/J8/capture/001.result.json": "6922d263e6e058c02bc6887cfdf42fad99c320cca37ff211921481e6c1869088",
+    "blend/simple/J8/capture/001.result.brep": "58d39b25754a0b7ad06bf317306606a95879cf2876e03c669098eaa63960fcc6"
+  },
+  "replay_artifact_sha256": {
+    "J6/001.input.step": "cb784f1d18e2005110c36b8dd25195c7bd1bd4872123ce8af5a3f3861ac91698",
+    "J6/001.input.json": "ea71a87552eb287889145c6b055f998ad8b1d88957609b2f68f03b64956eba22",
+    "J6/001.input.brep": "1f85404177987ca2c642dbe12a790d0b3e11834866ab466e7476abbe4d2d22fe",
+    "J6/001.result.step": "8671ab8d071cf8fab5fd87c836d51ffdeda711a2aeb8e6a34b5300f75fff325f",
+    "J6/001.result.json": "7957b09d23db2e4ec57d2df28bc3f254e3a286363e5d3509283f97e80c9f3cec",
+    "J6/001.result.brep": "56513e2cc7be1367c0dcfa0a7a565fab15ecb7081ca129673013fc29ab4eb45f",
+    "J6/replay.log": "5084cd1064e978163d873aec3ded7b4ae191b18edecc5f240addc76e2b7a3768",
+    "J6/001.truck.step": "c20e9640b8a9192124eb042a6170fd25aee996a687024811984a21cd0e939b66",
+    "J6/001.truck.json": "d2b1290ea69ac60f7b79ef2693d8b53023b62bb1b7da47da482d34b7647d2a9a",
+    "J6/comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "J6/001.comparison.json": "ee3df68c9a44892e6993582f3d2a6269a1b9bb8523673b0fa93965d3a3abf5d0",
+    "J6/independent-step.txt": "d96aedc3169630f3b856ea4f878098999d2aa478bccc2475226c38372423bc10",
+    "J6/native-radius.txt": "1081cf60e1d1f4986e45cfcc9abfb8da6fceebf2ee921b9222e5fb485d08a62c",
+    "J6/truck-radius.txt": "9311e2f5aa368b554779130d11ad6df6b4d6e1febaf85b154fdc93eb87c2a08c",
+    "J8/001.input.step": "03126b75fd1eb4aa31d99f6ab5a039bfef4d472f84ed0e8a8e69efc988cecaa3",
+    "J8/001.input.json": "405da042e9e361b4956ca1765f721d8b90a83a8df9f98ee4e68c3241f8c213f2",
+    "J8/001.input.brep": "60a9c734f88db7fddbf642835d72c08922005512f7cd52b5e560b230c3aa0d76",
+    "J8/001.result.step": "af66c6780c1005f3c369ad429776bc770219eacd11171536d2885bee1c145714",
+    "J8/001.result.json": "6922d263e6e058c02bc6887cfdf42fad99c320cca37ff211921481e6c1869088",
+    "J8/001.result.brep": "58d39b25754a0b7ad06bf317306606a95879cf2876e03c669098eaa63960fcc6",
+    "J8/replay.log": "97bb8da6dfc80f600edde1d226a0ab2f2b4e175b434e7ca38f3bb08ff6ebde2f",
+    "J8/001.truck.step": "15de2c47f713281c0eadd6a8f09b86acdfb7ae211c16b0d5f3ba51b4491e7d0f",
+    "J8/001.truck.json": "5ccf505a7c2dd6345b43dba0eb25b53aa8fe52d936257c3cfd96a70ce505db47",
+    "J8/comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "J8/001.comparison.json": "0a603b189d9f458b688106b081204cb622cf58481ce479a7a20ba3e5a8d3e9e3",
+    "J8/independent-step.txt": "eb4a97d8206ccd35c4cf64c76dedbbda292bf8adcee3076cd9bb3ab756a4e9d6",
+    "J8/native-radius.txt": "2c1a448eac81f15348b82e5d05a978b4562c231e6146ad2a3a1951e286f9d542",
+    "J8/truck-radius.txt": "93193bde4d2c1cab290e65472558499a9c0fa52b90264cd76ab43b4752ad8ac5"
+  },
+  "replay_archive_sha256": "9687d8414e83fbfc625cab6d115aaf93dd4ecdb26c57884aa830bde85813d246",
+  "targeted_results": {
+    "J6": {
+      "comparison": "unverified",
+      "result": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 1560449.8471156908,
+        "selected_edges": 2,
+        "status": "operation-succeeded",
+        "step_prepared": true
+      },
+      "schema_version": 1,
+      "stage": "output-consistency",
+      "tolerance": 0.001
+    },
+    "J8": {
+      "comparison": "unverified",
+      "result": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 772395.3995266288,
+        "selected_edges": 2,
+        "status": "operation-succeeded",
+        "step_prepared": true
+      },
+      "schema_version": 1,
+      "stage": "output-consistency",
+      "tolerance": 0.001
+    }
+  },
+  "targeted_comparisons": {
+    "J6": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 1560465.4548421775,
+      "truck_volume": 1560464.3520426406,
+      "native_to_truck_max_distance": 0.0009116892109306192,
+      "native_to_truck_samples": 634,
+      "truck_to_native_max_distance": 0.0018145406249262244,
+      "truck_to_native_samples": 1110
+    },
+    "J8": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 772420.8122140876,
+      "truck_volume": 772406.7160132927,
+      "native_to_truck_max_distance": 0.09175800354400195,
+      "native_to_truck_samples": 627,
+      "truck_to_native_max_distance": 0.08908512359529569,
+      "truck_to_native_samples": 1104
+    }
+  },
+  "independent_input_volumes": {
+    "J6": "500000*pi",
+    "J8": "250000*pi"
+  },
+  "independent_fillet_volumes": {
+    "J6": 1560464.3531795258,
+    "J8": 772406.7218958114
+  },
+  "independent_step_checker": {
+    "target/inspect-polar-step": "8ba733150ff8088ea07eb21ecf213d906655905dbff4ee8f89b771cca74e8b2d",
+    "truck-benchmarks/results/2026-10-13-polar-cap-seams/inspect-polar-step.cpp": "7281a40d2d00f601932f4a98d5b7559e137e966e382602a3ac76a762fe99035d"
+  },
+  "radius_checker": {
+    "target/check-rim-radius": "af32fb5a9b32e600fcddc1c233d565d5f270dbd2e4cba91d766ad493fd3e6e3c",
+    "truck-benchmarks/results/2026-10-13-extruded-pcurves/check-rim-radius.cpp": "b6c64a1a2588523b4b094a1d299871d5d18828409da63ab687f625331e08043a"
+  },
+  "radius_checker_build": "c++ -std=c++17 -O2 -I target/occt-sdk/usr/include/opencascade truck-benchmarks/results/2026-10-13-extruded-pcurves/check-rim-radius.cpp -L target/occt-sdk/usr/lib64 -Wl,-rpath-link,target/occt-sdk/usr/lib64 -lTKDESTEP -lTKXSBase -lTKTopAlgo -lTKBRep -lTKG3d -lTKG2d -lTKGeomBase -lTKMath -lTKernel -o target/check-rim-radius",
+  "performance_claim": "None; action benchmark smoke only."
+}

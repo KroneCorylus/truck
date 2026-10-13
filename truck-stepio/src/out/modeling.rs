@@ -341,10 +341,20 @@ fn prepare_surface(surface: &Surface, curves: &[&Curve], tol: f64) -> Option<Sur
             }
             Some(Surface::RevolutedCurve(prepared))
         }
-        Surface::Extruded(extruded) => Some(Surface::Extruded(ExtrudedCurve::by_extrusion(
-            prepare_curve(extruded.entity_curve(), tol)?,
-            extruded.extruding_vector(),
-        ))),
+        Surface::Extruded(extruded) => {
+            let mut curve = prepare_curve(extruded.entity_curve(), tol)?;
+            // Keep a partial profile's bounds; a complete ellipse retains its periodic chart.
+            if let Curve::Conic(ellipse) = &curve {
+                let (a, b) = ellipse.range_tuple();
+                if surface.elementary().is_none() && !(b - a).near(&std::f64::consts::TAU) {
+                    curve = Curve::NurbsCurve(NurbsCurve::try_from(&curve).ok()?);
+                }
+            }
+            Some(Surface::Extruded(ExtrudedCurve::by_extrusion(
+                curve,
+                extruded.extruding_vector(),
+            )))
+        }
         _ => Some(surface.clone()),
     }
 }
@@ -556,6 +566,63 @@ fn fillet_to_nurbs(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn extruded_ellipse_step_preserves_trim_and_normal_direction() {
+        use crate::{
+            out::*,
+            r#in::{step_geometry::StepExtrudedCurve, SurfaceOfLinearExtrusionHolder, Table},
+        };
+        use ruststep::{ast::DataSection, tables::EntityTable};
+        use std::{f64::consts::TAU, str::FromStr};
+        for range in [(0., TAU), (0.3, 4.1)] {
+            for reversed in [false, true] {
+                for moved in [false, true] {
+                    let matrix = if moved {
+                        Matrix4::from_translation(Vector3::new(13., -7., 23.))
+                            * Matrix4::from_axis_angle(
+                                Vector3::new(1., 2., 3.).normalize(),
+                                Rad(0.73),
+                            )
+                    } else {
+                        Matrix4::identity()
+                    };
+                    let mut profile = Processor::with_transform(
+                        TrimmedCurve::new(UnitCircle::new(), range),
+                        matrix * Matrix4::from_nonuniform_scale(2., 1., 1.),
+                    );
+                    if reversed {
+                        profile.invert();
+                    }
+                    let original = Surface::Extruded(ExtrudedCurve::by_extrusion(
+                        Curve::Conic(profile),
+                        matrix.transform_vector(Vector3::new(1., 0., 3.)),
+                    ));
+                    let prepared = prepare_surface(&original, &[], 1e-5).unwrap();
+                    let data = format!("DATA;{}ENDSEC;", StepDataDisplay::new(&prepared, 1));
+                    let table = Table::from_data_section(&DataSection::from_str(&data).unwrap());
+                    let entity =
+                        EntityTable::<SurfaceOfLinearExtrusionHolder>::get_owned(&table, 1)
+                            .unwrap();
+                    let read = StepExtrudedCurve::try_from(&entity).unwrap();
+                    let (a, b) = read.entity_curve().range_tuple();
+                    for v in [0., 0.5, 1.] {
+                        assert!(read.subs(a, v).distance(original.subs(range.0, v)) < 1e-10);
+                        assert!(read.subs(b, v).distance(original.subs(range.1, v)) < 1e-10);
+                        for i in 0..=64 {
+                            let u = range.0 + (range.1 - range.0) * i as f64 / 64.;
+                            let p = original.subs(u, v);
+                            let (s, t) = read.search_parameter(p, None, 100).unwrap();
+                            assert!(read.subs(s, t).distance(p) < 1e-9);
+                            let normal =
+                                read.normal(s, t) * if prepared.same_sense() { 1. } else { -1. };
+                            assert!(normal.dot(original.normal(u, v)) > 1. - 1e-10);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     #[test]
     fn fillet_export_refines_local_error_without_relaxing_tolerance() {

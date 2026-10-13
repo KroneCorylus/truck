@@ -6,6 +6,10 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Preserve linear STEP pcurves on extruded lines, ellipses and splines without changing their surface parameters. Export extrusion face senses using the profile's traversal direction; preserve partial elliptical profiles as exact rational arcs while full ellipses retain their periodic chart. Regressions check positions and derivatives, rejected reparameterized profiles, input and fillet material, radius, contact normals, reversed selections, rigid motion, closed meshes and STEP. Native J6/J8 rims now construct; sampled reference discrepancies remain open.
+
+- Breaking: `StepSurface` for `ExtrudedCurve<C, Vector3>` and `Processor<ExtrudedCurve<C, Vector3>, T>` now requires `C: StepCurve` to preserve the exported profile's traversal direction. Add that bound to generic export wrappers. PiezaCAD's concrete exports in `cad-core/src/kernel/mod.rs`, `cad-core/src/kernel/assembly.rs` and `cad-core/tests/healing.rs` need no call-site changes.
+
 - Fit imported cone support domains to complete boundary hulls while keeping the apex at an endpoint of a single cone nappe. Preserve shifted and scaled cone generators in STEP output by reconstructing their slope and reference-plane radius. Conical sector regressions check apex inversion, both nappes and slope directions, affine frames, independent input/fillet volumes, radius and normals, closed meshes and STEP. H6 now constructs and exports; H7/H9 reach the existing unsupported nonplanar corner path.
 
 - Evaluate revolution-pole normals with the rotated meridian tangent, including conical tips. Refine meshes against their shared boundary positions and ignore facet planes whose vertices collapse at kernel tolerance. Regressions cover both pole ends, reversed orientation, affine transforms, perturbed shared apex coordinates, bounded refinement and dense surface-to-mesh distance checks.

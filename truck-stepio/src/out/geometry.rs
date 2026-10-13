@@ -745,11 +745,13 @@ impl<C: StepLength> StepLength for ExtrudedCurve<C, Vector3> {
 impl<C: ConstStepLength> ConstStepLength for ExtrudedCurve<C, Vector3> {
     const LENGTH: usize = 1 + C::LENGTH + Vector3::LENGTH;
 }
-impl<C> StepSurface for ExtrudedCurve<C, Vector3> {}
+impl<C: StepCurve> StepSurface for ExtrudedCurve<C, Vector3> {
+    fn same_sense(&self) -> bool { self.entity_curve().same_sense() }
+}
 
-impl<C, T: One> StepSurface for Processor<ExtrudedCurve<C, Vector3>, T> {
+impl<C: StepCurve, T: One> StepSurface for Processor<ExtrudedCurve<C, Vector3>, T> {
     #[inline(always)]
-    fn same_sense(&self) -> bool { self.orientation() }
+    fn same_sense(&self) -> bool { self.orientation() == self.entity().same_sense() }
 }
 
 impl<C> DisplayByStep for RevolutedCurve<C>
@@ -924,6 +926,7 @@ impl StepSurface for ModelingSurface {
             Some((_, outward)) => outward,
             None => match self {
                 ModelingSurface::RevolutedCurve(x) => StepSurface::same_sense(x),
+                ModelingSurface::Extruded(x) => StepSurface::same_sense(x),
                 _ => true,
             },
         }

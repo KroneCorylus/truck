@@ -7,6 +7,7 @@
 //! Isoparametric pcurves on toroidal surfaces become exact spatial circles.
 //! Isoparametric pcurves on spline surfaces become exact spatial splines.
 //! Other linear pcurves on cylinders, cones and tori retain their exact surface coordinates.
+//! Linear pcurves on extruded lines, ellipses and splines retain their exact surface coordinates.
 //! Other pcurves are rejected.
 //!
 //! ```
@@ -87,6 +88,20 @@ impl TryFrom<&Curve3D> for ModelingCurve {
                 match pcurve.surface().as_ref() {
                     Surface::ElementarySurface(ElementarySurface::ToroidalSurface(surface)) => {
                         return toroidal_pcurve(surface, line);
+                    }
+                    Surface::SweptCurve(SweptCurve::ExtrudedCurve(surface))
+                        if matches!(
+                            surface.entity_curve(),
+                            Curve3D::Line(_)
+                                | Curve3D::Conic(Conic3D::Ellipse(_))
+                                | Curve3D::BSplineCurve(_)
+                                | Curve3D::NurbsCurve(_)
+                        ) =>
+                    {
+                        return parameter_pcurve(
+                            ModelingSurface::try_from(pcurve.surface().as_ref())?,
+                            line,
+                        );
                     }
                     Surface::BSplineSurface(surface) => {
                         return Ok(Self::BSplineCurve(spline_isoparameter(surface, line)?));
@@ -183,9 +198,16 @@ fn elementary_pcurve(
     {
         return Err("invalid imported pcurve transform".into());
     }
+    parameter_pcurve(ModelingSurface::RevolutedCurve(revolved), line)
+}
+
+fn parameter_pcurve(
+    surface: ModelingSurface,
+    line: &Line<Point2>,
+) -> std::result::Result<ModelingCurve, StepConvertingError> {
     let curve = ModelingCurve::PCurve(truck_modeling::PCurve::new(
         BSplineCurve::from(*line),
-        Box::new(ModelingSurface::RevolutedCurve(revolved)),
+        Box::new(surface),
     ));
     let mut regular = false;
     for t in [0., 0.5, 1.] {
