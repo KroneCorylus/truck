@@ -2,6 +2,114 @@ use super::*;
 use proptest::prelude::*;
 
 #[test]
+fn nonperiodic_closed_profile_boundaries_keep_their_parameter_branch() {
+    use truck_geometry::prelude::*;
+    let cubic = NurbsCurve::new(BSplineCurve::new(
+        KnotVec::bezier_knot(3),
+        vec![
+            Vector4::new(0., 0., 0., 1.),
+            Vector4::new(0., 10., 0., 1.),
+            Vector4::new(10., 0., 0., 1.),
+            Vector4::new(0., 0., 0., 1.),
+        ],
+    ));
+    let quartic = NurbsCurve::new(BSplineCurve::new(
+        KnotVec::bezier_knot(4),
+        vec![
+            Vector4::new(0., 0., 0., 1.),
+            Vector4::new(0., -10., 0., 1.),
+            Vector4::new(50., 50., 0., 1.),
+            Vector4::new(-10., 0., 0., 1.),
+            Vector4::new(0., 0., 0., 1.),
+        ],
+    ));
+    let ellipse: NurbsCurve<Vector4> = Processor::with_transform(
+        TrimmedCurve::new(UnitCircle::<Point3>::new(), (0., std::f64::consts::TAU)),
+        Matrix4::from_nonuniform_scale(10., 5., 1.),
+    )
+    .to_same_geometry();
+    for curve in [cubic, quartic, ellipse] {
+        for matrix in [
+            Matrix4::identity(),
+            Matrix4::from_translation(Vector3::new(2., -3., 5.))
+                * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.73))
+                * Matrix4::from_nonuniform_scale(0.1, 0.2, 0.15),
+        ] {
+            let reference = Processor::with_transform(
+                ExtrudedCurve::by_extrusion(curve.clone(), Vector3::new(2., -1., 10.)),
+                matrix,
+            );
+            assert_eq!(reference.u_period(), None);
+            let (ur, _) = reference.range_tuple();
+            let mid = (ur.0 + ur.1) / 2.;
+            for (a, b) in [(ur.0, mid), (mid, ur.1)] {
+                let corners = [
+                    Point2::new(a, 0.),
+                    Point2::new(b, 0.),
+                    Point2::new(b, 1.),
+                    Point2::new(a, 1.),
+                ];
+                let wire: Vec<PolylineCurve> = (0..4)
+                    .map(|i| {
+                        let line = Line(corners[i], corners[(i + 1) % 4]);
+                        (0..=64)
+                            .map(|j| {
+                                let uv = line.subs(j as f64 / 64.);
+                                reference.subs(uv.x, uv.y)
+                            })
+                            .collect()
+                    })
+                    .collect();
+                for reversed in [false, true] {
+                    for start in 0..4 {
+                        let mut surface = reference.clone();
+                        let mut wire = wire.clone();
+                        wire.rotate_left(start);
+                        if reversed {
+                            surface.invert();
+                            wire.reverse();
+                            wire.iter_mut().for_each(|p| p.0.reverse());
+                        }
+                        let points: Vec<_> = wire
+                            .iter()
+                            .flat_map(|poly| poly.iter().take(poly.len() - 1))
+                            .copied()
+                            .collect();
+                        let piece = PolyBoundaryPiece::try_new(
+                            &surface,
+                            wire.into_iter(),
+                            by_search_parameter,
+                        )
+                        .unwrap();
+                        assert_eq!(piece.0.len(), points.len() + 1);
+                        let axis = usize::from(reversed);
+                        for (actual, expected) in
+                            piece.0.iter().zip(points.iter().chain(points.first()))
+                        {
+                            assert_eq!(actual.point, *expected);
+                            assert!(surface.subs(actual.x, actual.y).distance(*expected) < 1e-7);
+                            assert!(
+                                actual.uv[axis] >= a - 1e-7 && actual.uv[axis] <= b + 1e-7,
+                                "start={start} reversed={reversed} uv={:?} range={a}..{b}",
+                                actual.uv
+                            );
+                        }
+                        let area: f64 = piece
+                            .0
+                            .windows(2)
+                            .map(|p| p[0].x * p[1].y - p[1].x * p[0].y)
+                            .sum::<f64>()
+                            / 2.;
+                        assert!((area - (b - a)).abs() < 1e-7, "{area}");
+                        assert_eq!(loop_orientation(&piece.0), Some(true));
+                    }
+                }
+            }
+        }
+    }
+}
+
+#[test]
 fn polar_ellipsoid_boundaries_keep_the_large_angular_sector() {
     use std::f64::consts::{FRAC_PI_2, PI};
     use truck_geometry::prelude::*;

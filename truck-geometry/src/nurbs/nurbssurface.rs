@@ -672,7 +672,7 @@ where V::Point: MetricSpace<Metric = f64> + HashGen<f64>
                     .row_curve(points[0].len() - 1)
                     .parameter_division(range.0, tol)
                     .0;
-                (merge(first, second), vec![range.1.0, range.1.1])
+                (merge(first, second), vec![range.1 .0, range.1 .1])
             }
             Some(LinearAxis::U) => {
                 let first = self.column_curve(0).parameter_division(range.1, tol).0;
@@ -680,7 +680,7 @@ where V::Point: MetricSpace<Metric = f64> + HashGen<f64>
                     .column_curve(points.len() - 1)
                     .parameter_division(range.1, tol)
                     .0;
-                (vec![range.0.0, range.0.1], merge(first, second))
+                (vec![range.0 .0, range.0 .1], merge(first, second))
             }
             None => algo::surface::parameter_division(self, range, tol),
         }
@@ -724,73 +724,54 @@ impl IncludeCurve<NurbsCurve<Vector3>> for NurbsSurface<Vector3> {
     }
 }
 
-impl IncludeCurve<BSplineCurve<Point3>> for NurbsSurface<Vector4> {
-    #[inline(always)]
-    fn include(&self, curve: &BSplineCurve<Point3>) -> bool {
-        let pt = curve.front();
-        let mut hint = match self.search_parameter(pt, None, INCLUDE_CURVE_TRIALS) {
-            Some(got) => got,
-            None => return false,
+impl NurbsSurface<Vector4> {
+    fn include_curve(&self, knots: &KnotVec, degree: usize, subs: impl Fn(f64) -> Point3) -> bool {
+        let ((u0, u1), (v0, v1)) = self.range_tuple();
+        let valid = |point: Point3, &(u, v): &(f64, f64)| {
+            self.subs(u, v).near(&point)
+                && u >= u0 - TOLERANCE
+                && u <= u1 + TOLERANCE
+                && v >= v0 - TOLERANCE
+                && v <= v1 + TOLERANCE
         };
-        let uknot_vec = self.uknot_vec();
-        let vknot_vec = self.vknot_vec();
-        let degree = curve.degree() * 6;
-        let (knots, _) = curve.knot_vec().to_single_multi();
-        for i in 1..knots.len() {
-            for j in 1..=degree {
-                let p = j as f64 / degree as f64;
-                let t = knots[i - 1] * (1.0 - p) + knots[i] * p;
-                let pt = curve.subs(t);
-                hint = match self.search_parameter(pt, Some(hint), INCLUDE_CURVE_TRIALS) {
-                    Some(got) => got,
-                    None => return false,
-                };
-                if !self.subs(hint.0, hint.1).near(&pt)
-                    || hint.0 < uknot_vec[0] - TOLERANCE
-                    || hint.0 - uknot_vec[0] > uknot_vec.range_length() + TOLERANCE
-                    || hint.1 < vknot_vec[0] - TOLERANCE
-                    || hint.1 - vknot_vec[0] > vknot_vec.range_length() + TOLERANCE
-                {
-                    return false;
-                }
+        let point = subs(knots[0]);
+        let Some(mut hint) = self
+            .search_parameter(point, None, INCLUDE_CURVE_TRIALS)
+            .filter(|uv| valid(point, uv))
+        else {
+            return false;
+        };
+        let (knots, _) = knots.to_single_multi();
+        for interval in knots.windows(2) {
+            for j in 1..=degree * 6 {
+                let p = j as f64 / (degree * 6) as f64;
+                let point = subs(interval[0] * (1. - p) + interval[1] * p);
+                let found = self
+                    .search_parameter(point, Some(hint), INCLUDE_CURVE_TRIALS)
+                    .filter(|uv| valid(point, uv))
+                    .or_else(|| {
+                        self.search_parameter(point, None, INCLUDE_CURVE_TRIALS)
+                            .filter(|uv| valid(point, uv))
+                    });
+                let Some(found) = found else { return false };
+                hint = found;
             }
         }
         true
     }
 }
 
+impl IncludeCurve<BSplineCurve<Point3>> for NurbsSurface<Vector4> {
+    #[inline(always)]
+    fn include(&self, curve: &BSplineCurve<Point3>) -> bool {
+        self.include_curve(curve.knot_vec(), curve.degree(), |t| curve.subs(t))
+    }
+}
+
 impl IncludeCurve<NurbsCurve<Vector4>> for NurbsSurface<Vector4> {
     #[inline(always)]
     fn include(&self, curve: &NurbsCurve<Vector4>) -> bool {
-        let pt = curve.front();
-        let mut hint = match self.search_parameter(pt, None, INCLUDE_CURVE_TRIALS) {
-            Some(got) => got,
-            None => return false,
-        };
-        let uknot_vec = self.uknot_vec();
-        let vknot_vec = self.vknot_vec();
-        let degree = curve.degree() * 6;
-        let (knots, _) = curve.knot_vec().to_single_multi();
-        for i in 1..knots.len() {
-            for j in 1..=degree {
-                let p = j as f64 / degree as f64;
-                let t = knots[i - 1] * (1.0 - p) + knots[i] * p;
-                let pt = curve.subs(t);
-                hint = match self.search_parameter(pt, Some(hint), INCLUDE_CURVE_TRIALS) {
-                    Some(got) => got,
-                    None => return false,
-                };
-                if !self.subs(hint.0, hint.1).near(&pt)
-                    || hint.0 < uknot_vec[0] - TOLERANCE
-                    || hint.0 - uknot_vec[0] > uknot_vec.range_length() + TOLERANCE
-                    || hint.1 < vknot_vec[0] - TOLERANCE
-                    || hint.1 - vknot_vec[0] > vknot_vec.range_length() + TOLERANCE
-                {
-                    return false;
-                }
-            }
-        }
-        true
+        self.include_curve(curve.knot_vec(), curve.degree(), |t| curve.subs(t))
     }
 }
 

@@ -6,6 +6,8 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Import closed cubic and quartic Bézier prisms with distinct parameter branches at their nonsmooth seams. Share ordered-boundary seeding between face splitting and meshing, and retry failed NURBS curve-inclusion continuations with unchanged sample counts and geometric/domain checks. Regressions cover both preprocessing modes, rotated/reversed boundary starts, affine charts, exact material, closed meshes, STEP round trips and immutable rejection of unsupported cusp-rim fillets.
+
 - Resolve ambiguous inverse-search seeds at coincident extrusion-profile endpoints by comparing local tangent projections on both branches. Preserve explicit parameter hints and trial budgets. Regressions cover cubic/quartic cusps, rational profiles, complete rational ellipses, reversed profiles, affine transforms, three scales, exact inversion and nearest points. Closed-cusp STEP boundary reconstruction remains a separate unsupported case.
 
 - Remove an isolated, retraced face seam ending at a collapsed periodic pole while preserving nonpolar, shared and empty-boundary cases. Keep artificial mesh seam endpoints at their shared fitted trim positions rather than replacing them with surface projections. Native spherical-cap regressions check independent input and fillet volumes, rolling radius, contact normals, reversed selections, rigid motion, closed meshes and STEP; fitted polar mesh regressions preserve the complete shared boundary through both poles and orientations.

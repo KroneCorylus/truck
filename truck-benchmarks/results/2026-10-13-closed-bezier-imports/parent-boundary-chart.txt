@@ -1,0 +1,29 @@
+   Compiling truck-geotrait v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-geotrait)
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+   Compiling truck-topology v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-topology)
+   Compiling truck-polymesh v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-polymesh)
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-modeling)
+   Compiling truck-meshalgo v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-meshalgo)
+    Finished `release` profile [optimized] target(s) in 5.49s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running unittests src/lib.rs (target/release/deps/truck_meshalgo-6f1452336a80c8f6)
+
+running 1 test
+test tessellation::triangulation::tests::nonperiodic_closed_profile_boundaries_keep_their_parameter_branch ... FAILED
+
+failures:
+
+---- tessellation::triangulation::tests::nonperiodic_closed_profile_boundaries_keep_their_parameter_branch stdout ----
+
+thread 'tessellation::triangulation::tests::nonperiodic_closed_profile_boundaries_keep_their_parameter_branch' (614151) panicked at truck-meshalgo/src/tessellation/triangulation/tests.rs:91:29:
+start=1 reversed=false uv=Point2 [0.0, 0.0] range=0.5..1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    tessellation::triangulation::tests::nonperiodic_closed_profile_boundaries_keep_their_parameter_branch
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 24 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-meshalgo --lib`

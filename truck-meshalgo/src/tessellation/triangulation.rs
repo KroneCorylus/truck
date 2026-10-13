@@ -541,7 +541,8 @@ impl PolyBoundaryPiece {
             })
             .collect();
         bdry3d.push(bdry3d[0]);
-        let mut previous = None;
+        let mut previous =
+            algo::surface::boundary_search_hint(surface, bdry3d.iter().copied(), &sp);
         let mut vec = bdry3d
             .into_iter()
             .flat_map(|pt| {

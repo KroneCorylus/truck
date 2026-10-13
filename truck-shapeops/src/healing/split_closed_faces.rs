@@ -670,8 +670,10 @@ fn boundary_to_param_polys<S: ParametricSurface3D>(
 ) -> Option<Vec<PolylineCurve<Point2>>> {
     let get_poly = closure_get_poly(poly_edges);
     let poly_boundary: Vec<_> = boundary.iter().copied().map(get_poly).collect();
+    let hint =
+        algo::surface::boundary_search_hint(surface, PolyWireIter::try_new(&poly_boundary)?, &sp);
     let poly_wire_iter = PolyWireIter::try_new(&poly_boundary)?;
-    let closure = poly_project_to_uv(surface, sp);
+    let closure = poly_project_to_uv(surface, sp, hint);
     let mut long_poly = poly_wire_iter.map(closure).collect::<Option<Vec<_>>>()?;
     boundary_into_domain(&mut long_poly, surface);
     let mut vec = vec![long_poly.remove(0)];
@@ -719,9 +721,9 @@ impl<P: Copy> Iterator for PolyWireIter<'_, P> {
 fn poly_project_to_uv<'a, S: ParametricSurface3D>(
     surface: &'a S,
     sp: impl SP<S> + 'a,
+    mut previous: Option<(f64, f64)>,
 ) -> impl FnMut(Point3) -> Option<Point2> + 'a {
     let (up, vp) = (surface.u_period(), surface.v_period());
-    let mut previous = None;
     move |pt| {
         let (mut u, mut v) = sp(surface, pt, previous)?;
         if let (Some(up), Some((u0, _))) = (up, previous) {

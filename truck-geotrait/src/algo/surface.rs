@@ -33,6 +33,67 @@ where
     res
 }
 
+/// Chooses a seed for projecting an ordered boundary. At coincident nonperiodic
+/// domain ends, use a following point away from the seam to select the branch.
+/// The returned seed must still be used to invert the original first point.
+/// Returns `None` when no alternative branch seed is available or needed.
+pub fn boundary_search_hint<S: ParametricSurface3D>(
+    surface: &S,
+    points: impl IntoIterator<Item = Point3>,
+    search: impl Fn(&S, Point3, Option<(f64, f64)>) -> Option<(f64, f64)>,
+) -> Option<(f64, f64)> {
+    let mut points = points.into_iter();
+    let first = search(surface, points.next()?, None)?;
+    let (urange, vrange) = surface.try_range_tuple();
+    let ranges = [urange, vrange];
+    let ambiguous = |(u, v): (f64, f64)| {
+        let point = surface.subs(u, v);
+        [
+            (u, surface.u_period(), surface.uder(u, v)),
+            (v, surface.v_period(), surface.vder(u, v)),
+        ]
+        .into_iter()
+        .zip(ranges)
+        .enumerate()
+        .any(|(axis, ((t, period, tangent), range))| {
+            let Some((a, b)) = range else { return false };
+            if period.is_some() || tangent.so_small() || !a.is_finite() || !b.is_finite() {
+                return false;
+            }
+            let other = if t.near(&a) {
+                b
+            } else if t.near(&b) {
+                a
+            } else {
+                return false;
+            };
+            let opposite = if axis == 0 {
+                surface.subs(other, v)
+            } else {
+                surface.subs(u, other)
+            };
+            point.near(&opposite)
+        })
+    };
+    if !ambiguous(first) {
+        return None;
+    }
+    let valid = |point: Point3, &(u, v): &(f64, f64)| {
+        [u, v].into_iter().zip(ranges).all(|(t, range)| {
+            t.is_finite()
+                && range.is_none_or(|(a, b)| t >= a.min(b) - TOLERANCE && t <= a.max(b) + TOLERANCE)
+        }) && surface.subs(u, v).near(&point)
+    };
+    let mut previous = Some(first);
+    points.find_map(|point| {
+        let parameter = search(surface, point, previous)
+            .filter(|uv| valid(point, uv))
+            .or_else(|| search(surface, point, None).filter(|uv| valid(point, uv)))?;
+        previous = Some(parameter);
+        (!ambiguous(parameter)).then_some(parameter)
+    })
+}
+
 /// The affine parameter of a ruled surface.
 #[derive(Clone, Copy, Debug)]
 pub enum LinearAxis {

@@ -1,0 +1,300 @@
+{
+  "parent": "d411512158f6b0b2e1024e2ef43e5580b147b227",
+  "source_sha256": {
+    "CHANGELOG.md": "1d5bca70b13fb9efb74b018c8cc515ff5325ce67ff593dc24013d89d8525e1cb",
+    "truck-geotrait/src/algo/surface.rs": "c93683ccddd13c7b8e841d9ccf893f15fcc67a144961fde516d6faa1482779c0",
+    "truck-geometry/src/nurbs/nurbssurface.rs": "245bfc09be078dda70b786ee36a779fd89a602d88db4685807bcd99069355473",
+    "truck-meshalgo/src/tessellation/triangulation.rs": "1342dec7d1382532fd1cc3352b1fdad3024b700e7a87eed78c5f222c8c5011ba",
+    "truck-meshalgo/src/tessellation/triangulation/tests.rs": "a97288070dc05d5bc5eedefeaa1c5b687f9a2e566bd88c863684a4d0f88fcf4d",
+    "truck-shapeops/src/healing/split_closed_faces.rs": "2c46b9aa8fd8f9aaba42afb118c6898f6c2e1c0d2767869570d2206297c86794",
+    "truck-geometry/tests/closed_surface_inclusion.rs": "75633e51713202320aa4789d30302ea97efc16a2841e7d130391cd5c13b21842",
+    "truck-shapeops/tests/imported_closed_bezier_prisms.rs": "cd41b0f35881d0c7a445adff4098138231f547050e5788d6cc4fb7df0a9efca3",
+    "truck-shapeops/tests/fixtures/closed-bezier-prisms/cubic.step": "40658e7a0da09323750635035f260db205e9f1f911d598da0e4467a151e14ccf",
+    "truck-shapeops/tests/fixtures/closed-bezier-prisms/quartic.step": "b27a8a4598f5fba5a5c7d7afebfd7b1cd20007c6535d07d24246ba627eba2c4a",
+    "truck-shapeops/tests/fixtures/closed-bezier-prisms/README.md": "c40da21ed23ac6819b2002b84c9aca5ef4a0955ccdefe5ce7f21863c1190ce21"
+  },
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "truck-geotrait",
+        "-p",
+        "truck-geometry",
+        "-p",
+        "truck-modeling",
+        "-p",
+        "truck-meshalgo",
+        "-p",
+        "truck-stepio",
+        "-p",
+        "truck-shapeops",
+        "--no-fail-fast"
+      ],
+      "exit_code": 101
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--release",
+        "-p",
+        "truck-geotrait",
+        "-p",
+        "truck-geometry",
+        "-p",
+        "truck-modeling",
+        "-p",
+        "truck-meshalgo",
+        "-p",
+        "truck-stepio",
+        "-p",
+        "truck-shapeops",
+        "-p",
+        "truck-benchmarks",
+        "--all-targets"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "bench",
+        "-p",
+        "truck-benchmarks",
+        "--bench",
+        "actions",
+        "--",
+        "--test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--release",
+        "-p",
+        "truck-shapeops",
+        "--example",
+        "replay_occt_blend"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "replay_sha256": "96c74ac328a49af7d755572f4664923c3fb966378849101a8aeb3beb7d06c028",
+  "native_archive": "audits/fillet-chamfer/capture/2026-10-13-conical-domains/artifacts.zip",
+  "native_archive_sha256": "f1d7b5780e586ba4eec326be606d273b687d27cb419b4565f6547c94569a2afc",
+  "native_artifact_sha256": {
+    "bugs/modalg_7/bug30940_2/capture/001.input.step": "40658e7a0da09323750635035f260db205e9f1f911d598da0e4467a151e14ccf",
+    "bugs/modalg_7/bug30940_2/capture/001.input.brep": "ea8cea4f6c1f78df1f3aafb7f40c68b365cc7ab1da650c276dd8e8000f025d3c",
+    "bugs/modalg_7/bug30940_2/capture/001.input.json": "10bb8dd92b30896e6b8492bb7f75cfe961404038569e5aeb3daac7182172cdc0",
+    "bugs/modalg_7/bug30940_2/capture/001.result.step": "0b61b1f91db9e837396f86dfcedcc3a8b1a0e8530b9528283329ca46f21b7697",
+    "bugs/modalg_7/bug30940_2/capture/001.result.brep": "85d6fba3c309878b8aa146d69e2952387721cecf1d1c516b768fab547fba58ff",
+    "bugs/modalg_7/bug30940_2/capture/001.result.json": "cdd518b765138ffa7a494e79ef34fe4aeadddc709e3b3d8a0551082a7714531c",
+    "bugs/modalg_7/bug30940_3/capture/001.input.step": "203525d2e9612b37a8225dfe6713099014365f88522f63a08746dba2ff553479",
+    "bugs/modalg_7/bug30940_3/capture/001.input.brep": "ea8cea4f6c1f78df1f3aafb7f40c68b365cc7ab1da650c276dd8e8000f025d3c",
+    "bugs/modalg_7/bug30940_3/capture/001.input.json": "0fe2ed2163edce4e482017bea714f18695d9efbe84ff66dd12bcd3f8d2b9c86f",
+    "bugs/modalg_7/bug30940_3/capture/001.result.step": "3cf8fcfe90fcecb3e333ce42fad68b3a40b631ed31db668515a25c7a5b7a13a8",
+    "bugs/modalg_7/bug30940_3/capture/001.result.brep": "7a0829c8c87ec099c6e87a0fe062ef2fe1489bbeae2d7ea105e828b8c11cfb8d",
+    "bugs/modalg_7/bug30940_3/capture/001.result.json": "f01c29c27b01110af589a14fc8ed898ad1da49e1c257cd22564cc1bfab383cc5",
+    "bugs/modalg_7/bug30940_4/capture/001.input.step": "203525d2e9612b37a8225dfe6713099014365f88522f63a08746dba2ff553479",
+    "bugs/modalg_7/bug30940_4/capture/001.input.brep": "ea8cea4f6c1f78df1f3aafb7f40c68b365cc7ab1da650c276dd8e8000f025d3c",
+    "bugs/modalg_7/bug30940_4/capture/001.input.json": "dba599f6c95524ebaa975670b92a2f12c0793036f325e04eb1ebed7c88d0803d",
+    "bugs/modalg_7/bug30940_4/capture/001.result.step": "5e6065f5ff2194308dc4d6fc0aea87b24e0022af6f70de227e94f675027938df",
+    "bugs/modalg_7/bug30940_4/capture/001.result.brep": "61a81d97b85d249670d17f1f358374220495a6e3599e6aea45e7fca832d91b0a",
+    "bugs/modalg_7/bug30940_4/capture/001.result.json": "5c924bf75257aa9ef179a232a8e1bb3b075102006759fcd3c45b3a8a5dfbb372",
+    "bugs/modalg_7/bug30940_5/capture/001.input.step": "b27a8a4598f5fba5a5c7d7afebfd7b1cd20007c6535d07d24246ba627eba2c4a",
+    "bugs/modalg_7/bug30940_5/capture/001.input.brep": "953a7681a709fb45b42539eafaf2ef34b4d201e28d43152b3ef86046fba5f51c",
+    "bugs/modalg_7/bug30940_5/capture/001.input.json": "091c8cde107772f26570eb341550adb9046aa4de281296327eda5211aed5a96b",
+    "bugs/modalg_7/bug30940_5/capture/001.result.step": "269c1761aef2a96d5a040576c97657e1e3effe49038686c034673a79c01d9353",
+    "bugs/modalg_7/bug30940_5/capture/001.result.brep": "30b85a95a472540ab701d3d897ea038dab091a00a6b43c1a497161c3443098a8",
+    "bugs/modalg_7/bug30940_5/capture/001.result.json": "944faf574a88b061dd751d687986665e8dd5227070229e54c26561f49f63043d",
+    "bugs/modalg_7/bug30940_6/capture/001.input.step": "b27a8a4598f5fba5a5c7d7afebfd7b1cd20007c6535d07d24246ba627eba2c4a",
+    "bugs/modalg_7/bug30940_6/capture/001.input.brep": "953a7681a709fb45b42539eafaf2ef34b4d201e28d43152b3ef86046fba5f51c",
+    "bugs/modalg_7/bug30940_6/capture/001.input.json": "aa4e5a61e105d869eb004bba9e50a6c04371bb8db75b7a783e76da1b889fe1e3",
+    "bugs/modalg_7/bug30940_6/capture/001.result.step": "62fcf3707def69ceb6b9c9769286b8d2b1f488b3c9d163057b618934d4ac0d2c",
+    "bugs/modalg_7/bug30940_6/capture/001.result.brep": "00a78647637491e2ddd75856b58d0cbc54da5f16b7fa51bb269ce73ea953262d",
+    "bugs/modalg_7/bug30940_6/capture/001.result.json": "fe11cecc2344cb62ad1e54e1f39a5976aefd61f93539cb78b6bc86b15cb09941"
+  },
+  "replay_artifact_sha256": {
+    "export-inputs.txt": "f9051a1bc6212a45ff54aca0ce379c1dad6a4373312046b84dc8ccab4d02da04",
+    "provenance.json": "7da0a57c618dd2d2cb00e59985a3487b09bde4fe541492d5339e1cf38b92fd62",
+    "bug30940_2/001.input.step": "40658e7a0da09323750635035f260db205e9f1f911d598da0e4467a151e14ccf",
+    "bug30940_2/001.input.json": "10bb8dd92b30896e6b8492bb7f75cfe961404038569e5aeb3daac7182172cdc0",
+    "bug30940_2/001.result.json": "cdd518b765138ffa7a494e79ef34fe4aeadddc709e3b3d8a0551082a7714531c",
+    "bug30940_2/replay.log": "e53354821ea5c28ca56f0d2923099f3a5f69a54e93bfa7a0f4335db7784a6b52",
+    "bug30940_2/001.truck.json": "4699eb83e425937207524989f9fd75760b3cdf73daee882f014953dabd146e6e",
+    "bug30940_2/001.imported.step": "d0015a0f4cae3ead38cdf92a64c32242a53bc4f5c281252baeef93e7d135b541",
+    "bug30940_2/001.input.brep": "ea8cea4f6c1f78df1f3aafb7f40c68b365cc7ab1da650c276dd8e8000f025d3c",
+    "bug30940_2/001.result.brep": "85d6fba3c309878b8aa146d69e2952387721cecf1d1c516b768fab547fba58ff",
+    "bug30940_2/001.result.step": "0b61b1f91db9e837396f86dfcedcc3a8b1a0e8530b9528283329ca46f21b7697",
+    "bug30940_2/input-comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bug30940_2/independent-imported-step.txt": "1e6573c839836f1a6d8f5645f2257fa8d0511b3d43f275b410862f6690478f4a",
+    "bug30940_2/001.input-comparison.json": "239c976d2aec06e5fe5bb579a30c95881a2c1c11b4263603629811f5c7890da5",
+    "bug30940_3/001.input.step": "203525d2e9612b37a8225dfe6713099014365f88522f63a08746dba2ff553479",
+    "bug30940_3/001.input.json": "0fe2ed2163edce4e482017bea714f18695d9efbe84ff66dd12bcd3f8d2b9c86f",
+    "bug30940_3/001.result.json": "f01c29c27b01110af589a14fc8ed898ad1da49e1c257cd22564cc1bfab383cc5",
+    "bug30940_3/replay.log": "9877a40ba3d5bec038533c388f60d2b4252e064f25399cb5c05aea01536c1ae2",
+    "bug30940_3/001.truck.json": "1cbeb06283ba453f618e595230ec3ac0a87f091d223d9e72f758499689636e65",
+    "bug30940_3/001.input.brep": "ea8cea4f6c1f78df1f3aafb7f40c68b365cc7ab1da650c276dd8e8000f025d3c",
+    "bug30940_3/001.result.brep": "7a0829c8c87ec099c6e87a0fe062ef2fe1489bbeae2d7ea105e828b8c11cfb8d",
+    "bug30940_3/001.result.step": "3cf8fcfe90fcecb3e333ce42fad68b3a40b631ed31db668515a25c7a5b7a13a8",
+    "bug30940_4/001.input.step": "203525d2e9612b37a8225dfe6713099014365f88522f63a08746dba2ff553479",
+    "bug30940_4/001.input.json": "dba599f6c95524ebaa975670b92a2f12c0793036f325e04eb1ebed7c88d0803d",
+    "bug30940_4/001.result.json": "5c924bf75257aa9ef179a232a8e1bb3b075102006759fcd3c45b3a8a5dfbb372",
+    "bug30940_4/replay.log": "a3f530ae2e3afbc9a72ae135f4c03a8bfcae31906723a33e86030dfeb0d84132",
+    "bug30940_4/001.truck.json": "8ff2bf30707dd8b4896cb98c874d83bcbc6950db4fb56888e778168956711a8b",
+    "bug30940_4/001.input.brep": "ea8cea4f6c1f78df1f3aafb7f40c68b365cc7ab1da650c276dd8e8000f025d3c",
+    "bug30940_4/001.result.brep": "61a81d97b85d249670d17f1f358374220495a6e3599e6aea45e7fca832d91b0a",
+    "bug30940_4/001.result.step": "5e6065f5ff2194308dc4d6fc0aea87b24e0022af6f70de227e94f675027938df",
+    "bug30940_5/001.input.step": "b27a8a4598f5fba5a5c7d7afebfd7b1cd20007c6535d07d24246ba627eba2c4a",
+    "bug30940_5/001.input.json": "091c8cde107772f26570eb341550adb9046aa4de281296327eda5211aed5a96b",
+    "bug30940_5/001.result.json": "944faf574a88b061dd751d687986665e8dd5227070229e54c26561f49f63043d",
+    "bug30940_5/replay.log": "e53354821ea5c28ca56f0d2923099f3a5f69a54e93bfa7a0f4335db7784a6b52",
+    "bug30940_5/001.truck.json": "4699eb83e425937207524989f9fd75760b3cdf73daee882f014953dabd146e6e",
+    "bug30940_5/001.imported.step": "1fe3be637e6df119aa3b13f0b4d4cf7270f52d7124683e7fbd5d2288f383ff0f",
+    "bug30940_5/001.input.brep": "953a7681a709fb45b42539eafaf2ef34b4d201e28d43152b3ef86046fba5f51c",
+    "bug30940_5/001.result.brep": "30b85a95a472540ab701d3d897ea038dab091a00a6b43c1a497161c3443098a8",
+    "bug30940_5/001.result.step": "269c1761aef2a96d5a040576c97657e1e3effe49038686c034673a79c01d9353",
+    "bug30940_5/input-comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bug30940_5/independent-imported-step.txt": "f225397b668ac9602ca88aef140c9ec620d5ee80f458a8f4303bfeb4d8002ea0",
+    "bug30940_5/001.input-comparison.json": "324385750f11ce9d670be52ad1131d91dab1acefd46b9826e255e3801a9e650b",
+    "bug30940_6/001.input.step": "b27a8a4598f5fba5a5c7d7afebfd7b1cd20007c6535d07d24246ba627eba2c4a",
+    "bug30940_6/001.input.json": "aa4e5a61e105d869eb004bba9e50a6c04371bb8db75b7a783e76da1b889fe1e3",
+    "bug30940_6/001.result.json": "fe11cecc2344cb62ad1e54e1f39a5976aefd61f93539cb78b6bc86b15cb09941",
+    "bug30940_6/replay.log": "a3f530ae2e3afbc9a72ae135f4c03a8bfcae31906723a33e86030dfeb0d84132",
+    "bug30940_6/001.truck.json": "8ff2bf30707dd8b4896cb98c874d83bcbc6950db4fb56888e778168956711a8b",
+    "bug30940_6/001.input.brep": "953a7681a709fb45b42539eafaf2ef34b4d201e28d43152b3ef86046fba5f51c",
+    "bug30940_6/001.result.brep": "00a78647637491e2ddd75856b58d0cbc54da5f16b7fa51bb269ce73ea953262d",
+    "bug30940_6/001.result.step": "62fcf3707def69ceb6b9c9769286b8d2b1f488b3c9d163057b618934d4ac0d2c"
+  },
+  "replay_archive_sha256": "f253c1707dacfe463d68a79b3467cb93e1b2d0d2f9c5e0be2ea2a5d3e11dac7a",
+  "targeted_results": {
+    "bug30940_2": {
+      "comparison": "unverified",
+      "result": {
+        "code": "UnsupportedGeometry",
+        "error": "TRUCK_UNSUPPORTED_GEOMETRY: The selected wire is not tangent continuous. (fillet_solid_along_wire / validate_wire)",
+        "input_unchanged": true,
+        "selected_edges": 2,
+        "status": "operation-failed"
+      },
+      "schema_version": 1,
+      "stage": "blend",
+      "tolerance": 0.001
+    },
+    "bug30940_3": {
+      "comparison": "unverified",
+      "result": {
+        "code": "BlendConstructionFailed",
+        "error": "TRUCK_BLEND_CONSTRUCTION_FAILED: Blend construction failed; the numerical or geometric constraint could not be resolved. (fillet_solid_along_wire / find_contact)",
+        "input_unchanged": true,
+        "selected_edges": 1,
+        "status": "operation-failed"
+      },
+      "schema_version": 1,
+      "stage": "blend",
+      "tolerance": 0.001
+    },
+    "bug30940_4": {
+      "comparison": "unverified",
+      "result": {
+        "code": "NonPlanarFace",
+        "error": "TRUCK_FILLET_NON_PLANAR_FACE: This fillet operation requires planar faces. (fillet_solid_edges / validate_input)",
+        "input_unchanged": true,
+        "selected_edges": 5,
+        "status": "operation-failed"
+      },
+      "schema_version": 1,
+      "stage": "blend",
+      "tolerance": 0.001
+    },
+    "bug30940_5": {
+      "comparison": "unverified",
+      "result": {
+        "code": "UnsupportedGeometry",
+        "error": "TRUCK_UNSUPPORTED_GEOMETRY: The selected wire is not tangent continuous. (fillet_solid_along_wire / validate_wire)",
+        "input_unchanged": true,
+        "selected_edges": 2,
+        "status": "operation-failed"
+      },
+      "schema_version": 1,
+      "stage": "blend",
+      "tolerance": 0.001
+    },
+    "bug30940_6": {
+      "comparison": "unverified",
+      "result": {
+        "code": "NonPlanarFace",
+        "error": "TRUCK_FILLET_NON_PLANAR_FACE: This fillet operation requires planar faces. (fillet_solid_edges / validate_input)",
+        "input_unchanged": true,
+        "selected_edges": 5,
+        "status": "operation-failed"
+      },
+      "schema_version": 1,
+      "stage": "blend",
+      "tolerance": 0.001
+    }
+  },
+  "independent_inputs": {
+    "bug30940_2": {
+      "expected_volume": 150.0,
+      "native_step_check": "valid 1\nsolids 1\nvolume 150.00000000000773\nexpected 150\nabsolute_error 7.73070496506989e-12\nmax_edge_vertex_tolerance 9.9999999999999995e-08\n",
+      "sampled_comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 150.00000000000006,
+        "truck_volume": 150.00000000000801,
+        "native_to_truck_max_distance": 7.234986049614835e-13,
+        "native_to_truck_samples": 299,
+        "truck_to_native_max_distance": 3.2038163556720522e-15,
+        "truck_to_native_samples": 654
+      }
+    },
+    "bug30940_5": {
+      "expected_volume": 1028.5714285714287,
+      "native_step_check": "valid 1\nsolids 1\nvolume 1028.5714285714271\nexpected 1028.5714285714287\nabsolute_error 1.5916157281026244e-12\nmax_edge_vertex_tolerance 9.9999999999999995e-08\n",
+      "sampled_comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 1028.5714285714294,
+        "truck_volume": 1028.5714285714287,
+        "native_to_truck_max_distance": 3.844787451501926e-14,
+        "native_to_truck_samples": 277,
+        "truck_to_native_max_distance": 6.792916156459135e-14,
+        "truck_to_native_samples": 584
+      }
+    }
+  },
+  "independent_checker_sha256": {
+    "target/inspect-polar-step": "8ba733150ff8088ea07eb21ecf213d906655905dbff4ee8f89b771cca74e8b2d",
+    "truck-benchmarks/results/2026-10-13-polar-cap-seams/inspect-polar-step.cpp": "7281a40d2d00f601932f4a98d5b7559e137e966e382602a3ac76a762fe99035d",
+    "target/occt-capture-plugin/compare_shapes": "476c2efb758a6c3f7b075f2fcbdddc1ccf07b54baca5dac934abe6420616bcf3",
+    "truck-benchmarks/results/2026-10-13-closed-bezier-imports/export-bezier-inputs.rs": "9a4c997559164be70729c5ae2ac865f5878dc94eb9dd7c3b04720b3b9f7348ba",
+    "target/import-wire-investigation/export-bezier-inputs": "e43fabf1a658934f4160304e1be1adaae9f6a4078de607ad131df69f16c567d5"
+  },
+  "release_tests": {
+    "passed": 964,
+    "failed": 1,
+    "ignored": 6,
+    "targets": 155
+  },
+  "existing_failure": {
+    "test": "truck-geometry/tests/pcurve.rs::pcurve_derivation",
+    "parent_proof": "truck-benchmarks/results/2026-10-13-cubic-endpoints/parent-precision-test.txt",
+    "left": -2829663063.761872,
+    "right": -2829663063.7618704
+  },
+  "performance_claim": "None; action benchmark smoke only."
+}

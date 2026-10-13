@@ -1,0 +1,31 @@
+   Compiling truck-geotrait v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-geotrait)
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+    Finished `release` profile [optimized] target(s) in 2.10s
+     Running tests/closed_surface_inclusion.rs (target/release/deps/closed_surface_inclusion-ece78606c13c72e2)
+
+running 3 tests
+test closed_nurbs_inclusion_checks_interior_samples_and_each_knot_span ... ok
+test rational_closed_surface_inclusion_follows_each_cusp_branch ... FAILED
+test closed_nurbs_surfaces_include_boundary_curves_starting_on_either_cusp_branch ... FAILED
+
+failures:
+
+---- rational_closed_surface_inclusion_follows_each_cusp_branch stdout ----
+
+thread 'rational_closed_surface_inclusion_follows_each_cusp_branch' (613934) panicked at truck-geometry/tests/closed_surface_inclusion.rs:110:17:
+assertion failed: surface.include(&curve)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- closed_nurbs_surfaces_include_boundary_curves_starting_on_either_cusp_branch stdout ----
+
+thread 'closed_nurbs_surfaces_include_boundary_curves_starting_on_either_cusp_branch' (613933) panicked at truck-geometry/tests/closed_surface_inclusion.rs:54:25:
+assertion failed: surface.include(&curve)
+
+
+failures:
+    closed_nurbs_surfaces_include_boundary_curves_starting_on_either_cusp_branch
+    rational_closed_surface_inclusion_follows_each_cusp_branch
+
+test result: FAILED. 1 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-geometry --test closed_surface_inclusion`
