@@ -1,0 +1,211 @@
+{
+  "kernel_revision": "fef68affc5e78615bdcc76e961c450b2fc4c5cbf",
+  "native": {
+    "passed": 156
+  },
+  "captures": 161,
+  "before_statuses": {
+    "input-import-failed": 8,
+    "operation-succeeded": 96,
+    "operation-failed": 48,
+    "unhandled-intent": 8,
+    "capture-incomplete": 1
+  },
+  "after_statuses": {
+    "input-import-failed": 3,
+    "operation-succeeded": 96,
+    "operation-failed": 53,
+    "unhandled-intent": 8,
+    "capture-incomplete": 1
+  },
+  "successful_checks": {
+    "constructed": 96,
+    "input_unchanged": 96,
+    "geometry_consistent": 96,
+    "mesh_closed": 96,
+    "step_prepared": 96,
+    "native_valid": 96,
+    "truck_step_valid": 96,
+    "single_solid": 96,
+    "sampled_distance": 87
+  },
+  "limited_comparison_passes": 87,
+  "status_changes": [
+    {
+      "case": "bugs/modalg_7/bug30940_2",
+      "capture": "001",
+      "before": "input-import-failed",
+      "after": "operation-failed"
+    },
+    {
+      "case": "bugs/modalg_7/bug30940_3",
+      "capture": "001",
+      "before": "input-import-failed",
+      "after": "operation-failed"
+    },
+    {
+      "case": "bugs/modalg_7/bug30940_4",
+      "capture": "001",
+      "before": "input-import-failed",
+      "after": "operation-failed"
+    },
+    {
+      "case": "bugs/modalg_7/bug30940_5",
+      "capture": "001",
+      "before": "input-import-failed",
+      "after": "operation-failed"
+    },
+    {
+      "case": "bugs/modalg_7/bug30940_6",
+      "capture": "001",
+      "before": "input-import-failed",
+      "after": "operation-failed"
+    }
+  ],
+  "check_changes": [
+    {
+      "case": "bugs/modalg_7/bug30940_2",
+      "capture": "001",
+      "before": {
+        "constructed": false,
+        "input_unchanged": false,
+        "geometry_consistent": false,
+        "mesh_closed": false,
+        "step_prepared": false,
+        "native_valid": false,
+        "truck_step_valid": false,
+        "single_solid": false,
+        "sampled_distance": false
+      },
+      "after": {
+        "constructed": false,
+        "input_unchanged": true,
+        "geometry_consistent": false,
+        "mesh_closed": false,
+        "step_prepared": false,
+        "native_valid": false,
+        "truck_step_valid": false,
+        "single_solid": false,
+        "sampled_distance": false
+      }
+    },
+    {
+      "case": "bugs/modalg_7/bug30940_3",
+      "capture": "001",
+      "before": {
+        "constructed": false,
+        "input_unchanged": false,
+        "geometry_consistent": false,
+        "mesh_closed": false,
+        "step_prepared": false,
+        "native_valid": false,
+        "truck_step_valid": false,
+        "single_solid": false,
+        "sampled_distance": false
+      },
+      "after": {
+        "constructed": false,
+        "input_unchanged": true,
+        "geometry_consistent": false,
+        "mesh_closed": false,
+        "step_prepared": false,
+        "native_valid": false,
+        "truck_step_valid": false,
+        "single_solid": false,
+        "sampled_distance": false
+      }
+    },
+    {
+      "case": "bugs/modalg_7/bug30940_4",
+      "capture": "001",
+      "before": {
+        "constructed": false,
+        "input_unchanged": false,
+        "geometry_consistent": false,
+        "mesh_closed": false,
+        "step_prepared": false,
+        "native_valid": false,
+        "truck_step_valid": false,
+        "single_solid": false,
+        "sampled_distance": false
+      },
+      "after": {
+        "constructed": false,
+        "input_unchanged": true,
+        "geometry_consistent": false,
+        "mesh_closed": false,
+        "step_prepared": false,
+        "native_valid": false,
+        "truck_step_valid": false,
+        "single_solid": false,
+        "sampled_distance": false
+      }
+    },
+    {
+      "case": "bugs/modalg_7/bug30940_5",
+      "capture": "001",
+      "before": {
+        "constructed": false,
+        "input_unchanged": false,
+        "geometry_consistent": false,
+        "mesh_closed": false,
+        "step_prepared": false,
+        "native_valid": false,
+        "truck_step_valid": false,
+        "single_solid": false,
+        "sampled_distance": false
+      },
+      "after": {
+        "constructed": false,
+        "input_unchanged": true,
+        "geometry_consistent": false,
+        "mesh_closed": false,
+        "step_prepared": false,
+        "native_valid": false,
+        "truck_step_valid": false,
+        "single_solid": false,
+        "sampled_distance": false
+      }
+    },
+    {
+      "case": "bugs/modalg_7/bug30940_6",
+      "capture": "001",
+      "before": {
+        "constructed": false,
+        "input_unchanged": false,
+        "geometry_consistent": false,
+        "mesh_closed": false,
+        "step_prepared": false,
+        "native_valid": false,
+        "truck_step_valid": false,
+        "single_solid": false,
+        "sampled_distance": false
+      },
+      "after": {
+        "constructed": false,
+        "input_unchanged": true,
+        "geometry_consistent": false,
+        "mesh_closed": false,
+        "step_prepared": false,
+        "native_valid": false,
+        "truck_step_valid": false,
+        "single_solid": false,
+        "sampled_distance": false
+      }
+    }
+  ],
+  "numeric_changes": [
+    {
+      "case": "blend/simple/J9",
+      "capture": "001",
+      "changes": {
+        "mesh_volume": {
+          "before": 1808712.393059274,
+          "after": 1808714.8871952966
+        }
+      }
+    }
+  ],
+  "regressions": [],
+  "unchanged_successful_results_and_comparisons": 95
+}
