@@ -209,3 +209,49 @@ fn projection_near_a_revolution_pole_uses_a_regular_seed() {
         }
     }
 }
+
+#[test]
+fn conical_pole_normals_follow_the_angular_limit() {
+    for reversed in [false, true] {
+        for inverted in [false, true] {
+            for transformed in [false, true] {
+                let mut line = Line(Point3::new(0., 0., -2.), Point3::new(3., 0., 1.));
+                if reversed {
+                    line.invert();
+                }
+                let mut surface = Processor::<_, Matrix4>::new(RevolutedCurve::by_revolution(
+                    line,
+                    Point3::origin(),
+                    Vector3::unit_z(),
+                ));
+                if inverted {
+                    surface.invert();
+                }
+                if transformed {
+                    surface.transform_by(
+                        Matrix4::from_translation(Vector3::new(13., -7., 23.))
+                            * Matrix4::from_axis_angle(
+                                Vector3::new(1., 2., 3.).normalize(),
+                                Rad(0.73),
+                            )
+                            * Matrix4::from_nonuniform_scale(1.2, 0.8, 1.4),
+                    );
+                }
+                let pole = if reversed { 1. } else { 0. };
+                let regular = if reversed { 0.999 } else { 0.001 };
+                for i in 0..=32 {
+                    let angle = 2. * PI * i as f64 / 32.;
+                    let parameters = |u| if inverted { (angle, u) } else { (u, angle) };
+                    let (u, v) = parameters(pole);
+                    let (s, t) = parameters(regular);
+                    let normal = surface.normal(u, v);
+                    let limit = surface.uder(s, t).cross(surface.vder(s, t)).normalize();
+                    assert!(
+                        normal.distance(limit) < 1e-10,
+                        "angle={angle}: {normal:?} != {limit:?}"
+                    );
+                }
+            }
+        }
+    }
+}

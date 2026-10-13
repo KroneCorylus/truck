@@ -452,3 +452,72 @@ fn normal_orientation_preserves_ambiguous_meridian_facets_and_flips_reliable_one
         );
     }
 }
+
+#[test]
+fn refinement_uses_shared_pole_positions() {
+    check_pole_refinement(0.);
+    check_pole_refinement(1.8e-10);
+}
+
+fn check_pole_refinement(pole_roundoff: f64) {
+    use std::f64::consts::PI;
+    use truck_geometry::prelude::*;
+    let surface = Processor::with_transform(
+        RevolutedCurve::by_revolution(
+            Line(
+                Point3::new(0., 0., -200.0000000001819),
+                Point3::new(201.000001, 0., 1.000001),
+            ),
+            Point3::origin(),
+            Vector3::unit_z(),
+        ),
+        Matrix4::from_translation(Vector3::new(0., 0., -50.)),
+    )
+    .inverse();
+    let tol = 0.01;
+    let top = 200. / 201.000001;
+    let divisions = surface
+        .parameter_division(((0., 1.5 * PI), (0., top)), tol)
+        .0;
+    let pole = Point3::new(0., 0., -250.);
+    let mut points: Vec<SurfacePoint> = divisions
+        .iter()
+        .map(|angle| (Point2::new(*angle, 0.), pole).into())
+        .collect();
+    points.last_mut().unwrap().point.z -= pole_roundoff;
+    points.extend(
+        divisions
+            .iter()
+            .rev()
+            .map(|angle| SurfacePoint::from((Point2::new(*angle, top), surface.subs(*angle, top)))),
+    );
+    let boundary = PolyBoundary::from_loops(vec![points]);
+    let mesh = trimming_tessellation(&surface, &boundary, tol);
+    assert!(
+        mesh.positions().len() <= 2 * divisions.len(),
+        "{} vertices for {} angular divisions",
+        mesh.positions().len(),
+        divisions.len(),
+    );
+    for (point, uv) in mesh.positions().iter().zip(mesh.uv_coords()) {
+        assert!(point.distance(surface.subs(uv.x, uv.y)) < 1e-8);
+        if uv.y == 0. {
+            assert!(point.distance(pole) <= 1.81e-10);
+        }
+    }
+    use crate::analyzers::WithPointCloud;
+    let mut samples = Vec::new();
+    for tri in mesh.tri_faces() {
+        for (u, v) in [(0.25, 0.25), (0.5, 0.25), (0.25, 0.5)] {
+            let [p, q, r] = tri.map(|v| mesh.uv_coords()[v.uv.unwrap()]);
+            let uv = p + u * (q - p) + v * (r - p);
+            samples.push(surface.subs(uv.x, uv.y));
+        }
+    }
+    for angle in divisions.windows(2).map(|pair| (pair[0] + pair[1]) / 2.) {
+        for i in 0..=32 {
+            samples.push(surface.subs(angle, top * i as f64 / 32.));
+        }
+    }
+    assert!(mesh.neighborhood_include(&samples, tol));
+}

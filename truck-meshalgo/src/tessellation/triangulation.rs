@@ -1031,7 +1031,14 @@ where S: PreMeshableSurface {
         divisions,
     );
     if single_direction {
-        refine_interior(&mut triangulation, surface, polyboundary, tol, &metric);
+        refine_interior(
+            &mut triangulation,
+            surface,
+            polyboundary,
+            tol,
+            &metric,
+            &boundary_map,
+        );
     }
     let mut mesh = triangulation_into_polymesh(
         triangulation.vertices(),
@@ -1053,12 +1060,16 @@ fn refine_interior(
     boundary: &PolyBoundary,
     tol: f64,
     metric: &MeshMetric,
+    boundary_map: &HashMap<FixedVertexHandle, Point3>,
 ) {
     for _ in 0..20 {
         let mut positions = vec![Point3::origin(); triangulation.num_vertices()];
         for vertex in triangulation.vertices() {
             let uv = vertex.as_ref().uv;
-            positions[vertex.index()] = surface.subs(uv.x, uv.y);
+            positions[vertex.index()] = boundary_map
+                .get(&vertex.fix())
+                .copied()
+                .unwrap_or_else(|| surface.subs(uv.x, uv.y));
         }
         let points: Vec<_> = triangulation
             .undirected_edges()
@@ -1077,6 +1088,10 @@ fn refine_interior(
                         return false;
                     };
                     let [p, q, r] = face.vertices().map(|v| positions[v.index()]);
+                    // A facet collapsed by shared-vertex welding has no reliable plane.
+                    if p.near(&q) || q.near(&r) || r.near(&p) {
+                        return false;
+                    }
                     let normal = (q - p).cross(r - p);
                     let distance = (point - p).dot(normal);
                     distance * distance > tol * tol * normal.magnitude2()

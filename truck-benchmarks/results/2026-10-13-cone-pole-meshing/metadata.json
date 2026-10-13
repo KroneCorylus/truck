@@ -1,0 +1,86 @@
+{
+  "parent": "4dd50ab831cc89632e71c9f32f568b0fc522cefd",
+  "source_sha256": {
+    "CHANGELOG.md": "b40c96d1d94a7a4d687e8d4e61972da67bc2e32108c7b6f2ec25bcd0a93543e3",
+    "truck-geometry/src/decorators/revolved_curve.rs": "66ab2e5ce82c1f46edf26c47dbe732211e8335b1d8366067e430f8942037408a",
+    "truck-geometry/tests/revolved_curve.rs": "3397e0401f38fc3c5cbb9339447a00fa85eeed6d081c79087c503d9e399887f8",
+    "truck-meshalgo/src/tessellation/triangulation.rs": "056eb358b9576da98ce3759c9589c181df55cdef9fa294eea8f0c2ebd1ba5abf",
+    "truck-meshalgo/src/tessellation/triangulation/tests.rs": "15d3b705cf69630120b2bb5d5e754c5d720417d286febdafe0b2dd031220d142"
+  },
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "truck-geometry",
+        "-p",
+        "truck-modeling",
+        "-p",
+        "truck-meshalgo",
+        "-p",
+        "truck-stepio",
+        "-p",
+        "truck-shapeops",
+        "--no-fail-fast"
+      ],
+      "exit_code": 101
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--release",
+        "-p",
+        "truck-geometry",
+        "-p",
+        "truck-modeling",
+        "-p",
+        "truck-meshalgo",
+        "-p",
+        "truck-stepio",
+        "-p",
+        "truck-shapeops",
+        "-p",
+        "truck-benchmarks",
+        "--all-targets"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "bench",
+        "-p",
+        "truck-benchmarks",
+        "--bench",
+        "actions",
+        "--",
+        "--test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--release",
+        "-p",
+        "truck-shapeops",
+        "--example",
+        "replay_occt_blend"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "replay_sha256": "ca5ab3c8d8fe0afc7f233645d3ea4d24583f794a3852d592cc86c40359ab730e",
+  "release_tests": {
+    "passed": 921,
+    "failed": 1,
+    "ignored": 5,
+    "targets": 143
+  },
+  "known_failure": "truck-geometry/tests/pcurve.rs::pcurve_derivation; unchanged values -2829663063.761872 and -2829663063.7618704; parent proof in ../2026-10-13-cubic-endpoints/parent-precision-test.txt",
+  "performance_claim": "None; action benchmark smoke only."
+}

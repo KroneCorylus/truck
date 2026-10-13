@@ -126,7 +126,7 @@ impl<C: ParametricCurve3D + BoundedCurve> ParametricSurface3D for RevolutedCurve
             let pt = self.curve.subs(u);
             let radius = self.axis().cross(pt - self.origin());
             if radius.so_small() {
-                let uder = self.curve.der(u);
+                let uder = self.uder(u, v);
                 (uder, self.axis().cross(uder))
             } else {
                 (self.uder(u, v), self.vder(u, v))
@@ -135,7 +135,7 @@ impl<C: ParametricCurve3D + BoundedCurve> ParametricSurface3D for RevolutedCurve
             let pt = self.curve.subs(u);
             let radius = self.axis().cross(pt - self.origin());
             if radius.so_small() {
-                let uder = self.curve.der(u);
+                let uder = self.uder(u, v);
                 (uder, uder.cross(self.axis()))
             } else {
                 (self.uder(u, v), self.vder(u, v))

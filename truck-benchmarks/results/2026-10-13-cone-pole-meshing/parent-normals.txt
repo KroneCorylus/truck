@@ -1,0 +1,22 @@
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+    Finished `release` profile [optimized] target(s) in 1.81s
+     Running tests/revolved_curve.rs (target/release/deps/revolved_curve-8c6c9f22ad2ea91e)
+
+running 1 test
+test conical_pole_normals_follow_the_angular_limit ... FAILED
+
+failures:
+
+---- conical_pole_normals_follow_the_angular_limit stdout ----
+
+thread 'conical_pole_normals_follow_the_angular_limit' (381573) panicked at truck-geometry/tests/revolved_curve.rs:249:21:
+angle=0.19634954084936207: Vector3 [-0.7071067811865476, 0.0, 0.7071067811865476] != Vector3 [-0.6935199226610738, -0.1379496896414715, 0.7071067811865475]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    conical_pole_normals_follow_the_angular_limit
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-geometry --test revolved_curve`
