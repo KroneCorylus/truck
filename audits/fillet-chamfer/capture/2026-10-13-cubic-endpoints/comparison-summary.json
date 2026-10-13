@@ -1,0 +1,86 @@
+{
+  "kernel_revision": "78baa69682f3c4dfc635d68e14e64ee0a59d1aff",
+  "native": {
+    "passed": 156
+  },
+  "captures": 161,
+  "before_statuses": {
+    "input-import-failed": 11,
+    "operation-succeeded": 87,
+    "operation-failed": 43,
+    "unhandled-intent": 8,
+    "input-inconsistent": 11,
+    "capture-incomplete": 1
+  },
+  "after_statuses": {
+    "input-import-failed": 11,
+    "operation-succeeded": 87,
+    "operation-failed": 43,
+    "unhandled-intent": 8,
+    "input-inconsistent": 11,
+    "capture-incomplete": 1
+  },
+  "successful_checks": {
+    "constructed": 87,
+    "input_unchanged": 87,
+    "geometry_consistent": 87,
+    "mesh_closed": 87,
+    "step_prepared": 87,
+    "native_valid": 87,
+    "truck_step_valid": 87,
+    "single_solid": 87,
+    "sampled_distance": 81
+  },
+  "limited_comparison_passes": 81,
+  "status_changes": [],
+  "check_changes": [
+    {
+      "case": "blend/simple/K4",
+      "capture": "001",
+      "before": {
+        "constructed": true,
+        "input_unchanged": true,
+        "geometry_consistent": true,
+        "mesh_closed": true,
+        "step_prepared": false,
+        "native_valid": false,
+        "truck_step_valid": false,
+        "single_solid": false,
+        "sampled_distance": false
+      },
+      "after": {
+        "constructed": true,
+        "input_unchanged": true,
+        "geometry_consistent": true,
+        "mesh_closed": true,
+        "step_prepared": true,
+        "native_valid": true,
+        "truck_step_valid": true,
+        "single_solid": true,
+        "sampled_distance": false
+      }
+    }
+  ],
+  "numeric_changes": [
+    {
+      "case": "blend/simple/K4",
+      "capture": "001",
+      "changes": {
+        "truck_volume": {
+          "before": null,
+          "after": 214210.88280914773
+        },
+        "native_to_truck_max_distance": {
+          "before": null,
+          "after": 0.04617208169705975
+        },
+        "truck_to_native_max_distance": {
+          "before": null,
+          "after": 0.05617813045504337
+        }
+      }
+    }
+  ],
+  "regressions": [],
+  "unchanged_successful_results_and_comparisons": 86
+}
