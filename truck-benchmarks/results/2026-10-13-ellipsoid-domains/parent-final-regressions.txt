@@ -1,0 +1,40 @@
+Parent: 48539317558965aea4a847fa9868c46974404e30
+Command: CARGO_BUILD_JOBS=12 cargo test --release -p truck-shapeops --test imported_ellipsoid_sectors -- --nocapture
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-modeling)
+   Compiling truck-meshalgo v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-meshalgo)
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 12.72s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/imported_ellipsoid_sectors.rs (target/release/deps/imported_ellipsoid_sectors-a27d1232e744b7bc)
+
+running 4 tests
+
+thread 'ellipse_cone_junction_fillet_preserves_radius_material_and_step' (152945) panicked at truck-shapeops/tests/imported_ellipsoid_sectors.rs:59:5:
+[(0.0, 6.283185307179586)]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ellipse_cone_junction_fillet_preserves_radius_material_and_step ... FAILED
+
+thread 'original_scale_ellipsoid_sector_preserves_material_and_step' (152948) panicked at truck-shapeops/tests/imported_ellipsoid_sectors.rs:59:5:
+[(0.0, 6.283185307179586)]
+
+thread 'elliptical_revolutions_preserve_the_native_meridian_sheet' (152946) panicked at truck-shapeops/tests/imported_ellipsoid_sectors.rs:59:5:
+[(0.0, 6.283185307179586)]
+test original_scale_ellipsoid_sector_preserves_material_and_step ... FAILED
+test elliptical_revolutions_preserve_the_native_meridian_sheet ... FAILED
+test hole_only_or_invalid_pcurves_do_not_shrink_revolution_supports ... ok
+
+failures:
+
+failures:
+    ellipse_cone_junction_fillet_preserves_radius_material_and_step
+    elliptical_revolutions_preserve_the_native_meridian_sheet
+    original_scale_ellipsoid_sector_preserves_material_and_step
+
+test result: FAILED. 1 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-shapeops --test imported_ellipsoid_sectors`
+
+Exit status: 101

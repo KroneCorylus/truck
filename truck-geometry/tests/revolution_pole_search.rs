@@ -66,3 +66,43 @@ fn surface_newton_preserves_an_already_converged_polar_seed() {
         }
     }
 }
+
+#[test]
+fn ellipse_inverse_keeps_the_trimmed_sheet_near_a_rounded_pole() {
+    use std::f64::consts::FRAC_PI_2;
+    let rounded_pole = (FRAC_PI_2 * 1e12).round() / 1e12;
+    for scale in [0.01, 1., 10.] {
+        let curve = Processor::with_transform(
+            TrimmedCurve::new(UnitCircle::<Point3>::new(), (0., rounded_pole)),
+            Matrix4::from_cols(
+                Vector4::new(150. * scale, 0., 0., 0.),
+                Vector4::new(0., 1.110223024625e-14 * scale, 100. * scale, 0.),
+                Vector4::new(0., -100. * scale, 1.110223024625e-14 * scale, 0.),
+                Vector4::unit_w(),
+            ),
+        );
+        let surface = RevolutedCurve::by_revolution(curve, Point3::origin(), Vector3::unit_z());
+        for offset in [0.01, 0.005, 0.001, 0.0001] {
+            let parameter = FRAC_PI_2 - offset;
+            let point = surface.subs(parameter, 0.);
+            for hint in [None, Some((FRAC_PI_2, 0.)), Some((rounded_pole, 0.))] {
+                for (name, uv) in [
+                    ("exact", surface.search_parameter(point, hint, 100)),
+                    (
+                        "nearest",
+                        surface.search_nearest_parameter(point, hint, 100),
+                    ),
+                ] {
+                    let uv = uv.unwrap_or_else(|| {
+                        panic!("{name} scale={scale} offset={offset} hint={hint:?}")
+                    });
+                    assert!(
+                        (uv.0 - parameter).abs() < 1e-8,
+                        "{name} scale={scale} offset={offset} hint={hint:?} uv={uv:?}"
+                    );
+                    assert!(surface.subs(uv.0, uv.1).distance(point) < 1e-6);
+                }
+            }
+        }
+    }
+}

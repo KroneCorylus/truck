@@ -1,5 +1,113 @@
 use super::*;
 
+pub(super) fn trimmed_revolution(
+    surface: &Surface,
+    holder: &FaceSurfaceHolder,
+    table: &Table,
+) -> Option<Surface> {
+    let Surface::SweptCurve(SweptCurve::RevolutedCurve(revolved)) = surface else {
+        return None;
+    };
+    let Curve3D::Conic(Conic3D::Ellipse(ellipse)) = revolved.entity().entity_curve() else {
+        return None;
+    };
+    if !ellipse.orientation() {
+        return None;
+    }
+    let face = holder.clone().into_owned(table).ok()?;
+    let support = Surface::try_from(&face.face_geometry).ok()?;
+    let (mut lo, mut hi) = (f64::INFINITY, f64::NEG_INFINITY);
+    let mut outer = false;
+    for bound in &face.bounds {
+        let mut points = Vec::new();
+        for edge in &bound.bound.edge_list {
+            let (edge, forward) = match edge {
+                EdgeAny::EdgeCurve(edge) => (edge, true),
+                EdgeAny::OrientedEdge(edge) => (&edge.edge_element, edge.orientation),
+            };
+            let CurveAny::SurfaceCurve(curve) = &edge.edge_geometry else {
+                return None;
+            };
+            let pcurve = curve
+                .associated_geometry
+                .iter()
+                .find_map(|geometry| match geometry {
+                    PcurveOrSurface::Pcurve(pcurve)
+                        if pcurve.basis_surface == face.face_geometry =>
+                    {
+                        Some(pcurve)
+                    }
+                    _ => None,
+                })?;
+            let pcurve = PCurve::try_from(pcurve.as_ref()).ok()?;
+            let Curve2D::BSplineCurve(curve) = pcurve.curve().as_ref() else {
+                return None;
+            };
+            let [a, b] = curve.control_points().as_slice() else {
+                return None;
+            };
+            if curve.degree() != 1 || ![a.x, a.y, b.x, b.y].iter().all(|x| x.is_finite()) {
+                return None;
+            }
+            let start = Point3::from(&edge.edge_start.vertex_geometry);
+            let end = Point3::from(&edge.edge_end.vertex_geometry);
+            let (start, end) = if edge.same_sense {
+                (start, end)
+            } else {
+                (end, start)
+            };
+            // Only bounded pcurves that describe the complete edge can bound its support.
+            if !pcurve.front().near(&start) || !pcurve.back().near(&end) {
+                return None;
+            }
+            points.extend(if forward == edge.same_sense {
+                [*a, *b]
+            } else {
+                [*b, *a]
+            });
+            lo = lo.min(a.y).min(b.y);
+            hi = hi.max(a.y).max(b.y);
+        }
+        let origin = *points.first()?;
+        let mut area = 0.;
+        let mut scale = 0.;
+        for i in 0..points.len() {
+            let (a, b) = (points[i], points[(i + 1) % points.len()]);
+            // Separate pcurve ends may be joined in UV only along a collapsed pole.
+            if i % 2 == 1
+                && !a.near(&b)
+                && (!a.y.near(&b.y)
+                    || !support.uder(a.x, a.y).so_small()
+                    || !support.uder(b.x, b.y).so_small())
+            {
+                return None;
+            }
+            let (a, b) = (a - origin, b - origin);
+            area += a.perp_dot(b);
+            scale += (a.x * b.y).abs() + (a.y * b.x).abs();
+        }
+        let sign = if bound.orientation == face.same_sense {
+            1.
+        } else {
+            -1.
+        };
+        outer |= sign * area > f64::EPSILON * (points.len() + 2) as f64 * scale;
+    }
+    if !outer || lo >= hi || !lo.is_finite() || !hi.is_finite() || hi - lo >= 2. * PI {
+        return None;
+    }
+    let meridian = ellipse.map_ref(|curve| TrimmedCurve::new(*curve.curve(), (lo, hi)));
+    Some(Surface::SweptCurve(SweptCurve::RevolutedCurve(
+        revolved.map_ref(|entity| {
+            RevolutedCurve::by_revolution(
+                Curve3D::Conic(Conic3D::Ellipse(meridian)),
+                entity.origin(),
+                entity.axis(),
+            )
+        }),
+    )))
+}
+
 pub(super) fn fit(
     surface: &mut Surface,
     boundaries: &[Vec<CompressedEdgeIndex>],

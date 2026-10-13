@@ -1,0 +1,134 @@
+{
+  "parent": "48539317558965aea4a847fa9868c46974404e30",
+  "source_sha256": {
+    "CHANGELOG.md": "32bcc762070f35fcd23106d13d99d4772912ac3814a890dfcb7bbd15dd42695f",
+    "truck-geometry/src/decorators/revolved_curve.rs": "d085d48906970054c8f80dc257f04fc77b1c3e1bfc151e618da3372e3320b612",
+    "truck-geometry/tests/revolution_pole_search.rs": "16d2e22ab615c0dfa4e35e744e5cdc2fd0bc69f14327b82016eef4364492fc6c",
+    "truck-meshalgo/src/tessellation/triangulation.rs": "ab56ae86f549163183d3b7b978a0cdc6807f75b7f46d3497d4f2781b04eef8ae",
+    "truck-meshalgo/src/tessellation/triangulation/tests.rs": "02661fbfcb02ed6ce3c0ddca151b5b4c0a41af19363bf272e82b2fa95301d6a0",
+    "truck-stepio/src/in/convert.rs": "9b70866c9bfa8187146fa431eda20552334525c4a96dac9c76e8b2f686d66e58",
+    "truck-stepio/src/in/support_domain.rs": "7309bf792f8262ccc9588993bf75eda0ba0bdd725ff7074bd00352d89e367eb6",
+    "truck-stepio/src/out/modeling.rs": "7cb3cd31f0e268007da629952d343ae37841940c2a87954ba54c171068a7e856",
+    "truck-shapeops/tests/imported_ellipsoid_sectors.rs": "8a636c8200124bbbfea6b012c99283415cbfecc07d072b6292e3d85f78a72fab",
+    "truck-shapeops/tests/fixtures/ellipsoid-sectors/README.md": "d9e2cdd78adec5e81b713d1ce6e730236bb7d6d67221a694f5485c2d763cbbd3",
+    "truck-shapeops/tests/fixtures/ellipsoid-sectors/H2.step": "9479ad8f07aaeca6de19ab72454a035a6ffd8d1af61c708a5fb7bc969c61a3e7"
+  },
+  "replay_sha256": "fc3445c69142e7855c10fb783f957babeb8ab908a74a49e4c62b080418c63f1d",
+  "native_archive": "audits/fillet-chamfer/capture/2026-10-13-diagonal-pcurves/artifacts.zip",
+  "native_archive_sha256": "c18c431023de4777ba15df5400b1ddc903bfc343cee5bfbae74ee68efb0943b2",
+  "native_artifact_sha256": {
+    "blend/simple/H2/capture/001.input.json": "93bdff805bd3e8efdaab4ebcdedccc90333452ace46f06e13f7131e4970c1bc6",
+    "blend/simple/H2/capture/001.input.brep": "7586600f7eb25f31372d271611731afc9a13c50f3e49f64fc742acb087702285",
+    "blend/simple/H2/capture/001.input.step": "bf4d3e46bdb7e98303828ff01b88fe57ce30b5f85dbf0c0be7b8049a0f23cd01",
+    "blend/simple/H2/capture/001.result.json": "5b1d345b514cec526233559dc321e16c5a47463d1e944e18b7efa30376038313",
+    "blend/simple/H2/capture/001.result.brep": "45550996dd412013cb887d0d1143cc0bb0f95826a8a22619a609eeed6d8e32af",
+    "blend/simple/H4/capture/001.input.json": "1965f7bfd1d6e84d0bac0806d9e12769c929240e907b214cab6d28a95d44288e",
+    "blend/simple/H4/capture/001.input.brep": "7586600f7eb25f31372d271611731afc9a13c50f3e49f64fc742acb087702285",
+    "blend/simple/H4/capture/001.input.step": "8b7e9653300bbf7c085378ea7e015a1d5986413439735f850ea508a8b852dfcf",
+    "blend/simple/H4/capture/001.result.json": "df54f177f5e94bfc665302b16c18f4951d64576ca3cf98423c2ff7c6973a7d5c",
+    "blend/simple/H4/capture/001.result.brep": "28a323585ea4ecf71612d4912d5e4c2df64c0d06cddb6e4d1e3d79edb03e4110"
+  },
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.1\nLLVM version: 22.1.8\n",
+  "performance_claim": "None; action benchmark smoke only.",
+  "release_tests": {
+    "passed": 905,
+    "failed": 1,
+    "ignored": 5,
+    "targets": 141,
+    "known_failure": "truck-geometry/tests/pcurve.rs::pcurve_derivation; same input and values as 2026-10-11 parent proof"
+  },
+  "checks": {
+    "all_target_release_clippy": "passed",
+    "actions_smoke": "passed",
+    "replay_build": "passed",
+    "rounded_pole_focused_release": "passed"
+  },
+  "targeted_replays": {
+    "H2": {
+      "replay": {
+        "comparison": "unverified",
+        "result": {
+          "geometry_consistent": true,
+          "input_unchanged": true,
+          "mesh_closed": true,
+          "mesh_volume": 13156661.50397187,
+          "selected_edges": 1,
+          "status": "operation-succeeded",
+          "step_prepared": true
+        },
+        "schema_version": 1,
+        "stage": "output-consistency",
+        "tolerance": 0.001
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 13156727.639241457,
+        "truck_volume": 13156726.838964274,
+        "native_to_truck_max_distance": 1.4044390880778879e-05,
+        "native_to_truck_samples": 1191,
+        "truck_to_native_max_distance": 1.4100022058008205e-05,
+        "truck_to_native_samples": 1183
+      }
+    },
+    "H4": {
+      "replay": {
+        "comparison": "unverified",
+        "result": {
+          "geometry_consistent": true,
+          "input_unchanged": true,
+          "mesh_closed": false,
+          "mesh_volume": 13159628.450343022,
+          "selected_edges": 1,
+          "status": "operation-succeeded",
+          "step_prepared": true
+        },
+        "schema_version": 1,
+        "stage": "output-consistency",
+        "tolerance": 0.001
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": false,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 13151259.698596016,
+        "truck_volume": -7856963.248838655,
+        "native_to_truck_max_distance": 93.70980027845584,
+        "native_to_truck_samples": 1104,
+        "truck_to_native_max_distance": 88.16778784387078,
+        "truck_to_native_samples": 1081
+      }
+    }
+  },
+  "replay_artifact_sha256": {
+    "H2/001.comparison.json": "c2ed273a208d4d2b1a34df7259ea1f4f51dfcc6fea30ca50690b20584171f34a",
+    "H2/001.input.brep": "7586600f7eb25f31372d271611731afc9a13c50f3e49f64fc742acb087702285",
+    "H2/001.input.json": "93bdff805bd3e8efdaab4ebcdedccc90333452ace46f06e13f7131e4970c1bc6",
+    "H2/001.input.step": "bf4d3e46bdb7e98303828ff01b88fe57ce30b5f85dbf0c0be7b8049a0f23cd01",
+    "H2/001.result.brep": "45550996dd412013cb887d0d1143cc0bb0f95826a8a22619a609eeed6d8e32af",
+    "H2/001.result.json": "5b1d345b514cec526233559dc321e16c5a47463d1e944e18b7efa30376038313",
+    "H2/001.truck.json": "504d14773181cb92f7690795db3668ac32bfaecfd28f127b4d2b26d2820109a0",
+    "H2/001.truck.step": "975f5f68fd7efa6c0cd5e862ba36e2a3f8096e685dd7c2e52295f35d6415a8a6",
+    "H4/001.comparison.json": "6d1d7115a1910563ac0b02f7212649e132d79746ba058cd39009e9269ad99561",
+    "H4/001.input.brep": "7586600f7eb25f31372d271611731afc9a13c50f3e49f64fc742acb087702285",
+    "H4/001.input.json": "1965f7bfd1d6e84d0bac0806d9e12769c929240e907b214cab6d28a95d44288e",
+    "H4/001.input.step": "8b7e9653300bbf7c085378ea7e015a1d5986413439735f850ea508a8b852dfcf",
+    "H4/001.result.brep": "28a323585ea4ecf71612d4912d5e4c2df64c0d06cddb6e4d1e3d79edb03e4110",
+    "H4/001.result.json": "df54f177f5e94bfc665302b16c18f4951d64576ca3cf98423c2ff7c6973a7d5c",
+    "H4/001.truck.json": "74a2b267ee0148de75f61298b05969663bb9c89a087984f064605e2fe968b701",
+    "H4/001.truck.step": "ca67521e3149e8158ca8bfc610a369955e3b1c8b15ea811b7522d61a4acae81f"
+  },
+  "replay_archive_sha256": "662d00911af1172b473958a391a6aa264d243849dc1f5e09200355fd98dfd8bc",
+  "native_diagnostic_sha256": {
+    "inspect-native.cpp": "d08e8af8063da772942d26c94c254daebb6f2f6f128f6fa69c7846601cb33fb2",
+    "H2-native-tolerances.txt": "5ee7e42e5178ca9f8eea049a466294f11448a08a686dd69c324a3f06d77e0aea",
+    "H4-native-tolerances.txt": "3082df6e701a11573586247f28cd70e7f3b5a7cebb918f2262608852245160db"
+  }
+}

@@ -1,0 +1,10 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 2.82s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/imported_ellipsoid_sectors.rs (target/release/deps/imported_ellipsoid_sectors-a27d1232e744b7bc)
+
+running 1 test
+test ellipse_cone_junction_fillet_preserves_radius_material_and_step ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 1.60s

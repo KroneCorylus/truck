@@ -1,0 +1,28 @@
+Command: CARGO_BUILD_JOBS=12 cargo clippy --release -p truck-geometry -p truck-modeling -p truck-meshalgo -p truck-stepio -p truck-shapeops -p truck-benchmarks --all-targets
+    Checking truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+    Checking truck-modeling v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-modeling)
+    Checking truck-meshalgo v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-meshalgo)
+    Checking truck-drafting v0.1.0 (/home/krone/Development/Pieza_WS/truck/truck-drafting)
+error: approximate value of `f{32, 64}::consts::FRAC_PI_2` found
+  --> truck-geometry/tests/revolution_pole_search.rs:75:65
+   |
+75 |             TrimmedCurve::new(UnitCircle::<Point3>::new(), (0., 1.570796326795)),
+   |                                                                 ^^^^^^^^^^^^^^
+   |
+   = help: consider using the constant directly
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#approx_constant
+   = note: `#[deny(clippy::approx_constant)]` on by default
+
+error: approximate value of `f{32, 64}::consts::FRAC_PI_2` found
+  --> truck-geometry/tests/revolution_pole_search.rs:87:61
+   |
+87 |             for hint in [None, Some((FRAC_PI_2, 0.)), Some((1.570796326795, 0.))] {
+   |                                                             ^^^^^^^^^^^^^^
+   |
+   = help: consider using the constant directly
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#approx_constant
+
+error: could not compile `truck-geometry` (test "revolution_pole_search") due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...
+
+Exit status: 101

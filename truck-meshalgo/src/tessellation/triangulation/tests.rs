@@ -2,6 +2,79 @@ use super::*;
 use proptest::prelude::*;
 
 #[test]
+fn polar_ellipsoid_boundaries_keep_the_large_angular_sector() {
+    use std::f64::consts::{FRAC_PI_2, PI};
+    use truck_geometry::prelude::*;
+    let meridian = Processor::with_transform(
+        TrimmedCurve::new(UnitCircle::<Point3>::new(), (0., FRAC_PI_2)),
+        Matrix4::from_cols(
+            Vector4::new(1.5, 0., 0., 0.),
+            Vector4::new(0., 0., 1., 0.),
+            Vector4::new(0., -1., 0., 0.),
+            Vector4::unit_w(),
+        ),
+    );
+    let reference = Processor::<_, Matrix4>::new(RevolutedCurve::by_revolution(
+        meridian,
+        Point3::origin(),
+        Vector3::unit_z(),
+    ))
+    .inverse();
+    let angle = 1.5 * PI;
+    let lines = [
+        Line(Point2::new(0., 0.), Point2::new(angle, 0.)),
+        Line(Point2::new(angle, 0.), Point2::new(angle, FRAC_PI_2)),
+        Line(Point2::new(0., FRAC_PI_2), Point2::new(0., 0.)),
+    ];
+    let wire: Vec<PolylineCurve> = lines
+        .iter()
+        .map(|line| {
+            (0..=64)
+                .map(|i| {
+                    let p = line.subs(i as f64 / 64.);
+                    reference.subs(p.x, p.y)
+                })
+                .collect()
+        })
+        .collect();
+    for reversed in [false, true] {
+        for start in 0..3 {
+            let mut surface = reference;
+            let mut wire = wire.clone();
+            wire.rotate_left(start);
+            if reversed {
+                surface.invert();
+                wire.reverse();
+                for edge in &mut wire {
+                    edge.0.reverse();
+                }
+            }
+            let piece = PolyBoundaryPiece::try_new(&surface, wire.into_iter(), by_search_parameter)
+                .unwrap();
+            let boundary = PolyBoundary::new(vec![piece], &surface, 0.001).unwrap();
+            let bounds: BoundingBox<Point2> =
+                boundary.loops.iter().flatten().map(|p| p.uv).collect();
+            let span = bounds.max() - bounds.min();
+            let (major, minor) = if reversed {
+                (span.y, span.x)
+            } else {
+                (span.x, span.y)
+            };
+            assert!(
+                (major - angle).abs() < 1e-8,
+                "start={start} reversed={reversed} bounds={bounds:?}"
+            );
+            assert!(
+                (minor - FRAC_PI_2).abs() < 1e-8,
+                "start={start} reversed={reversed} bounds={bounds:?}"
+            );
+            assert_eq!(boundary.loops.len(), 1);
+            assert_eq!(loop_orientation(&boundary.loops[0]), Some(true));
+        }
+    }
+}
+
+#[test]
 fn thin_planar_faces_keep_all_nonzero_triangles() {
     let plane = truck_geometry::prelude::Plane::new(
         Point3::origin(),

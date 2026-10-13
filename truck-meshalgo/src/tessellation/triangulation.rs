@@ -580,6 +580,38 @@ impl PolyBoundaryPiece {
                 res
             })
             .collect::<Option<Vec<SurfacePoint>>>()?;
+        for (axis, period) in [(0, up), (1, vp)] {
+            let Some(period) = period else { continue };
+            let delta = vec.last()?.uv[axis] - vec.first()?.uv[axis];
+            let shift = (delta / period).round() * period;
+            if shift == 0. || !delta.near(&shift) {
+                continue;
+            }
+            let collapsed = |p: &SurfacePoint| {
+                if axis == 0 {
+                    surface.uder(p.x, p.y)
+                } else {
+                    surface.vder(p.x, p.y)
+                }
+                .so_small()
+            };
+            let mut bridges = vec.windows(2).enumerate().filter_map(|(i, points)| {
+                let [a, b] = [points[0], points[1]];
+                (a.point.near(&b.point)
+                    && !a.uv[axis].near(&b.uv[axis])
+                    && a.uv[1 - axis].near(&b.uv[1 - axis])
+                    && collapsed(&a)
+                    && collapsed(&b))
+                .then_some(i + 1)
+            });
+            if let (Some(index), None) = (bridges.next(), bridges.next()) {
+                // Close a single polar bridge using the loop's winding. The shortest
+                // angular jump would replace a 270-degree sector by its 90-degree complement.
+                for point in &mut vec[index..] {
+                    point.uv[axis] -= shift;
+                }
+            }
+        }
         let grav = vec.iter().fold(Point2::origin(), |g, p| g + p.uv.to_vec()) / vec.len() as f64;
         if let (Some(up), Some((u0, _))) = (up, urange) {
             let quot = f64::floor((grav.x - u0) / up);

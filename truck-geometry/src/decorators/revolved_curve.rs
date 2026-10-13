@@ -201,16 +201,20 @@ impl<C: ParametricCurve3D + BoundedCurve> BoundedCurve for ProjectedCurve<C> {}
 
 impl<C: ParametricCurve3D + BoundedCurve> ProjectedCurve<C> {
     fn regular_hint(&self, point: Point2, hint: f64) -> f64 {
-        if self.der(hint).magnitude2().is_finite() && self.der2(hint).magnitude2().is_finite() {
+        let regular = |t| {
+            !self.revolution.contains(self.curve.subs(t))
+                && self.der(t).magnitude2().is_finite()
+                && self.der2(t).magnitude2().is_finite()
+        };
+        if regular(hint) {
             return hint;
         }
         let (a, b) = self.range_tuple();
-        // Midpoints avoid the undefined radial derivative at a revolution pole.
+        // A rounded pole can have finite derivatives on the opposite meridian sheet.
+        // Interior seeds avoid that ambiguous radial derivative.
         (0..PRESEARCH_DIVISION)
             .map(|i| a + (b - a) * (i as f64 + 0.5) / PRESEARCH_DIVISION as f64)
-            .filter(|&t| {
-                self.der(t).magnitude2().is_finite() && self.der2(t).magnitude2().is_finite()
-            })
+            .filter(|&t| regular(t))
             .min_by(|&x, &y| {
                 self.subs(x)
                     .distance2(point)

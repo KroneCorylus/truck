@@ -275,6 +275,9 @@ impl Table {
             }
         }
         support_domain::fit(&mut surface, &boundaries, edges);
+        if let Some(trimmed) = support_domain::trimmed_revolution(&surface, &face, self) {
+            surface = trimmed;
+        }
         Ok(CompressedFace {
             surface,
             boundaries,

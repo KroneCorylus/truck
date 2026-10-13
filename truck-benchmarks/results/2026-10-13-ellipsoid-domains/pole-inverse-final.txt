@@ -1,0 +1,15 @@
+Command: CARGO_BUILD_JOBS=12 cargo test --release -p truck-geometry --test revolution_pole_search
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+    Finished `release` profile [optimized] target(s) in 1.78s
+     Running tests/revolution_pole_search.rs (target/release/deps/revolution_pole_search-b463edbe72686a68)
+
+running 4 tests
+test sphere_nearest_search_has_finite_parameters_at_both_poles ... ok
+test nearest_search_accepts_roundoff_just_inside_a_fixed_pole ... ok
+test surface_newton_preserves_an_already_converged_polar_seed ... ok
+test ellipse_inverse_keeps_the_trimmed_sheet_near_a_rounded_pole ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+Exit status: 0

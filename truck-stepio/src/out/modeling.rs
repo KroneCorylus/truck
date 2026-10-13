@@ -326,7 +326,12 @@ fn prepare_surface(surface: &Surface, curves: &[&Curve], tol: f64) -> Option<Sur
         }
         Surface::RevolutedCurve(processor) => {
             let entity = processor.entity();
-            let curve = prepare_curve(entity.entity_curve(), tol)?;
+            let mut curve = prepare_curve(entity.entity_curve(), tol)?;
+            // A STEP ellipse has no trim range. Retain a non-elementary revolution's
+            // meridian domain as an exact rational arc instead of exporting its full ellipse.
+            if surface.elementary().is_none() && matches!(curve, Curve::Conic(_)) {
+                curve = Curve::NurbsCurve(NurbsCurve::try_from(&curve).ok()?);
+            }
             let mut prepared = Processor::with_transform(
                 RevolutedCurve::by_revolution(curve, entity.origin(), entity.axis()),
                 *processor.transform(),
