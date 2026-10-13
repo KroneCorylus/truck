@@ -1,0 +1,1 @@
+{"comparison":"unverified","result":{"code":"UnsupportedGeometry","error":"TRUCK_UNSUPPORTED_GEOMETRY: The selected wire is not tangent continuous. (fillet_solid_along_wire / validate_wire)","input_unchanged":true,"selected_edges":2,"status":"operation-failed"},"schema_version":1,"stage":"blend","tolerance":0.001}

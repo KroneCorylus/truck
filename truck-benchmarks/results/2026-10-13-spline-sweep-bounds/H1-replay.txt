@@ -1,0 +1,1 @@
+{"comparison":"unverified","result":{"code":"NonPlanarFace","error":"TRUCK_FILLET_NON_PLANAR_FACE: This fillet operation requires planar faces. (fillet_solid_edges / validate_input)","input_unchanged":true,"selected_edges":3,"status":"operation-failed"},"schema_version":1,"stage":"blend","tolerance":0.001}

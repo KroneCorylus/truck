@@ -1,0 +1,2 @@
+G3 signed area 23000 volume 2300000
+G7 signed area -3720 volume 372000

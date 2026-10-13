@@ -123,6 +123,7 @@ fn fitted(
     boundaries: &[Vec<CompressedEdgeIndex>],
     edges: &[CompressedEdge<Curve3D>],
 ) -> Option<Surface> {
+    let mut profile_controls = Vec::new();
     let (origin, normal, vector) = match surface {
         Surface::ElementarySurface(ElementarySurface::CylindricalSurface(cylinder)) => {
             let entity = cylinder.entity();
@@ -135,20 +136,30 @@ fn fitted(
         }
         Surface::SweptCurve(SweptCurve::ExtrudedCurve(extruded)) => {
             let transform = match extruded.entity_curve() {
-                Curve3D::Conic(Conic3D::Ellipse(curve)) => curve.transform(),
-                Curve3D::Conic(Conic3D::Parabola(curve)) => curve.transform(),
-                Curve3D::Conic(Conic3D::Hyperbola(curve)) => curve.transform(),
+                Curve3D::Conic(Conic3D::Ellipse(curve)) => Some(curve.transform()),
+                Curve3D::Conic(Conic3D::Parabola(curve)) => Some(curve.transform()),
+                Curve3D::Conic(Conic3D::Hyperbola(curve)) => Some(curve.transform()),
+                Curve3D::BSplineCurve(_) | Curve3D::NurbsCurve(_) => {
+                    profile_controls = positive_control_hull(extruded.entity_curve())?;
+                    None
+                }
                 _ => return None,
             };
-            (
-                transform.transform_point(Point3::origin()),
-                transform
-                    .x
-                    .truncate()
-                    .cross(transform.y.truncate())
-                    .normalize(),
-                extruded.extruding_vector(),
-            )
+            let (origin, normal) = match transform {
+                Some(transform) => (
+                    transform.transform_point(Point3::origin()),
+                    transform
+                        .x
+                        .truncate()
+                        .cross(transform.y.truncate())
+                        .normalize(),
+                ),
+                None => (
+                    *profile_controls.first()?,
+                    extruded.extruding_vector().normalize(),
+                ),
+            };
+            (origin, normal, extruded.extruding_vector())
         }
         _ => return None,
     };
@@ -180,14 +191,7 @@ fn fitted(
                 continue;
             }
         }
-        let curve = truck_modeling::Curve::try_from(source).ok()?;
-        let lifted = curve.try_lift_up()?;
-        for p in lifted.control_points() {
-            if p.w <= 0. || ![p.x, p.y, p.z, p.w].iter().all(|x| x.is_finite()) {
-                return None;
-            }
-            controls.push(Point3::from_homogeneous(*p));
-        }
+        controls.extend(positive_control_hull(source)?);
     }
     if controls.is_empty() {
         return None;
@@ -195,14 +199,24 @@ fn fitted(
     // The enclosing conic boxes and positive rational control hulls bound this
     // sweep coordinate over complete curves, including extrema between vertices.
     let parameter = |p: Point3| (p - origin).dot(normal) / denominator;
+    let (mut base_lo, mut base_hi) = (0_f64, 0_f64);
+    for p in profile_controls {
+        let v = parameter(p);
+        if !v.is_finite() {
+            return None;
+        }
+        base_lo = base_lo.min(v);
+        base_hi = base_hi.max(v);
+    }
     let (mut lo, mut hi) = (0_f64, 1_f64);
     for &p in &controls {
         let v = parameter(p);
         if !v.is_finite() {
             return None;
         }
-        lo = lo.min(v);
-        hi = hi.max(v);
+        // P = Q + v V: subtract the entire profile projection hull, including nonplanar profiles.
+        lo = lo.min(v - base_hi);
+        hi = hi.max(v - base_lo);
     }
     let padding = TOLERANCE / denominator.abs();
     lo -= padding;
@@ -262,4 +276,17 @@ fn fitted(
         }
         _ => unreachable!(),
     })
+}
+
+fn positive_control_hull(curve: &Curve3D) -> Option<Vec<Point3>> {
+    truck_modeling::Curve::try_from(curve)
+        .ok()?
+        .try_lift_up()?
+        .control_points()
+        .iter()
+        .map(|p| {
+            (p.w > 0. && [p.x, p.y, p.z, p.w].iter().all(|x| x.is_finite()))
+                .then(|| Point3::from_homogeneous(*p))
+        })
+        .collect()
 }

@@ -6,6 +6,8 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Preserve the complete trimmed domains of imported spline extrusions. Bound the sweep coordinate with both the boundary and positive-weight profile control hulls, including nonplanar profiles and interior extrema; retain the exact curves and existing conic handling. Native G3/G7 prism inputs now pass geometric consistency, independent volume, closed-mesh and STEP checks at small/original scales and under rigid motion. Importer regressions additionally cover polynomial/rational profiles, reversal, affine frames, boundary parameters and normals. Targeted replays recover G3/G5/G7/G9 single-edge fillets; G5 retains a sampled reference discrepancy.
+
 - Extend exact straight end boundaries toward an open fillet chain when a reentrant contact lies beyond the old vertex. Curved boundaries, interior seams, closed chains and the opposite straight-edge endpoint retain their trimmed domains. E9's torus meridian fillet now passes independent radius/normal, volume, closed-mesh and STEP checks at original scale and with transformed/reversed selections.
 
 - Breaking: generic `fillet_along_wire` and `try_fillet_along_wire` now require `C: TryInto<Line<Point3>>` so end trimming can recognize exact straight supports. Use `truck_modeling::Curve`, or implement a fallible conversion that succeeds only for exact lines. The modeling-solid APIs are unchanged; PiezaCAD's call in `cad-core/src/kernel/blend.rs` needs no migration.

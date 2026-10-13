@@ -1,0 +1,341 @@
+{
+  "parent": "55a389c184dd91ac053917c08b650d56bb500b89",
+  "source_sha256": {
+    "CHANGELOG.md": "48be553f248fd8bf64c6bcad70fa87723dc77575bc632474f063b228e2ed96ec",
+    "truck-stepio/src/in/support_domain.rs": "f148d4f1646e6d65ec968a65120e368c0bca539a7b6737e77e490910e65498a4",
+    "truck-stepio/tests/imported_support_bounds.rs": "28a365718fc94c10931388dc11f21c537c6a2c6ca419bc72a612f2d41df1c117",
+    "truck-shapeops/tests/imported_spline_prisms.rs": "81971728b32f3fe218cf8875342c95d92a9a55ac37531c14901a859fd207899b"
+  },
+  "fixture_sha256": {
+    "truck-shapeops/tests/fixtures/spline-prisms/G3.step": "f728e433641133019302f26030369b8da0ec77bda7133e422fa3e3e04d66983e",
+    "truck-shapeops/tests/fixtures/spline-prisms/G7.step": "84e57136278bfd50f0195b399cb4fc5eba6c1280d2ece7bc0655b96ad768857b"
+  },
+  "replay_sha256": "cbfcf96b4a58bf58951cba8816641ba515016ef1611033fc1b1fec6ca67e55f9",
+  "native_archive": "audits/fillet-chamfer/capture/2026-10-13-cubic-endpoints/artifacts.zip",
+  "native_archive_sha256": "fe9df40abe48d8387b6ccf721f48a3c75a31cd6c057dccbf7654bfef36a66e9a",
+  "native_artifact_sha256": {
+    "blend/simple/G3/capture/001.input.step": "f728e433641133019302f26030369b8da0ec77bda7133e422fa3e3e04d66983e",
+    "blend/simple/G3/capture/001.input.json": "1c04414eedb020fe7dd665bb1b21e371b587450e3fa5021ef6b9c74529e6d585",
+    "blend/simple/G3/capture/001.input.brep": "292252a4b519572d68e5525d77f3b865813e2ac714669569695a37b0698b10bd",
+    "blend/simple/G3/capture/001.result.brep": "1777dd5832d1d522dd1092064acdad0d590ed9c2c4b05c83380d0e7be94c0973",
+    "blend/simple/G3/capture/001.result.json": "e9035e47af5311d2e0d0f142b71714b76c6e59e7936a752b30da7db2c3cf13ae",
+    "blend/simple/G3/capture/001.result.step": "7c28ccdf1acab4585412160c150f2edc933d0a1735ef99ce51c3993a7d51e35c",
+    "blend/simple/G4/capture/001.input.step": "f728e433641133019302f26030369b8da0ec77bda7133e422fa3e3e04d66983e",
+    "blend/simple/G4/capture/001.input.json": "93f0451e5374989a1ff4a7d065feddbb1ac9dcca347ea0d14bc372d141bb4362",
+    "blend/simple/G4/capture/001.input.brep": "292252a4b519572d68e5525d77f3b865813e2ac714669569695a37b0698b10bd",
+    "blend/simple/G4/capture/001.result.brep": "eee114a6438e152b2a38b5ae1091088cf08ac8737bf492bef23d2ddd4364a7e8",
+    "blend/simple/G4/capture/001.result.json": "830f223675f9312649185944553c01b51062c3b5b253318a4c56bcca75b2bef7",
+    "blend/simple/G4/capture/001.result.step": "df792a24f961036b4deabd44d90d2711f126258b879336ff7ae4d84ab5d4eb56",
+    "blend/simple/G5/capture/001.input.step": "f728e433641133019302f26030369b8da0ec77bda7133e422fa3e3e04d66983e",
+    "blend/simple/G5/capture/001.input.json": "1b3991049ebae51d49d8ee6c474d620c6e12171db666736dfe9f07af8247d62b",
+    "blend/simple/G5/capture/001.input.brep": "292252a4b519572d68e5525d77f3b865813e2ac714669569695a37b0698b10bd",
+    "blend/simple/G5/capture/001.result.brep": "f728188e9ac3890bfdd1cb9e2c7ead3da727120e90c974c55f586d07011884fa",
+    "blend/simple/G5/capture/001.result.json": "d6669e20727d363183a896ce23891515bbbb6d45dbbf6dc388851edcb97c803a",
+    "blend/simple/G5/capture/001.result.step": "c71266eb4d5511eec773af370473f6875275496d45b02002d0063b4f1ff09363",
+    "blend/simple/G6/capture/001.input.step": "ff2cb058242e17a6dbcc48f53cf51a8a774fabcc15a34aa406bff8e98c5d8310",
+    "blend/simple/G6/capture/001.input.json": "76ab7b6c3729b85642e374e6fcdab79d507b7aacbd5d72b5c40dd3c67db8476e",
+    "blend/simple/G6/capture/001.input.brep": "292252a4b519572d68e5525d77f3b865813e2ac714669569695a37b0698b10bd",
+    "blend/simple/G6/capture/001.result.brep": "cb5048b5d18ebe94786b2f67da407432e543692783a4b36c18bf4711fc098662",
+    "blend/simple/G6/capture/001.result.json": "e562d53e47cc97a7a073ae03f151dcf8d3568ddc827fb109899234c2d37a68fd",
+    "blend/simple/G6/capture/001.result.step": "14b37396db1de4795b93745e054f40a16b4304751f02290cc220c85cb5e4e962",
+    "blend/simple/G7/capture/001.input.step": "84e57136278bfd50f0195b399cb4fc5eba6c1280d2ece7bc0655b96ad768857b",
+    "blend/simple/G7/capture/001.input.json": "63552b4a210ec099e2776ce87a3cb8ad19d118ec98e5427726f64dff3da7c755",
+    "blend/simple/G7/capture/001.input.brep": "397badb9530b7ab19a0824b5b16b4c172f369b7a1fffcbc5ea7e55b26e354fba",
+    "blend/simple/G7/capture/001.result.brep": "b16966116e9191365d7d4d5a60329bfe9ec2f5f6fd616519592342e6524a30c6",
+    "blend/simple/G7/capture/001.result.json": "268eaf0d7e59d692f9a0fd1c956767a70d84d275a05fb05617eb9593544e6af4",
+    "blend/simple/G7/capture/001.result.step": "354976fbe57cd48d17e0aabb5973e7cee2306ec7311dade3b6ef8857e0bda32e",
+    "blend/simple/G8/capture/001.input.step": "84e57136278bfd50f0195b399cb4fc5eba6c1280d2ece7bc0655b96ad768857b",
+    "blend/simple/G8/capture/001.input.json": "61745c2bc64dc4c131bdbbe54f5859b4bdc66f5205a9e78f1f3ad83d5a404945",
+    "blend/simple/G8/capture/001.input.brep": "397badb9530b7ab19a0824b5b16b4c172f369b7a1fffcbc5ea7e55b26e354fba",
+    "blend/simple/G8/capture/001.result.brep": "4c9487a035a6319a1335fd973cde4452ace15a5d779f5c8b2d21de319a10e0d8",
+    "blend/simple/G8/capture/001.result.json": "d61880140793b917c2093dcb66ef511cf98ade6d42a047daea8177bb5474e22c",
+    "blend/simple/G8/capture/001.result.step": "5e8474a546f5ce1520925d11b59a74afd057c41eabe1270fda350e98b7ff621d",
+    "blend/simple/G9/capture/001.input.step": "84e57136278bfd50f0195b399cb4fc5eba6c1280d2ece7bc0655b96ad768857b",
+    "blend/simple/G9/capture/001.input.json": "cb3442932915f16731e479e589744d1395d54a9e90856e040e0b54c360084b5d",
+    "blend/simple/G9/capture/001.input.brep": "397badb9530b7ab19a0824b5b16b4c172f369b7a1fffcbc5ea7e55b26e354fba",
+    "blend/simple/G9/capture/001.result.brep": "19928954277599b82f3dc5800ad71d4990274c305179aca5e36a9bf279da07bd",
+    "blend/simple/G9/capture/001.result.json": "7382db0d8b3fe77a025811cd817b03fb5e106c044b97a53bf782d7afe8c6ca18",
+    "blend/simple/G9/capture/001.result.step": "3f0bf0876bda0bcc8cbf2f6755c1206dd5eaab6d9c8d36ef6ec008ff0f7bc5e1",
+    "blend/simple/H1/capture/001.input.step": "84e57136278bfd50f0195b399cb4fc5eba6c1280d2ece7bc0655b96ad768857b",
+    "blend/simple/H1/capture/001.input.json": "ad426dee45cb43cea3276fc9d166acfb515ad08329eab7e45ff4fb3384a0b7e1",
+    "blend/simple/H1/capture/001.input.brep": "397badb9530b7ab19a0824b5b16b4c172f369b7a1fffcbc5ea7e55b26e354fba",
+    "blend/simple/H1/capture/001.result.brep": "841a81cc2d807e85ecfc45e7420a0e4d407f85c701b644078cd401f5fedfb8d7",
+    "blend/simple/H1/capture/001.result.json": "f639f943d804337f256bf9bcb3adbe38a9f8b531e15f32fa9a7322e9c0a9aaa6",
+    "blend/simple/H1/capture/001.result.step": "67d11b2da1b67d6bc58608cc6bf8a7f1e3bf17956c0a6b093fa085be5b70e7a0"
+  },
+  "replay_artifact_sha256": {
+    "G3/001.input.step": "f728e433641133019302f26030369b8da0ec77bda7133e422fa3e3e04d66983e",
+    "G3/001.input.json": "1c04414eedb020fe7dd665bb1b21e371b587450e3fa5021ef6b9c74529e6d585",
+    "G3/001.input.brep": "292252a4b519572d68e5525d77f3b865813e2ac714669569695a37b0698b10bd",
+    "G3/001.result.brep": "1777dd5832d1d522dd1092064acdad0d590ed9c2c4b05c83380d0e7be94c0973",
+    "G3/001.result.json": "e9035e47af5311d2e0d0f142b71714b76c6e59e7936a752b30da7db2c3cf13ae",
+    "G3/001.result.step": "7c28ccdf1acab4585412160c150f2edc933d0a1735ef99ce51c3993a7d51e35c",
+    "G3/001.truck.step": "1801772b937613670c07f630ed89300e4cd26c7316ca070f321a6140d6023e8b",
+    "G3/001.truck.json": "5fb8048c8753de7582686d7668c93ae853600af596973d030d0db5fbf30bd602",
+    "G3/001.comparison.json": "43e80e4dce8d2086cc59105daf97504633e0c08fd097af947253e587987627df",
+    "G4/001.input.step": "f728e433641133019302f26030369b8da0ec77bda7133e422fa3e3e04d66983e",
+    "G4/001.input.json": "93f0451e5374989a1ff4a7d065feddbb1ac9dcca347ea0d14bc372d141bb4362",
+    "G4/001.input.brep": "292252a4b519572d68e5525d77f3b865813e2ac714669569695a37b0698b10bd",
+    "G4/001.result.brep": "eee114a6438e152b2a38b5ae1091088cf08ac8737bf492bef23d2ddd4364a7e8",
+    "G4/001.result.json": "830f223675f9312649185944553c01b51062c3b5b253318a4c56bcca75b2bef7",
+    "G4/001.result.step": "df792a24f961036b4deabd44d90d2711f126258b879336ff7ae4d84ab5d4eb56",
+    "G4/001.truck.json": "4699eb83e425937207524989f9fd75760b3cdf73daee882f014953dabd146e6e",
+    "G5/001.input.step": "f728e433641133019302f26030369b8da0ec77bda7133e422fa3e3e04d66983e",
+    "G5/001.input.json": "1b3991049ebae51d49d8ee6c474d620c6e12171db666736dfe9f07af8247d62b",
+    "G5/001.input.brep": "292252a4b519572d68e5525d77f3b865813e2ac714669569695a37b0698b10bd",
+    "G5/001.result.brep": "f728188e9ac3890bfdd1cb9e2c7ead3da727120e90c974c55f586d07011884fa",
+    "G5/001.result.json": "d6669e20727d363183a896ce23891515bbbb6d45dbbf6dc388851edcb97c803a",
+    "G5/001.result.step": "c71266eb4d5511eec773af370473f6875275496d45b02002d0063b4f1ff09363",
+    "G5/001.truck.step": "429f3d21eb43a4a935cd60af02a86ffd4a22e41fb9fc4d0d28fcaf5418605504",
+    "G5/001.truck.json": "b1452ab0e8719e3f62c922648dd121ce59e210039daa5d75d2a2efd7fd480e67",
+    "G5/001.comparison.json": "eaa1b2bafc8c2800d755166e1a84e2ac91faee39235fc4d6daaf6a6c85b1deef",
+    "G6/001.input.step": "ff2cb058242e17a6dbcc48f53cf51a8a774fabcc15a34aa406bff8e98c5d8310",
+    "G6/001.input.json": "76ab7b6c3729b85642e374e6fcdab79d507b7aacbd5d72b5c40dd3c67db8476e",
+    "G6/001.input.brep": "292252a4b519572d68e5525d77f3b865813e2ac714669569695a37b0698b10bd",
+    "G6/001.result.brep": "cb5048b5d18ebe94786b2f67da407432e543692783a4b36c18bf4711fc098662",
+    "G6/001.result.json": "e562d53e47cc97a7a073ae03f151dcf8d3568ddc827fb109899234c2d37a68fd",
+    "G6/001.result.step": "14b37396db1de4795b93745e054f40a16b4304751f02290cc220c85cb5e4e962",
+    "G6/001.truck.json": "959237715c43c2fbcfa0e2f02de401cc662be7cb40d26ca80e714e938794cccb",
+    "G7/001.input.step": "84e57136278bfd50f0195b399cb4fc5eba6c1280d2ece7bc0655b96ad768857b",
+    "G7/001.input.json": "63552b4a210ec099e2776ce87a3cb8ad19d118ec98e5427726f64dff3da7c755",
+    "G7/001.input.brep": "397badb9530b7ab19a0824b5b16b4c172f369b7a1fffcbc5ea7e55b26e354fba",
+    "G7/001.result.brep": "b16966116e9191365d7d4d5a60329bfe9ec2f5f6fd616519592342e6524a30c6",
+    "G7/001.result.json": "268eaf0d7e59d692f9a0fd1c956767a70d84d275a05fb05617eb9593544e6af4",
+    "G7/001.result.step": "354976fbe57cd48d17e0aabb5973e7cee2306ec7311dade3b6ef8857e0bda32e",
+    "G7/001.truck.step": "1481178537cb1342bb6d6c16f8629e1be1a2a6618a15f8c9968fa41f9cc56c2c",
+    "G7/001.truck.json": "f2e7711d23fa4c4f364ece879d36dd086e01b58ec31dc27eef145a84d52905f8",
+    "G7/001.comparison.json": "5713a58226ed875ad58c02882c03fa5b51d2549f5d54bc5156e2f17b0293ea29",
+    "G8/001.input.step": "84e57136278bfd50f0195b399cb4fc5eba6c1280d2ece7bc0655b96ad768857b",
+    "G8/001.input.json": "61745c2bc64dc4c131bdbbe54f5859b4bdc66f5205a9e78f1f3ad83d5a404945",
+    "G8/001.input.brep": "397badb9530b7ab19a0824b5b16b4c172f369b7a1fffcbc5ea7e55b26e354fba",
+    "G8/001.result.brep": "4c9487a035a6319a1335fd973cde4452ace15a5d779f5c8b2d21de319a10e0d8",
+    "G8/001.result.json": "d61880140793b917c2093dcb66ef511cf98ade6d42a047daea8177bb5474e22c",
+    "G8/001.result.step": "5e8474a546f5ce1520925d11b59a74afd057c41eabe1270fda350e98b7ff621d",
+    "G8/001.truck.json": "4699eb83e425937207524989f9fd75760b3cdf73daee882f014953dabd146e6e",
+    "G9/001.input.step": "84e57136278bfd50f0195b399cb4fc5eba6c1280d2ece7bc0655b96ad768857b",
+    "G9/001.input.json": "cb3442932915f16731e479e589744d1395d54a9e90856e040e0b54c360084b5d",
+    "G9/001.input.brep": "397badb9530b7ab19a0824b5b16b4c172f369b7a1fffcbc5ea7e55b26e354fba",
+    "G9/001.result.brep": "19928954277599b82f3dc5800ad71d4990274c305179aca5e36a9bf279da07bd",
+    "G9/001.result.json": "7382db0d8b3fe77a025811cd817b03fb5e106c044b97a53bf782d7afe8c6ca18",
+    "G9/001.result.step": "3f0bf0876bda0bcc8cbf2f6755c1206dd5eaab6d9c8d36ef6ec008ff0f7bc5e1",
+    "G9/001.truck.step": "70dbf0a5586ef9e242fa67c5c9a52b3b849a893c7f17db43bb20db40d7efe8bc",
+    "G9/001.truck.json": "3af78edce6cd80a9c5a6151f9240d67a41b81b89e9841d5dd2354f6ec5e81634",
+    "G9/001.comparison.json": "062c425aeb85b1d303c15ff11665faad2b1c1e21edad828937996ee059b46da5",
+    "H1/001.input.step": "84e57136278bfd50f0195b399cb4fc5eba6c1280d2ece7bc0655b96ad768857b",
+    "H1/001.input.json": "ad426dee45cb43cea3276fc9d166acfb515ad08329eab7e45ff4fb3384a0b7e1",
+    "H1/001.input.brep": "397badb9530b7ab19a0824b5b16b4c172f369b7a1fffcbc5ea7e55b26e354fba",
+    "H1/001.result.brep": "841a81cc2d807e85ecfc45e7420a0e4d407f85c701b644078cd401f5fedfb8d7",
+    "H1/001.result.json": "f639f943d804337f256bf9bcb3adbe38a9f8b531e15f32fa9a7322e9c0a9aaa6",
+    "H1/001.result.step": "67d11b2da1b67d6bc58608cc6bf8a7f1e3bf17956c0a6b093fa085be5b70e7a0",
+    "H1/001.truck.json": "959237715c43c2fbcfa0e2f02de401cc662be7cb40d26ca80e714e938794cccb"
+  },
+  "replay_archive_sha256": "5d1968eba92683e3ac63acd1c49f63fd06cd038edfc2a51ccf1ba39f917411a9",
+  "targeted_results": {
+    "G3": {
+      "truck": {
+        "comparison": "unverified",
+        "result": {
+          "geometry_consistent": true,
+          "input_unchanged": true,
+          "mesh_closed": true,
+          "mesh_volume": 2294136.9843814196,
+          "selected_edges": 1,
+          "status": "operation-succeeded",
+          "step_prepared": true
+        },
+        "schema_version": 1,
+        "stage": "output-consistency",
+        "tolerance": 0.001
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 2294150.6118989084,
+        "truck_volume": 2294150.607043287,
+        "native_to_truck_max_distance": 1.1409450059813582e-05,
+        "native_to_truck_samples": 859,
+        "truck_to_native_max_distance": 9.411814409087239e-06,
+        "truck_to_native_samples": 859
+      }
+    },
+    "G4": {
+      "truck": {
+        "comparison": "unverified",
+        "result": {
+          "code": "UnsupportedGeometry",
+          "error": "TRUCK_UNSUPPORTED_GEOMETRY: The selected wire is not tangent continuous. (fillet_solid_along_wire / validate_wire)",
+          "input_unchanged": true,
+          "selected_edges": 2,
+          "status": "operation-failed"
+        },
+        "schema_version": 1,
+        "stage": "blend",
+        "tolerance": 0.001
+      }
+    },
+    "G5": {
+      "truck": {
+        "comparison": "unverified",
+        "result": {
+          "geometry_consistent": true,
+          "input_unchanged": true,
+          "mesh_closed": true,
+          "mesh_volume": 2292134.3686765283,
+          "selected_edges": 1,
+          "status": "operation-succeeded",
+          "step_prepared": true
+        },
+        "schema_version": 1,
+        "stage": "output-consistency",
+        "tolerance": 0.001
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 2292148.707844867,
+        "truck_volume": 2292147.8343762597,
+        "native_to_truck_max_distance": 0.001706935290957981,
+        "native_to_truck_samples": 864,
+        "truck_to_native_max_distance": 0.00170290628978652,
+        "truck_to_native_samples": 862
+      }
+    },
+    "G6": {
+      "truck": {
+        "comparison": "unverified",
+        "result": {
+          "code": "NonPlanarFace",
+          "error": "TRUCK_FILLET_NON_PLANAR_FACE: This fillet operation requires planar faces. (fillet_solid_edges / validate_input)",
+          "input_unchanged": true,
+          "selected_edges": 3,
+          "status": "operation-failed"
+        },
+        "schema_version": 1,
+        "stage": "blend",
+        "tolerance": 0.001
+      }
+    },
+    "G7": {
+      "truck": {
+        "comparison": "unverified",
+        "result": {
+          "geometry_consistent": true,
+          "input_unchanged": true,
+          "mesh_closed": true,
+          "mesh_volume": 371119.16884258675,
+          "selected_edges": 1,
+          "status": "operation-succeeded",
+          "step_prepared": true
+        },
+        "schema_version": 1,
+        "stage": "output-consistency",
+        "tolerance": 0.001
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 371121.31979745557,
+        "truck_volume": 371121.321158088,
+        "native_to_truck_max_distance": 6.39180880152669e-06,
+        "native_to_truck_samples": 883,
+        "truck_to_native_max_distance": 8.15296655590294e-07,
+        "truck_to_native_samples": 883
+      }
+    },
+    "G8": {
+      "truck": {
+        "comparison": "unverified",
+        "result": {
+          "code": "UnsupportedGeometry",
+          "error": "TRUCK_UNSUPPORTED_GEOMETRY: The selected wire is not tangent continuous. (fillet_solid_along_wire / validate_wire)",
+          "input_unchanged": true,
+          "selected_edges": 2,
+          "status": "operation-failed"
+        },
+        "schema_version": 1,
+        "stage": "blend",
+        "tolerance": 0.001
+      }
+    },
+    "G9": {
+      "truck": {
+        "comparison": "unverified",
+        "result": {
+          "geometry_consistent": true,
+          "input_unchanged": true,
+          "mesh_closed": true,
+          "mesh_volume": 370853.5065856865,
+          "selected_edges": 1,
+          "status": "operation-succeeded",
+          "step_prepared": true
+        },
+        "schema_version": 1,
+        "stage": "output-consistency",
+        "tolerance": 0.001
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 370856.8495906483,
+        "truck_volume": 370856.7803314651,
+        "native_to_truck_max_distance": 0.0008899970366070568,
+        "native_to_truck_samples": 892,
+        "truck_to_native_max_distance": 0.0009068425631325791,
+        "truck_to_native_samples": 887
+      }
+    },
+    "H1": {
+      "truck": {
+        "comparison": "unverified",
+        "result": {
+          "code": "NonPlanarFace",
+          "error": "TRUCK_FILLET_NON_PLANAR_FACE: This fillet operation requires planar faces. (fillet_solid_edges / validate_input)",
+          "input_unchanged": true,
+          "selected_edges": 3,
+          "status": "operation-failed"
+        },
+        "schema_version": 1,
+        "stage": "blend",
+        "tolerance": 0.001
+      }
+    }
+  },
+  "independent_input_volumes": {
+    "G3": 2300000,
+    "G7": 372000
+  },
+  "checks": {
+    "all_target_release_clippy": "passed",
+    "actions_smoke": "passed",
+    "replay_build": "passed"
+  },
+  "performance_claim": "None; action benchmark smoke only.",
+  "release_tests": {
+    "passed": 461,
+    "failed": 0,
+    "ignored": 1,
+    "targets": 87
+  },
+  "validation_commands": [
+    "CARGO_BUILD_JOBS=12 cargo test --release -p truck-stepio -p truck-shapeops --no-fail-fast",
+    "CARGO_BUILD_JOBS=12 cargo clippy --release -p truck-stepio -p truck-shapeops -p truck-benchmarks --all-targets",
+    "RAYON_NUM_THREADS=1 CARGO_BUILD_JOBS=12 cargo bench -p truck-benchmarks --bench actions -- --test",
+    "CARGO_BUILD_JOBS=12 cargo build --release -p truck-shapeops --example replay_occt_blend"
+  ]
+}
