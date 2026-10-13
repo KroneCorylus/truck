@@ -1,0 +1,2 @@
+Command: target/occt-capture-plugin/compare_shapes target/polar-cap-replay/H4/001.result.brep target/polar-cap-replay/H4/001.truck.step target/polar-cap-replay/H4/001.comparison.json
+Exit status: 0

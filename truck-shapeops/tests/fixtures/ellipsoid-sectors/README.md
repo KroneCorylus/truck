@@ -45,6 +45,30 @@ section against the independently solved center, radius, outward normals and
 contact heights, as well as the shared solid/STEP checks and input immutability.
 The small-scale cases use both meridian sheets, rigid motion and reversed wires.
 
-H4 selects the central vertical axis of the same input shape. Its output still
-has an open Truck mesh and fails native STEP validity; it is not covered by the
-successful H2 fillet assertions.
+## H4 central-axis fillet
+
+H4 selects the central vertical axis of the same input shape. The radius-10
+concave round fills the missing quadrant outside the circle centered at
+`(10, -10)` in the XY plane. Write `y = -Y` for its nonnegative coordinate.
+At each `(x, y)` the filled height is
+`100 + 100 sqrt(1 - (x^2 + y^2)/150^2)`.
+
+Parameterize the corner domain by `x = 10 (1-cos(t))`,
+`0 <= y <= 10 (1-sin(t))`, `0 <= t <= pi/2`, with `dx = 10 sin(t) dt`.
+For `A = 1-x^2/150^2`, the integral over height and y is
+
+```
+100 y + 50 [y sqrt(A-y^2/150^2) + 150 A asin(y/(150 sqrt(A)))].
+```
+
+Simpson integration with 1024 intervals gives added volume
+**4291.225257665**, hence total **13159710.462164925**. The regression checks
+this independent integral, cylinder radius/normals, closed mesh, STEP round
+trip, the exported pole position, and unchanged input on both meridian sheets
+with rigid motion, two scales and reversed selection.
+
+The captured native reference's volume is **13151259.698596016**, and its
+maximum edge/vertex tolerance is approximately **22.9741 model units**. Its
+validity result is not an accurate material reference near the pole. Native
+STEP validity and agreement with the independent integral are checked
+separately from the sampled comparison against that reference.

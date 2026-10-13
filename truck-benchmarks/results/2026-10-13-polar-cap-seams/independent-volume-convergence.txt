@@ -1,0 +1,6 @@
+Independent H4 corner-fill integral (formula in fixture README)
+Simpson intervals 256: 13159710.462165082
+Simpson intervals 512: 13159710.462164935
+Simpson intervals 1024: 13159710.462164925
+Simpson intervals 2048: 13159710.462164925
+Simpson intervals 4096: 13159710.462164925

@@ -1,0 +1,1 @@
+{"comparison":"unverified","result":{"geometry_consistent":true,"input_unchanged":true,"mesh_closed":true,"mesh_volume":13159628.445614986,"selected_edges":1,"status":"operation-succeeded","step_prepared":true},"schema_version":1,"stage":"output-consistency","tolerance":0.001}

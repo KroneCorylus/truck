@@ -75,6 +75,140 @@ fn polar_ellipsoid_boundaries_keep_the_large_angular_sector() {
 }
 
 #[test]
+fn polar_cap_meshes_close_the_periodic_seam_at_the_boundary_start() {
+    use crate::analyzers::Topology;
+    use crate::filters::*;
+    use std::f64::consts::{PI, TAU};
+    use truck_geometry::prelude::*;
+    let reference = Processor::with_transform(
+        Sphere::new(Point3::origin(), 1.),
+        Matrix4::from_nonuniform_scale(1.5, 1.5, 1.),
+    );
+    for north in [true, false] {
+        for reversed in [false, true] {
+            for start in [0., 0.37, 2.1] {
+                let latitude = if north { 0.7 } else { PI - 0.7 };
+                let samples: Vec<_> = (0..=64)
+                    .map(|i| {
+                        let angle = start + if north { 1. } else { -1. } * TAU * i as f64 / 64.;
+                        reference.subs(latitude, angle)
+                    })
+                    .collect();
+                let mut wire = PolylineCurve(samples.clone());
+                let surface = if reversed {
+                    wire.0.reverse();
+                    reference.inverse()
+                } else {
+                    reference
+                };
+                let piece = PolyBoundaryPiece::try_new(
+                    &surface,
+                    std::iter::once(wire),
+                    by_search_parameter,
+                )
+                .unwrap();
+                let boundary = PolyBoundary::new(vec![piece], &surface, 0.005).unwrap();
+                let mut mesh = trimming_tessellation(&surface, &boundary, 0.005);
+                assert!(consistent_winding(&mesh));
+                mesh.put_together_same_attrs(TOLERANCE)
+                    .remove_degenerate_faces()
+                    .remove_unused_attrs();
+                let boundaries = mesh.extract_boundaries();
+                assert_eq!(
+                    boundaries.len(),
+                    1,
+                    "north={north} reversed={reversed} start={start}"
+                );
+                assert_eq!(
+                    boundaries[0].len(),
+                    64,
+                    "north={north} reversed={reversed} start={start}"
+                );
+                for &i in &boundaries[0] {
+                    assert!(samples.iter().any(|p| p.near(&mesh.positions()[i])));
+                }
+                let z = latitude.cos();
+                for p in mesh.positions() {
+                    assert!(if north {
+                        p.z >= z - 1e-8
+                    } else {
+                        p.z <= z + 1e-8
+                    });
+                }
+            }
+        }
+    }
+}
+
+#[test]
+fn polar_cap_meridians_keep_the_shared_boundary_samples() {
+    use crate::analyzers::Topology;
+    use crate::filters::*;
+    use std::f64::consts::{FRAC_PI_2, PI, TAU};
+    use truck_geometry::prelude::*;
+    let reference = Processor::with_transform(
+        Sphere::new(Point3::origin(), 1.),
+        Matrix4::from_nonuniform_scale(1.5, 1.5, 1.),
+    );
+    let corners = [
+        Point2::new(FRAC_PI_2, 0.),
+        Point2::new(FRAC_PI_2, 1.5 * PI),
+        Point2::new(0.2, 1.5 * PI),
+        Point2::new(0.2, TAU),
+        Point2::new(FRAC_PI_2, TAU),
+    ];
+    let wire: Vec<PolylineCurve> = corners
+        .windows(2)
+        .map(|ends| {
+            let line = Line(ends[0], ends[1]);
+            (0..=64)
+                .map(|i| {
+                    let p = line.subs(i as f64 / 64.);
+                    reference.subs(p.x, p.y)
+                })
+                .collect()
+        })
+        .collect();
+    for reversed in [false, true] {
+        for start in 0..4 {
+            let mut wire = wire.clone();
+            wire.rotate_left(start);
+            let surface = if reversed {
+                wire.reverse();
+                for curve in &mut wire {
+                    curve.0.reverse();
+                }
+                reference.inverse()
+            } else {
+                reference
+            };
+            let samples: Vec<_> = wire
+                .iter()
+                .flat_map(|curve| curve.iter().copied().take(curve.len() - 1))
+                .collect();
+            let piece = PolyBoundaryPiece::try_new(&surface, wire.into_iter(), by_search_parameter)
+                .unwrap();
+            let boundary = PolyBoundary::new(vec![piece], &surface, 0.005).unwrap();
+            let mut mesh = trimming_tessellation(&surface, &boundary, 0.005);
+            assert!(consistent_winding(&mesh));
+            mesh.put_together_same_attrs(TOLERANCE)
+                .remove_degenerate_faces()
+                .remove_unused_attrs();
+            let outlines = mesh.extract_boundaries();
+            assert_eq!(outlines.len(), 1, "start={start} reversed={reversed}");
+            assert_eq!(
+                outlines[0].len(),
+                samples.len(),
+                "start={start} reversed={reversed}"
+            );
+            for &i in &outlines[0] {
+                assert!(samples.iter().any(|p| p.near(&mesh.positions()[i])));
+            }
+        }
+    }
+}
+
+#[test]
 fn thin_planar_faces_keep_all_nonzero_triangles() {
     let plane = truck_geometry::prelude::Plane::new(
         Point3::origin(),

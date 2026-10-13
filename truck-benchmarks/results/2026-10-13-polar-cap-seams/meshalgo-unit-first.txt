@@ -1,0 +1,50 @@
+   Compiling truck-meshalgo v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-meshalgo)
+    Finished `release` profile [optimized] target(s) in 3.49s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running unittests src/lib.rs (target/release/deps/truck_meshalgo-6f1452336a80c8f6)
+
+running 23 tests
+test analyzers::collision::collide_triangles_test ... ok
+test analyzers::collision::triangle_seams_survive_roundoff_without_turning_coplanar_faces_into_crossings ... ok
+test analyzers::point_cloud::hashed_point_cloud::distance_point_triangle_test ... ok
+test analyzers::in_out_judge::inside100 ... ok
+test analyzers::splitting::into_components_test ... ok
+test filters::optimizing::tests::degenerate_polygon_test ... ok
+test tessellation::triangulation::par_bench ... ignored
+test filters::optimizing::tests::welding_preserves_transitive_connections_and_strict_tolerance ... ok
+test tessellation::triangulation::tests::culling_preserves_near_boundary_rejection ... ok
+test tessellation::triangulation::tests::normal_orientation_preserves_ambiguous_meridian_facets_and_flips_reliable_ones ... ok
+test tessellation::triangulation::tests::thin_planar_faces_keep_all_nonzero_triangles ... ok
+test analyzers::collision::sweep_finds_every_crossing_pair ... ok
+test tessellation::triangulation::tests::polar_ellipsoid_boundaries_keep_the_large_angular_sector ... ok
+test tessellation::triangulation::tests::holes_islands_disconnected_and_concave_loops ... ok
+test tessellation::triangulation::tests::fitted_edge_endpoints_use_shared_topology_vertices ... ok
+test tessellation::triangulation::tests::one_worker_and_parallel_tessellation_are_identical ... ok
+test analyzers::point_cloud::hashed_point_cloud::space_division_distance ... ok
+face 0 ori=true piece 116 BoundingBox(Point2 [0.0, 0.0], Point2 [6.283185307179586, 1.5431785785769594]) ends Some(SurfacePoint { point: Point3 [1.5, -3.6739403974420594e-16, 0.0], uv: Point2 [0.0, 0.0] }) Some(SurfacePoint { point: Point3 [1.5, -3.6739403974420594e-16, 0.0], uv: Point2 [6.283185307179586, 0.0] })
+test tessellation::triangulation::tests::culling_matches_full_winding_scan ... ok
+test filters::optimizing::tests::welding_matches_pairwise_components ... ok
+test tessellation::triangulation::tests::polar_cap_meshes_close_the_periodic_seam_at_the_boundary_start ... ok
+test tessellation::triangulation::tests::polar_cap_meridians_keep_the_shared_boundary_samples ... ok
+test filters::optimizing::tests::large_equal_attribute_groups ... ok
+face 0: winding true tris 8036
+face 0 boundaries [115] samples119 extras0 []
+face 1 ori=true piece 95 BoundingBox(Point2 [-250.0, -250.0], Point2 [250.0, 250.0]) ends Some(SurfacePoint { point: Point3 [-1.0715659492539341e-15, -2.5, -1.0], uv: Point2 [-250.0, -1.071565949253934e-13] }) Some(SurfacePoint { point: Point3 [-1.0715659492539341e-15, -2.5, -1.0], uv: Point2 [-250.0, -1.071565949253934e-13] })
+face 1: winding true tris 92
+face 1 boundaries [94] samples98 extras0 []
+face 2 ori=true piece 152 BoundingBox(Point2 [1.5707963267948966, -100.00000000004547], Point2 [6.283185307179586, 0.0]) ends Some(SurfacePoint { point: Point3 [2.5, -6.123233995736766e-16, -1.0], uv: Point2 [6.283185307179586, 0.0] }) Some(SurfacePoint { point: Point3 [2.5, -6.123233995736766e-16, -1.0], uv: Point2 [6.283185307179586, 0.0] })
+face 2: winding true tris 149
+face 2 boundaries [151] samples155 extras0 []
+face 3 ori=true piece 25 BoundingBox(Point2 [-124.0429408147017, -87.39058551596993], Point2 [75.73458949926993, 152.60941448402988]) ends Some(SurfacePoint { point: Point3 [1.5, -2.719262146893399e-32, -2.4492935982947064e-16], uv: Point2 [-24.265410500729956, 52.60941448402996] }) Some(SurfacePoint { point: Point3 [1.5, -2.719262146893399e-32, -2.4492935982947064e-16], uv: Point2 [-24.265410500729956, 52.60941448402996] })
+face 3: winding true tris 22
+face 3 boundaries [24] samples28 extras0 []
+face 4 ori=true piece 25 BoundingBox(Point2 [-87.39058551596993, -124.04294081470167], Point2 [152.60941448402988, 75.73458949926993]) ends Some(SurfacePoint { point: Point3 [-3.330669073875e-16, -1.5, 0.0], uv: Point2 [52.60941448402996, -24.26541050072998] }) Some(SurfacePoint { point: Point3 [-3.330669073875e-16, -1.5, 0.0], uv: Point2 [52.60941448402996, -24.26541050072998] })
+face 4: winding true tris 22
+face 4 boundaries [24] samples28 extras0 []
+face 5 ori=true piece 19 BoundingBox(Point2 [0.0, 0.00019067288420870733], Point2 [1.000000000000002, 1.0]) ends Some(SurfacePoint { point: Point3 [0.09999999999999987, 1.827502172952e-17, -1.0], uv: Point2 [0.0, 1.0] }) Some(SurfacePoint { point: Point3 [0.09999999999999987, 1.827502172952e-17, -1.0], uv: Point2 [1.3252815901221455e-16, 1.0] })
+face 5: winding true tris 898
+face 5 boundaries [18] samples22 extras0 []
+test tessellation::triangulation::tests::diagnostic_h4_boundaries ... ok
+
+test result: ok. 22 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.13s

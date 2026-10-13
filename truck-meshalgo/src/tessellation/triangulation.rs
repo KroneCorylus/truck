@@ -771,50 +771,82 @@ impl PolyBoundary {
         match open.len() {
             1 => {
                 let mut curve = open.pop().unwrap();
-                let p = curve[0];
-                let q = curve[curve.len() - 1];
-                if let (Some((u0, u1)), Some((v0, v1))) = surface.try_range_tuple() {
-                    if p.x < q.x - TOLERANCE {
-                        normalize_range(&mut curve, 0, (u0, u1));
-                        let p = curve[0];
-                        let q = curve[curve.len() - 1];
-                        let x = (Point2::new(u0, v1), surface.subs(u0, v1)).into();
-                        let y = (Point2::new(u1, v1), surface.subs(u1, v1)).into();
-                        let vec0 = polyline_on_surface(surface, q, y, tol);
-                        let vec1 = polyline_on_surface(surface, y, x, tol);
-                        let vec2 = polyline_on_surface(surface, x, p, tol);
-                        closed.push(connect_edges([vec0, vec1, vec2, curve]));
-                    } else if q.x < p.x - TOLERANCE {
-                        normalize_range(&mut curve, 0, (u0, u1));
-                        let p = curve[0];
-                        let q = curve[curve.len() - 1];
-                        let x = (Point2::new(u1, v0), surface.subs(u1, v0)).into();
-                        let y = (Point2::new(u0, v0), surface.subs(u0, v0)).into();
-                        let vec0 = polyline_on_surface(surface, q, y, tol);
-                        let vec1 = polyline_on_surface(surface, y, x, tol);
-                        let vec2 = polyline_on_surface(surface, x, p, tol);
-                        closed.push(connect_edges([vec0, vec1, vec2, curve]));
-                    } else if p.y < q.y - TOLERANCE {
-                        normalize_range(&mut curve, 1, (v0, v1));
-                        let p = curve[0];
-                        let q = curve[curve.len() - 1];
-                        let x = (Point2::new(u0, v0), surface.subs(u0, v0)).into();
-                        let y = (Point2::new(u0, v1), surface.subs(u0, v1)).into();
-                        let vec0 = polyline_on_surface(surface, q, y, tol);
-                        let vec1 = polyline_on_surface(surface, y, x, tol);
-                        let vec2 = polyline_on_surface(surface, x, p, tol);
-                        closed.push(connect_edges([vec0, vec1, vec2, curve]));
-                    } else if q.y < p.y - TOLERANCE {
-                        normalize_range(&mut curve, 1, (v0, v1));
-                        let p = curve[0];
-                        let q = curve[curve.len() - 1];
-                        let x = (Point2::new(u1, v1), surface.subs(u1, v1)).into();
-                        let y = (Point2::new(u1, v0), surface.subs(u1, v0)).into();
-                        let vec0 = polyline_on_surface(surface, q, y, tol);
-                        let vec1 = polyline_on_surface(surface, y, x, tol);
-                        let vec2 = polyline_on_surface(surface, x, p, tol);
-                        closed.push(connect_edges([vec0, vec1, vec2, curve]));
+                if let (Some(urange), Some(vrange)) = surface.try_range_tuple() {
+                    let mut ranges = [urange, vrange];
+                    let (p, q) = (curve[0], *curve.last()?);
+                    let axis = usize::from((p.x - q.x).abs() <= TOLERANCE);
+                    let delta = q.uv[axis] - p.uv[axis];
+                    let forward = delta > 0.;
+                    let pole = if (axis == 0) == forward {
+                        ranges[1 - axis].1
+                    } else {
+                        ranges[1 - axis].0
+                    };
+                    let mut at_pole = p.uv;
+                    at_pole[1 - axis] = pole;
+                    let tangent = if axis == 0 {
+                        surface.uder(at_pole.x, at_pole.y)
+                    } else {
+                        surface.vder(at_pole.x, at_pole.y)
+                    };
+                    let period = [surface.u_period(), surface.v_period()][axis];
+                    let mut polar_seam = false;
+                    if tangent.so_small() && period.is_some_and(|period| delta.abs().near(&period))
+                    {
+                        let index = curve.windows(3).position(|points| {
+                            (points[1].uv[axis] - points[0].uv[axis]) * delta.signum() > TOLERANCE
+                                && (points[2].uv[axis] - points[1].uv[axis]) * delta.signum()
+                                    > TOLERANCE
+                                && !points[0].point.near(&points[1].point)
+                                && !points[1].point.near(&points[2].point)
+                        });
+                        if let Some(index) = index.map(|i| i + 1) {
+                            // Cross the boundary away from existing meridians, whose shared
+                            // samples must not be replaced by an artificial polar seam.
+                            let mut prefix = curve[..=index].to_vec();
+                            for point in &mut prefix {
+                                point.uv[axis] += delta;
+                            }
+                            curve = curve[index..curve.len() - 1].to_vec();
+                            curve.extend(prefix);
+                            let (p, q) = (curve[0].uv[axis], curve.last()?.uv[axis]);
+                            ranges[axis] = (p.min(q), p.max(q));
+                            polar_seam = true;
+                        }
                     }
+                    normalize_range(&mut curve, axis, ranges[axis]);
+                    let (p, q) = (curve[0], *curve.last()?);
+                    let mut x = p.uv;
+                    let mut y = q.uv;
+                    x[axis] = if forward {
+                        ranges[axis].0
+                    } else {
+                        ranges[axis].1
+                    };
+                    y[axis] = if forward {
+                        ranges[axis].1
+                    } else {
+                        ranges[axis].0
+                    };
+                    x[1 - axis] = pole;
+                    y[1 - axis] = pole;
+                    let x = (x, surface.subs(x.x, x.y)).into();
+                    let y = (y, surface.subs(y.x, y.y)).into();
+                    let vec0 = polyline_on_surface(surface, q, y, tol);
+                    let vec1 = polyline_on_surface(surface, y, x, tol);
+                    let vec2 = if polar_seam {
+                        // Both copies of a periodic seam need identical spatial samples.
+                        vec0.iter()
+                            .rev()
+                            .map(|point| SurfacePoint {
+                                uv: point.uv + (p.uv - q.uv),
+                                point: point.point,
+                            })
+                            .collect()
+                    } else {
+                        polyline_on_surface(surface, x, p, tol)
+                    };
+                    closed.push(connect_edges([vec0, vec1, vec2, curve]));
                 }
             }
             2 => {

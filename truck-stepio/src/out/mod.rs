@@ -341,7 +341,11 @@ ENDSEC;\n",
     }
 }
 
-/// Display model with configurations
+/// Display model with configurations.
+///
+/// Construction requires bounded, subdividable 3D curves and 3D surfaces supporting nearest
+/// parameter searches. A singly bounded face winding around an enclosed surface pole gains a
+/// degenerate STEP vertex loop at that pole; the source model's topology is unchanged.
 #[derive(Clone, Debug)]
 pub enum StepModel<'a, P, C, S> {
     /// shell based surface model

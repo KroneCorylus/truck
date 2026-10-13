@@ -73,6 +73,52 @@ fn volume() -> f64 {
     3. * PI / 4. * ((250_f64.powi(3) - 150_f64.powi(3)) / 3. + 2. * 150_f64.powi(2) * 100. / 3.)
 }
 
+fn assert_step_poles(solid: &Solid, expected: &[Point3]) {
+    use ruststep::{
+        ast::{EntityInstance, Name, Parameter},
+        tables::EntityTable,
+    };
+    use truck_stepio::{out::*, r#in::ruststep};
+    let prepared = prepare_for_step(&solid.compress(), 0.00005).unwrap();
+    let step = StepDisplay::new(
+        Default::default(),
+        StepDesign::from_model(StepModel::from(&prepared)),
+    )
+    .to_string();
+    let table = Table::from_step(&step).unwrap();
+    let parsed = ruststep::parser::parse(&step).unwrap();
+    let poles: Vec<_> = parsed
+        .data
+        .iter()
+        .flat_map(|data| &data.entities)
+        .filter_map(|entity| {
+            let EntityInstance::Simple { record, .. } = entity else {
+                return None;
+            };
+            if record.name != "VERTEX_LOOP" {
+                return None;
+            }
+            let Parameter::List(parameters) = &record.parameter else {
+                panic!("vertex loop parameters")
+            };
+            let Parameter::Ref(Name::Entity(vertex)) = parameters[1] else {
+                panic!("vertex loop reference")
+            };
+            let vertex =
+                EntityTable::<truck_stepio::r#in::VertexPointHolder>::get_owned(&table, vertex)
+                    .unwrap();
+            Some(Point3::from(&vertex.vertex_geometry))
+        })
+        .collect();
+    assert_eq!(poles.len(), expected.len(), "{poles:?}");
+    for point in expected {
+        assert!(
+            poles.iter().any(|pole| pole.near(point)),
+            "{poles:?}, expected {point:?}"
+        );
+    }
+}
+
 fn check(negative_sheet: bool, start: usize, scale: f64, transformed: bool) {
     let transform = if transformed {
         Matrix4::from_translation(Vector3::new(13., -7., 23.))
@@ -84,6 +130,7 @@ fn check(negative_sheet: bool, start: usize, scale: f64, transformed: bool) {
     assert!(model.is_geometric_consistent());
     common::assert_solid(&model, volume() * scale.powi(3), &[0], 0.001);
     common::blend::assert_step(&model, volume() * scale.powi(3), 0.001);
+    assert_step_poles(&model, &[]);
 }
 
 #[test]
@@ -209,6 +256,91 @@ fn ellipse_cone_junction_fillet_preserves_radius_material_and_step() {
             assert!((max_z - z1).abs() * scale < 1e-6);
             common::assert_solid(&result.solid, expected * scale.powi(3), &[0], 0.001);
             common::blend::assert_step(&result.solid, expected * scale.powi(3), 0.001);
+            assert_step_poles(&result.solid, &[]);
+        }
+    }
+}
+
+fn axis_fillet_volume() -> f64 {
+    // Integrate the filled corner outside its rolling circle, from the base to the ellipsoid.
+    let n = 1024;
+    let step = FRAC_PI_2 / n as f64;
+    let integrand = |t: f64| {
+        let (x, y) = (10. * (1. - t.cos()), 10. * (1. - t.sin()));
+        let a = 1. - x * x / 150_f64.powi(2);
+        let height_integral = 100. * y
+            + 50.
+                * (y * (a - y * y / 150_f64.powi(2)).sqrt()
+                    + 150. * a * (y / (150. * a.sqrt())).asin());
+        height_integral * 10. * t.sin()
+    };
+    let added = (0..=n)
+        .map(|i| {
+            let weight = if i == 0 || i == n {
+                1.
+            } else if i % 2 == 0 {
+                2.
+            } else {
+                4.
+            };
+            weight * integrand(i as f64 * step)
+        })
+        .sum::<f64>()
+        * step
+        / 3.;
+    volume() + added
+}
+
+#[test]
+fn central_axis_fillet_preserves_the_polar_cap_and_step() {
+    use truck_shapeops::fillet::{try_fillet_solid_along_wire, try_fillet_solid_edges};
+    for negative_sheet in [false, true] {
+        for reversed in [false, true] {
+            let scale = if reversed { 0.02 } else { 0.01 };
+            let matrix = if reversed {
+                Matrix4::from_translation(Vector3::new(13., -7., 23.))
+                    * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.73))
+            } else {
+                Matrix4::identity()
+            } * Matrix4::from_scale(scale);
+            let inverse = matrix.invert().unwrap();
+            let solid = builder::transformed(&input(negative_sheet, 0), matrix);
+            let edge = common::blend::edge_through(
+                &solid.boundaries()[0],
+                matrix.transform_point(Point3::origin()),
+            );
+            let edge = if reversed { edge.inverse() } else { edge };
+            let before = serde_json::to_string(&solid.compress()).unwrap();
+            let result = try_fillet_solid_edges(&solid, &[edge.id()], 10. * scale, 0.001)
+                .or_else(|_| try_fillet_solid_along_wire(&solid, &wire![edge], 10. * scale, 0.001))
+                .unwrap();
+            assert_eq!(before, serde_json::to_string(&solid.compress()).unwrap());
+            assert!(result.solid.is_geometric_consistent());
+            assert_eq!(result.generated_faces.len(), 1);
+            let surface = result.generated_faces[0].oriented_surface();
+            let (u, v) = surface.try_range_tuple();
+            let ((a, b), (c, d)) = (u.unwrap(), v.unwrap());
+            for i in 0..=8 {
+                for j in 0..=16 {
+                    let (u, v) = (a + (b - a) * i as f64 / 8., c + (d - c) * j as f64 / 16.);
+                    let p = inverse.transform_point(surface.subs(u, v));
+                    assert!(((p.x - 10.).hypot(p.y + 10.) - 10.).abs() * scale < 1e-6);
+                    let normal = inverse.transform_vector(surface.normal(u, v)).normalize();
+                    let expected = Vector3::new(10. - p.x, -10. - p.y, 0.).normalize();
+                    assert!(normal.dot(expected) > 1. - 1e-5);
+                }
+            }
+            common::assert_solid(
+                &result.solid,
+                axis_fillet_volume() * scale.powi(3),
+                &[0],
+                0.001,
+            );
+            common::blend::assert_step(&result.solid, axis_fillet_volume() * scale.powi(3), 0.001);
+            assert_step_poles(
+                &result.solid,
+                &[matrix.transform_point(Point3::new(0., 0., 100.))],
+            );
         }
     }
 }

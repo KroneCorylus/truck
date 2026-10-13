@@ -1,0 +1,8 @@
+Command: target/inspect-polar-step target/polar-cap-replay/H4/001.truck.step 13159710.462164925
+valid 1
+solids 1
+volume 13159710.46449488
+expected 13159710.462164925
+absolute_error 0.0023299548774957657
+max_edge_vertex_tolerance 1.0000000000000001e-05
+Exit status: 0

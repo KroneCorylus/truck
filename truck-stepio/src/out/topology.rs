@@ -1,5 +1,72 @@
 use super::{Result, *};
+use truck_geometry::prelude::*;
 use truck_topology::compress::*;
+
+fn enclosed_pole<C, S>(face: &CompressedFace<S>, edges: &[CompressedEdge<C>]) -> Option<Point3>
+where
+    C: ParametricCurve3D + BoundedCurve + ParameterDivision1D<Point = Point3>,
+    S: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>, {
+    if face.boundaries.len() != 1 {
+        return None;
+    }
+    let (u, v) = face.surface.try_range_tuple();
+    let ranges = [u?, v?];
+    let periods = [face.surface.u_period(), face.surface.v_period()];
+    for axis in 0..2 {
+        let Some(period) = periods[axis].filter(|p| p.is_finite() && *p > 0.) else {
+            continue;
+        };
+        let poles = [ranges[1 - axis].0, ranges[1 - axis].1].map(|end| {
+            let mut uv = [ranges[0].0, ranges[1].0];
+            uv[1 - axis] = end;
+            let pole = face.surface.subs(uv[0], uv[1]);
+            (0..4)
+                .all(|i| {
+                    uv[axis] = ranges[axis].0 + i as f64 * period / 4.;
+                    face.surface.subs(uv[0], uv[1]).near(&pole)
+                })
+                .then_some(pole)
+        });
+        if poles.iter().all(Option::is_none) {
+            continue;
+        }
+        let mut previous: Option<(f64, f64)> = None;
+        let mut winding = 0.;
+        let mut touched = [false; 2];
+        for edge in &face.boundaries[0] {
+            let curve = &edges.get(edge.index)?.curve;
+            let (_, mut points) = curve.parameter_division(curve.range_tuple(), TOLERANCE);
+            if !edge.orientation {
+                points.reverse();
+            }
+            for point in points {
+                for (pole, touched) in poles.iter().zip(&mut touched) {
+                    *touched |= pole.is_some_and(|pole| pole.near(&point));
+                }
+                let uv = face
+                    .surface
+                    .search_nearest_parameter(point, previous, 50)
+                    .or_else(|| face.surface.search_nearest_parameter(point, None, 50))?;
+                if !uv.0.is_finite() || !uv.1.is_finite() {
+                    return None;
+                }
+                if let Some(previous) = previous {
+                    let step = [uv.0 - previous.0, uv.1 - previous.1][axis];
+                    winding += step - period * (step / period).round();
+                }
+                previous = Some(uv);
+            }
+        }
+        if (winding.abs() - period).abs() <= TOLERANCE {
+            // The left side of the oriented loop closes at the corresponding chart pole.
+            let end = usize::from((axis == 0) == (winding > 0.));
+            if !touched[end] {
+                return poles[end];
+            }
+        }
+    }
+    None
+}
 
 #[derive(Clone, Debug)]
 struct StepShellIndices {
@@ -17,27 +84,34 @@ pub struct StepShell<'a, P, C, S> {
     entity: &'a CompressedShell<P, C, S>,
     indices: StepShellIndices,
     is_open: bool,
+    pole_bounds: Vec<Option<Point3>>,
 }
 
 impl<'a, P, C, S> StepShell<'a, P, C, S>
 where
     P: Copy,
-    C: StepLength,
-    S: StepLength,
+    C: StepLength + ParametricCurve3D + BoundedCurve + ParameterDivision1D<Point = Point3>,
+    S: StepLength + ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>,
 {
     fn new(shell: &'a CompressedShell<P, C, S>, is_open: bool) -> Self {
         let faces = &shell.faces;
         let edges = &shell.edges;
         let vertices = &shell.vertices;
+        let pole_bounds: Vec<_> = faces
+            .iter()
+            .map(|face| enclosed_pole(face, edges))
+            .collect();
         let mut cursor = 1;
         let face_indices = faces
             .iter()
-            .map(|f| {
+            .zip(&pole_bounds)
+            .map(|(f, pole)| {
                 let res = cursor;
                 cursor += match f.boundaries.is_empty() {
                     true => 5,
                     false => 1 + f.boundaries.iter().map(|b| 2 + b.len()).sum::<usize>(),
                 };
+                cursor += 4 * usize::from(pole.is_some());
                 res
             })
             .collect::<Vec<_>>();
@@ -72,6 +146,7 @@ where
                 ep_points,
             },
             is_open,
+            pole_bounds,
         }
     }
 }
@@ -107,6 +182,7 @@ where
             entity,
             indices,
             is_open,
+            pole_bounds,
         } = self;
         let StepShellIndices {
             face_indices,
@@ -131,7 +207,7 @@ where
             let idx = face_indices[i];
             let mut cursor = idx + 1;
             let face_geometry = surface_indices[i];
-            let face_bounds = match f.boundaries.is_empty() {
+            let mut face_bounds = match f.boundaries.is_empty() {
                 true => vec![cursor],
                 false => {
                     let closure = |b: &Vec<CompressedEdgeIndex>| {
@@ -142,6 +218,9 @@ where
                     f.boundaries.iter().map(closure).collect()
                 }
             };
+            if pole_bounds[i].is_some() {
+                face_bounds.push(cursor);
+            }
             formatter.write_fmt(format_args!(
                 "#{idx} = FACE_SURFACE('', {face_bound}, #{face_geometry}, {same_sense});\n",
                 same_sense = BooleanDisplay(f.orientation == f.surface.same_sense()),
@@ -180,7 +259,19 @@ where
                         orientation = if ce.orientation { ".T." } else { ".F." },
                     ))
                 })
-            })
+            })?;
+            if let Some(pole) = pole_bounds[i] {
+                formatter.write_fmt(format_args!(
+                    "#{cursor} = FACE_BOUND('', #{vertex_loop}, .T.);\n\
+#{vertex_loop} = VERTEX_LOOP('', #{vertex});\n\
+#{vertex} = VERTEX_POINT('', #{point});\n",
+                    vertex_loop = cursor + 1,
+                    vertex = cursor + 2,
+                    point = cursor + 3,
+                ))?;
+                Display::fmt(&StepDataDisplay::new(pole, cursor + 3), formatter)?;
+            }
+            Ok(())
         })?;
         edges.iter().enumerate().try_for_each(|(i, e)| {
             let same_sense = if e.curve.same_sense() { ".T." } else { ".F." };
@@ -224,8 +315,8 @@ pub struct StepSolid<'a, P, C, S> {
 impl<'a, P, C, S> StepSolid<'a, P, C, S>
 where
     P: Copy,
-    C: StepLength,
-    S: StepLength,
+    C: StepLength + ParametricCurve3D + BoundedCurve + ParameterDivision1D<Point = Point3>,
+    S: StepLength + ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>,
 {
     fn new(solid: &'a CompressedSolid<P, C, S>) -> Self {
         let boundaries = solid
@@ -307,8 +398,8 @@ impl<P, C, S> StepLength for StepSolid<'_, P, C, S> {
 impl<'a, P, C, S> From<&'a CompressedShell<P, C, S>> for StepModel<'a, P, C, S>
 where
     P: Copy,
-    C: StepLength,
-    S: StepLength,
+    C: StepLength + ParametricCurve3D + BoundedCurve + ParameterDivision1D<Point = Point3>,
+    S: StepLength + ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>,
 {
     fn from(shell: &'a CompressedShell<P, C, S>) -> Self {
         Self::Shells(vec![StepShell::new(shell, true)])
@@ -318,8 +409,8 @@ where
 impl<'a, P, C, S> From<&'a CompressedSolid<P, C, S>> for StepModel<'a, P, C, S>
 where
     P: Copy,
-    C: StepLength,
-    S: StepLength,
+    C: StepLength + ParametricCurve3D + BoundedCurve + ParameterDivision1D<Point = Point3>,
+    S: StepLength + ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>,
 {
     fn from(solid: &'a CompressedSolid<P, C, S>) -> Self { Self::Solid(StepSolid::new(solid)) }
 }
@@ -327,8 +418,8 @@ where
 impl<'a, P, C, S> FromIterator<&'a CompressedShell<P, C, S>> for StepModel<'a, P, C, S>
 where
     P: Copy,
-    C: StepLength,
-    S: StepLength,
+    C: StepLength + ParametricCurve3D + BoundedCurve + ParameterDivision1D<Point = Point3>,
+    S: StepLength + ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>,
 {
     fn from_iter<T: IntoIterator<Item = &'a CompressedShell<P, C, S>>>(iter: T) -> Self {
         Self::Shells(

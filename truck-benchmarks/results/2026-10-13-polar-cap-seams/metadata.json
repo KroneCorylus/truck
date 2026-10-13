@@ -1,0 +1,78 @@
+{
+  "parent": "3ff36652abbac7e206a66a395acc3debb4edc8a6",
+  "source_sha256": {
+    "CHANGELOG.md": "a4716c1f4166bbd22a9cf6b7f6b2ade430765ea783d1d805456f907dd05934f9",
+    "truck-meshalgo/src/tessellation/triangulation.rs": "c9547ad32653ab1ef6a91f3ea62db46e2981394a63b51573e9eb849ed12cbb67",
+    "truck-meshalgo/src/tessellation/triangulation/tests.rs": "0f70b51ebfee8f7145cd587ae953b06fbcb7a0df1416f8439d237ce5cb407245",
+    "truck-stepio/src/out/topology.rs": "cffa8636e6c537b75f24e9aac74739780d6561a9a37ef7e5d741af8063b5cb40",
+    "truck-stepio/src/out/mod.rs": "4d3d17a02ac4d6cb3418fbb60cbdfb69acce22fa4310e1f43615e9f2b440715b",
+    "truck-stepio/tests/polar_cap_bounds.rs": "ba137a6545aea1b67ff4eb49a5a41b945b8c5dacf1e6bf0b7914b7a9a129df3f",
+    "truck-shapeops/tests/imported_ellipsoid_sectors.rs": "adfc182af54d7ca0e437bbd08651d1415eab25d71302cefc6d56d59b55f14cbb",
+    "truck-shapeops/tests/fixtures/ellipsoid-sectors/README.md": "4969928f97dcf655b42eb50424ad2f3174c1498d9525d884a0e01db529ffd45d",
+    "truck-shapeops/tests/fixtures/ellipsoid-sectors/H2.step": "9479ad8f07aaeca6de19ab72454a035a6ffd8d1af61c708a5fb7bc969c61a3e7"
+  },
+  "replay_sha256": "bb917554c6819e1068c0a5e49e42e9b34a4703f97f01326e4019eea9e576c3e1",
+  "native_archive": "audits/fillet-chamfer/capture/2026-10-13-diagonal-pcurves/artifacts.zip",
+  "native_archive_sha256": "c18c431023de4777ba15df5400b1ddc903bfc343cee5bfbae74ee68efb0943b2",
+  "native_artifact_sha256": {
+    "blend/simple/H4/capture/001.input.json": "1965f7bfd1d6e84d0bac0806d9e12769c929240e907b214cab6d28a95d44288e",
+    "blend/simple/H4/capture/001.input.step": "8b7e9653300bbf7c085378ea7e015a1d5986413439735f850ea508a8b852dfcf",
+    "blend/simple/H4/capture/001.input.brep": "7586600f7eb25f31372d271611731afc9a13c50f3e49f64fc742acb087702285",
+    "blend/simple/H4/capture/001.result.json": "df54f177f5e94bfc665302b16c18f4951d64576ca3cf98423c2ff7c6973a7d5c",
+    "blend/simple/H4/capture/001.result.brep": "28a323585ea4ecf71612d4912d5e4c2df64c0d06cddb6e4d1e3d79edb03e4110"
+  },
+  "replay_artifact_sha256": {
+    "H4/001.comparison.json": "0f827c3ef665f83675421b7f10cce0697b410a47b6b4236055c1dcab43dd3b7b",
+    "H4/001.input.brep": "7586600f7eb25f31372d271611731afc9a13c50f3e49f64fc742acb087702285",
+    "H4/001.input.json": "1965f7bfd1d6e84d0bac0806d9e12769c929240e907b214cab6d28a95d44288e",
+    "H4/001.input.step": "8b7e9653300bbf7c085378ea7e015a1d5986413439735f850ea508a8b852dfcf",
+    "H4/001.result.brep": "28a323585ea4ecf71612d4912d5e4c2df64c0d06cddb6e4d1e3d79edb03e4110",
+    "H4/001.result.json": "df54f177f5e94bfc665302b16c18f4951d64576ca3cf98423c2ff7c6973a7d5c",
+    "H4/001.truck.json": "8d2fea7408dac59da87af935fe87450b83af71dfb1e09989096cc57233e9e2f8",
+    "H4/001.truck.step": "283178837d3bdd775e195e55aa701f5d70a8ec199745ac2f3d2291e181d765c5"
+  },
+  "replay_archive_sha256": "5796819c5232483e859b42b00e3fc50abf25c6863de7e882a7b278c3d4b961b0",
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.1\nLLVM version: 22.1.8\n",
+  "release_tests": {
+    "passed": 549,
+    "failed": 0,
+    "ignored": 2,
+    "targets": 97
+  },
+  "checks": {
+    "all_target_release_clippy": "passed",
+    "actions_smoke": "passed",
+    "replay_build": "passed"
+  },
+  "performance_claim": "None; action benchmark smoke only.",
+  "targeted_replay": {
+    "comparison": "unverified",
+    "result": {
+      "geometry_consistent": true,
+      "input_unchanged": true,
+      "mesh_closed": true,
+      "mesh_volume": 13159628.445614986,
+      "selected_edges": 1,
+      "status": "operation-succeeded",
+      "step_prepared": true
+    },
+    "schema_version": 1,
+    "stage": "output-consistency",
+    "tolerance": 0.001
+  },
+  "targeted_comparison": {
+    "schema_version": 1,
+    "comparison": "sampled-only",
+    "native_valid": true,
+    "truck_step_valid": true,
+    "native_solids": 1,
+    "truck_solids": 1,
+    "native_volume": 13151259.698596016,
+    "truck_volume": 13159710.046042992,
+    "native_to_truck_max_distance": 0.0021806666550459528,
+    "native_to_truck_samples": 1104,
+    "truck_to_native_max_distance": 4.142110055441669,
+    "truck_to_native_samples": 1209
+  },
+  "native_independent_volume": "Command: target/inspect-polar-step target/polar-cap-replay/H4/001.truck.step 13159710.462164925\nvalid 1\nsolids 1\nvolume 13159710.46449488\nexpected 13159710.462164925\nabsolute_error 0.0023299548774957657\nmax_edge_vertex_tolerance 1.0000000000000001e-05\nExit status: 0\n"
+}

@@ -1,0 +1,31 @@
+   Compiling truck-meshalgo v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-meshalgo)
+    Finished `release` profile [optimized] target(s) in 2.84s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running unittests src/lib.rs (target/release/deps/truck_meshalgo-6f1452336a80c8f6)
+
+running 22 tests
+test analyzers::collision::collide_triangles_test ... ok
+test analyzers::point_cloud::hashed_point_cloud::distance_point_triangle_test ... ok
+test analyzers::collision::triangle_seams_survive_roundoff_without_turning_coplanar_faces_into_crossings ... ok
+test analyzers::in_out_judge::inside100 ... ok
+test filters::optimizing::tests::degenerate_polygon_test ... ok
+test tessellation::triangulation::par_bench ... ignored
+test analyzers::splitting::into_components_test ... ok
+test filters::optimizing::tests::welding_preserves_transitive_connections_and_strict_tolerance ... ok
+test tessellation::triangulation::tests::culling_preserves_near_boundary_rejection ... ok
+test tessellation::triangulation::tests::normal_orientation_preserves_ambiguous_meridian_facets_and_flips_reliable_ones ... ok
+test tessellation::triangulation::tests::thin_planar_faces_keep_all_nonzero_triangles ... ok
+test analyzers::collision::sweep_finds_every_crossing_pair ... ok
+test tessellation::triangulation::tests::polar_ellipsoid_boundaries_keep_the_large_angular_sector ... ok
+test tessellation::triangulation::tests::holes_islands_disconnected_and_concave_loops ... ok
+test tessellation::triangulation::tests::fitted_edge_endpoints_use_shared_topology_vertices ... ok
+test analyzers::point_cloud::hashed_point_cloud::space_division_distance ... ok
+test tessellation::triangulation::tests::one_worker_and_parallel_tessellation_are_identical ... ok
+test tessellation::triangulation::tests::culling_matches_full_winding_scan ... ok
+test filters::optimizing::tests::welding_matches_pairwise_components ... ok
+test tessellation::triangulation::tests::polar_cap_meshes_close_the_periodic_seam_at_the_boundary_start ... ok
+test tessellation::triangulation::tests::polar_cap_meridians_keep_the_shared_boundary_samples ... ok
+test filters::optimizing::tests::large_equal_attribute_groups ... ok
+
+test result: ok. 21 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.09s

@@ -1,0 +1,23 @@
+   Compiling truck-meshalgo v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-meshalgo)
+    Finished `release` profile [optimized] target(s) in 3.46s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running unittests src/lib.rs (target/release/deps/truck_meshalgo-6f1452336a80c8f6)
+
+running 1 test
+
+thread 'tessellation::triangulation::tests::polar_cap_meridians_keep_the_shared_boundary_samples' (198856) panicked at truck-meshalgo/src/tessellation/triangulation/tests.rs:198:13:
+assertion `left == right` failed: start=0 reversed=false
+  left: 9
+ right: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test tessellation::triangulation::tests::polar_cap_meridians_keep_the_shared_boundary_samples ... FAILED
+
+failures:
+
+failures:
+    tessellation::triangulation::tests::polar_cap_meridians_keep_the_shared_boundary_samples
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 22 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p truck-meshalgo --lib`

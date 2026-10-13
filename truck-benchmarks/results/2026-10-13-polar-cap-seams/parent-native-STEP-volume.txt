@@ -1,0 +1,8 @@
+Command: LD_LIBRARY_PATH=target/occt-sdk/usr/lib64 target/inspect-polar-step target/ellipsoid-domain-replay/H4/001.truck.step 13159710.462164925
+valid 0
+solids 1
+volume -7856962.4070681185
+expected 13159710.462164925
+absolute_error 21016672.869233042
+max_edge_vertex_tolerance 8.4779778757985042e-06
+Exit status: 4
