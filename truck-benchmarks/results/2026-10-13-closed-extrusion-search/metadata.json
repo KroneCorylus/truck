@@ -1,0 +1,89 @@
+{
+  "parent": "cb6e5f49778433f41e9707bde83b6a69468edcfd",
+  "source_sha256": {
+    "CHANGELOG.md": "558268090a43856aa6112b6380dc411d1559a82b7d1bc25d441900e23c215df6",
+    "truck-geometry/src/decorators/extruded_curve.rs": "98c62cd1d1a780cab57e950fe47d06e97341c9b94471d52ddfca130ba7d1ef13",
+    "truck-geometry/tests/closed_extrusion_search.rs": "9e844c1b02b02892e59bd0a906e70738479f9d3e891eb17647c005f1b102dd99"
+  },
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "truck-geometry",
+        "-p",
+        "truck-modeling",
+        "-p",
+        "truck-meshalgo",
+        "-p",
+        "truck-stepio",
+        "-p",
+        "truck-shapeops",
+        "--no-fail-fast"
+      ],
+      "exit_code": 101
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--release",
+        "-p",
+        "truck-geometry",
+        "-p",
+        "truck-modeling",
+        "-p",
+        "truck-meshalgo",
+        "-p",
+        "truck-stepio",
+        "-p",
+        "truck-shapeops",
+        "-p",
+        "truck-benchmarks",
+        "--all-targets"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "bench",
+        "-p",
+        "truck-benchmarks",
+        "--bench",
+        "actions",
+        "--",
+        "--test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--release",
+        "-p",
+        "truck-shapeops",
+        "--example",
+        "replay_occt_blend"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "replay_sha256": "727a56d091825d66b60eacfd1663457b4f87a4cf33943baa6a402e19098fea48",
+  "release_tests": {
+    "passed": 944,
+    "failed": 1,
+    "ignored": 5,
+    "targets": 148
+  },
+  "existing_failure": {
+    "test": "truck-geometry/tests/pcurve.rs::pcurve_derivation",
+    "left": -2829663063.761872,
+    "right": -2829663063.7618704,
+    "parent_proof": "truck-benchmarks/results/2026-10-13-cubic-endpoints/parent-precision-test.txt"
+  },
+  "performance_claim": "None; action benchmark smoke only."
+}

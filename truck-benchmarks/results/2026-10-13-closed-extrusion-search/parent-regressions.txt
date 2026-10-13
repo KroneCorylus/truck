@@ -1,0 +1,51 @@
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+    Finished `release` profile [optimized] target(s) in 1.83s
+     Running tests/closed_extrusion_search.rs (target/release/deps/closed_extrusion_search-41f96bad887bc971)
+
+running 6 tests
+test explicit_extrusion_seeds_keep_the_requested_branch_and_trial_budget ... ok
+test nearest_extrusion_search_does_not_choose_the_other_cusp_branch ... FAILED
+test closed_cubic_extrusion_searches_both_sides_of_the_cusp ... FAILED
+test closed_rational_ellipse_extrusion_searches_both_sides_of_the_seam ... FAILED
+test closed_rational_extrusion_searches_both_sides_of_the_cusp ... FAILED
+test closed_quartic_extrusion_searches_both_sides_of_the_cusp ... FAILED
+
+failures:
+
+---- nearest_extrusion_search_does_not_choose_the_other_cusp_branch stdout ----
+
+thread 'nearest_extrusion_search_does_not_choose_the_other_cusp_branch' (561596) panicked at truck-geometry/tests/closed_extrusion_search.rs:120:9:
+(-3.0865210413867396e-6, 0.37) != (0.9995,0.37)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- closed_cubic_extrusion_searches_both_sides_of_the_cusp stdout ----
+
+thread 'closed_cubic_extrusion_searches_both_sides_of_the_cusp' (561591) panicked at truck-geometry/tests/closed_extrusion_search.rs:20:33:
+exact scale=0.01, uv=(0.99999,0), hint=None
+
+---- closed_rational_ellipse_extrusion_searches_both_sides_of_the_seam stdout ----
+
+thread 'closed_rational_ellipse_extrusion_searches_both_sides_of_the_seam' (561593) panicked at truck-geometry/tests/closed_extrusion_search.rs:24:33:
+(-1.000023432114182e-5, 9.852884635311631e-15) != (0.99999,0)
+
+---- closed_rational_extrusion_searches_both_sides_of_the_cusp stdout ----
+
+thread 'closed_rational_extrusion_searches_both_sides_of_the_cusp' (561594) panicked at truck-geometry/tests/closed_extrusion_search.rs:20:33:
+exact scale=0.01, uv=(0.99999,0), hint=None
+
+---- closed_quartic_extrusion_searches_both_sides_of_the_cusp stdout ----
+
+thread 'closed_quartic_extrusion_searches_both_sides_of_the_cusp' (561592) panicked at truck-geometry/tests/closed_extrusion_search.rs:20:33:
+exact scale=0.01, uv=(0.99999,0), hint=None
+
+
+failures:
+    closed_cubic_extrusion_searches_both_sides_of_the_cusp
+    closed_quartic_extrusion_searches_both_sides_of_the_cusp
+    closed_rational_ellipse_extrusion_searches_both_sides_of_the_seam
+    closed_rational_extrusion_searches_both_sides_of_the_cusp
+    nearest_extrusion_search_does_not_choose_the_other_cusp_branch
+
+test result: FAILED. 1 passed; 5 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-geometry --test closed_extrusion_search`

@@ -86,6 +86,55 @@ impl<C: ParameterDivision1D, V> ParameterDivision2D for ExtrudedCurve<C, V> {
     }
 }
 
+impl<P, C> ExtrudedCurve<C, P::Diff>
+where
+    P: EuclideanSpace<Scalar = f64> + MetricSpace<Metric = f64> + Tolerance,
+    P::Diff: SspVector<Point = P>,
+    C: ParametricCurve<Point = P, Vector = P::Diff> + BoundedCurve,
+{
+    fn search_hint(&self, point: P, range: ((f64, f64), (f64, f64))) -> (f64, f64) {
+        let mut hint = algo::surface::presearch_linear(
+            self,
+            point,
+            range,
+            PRESEARCH_DIVISION,
+            algo::surface::LinearAxis::V,
+        );
+        let ((a, b), (c, d)) = range;
+        if (hint.0 != a && hint.0 != b)
+            || ![a, b, c, d].iter().all(|x| x.is_finite())
+            || !self.curve.subs(a).near2(&self.curve.subs(b))
+        {
+            return hint;
+        }
+        // Coincident endpoints can have different tangents. Compare one local
+        // tangent projection on each branch before Newton chooses either sheet.
+        let mut distance = self.subs(hint.0, hint.1).distance2(point);
+        let vv = self.vector.magnitude2();
+        for (u, next) in [
+            (a, a + (b - a) / PRESEARCH_DIVISION as f64),
+            (b, b - (b - a) / PRESEARCH_DIVISION as f64),
+        ] {
+            let tangent = self.curve.der(u);
+            let uv = tangent.dot(self.vector);
+            let det = tangent.magnitude2() * vv - uv * uv;
+            if !det.is_finite() || det <= 0. {
+                continue;
+            }
+            let delta = point - self.curve.subs(u);
+            let du = (delta.dot(tangent) * vv - delta.dot(self.vector) * uv) / det;
+            let u = (u + du).clamp(u.min(next), u.max(next));
+            let v = ((point - self.curve.subs(u)).dot(self.vector) / vv).clamp(c.min(d), c.max(d));
+            let candidate_distance = self.subs(u, v).distance2(point);
+            if candidate_distance < distance {
+                distance = candidate_distance;
+                hint = (u, v);
+            }
+        }
+        hint
+    }
+}
+
 impl<P, C> SearchParameter<D2> for ExtrudedCurve<C, P::Diff>
 where
     P: EuclideanSpace<Scalar = f64> + MetricSpace<Metric = f64> + Tolerance,
@@ -102,20 +151,8 @@ where
     ) -> Option<(f64, f64)> {
         let hint = match hint.into() {
             SPHint2D::Parameter(x, y) => (x, y),
-            SPHint2D::Range(range0, range1) => algo::surface::presearch_linear(
-                self,
-                point,
-                (range0, range1),
-                PRESEARCH_DIVISION,
-                algo::surface::LinearAxis::V,
-            ),
-            SPHint2D::None => algo::surface::presearch_linear(
-                self,
-                point,
-                self.range_tuple(),
-                PRESEARCH_DIVISION,
-                algo::surface::LinearAxis::V,
-            ),
+            SPHint2D::Range(range0, range1) => self.search_hint(point, (range0, range1)),
+            SPHint2D::None => self.search_hint(point, self.range_tuple()),
         };
         algo::surface::search_parameter(self, point, hint, trials)
     }
@@ -132,20 +169,8 @@ impl<C: ParametricCurve3D + BoundedCurve> SearchNearestParameter<D2> for Extrude
     ) -> Option<(f64, f64)> {
         let hint = match hint.into() {
             SPHint2D::Parameter(x, y) => (x, y),
-            SPHint2D::Range(range0, range1) => algo::surface::presearch_linear(
-                self,
-                point,
-                (range0, range1),
-                PRESEARCH_DIVISION,
-                algo::surface::LinearAxis::V,
-            ),
-            SPHint2D::None => algo::surface::presearch_linear(
-                self,
-                point,
-                self.range_tuple(),
-                PRESEARCH_DIVISION,
-                algo::surface::LinearAxis::V,
-            ),
+            SPHint2D::Range(range0, range1) => self.search_hint(point, (range0, range1)),
+            SPHint2D::None => self.search_hint(point, self.range_tuple()),
         };
         algo::surface::search_nearest_parameter(self, point, hint, trials)
     }
