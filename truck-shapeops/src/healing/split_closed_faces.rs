@@ -10,6 +10,7 @@ where
         + SearchNearestParameter<D1, Point = Point3>
         + TryFrom<PCurve<Line<Point2>, S>>,
     S: ParametricSurface3D, {
+    remove_isolated_polar_excursions(shell, &sp);
     let to_poly = closure_to_poly(tol);
     let mut poly_edges: Vec<_> = shell.edges.iter().map(to_poly).collect();
     let len = shell.faces.len();
@@ -20,6 +21,78 @@ where
     let closure = |i| split_face_with_non_simple_wire(i, shell, &mut poly_edges, &sp, tol);
     let new_faces: Vec<_> = (0..len).filter_map(closure).flatten().collect();
     shell.faces.extend(new_faces);
+}
+
+fn remove_isolated_polar_excursions<C, S: ParametricSurface3D>(
+    shell: &mut Shell<Point3, C, S>,
+    sp: impl SP<S>,
+) {
+    let mut uses = vec![0; shell.edges.len()];
+    let mut incidence = vec![0; shell.vertices.len()];
+    for edge in shell
+        .faces
+        .iter()
+        .flat_map(|f| f.boundaries.iter().flatten())
+    {
+        uses[edge.index] += 1;
+    }
+    for edge in &shell.edges {
+        incidence[edge.vertices.0] += 1;
+        incidence[edge.vertices.1] += 1;
+    }
+    for face in &mut shell.faces {
+        let surface = &face.surface;
+        for wire in &mut face.boundaries {
+            while wire.len() > 2 {
+                let excursion = (0..wire.len()).find(|&i| {
+                    let (a, b) = (wire[i], wire[(i + 1) % wire.len()]);
+                    if a.index != b.index || a.orientation == b.orientation || uses[a.index] != 2 {
+                        return false;
+                    }
+                    let ends = shell.edges[a.index].vertices;
+                    let pole = if a.orientation { ends.1 } else { ends.0 };
+                    if incidence[pole] != 1 {
+                        return false;
+                    }
+                    let point = shell.vertices[pole];
+                    let Some((u, v)) = sp(surface, point, None) else {
+                        return false;
+                    };
+                    if !surface.subs(u, v).near(&point) {
+                        return false;
+                    }
+                    [
+                        (surface.u_period(), surface.uder(u, v)),
+                        (surface.v_period(), surface.vder(u, v)),
+                    ]
+                    .into_iter()
+                    .enumerate()
+                    .any(|(axis, (period, tangent))| {
+                        let Some(period) = period.filter(|p| p.is_finite() && *p > 0.) else {
+                            return false;
+                        };
+                        tangent.so_small()
+                            && (1..4).all(|i| {
+                                let offset = period * i as f64 / 4.;
+                                let (u, v) = if axis == 0 {
+                                    (u + offset, v)
+                                } else {
+                                    (u, v + offset)
+                                };
+                                surface.subs(u, v).near(&point)
+                            })
+                    })
+                });
+                let Some(i) = excursion else {
+                    break;
+                };
+                let j = (i + 1) % wire.len();
+                // A retraced seam ending only at a periodic pole contributes no trim boundary.
+                wire.remove(i.max(j));
+                wire.remove(i.min(j));
+            }
+        }
+    }
 }
 
 fn split_face_with_non_closed_boundary<C, S>(
@@ -1045,6 +1118,103 @@ fn nearest_correction(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn polar_excursion(pole: Point3) -> Shell<Point3, (), Sphere> {
+        Shell {
+            vertices: vec![Point3::new(1., 0., 0.), pole, Point3::new(-1., 0., 0.)],
+            edges: [(0, 2), (2, 0), (0, 1)]
+                .into_iter()
+                .map(|vertices| Edge {
+                    vertices,
+                    curve: (),
+                })
+                .collect(),
+            faces: vec![Face {
+                surface: Sphere::new(Point3::origin(), 1.),
+                orientation: true,
+                boundaries: vec![[(0, true), (1, true), (2, true), (2, false)]
+                    .into_iter()
+                    .map(|(index, orientation)| EdgeIndex { index, orientation })
+                    .collect()],
+            }],
+        }
+    }
+
+    #[test]
+    fn isolated_polar_excursions_ignore_boundary_start_and_direction() {
+        for pole in [Point3::new(0., 0., 1.), Point3::new(0., 0., -1.)] {
+            for reversed in [false, true] {
+                for shift in 0..4 {
+                    let mut shell = polar_excursion(pole);
+                    let wire = &mut shell.faces[0].boundaries[0];
+                    if reversed {
+                        wire.reverse();
+                        wire.iter_mut().for_each(|e| e.orientation = !e.orientation);
+                    }
+                    wire.rotate_left(shift);
+                    let expected: Vec<_> = wire.iter().copied().filter(|e| e.index != 2).collect();
+                    remove_isolated_polar_excursions(&mut shell, |s, p, h| {
+                        s.search_parameter(p, h, 100)
+                    });
+                    assert_eq!(shell.faces[0].boundaries[0], expected);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn nonpolar_shared_or_empty_excursions_are_preserved() {
+        let mut nonpolar = polar_excursion(Point3::new(0., 1., 0.));
+        let mut off_surface = polar_excursion(Point3::new(0., 0., 1.1));
+        let mut shared = polar_excursion(Point3::new(0., 0., 1.));
+        shared.edges.push(Edge {
+            vertices: (1, 2),
+            curve: (),
+        });
+        let mut reused = polar_excursion(Point3::new(0., 0., 1.));
+        reused.faces.push(reused.faces[0].clone());
+        let mut empty = polar_excursion(Point3::new(0., 0., 1.));
+        empty.faces[0].boundaries[0].retain(|e| e.index == 2);
+        for shell in [
+            &mut nonpolar,
+            &mut off_surface,
+            &mut shared,
+            &mut reused,
+            &mut empty,
+        ] {
+            let before: Vec<_> = shell.faces.iter().map(|f| f.boundaries.clone()).collect();
+            remove_isolated_polar_excursions(shell, |s, p, h| s.search_parameter(p, h, 100));
+            assert_eq!(
+                shell
+                    .faces
+                    .iter()
+                    .map(|f| f.boundaries.clone())
+                    .collect::<Vec<_>>(),
+                before
+            );
+        }
+    }
+
+    #[test]
+    fn stationary_periodic_tangent_is_not_a_collapsed_pole() {
+        let mut shell = polar_excursion(Point3::new(1., 0., 0.))
+            .try_mapped(
+                |p| Some(*p),
+                |_| Some(()),
+                |s| {
+                    Some(Processor::with_transform(
+                        *s,
+                        Matrix4::from_nonuniform_scale(1., 0., 1.),
+                    ))
+                },
+            )
+            .unwrap();
+        let before = shell.faces[0].boundaries.clone();
+        remove_isolated_polar_excursions(&mut shell, |_, _, _| {
+            Some((std::f64::consts::FRAC_PI_2, 0.))
+        });
+        assert_eq!(shell.faces[0].boundaries, before);
+    }
 
     fn plane() -> Plane {
         Plane::new(

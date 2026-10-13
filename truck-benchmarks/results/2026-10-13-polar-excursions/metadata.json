@@ -1,0 +1,140 @@
+{
+  "parent": "a38b7cb54ba617cf8ee929b4c10f35e0d00d1bcd",
+  "source_sha256": {
+    "CHANGELOG.md": "0983549290ef4296b44aa82446f3315c425bd60687be5368046d3dd5f0194f4f",
+    "truck-shapeops/src/healing/mod.rs": "393e50d89792274cf2fdd4f670a418ebf9ce1f4fb93272f1e98cdf5a9c37b7a7",
+    "truck-shapeops/src/healing/split_closed_faces.rs": "7127c206fbf1235f938f82ba413e1665415eb025e9630ee9b111d53aea204c5f",
+    "truck-meshalgo/src/tessellation/triangulation.rs": "80c95bd5e0e5da6bfff81fe68e1c04ef0f724ca45ba1a521904096f6c3d9cb25",
+    "truck-meshalgo/src/tessellation/triangulation/tests.rs": "7f1fa47619f33b5f9149cb08e618a0c09ef7b3272fa55a396d100e886bd25cb0",
+    "truck-shapeops/tests/imported_polar_excursions.rs": "5c69d44a0d14fe86ec109bd99b31c5af7bd7bc5ac46f5d0f25160a4c215a4504",
+    "truck-shapeops/tests/fixtures/polar-excursions/J2.step": "247a0f51805008387e6e077454038edb5fbd77c1d94b8f544096531c7d58d839",
+    "truck-shapeops/tests/fixtures/polar-excursions/README.md": "f30d7c4b57c5f827fc0243a50373d4d19cfc7e2e5e0d18ca30d3911b78838850"
+  },
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--release",
+        "-p",
+        "truck-meshalgo",
+        "-p",
+        "truck-stepio",
+        "-p",
+        "truck-shapeops",
+        "-p",
+        "truck-benchmarks",
+        "--all-targets"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "truck-meshalgo",
+        "-p",
+        "truck-stepio",
+        "-p",
+        "truck-shapeops",
+        "--no-fail-fast"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "bench",
+        "-p",
+        "truck-benchmarks",
+        "--bench",
+        "actions",
+        "--",
+        "--test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--release",
+        "-p",
+        "truck-shapeops",
+        "--example",
+        "replay_occt_blend"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "replay_sha256": "2baf0da70145e2c1010709633b8500327022923b2ac4dba92cc571e62363adfd",
+  "release_tests": {
+    "passed": 574,
+    "failed": 0,
+    "ignored": 2,
+    "targets": 102
+  },
+  "native_archive": "audits/fillet-chamfer/capture/2026-10-13-conical-domains/artifacts.zip",
+  "native_archive_sha256": "f1d7b5780e586ba4eec326be606d273b687d27cb419b4565f6547c94569a2afc",
+  "native_artifact_sha256": {
+    "blend/simple/J2/capture/001.input.step": "247a0f51805008387e6e077454038edb5fbd77c1d94b8f544096531c7d58d839",
+    "blend/simple/J2/capture/001.input.json": "a5a29380799728ea0453fabcc187cd98a0a849cad67070317b8dc41d059afcbb",
+    "blend/simple/J2/capture/001.input.brep": "5e52b2cc28de094c071f1fc7ccd38a70a98100db0e607bd3738e27abc250eec7",
+    "blend/simple/J2/capture/001.result.step": "f218d5dfc5567c04f11ec65a3e6c612291376bd320a9f7c42f2b96a26fec2b13",
+    "blend/simple/J2/capture/001.result.json": "10b55fd71224250658ee90bbef5461abc790e9ed17f09fa1c5699d57ff052a3b",
+    "blend/simple/J2/capture/001.result.brep": "1e3f6f01035771c938d5c01dc3339da9efdfcffc1e091c83d5ceacc6ef310fdb"
+  },
+  "replay_artifact_sha256": {
+    "J2/001.input.step": "247a0f51805008387e6e077454038edb5fbd77c1d94b8f544096531c7d58d839",
+    "J2/001.input.json": "a5a29380799728ea0453fabcc187cd98a0a849cad67070317b8dc41d059afcbb",
+    "J2/001.input.brep": "5e52b2cc28de094c071f1fc7ccd38a70a98100db0e607bd3738e27abc250eec7",
+    "J2/001.result.step": "f218d5dfc5567c04f11ec65a3e6c612291376bd320a9f7c42f2b96a26fec2b13",
+    "J2/001.result.json": "10b55fd71224250658ee90bbef5461abc790e9ed17f09fa1c5699d57ff052a3b",
+    "J2/001.result.brep": "1e3f6f01035771c938d5c01dc3339da9efdfcffc1e091c83d5ceacc6ef310fdb",
+    "J2/replay.log": "77a8d8c3607c0e8b0b21687e55a6d3178ab4470a3c1f023e16d1e367cc169316",
+    "J2/001.truck.step": "94e35812b71d68ce1a62f46560290c82eb25bfaece1e6728b656e6f9f90d6ef0",
+    "J2/001.truck.json": "54f14489b27f8f23c5249104037c60e4fc52982e35ec2ab7d45c30195d17d3ff",
+    "J2/comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "J2/independent-step.txt": "08b90e25592d685d125b9681bc5e5440bb54ab443fc96a4b9695364421ab9824",
+    "J2/001.comparison.json": "aea43832707e48f5980c812262e84ef856c428793eca8a2d220fc3272427dd4f"
+  },
+  "replay_archive_sha256": "9fcfb7f8ae6aa0d54be94ebb5bd745102a76c02d0531db831f58ad0ea28b448a",
+  "targeted_result": {
+    "comparison": "unverified",
+    "result": {
+      "geometry_consistent": true,
+      "input_unchanged": true,
+      "mesh_closed": true,
+      "mesh_volume": 492579.9160723548,
+      "selected_edges": 2,
+      "status": "operation-succeeded",
+      "step_prepared": true
+    },
+    "schema_version": 1,
+    "stage": "output-consistency",
+    "tolerance": 0.001
+  },
+  "targeted_comparison": {
+    "schema_version": 1,
+    "comparison": "sampled-only",
+    "native_valid": true,
+    "truck_step_valid": true,
+    "native_solids": 1,
+    "truck_solids": 1,
+    "native_volume": 492592.0503508903,
+    "truck_volume": 492592.04932703107,
+    "native_to_truck_max_distance": 7.4300320694795166e-06,
+    "native_to_truck_samples": 538,
+    "truck_to_native_max_distance": 7.535456583714329e-06,
+    "truck_to_native_samples": 765
+  },
+  "independent_input_volume": 493199.54082823097,
+  "independent_fillet_volume": 492592.0503127781,
+  "independent_step_checker": {
+    "target/inspect-polar-step": "8ba733150ff8088ea07eb21ecf213d906655905dbff4ee8f89b771cca74e8b2d",
+    "truck-benchmarks/results/2026-10-13-polar-cap-seams/inspect-polar-step.cpp": "7281a40d2d00f601932f4a98d5b7559e137e966e382602a3ac76a762fe99035d"
+  },
+  "performance_claim": "None; action benchmark smoke only."
+}

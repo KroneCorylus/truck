@@ -6,6 +6,8 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Remove an isolated, retraced face seam ending at a collapsed periodic pole while preserving nonpolar, shared and empty-boundary cases. Keep artificial mesh seam endpoints at their shared fitted trim positions rather than replacing them with surface projections. Native spherical-cap regressions check independent input and fillet volumes, rolling radius, contact normals, reversed selections, rigid motion, closed meshes and STEP; fitted polar mesh regressions preserve the complete shared boundary through both poles and orientations.
+
 - Preserve linear STEP pcurves on extruded lines, ellipses and splines without changing their surface parameters. Export extrusion face senses using the profile's traversal direction; preserve partial elliptical profiles as exact rational arcs while full ellipses retain their periodic chart. Regressions check positions and derivatives, rejected reparameterized profiles, input and fillet material, radius, contact normals, reversed selections, rigid motion, closed meshes and STEP. Native J6/J8 rims now construct; sampled reference discrepancies remain open.
 
 - Breaking: `StepSurface` for `ExtrudedCurve<C, Vector3>` and `Processor<ExtrudedCurve<C, Vector3>, T>` now requires `C: StepCurve` to preserve the exported profile's traversal direction. Add that bound to generic export wrappers. PiezaCAD's concrete exports in `cad-core/src/kernel/mod.rs`, `cad-core/src/kernel/assembly.rs` and `cad-core/tests/healing.rs` need no call-site changes.

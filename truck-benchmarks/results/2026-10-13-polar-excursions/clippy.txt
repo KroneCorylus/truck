@@ -1,0 +1,8 @@
+    Checking truck-meshalgo v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-meshalgo)
+    Checking truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Checking truck-hlr v0.1.0 (/home/krone/Development/Pieza_WS/truck/truck-hlr)
+    Checking truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/truck-stepio)
+    Checking truck-benchmarks v0.1.0 (/home/krone/Development/Pieza_WS/truck/truck-benchmarks)
+    Finished `release` profile [optimized] target(s) in 3.64s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`

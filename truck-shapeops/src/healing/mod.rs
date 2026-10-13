@@ -70,8 +70,8 @@ fn connect_coincident_wire_ends<C, S>(shell: &mut Shell<Point3, C, S>) {
 /// of `CompressedShell` and `CompressedSolid`, which are intermediate forms.
 ///
 /// # Remarks
-/// Boundary simplification is still only implemented for cylinders.
-/// It has not yet been implemented for cases involving singularities, such as spherical surfaces.
+/// Boundary reconstruction handles regular periodic seams and isolated retraced seams ending
+/// at a surface pole. More general singular or intersecting boundaries may remain unsupported.
 pub trait SplitClosedEdgesAndFaces {
     /// Splits closed edges and faces
     fn split_closed_edges_and_faces(&mut self, tol: f64);

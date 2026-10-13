@@ -1279,12 +1279,21 @@ fn polyline_on_surface(
     let line = Line(p.uv, q.uv);
     let pcurve = PCurve::new(line, &surface);
     let (vec, _) = pcurve.parameter_division(pcurve.range_tuple(), tol);
-    vec.into_iter()
+    let mut points: Vec<_> = vec
+        .into_iter()
         .map(|t| {
             let uv = line.subs(t);
             (uv, surface.subs(uv.x, uv.y)).into()
         })
-        .collect()
+        .collect();
+    // Fitted trim points can differ from their surface projection; keep their shared positions.
+    if let Some(first) = points.first_mut() {
+        *first = p;
+    }
+    if let Some(last) = points.last_mut() {
+        *last = q;
+    }
+    points
 }
 
 #[test]

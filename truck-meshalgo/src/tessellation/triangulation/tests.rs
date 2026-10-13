@@ -209,6 +209,69 @@ fn polar_cap_meridians_keep_the_shared_boundary_samples() {
 }
 
 #[test]
+fn polar_cap_seams_preserve_fitted_trim_positions() {
+    use crate::analyzers::Topology;
+    use crate::filters::*;
+    use std::f64::consts::{PI, TAU};
+    use truck_geometry::prelude::*;
+    for north in [true, false] {
+        for reversed in [false, true] {
+            for start in [0., 0.37, 2.1] {
+                let reference = Processor::with_transform(
+                    Sphere::new(Point3::origin(), 1.),
+                    Matrix4::from_translation(Vector3::new(1., -2., 3.))
+                        * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.73))
+                        * Matrix4::from_nonuniform_scale(1.5, 1.5, 1.),
+                );
+                let latitude = if north { 0.7 } else { PI - 0.7 };
+                let samples: Vec<_> = (0..=64)
+                    .map(|i| {
+                        let angle = start + if north { 1. } else { -1. } * TAU * i as f64 / 64.;
+                        reference.subs(latitude, angle)
+                            + reference.normal(latitude, angle) * (8e-6 + 2e-6 * (3. * angle).cos())
+                    })
+                    .collect();
+                let mut wire = PolylineCurve(samples.clone());
+                let surface = if reversed {
+                    wire.0.reverse();
+                    reference.inverse()
+                } else {
+                    reference
+                };
+                let piece = PolyBoundaryPiece::try_new(
+                    &surface,
+                    std::iter::once(wire),
+                    by_search_nearest_parameter,
+                )
+                .unwrap();
+                let boundary = PolyBoundary::new(vec![piece], &surface, 0.005).unwrap();
+                let mut mesh = trimming_tessellation(&surface, &boundary, 0.005);
+                assert!(consistent_winding(&mesh));
+                mesh.put_together_same_attrs(TOLERANCE)
+                    .remove_degenerate_faces()
+                    .remove_unused_attrs();
+                let outlines = mesh.extract_boundaries();
+                assert_eq!(
+                    outlines.len(),
+                    1,
+                    "north={north} reversed={reversed} start={start}"
+                );
+                assert_eq!(
+                    outlines[0].len(),
+                    64,
+                    "north={north} reversed={reversed} start={start}"
+                );
+                for &i in &outlines[0] {
+                    assert!(samples
+                        .iter()
+                        .any(|p| p.distance(mesh.positions()[i]) < 1e-12));
+                }
+            }
+        }
+    }
+}
+
+#[test]
 fn thin_planar_faces_keep_all_nonzero_triangles() {
     let plane = truck_geometry::prelude::Plane::new(
         Point3::origin(),
