@@ -6,6 +6,8 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Fit imported cone support domains to complete boundary hulls while keeping the apex at an endpoint of a single cone nappe. Preserve shifted and scaled cone generators in STEP output by reconstructing their slope and reference-plane radius. Conical sector regressions check apex inversion, both nappes and slope directions, affine frames, independent input/fillet volumes, radius and normals, closed meshes and STEP. H6 now constructs and exports; H7/H9 reach the existing unsupported nonplanar corner path.
+
 - Evaluate revolution-pole normals with the rotated meridian tangent, including conical tips. Refine meshes against their shared boundary positions and ignore facet planes whose vertices collapse at kernel tolerance. Regressions cover both pole ends, reversed orientation, affine transforms, perturbed shared apex coordinates, bounded refinement and dense surface-to-mesh distance checks.
 
 - Preserve the complete trimmed domains of imported spline extrusions. Bound the sweep coordinate with both the boundary and positive-weight profile control hulls, including nonplanar profiles and interior extrema; retain the exact curves and existing conic handling. Native G3/G7 prism inputs now pass geometric consistency, independent volume, closed-mesh and STEP checks at small/original scales and under rigid motion. Importer regressions additionally cover polynomial/rational profiles, reversal, affine frames, boundary parameters and normals. Targeted replays recover G3/G5/G7/G9 single-edge fillets; G5 retains a sampled reference discrepancy.

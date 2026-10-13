@@ -1,0 +1,191 @@
+{
+  "parent": "da3f3ca1a0d64cd6e313018dce7f312ff0c3b26e",
+  "source_sha256": {
+    "CHANGELOG.md": "af302c85a661ff6587e3e5690818943fa96c3032ca4a8899ea9ac0550d659d67",
+    "truck-stepio/src/in/support_domain.rs": "f98b6e4b0ff50427b7d169cad1387b2a379311a343280ae2574ef45729ff02b0",
+    "truck-stepio/src/in/step_geometry/stepout_impls.rs": "b28a215a69c9b84d6133b4e1b6b626850d2ffa6e760c011b323029fa78269400",
+    "truck-stepio/tests/imported_support_bounds.rs": "8b5a9f0b935cf2112b8d5450ecb27a9c5d7c611c0c7c2c0a6fa0ac5e6e665aee",
+    "truck-shapeops/tests/imported_conical_sectors.rs": "473d63b78bec4aeb28a6c3aa6b3cc4dbdd79ce08ef95505355e483b652af6e52",
+    "truck-shapeops/tests/fixtures/conical-sectors/H6.step": "0f1722b346a2680aa6560e5483922945196fc0a391a21e80bc676b76e45a9097",
+    "truck-shapeops/tests/fixtures/conical-sectors/README.md": "abfbde088007844529126d82e26ab1d03de24f8716dc0135779103261430eefd"
+  },
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--release",
+        "-p",
+        "truck-stepio",
+        "-p",
+        "truck-shapeops",
+        "-p",
+        "truck-benchmarks",
+        "--all-targets"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "truck-stepio",
+        "-p",
+        "truck-shapeops",
+        "--no-fail-fast"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "bench",
+        "-p",
+        "truck-benchmarks",
+        "--bench",
+        "actions",
+        "--",
+        "--test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--release",
+        "-p",
+        "truck-shapeops",
+        "--example",
+        "replay_occt_blend"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "replay_sha256": "4e515dedd02d317dd0b5f4d317eb714e0d7c33d0c00740a0772603a10ca885e0",
+  "release_tests": {
+    "passed": 466,
+    "failed": 0,
+    "ignored": 1,
+    "targets": 88
+  },
+  "native_archive": "audits/fillet-chamfer/capture/2026-10-13-cone-pole-meshing/artifacts.zip",
+  "native_archive_sha256": "d0d74a8b900938f7c8f31dd826b89df181fa04ae13730497984e1a5df213fa0a",
+  "native_artifact_sha256": {
+    "blend/simple/H6/capture/001.input.step": "0f1722b346a2680aa6560e5483922945196fc0a391a21e80bc676b76e45a9097",
+    "blend/simple/H6/capture/001.input.json": "4cca4e641c998ac6b6fd6778032a2a86cd468abe51f6189b759f55c9bcbe9848",
+    "blend/simple/H6/capture/001.input.brep": "d64850c4f8d09fa9fc1650f479ead73eb52cc41d27d78faa8998e9269e81b825",
+    "blend/simple/H6/capture/001.result.step": "b4bb4e320ca1ecd6843a03909dd67bc9b13b390a4005fde3d8ccd6fef2e56e70",
+    "blend/simple/H6/capture/001.result.json": "f5d120df611c4ed11641eefcb6db92c797280fce8f9c87eb1496c30717f15b1a",
+    "blend/simple/H6/capture/001.result.brep": "cc106e31d49db011b5a85de1c72d58a0cfd8b1312eeed68f12e9c750e9b860e7",
+    "blend/simple/H7/capture/001.input.step": "e80de0346e58a20d2422c0231c2075bae49764d5a53a2a470311bda812161d08",
+    "blend/simple/H7/capture/001.input.json": "a16edee7fad83ed959e3baef37920f6a99b6b925abd48a3946828ceda5a2eb08",
+    "blend/simple/H7/capture/001.input.brep": "d64850c4f8d09fa9fc1650f479ead73eb52cc41d27d78faa8998e9269e81b825",
+    "blend/simple/H7/capture/001.result.step": "07bdcbae0feb419c8963487f715edeef2438c4f00a75d801dc960be0a6897fb3",
+    "blend/simple/H7/capture/001.result.json": "925c6c12859eb481eba96d21a0ea049892b5b31343a5975f770f585a3a16e785",
+    "blend/simple/H7/capture/001.result.brep": "f9c2cd87da2f54369fe1423307dc8c633c5be8685e34b7a7795a000c027bdb06",
+    "blend/simple/H9/capture/001.input.step": "e80de0346e58a20d2422c0231c2075bae49764d5a53a2a470311bda812161d08",
+    "blend/simple/H9/capture/001.input.json": "49494eb3479a511a2acd16f8a049c639f2e9e015561053da04f4e8828b431e37",
+    "blend/simple/H9/capture/001.input.brep": "d64850c4f8d09fa9fc1650f479ead73eb52cc41d27d78faa8998e9269e81b825",
+    "blend/simple/H9/capture/001.result.step": "637b399c4f0e84995cd3954bff501baf8e652e327261024469b928d97616e2be",
+    "blend/simple/H9/capture/001.result.json": "32247afe17c2c2cae76b659180c41dfec601ed4aef3342e8c6b4b303673b3d65",
+    "blend/simple/H9/capture/001.result.brep": "4e842211fa282bdd75941f0257af7a6f3d79b1362ad6b21f3ddd5773b8e7a78c"
+  },
+  "replay_artifact_sha256": {
+    "H6/001.input.step": "0f1722b346a2680aa6560e5483922945196fc0a391a21e80bc676b76e45a9097",
+    "H6/001.input.json": "4cca4e641c998ac6b6fd6778032a2a86cd468abe51f6189b759f55c9bcbe9848",
+    "H6/001.input.brep": "d64850c4f8d09fa9fc1650f479ead73eb52cc41d27d78faa8998e9269e81b825",
+    "H6/001.result.step": "b4bb4e320ca1ecd6843a03909dd67bc9b13b390a4005fde3d8ccd6fef2e56e70",
+    "H6/001.result.json": "f5d120df611c4ed11641eefcb6db92c797280fce8f9c87eb1496c30717f15b1a",
+    "H6/001.result.brep": "cc106e31d49db011b5a85de1c72d58a0cfd8b1312eeed68f12e9c750e9b860e7",
+    "H6/replay.log": "1f8b9ac0011bacc874a8c04eca3700ae6a768b0d45babfeb4759f06b9735407c",
+    "H6/001.truck.step": "06820ccffe656b238cb37352473fc88155954b96fcaf75a2f8ce752249de5c08",
+    "H6/001.truck.json": "244d49012b0a7831a92287ce7a80e43c2efbec285e655801adc8e6784de2eb46",
+    "H6/comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "H6/001.comparison.json": "5342b550288999d25e212b8fbe71cad066487724eb5bbc509ab5cc211fc85f45",
+    "H6/independent-step-check.txt": "203d74f838d8c2aed6410c5493a833e89a241f7eb3239676018413e8c38765f3",
+    "H7/001.input.step": "e80de0346e58a20d2422c0231c2075bae49764d5a53a2a470311bda812161d08",
+    "H7/001.input.json": "a16edee7fad83ed959e3baef37920f6a99b6b925abd48a3946828ceda5a2eb08",
+    "H7/001.input.brep": "d64850c4f8d09fa9fc1650f479ead73eb52cc41d27d78faa8998e9269e81b825",
+    "H7/001.result.step": "07bdcbae0feb419c8963487f715edeef2438c4f00a75d801dc960be0a6897fb3",
+    "H7/001.result.json": "925c6c12859eb481eba96d21a0ea049892b5b31343a5975f770f585a3a16e785",
+    "H7/001.result.brep": "f9c2cd87da2f54369fe1423307dc8c633c5be8685e34b7a7795a000c027bdb06",
+    "H7/replay.log": "a2afeada5ff5e98f16598399058aaed558c0de0bed4802a871802c81e862f7aa",
+    "H7/001.truck.json": "959237715c43c2fbcfa0e2f02de401cc662be7cb40d26ca80e714e938794cccb",
+    "H9/001.input.step": "e80de0346e58a20d2422c0231c2075bae49764d5a53a2a470311bda812161d08",
+    "H9/001.input.json": "49494eb3479a511a2acd16f8a049c639f2e9e015561053da04f4e8828b431e37",
+    "H9/001.input.brep": "d64850c4f8d09fa9fc1650f479ead73eb52cc41d27d78faa8998e9269e81b825",
+    "H9/001.result.step": "637b399c4f0e84995cd3954bff501baf8e652e327261024469b928d97616e2be",
+    "H9/001.result.json": "32247afe17c2c2cae76b659180c41dfec601ed4aef3342e8c6b4b303673b3d65",
+    "H9/001.result.brep": "4e842211fa282bdd75941f0257af7a6f3d79b1362ad6b21f3ddd5773b8e7a78c",
+    "H9/replay.log": "a2afeada5ff5e98f16598399058aaed558c0de0bed4802a871802c81e862f7aa",
+    "H9/001.truck.json": "959237715c43c2fbcfa0e2f02de401cc662be7cb40d26ca80e714e938794cccb"
+  },
+  "replay_archive_sha256": "f804b99798a6f7126b5d8ef705ff1f83a570f12803d2b54f1926c96ba6272f3e",
+  "targeted_results": {
+    "H6": {
+      "comparison": "unverified",
+      "result": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 13160610.764468135,
+        "selected_edges": 1,
+        "status": "operation-succeeded",
+        "step_prepared": true
+      },
+      "schema_version": 1,
+      "stage": "output-consistency",
+      "tolerance": 0.001
+    },
+    "H7": {
+      "comparison": "unverified",
+      "result": {
+        "code": "NonPlanarFace",
+        "error": "TRUCK_FILLET_NON_PLANAR_FACE: This fillet operation requires planar faces. (fillet_solid_edges / validate_input)",
+        "input_unchanged": true,
+        "selected_edges": 3,
+        "status": "operation-failed"
+      },
+      "schema_version": 1,
+      "stage": "blend",
+      "tolerance": 0.001
+    },
+    "H9": {
+      "comparison": "unverified",
+      "result": {
+        "code": "NonPlanarFace",
+        "error": "TRUCK_FILLET_NON_PLANAR_FACE: This fillet operation requires planar faces. (fillet_solid_edges / validate_input)",
+        "input_unchanged": true,
+        "selected_edges": 3,
+        "status": "operation-failed"
+      },
+      "schema_version": 1,
+      "stage": "blend",
+      "tolerance": 0.001
+    }
+  },
+  "H6_comparison": {
+    "schema_version": 1,
+    "comparison": "sampled-only",
+    "native_valid": true,
+    "truck_step_valid": true,
+    "native_solids": 1,
+    "truck_solids": 1,
+    "native_volume": 13160701.562721223,
+    "truck_volume": 13160701.556814155,
+    "native_to_truck_max_distance": 1.910174112464739e-05,
+    "native_to_truck_samples": 1675,
+    "truck_to_native_max_distance": 1.910194872339987e-05,
+    "truck_to_native_samples": 1675
+  },
+  "independent_input_volume": 13155419.236907259,
+  "independent_fillet_volume": 13160701.562723719,
+  "independent_step_checker": {
+    "target/inspect-polar-step": "8ba733150ff8088ea07eb21ecf213d906655905dbff4ee8f89b771cca74e8b2d",
+    "truck-benchmarks/results/2026-10-13-polar-cap-seams/inspect-polar-step.cpp": "7281a40d2d00f601932f4a98d5b7559e137e966e382602a3ac76a762fe99035d"
+  },
+  "performance_claim": "None; action benchmark smoke only."
+}

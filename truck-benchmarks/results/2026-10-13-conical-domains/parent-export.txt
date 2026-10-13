@@ -1,0 +1,24 @@
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/truck-stepio)
+    Finished `release` profile [optimized] target(s) in 0.92s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/imported_support_bounds.rs (target/release/deps/imported_support_bounds-b13348f67321254f)
+
+running 1 test
+test cone_step_export_preserves_shifted_and_scaled_generators ... FAILED
+
+failures:
+
+---- cone_step_export_preserves_shifted_and_scaled_generators stdout ----
+
+thread 'cone_step_export_preserves_shifted_and_scaled_generators' (429906) panicked at truck-stepio/tests/imported_support_bounds.rs:301:21:
+assertion failed: parsed.subs(angle, v).distance(cone.subs(t, angle)) < 1e-9
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    cone_step_export_preserves_shifted_and_scaled_generators
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-stepio --test imported_support_bounds`

@@ -1,0 +1,32 @@
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 10.81s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/imported_conical_sectors.rs (target/release/deps/imported_conical_sectors-c6f1c0c1f26c0306)
+
+running 2 tests
+test conical_sector_import_preserves_apices_material_and_step ... FAILED
+test conical_sector_neck_fillet_preserves_radius_normals_material_and_step ... FAILED
+
+failures:
+
+---- conical_sector_import_preserves_apices_material_and_step stdout ----
+
+thread 'conical_sector_import_preserves_apices_material_and_step' (430100) panicked at truck-shapeops/tests/imported_conical_sectors.rs:49:9:
+assertion failed: solid.is_geometric_consistent()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- conical_sector_neck_fillet_preserves_radius_normals_material_and_step stdout ----
+
+thread 'conical_sector_neck_fillet_preserves_radius_normals_material_and_step' (430101) panicked at truck-shapeops/tests/imported_conical_sectors.rs:90:9:
+assertion failed: solid.is_geometric_consistent()
+
+
+failures:
+    conical_sector_import_preserves_apices_material_and_step
+    conical_sector_neck_fillet_preserves_radius_normals_material_and_step
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p truck-shapeops --test imported_conical_sectors`

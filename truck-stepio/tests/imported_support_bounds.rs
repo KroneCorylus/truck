@@ -265,3 +265,45 @@ fn cylinder_step_export_uses_radial_distance_for_axially_shifted_generators() {
         }
     }
 }
+
+#[test]
+fn cone_step_export_preserves_shifted_and_scaled_generators() {
+    use std::str::FromStr;
+    use truck_stepio::r#in::ruststep::{ast::DataSection, tables::EntityTable};
+    use truck_stepio::r#in::ConicalSurfaceHolder;
+    for slope in [-0.5, 0.5] {
+        for bounds in [(-3., 8.), (-20., 1.), (0., 30.)] {
+            for moved in [false, true] {
+                let original = Line(Point3::new(10., 0., 0.), Point3::new(10. + slope, 0., 1.));
+                let matrix = if moved {
+                    Matrix4::from_translation(Vector3::new(13., -7., 23.))
+                        * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.73))
+                } else {
+                    Matrix4::identity()
+                };
+                let cone = Processor::with_transform(
+                    RevolutedCurve::by_revolution(
+                        Line(original.subs(bounds.0), original.subs(bounds.1)),
+                        Point3::origin(),
+                        Vector3::unit_z(),
+                    ),
+                    matrix,
+                );
+                let surface = ElementarySurface::ConicalSurface(cone);
+                let data = format!("DATA;{}ENDSEC;", StepDataDisplay::new(surface, 1));
+                let table = Table::from_data_section(&DataSection::from_str(&data).unwrap());
+                let entity = EntityTable::<ConicalSurfaceHolder>::get_owned(&table, 1).unwrap();
+                let parsed: ConicalSurface = (&entity).into();
+                for i in 0..=32 {
+                    let t = i as f64 / 32.;
+                    let v = bounds.0 + (bounds.1 - bounds.0) * t;
+                    let angle = 2. * std::f64::consts::PI * t;
+                    assert!(parsed.subs(angle, v).distance(cone.subs(t, angle)) < 1e-9);
+                    if original.subs(v).x.abs() > 1e-6 {
+                        assert!(parsed.normal(angle, v).dot(cone.normal(t, angle)) < -1. + 1e-10);
+                    }
+                }
+            }
+        }
+    }
+}

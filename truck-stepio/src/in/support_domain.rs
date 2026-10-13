@@ -123,6 +123,10 @@ fn fitted(
     boundaries: &[Vec<CompressedEdgeIndex>],
     edges: &[CompressedEdge<Curve3D>],
 ) -> Option<Surface> {
+    if let Surface::ElementarySurface(ElementarySurface::ConicalSurface(cone)) = surface {
+        return fitted_cone(cone, &boundary_control_hull(boundaries, edges)?)
+            .map(|cone| Surface::ElementarySurface(ElementarySurface::ConicalSurface(cone)));
+    }
     let mut profile_controls = Vec::new();
     let (origin, normal, vector) = match surface {
         Surface::ElementarySurface(ElementarySurface::CylindricalSurface(cylinder)) => {
@@ -167,35 +171,7 @@ fn fitted(
     if denominator == 0. || !denominator.is_finite() {
         return None;
     }
-    let mut controls = Vec::new();
-    for index in boundaries.iter().flatten() {
-        let source = &edges.get(index.index)?.curve;
-        if let Curve3D::Conic(Conic3D::Ellipse(ellipse)) = source {
-            let matrix = ellipse.transform();
-            if matrix.x.w == 0. && matrix.y.w == 0. && matrix.w.w != 0. {
-                let center = Point3::from_homogeneous(matrix.w);
-                let x = matrix.x.truncate() / matrix.w.w;
-                let y = matrix.y.truncate() / matrix.w.w;
-                // The affine circle lies inside this parallelogram, including full turns.
-                for point in [
-                    center + x + y,
-                    center + x - y,
-                    center - x + y,
-                    center - x - y,
-                ] {
-                    if ![point.x, point.y, point.z].iter().all(|x| x.is_finite()) {
-                        return None;
-                    }
-                    controls.push(point);
-                }
-                continue;
-            }
-        }
-        controls.extend(positive_control_hull(source)?);
-    }
-    if controls.is_empty() {
-        return None;
-    }
+    let controls = boundary_control_hull(boundaries, edges)?;
     // The enclosing conic boxes and positive rational control hulls bound this
     // sweep coordinate over complete curves, including extrema between vertices.
     let parameter = |p: Point3| (p - origin).dot(normal) / denominator;
@@ -289,4 +265,209 @@ fn positive_control_hull(curve: &Curve3D) -> Option<Vec<Point3>> {
                 .then(|| Point3::from_homogeneous(*p))
         })
         .collect()
+}
+
+fn boundary_control_hull(
+    boundaries: &[Vec<CompressedEdgeIndex>],
+    edges: &[CompressedEdge<Curve3D>],
+) -> Option<Vec<Point3>> {
+    let mut controls = Vec::new();
+    for index in boundaries.iter().flatten() {
+        let source = &edges.get(index.index)?.curve;
+        if let Curve3D::Conic(Conic3D::Ellipse(ellipse)) = source {
+            let matrix = ellipse.transform();
+            if matrix.x.w == 0. && matrix.y.w == 0. && matrix.w.w != 0. {
+                let center = Point3::from_homogeneous(matrix.w);
+                let x = matrix.x.truncate() / matrix.w.w;
+                let y = matrix.y.truncate() / matrix.w.w;
+                // The affine circle lies inside this parallelogram, including full turns.
+                for point in [
+                    center + x + y,
+                    center + x - y,
+                    center - x + y,
+                    center - x - y,
+                ] {
+                    if ![point.x, point.y, point.z].iter().all(|x| x.is_finite()) {
+                        return None;
+                    }
+                    controls.push(point);
+                }
+                continue;
+            }
+        }
+        controls.extend(positive_control_hull(source)?);
+    }
+    (!controls.is_empty()).then_some(controls)
+}
+
+fn fitted_cone(
+    cone: &step_geometry::ConicalSurface,
+    controls: &[Point3],
+) -> Option<step_geometry::ConicalSurface> {
+    let entity = cone.entity();
+    let line = entity.entity_curve();
+    let axis = entity.axis();
+    let direction = line.1 - line.0;
+    let axial = direction.dot(axis);
+    let inverse = cone.transform().invert()?;
+    if axial == 0. || !axial.is_finite() {
+        return None;
+    }
+    let parameter = |p| (inverse.transform_point(p) - line.0).dot(axis) / axial;
+    let (mut lower, mut upper) = (f64::INFINITY, f64::NEG_INFINITY);
+    for &p in controls {
+        let t = parameter(p);
+        if !t.is_finite() {
+            return None;
+        }
+        lower = lower.min(t);
+        upper = upper.max(t);
+    }
+    let radial = line.0 - entity.origin();
+    let radial = radial - axis * radial.dot(axis);
+    let slope = direction - axis * axial;
+    let pole = -radial.dot(slope) / slope.magnitude2();
+    if !pole.is_finite() || !(radial + pole * slope).so_small() {
+        return None;
+    }
+    let padding = TOLERANCE * inverse.transpose().transform_vector(axis).magnitude() / axial.abs();
+    let (mut lo, mut hi) = (lower.min(0.) - padding, upper.max(1.) + padding);
+    // Keep one cone nappe: padding through the apex would introduce an interior pole.
+    if lower >= pole - padding {
+        lo = lo.max(pole);
+    } else if upper <= pole + padding {
+        hi = hi.min(pole);
+    } else {
+        return None;
+    }
+    if !lo.is_finite() || !hi.is_finite() || !(hi - lo).is_finite() || lo >= hi {
+        return None;
+    }
+    let point = |t| {
+        let p = line.subs(t);
+        if t == pole {
+            entity.origin() + axis * (p - entity.origin()).dot(axis)
+        } else {
+            p
+        }
+    };
+    Some(cone.map_ref(|entity| {
+        RevolutedCurve::by_revolution(Line(point(lo), point(hi)), entity.origin(), entity.axis())
+    }))
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn cone_support_bounds_keep_the_apex_at_a_generator_endpoint() {
+        for slope in [0.5_f64, -0.5] {
+            for negative_sheet in [false, true] {
+                for reversed in [false, true] {
+                    for transformed in [false, true] {
+                        let line = Line(Point3::new(10., 0., 0.), Point3::new(10. + slope, 0., 1.));
+                        let mut affine = Matrix4::from_nonuniform_scale(1.2, 0.8, 1.4);
+                        affine.x.z = 0.2;
+                        affine.z.x = 0.3;
+                        let matrix = if transformed {
+                            Matrix4::from_translation(Vector3::new(13., -7., 23.))
+                                * Matrix4::from_axis_angle(
+                                    Vector3::new(1., 2., 3.).normalize(),
+                                    Rad(0.73),
+                                )
+                                * affine
+                        } else {
+                            Matrix4::identity()
+                        };
+                        let mut cone = Processor::with_transform(
+                            RevolutedCurve::by_revolution(
+                                line,
+                                Point3::origin(),
+                                Vector3::unit_z(),
+                            ),
+                            matrix,
+                        );
+                        if reversed {
+                            cone.invert();
+                        }
+                        let surface =
+                            Surface::ElementarySurface(ElementarySurface::ConicalSurface(cone));
+                        let pole = -10. / slope;
+                        let sheet = if negative_sheet { -1. } else { 1. };
+                        let sign = slope.signum() * sheet;
+                        let curve = Curve3D::BSplineCurve(BSplineCurve::new(
+                            KnotVec::bezier_knot(2),
+                            [pole, pole + sign * 60., pole + sign * 12.]
+                                .map(|t| matrix.transform_point(line.subs(t)))
+                                .to_vec(),
+                        ));
+                        let edges = [CompressedEdge {
+                            vertices: (0, 1),
+                            curve,
+                        }];
+                        let boundaries = vec![vec![CompressedEdgeIndex {
+                            index: 0,
+                            orientation: true,
+                        }]];
+                        let fitted =
+                            fitted(&surface, &boundaries, &edges).expect("complete cone domain");
+                        let Surface::ElementarySurface(ElementarySurface::ConicalSurface(fitted)) =
+                            fitted
+                        else {
+                            panic!("cone representation")
+                        };
+                        let generator = fitted.entity().entity_curve();
+                        let at_pole = if sign > 0. { generator.0 } else { generator.1 };
+                        assert!(at_pole.x.abs() < 1e-12);
+                        assert!(sheet * generator.0.x >= -1e-12 && sheet * generator.1.x >= -1e-12);
+                        let modeled = truck_modeling::Surface::try_from(
+                            &Surface::ElementarySurface(ElementarySurface::ConicalSurface(fitted)),
+                        )
+                        .unwrap();
+                        let curve = truck_modeling::Curve::try_from(&edges[0].curve).unwrap();
+                        assert!(modeled.include(&curve));
+                        let (u, v) = modeled.try_range_tuple();
+                        let ((a, b), (c, d)) = (u.unwrap(), v.unwrap());
+                        for i in 0..=128 {
+                            let p = curve.subs(i as f64 / 128.);
+                            let (u, v) = modeled.search_parameter(p, None, 100).unwrap();
+                            assert!((a - 1e-9..=b + 1e-9).contains(&u));
+                            assert!((c - 1e-9..=d + 1e-9).contains(&v));
+                            assert!(modeled.subs(u, v).distance(p) < 1e-8);
+                            let local = matrix.invert().unwrap().transform_point(p);
+                            let t = local.z;
+                            let normal = if reversed {
+                                surface.normal(0., t)
+                            } else {
+                                surface.normal(t, 0.)
+                            };
+                            if i > 0 {
+                                assert!(modeled.normal(u, v).dot(normal) > 1. - 1e-8);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn cone_support_bounds_do_not_clip_a_hull_across_the_apex() {
+        let surface = Surface::ElementarySurface(ElementarySurface::ConicalSurface(
+            Processor::new(RevolutedCurve::by_revolution(
+                Line(Point3::new(1., 0., 0.), Point3::new(2., 0., 1.)),
+                Point3::origin(),
+                Vector3::unit_z(),
+            )),
+        ));
+        let edges = [CompressedEdge {
+            vertices: (0, 1),
+            curve: Curve3D::Line(Line(Point3::new(-1., 0., -2.), Point3::new(2., 0., 1.))),
+        }];
+        let boundaries = vec![vec![CompressedEdgeIndex {
+            index: 0,
+            orientation: true,
+        }]];
+        assert!(fitted(&surface, &boundaries, &edges).is_none());
+    }
 }

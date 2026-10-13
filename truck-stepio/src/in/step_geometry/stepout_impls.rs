@@ -53,8 +53,9 @@ impl out::DisplayByStep for ElementarySurface {
                 let p = line.0;
                 let v = line.1 - p;
 
-                let radius = out::FloatDisplay(p.x);
-                let semi_angle = out::FloatDisplay(f64::atan(v.x));
+                let slope = v.x / v.z;
+                let radius = out::FloatDisplay(p.x - slope * p.z);
+                let semi_angle = out::FloatDisplay(slope.atan());
 
                 let position_idx = idx + 1;
                 let location_idx = idx + 2;
