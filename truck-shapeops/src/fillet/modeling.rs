@@ -257,6 +257,64 @@ pub fn try_fillet_solid_edges(
     }
 }
 
+/// Fillets selected edges with one positive, finite constant radius per edge.
+///
+/// Equal radii use [`try_fillet_solid_edges`] and retain its supported scope.
+/// Unequal radii support separate straight edges between planes or an axial cylindrical
+/// support, with the end-face restrictions of the existing straight-edge construction.
+/// Selected edges must belong to one shell and must not share vertices. Contacts must fit
+/// the supporting faces; unequal-radius corner junctions are unsupported. This operation
+/// does not detect intersections with distant faces or other shells.
+/// Selection order does not affect construction order. Face history relates the original
+/// solid to the final result. Empty selection returns the original solid and empty history;
+/// any failure leaves the input unchanged. Invalid radii identify their selection index.
+pub fn try_fillet_solid_edges_with_radii(
+    solid: &Solid,
+    edges: &[(EdgeID, f64)],
+    tol: f64,
+) -> Result<BlendResult, Diagnostic> {
+    let operation = "fillet_solid_edges";
+    validate_tolerance(tol, operation)?;
+    for (i, &(_, radius)) in edges.iter().enumerate() {
+        positive(radius, "radius", operation).map_err(|e| e.selection(i))?;
+    }
+    let ids: Vec<_> = edges.iter().map(|&(id, _)| id).collect();
+    let radius = edges.first().map_or(1.0, |&(_, r)| r);
+    if edges.iter().all(|&(_, r)| r == radius) {
+        return try_fillet_solid_edges(solid, &ids, radius, tol);
+    }
+    Solid::try_new(solid.boundaries().clone()).map_err(|e| {
+        Diagnostic::new(Code::InvalidInputTopology, operation, "validate_input")
+            .with_coded_source(e)
+    })?;
+    let index = validate_selection(solid, &ids, operation)?;
+    let shell = &solid.boundaries()[index];
+    let mut vertices = HashSet::default();
+    for (i, id) in ids.iter().enumerate() {
+        let edge = shell.edge_iter().find(|e| e.id() == *id).unwrap();
+        if [edge.front(), edge.back()]
+            .iter()
+            .any(|v| !vertices.insert(v.id()))
+        {
+            return Err(
+                Diagnostic::new(Code::UnsupportedTopology, operation, "validate_input")
+                    .selection(i)
+                    .shell(index),
+            );
+        }
+    }
+    let shell = super::planar_edge::blend_edges(
+        shell,
+        &edges
+            .iter()
+            .map(|&(id, r)| (id, super::planar_edge::Blend::Fillet(r)))
+            .collect::<Vec<_>>(),
+        tol,
+    )
+    .map_err(|e| e.operation(operation).shell(index))?;
+    finish(solid, index, shell, tol).map_err(|e| e.operation(operation))
+}
+
 fn separate_contours(
     solid: &Solid,
     index: usize,

@@ -231,31 +231,41 @@ fn replay(prefix: &str, stage: &Cell<&'static str>) -> Result<Value, String> {
     if !radius.is_finite() || radius <= 0. {
         return Err("Invalid captured radius".into());
     }
-    if !selection
-        .iter()
-        .all(|s| s["radius"].as_f64() == Some(radius))
-    {
-        return Ok(
-            json!({"status":"unhandled-intent","reason":"This replay route currently handles equal radii only"}),
-        );
-    }
-    stage.set("physical-selection");
     let mut edges = Vec::new();
-    let mut seen = HashSet::new();
+    let mut selected = Vec::new();
+    let mut radii = std::collections::HashMap::new();
+    stage.set("physical-selection");
     for chosen in selection {
+        let chosen_radius = chosen["radius"].as_f64().ok_or("Missing radius")?;
+        if !chosen_radius.is_finite() || chosen_radius <= 0. {
+            return Err("Invalid captured radius".into());
+        }
         match match_selection(&input, chosen) {
-            Ok(matched) => edges.extend(matched.into_iter().filter(|e| seen.insert(e.id()))),
+            Ok(matched) => {
+                for edge in matched {
+                    if let Some(previous) = radii.insert(edge.id(), chosen_radius) {
+                        if previous != chosen_radius {
+                            return Err("Conflicting radii for the same physical edge".into());
+                        }
+                    } else {
+                        selected.push((edge.id(), chosen_radius));
+                        edges.push(edge);
+                    }
+                }
+            }
             Err(error) => return Ok(json!({"status":"selection-unmatched","error":error})),
         }
     }
     let ids: Vec<_> = edges.iter().map(|e| e.id()).collect();
+    let equal = selected.iter().all(|&(_, r)| r == radius);
     stage.set("blend");
-    let result = try_fillet_solid_edges(&input, &ids, radius, TOL).or_else(|error| {
-        if let Some(wire) = as_wire(&edges) {
-            try_fillet_solid_along_wire(&input, &wire, radius, TOL)
-        } else {
-            Err(error)
+    let result = try_fillet_solid_edges_with_radii(&input, &selected, TOL).or_else(|error| {
+        if equal {
+            if let Some(wire) = as_wire(&edges) {
+                return try_fillet_solid_along_wire(&input, &wire, radius, TOL);
+            }
         }
+        Err(error)
     });
     let unchanged =
         before == serde_json::to_string(&input.compress()).map_err(|e| e.to_string())?;
@@ -417,4 +427,73 @@ mod curved_selection_tests {
         assert_eq!(selected.len(), 1);
         assert_eq!(selected[0].id(), bent.id());
     }
+}
+
+#[cfg(test)]
+#[path = "../tests/fixtures/unequal-radii/model.rs"]
+mod unequal_fixture;
+
+#[cfg(test)]
+mod unequal_radius_tests {
+    use super::*;
+
+    fn check(name: &str) {
+        let case = unequal_fixture::case(name);
+        let directory = std::env::temp_dir().join(format!(
+            "truck-unequal-replay-{}-{name}",
+            std::process::id()
+        ));
+        std::fs::create_dir_all(&directory).unwrap();
+        let prefix = directory.join("001");
+        let prefix = prefix.to_str().unwrap();
+        std::fs::write(format!("{prefix}.input.step"), case.step).unwrap();
+        let selection: Vec<_> = case
+            .edges
+            .iter()
+            .map(|(a, b, r)| json!({"radius":r,"points":[[a.x,a.y,a.z],[b.x,b.y,b.z]]}))
+            .collect();
+        let task = json!({"operation":"fillet","selection":selection});
+        std::fs::write(format!("{prefix}.input.json"), task.to_string()).unwrap();
+        let result = replay(prefix, &Cell::new("start")).unwrap();
+        assert_eq!(result["status"], "operation-succeeded", "{result}");
+        for field in [
+            "input_unchanged",
+            "geometry_consistent",
+            "mesh_closed",
+            "step_prepared",
+        ] {
+            assert_eq!(result[field], true, "{field}: {result}");
+        }
+        assert!(
+            (result["mesh_volume"].as_f64().unwrap() - case.volume).abs() < 0.001 * case.volume
+        );
+        assert_eq!(
+            std::fs::read_to_string(format!("{prefix}.input.step")).unwrap(),
+            case.step
+        );
+        let mut duplicate = task.clone();
+        let same = duplicate["selection"][0].clone();
+        duplicate["selection"].as_array_mut().unwrap().push(same);
+        std::fs::write(format!("{prefix}.input.json"), duplicate.to_string()).unwrap();
+        assert_eq!(replay(prefix, &Cell::new("start")).unwrap(), result);
+        duplicate["selection"][2]["radius"] = json!(case.edges[0].2 + 1.);
+        std::fs::write(format!("{prefix}.input.json"), duplicate.to_string()).unwrap();
+        assert!(replay(prefix, &Cell::new("start"))
+            .unwrap_err()
+            .contains("Conflicting radii"));
+        let mut invalid = task;
+        invalid["selection"][1]["radius"] = json!(0.);
+        std::fs::write(format!("{prefix}.input.json"), invalid.to_string()).unwrap();
+        assert!(replay(prefix, &Cell::new("start"))
+            .unwrap_err()
+            .contains("Invalid captured radius"));
+        std::fs::remove_dir_all(directory).unwrap();
+    }
+
+    #[test]
+    fn unequal_box_radii_reach_the_solid_solver() { check("A2"); }
+    #[test]
+    fn unequal_wedge_radii_reach_the_solid_solver() { check("B5"); }
+    #[test]
+    fn unequal_cylindrical_lip_radii_reach_the_solid_solver() { check("C4"); }
 }

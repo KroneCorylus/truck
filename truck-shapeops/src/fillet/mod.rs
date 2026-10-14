@@ -5,6 +5,7 @@
 //! [`crate::fillet::chamfer_solid_edges`] for equal-distance corner and channel-rim chamfers, and
 //! [`crate::fillet::fillet_solid_edges`] for equal radii on planar neighborhoods and straight
 //! cylinder lips, including orthogonal miters, spherical corners, and mixed toroidal corners.
+//! Use [`try_fillet_solid_edges_with_radii`] for separate straight edges with different radii.
 //! The generic shell and face functions below also accept the modeling types directly;
 //! no representation conversion is necessary. Each operation documents its supported junctions.
 //!
@@ -498,5 +499,5 @@ pub use modeling::{
     chamfer_solid_along_wire, chamfer_solid_edge, chamfer_solid_edges, fillet_solid_along_wire,
     fillet_solid_edges, try_chamfer_solid_along_wire, try_chamfer_solid_edge,
     try_chamfer_solid_edges, try_chamfer_solid_edges_with_distances, try_fillet_solid_along_wire,
-    try_fillet_solid_edges, BlendResult,
+    try_fillet_solid_edges, try_fillet_solid_edges_with_radii, BlendResult,
 };

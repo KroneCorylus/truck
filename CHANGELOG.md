@@ -6,6 +6,8 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Added `try_fillet_solid_edges_with_radii` for atomic constant-radius fillets on separate straight edges, including plane/cylinder lips. Equal radii retain existing solid-fillet behavior; unequal-radius corners remain unsupported. The native replay now preserves per-edge radii and rejects conflicting assignments.
+
 - Equal-radius solid fillets can round multiple closed tangent contours with distinct support faces atomically. Selection order is stable, original-to-final face history is retained, and shared trims remain unsupported.
 
 - Fillet the vertical cusp of a closed cubic Bézier prism by preserving each adjacent face's support-parameter branch through rolling contacts and endpoint searches. `RbfSurface::try_with_support_hints` adds finite branch hints that survive contact-curve reversal, cutting, boxing and serialization; the default constructor and unseeded serialization remain unchanged. Rolling-surface inverse searches use geometric coplanarity and the evaluated contact circle, and return `None` for singular support systems. Regressions check independent material, radius, normals, transforms, scales, reversed selections, closed meshes and STEP.

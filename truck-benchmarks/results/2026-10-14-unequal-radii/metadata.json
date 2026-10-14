@@ -1,0 +1,398 @@
+{
+  "parent": "d3bc14fe9b225b37076bf86517c09145a4cd2ba6",
+  "source_sha256": {
+    "CHANGELOG.md": "14dfb19be6196ba4e947817f66a6012cc18a4df347ea16279ed8b215f1792781",
+    "DIAGNOSTICS.md": "299dc6579e5d3aaecdf178a8ef31201472dab2455d9a6ddabb25c1d70faf7b2d",
+    "truck-shapeops/src/fillet/modeling.rs": "f69870c86b7f237f8d044d1ab465b3eac0511c9e07e9055f0f29e1b699fc85ce",
+    "truck-shapeops/src/fillet/mod.rs": "b49f1b0ac6d69046f2b93c472a0d6a13609ab066150f3bf68bd10ee6faeaff84",
+    "truck-shapeops/examples/replay_occt_blend.rs": "e9f5d7199e73b2dd25766a2f09b6025e925ac805148ab3944ee756cf31fad734",
+    "truck-shapeops/tests/unequal_fillet_radii.rs": "2fce9b2ff6d60311e49348d13b0fa0ef6dd719704c303d5acb0e4da05e034a81",
+    "truck-shapeops/tests/fixtures/unequal-radii/A2.step": "3167c4c3e1c86fc9df9f8532ab3538ea79b542be7361e9f97d0aed28604de2d0",
+    "truck-shapeops/tests/fixtures/unequal-radii/B5.step": "d2a7c712edafb7e66970f0e3933afcfe5ce37d13dade0f21fcf5d19229b73fae",
+    "truck-shapeops/tests/fixtures/unequal-radii/C4.step": "46957414429098d57904d03e9b78f360309a62cbe3c71bda76104cf586174dd5",
+    "truck-shapeops/tests/fixtures/unequal-radii/README.md": "eada31de93678a5613ba6a5b0c94e9f7b948e5557aba217c39d69b2b7e848c19",
+    "truck-shapeops/tests/fixtures/unequal-radii/model.rs": "29579fbb389bddc6f574a438905f4c542515305318cfe06cc1472835bd61bef9"
+  },
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "truck-shapeops",
+        "--no-fail-fast"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "truck-shapeops",
+        "--example",
+        "replay_occt_blend"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--release",
+        "-p",
+        "truck-shapeops",
+        "-p",
+        "truck-benchmarks",
+        "--all-targets"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "bench",
+        "-p",
+        "truck-benchmarks",
+        "--bench",
+        "actions",
+        "--",
+        "--test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--release",
+        "-p",
+        "truck-shapeops",
+        "--example",
+        "replay_occt_blend"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "replay_sha256": "092325768335ca28255334638b68a4e563e329584462f6215aa65362ad49b66e",
+  "native_archive": "audits/fillet-chamfer/capture/2026-10-14-separate-contours/artifacts.zip",
+  "native_archive_sha256": "aa05a8d86cd34d02f5ac4120fcce84c59377ab27165de547a0b5dedc303d2e36",
+  "native_artifact_sha256": {
+    "blend/simple/A4/capture/001.input.step": "916725c05d2014cd91513ab5f180bd66c6b42193ea7020679a164913b44368fb",
+    "blend/simple/A4/capture/001.input.brep": "2bb5f038118846a5d9fa689d8bf6639c962ca64925f94d832c0f953044d17e8d",
+    "blend/simple/A4/capture/001.input.json": "f02e34b861cfefae11d73e5be75a0f0320b51341d3ff468bae7af348a670d524",
+    "blend/simple/A4/capture/001.result.step": "efc8595bbc9af615893caa62d01a6069407fd16924d9f0ea42e8fc0b0a9278b3",
+    "blend/simple/A4/capture/001.result.brep": "e15c6a0e95112f1ea3e285fc1dee8a493e5ecabb28f74a0bad9b17110e528b4e",
+    "blend/simple/A4/capture/001.result.json": "1012f9bb1a6e8408d435782b849d6eb485432c865aad9077c13caf712b5611b9",
+    "blend/simple/P9/capture/001.input.step": "1b94f3a93e6f96d16507c06e644675e21edb835017d7ed8c63302631cd4e3419",
+    "blend/simple/P9/capture/001.input.brep": "ba7f45c920880c2472c1041d395c9c34df22a9c3f054f8c0245a4b9c8215318f",
+    "blend/simple/P9/capture/001.input.json": "6f2e3c10410388c31e0e004f4298920aa676d4b10dd63b10922e0d3921b30092",
+    "blend/simple/P9/capture/001.result.step": "07d41612d9cde3e10c5c8f552f857f449e04d1e5b77c6351d6426e4f301045d4",
+    "blend/simple/P9/capture/001.result.brep": "ae1239f58f00430f1b4b3bbb80c3af23732beb17257d2e1ef4cef5b37c1fa22f",
+    "blend/simple/P9/capture/001.result.json": "54f3a41b1624644437c86edbf218cd69dc7eda2110923f86e055185c8db45515",
+    "blend/tolblend_simple/A2/capture/001.input.step": "237cd3b91c47e59555c3870e8fd10d32edbed664618ef15f560fc59eb8003db0",
+    "blend/tolblend_simple/A2/capture/001.input.brep": "a6af0f06dfad5c0d3dec2a111a8fd7942607137391530138557b375989ebb525",
+    "blend/tolblend_simple/A2/capture/001.input.json": "e93c192bcf2935d2bb9020a2075231284f97afef94a1839c3ccd817c08b4777e",
+    "blend/tolblend_simple/A2/capture/001.result.step": "363653b2aec3297a03bfa9f560e27e2f67c89c52ad1652817963cc18e495dfe1",
+    "blend/tolblend_simple/A2/capture/001.result.brep": "bd2a88bf29ed2a77579cbd602b3d0b8abd43258f1feca7ae4cf3bb4de2b7dd52",
+    "blend/tolblend_simple/A2/capture/001.result.json": "85dd101566beb88f0ac1f0e75acd3c6c19af866f8849db3b7a16fb78b20b83cd",
+    "draft/angle/A2/capture/001.input.step": "3167c4c3e1c86fc9df9f8532ab3538ea79b542be7361e9f97d0aed28604de2d0",
+    "draft/angle/A2/capture/001.input.brep": "1156c9306f8c1ca6e859f2254b8aa4f577a93045c5c651fd6575f8f3338d598f",
+    "draft/angle/A2/capture/001.input.json": "d4499949c668066818310f4503ff94f22cccaebe4ab08491231684c7fedf12f3",
+    "draft/angle/A2/capture/001.result.step": "d6e4e850e0e1cde78ea0c419c0fdb78d92a741285fa50ea9e878e389d6ad2deb",
+    "draft/angle/A2/capture/001.result.brep": "7845b913c96da1bbf05ae2c90fe0a8c4048c2a907b86017812c6da2f62fe5cc4",
+    "draft/angle/A2/capture/001.result.json": "40bef8046968369505eb7fe33f0a813c7439627bf37d468514ea64d15709fc2d",
+    "draft/angle/B5/capture/001.input.step": "d2a7c712edafb7e66970f0e3933afcfe5ce37d13dade0f21fcf5d19229b73fae",
+    "draft/angle/B5/capture/001.input.brep": "ea9323c9d23edc4571e6df29b2198cfd862a4743f5c27035ebc80f972ff408f9",
+    "draft/angle/B5/capture/001.input.json": "7e0ef7d21a94830655ddd2bbabce15464017a05129563f8cac2f957bcf3f0e8d",
+    "draft/angle/B5/capture/001.result.step": "da88b1f938ca6e3a74088a072ebfa4b1909e39ec7f5f0512d8980bc65562bcfa",
+    "draft/angle/B5/capture/001.result.brep": "9ab206c3a6d2b5de0fb91946036c6e1aaee0dd0866b20c894a5101dd690f1be9",
+    "draft/angle/B5/capture/001.result.json": "6f6559b588dd15e41d19b79e8d243670f7451318c78a1c279dd98b88eacd6b35",
+    "draft/angle/C4/capture/001.input.step": "46957414429098d57904d03e9b78f360309a62cbe3c71bda76104cf586174dd5",
+    "draft/angle/C4/capture/001.input.brep": "313a8f677d449c5741573fa7d24e3358e9ec6974973724da0519550b2a890655",
+    "draft/angle/C4/capture/001.input.json": "45b29092827821ff02528b02c6c3a62ace02bcf27da477e36b2fe071e5f6912d",
+    "draft/angle/C4/capture/001.result.step": "6e6049280cfb15bb70917ac0ab7c204f04ea7d7b1b2e7c7bd9cd089159a0add0",
+    "draft/angle/C4/capture/001.result.brep": "24f09543d8ca8454716fc9b33bc919842cbb7deeba91614027b245aaabd25511",
+    "draft/angle/C4/capture/001.result.json": "71d7b813d2eb3bf1bb33459ca1389b4eecab922d43521f6c07d124627adcdcee",
+    "feat/featlf/E2/capture/001.input.step": "ff74e1a47d3d99ba676bc45ddea85b251da3d4966678fb3e4e60dfffa4420037",
+    "feat/featlf/E2/capture/001.input.brep": "31d1e12f3a0023b9bb994ee74517da0d5008ce2891961b2e56b9e2e9ac46f702",
+    "feat/featlf/E2/capture/001.input.json": "bf0e018e937be5ea7102dbfc338a1c503a9a495aa93a2d5a65abb94481ade298",
+    "feat/featlf/E2/capture/001.result.step": "1f5f38b7ec077022e65ec4cb18afe43da189394b5c77650171f3e74332c38942",
+    "feat/featlf/E2/capture/001.result.brep": "55445d462ee7ae20a76762033ded6307925a7f8fa27648ba4f3c78c1f7d513db",
+    "feat/featlf/E2/capture/001.result.json": "8ef3f3781efba91100362d81130ccddaf3214308e47837c825cf730acc2d2991",
+    "feat/featlf/E3/capture/001.input.step": "ff74e1a47d3d99ba676bc45ddea85b251da3d4966678fb3e4e60dfffa4420037",
+    "feat/featlf/E3/capture/001.input.brep": "31d1e12f3a0023b9bb994ee74517da0d5008ce2891961b2e56b9e2e9ac46f702",
+    "feat/featlf/E3/capture/001.input.json": "bf0e018e937be5ea7102dbfc338a1c503a9a495aa93a2d5a65abb94481ade298",
+    "feat/featlf/E3/capture/001.result.step": "1f5f38b7ec077022e65ec4cb18afe43da189394b5c77650171f3e74332c38942",
+    "feat/featlf/E3/capture/001.result.brep": "55445d462ee7ae20a76762033ded6307925a7f8fa27648ba4f3c78c1f7d513db",
+    "feat/featlf/E3/capture/001.result.json": "8ef3f3781efba91100362d81130ccddaf3214308e47837c825cf730acc2d2991"
+  },
+  "targeted_results": {
+    "blend/simple/A4": {
+      "comparison": "unverified",
+      "result": {
+        "code": "UnsupportedTopology",
+        "error": "TRUCK_UNSUPPORTED_TOPOLOGY: The topology is outside the supported scope of this operation. (fillet_solid_edges / validate_input)",
+        "input_unchanged": true,
+        "selected_edges": 3,
+        "status": "operation-failed"
+      },
+      "schema_version": 1,
+      "stage": "blend",
+      "tolerance": 0.001
+    },
+    "blend/simple/P9": {
+      "comparison": "unverified",
+      "result": {
+        "code": "UnsupportedTopology",
+        "error": "TRUCK_UNSUPPORTED_TOPOLOGY: The topology is outside the supported scope of this operation. (fillet_solid_edges / validate_input)",
+        "input_unchanged": true,
+        "selected_edges": 2,
+        "status": "operation-failed"
+      },
+      "schema_version": 1,
+      "stage": "blend",
+      "tolerance": 0.001
+    },
+    "blend/tolblend_simple/A2": {
+      "comparison": "unverified",
+      "result": {
+        "code": "UnsupportedTopology",
+        "error": "TRUCK_UNSUPPORTED_TOPOLOGY: The topology is outside the supported scope of this operation. (fillet_solid_edges / validate_input)",
+        "input_unchanged": true,
+        "selected_edges": 4,
+        "status": "operation-failed"
+      },
+      "schema_version": 1,
+      "stage": "blend",
+      "tolerance": 0.001
+    },
+    "draft/angle/A2": {
+      "comparison": "unverified",
+      "result": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 5972.050850294671,
+        "selected_edges": 2,
+        "status": "operation-succeeded",
+        "step_prepared": true
+      },
+      "schema_version": 1,
+      "stage": "output-consistency",
+      "tolerance": 0.001
+    },
+    "draft/angle/B5": {
+      "comparison": "unverified",
+      "result": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 13.392603882766146,
+        "selected_edges": 2,
+        "status": "operation-succeeded",
+        "step_prepared": true
+      },
+      "schema_version": 1,
+      "stage": "output-consistency",
+      "tolerance": 0.001
+    },
+    "draft/angle/C4": {
+      "comparison": "unverified",
+      "result": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 2988.3556155900446,
+        "selected_edges": 2,
+        "status": "operation-succeeded",
+        "step_prepared": true
+      },
+      "schema_version": 1,
+      "stage": "output-consistency",
+      "tolerance": 0.001
+    },
+    "feat/featlf/E2": {
+      "comparison": "unverified",
+      "result": {
+        "code": "UnsupportedTopology",
+        "error": "TRUCK_UNSUPPORTED_TOPOLOGY: The topology is outside the supported scope of this operation. (fillet_solid_edges / validate_input)",
+        "input_unchanged": true,
+        "selected_edges": 7,
+        "status": "operation-failed"
+      },
+      "schema_version": 1,
+      "stage": "blend",
+      "tolerance": 0.001
+    },
+    "feat/featlf/E3": {
+      "comparison": "unverified",
+      "result": {
+        "code": "UnsupportedTopology",
+        "error": "TRUCK_UNSUPPORTED_TOPOLOGY: The topology is outside the supported scope of this operation. (fillet_solid_edges / validate_input)",
+        "input_unchanged": true,
+        "selected_edges": 7,
+        "status": "operation-failed"
+      },
+      "schema_version": 1,
+      "stage": "blend",
+      "tolerance": 0.001
+    }
+  },
+  "sampled_comparisons": {
+    "draft/angle/A2": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 5972.101761241652,
+      "truck_volume": 5972.101761241659,
+      "native_to_truck_max_distance": 1.1102230246251565e-14,
+      "native_to_truck_samples": 1862,
+      "truck_to_native_max_distance": 3.8778423131653425e-15,
+      "truck_to_native_samples": 1862
+    },
+    "draft/angle/B5": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 13.396787978167854,
+      "truck_volume": 13.39678797816436,
+      "native_to_truck_max_distance": 1.679589791180427e-12,
+      "native_to_truck_samples": 1790,
+      "truck_to_native_max_distance": 1.744048299869566e-12,
+      "truck_to_native_samples": 1790
+    },
+    "draft/angle/C4": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 2988.7258887339763,
+      "truck_volume": 2988.7258887340026,
+      "native_to_truck_max_distance": 3.1086244689551734e-14,
+      "native_to_truck_samples": 1780,
+      "truck_to_native_max_distance": 5.329070518200751e-15,
+      "truck_to_native_samples": 1780
+    }
+  },
+  "independent_step_checks": {
+    "draft/angle/A2": "valid 1\nsolids 1\nvolume 5972.1017612416645\nexpected 5972.1017612416681\nabsolute_error 3.637978807091713e-12\nmax_edge_vertex_tolerance 9.9999999999999995e-08\n",
+    "draft/angle/B5": "valid 1\nsolids 1\nvolume 13.396787978164388\nexpected 13.39678797816957\nabsolute_error 5.1816329005305306e-12\nmax_edge_vertex_tolerance 9.9999999999999995e-08\n",
+    "draft/angle/C4": "valid 1\nsolids 1\nvolume 2988.7258887340031\nexpected 2988.725888734009\nabsolute_error 5.9117155615240335e-12\nmax_edge_vertex_tolerance 9.9999999999999995e-08\n"
+  },
+  "independent_volumes": {
+    "A2": 5972.101761241668,
+    "B5": 13.39678797816957,
+    "C4": 2988.725888734009
+  },
+  "independent_volume_relative_tolerance": 1e-06,
+  "release_tests": {
+    "passed": 380,
+    "failed": 0,
+    "ignored": 1,
+    "targets": 76
+  },
+  "replay_tests": {
+    "passed": 8,
+    "failed": 0,
+    "ignored": 0,
+    "targets": 1
+  },
+  "independent_checker_sha256": {
+    "target/inspect-polar-step": "8ba733150ff8088ea07eb21ecf213d906655905dbff4ee8f89b771cca74e8b2d",
+    "truck-benchmarks/results/2026-10-13-polar-cap-seams/inspect-polar-step.cpp": "7281a40d2d00f601932f4a98d5b7559e137e966e382602a3ac76a762fe99035d",
+    "target/occt-capture-plugin/compare_shapes": "476c2efb758a6c3f7b075f2fcbdddc1ccf07b54baca5dac934abe6420616bcf3",
+    "truck-benchmarks/results/2026-10-14-unequal-radii/independent-volumes.py": "c43aa7cada8ea0b59fc53d13959b97b05ee5edc3b6c385181d1fc1d352c59502"
+  },
+  "performance_claim": "None; action benchmark smoke only.",
+  "replay_artifact_sha256": {
+    "provenance.json": "aa64f49cb061de464fcc61216194307269a4e36f99fedc3203e46ffe0a62a20a",
+    "feat/featlf/E2/001.input.step": "ff74e1a47d3d99ba676bc45ddea85b251da3d4966678fb3e4e60dfffa4420037",
+    "feat/featlf/E2/001.input.brep": "31d1e12f3a0023b9bb994ee74517da0d5008ce2891961b2e56b9e2e9ac46f702",
+    "feat/featlf/E2/001.input.json": "bf0e018e937be5ea7102dbfc338a1c503a9a495aa93a2d5a65abb94481ade298",
+    "feat/featlf/E2/001.result.step": "1f5f38b7ec077022e65ec4cb18afe43da189394b5c77650171f3e74332c38942",
+    "feat/featlf/E2/001.result.brep": "55445d462ee7ae20a76762033ded6307925a7f8fa27648ba4f3c78c1f7d513db",
+    "feat/featlf/E2/001.result.json": "8ef3f3781efba91100362d81130ccddaf3214308e47837c825cf730acc2d2991",
+    "feat/featlf/E2/replay.log": "fd780c7b06cd872ae665b07553c03184ab99079e49b35b0a49682aaf4674ba67",
+    "feat/featlf/E2/001.truck.json": "22e3bfcf0f086e9dc78dc04b8048aaf980de18c41bafa9509e163579e623df67",
+    "feat/featlf/E3/001.input.step": "ff74e1a47d3d99ba676bc45ddea85b251da3d4966678fb3e4e60dfffa4420037",
+    "feat/featlf/E3/001.input.brep": "31d1e12f3a0023b9bb994ee74517da0d5008ce2891961b2e56b9e2e9ac46f702",
+    "feat/featlf/E3/001.input.json": "bf0e018e937be5ea7102dbfc338a1c503a9a495aa93a2d5a65abb94481ade298",
+    "feat/featlf/E3/001.result.step": "1f5f38b7ec077022e65ec4cb18afe43da189394b5c77650171f3e74332c38942",
+    "feat/featlf/E3/001.result.brep": "55445d462ee7ae20a76762033ded6307925a7f8fa27648ba4f3c78c1f7d513db",
+    "feat/featlf/E3/001.result.json": "8ef3f3781efba91100362d81130ccddaf3214308e47837c825cf730acc2d2991",
+    "feat/featlf/E3/replay.log": "fd780c7b06cd872ae665b07553c03184ab99079e49b35b0a49682aaf4674ba67",
+    "feat/featlf/E3/001.truck.json": "22e3bfcf0f086e9dc78dc04b8048aaf980de18c41bafa9509e163579e623df67",
+    "draft/angle/A2/001.input.step": "3167c4c3e1c86fc9df9f8532ab3538ea79b542be7361e9f97d0aed28604de2d0",
+    "draft/angle/A2/001.input.brep": "1156c9306f8c1ca6e859f2254b8aa4f577a93045c5c651fd6575f8f3338d598f",
+    "draft/angle/A2/001.input.json": "d4499949c668066818310f4503ff94f22cccaebe4ab08491231684c7fedf12f3",
+    "draft/angle/A2/001.result.step": "d6e4e850e0e1cde78ea0c419c0fdb78d92a741285fa50ea9e878e389d6ad2deb",
+    "draft/angle/A2/001.result.brep": "7845b913c96da1bbf05ae2c90fe0a8c4048c2a907b86017812c6da2f62fe5cc4",
+    "draft/angle/A2/001.result.json": "40bef8046968369505eb7fe33f0a813c7439627bf37d468514ea64d15709fc2d",
+    "draft/angle/A2/replay.log": "cca8b1f88debcb1d6620b601e2dfd751ad9997a5f417bd45cf296feccc9fbf3c",
+    "draft/angle/A2/001.truck.step": "16c10ffa689f0f79e7b2283fb76dc4c424a99665159ce2d389dbc64294567aa1",
+    "draft/angle/A2/001.truck.json": "cdb8a2646157a634323b498481a32483f5170184527184132cb199b6977dee99",
+    "draft/angle/A2/independent-step.txt": "4341eb97d2cae318359ea5b669da7bd5233ca01cb3d67d17af94580fedf5b18b",
+    "draft/angle/A2/comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "draft/angle/A2/001.comparison.json": "25270d8aa5174d1c653f8d2f793ae96e30f72e039deb60ea5880dd2edd04cdc0",
+    "draft/angle/B5/001.input.step": "d2a7c712edafb7e66970f0e3933afcfe5ce37d13dade0f21fcf5d19229b73fae",
+    "draft/angle/B5/001.input.brep": "ea9323c9d23edc4571e6df29b2198cfd862a4743f5c27035ebc80f972ff408f9",
+    "draft/angle/B5/001.input.json": "7e0ef7d21a94830655ddd2bbabce15464017a05129563f8cac2f957bcf3f0e8d",
+    "draft/angle/B5/001.result.step": "da88b1f938ca6e3a74088a072ebfa4b1909e39ec7f5f0512d8980bc65562bcfa",
+    "draft/angle/B5/001.result.brep": "9ab206c3a6d2b5de0fb91946036c6e1aaee0dd0866b20c894a5101dd690f1be9",
+    "draft/angle/B5/001.result.json": "6f6559b588dd15e41d19b79e8d243670f7451318c78a1c279dd98b88eacd6b35",
+    "draft/angle/B5/replay.log": "aa77d6e6294d57b585e7d97a8c9188eb8503fa549dbc40f67daef1555934fd7c",
+    "draft/angle/B5/001.truck.step": "0f3e4735a91c2a24d4d86ae3f19eeef5b4c26bc44a2598c308e54674f0a036ed",
+    "draft/angle/B5/001.truck.json": "2dd27770169a200534b0c9c6c70a2cc2ae6603fa923ebfb4051ce625be2169e0",
+    "draft/angle/B5/independent-step.txt": "3fabce2a05b177a89f78f593d6df2fd17327aec5c0bcd8b3f8fc8217b29b4d87",
+    "draft/angle/B5/comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "draft/angle/B5/001.comparison.json": "4d7f5d784959136dabe69b875b691b920832cf6fd9ed03e92ef8a72f62a7ba10",
+    "draft/angle/C4/001.input.step": "46957414429098d57904d03e9b78f360309a62cbe3c71bda76104cf586174dd5",
+    "draft/angle/C4/001.input.brep": "313a8f677d449c5741573fa7d24e3358e9ec6974973724da0519550b2a890655",
+    "draft/angle/C4/001.input.json": "45b29092827821ff02528b02c6c3a62ace02bcf27da477e36b2fe071e5f6912d",
+    "draft/angle/C4/001.result.step": "6e6049280cfb15bb70917ac0ab7c204f04ea7d7b1b2e7c7bd9cd089159a0add0",
+    "draft/angle/C4/001.result.brep": "24f09543d8ca8454716fc9b33bc919842cbb7deeba91614027b245aaabd25511",
+    "draft/angle/C4/001.result.json": "71d7b813d2eb3bf1bb33459ca1389b4eecab922d43521f6c07d124627adcdcee",
+    "draft/angle/C4/replay.log": "b5b8b9a3e88ce169f1da1083e6de5d87ff1c4efb069d7dc05c0422446c9fb353",
+    "draft/angle/C4/001.truck.step": "71da13d6dc7f6e0f05486dfb3bf3c12e09a72f3afbdc7025c15bfbae1501597d",
+    "draft/angle/C4/001.truck.json": "739c580948ea62cb53dab9a9e08eaf512bf8c1e1eedc5642c067903df934e686",
+    "draft/angle/C4/independent-step.txt": "ce288d6fc19fd6e38e4865c64ded52a616f7225c9a26438cbe47fd63cb4443aa",
+    "draft/angle/C4/comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "draft/angle/C4/001.comparison.json": "b3e6b46ecd74ecf16a8623f4b48dbd09b9769f18ced226e144250533e4c0b1f5",
+    "blend/tolblend_simple/A2/001.input.step": "237cd3b91c47e59555c3870e8fd10d32edbed664618ef15f560fc59eb8003db0",
+    "blend/tolblend_simple/A2/001.input.brep": "a6af0f06dfad5c0d3dec2a111a8fd7942607137391530138557b375989ebb525",
+    "blend/tolblend_simple/A2/001.input.json": "e93c192bcf2935d2bb9020a2075231284f97afef94a1839c3ccd817c08b4777e",
+    "blend/tolblend_simple/A2/001.result.step": "363653b2aec3297a03bfa9f560e27e2f67c89c52ad1652817963cc18e495dfe1",
+    "blend/tolblend_simple/A2/001.result.brep": "bd2a88bf29ed2a77579cbd602b3d0b8abd43258f1feca7ae4cf3bb4de2b7dd52",
+    "blend/tolblend_simple/A2/001.result.json": "85dd101566beb88f0ac1f0e75acd3c6c19af866f8849db3b7a16fb78b20b83cd",
+    "blend/tolblend_simple/A2/replay.log": "88d416ceef139345fee5128bbff7fee4f8deffff92d057dc39f411c8445312ce",
+    "blend/tolblend_simple/A2/001.truck.json": "042919a087d29a8e2d91ab4f789bcc50d740b6107a5c7599dc8de715f3973985",
+    "blend/simple/A4/001.input.step": "916725c05d2014cd91513ab5f180bd66c6b42193ea7020679a164913b44368fb",
+    "blend/simple/A4/001.input.brep": "2bb5f038118846a5d9fa689d8bf6639c962ca64925f94d832c0f953044d17e8d",
+    "blend/simple/A4/001.input.json": "f02e34b861cfefae11d73e5be75a0f0320b51341d3ff468bae7af348a670d524",
+    "blend/simple/A4/001.result.step": "efc8595bbc9af615893caa62d01a6069407fd16924d9f0ea42e8fc0b0a9278b3",
+    "blend/simple/A4/001.result.brep": "e15c6a0e95112f1ea3e285fc1dee8a493e5ecabb28f74a0bad9b17110e528b4e",
+    "blend/simple/A4/001.result.json": "1012f9bb1a6e8408d435782b849d6eb485432c865aad9077c13caf712b5611b9",
+    "blend/simple/A4/replay.log": "e96ca8f0a1c9bcb377906aa28605c22a2338ff044e310b0420b6d9c5e5b82fa8",
+    "blend/simple/A4/001.truck.json": "610bfaaa7bdefbea0df8286ca74927bc4785bb5cccf685ce5a6375c37b49f914",
+    "blend/simple/P9/001.input.step": "1b94f3a93e6f96d16507c06e644675e21edb835017d7ed8c63302631cd4e3419",
+    "blend/simple/P9/001.input.brep": "ba7f45c920880c2472c1041d395c9c34df22a9c3f054f8c0245a4b9c8215318f",
+    "blend/simple/P9/001.input.json": "6f2e3c10410388c31e0e004f4298920aa676d4b10dd63b10922e0d3921b30092",
+    "blend/simple/P9/001.result.step": "07d41612d9cde3e10c5c8f552f857f449e04d1e5b77c6351d6426e4f301045d4",
+    "blend/simple/P9/001.result.brep": "ae1239f58f00430f1b4b3bbb80c3af23732beb17257d2e1ef4cef5b37c1fa22f",
+    "blend/simple/P9/001.result.json": "54f3a41b1624644437c86edbf218cd69dc7eda2110923f86e055185c8db45515",
+    "blend/simple/P9/replay.log": "b0655a4b323b53dc7dc715df81a979a903329229071d19a43c357f8ec2df5e35",
+    "blend/simple/P9/001.truck.json": "060c236f9f7af4e7b35a0c09fd7f2a55d8e40f93c8cdd1f289b86e389f1b90fd"
+  },
+  "replay_archive_sha256": "f1b4cda3667f134d1f75be8ff72546b1e51976101adf633e7b7a33678e3292a8"
+}
