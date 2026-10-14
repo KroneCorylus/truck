@@ -1,0 +1,162 @@
+{
+  "parent": "2a0c0968ee57b2233069296da2fe932545ee0ccb",
+  "source_sha256": {
+    "CHANGELOG.md": "3df8c4bbd477f06b4552341014b22f7f1d30894196d5d2b3d16f63920b7acc39",
+    "truck-stepio/src/in/step_geometry/modeling_impls.rs": "f0d4ff261b2a3023122c490f2b965c14bd1f89e6e3f92e03bc5fbff1b06132ed",
+    "truck-stepio/src/in/step_geometry/sphere.rs": "5cf8f389468127e305a8995423c64eb2a5cd1fe8d9dc8e7a35b3e74e4518e494",
+    "truck-stepio/tests/spherical_import_pcurves.rs": "1bb383eba6c7178cf9edbcd077a6485f55d247c0b08825d060c83d9d3eca52df",
+    "truck-shapeops/tests/imported_spherical_pcurves.rs": "71410dfa77c788a72fb636faa5a87129577e11d1e099ca7295529e9545e7a83c",
+    "truck-shapeops/tests/fixtures/spherical-pcurves/F1.step": "cf4a66c00cf04e14785fa8e934eb945b0fdb8c79d51e5292599886a8c18f3c50",
+    "truck-shapeops/tests/fixtures/spherical-pcurves/README.md": "f8fe91ae5922ed066757369d680d91d0f5d3221879d848df434b40c4e06a78e5"
+  },
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "truck-stepio",
+        "-p",
+        "truck-shapeops",
+        "--no-fail-fast"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "truck-shapeops",
+        "--example",
+        "replay_occt_blend"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--release",
+        "-p",
+        "truck-stepio",
+        "-p",
+        "truck-shapeops",
+        "-p",
+        "truck-benchmarks",
+        "--all-targets"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "bench",
+        "-p",
+        "truck-benchmarks",
+        "--bench",
+        "actions",
+        "--",
+        "--test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--release",
+        "-p",
+        "truck-shapeops",
+        "--example",
+        "replay_occt_blend"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "replay_sha256": "794aae4c375e295cb58124d391f46788ce3881af07759ff814ad95e119b37d43",
+  "native_archive": "audits/fillet-chamfer/capture/2026-10-14-unequal-radii/artifacts.zip",
+  "native_archive_sha256": "7a5608fdb1e5ee58f7ffbf830b6a4fd9b8f1e8e73dbc3a554b547ecdfe21b1cd",
+  "native_artifact_sha256": {
+    "draft/angle/F1/capture/001.input.step": "cf4a66c00cf04e14785fa8e934eb945b0fdb8c79d51e5292599886a8c18f3c50",
+    "draft/angle/F1/capture/001.input.brep": "5dd4ddbb1555473b91b6238dc5ff3bf938d090d4d220411a0870ff9dd5b54da5",
+    "draft/angle/F1/capture/001.input.json": "d1bf04005b96d85c52a9d62f5aa1ec67de79ee50570a082d269729ea10fa18ff",
+    "draft/angle/F1/capture/001.result.step": "c907dd90b2762abd885c018cf89642d340fcf332e0c0b06d44422a61aad74ddb",
+    "draft/angle/F1/capture/001.result.brep": "668275b3eae4dd62b72cbe0fe4488a6d0f5592d7ee3981becdd2d75d1aae161f",
+    "draft/angle/F1/capture/001.result.json": "8416a9c3220b8dc88992b973aefdda491a29c03fa09cc3e49c02c2c1342507f7"
+  },
+  "targeted_result": {
+    "comparison": "unverified",
+    "result": {
+      "geometry_consistent": true,
+      "input_unchanged": true,
+      "mesh_closed": true,
+      "mesh_volume": 21453.370065536375,
+      "selected_edges": 1,
+      "status": "operation-succeeded",
+      "step_prepared": true
+    },
+    "schema_version": 1,
+    "stage": "output-consistency",
+    "tolerance": 0.001
+  },
+  "sampled_comparison": {
+    "schema_version": 1,
+    "comparison": "sampled-only",
+    "native_valid": true,
+    "truck_step_valid": true,
+    "native_solids": 1,
+    "truck_solids": 1,
+    "native_volume": 21454.33112338711,
+    "truck_volume": 21454.33082140236,
+    "native_to_truck_max_distance": 1.1853237093760647e-06,
+    "native_to_truck_samples": 1722,
+    "truck_to_native_max_distance": 1.9099509390187486e-06,
+    "truck_to_native_samples": 1905
+  },
+  "independent_step_check": "valid 1\nsolids 1\nvolume 21454.330821521886\nexpected 21454.331120055493\nabsolute_error 0.00029853360683773644\nmax_edge_vertex_tolerance 3.2508040958485199e-06\n",
+  "independent_volumes": {
+    "input": 21467.43404299306,
+    "fillet": 21454.331120055493
+  },
+  "independent_volume_relative_tolerance": 1e-07,
+  "release_tests": {
+    "passed": 493,
+    "failed": 0,
+    "ignored": 1,
+    "targets": 96
+  },
+  "replay_tests": {
+    "passed": 8,
+    "failed": 0,
+    "ignored": 0,
+    "targets": 1
+  },
+  "independent_checker_sha256": {
+    "target/inspect-polar-step": "8ba733150ff8088ea07eb21ecf213d906655905dbff4ee8f89b771cca74e8b2d",
+    "truck-benchmarks/results/2026-10-13-polar-cap-seams/inspect-polar-step.cpp": "7281a40d2d00f601932f4a98d5b7559e137e966e382602a3ac76a762fe99035d",
+    "target/occt-capture-plugin/compare_shapes": "476c2efb758a6c3f7b075f2fcbdddc1ccf07b54baca5dac934abe6420616bcf3",
+    "truck-benchmarks/results/2026-10-14-spherical-pcurves/independent-volume.py": "d539ef25322de99f5d39b0f131a9ca7978fa69923a05e841b5b43b76745b7513"
+  },
+  "performance_claim": "None; action benchmark smoke only.",
+  "replay_artifact_sha256": {
+    "001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "001.input.brep": "5dd4ddbb1555473b91b6238dc5ff3bf938d090d4d220411a0870ff9dd5b54da5",
+    "001.input.json": "d1bf04005b96d85c52a9d62f5aa1ec67de79ee50570a082d269729ea10fa18ff",
+    "001.input.step": "cf4a66c00cf04e14785fa8e934eb945b0fdb8c79d51e5292599886a8c18f3c50",
+    "001.result.brep": "668275b3eae4dd62b72cbe0fe4488a6d0f5592d7ee3981becdd2d75d1aae161f",
+    "001.result.json": "8416a9c3220b8dc88992b973aefdda491a29c03fa09cc3e49c02c2c1342507f7",
+    "001.result.step": "c907dd90b2762abd885c018cf89642d340fcf332e0c0b06d44422a61aad74ddb",
+    "001.truck.json": "cd2c1279f99ba1bbdb024f2c99a22b9f1e351ef2e4507b11a7585238a48bf5a8",
+    "001.truck.log": "0f23dc063e162cf9ede01ec21ff521560621b5c30dbff36aef0ea670d6a68735",
+    "replay.log": "3bb17d549af27cce222de753edde29bbf4f2c4d6ff2acb826450c8cf5774a96e",
+    "001.truck.step": "b1a79c34b615a74f452aba2541eb8bd0ffd820a8aab2f9ce2a89a92711dd7427",
+    "independent-step.txt": "c4f9423dc76dc366b0c316c91fc3c583338c606a4d064c742b59c89124486d8e",
+    "comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "001.comparison.json": "f5335fea2b0b2ef01fbb3fe1914b942255956888d0cf83a811d856c53c40c869",
+    "provenance.json": "f023be09e56304b0be3f7460d5cd7551be0057364b2eaae8f1bb0c8dd18e98bc"
+  },
+  "replay_archive_sha256": "d9869c30e7325833874f11d72b09e93816aa81c68e6ad8df0e7c5cc95ad4001a"
+}

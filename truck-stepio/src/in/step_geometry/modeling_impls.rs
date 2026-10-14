@@ -6,7 +6,7 @@
 //! Linear pcurves on planes and cylindrical generators become exact spatial lines.
 //! Isoparametric pcurves on toroidal surfaces become exact spatial circles.
 //! Isoparametric pcurves on spline surfaces become exact spatial splines.
-//! Other linear pcurves on cylinders, cones and tori retain their exact surface coordinates.
+//! Other linear pcurves on cylinders, cones, spheres and tori retain their exact geometry.
 //! Linear pcurves on extruded lines, ellipses and splines retain their exact surface coordinates.
 //! Other pcurves are rejected.
 //!
@@ -86,6 +86,9 @@ impl TryFrom<&Curve3D> for ModelingCurve {
                     return Err("degenerate imported pcurve".into());
                 }
                 match pcurve.surface().as_ref() {
+                    Surface::ElementarySurface(ElementarySurface::Sphere(surface)) => {
+                        return spherical_pcurve(surface, line);
+                    }
                     Surface::ElementarySurface(ElementarySurface::ToroidalSurface(surface)) => {
                         return toroidal_pcurve(surface, line);
                     }
@@ -161,6 +164,30 @@ impl TryFrom<&Curve3D> for ModelingCurve {
             }
         })
     }
+}
+
+fn spherical_pcurve(
+    surface: &SphericalSurface,
+    line: &Line<Point2>,
+) -> std::result::Result<ModelingCurve, StepConvertingError> {
+    let transform = surface.transform();
+    if (0..4).any(|i| (0..4).any(|j| !transform[i][j].is_finite())) || transform.invert().is_none()
+    {
+        return Err("invalid imported pcurve transform".into());
+    }
+    // STEP uses (longitude, latitude); the modeling sphere uses (colatitude, longitude).
+    let map = |p: Point2| {
+        let (longitude, latitude) = if surface.orientation() {
+            (p.x, p.y)
+        } else {
+            (p.y, p.x)
+        };
+        Point2::new(PI / 2. - latitude, longitude)
+    };
+    parameter_pcurve(
+        ModelingSurface::Sphere(Processor::with_transform(surface.entity().0, *transform)),
+        &Line(map(line.0), map(line.1)),
+    )
 }
 
 fn elementary_pcurve(

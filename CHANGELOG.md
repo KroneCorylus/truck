@@ -6,6 +6,8 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Preserve linear STEP parameter curves on spheres through an exact longitude/latitude coordinate map, including inverted and affine support placements. Correct spherical mixed derivative order and sign. Regressions cover points, derivatives, cutting, invalid geometry, and the hemisphere/box F1 input and fillet with independent material, radius, normals, face history, closed meshes and STEP.
+
 - Added `try_fillet_solid_edges_with_radii` for atomic constant-radius fillets on separate straight edges, including plane/cylinder lips. Equal radii retain existing solid-fillet behavior; unequal-radius corners remain unsupported. The native replay now preserves per-edge radii and rejects conflicting assignments.
 
 - Equal-radius solid fillets can round multiple closed tangent contours with distinct support faces atomically. Selection order is stable, original-to-final face history is retained, and shared trims remain unsupported.

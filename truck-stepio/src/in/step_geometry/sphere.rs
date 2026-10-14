@@ -6,7 +6,7 @@ impl ParametricSurface for Sphere {
     type Vector = Vector3;
     #[inline]
     fn der_mn(&self, m: usize, n: usize, u: f64, v: f64) -> Self::Vector {
-        self.0.der_mn(m, n, PI / 2.0 - v, u) * (-1f64).powi(m as i32)
+        self.0.der_mn(n, m, PI / 2.0 - v, u) * if n.is_multiple_of(2) { 1. } else { -1. }
     }
     #[inline]
     fn subs(&self, u: f64, v: f64) -> Point3 { self.0.subs(PI / 2.0 - v, u) }
