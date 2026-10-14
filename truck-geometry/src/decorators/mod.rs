@@ -338,6 +338,8 @@ pub struct RbfSurface<C, S0, S1, R> {
     surface0: S0,
     surface1: S1,
     radius: R,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    support_hints: Option<[(f64, f64); 2]>,
 }
 
 /// the orbit curve of contact point of rolling ball fillet surface

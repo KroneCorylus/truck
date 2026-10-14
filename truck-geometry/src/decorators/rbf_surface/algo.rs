@@ -36,53 +36,57 @@ where
     /// assert_near!(cp1.uv, Point2::new(r, t));
     /// ```
     pub fn contact_circle(&self, t: f64) -> Option<ContactCircle> {
+        let hints = self.search_hints()?;
         let poc = (self.edge_curve.subs(t), self.edge_curve.der(t));
         let radius = self.radius.subs(t);
-        ContactCircle::try_new(poc, t, &self.surface0, &self.surface1, radius).or_else(|| {
-            // The guide can lie at a parameter pole while its offset contacts are regular.
-            let (a, b) = self.edge_curve.try_range_tuple()?;
-            if !t.is_finite()
-                || !radius.is_finite()
-                || radius == 0.0
-                || !a.is_finite()
-                || !b.is_finite()
-                || a >= b
-            {
-                return None;
-            }
-            let step = (b - a) / 64.;
-            for shift in [-1., 1., -4., 4., -16., 16.] {
-                let v = (t + shift * step).clamp(a, b);
-                if v == t {
-                    continue;
+        ContactCircle::try_new(poc, t, &self.surface0, &self.surface1, radius, hints).or_else(
+            || {
+                // The guide can lie at a parameter pole while its offset contacts are regular.
+                let (a, b) = self.edge_curve.try_range_tuple()?;
+                if !t.is_finite()
+                    || !radius.is_finite()
+                    || radius == 0.0
+                    || !a.is_finite()
+                    || !b.is_finite()
+                    || a >= b
+                {
+                    return None;
                 }
-                if let Some(seed) = ContactCircle::try_new(
-                    (self.edge_curve.subs(v), self.edge_curve.der(v)),
-                    v,
-                    &self.surface0,
-                    &self.surface1,
-                    self.radius.subs(v),
-                ) {
-                    let cp0 = seed.contact_point0();
-                    let cp1 = seed.contact_point1();
-                    let sign = (seed.center() - cp0.point)
-                        .dot(self.surface0.normal(cp0.uv.x, cp0.uv.y))
-                        .signum()
-                        * self.radius.subs(v).signum();
-                    if let Some(cc) = ContactCircle::try_from_contacts(
-                        poc,
-                        t,
+                let step = (b - a) / 64.;
+                for shift in [-1., 1., -4., 4., -16., 16.] {
+                    let v = (t + shift * step).clamp(a, b);
+                    if v == t {
+                        continue;
+                    }
+                    if let Some(seed) = ContactCircle::try_new(
+                        (self.edge_curve.subs(v), self.edge_curve.der(v)),
+                        v,
                         &self.surface0,
                         &self.surface1,
-                        sign * radius,
-                        [cp0.uv, cp1.uv],
+                        self.radius.subs(v),
+                        hints,
                     ) {
-                        return Some(cc);
+                        let cp0 = seed.contact_point0();
+                        let cp1 = seed.contact_point1();
+                        let sign = (seed.center() - cp0.point)
+                            .dot(self.surface0.normal(cp0.uv.x, cp0.uv.y))
+                            .signum()
+                            * self.radius.subs(v).signum();
+                        if let Some(cc) = ContactCircle::try_from_contacts(
+                            poc,
+                            t,
+                            &self.surface0,
+                            &self.surface1,
+                            sign * radius,
+                            [cp0.uv, cp1.uv],
+                        ) {
+                            return Some(cc);
+                        }
                     }
                 }
-            }
-            None
-        })
+                None
+            },
+        )
     }
 
     /// Calculate higher-order derivatives of the center curve and the contact curves.
@@ -590,13 +594,15 @@ where
             surface0,
             surface1,
             radius,
+            ..
         } = &self;
+        let hints = self.search_hints()?;
 
         let t0 = edge_curve.search_nearest_parameter(point, hint, trials)?;
         let p0 = edge_curve.subs(t0);
         let ((u00, v00), (u10, v10)) = (
-            surface0.search_parameter(p0, None, trials)?,
-            surface1.search_parameter(p0, None, trials)?,
+            surface0.search_parameter(p0, hints[0], trials)?,
+            surface1.search_parameter(p0, hints[1], trials)?,
         );
         let (n0, n1) = (surface0.normal(u00, v00), surface1.normal(u10, v10));
         let sign = -f64::signum(n0.cross(n1).dot(edge_curve.der(t0)))
@@ -680,7 +686,9 @@ where
             surface0,
             surface1,
             radius,
+            ..
         } = self;
+        let hints = self.search_hints()?;
         let curve_hint = match hint.into() {
             SPHint2D::Parameter(_, v) => SPHint1D::Parameter(v),
             SPHint2D::Range(_, (v0, v1)) => SPHint1D::Range(v0, v1),
@@ -689,14 +697,14 @@ where
         let mut t = edge_curve.search_nearest_parameter(point, curve_hint, trials)?;
         let mut c = edge_curve.subs(t);
         let ((mut u0, mut v0), (mut u1, mut v1)) = (
-            surface0.search_nearest_parameter(point, None, trials)?,
-            surface1.search_nearest_parameter(point, None, trials)?,
+            surface0.search_nearest_parameter(point, hints[0], trials)?,
+            surface1.search_nearest_parameter(point, hints[1], trials)?,
         );
 
         let (n0, n1) = (surface0.normal(u0, v0), surface1.normal(u1, v1));
         let sign = -f64::signum(n0.cross(n1).dot(edge_curve.der(t)));
 
-        let (p0, p1) = (0..=trials).find_map(|_i| {
+        let _ = (0..=trials).find_map(|_i| {
             let eders = edge_curve.ders(2, t);
             let (p, der, der2) = (Point3::from_vec(eders[0]), eders[1], eders[2]);
             let rders = radius.ders(1, t);
@@ -726,7 +734,7 @@ where
             }
             let center_contact0 = (p0 + r * n0).near(&c);
             let center_contact1 = (p1 + r * n1).near(&c);
-            let same_plane = pp0.cross(pp1).dot(pc).so_small2();
+            let same_plane = pp0.cross(pp1).normalize().dot(pc).so_small();
             if center_contact0 && center_contact1 && same_plane {
                 return Some((p0, p1));
             }
@@ -739,7 +747,7 @@ where
                     n1.dot(p1.to_vec()) + r,
                 );
                 let c_next1 = Vector3::new(der.dot(der) - der2.dot(pc), r_der, r_der);
-                mat.invert().unwrap() * PointVector3(c_next0, c_next1)
+                mat.invert()? * PointVector3(c_next0, c_next1)
             };
 
             let duv0 = {
@@ -748,7 +756,7 @@ where
                     vder0 + r * surface0.normal_vder(u0, v0),
                     n0,
                 );
-                mat.invert().unwrap() * (c_next - PointVector3(p0 + r * n0, r_der * n0))
+                mat.invert()? * (c_next - PointVector3(p0 + r * n0, r_der * n0))
             };
             debug_assert!(duv0.0.z.so_small() && duv0.1.z.so_small(), "{duv0:?}");
 
@@ -758,7 +766,7 @@ where
                     vder1 + r * surface1.normal_vder(u1, v1),
                     n1,
                 );
-                mat.invert().unwrap() * (c_next - PointVector3(p1 + r * n1, r_der * n1))
+                mat.invert()? * (c_next - PointVector3(p1 + r * n1, r_der * n1))
             };
             debug_assert!(duv1.0.z.so_small() && duv1.1.z.so_small(), "{duv1:?}");
 
@@ -782,7 +790,13 @@ where
             None
         })?;
 
-        let (cp0, cp1, cp) = (p0 - c, p1 - c, point - c);
+        // Recover the angle on the evaluated section, not the iteration's approximate circle.
+        let circle = self.contact_circle(t)?;
+        let (cp0, cp1, cp) = (
+            circle.contact_point0.point - circle.center,
+            circle.contact_point1.point - circle.center,
+            point - circle.center,
+        );
         let theta = cp.angle(cp0);
         let rot = Matrix3::from_axis_angle(cp0.cross(cp1).normalize(), theta);
         match (rot * cp0).near(&cp) {
@@ -871,14 +885,16 @@ where
             surface0,
             surface1,
             radius,
+            ..
         } = self;
+        let hints = self.search_hints()?;
         let (mut t, mut s, mut w) = (edge_hint, adjacent_hint, 0.0);
         let mut c = seed.map_or_else(|| edge_curve.subs(t), ContactCircle::center);
         let ((mut u0, mut v0), (mut u1, mut v1)) = match seed {
             Some(cc) => (cc.contact_point0().uv.into(), cc.contact_point1().uv.into()),
             None => (
-                surface0.search_parameter(c, None, trials)?,
-                surface1.search_parameter(c, None, trials)?,
+                surface0.search_parameter(c, hints[0], trials)?,
+                surface1.search_parameter(c, hints[1], trials)?,
             ),
         };
         let (n0, n1) = (surface0.normal(u0, v0), surface1.normal(u1, v1));

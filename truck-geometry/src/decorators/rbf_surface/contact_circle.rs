@@ -32,6 +32,7 @@ impl ContactCircle {
         surface0: &impl FilletableSurface,
         surface1: &impl FilletableSurface,
         radius: f64,
+        hints: [Option<(f64, f64)>; 2],
     ) -> Option<Self> {
         let (p, der) = point_on_curve;
         if !t.is_finite()
@@ -40,8 +41,8 @@ impl ContactCircle {
         {
             return None;
         }
-        let (u0, v0) = surface0.search_parameter(p, None, 100)?;
-        let (u1, v1) = surface1.search_parameter(p, None, 100)?;
+        let (u0, v0) = surface0.search_parameter(p, hints[0], 100)?;
+        let (u1, v1) = surface1.search_parameter(p, hints[1], 100)?;
         let (n0, n1) = (surface0.normal(u0, v0), surface1.normal(u1, v1));
         let sign = -f64::signum(n0.cross(n1).dot(der));
         Self::try_from_contacts(

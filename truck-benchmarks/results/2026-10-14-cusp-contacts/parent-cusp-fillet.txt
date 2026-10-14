@@ -1,0 +1,21 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 3.58s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/imported_closed_bezier_prisms.rs (target/release/deps/imported_closed_bezier_prisms-7ce574521e444d07)
+
+running 1 test
+
+thread 'cubic_cusp_fillet_preserves_radius_normals_material_and_step' (73957) panicked at truck-shapeops/tests/imported_closed_bezier_prisms.rs:170:10:
+called `Result::unwrap()` on an `Err` value: Diagnostic { code: BlendConstructionFailed, operation: "fillet_solid_along_wire", stage: "find_contact", message: "Blend construction failed; the numerical or geometric constraint could not be resolved.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: Some(0), related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test cubic_cusp_fillet_preserves_radius_normals_material_and_step ... FAILED
+
+failures:
+
+failures:
+    cubic_cusp_fillet_preserves_radius_normals_material_and_step
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p truck-shapeops --test imported_closed_bezier_prisms`

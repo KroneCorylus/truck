@@ -1,0 +1,29 @@
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+    Finished `release` profile [optimized] target(s) in 1.85s
+     Running tests/rbf_inverse_residual.rs (target/release/deps/rbf_inverse_residual-11a03adb90eb5018)
+
+running 2 tests
+test singular_support_inverse_fails_without_panicking ... FAILED
+test rolling_surface_inverse_uses_the_evaluated_contact_circle ... FAILED
+
+failures:
+
+---- singular_support_inverse_fails_without_panicking stdout ----
+
+thread 'singular_support_inverse_fails_without_panicking' (82506) panicked at truck-geometry/src/decorators/rbf_surface/algo.rs:742:30:
+called `Option::unwrap()` on a `None` value
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- rolling_surface_inverse_uses_the_evaluated_contact_circle stdout ----
+
+thread 'rolling_surface_inverse_uses_the_evaluated_contact_circle' (82505) panicked at truck-geometry/tests/rbf_inverse_residual.rs:45:17:
+scale=0.01 uv=(0.2,0) found=(0.19998339811646473,-0.000000000000022590259356611494)
+
+
+failures:
+    rolling_surface_inverse_uses_the_evaluated_contact_circle
+    singular_support_inverse_fails_without_panicking
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-geometry --test rbf_inverse_residual`

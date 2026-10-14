@@ -10,6 +10,30 @@ impl<C, S0, S1, R> RbfSurface<C, S0, S1, R> {
             surface0,
             surface1,
             radius,
+            support_hints: None,
+        }
+    }
+
+    /// Selects the parameter branch on each support when the guide has multiple inverses.
+    /// The hints are in the respective support coordinates; nonfinite hints are rejected.
+    pub fn try_with_support_hints(mut self, hints: [(f64, f64); 2]) -> Option<Self> {
+        if hints.iter().any(|(u, v)| !u.is_finite() || !v.is_finite()) {
+            return None;
+        }
+        self.support_hints = Some(hints);
+        Some(self)
+    }
+
+    /// Returns the initial parameter hints for the two support surfaces.
+    pub const fn support_hints(&self) -> Option<[(f64, f64); 2]> { self.support_hints }
+
+    fn search_hints(&self) -> Option<[Option<(f64, f64)>; 2]> {
+        match self.support_hints {
+            None => Some([None; 2]),
+            Some(hints) => hints
+                .iter()
+                .all(|(u, v)| u.is_finite() && v.is_finite())
+                .then_some(hints.map(Some)),
         }
     }
 
@@ -201,6 +225,7 @@ impl<C, S0, S1, R> From<RbfSurface<C, S0, S1, R>> for RbfSurface<Box<C>, Box<S0>
             surface0: Box::new(value.surface0),
             surface1: Box::new(value.surface1),
             radius: value.radius,
+            support_hints: value.support_hints,
         }
     }
 }
@@ -276,6 +301,7 @@ where
                 surface0: self.surface.surface0.clone(),
                 surface1: self.surface.surface1.clone(),
                 radius: self.surface.radius.clone(),
+                support_hints: self.surface.support_hints,
             },
             index: self.index,
         }
@@ -295,6 +321,7 @@ where
                 surface0: self.surface.surface1.clone(),
                 surface1: self.surface.surface0.clone(),
                 radius: self.surface.radius.inverse(),
+                support_hints: self.surface.support_hints.map(|[a, b]| [b, a]),
             },
             index: 1 - self.index,
         }
@@ -303,6 +330,7 @@ where
         self.surface.edge_curve.invert();
         std::mem::swap(&mut self.surface.surface0, &mut self.surface.surface1);
         self.surface.radius.invert();
+        self.surface.support_hints = self.surface.support_hints.map(|[a, b]| [b, a]);
         self.index = 1 - self.index;
     }
 }
@@ -347,6 +375,7 @@ where
                 surface0: &self.surface.surface1,
                 surface1: &self.surface.surface0,
                 radius: &self.surface.radius,
+                support_hints: self.surface.support_hints.map(|[a, b]| [b, a]),
             }
             .search_contact_curve0_parameter(point, hint, trials, false),
         }
@@ -391,6 +420,7 @@ impl<C, S0, S1, R> From<RbfContactCurve<C, S0, S1, R>>
                 surface0: value.surface.surface0.into(),
                 surface1: value.surface.surface1.into(),
                 radius: value.surface.radius,
+                support_hints: value.surface.support_hints,
             },
             index: value.index,
         }

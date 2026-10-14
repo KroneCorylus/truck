@@ -450,13 +450,39 @@ where
                         },
                     ]
                 });
-            Ok(RbfSurface::new(
+            let supports = sides[k].map(|i| shell[i].oriented_surface());
+            let point = curve.subs((t0 + t1) / 2.);
+            let hints = std::array::from_fn::<_, 2, _>(|side| {
+                let points = std::iter::once(point).chain(
+                    shell[sides[k][side]].edge_iter().flat_map(|edge| {
+                        let curve = edge.oriented_curve();
+                        algo::curve::parameter_division(&curve, curve.range_tuple(), tol).1
+                    }),
+                );
+                algo::surface::boundary_search_hint(&supports[side], points, |s, p, h| {
+                    s.search_parameter(p, h, 100)
+                })
+            });
+            let support_hints = if hints.iter().any(Option::is_some) {
+                Some([
+                    supports[0]
+                        .search_parameter(point, hints[0], 100)
+                        .ok_or_else(failed)?,
+                    supports[1]
+                        .search_parameter(point, hints[1], 100)
+                        .ok_or_else(failed)?,
+                ])
+            } else {
+                None
+            };
+            let [surface0, surface1] = supports;
+            let rbf = RbfSurface::new(
                 ExtendedSpine {
                     current: curve,
                     neighbors,
                 },
-                shell[sides[k][0]].oriented_surface(),
-                shell[sides[k][1]].oriented_surface(),
+                surface0,
+                surface1,
                 ContinuedRadius {
                     current: EdgeRadius {
                         radius: radius.clone(),
@@ -467,7 +493,11 @@ where
                     range: (t0, t1),
                     neighbors: neighbor_radii,
                 },
-            ))
+            );
+            match support_hints {
+                Some(hints) => rbf.try_with_support_hints(hints).ok_or_else(failed),
+                None => Ok(rbf),
+            }
         })
         .collect::<Result<_, _>>()?;
     let mut ranges: Vec<(f64, f64)> = rbfs
