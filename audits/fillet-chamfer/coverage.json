@@ -94,7 +94,7 @@
         "fillet"
       ],
       "occt_scope": "Constant-radius contours with analytic special cases.",
-      "truck_scope": "Convex and concave local planar constructions have independent volume and mesh regressions.",
+      "truck_scope": "Convex and concave local planar constructions have independent volume and mesh regressions. The solid API also accepts separate straight edges with independent constant radii, with original-to-final history and atomic failure.",
       "next_case": "Pair box, wedge, tetrahedron and cavity cases; compare contact radius and retained volume.",
       "evidence": [
         {
@@ -126,11 +126,24 @@
           "path": "truck-shapeops/tests/short_spine_fillets.rs",
           "find": "fn planar_end_faces_trim_a_fillet_wider_than_its_spine",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/modeling.rs",
+          "find": "pub fn try_fillet_solid_edges_with_radii(",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/unequal_fillet_radii.rs",
+          "find": "fn unequal_straight_radii_preserve_material_normals_history_and_step",
+          "role": "test"
         }
       ],
       "required_outcome": "Round selected planar-solid edges to the requested constant radius, for convex and concave material, while preserving a valid solid.",
       "verification": [
-        "At d1b2bade, planar-ended fillets can be wider than their spine when the trimmed positive-weight rational patch fits every original convex half-space. The parent fails the length-0.2/radius-0.5 case. Thirty-six operations cover lengths 0.2/1/10, radii 0.5/10, perpendicular and oblique caps, and rigid transforms, with independent radius/normal/end-bound/volume checks, topology, closed meshes, history, immutable inputs and STEP. Full shapeops: 310 passed, 0 failed, 1 existing ignored; Clippy and action benchmark smoke pass. Evidence: truck-benchmarks/results/2026-10-11-short-spine-fillets/REPORT.md."
+        "At d1b2bade, planar-ended fillets can be wider than their spine when the trimmed positive-weight rational patch fits every original convex half-space. The parent fails the length-0.2/radius-0.5 case. Thirty-six operations cover lengths 0.2/1/10, radii 0.5/10, perpendicular and oblique caps, and rigid transforms, with independent radius/normal/end-bound/volume checks, topology, closed meshes, history, immutable inputs and STEP. Full shapeops: 310 passed, 0 failed, 1 existing ignored; Clippy and action benchmark smoke pass. Evidence: truck-benchmarks/results/2026-10-11-short-spine-fillets/REPORT.md.",
+        "At 35c6e2cf, per-edge constant radii recover draft/angle/A2 (box) and B5 (acute wedge). Three placements/scales and both selection orders check independently derived material, rolling radii/normals, complete history, unchanged input, closed meshes and STEP. Equal-radius all-edge cube and empty selections retain existing behavior. No lower-level geometric construction algorithm changed."
       ]
     },
     {
@@ -181,7 +194,7 @@
         "variable-radius"
       ],
       "occt_scope": "Per-edge/contour radii and general corner filling.",
-      "truck_scope": "Equal-radius joined corners are covered. The inspected multi-edge entry point accepts one common radius, but this alone does not prove unequal-radius corners impossible through other constructions. A valid unequal-radius joined result has not been established.",
+      "truck_scope": "Equal-radius joined corners are covered. The solid API now supports per-edge radii on separate straight edges, but rejects shared selected vertices when radii differ. Unequal-radius joined results remain unverified; the five captured connected unequal-radius selections now reach the kernel and fail with UnsupportedTopology.",
       "next_case": "Three edges at a corner with radii 1, 2 and 3, convex then mixed concavity. Try existing joint and composed constructions; judge the resulting contacts, continuity and solid validity.",
       "evidence": [
         {
@@ -201,9 +214,18 @@
           "path": "truck-shapeops/src/fillet/modeling.rs",
           "find": "pub fn fillet_solid_edges",
           "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-14-unequal-radii/REPORT.md",
+          "find": "# Per-edge radii",
+          "role": "test"
         }
       ],
-      "required_outcome": "Create a valid joined corner where incident edge fillets have different specified radii, with the intended contacts and continuity."
+      "required_outcome": "Create a valid joined corner where incident edge fillets have different specified radii, with the intended contacts and continuity.",
+      "verification": [
+        "The replay no longer labels unequal radii as unhandled. blend/simple/A4,P9; blend/tolblend_simple/A2; feat/featlf/E2,E3 now return UnsupportedTopology with unchanged inputs. This is clearer attempted coverage, not successful corner construction. General unequal-radius corners remain open."
+      ]
     },
     {
       "id": "F04",
@@ -513,7 +535,7 @@
         "cylinder"
       ],
       "occt_scope": "Analytic line/circle special cases plus generic walking.",
-      "truck_scope": "Straight axial lips, circular rims, holes and channels have tests; this does not cover all oblique intersections.",
+      "truck_scope": "Straight axial lips, circular rims, holes and channels have tests; this does not cover all oblique intersections. Separate axial lips can use different radii in one atomic solid operation; the semiannulus regression checks independent circular-area material and rolling-cylinder normals.",
       "next_case": "Compare convex/concave lips, hole/boss rims, and a tilted plane cutting a cylinder.",
       "evidence": [
         {
@@ -557,11 +579,24 @@
           "path": "truck-benchmarks/results/2026-10-11-imported-support-domains/REPORT.md",
           "find": "# Imported extrusion support domains",
           "role": "verification"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/fixtures/unequal-radii/model.rs",
+          "find": "fn circular_corner_area(",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-14-unequal-radii/REPORT.md",
+          "find": "# Per-edge radii",
+          "role": "test"
         }
       ],
       "required_outcome": "Blend lips and rims formed by planes and cylinders, for holes, bosses and channels in either material sense.",
       "verification": [
-        "At 4a3e11d4, imported cylinders and conic extrusions receive finite support domains bounded by their complete rational boundary control hulls. Affine conic inclusion/search preserves elliptical, sheared and oblique sweeps; cylinder conversion retains the fitted height and STEP export measures perpendicular radius. Native F8, eight cylinder variants, curved extrema and bounded/off-surface checks pass. Full release modeling/shapeops/STEP: 488 passed, 0 failed, 3 existing ignored; Clippy and action smoke pass. This resolves the previously recorded finite extrusion domain failures; unsupported boundary representations and other import failures remain open."
+        "At 4a3e11d4, imported cylinders and conic extrusions receive finite support domains bounded by their complete rational boundary control hulls. Affine conic inclusion/search preserves elliptical, sheared and oblique sweeps; cylinder conversion retains the fitted height and STEP export measures perpendicular radius. Native F8, eight cylinder variants, curved extrema and bounded/off-surface checks pass. Full release modeling/shapeops/STEP: 488 passed, 0 failed, 3 existing ignored; Clippy and action smoke pass. This resolves the previously recorded finite extrusion domain failures; unsupported boundary representations and other import failures remain open.",
+        "At 35c6e2cf, draft/angle/C4 rounds the two opposite cylindrical lips of a height-20 semiannulus (radii 2 and 10) with radii 2 and 1. Independent Green-integral volume is 2988.725888734009; native integration of Truck STEP differs by 5.912e-12. Both sampled distance directions are below 3.109e-14. These are sampled checks, not certified global bounds."
       ]
     },
     {
@@ -3297,6 +3332,12 @@
           "path": "audits/fillet-chamfer/capture/2026-10-12-seam-junction/REPORT.md",
           "find": "# Full captured comparison",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-14-unequal-radii/REPORT.md",
+          "find": "# Full capture after per-edge",
+          "role": "test"
         }
       ],
       "required_outcome": "Deliver blend results usable for closed meshing, STEP interchange and further modeling while preserving dimensions and validity.",
@@ -3332,7 +3373,8 @@
         "At 16958067, signed-angle torus inversion preserves near-axis/seam accuracy and the torus normal derivative is corrected. Isoparametric toroidal pcurves become exact conics with bounded world-space seam-roundoff error. Closed UV boundary charts now determine splitter branches, preserving J3's 270-degree sector instead of choosing its complementary arc. Eight parent-failing regressions cover numerical inversion/derivatives, transformed/reversed pcurves and J3/J4/J5 imported solids with independent volumes, closed meshes and STEP; all seven torus input regressions pass. Five-crate release: 893 passed, one unchanged PCurve precision failure, five existing ignored tests; final targeted checks, all-target Clippy and action smoke pass. Repaired imports cost 12-17 ms. E5/E9 controls retain identical volume but cost 0.4-0.7 ms more because the parent rejected valid boundary samples early (144/6541 and 387/9370); the repair rejects zero and completes validation. Clean native blend replay follows separately. See truck-benchmarks/results/2026-10-12-periodic-tori/REPORT.md.",
         "Clean 2099d2d8 replay after periodic torus repair: J3/J4/J5 now construct; 80 total constructions, all immutable/consistent/closed/STEP-prepared/native-valid single solids, 78 combined limited comparisons. G9 second operation newly exposes a preprocessing panic; H2/H4 time out. Raw manifest and 2,150 verified artifact hashes: audits/fillet-chamfer/capture/2026-10-12-periodic-tori/REPORT.md. Full parity remains unverified.",
         "Seam-junction checkpoint f6fa8d15: parent-failing seam-selection and native G9 input regressions; 349 shapeops release tests pass, 0 fail, 1 existing ignored across 68 targets. All-target Clippy and action smoke pass. Final targeted G9 replay reports Unsupported imported geometry without panic. Full native replay after this fix is pending at the user-requested stop. See truck-benchmarks/results/2026-10-12-seam-junction/REPORT.md.",
-        "Full clean replay at 946914f8 (kernel f6fa8d15): all 156 native entries pass; 161 captures contain 80 constructed outputs, 37 construction failures, 22 import failures, 11 inconsistent inputs, eight unhandled intents, two timeouts and one incomplete capture. Zero panics. G9 capture 002 changes from panic to Unsupported imported geometry; all other operation statuses are unchanged. All 80 constructions remain immutable/consistent/closed/STEP-prepared/native-valid single solids, with identical reported mesh volumes, STEP volumes and maximum sampled distances. Seventy-eight pass combined limited comparisons; G1 and tolerance-grid A1 differences and H2/H4 timeouts remain. Full parity remains unverified. See audits/fillet-chamfer/capture/2026-10-12-seam-junction/REPORT.md."
+        "Full clean replay at 946914f8 (kernel f6fa8d15): all 156 native entries pass; 161 captures contain 80 constructed outputs, 37 construction failures, 22 import failures, 11 inconsistent inputs, eight unhandled intents, two timeouts and one incomplete capture. Zero panics. G9 capture 002 changes from panic to Unsupported imported geometry; all other operation statuses are unchanged. All 80 constructions remain immutable/consistent/closed/STEP-prepared/native-valid single solids, with identical reported mesh volumes, STEP volumes and maximum sampled distances. Seventy-eight pass combined limited comparisons; G1 and tolerance-grid A1 differences and H2/H4 timeouts remain. Full parity remains unverified. See audits/fillet-chamfer/capture/2026-10-12-seam-junction/REPORT.md.",
+        "The clean 35c6e2cf full capture has 104 valid constructions and 95 limited comparison passes. All 101 preceding successful result/comparison records are exactly unchanged. Three formerly unhandled unequal-radius captures now construct; five are attempted unsupported-topology failures. Full parity remains unverified."
       ]
     },
     {
@@ -3426,7 +3468,7 @@
         "chamfer"
       ],
       "occt_scope": "Error reporting and robustness regressions, including invalid geometry.",
-      "truck_scope": "Selection, nonfinite parameter, tolerance and input-preservation checks exist.",
+      "truck_scope": "Selection, nonfinite parameter, tolerance and input-preservation checks exist. Per-edge radius validation identifies the invalid selection index. Native replay deduplicates same-radius aliases and rejects conflicting radii for one physical edge.",
       "next_case": "Empty/duplicate/stale edges, zero/negative/NaN sizes and nonmanifold input; no panic or input mutation.",
       "evidence": [
         {
@@ -3470,13 +3512,26 @@
           "path": "truck-shapeops/tests/separate_fillet_contours.rs",
           "find": "fn separate_contours_fail_atomically_when_a_later_round_does_not_fit",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/unequal_fillet_radii.rs",
+          "find": "fn unequal_radii_validate_every_assignment_and_preserve_input_on_failure",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/examples/replay_occt_blend.rs",
+          "find": "mod unequal_radius_tests",
+          "role": "test"
         }
       ],
       "required_outcome": "Handle invalid, empty, duplicate or stale selections and invalid numeric parameters deterministically without panic or input mutation.",
       "verification": [
         "At 9285a3a0, exact coincident adjacent wire ends are connected, tangent face loops are split, generated plane/cylinder-generator pcurves become spatial lines, and complete affine-circle bounds fit cylinder supports. Native Z1 preprocessing passes both modes and rigid transforms with geometry consistency, independent volume, closed meshes and STEP round trips. Invalid crossing counts and failed conversions preserve the polyline cache; unrelated coincident vertices and nonzero gaps are retained. Full release shapeops/STEP: 408 passed, 0 failed, 1 existing ignored; Clippy and action smoke pass. Subsequent native Z1 fillet replay remains to be measured; preprocessing success alone is not blend parity.",
         "At clean HEAD 6351c68b, the full tangent-input replay passes all 156 native entries and constructs 70 of 161 captured Truck tasks. All 70 preserve input and geometry consistency; 69 have closed Truck meshes, 69 prepare STEP, 68 yield native-valid single-solid STEP and 67 meet the combined limited checks including bidirectional sampled distance <=0.001. Z1 now succeeds, with maximum sampled distances about 3.48e-5. Newly reachable Q4 capture 2 has an open mesh, exports two solids and differs by 1.20840; D4 export, tolerance A1 and I3/J9 timeouts remain. Zero panics; no full parity verdict.",
-        "Separate-contour failure is atomic: a selection containing a valid individual round and an oversized round fails without changing the input in either selection order. Shared-support contours remain rejected."
+        "Separate-contour failure is atomic: a selection containing a valid individual round and an oversized round fails without changing the input in either selection order. Shared-support contours remain rejected.",
+        "At 35c6e2cf, regressions reject invalid/nonfinite per-edge radii, duplicate/unknown edges, oversized rounds, connected unequal-radius selections, overlapping parallel rounds and conflicting captured assignments. Valid nonoverlapping unequal rounds sharing a planar support pass material and STEP checks. Input preservation is asserted for success and failure."
       ]
     },
     {
