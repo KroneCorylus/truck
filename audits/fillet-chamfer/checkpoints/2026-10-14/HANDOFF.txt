@@ -1,0 +1,138 @@
+FILLET / CHAMFER CHECKPOINT — 2026-10-14
+
+STATE
+Two achievement groups are committed. The final full native capture and HTML
+report document the stable checkpoint. No push or PR. PiezaCAD was not edited
+and its dependency pin was not updated.
+Report: report.html beside this file.
+
+COMMITS
+0eaffdcd: preserve cusp support branches, use scale-correct rolling inverses,
+return failure for singular inverse systems.
+e1f87d42: clean cusp capture, catalog and first resumed HTML progress report.
+35d73044: atomic equal-radius grouping of separate closed tangent contours,
+canonical selection order and original-to-final face history.
+A documentation-only commit records the final capture, catalog and this report.
+
+METHOD
+Work in /home/krone/Development/Pieza_WS/truck, master. Read AGENTS.md.
+Consumer: ../PiezaCAD (the older AGENTS.md test_cad path is stale).
+- Write parent-failing regressions; do not weaken existing assertions.
+- Solids: tests/common::assert_solid and common::blend::assert_step.
+- CARGO_BUILD_JOBS=12. Run affected release suites, release all-target Clippy
+  including benchmarks, RAYON_NUM_THREADS=1 action benchmark smoke.
+- Never cargo fmt. Format touched Rust files only:
+  rustfmt +nightly --config skip_children=true PATHS
+- Freeze source during builds and validation. Commit implementation and proof
+  before a full native capture, which must use a clean tracked checkout.
+- Preserve raw STEP bytes. Force-add new JSON/STEP/ZIP evidence.
+  git diff --check -- . ':!*.step'
+- Hash-check source and executable before/after capture and archives byte-wise.
+- Commit meaningful validated groups; no push or PR unless requested.
+- No subagents authorized. No performance claims without before/after medians.
+
+FINAL RESULTS
+Full capture: audits/fillet-chamfer/capture/2026-10-14-separate-contours/
+Kernel: 35d73044. Raw copy: target/occt-capture-separate-contours.
+156 native entries passed, 161 captures:
+101 valid constructions / closed meshes / native-valid single-solid STEP;
+92 combined limited comparisons at 0.001; 48 operation failures; 3 imports;
+8 unhandled intents; 1 incomplete capture; no panics or timeouts.
+Full archive: 2,216 verified members; SHA-256 aa05a8d86cd34d02f5ac4120fcce84c59377ab27165de547a0b5dedc303d2e36.
+All 97 successful records from the preceding cusp capture are exactly unchanged.
+Only feat/featrf/A4, A5, A6, B4 change operation status in the final capture.
+They repeat one cylinder/cone-stack blend; do not count four distinct capabilities.
+
+Across both resumed groups: 96 -> 101 constructions; 87 -> 92 limited passes.
+The cusp group changed only bugs/modalg_7/bug30940_3, preserving all 96 preceding
+successful result/comparison records exactly.
+These are subset/sample results, not a global parity percentage or global bound.
+
+FINAL VALIDATION
+960 passing tests across 153 targets in geometry/modeling/meshalgo/stepio/shapeops.
+One unchanged failure and five existing ignores. Release all-target Clippy,
+action benchmark smoke, replay build, catalog check and 21 audit/capture tests pass.
+Known failure: truck-geometry/tests/pcurve.rs::pcurve_derivation,
+-2829663063.761872 vs -2829663063.7618704.
+Parent proof: truck-benchmarks/results/2026-10-13-cubic-endpoints/parent-precision-test.txt.
+Do not weaken that assertion. Resolve separately if desired.
+
+IMPLEMENTATION / EVIDENCE
+Cusp proof: truck-benchmarks/results/2026-10-14-cusp-contacts/.
+RbfSurface private serialized support_hints preserve the oriented face branch
+through contact circles, inverses, endpoint crossings, cutting, reversal and boxing.
+Along-wire construction chooses hints from each face boundary only where needed.
+The rolling-surface inverse uses normalized coplanarity distance and its actual
+contact circle; three singular matrix inversions return None instead of panic.
+Cubic cusp expected volume 149.39834519269158, native integration of Truck STEP
+149.39834440191035 (absolute error below 8e-7). Other cusp rims stay unsupported.
+
+Contour proof: truck-benchmarks/results/2026-10-14-separate-contours/.
+Private fallback in truck-shapeops/src/fillet/modeling.rs::separate_contours:
+- unique selected edges in input shell traversal order;
+- degree 2 at every selected vertex; closed, tangent-continuous components;
+- at least two components, distinct support faces;
+- existing wire solver runs on a local solid; re-modifying a changed/generated
+  face rejects the operation; finish() computes history against the original.
+No new public API/dependency. Existing planar/local/additive routes retain priority.
+This is not a global collision detector. Distant-face intersections are outside
+existing documented scope. Shared support faces/trims remain unsupported.
+New tests: truck-shapeops/tests/separate_fillet_contours.rs (3 tests).
+Raw native input: tests/fixtures/separate-contours/cylinder-cone-stack.step.
+Tests prove material, rolling radius/normals, scaled/transformed solids, deterministic
+selection permutations,6 modified + 4 generated face histories, mesh/STEP and atomic failure.
+
+The stack dimensions are cylinder r3/h5, frustum r2->1.5/h3 at z5,
+cylinder r1/h2 at z8. Fillet r0.3 on reentrant rims r2/z5 and r1/z8.
+Dimension-only volume: 177.01105983494742 (profile integral pi*integral rho^2 dz).
+At official replay tolerance 0.001, independent native integration: 177.01108465949309,
+error 2.4824545675983245e-5 (~0.14 ppm); maximum edge/vertex tolerance 7.3923650688958352e-6.
+Sampled native->Truck 3.5644795258947638e-6 / 1473 samples;
+Truck->native 1.2247625619350748e-5 / 2708 samples.
+Targeted archive: 49 members, SHA da538e35aaca8e1f85965f1a5ccfa5d59b2472d3b8fb7cd1206f6d62c727b4a0.
+24 native input/reference files verified against the previous full capture.
+
+REMAINING / NEXT INVESTIGATIONS
+Do not rerun the completed full capture until kernel changes or a concrete
+verification need arises. Do not start from the old 2026-10-12 blocker state.
+- 48 operation failures: general nonplanar multi-edge corners, nontangent rims,
+ trim intersections, difficult contact construction and collapse.
+- Q7/002: box5, existing fillet2, new radius2 at the rounded rim. A contact
+  curve collapses to a point; spherical-corner topology is needed.
+- X1/002: existing quartercircle radius10, requested15. Folded offsets / radius
+  beyond support curvature. Neither is a support-hint fix.
+- 8 unhandled unequal-radius intents: blend/simple/A4,P9;
+ blend/tolblend_simple/A2; draft/angle/A2,B5,C4; feat/featlf/E2,E3.
+ The three draft/angle cases select separate straight edges and are candidates
+ for scoping per-edge radii. Others include connected unequal-radius corners.
+ Do not assume replay routing alone establishes solver support.
+- 3 imports: blend/complex/B5, blend/simple/J7, draft/angle/F1. B5/J7 do not
+ expose the expected MANIFOLD_SOLID representation; J7 is a native closed shell
+ with zero solids, so solid-only replay has a representation/scope limitation.
+- 9 discrepancies: simple G1, tolblend A1, plus simple H4, K2, K3, K4, G5, J6 and J8. Several native
+ references have independent approximation error. Preserve recorded distinctions.
+ H4 native tolerance ~22.97; K2/K4 native rolling-radius residuals .0554/.0737;
+ J6/J8 native radius residuals .001796/.092095. Prior proof directories explain.
+- 279 dedicated chamfer fixture cases lack runtime coverage. One incomplete
+ capture remains (bugs/moddata_1/bug119). Broad variable-radius, collision,
+ chamfer and 2D behavior is unverified. Do not claim overall completion.
+- Resolve the unchanged PCurve precision baseline separately. Consumer pin/app
+ validation is a separate integration step when requested.
+
+REPRODUCTION
+Full capture:
+python3 audits/fillet-chamfer/capture/run_capture.py --occt ../investigations/sequential-holes-2026-10-10/occt --library-path target/occt-sdk/usr/lib64 --plugin target/occt-capture-plugin --replay target/release/examples/replay_occt_blend --output NEW_TARGET_DIRECTORY --workers 4 --timeout 120
+Catalog:
+python3 audits/fillet-chamfer/build_catalog.py --occt ../investigations/sequential-holes-2026-10-10/occt --app ../PiezaCAD
+Repeat with --check; run unittest discover in audits/fillet-chamfer and its capture/.
+Native checker: target/inspect-polar-step; source in
+truck-benchmarks/results/2026-10-13-polar-cap-seams/inspect-polar-step.cpp.
+LD_LIBRARY_PATH=target/occt-sdk/usr/lib64 target/inspect-polar-step FILE.step EXPECTED_VOLUME
+Comparator: target/occt-capture-plugin/compare_shapes NATIVE.brep TRUCK.step OUT.json
+with the same LD_LIBRARY_PATH.
+
+SCRATCH (IGNORED, NOT REQUIRED FOR REPRODUCTION)
+target/validate-separate-contours.py; replay-separate-contours.py;
+package-separate-capture.py; write-separate-checkpoint.py.
+Earlier diagnostic probes: target/import-wire-investigation/multiple-contours-*.rs.
+Do not replace the official replay binary with a diagnostic build.

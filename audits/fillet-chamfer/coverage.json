@@ -1281,7 +1281,7 @@
         "periodic-seam"
       ],
       "occt_scope": "Closed/tangent states, periodic surface handling and seam-related regressions, including expected failures.",
-      "truck_scope": "Cylinder rims and displaced longitudinal seams on a closed spline pipe have solid and STEP regressions. The spline case preserves a consistent contact parameter branch without requiring declared surface periodicity, including reversal and independent edge reparameterization. Broader torus and seam/termination interactions remain unverified.",
+      "truck_scope": "Cylinder rims and displaced longitudinal seams on a closed spline pipe have solid and STEP regressions. The spline case preserves a consistent contact parameter branch without requiring declared surface periodicity, including reversal and independent edge reparameterization. Broader torus and seam/termination interactions remain unverified. Separate closed tangent contours with distinct support faces can be rounded atomically in one equal-radius selection; shared changed trim faces are rejected.",
       "next_case": "Move toroidal seams through terminations and exercise closed single-edge spline contours with curvature and radius-law variation.",
       "evidence": [
         {
@@ -1319,12 +1319,31 @@
           "path": "audits/fillet-chamfer/capture/2026-10-12-spline-rim/REPORT.md",
           "find": "# Captured replay after closed spline-rim continuation",
           "role": "verification"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/src/fillet/modeling.rs",
+          "find": "fn separate_contours(",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/separate_fillet_contours.rs",
+          "find": "fn separate_curved_contours_preserve_material_normals_history_and_step",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-14-separate-contours/REPORT.md",
+          "find": "# Full capture after atomic",
+          "role": "test"
         }
       ],
       "required_outcome": "Complete a closed blend without gaps or invalid topology, regardless of where periodic seams lie.",
       "verification": [
         "Closed spline-pipe rim regressions now cover displaced longitudinal contact seams, two constant radii, rigid transformation, scale 0.01, reversed wire and unequal rim parameter spans. Contact fitting follows one UV branch across closed NURBS seams without treating support parameter bounds as face trims. Both end-to-end tests fail on parent 4a156c4f; they check radius/normals, independent volume, topology/mesh closure, STEP and immutable input. This is targeted capability evidence, supplemented by the subsequent clean 99c9d487 native capture. See truck-benchmarks/results/2026-10-12-spline-rim-continuation/REPORT.md.",
-        "Clean full capture at 99c9d487 (kernel f7f8f4f5) passes all 156 native entries. J9 is the sole construction-status change: it now succeeds, with maximum sampled distances 9.41989e-5/1.09879e-4. All 73 constructed outputs preserve input and geometry, close their meshes and yield native-valid single-solid STEP; 71 meet the combined limited comparisons. The 31 construction failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents, one incomplete capture, G1 and tolerance-grid A1 discrepancies remain. No panic, timeout or full-parity verdict. See capture/2026-10-12-spline-rim/REPORT.md."
+        "Clean full capture at 99c9d487 (kernel f7f8f4f5) passes all 156 native entries. J9 is the sole construction-status change: it now succeeds, with maximum sampled distances 9.41989e-5/1.09879e-4. All 73 constructed outputs preserve input and geometry, close their meshes and yield native-valid single-solid STEP; 71 meet the combined limited comparisons. The 31 construction failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents, one incomplete capture, G1 and tolerance-grid A1 discrepancies remain. No panic, timeout or full-parity verdict. See capture/2026-10-12-spline-rim/REPORT.md.",
+        "At 35d73044, separate cylinder/cone-stack rims pass dimension-derived material, rolling radius/normals, transformed/scaled input, selection permutation, face-history, mesh and STEP regressions. Native feat/featrf/A4,A5,A6,B4 repeat this one geometry and now pass the limited comparison. All 97 preceding successful records are exactly unchanged in the clean full capture (101 constructions, 92 limited passes). Shared supports, intersecting distant faces and general corners remain outside this added scope."
       ]
     },
     {
@@ -2018,7 +2037,7 @@
         "fillet"
       ],
       "occt_scope": "Start-solution failure is distinct from walking failure.",
-      "truck_scope": "Contact solvers have guards and diagnostics. Along-wire contact trimming now constrains Newton evaluations to both curve domains, damps nonconvergent steps and retries a sampled seed when endpoint tangents are parallel. Competing branches across general supports remain unverified. Open polar guide endpoints now use regular offset-contact seeds and contact continuation; revolution point searches avoid undefined projected derivatives at pole seeds. Complete-circle toroidal inputs E5/E9 now retain consistent boundaries, independent material volume, closed meshes and STEP orientation; this does not establish all requested torus fillets.",
+      "truck_scope": "Contact solvers have guards and diagnostics. Along-wire contact trimming now constrains Newton evaluations to both curve domains, damps nonconvergent steps and retries a sampled seed when endpoint tangents are parallel. Competing branches across general supports remain unverified. Open polar guide endpoints now use regular offset-contact seeds and contact continuation; revolution point searches avoid undefined projected derivatives at pole seeds. Complete-circle toroidal inputs E5/E9 now retain consistent boundaries, independent material volume, closed meshes and STEP orientation; this does not establish all requested torus fillets. Oriented face-branch hints now survive rolling contact construction, inversion and trimming; inverse coplanarity is scale-consistent and singular inverse systems fail safely.",
       "next_case": "Vary polar radius ratios and guide parameterizations, then compare competing contact branches and tangent end contacts on general supports.",
       "evidence": [
         {
@@ -2158,6 +2177,24 @@
           "path": "truck-benchmarks/results/2026-10-12-periodic-tori/REPORT.md",
           "find": "# Periodic torus projection, circular trims and material-preserving splits",
           "role": "executed-probe"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-geometry/tests/rbf_support_branches.rs",
+          "find": "fn support_branches_preserve_contacts_derivatives_and_inverse_searches",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-geometry/tests/rbf_inverse_residual.rs",
+          "find": "fn singular_support_inverse_fails_without_panicking",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-14-cusp-contacts/REPORT.md",
+          "find": "#",
+          "role": "test"
         }
       ],
       "required_outcome": "Find the intended valid contact solution near singularities and competing branches without unstable branch jumps or false failures.",
@@ -2170,7 +2207,8 @@
         "Clean full replay at 3f16afc9 (kernel 6db16d09) passes all 156 native entries and constructs 74 of 161 Truck captures, with no timeouts or panics. E3 is the sole construction-status improvement. All 74 outputs preserve input/geometry consistency, close their Truck meshes, prepare STEP and produce native-valid single solids; 72 meet combined limited checks including bidirectional distances <=0.001. E3 distances are 0.0001213415/0.0000218593, STEP volume 3479486.1878489405 versus independent 3479486.1779266507. G1 and tolerance A1 differences remain. Other outcomes are 30 operation failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents and one incomplete capture. All full-parity verdicts remain unverified.",
         "At 88f64f08, complete/large circular arcs convert to positive-weight quadratic NURBS spans with legal knots, restoring toroidal boundary inclusion. Elementary orientation retries regular samples when a horn-torus midpoint has an undefined normal, preventing reversed STEP faces. Six parent-failing regressions cover exact circle image/derivatives, affine transforms/reversal, horn-torus orientation and E5/E9 imported solids with independent volume, closed meshes and STEP. Five-crate release: 885 passed, one unchanged PCurve precision failure, five existing ignored tests; Clippy and action smoke pass. Cylinder/spline/sphere construction controls preserve identical volumes and show no material timing regression. This establishes input and round-trip repair; fresh captured fillet outcomes follow separately. See truck-benchmarks/results/2026-10-12-toroidal-sectors/REPORT.md.",
         "Clean full capture at 0d3a0259 (kernel 88f64f08) passes all 156 native entries. Of 161 captures, 77 construct, 37 fail construction, 25 fail import, 11 have inconsistent inputs, eight have unhandled intent, two time out and one is incomplete. E5/E7/F2 now construct and meet the combined limited comparisons; their largest sampled distances are 2.37698e-5/9.13687e-6/2.56259e-6. All 77 results preserve input/geometry, have closed meshes and native-valid single-solid STEP; 75 meet combined limited comparisons. Twelve formerly inconsistent inputs now advance: E9 fails trimming; E6/E8/F1/F3/H3/H5 reach the nonplanar multi-edge limitation; H2/H4 time out at 120 seconds. No previous construction regresses or panics occur. G1 and tolerance-grid A1 discrepancies remain; full parity remains unverified. See capture/2026-10-12-toroidal-sectors/REPORT.md.",
-        "At 16958067, signed-angle torus inversion preserves near-axis/seam accuracy and the torus normal derivative is corrected. Isoparametric toroidal pcurves become exact conics with bounded world-space seam-roundoff error. Closed UV boundary charts now determine splitter branches, preserving J3's 270-degree sector instead of choosing its complementary arc. Eight parent-failing regressions cover numerical inversion/derivatives, transformed/reversed pcurves and J3/J4/J5 imported solids with independent volumes, closed meshes and STEP; all seven torus input regressions pass. Five-crate release: 893 passed, one unchanged PCurve precision failure, five existing ignored tests; final targeted checks, all-target Clippy and action smoke pass. Repaired imports cost 12-17 ms. E5/E9 controls retain identical volume but cost 0.4-0.7 ms more because the parent rejected valid boundary samples early (144/6541 and 387/9370); the repair rejects zero and completes validation. Clean native blend replay follows separately. See truck-benchmarks/results/2026-10-12-periodic-tori/REPORT.md."
+        "At 16958067, signed-angle torus inversion preserves near-axis/seam accuracy and the torus normal derivative is corrected. Isoparametric toroidal pcurves become exact conics with bounded world-space seam-roundoff error. Closed UV boundary charts now determine splitter branches, preserving J3's 270-degree sector instead of choosing its complementary arc. Eight parent-failing regressions cover numerical inversion/derivatives, transformed/reversed pcurves and J3/J4/J5 imported solids with independent volumes, closed meshes and STEP; all seven torus input regressions pass. Five-crate release: 893 passed, one unchanged PCurve precision failure, five existing ignored tests; final targeted checks, all-target Clippy and action smoke pass. Repaired imports cost 12-17 ms. E5/E9 controls retain identical volume but cost 0.4-0.7 ms more because the parent rejected valid boundary samples early (144/6541 and 387/9370); the repair rejects zero and completes validation. Clean native blend replay follows separately. See truck-benchmarks/results/2026-10-12-periodic-tori/REPORT.md.",
+        "At 0eaffdcd, cubic cusp bug30940_3 constructs with independent volume 149.39834519269158 and native integration error below 8e-7. Parent-failing regressions cover distinct support branches, scales 0.01/1/100, inverse residuals and singular failure. The clean capture retained all 96 preceding successful records exactly. This does not add nontangent rim or contact-collapse support."
       ]
     },
     {
@@ -2874,9 +2912,18 @@
           "path": "cad-core/tests/blends.rs",
           "find": "fn a_fillet_reference_survives_a_boss",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/separate_fillet_contours.rs",
+          "find": "fn separate_curved_contours_preserve_material_normals_history_and_step",
+          "role": "test"
         }
       ],
-      "required_outcome": "Keep downstream references attached to their intended geometry after upstream edits split, replace or remove blend topology."
+      "required_outcome": "Keep downstream references attached to their intended geometry after upstream edits split, replace or remove blend topology.",
+      "verification": [
+        "At 35d73044, atomic separate-contour fillets retain all six original-to-final modified face correspondences and four generated faces across two rounds. Selection permutations produce identical compressed geometry. This is kernel correspondence evidence; no consumer migration or persistent-name change was made."
+      ]
     },
     {
       "id": "W05",
@@ -3321,7 +3368,7 @@
         {
           "repo": "truck",
           "path": "truck-shapeops/src/fillet/modeling.rs",
-          "find": "map_err(|_| error)",
+          "find": "Err(error) => super::additive::fillet",
           "role": "implementation"
         },
         {
@@ -3417,12 +3464,19 @@
           "path": "audits/fillet-chamfer/capture/2026-10-11-tangent-inputs/REPORT.md",
           "find": "70 constructed outputs",
           "role": "executed-capture"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/separate_fillet_contours.rs",
+          "find": "fn separate_contours_fail_atomically_when_a_later_round_does_not_fit",
+          "role": "test"
         }
       ],
       "required_outcome": "Handle invalid, empty, duplicate or stale selections and invalid numeric parameters deterministically without panic or input mutation.",
       "verification": [
         "At 9285a3a0, exact coincident adjacent wire ends are connected, tangent face loops are split, generated plane/cylinder-generator pcurves become spatial lines, and complete affine-circle bounds fit cylinder supports. Native Z1 preprocessing passes both modes and rigid transforms with geometry consistency, independent volume, closed meshes and STEP round trips. Invalid crossing counts and failed conversions preserve the polyline cache; unrelated coincident vertices and nonzero gaps are retained. Full release shapeops/STEP: 408 passed, 0 failed, 1 existing ignored; Clippy and action smoke pass. Subsequent native Z1 fillet replay remains to be measured; preprocessing success alone is not blend parity.",
-        "At clean HEAD 6351c68b, the full tangent-input replay passes all 156 native entries and constructs 70 of 161 captured Truck tasks. All 70 preserve input and geometry consistency; 69 have closed Truck meshes, 69 prepare STEP, 68 yield native-valid single-solid STEP and 67 meet the combined limited checks including bidirectional sampled distance <=0.001. Z1 now succeeds, with maximum sampled distances about 3.48e-5. Newly reachable Q4 capture 2 has an open mesh, exports two solids and differs by 1.20840; D4 export, tolerance A1 and I3/J9 timeouts remain. Zero panics; no full parity verdict."
+        "At clean HEAD 6351c68b, the full tangent-input replay passes all 156 native entries and constructs 70 of 161 captured Truck tasks. All 70 preserve input and geometry consistency; 69 have closed Truck meshes, 69 prepare STEP, 68 yield native-valid single-solid STEP and 67 meet the combined limited checks including bidirectional sampled distance <=0.001. Z1 now succeeds, with maximum sampled distances about 3.48e-5. Newly reachable Q4 capture 2 has an open mesh, exports two solids and differs by 1.20840; D4 export, tolerance A1 and I3/J9 timeouts remain. Zero panics; no full parity verdict.",
+        "Separate-contour failure is atomic: a selection containing a valid individual round and an oversized round fails without changing the input in either selection order. Shared-support contours remain rejected."
       ]
     },
     {
