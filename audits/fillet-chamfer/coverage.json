@@ -866,6 +866,12 @@
           "path": "audits/fillet-chamfer/capture/2026-10-12-seam-junction/REPORT.md",
           "find": "# Full captured comparison",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/imported_spherical_pcurves.rs",
+          "find": "fn hemisphere_box_union_import_preserves_closed_material_and_step",
+          "role": "test"
         }
       ],
       "required_outcome": "Blend intersections between curved supports, including cylinders, cones, spheres, tori and spline surfaces, with valid contacts and trimmed output.",
@@ -885,7 +891,8 @@
         "Clean full capture at 0d3a0259 (kernel 88f64f08) passes all 156 native entries. Of 161 captures, 77 construct, 37 fail construction, 25 fail import, 11 have inconsistent inputs, eight have unhandled intent, two time out and one is incomplete. E5/E7/F2 now construct and meet the combined limited comparisons; their largest sampled distances are 2.37698e-5/9.13687e-6/2.56259e-6. All 77 results preserve input/geometry, have closed meshes and native-valid single-solid STEP; 75 meet combined limited comparisons. Twelve formerly inconsistent inputs now advance: E9 fails trimming; E6/E8/F1/F3/H3/H5 reach the nonplanar multi-edge limitation; H2/H4 time out at 120 seconds. No previous construction regresses or panics occur. G1 and tolerance-grid A1 discrepancies remain; full parity remains unverified. See capture/2026-10-12-toroidal-sectors/REPORT.md.",
         "At 16958067, signed-angle torus inversion preserves near-axis/seam accuracy and the torus normal derivative is corrected. Isoparametric toroidal pcurves become exact conics with bounded world-space seam-roundoff error. Closed UV boundary charts now determine splitter branches, preserving J3's 270-degree sector instead of choosing its complementary arc. Eight parent-failing regressions cover numerical inversion/derivatives, transformed/reversed pcurves and J3/J4/J5 imported solids with independent volumes, closed meshes and STEP; all seven torus input regressions pass. Five-crate release: 893 passed, one unchanged PCurve precision failure, five existing ignored tests; final targeted checks, all-target Clippy and action smoke pass. Repaired imports cost 12-17 ms. E5/E9 controls retain identical volume but cost 0.4-0.7 ms more because the parent rejected valid boundary samples early (144/6541 and 387/9370); the repair rejects zero and completes validation. Clean native blend replay follows separately. See truck-benchmarks/results/2026-10-12-periodic-tori/REPORT.md.",
         "Clean 2099d2d8 replay after periodic torus repair: J3/J4/J5 now construct; 80 total constructions, all immutable/consistent/closed/STEP-prepared/native-valid single solids, 78 combined limited comparisons. G9 second operation newly exposes a preprocessing panic; H2/H4 time out. Raw manifest and 2,150 verified artifact hashes: audits/fillet-chamfer/capture/2026-10-12-periodic-tori/REPORT.md. Full parity remains unverified.",
-        "Full clean replay at 946914f8 (kernel f6fa8d15): all 156 native entries pass; 161 captures contain 80 constructed outputs, 37 construction failures, 22 import failures, 11 inconsistent inputs, eight unhandled intents, two timeouts and one incomplete capture. Zero panics. G9 capture 002 changes from panic to Unsupported imported geometry; all other operation statuses are unchanged. All 80 constructions remain immutable/consistent/closed/STEP-prepared/native-valid single solids, with identical reported mesh volumes, STEP volumes and maximum sampled distances. Seventy-eight pass combined limited comparisons; G1 and tolerance-grid A1 differences and H2/H4 timeouts remain. Full parity remains unverified. See audits/fillet-chamfer/capture/2026-10-12-seam-junction/REPORT.md."
+        "Full clean replay at 946914f8 (kernel f6fa8d15): all 156 native entries pass; 161 captures contain 80 constructed outputs, 37 construction failures, 22 import failures, 11 inconsistent inputs, eight unhandled intents, two timeouts and one incomplete capture. Zero panics. G9 capture 002 changes from panic to Unsupported imported geometry; all other operation statuses are unchanged. All 80 constructions remain immutable/consistent/closed/STEP-prepared/native-valid single solids, with identical reported mesh volumes, STEP volumes and maximum sampled distances. Seventy-eight pass combined limited comparisons; G1 and tolerance-grid A1 differences and H2/H4 timeouts remain. Full parity remains unverified. See audits/fillet-chamfer/capture/2026-10-12-seam-junction/REPORT.md.",
+        "At dbb54343, the hemisphere/box F1 input and its vertical radius-2 fillet pass independent material, cylinder radius and normal, face history, immutable input, closed-mesh and STEP checks in three placements/scales. The existing solver needed no changes. This establishes a spherical end-face case, not general spherical support-pair blending."
       ]
     },
     {
@@ -1450,7 +1457,7 @@
         "fillet"
       ],
       "occt_scope": "Intersection with terminating support faces.",
-      "truck_scope": "Exact planar elliptical terminations and selected curved ends are covered. Short spines with perpendicular and oblique planar caps also permit larger transverse radii when the trimmed patch fits the body.",
+      "truck_scope": "Exact planar elliptical terminations and selected curved ends are covered. Short spines with perpendicular and oblique planar caps also permit larger transverse radii when the trimmed patch fits the body. A vertical planar-edge fillet terminating on the hemisphere/box spherical face is verified through independent material, normals, closed meshes and STEP.",
       "next_case": "Nonparallel terminal planes near loss of the retained strip, curved terminal supports, and topology-collapse transitions.",
       "evidence": [
         {
@@ -1506,6 +1513,12 @@
           "path": "truck-shapeops/tests/two_edge_blend_caps.rs",
           "find": "fn parabolic_cap_preserves_the_rolling_radius_beyond_its_contact_endpoints",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-shapeops/tests/imported_spherical_pcurves.rs",
+          "find": "fn spherical_end_face_fillet_preserves_material_radius_normals_and_history",
+          "role": "test"
         }
       ],
       "required_outcome": "Terminate a blend correctly against oblique end faces while preserving the requested radius and a valid boundary.",
@@ -1514,7 +1527,8 @@
         "OCCT 7.9.3 returns valid single solids for all six unsheared short-spine tasks, with sampled dimensions and the same independent volume formula (maximum integration error 1.2e-10). Native shear/transform, mesh, STEP and downstream behavior remain unprobed.",
         "At fa1a142d, STEP fitting covers curved fillet trims beyond their contact endpoints. The parent loses conical end geometry; four direct quarter-cone operations verify requested radius/normals, independent volume, native/transformed-reversed selections, finite fitted-domain coverage, closed meshes/STEP, history and immutable inputs. Full release shapeops/STEP: 391 passed, 0 failed, 1 existing ignored; Clippy and action smoke pass. A fresh physical C7 replay reduces the native-to-STEP sampled discrepancy from 4.2283 to below 2.76e-6 in both directions. Finite sampling does not certify global bounds or full parity. Raw comparison/STEP evidence is retained with the validation and capture reports.",
         "At 83eccc89, curved fillets can retain the middle of a two-edge cap boundary and trim both ends on one terminal face. Parent-failing half-cylinder and parabolic-prism regressions verify independent radius/normals/volume, topology, closed meshes, STEP, immutable input and transformed/reversed selections. Full shapeops: 330 passed, zero failed, one existing ignored; the additional parabolic test passes separately (331 distinct passing tests), with Clippy and action smoke. Captured G1 now constructs a native-valid single-solid STEP with volume 132185649.97246, agreeing with independent integral 132185649.98388772. Its OCCT distance discrepancy remains open. Evidence: truck-benchmarks/results/2026-10-12-two-edge-caps/REPORT.md.",
-        "The clean 83eccc89 full capture passes all 156 native entries. Of 161 captures, 71 construct (up from 70), 31 fail construction, 25 fail import, 23 have inconsistent inputs, eight have unhandled intent, two time out and one is incomplete. All 71 constructed results preserve input and geometry consistency, close their Truck meshes and yield native-valid single-solid STEP. Sixty-nine meet the combined limited comparisons. G1 is the sole construction-status change: its independently checked result still differs from the captured OCCT surface (sampled distances 0.98750/0.01855). Tolerance-grid A1 also differs; I3/J9 still time out. Zero panics and no full parity verdict. Evidence: audits/fillet-chamfer/capture/2026-10-12-two-edge-caps/REPORT.md."
+        "The clean 83eccc89 full capture passes all 156 native entries. Of 161 captures, 71 construct (up from 70), 31 fail construction, 25 fail import, 23 have inconsistent inputs, eight have unhandled intent, two time out and one is incomplete. All 71 constructed results preserve input and geometry consistency, close their Truck meshes and yield native-valid single-solid STEP. Sixty-nine meet the combined limited comparisons. G1 is the sole construction-status change: its independently checked result still differs from the captured OCCT surface (sampled distances 0.98750/0.01855). Tolerance-grid A1 also differs; I3/J9 still time out. Zero panics and no full parity verdict. Evidence: audits/fillet-chamfer/capture/2026-10-12-two-edge-caps/REPORT.md.",
+        "At dbb54343, draft/angle/F1 terminates a vertical planar-edge fillet against a sphere. Independent filleted volume is 21454.331120055493; native integration of Truck STEP differs by 0.000298534. Bidirectional sampled distances are below 1.910e-6 at replay tolerance .001. The later native draft operation is not captured."
       ]
     },
     {
@@ -2391,7 +2405,7 @@
         "periodic-seam"
       ],
       "occt_scope": "Dedicated periodic/singular extrema and parameter repairs.",
-      "truck_scope": "Some exact conic seam handling and reversed-curve fixes exist. STEP fitting normalizes longitudinal fillet domains, including sub-tolerance ranges; general support, boundary-curve and paired seam coverage remains open. Periodic fillet contacts now retain continuous parameter branches, with quarter stations disambiguating full turns; chamfer contact sampling also preserves the previous periodic branch. Direct and conical solid regressions cover the exposed failures. Closed spline-pipe contacts now continue from neighboring solved sections across undeclared NURBS seams; displaced seam guide stations follow adjacent rim segments with matching speed. Open polar endpoint fitting now continues contacts to avoid switching between equivalent surface parameter branches. Complete-circle toroidal inputs E5/E9 now retain consistent boundaries, independent material volume, closed meshes and STEP orientation; this does not establish all requested torus fillets. Periodic torus inputs J3/J4/J5 now retain consistent closed geometry, independent volume and STEP round trips, including J3 original scale and rigid transformations; captured blend construction remains a separate check. G9 imported-face preprocessing now avoids reusing seam endpoints and rejects unsupported boundary graphs without panicking; raw topology, closed meshes and independent material volume pass ordinary/robust and rigid-transform regressions. Modeling conversion of its diagonal surface curves remains unsupported.",
+      "truck_scope": "Some exact conic seam handling and reversed-curve fixes exist. STEP fitting normalizes longitudinal fillet domains, including sub-tolerance ranges; general support, boundary-curve and paired seam coverage remains open. Periodic fillet contacts now retain continuous parameter branches, with quarter stations disambiguating full turns; chamfer contact sampling also preserves the previous periodic branch. Direct and conical solid regressions cover the exposed failures. Closed spline-pipe contacts now continue from neighboring solved sections across undeclared NURBS seams; displaced seam guide stations follow adjacent rim segments with matching speed. Open polar endpoint fitting now continues contacts to avoid switching between equivalent surface parameter branches. Complete-circle toroidal inputs E5/E9 now retain consistent boundaries, independent material volume, closed meshes and STEP orientation; this does not establish all requested torus fillets. Periodic torus inputs J3/J4/J5 now retain consistent closed geometry, independent volume and STEP round trips, including J3 original scale and rigid transformations; captured blend construction remains a separate check. G9 imported-face preprocessing now avoids reusing seam endpoints and rejects unsupported boundary graphs without panicking; raw topology, closed meshes and independent material volume pass ordinary/robust and rigid-transform regressions. Modeling conversion of its diagonal surface curves remains unsupported. Linear spherical STEP parameter curves now preserve exact spatial geometry through their coordinate map, including inverted affine supports.",
       "next_case": "Complete G9 diagonal surface-curve modeling import after seam-safe preprocessing; investigate ellipsoidal polar projection branches and other seam/pcurve-domain configurations.",
       "evidence": [
         {
@@ -2651,6 +2665,18 @@
           "path": "audits/fillet-chamfer/capture/2026-10-12-seam-junction/REPORT.md",
           "find": "# Full captured comparison",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-stepio/src/in/step_geometry/modeling_impls.rs",
+          "find": "fn spherical_pcurve(",
+          "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-stepio/tests/spherical_import_pcurves.rs",
+          "find": "fn spherical_derivative_orders_follow_longitude_and_latitude",
+          "role": "test"
         }
       ],
       "required_outcome": "Keep blend boundaries on both supports and close them correctly when surface parameters, orientations or seam positions change.",
@@ -2680,7 +2706,8 @@
         "At 16958067, signed-angle torus inversion preserves near-axis/seam accuracy and the torus normal derivative is corrected. Isoparametric toroidal pcurves become exact conics with bounded world-space seam-roundoff error. Closed UV boundary charts now determine splitter branches, preserving J3's 270-degree sector instead of choosing its complementary arc. Eight parent-failing regressions cover numerical inversion/derivatives, transformed/reversed pcurves and J3/J4/J5 imported solids with independent volumes, closed meshes and STEP; all seven torus input regressions pass. Five-crate release: 893 passed, one unchanged PCurve precision failure, five existing ignored tests; final targeted checks, all-target Clippy and action smoke pass. Repaired imports cost 12-17 ms. E5/E9 controls retain identical volume but cost 0.4-0.7 ms more because the parent rejected valid boundary samples early (144/6541 and 387/9370); the repair rejects zero and completes validation. Clean native blend replay follows separately. See truck-benchmarks/results/2026-10-12-periodic-tori/REPORT.md.",
         "Clean 2099d2d8 replay after periodic torus repair: J3/J4/J5 now construct; 80 total constructions, all immutable/consistent/closed/STEP-prepared/native-valid single solids, 78 combined limited comparisons. G9 second operation newly exposes a preprocessing panic; H2/H4 time out. Raw manifest and 2,150 verified artifact hashes: audits/fillet-chamfer/capture/2026-10-12-periodic-tori/REPORT.md. Full parity remains unverified.",
         "Seam-junction checkpoint f6fa8d15: parent-failing seam-selection and native G9 input regressions; 349 shapeops release tests pass, 0 fail, 1 existing ignored across 68 targets. All-target Clippy and action smoke pass. Final targeted G9 replay reports Unsupported imported geometry without panic. Full native replay after this fix is pending at the user-requested stop. See truck-benchmarks/results/2026-10-12-seam-junction/REPORT.md.",
-        "Full clean replay at 946914f8 (kernel f6fa8d15): all 156 native entries pass; 161 captures contain 80 constructed outputs, 37 construction failures, 22 import failures, 11 inconsistent inputs, eight unhandled intents, two timeouts and one incomplete capture. Zero panics. G9 capture 002 changes from panic to Unsupported imported geometry; all other operation statuses are unchanged. All 80 constructions remain immutable/consistent/closed/STEP-prepared/native-valid single solids, with identical reported mesh volumes, STEP volumes and maximum sampled distances. Seventy-eight pass combined limited comparisons; G1 and tolerance-grid A1 differences and H2/H4 timeouts remain. Full parity remains unverified. See audits/fillet-chamfer/capture/2026-10-12-seam-junction/REPORT.md."
+        "Full clean replay at 946914f8 (kernel f6fa8d15): all 156 native entries pass; 161 captures contain 80 constructed outputs, 37 construction failures, 22 import failures, 11 inconsistent inputs, eight unhandled intents, two timeouts and one incomplete capture. Zero panics. G9 capture 002 changes from panic to Unsupported imported geometry; all other operation statuses are unchanged. All 80 constructions remain immutable/consistent/closed/STEP-prepared/native-valid single solids, with identical reported mesh volumes, STEP volumes and maximum sampled distances. Seventy-eight pass combined limited comparisons; G1 and tolerance-grid A1 differences and H2/H4 timeouts remain. Full parity remains unverified. See audits/fillet-chamfer/capture/2026-10-12-seam-junction/REPORT.md.",
+        "At dbb54343, linear STEP pcurves on spheres retain exact geometry through the longitude/latitude to colatitude/longitude map. Tests cover affine/reflected supports, inversion, trace reversal, seams, poles, cutting and both derivatives. Generalized STEP sphere derivatives now swap orders and apply the latitude sign; derivative orders 0 through 4 in both coordinates are checked independently. draft/angle/F1 now imports after closed-face splitting."
       ]
     },
     {
@@ -3338,6 +3365,12 @@
           "path": "audits/fillet-chamfer/capture/2026-10-14-unequal-radii/REPORT.md",
           "find": "# Full capture after per-edge",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-14-spherical-pcurves/REPORT.md",
+          "find": "# Full capture after spherical",
+          "role": "test"
         }
       ],
       "required_outcome": "Deliver blend results usable for closed meshing, STEP interchange and further modeling while preserving dimensions and validity.",
@@ -3374,7 +3407,8 @@
         "Clean 2099d2d8 replay after periodic torus repair: J3/J4/J5 now construct; 80 total constructions, all immutable/consistent/closed/STEP-prepared/native-valid single solids, 78 combined limited comparisons. G9 second operation newly exposes a preprocessing panic; H2/H4 time out. Raw manifest and 2,150 verified artifact hashes: audits/fillet-chamfer/capture/2026-10-12-periodic-tori/REPORT.md. Full parity remains unverified.",
         "Seam-junction checkpoint f6fa8d15: parent-failing seam-selection and native G9 input regressions; 349 shapeops release tests pass, 0 fail, 1 existing ignored across 68 targets. All-target Clippy and action smoke pass. Final targeted G9 replay reports Unsupported imported geometry without panic. Full native replay after this fix is pending at the user-requested stop. See truck-benchmarks/results/2026-10-12-seam-junction/REPORT.md.",
         "Full clean replay at 946914f8 (kernel f6fa8d15): all 156 native entries pass; 161 captures contain 80 constructed outputs, 37 construction failures, 22 import failures, 11 inconsistent inputs, eight unhandled intents, two timeouts and one incomplete capture. Zero panics. G9 capture 002 changes from panic to Unsupported imported geometry; all other operation statuses are unchanged. All 80 constructions remain immutable/consistent/closed/STEP-prepared/native-valid single solids, with identical reported mesh volumes, STEP volumes and maximum sampled distances. Seventy-eight pass combined limited comparisons; G1 and tolerance-grid A1 differences and H2/H4 timeouts remain. Full parity remains unverified. See audits/fillet-chamfer/capture/2026-10-12-seam-junction/REPORT.md.",
-        "The clean 35c6e2cf full capture has 104 valid constructions and 95 limited comparison passes. All 101 preceding successful result/comparison records are exactly unchanged. Three formerly unhandled unequal-radius captures now construct; five are attempted unsupported-topology failures. Full parity remains unverified."
+        "The clean 35c6e2cf full capture has 104 valid constructions and 95 limited comparison passes. All 101 preceding successful result/comparison records are exactly unchanged. Three formerly unhandled unequal-radius captures now construct; five are attempted unsupported-topology failures. Full parity remains unverified.",
+        "The clean dbb54343 full capture has 105 valid constructions and 96 limited comparison passes. The F1 spherical pcurve import is recovered; 104 preceding successful result/comparison records are exactly unchanged. Two remaining import failures are closed-shell inputs with no native solid entity. Full parity remains unverified."
       ]
     },
     {
