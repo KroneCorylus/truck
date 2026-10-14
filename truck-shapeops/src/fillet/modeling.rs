@@ -1,5 +1,6 @@
 //! Blend operations on modeling solids.
 
+use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};
 use truck_base::diagnostics::{validate_tolerance, Code, Diagnostic};
 use truck_modeling::{EdgeID, Face, FaceID, ScalarFunctionD1, Shell, Solid, Surface, Wire};
 
@@ -166,6 +167,9 @@ pub fn try_fillet_solid_along_wire<R: ScalarFunctionD1>(
 /// Parallel concave edges ending on transverse planar caps also support stepped rib joints
 /// and split coplanar caps. Equal-radius rounds may touch and consume their shared planar
 /// support; overlapping contact patches are rejected. Face history retains split replacements.
+/// Multiple closed tangent contours with distinct support faces can also be rounded together.
+/// Their trims must not modify a common face. Components follow input-shell order, independent
+/// of selection order; failure in any component leaves the input unchanged.
 /// The operation must not intersect distant faces or another boundary. Returns `None` on
 /// unsupported input without modifying it. An empty selection returns the original solid
 /// and empty history.
@@ -239,8 +243,91 @@ pub fn try_fillet_solid_edges(
         .map_err(|e| e.operation(operation).shell(index));
     match shell {
         Ok(shell) => finish(solid, index, shell, tol).map_err(|e| e.operation(operation)),
-        Err(error) => super::additive::fillet(solid, edges, radius, tol).map_err(|_| error),
+        Err(error) => super::additive::fillet(solid, edges, radius, tol).or_else(|_| {
+            if matches!(
+                error.code,
+                Code::UnsupportedGeometry | Code::UnsupportedTopology | Code::NonPlanarFace
+            ) {
+                if let Some(result) = separate_contours(solid, index, edges, radius, tol) {
+                    return Ok(result);
+                }
+            }
+            Err(error)
+        }),
     }
+}
+
+fn separate_contours(
+    solid: &Solid,
+    index: usize,
+    selected: &[EdgeID],
+    radius: f64,
+    tol: f64,
+) -> Option<BlendResult> {
+    let shell = &solid.boundaries()[index];
+    let mut selected: HashSet<_> = selected.iter().copied().collect();
+    let mut edges: Vec<_> = shell
+        .edge_iter()
+        .filter(|e| selected.remove(&e.id()))
+        .collect();
+    let mut degree = HashMap::default();
+    for edge in &edges {
+        for vertex in [edge.front(), edge.back()] {
+            *degree.entry(vertex.id()).or_insert(0) += 1;
+        }
+    }
+    if degree.values().any(|&n| n != 2) {
+        return None;
+    }
+    let mut wires = Vec::new();
+    let mut supports = HashSet::default();
+    while !edges.is_empty() {
+        let mut wire = Wire::from(vec![edges.remove(0)]);
+        while !wire.is_cyclic() {
+            let vertex = wire.back_vertex()?.clone();
+            let i = edges
+                .iter()
+                .position(|e| e.front() == &vertex || e.back() == &vertex)?;
+            let edge = edges.remove(i);
+            wire.push_back(if edge.front() == &vertex {
+                edge
+            } else {
+                edge.inverse()
+            });
+        }
+        if !super::along_wire::is_tangent_continuous(&wire, true) {
+            return None;
+        }
+        let ids: HashSet<_> = wire.iter().map(|e| e.id()).collect();
+        for face in shell
+            .iter()
+            .filter(|f| f.edge_iter().any(|e| ids.contains(&e.id())))
+        {
+            if !supports.insert(face.id()) {
+                return None;
+            }
+        }
+        wires.push(wire);
+    }
+    if wires.len() < 2 {
+        return None;
+    }
+    let mut current = solid.clone();
+    let mut changed = HashSet::default();
+    for wire in wires {
+        let result = try_fillet_solid_along_wire(&current, &wire, radius, tol).ok()?;
+        if result
+            .modified_faces
+            .iter()
+            .any(|(id, _)| changed.contains(id))
+        {
+            return None;
+        }
+        changed.extend(result.modified_faces.iter().map(|(_, f)| f.id()));
+        changed.extend(result.generated_faces.iter().map(|f| f.id()));
+        current = result.solid;
+    }
+    finish(solid, index, current.boundaries()[index].clone(), tol).ok()
 }
 
 /// Equal-distance chamfers on straight sharp edges with planar or cylindrical support.

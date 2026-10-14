@@ -1,0 +1,26 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 2.91s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/separate_fillet_contours.rs (target/release/deps/separate_fillet_contours-96a870af960cacc2)
+
+running 3 tests
+test contours_sharing_support_faces_remain_unsupported ... ok
+test separate_curved_contours_preserve_material_normals_history_and_step ... FAILED
+test separate_contours_fail_atomically_when_a_later_round_does_not_fit ... ok
+
+failures:
+
+---- separate_curved_contours_preserve_material_normals_history_and_step stdout ----
+
+thread 'separate_curved_contours_preserve_material_normals_history_and_step' (134209) panicked at truck-shapeops/tests/separate_fillet_contours.rs:105:84:
+called `Result::unwrap()` on an `Err` value: Diagnostic { code: NonPlanarFace, operation: "fillet_solid_edges", stage: "validate_input", message: "This fillet operation requires planar faces.", context: Context { operand: None, shell_index: Some(0), face_index: Some(0), edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    separate_curved_contours_preserve_material_normals_history_and_step
+
+test result: FAILED. 2 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+
+error: test failed, to rerun pass `-p truck-shapeops --test separate_fillet_contours`

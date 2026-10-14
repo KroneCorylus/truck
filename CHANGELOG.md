@@ -6,6 +6,8 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Equal-radius solid fillets can round multiple closed tangent contours with distinct support faces atomically. Selection order is stable, original-to-final face history is retained, and shared trims remain unsupported.
+
 - Fillet the vertical cusp of a closed cubic Bézier prism by preserving each adjacent face's support-parameter branch through rolling contacts and endpoint searches. `RbfSurface::try_with_support_hints` adds finite branch hints that survive contact-curve reversal, cutting, boxing and serialization; the default constructor and unseeded serialization remain unchanged. Rolling-surface inverse searches use geometric coplanarity and the evaluated contact circle, and return `None` for singular support systems. Regressions check independent material, radius, normals, transforms, scales, reversed selections, closed meshes and STEP.
 
 - Import closed cubic and quartic Bézier prisms with distinct parameter branches at their nonsmooth seams. Share ordered-boundary seeding between face splitting and meshing, and retry failed NURBS curve-inclusion continuations with unchanged sample counts and geometric/domain checks. Regressions cover both preprocessing modes, rotated/reversed boundary starts, affine charts, exact material, closed meshes, STEP round trips and immutable rejection of unsupported cusp-rim fillets.
