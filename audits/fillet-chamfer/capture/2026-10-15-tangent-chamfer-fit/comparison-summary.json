@@ -1,0 +1,633 @@
+{
+  "kernel_revision": "c4706b38a3118322407abae9bbc091ba7fe23955",
+  "native": {
+    "passed": 396
+  },
+  "captures": 648,
+  "before_statuses": {
+    "input-import-failed": 96,
+    "operation-succeeded": 222,
+    "operation-failed": 195,
+    "unhandled-intent": 126,
+    "input-inconsistent": 9
+  },
+  "after_statuses": {
+    "input-import-failed": 96,
+    "operation-succeeded": 222,
+    "operation-failed": 195,
+    "unhandled-intent": 126,
+    "input-inconsistent": 9
+  },
+  "successful_checks": {
+    "constructed": 222,
+    "input_unchanged": 222,
+    "geometry_consistent": 222,
+    "mesh_closed": 222,
+    "step_prepared": 222,
+    "native_valid": 222,
+    "truck_step_valid": 222,
+    "single_solid": 222,
+    "sampled_distance": 208
+  },
+  "limited_comparison_passes": 208,
+  "status_changes": [],
+  "check_changes": [],
+  "numeric_changes": [
+    {
+      "case": "chamfer/equal_dist/B5",
+      "capture": "001",
+      "changes": {
+        "mesh_volume": {
+          "before": 0.8946631049229049,
+          "after": 0.8946631075288684
+        },
+        "truck_volume": {
+          "before": 0.8953447019481104,
+          "after": 0.8953447023454126
+        },
+        "native_to_truck_max_distance": {
+          "before": 3.312432729725845e-06,
+          "after": 3.312432729828759e-06
+        },
+        "truck_to_native_max_distance": {
+          "before": 2.0076366737167987e-06,
+          "after": 2.007636666198617e-06
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/B6",
+      "capture": "001",
+      "changes": {
+        "mesh_volume": {
+          "before": 0.8946631049229049,
+          "after": 0.8946631075288684
+        },
+        "truck_volume": {
+          "before": 0.8953447019481104,
+          "after": 0.8953447023454126
+        },
+        "native_to_truck_max_distance": {
+          "before": 3.312432729725845e-06,
+          "after": 3.312432729828759e-06
+        },
+        "truck_to_native_max_distance": {
+          "before": 2.0076366737167987e-06,
+          "after": 2.007636666198617e-06
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/C1",
+      "capture": "001",
+      "changes": {
+        "mesh_volume": {
+          "before": 0.8946631049229049,
+          "after": 0.8946631075288684
+        },
+        "truck_volume": {
+          "before": 0.8953447019481104,
+          "after": 0.8953447023454126
+        },
+        "native_to_truck_max_distance": {
+          "before": 3.312432729725845e-06,
+          "after": 3.312432729828759e-06
+        },
+        "truck_to_native_max_distance": {
+          "before": 2.0076366737167987e-06,
+          "after": 2.007636666198617e-06
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/C6",
+      "capture": "001",
+      "changes": {
+        "mesh_volume": {
+          "before": 0.24197095382880376,
+          "after": 0.24198738092149671
+        },
+        "truck_volume": {
+          "before": 0.2421128070702124,
+          "after": 0.24211280670268398
+        },
+        "native_to_truck_max_distance": {
+          "before": 3.060386382312002e-06,
+          "after": 3.0603863821179755e-06
+        },
+        "truck_to_native_max_distance": {
+          "before": 1.854873901967738e-06,
+          "after": 1.854873901948112e-06
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/C7",
+      "capture": "001",
+      "changes": {
+        "mesh_volume": {
+          "before": 0.24197095382880376,
+          "after": 0.24198738092149671
+        },
+        "truck_volume": {
+          "before": 0.2421128070702124,
+          "after": 0.24211280670268398
+        },
+        "native_to_truck_max_distance": {
+          "before": 3.060386382312002e-06,
+          "after": 3.0603863821179755e-06
+        },
+        "truck_to_native_max_distance": {
+          "before": 1.854873901967738e-06,
+          "after": 1.854873901948112e-06
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/C8",
+      "capture": "001",
+      "changes": {
+        "mesh_volume": {
+          "before": 0.24197095382880376,
+          "after": 0.24198738092149671
+        },
+        "truck_volume": {
+          "before": 0.2421128070702124,
+          "after": 0.24211280670268398
+        },
+        "native_to_truck_max_distance": {
+          "before": 3.060386382312002e-06,
+          "after": 3.0603863821179755e-06
+        },
+        "truck_to_native_max_distance": {
+          "before": 1.854873901967738e-06,
+          "after": 1.854873901948112e-06
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/C9",
+      "capture": "001",
+      "changes": {
+        "mesh_volume": {
+          "before": 0.21999570515736636,
+          "after": 0.2199956946884337
+        },
+        "truck_volume": {
+          "before": 0.2203492258037912,
+          "after": 0.2203492254103921
+        },
+        "native_to_truck_max_distance": {
+          "before": 2.808339589505342e-06,
+          "after": 2.808339589453885e-06
+        },
+        "truck_to_native_max_distance": {
+          "before": 1.7021105037696834e-06,
+          "after": 1.7021105035465417e-06
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/D1",
+      "capture": "001",
+      "changes": {
+        "mesh_volume": {
+          "before": 0.24197095382880376,
+          "after": 0.24198738092149671
+        },
+        "truck_volume": {
+          "before": 0.2421128070702124,
+          "after": 0.24211280670268398
+        },
+        "native_to_truck_max_distance": {
+          "before": 3.060386382312002e-06,
+          "after": 3.0603863821179755e-06
+        },
+        "truck_to_native_max_distance": {
+          "before": 1.854873901967738e-06,
+          "after": 1.854873901948112e-06
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/D2",
+      "capture": "001",
+      "changes": {
+        "mesh_volume": {
+          "before": 0.24197095382880376,
+          "after": 0.24198738092149671
+        },
+        "truck_volume": {
+          "before": 0.2421128070702124,
+          "after": 0.24211280670268398
+        },
+        "native_to_truck_max_distance": {
+          "before": 3.060386382312002e-06,
+          "after": 3.0603863821179755e-06
+        },
+        "truck_to_native_max_distance": {
+          "before": 1.854873901967738e-06,
+          "after": 1.854873901948112e-06
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/D3",
+      "capture": "001",
+      "changes": {
+        "mesh_volume": {
+          "before": 0.24197095382880376,
+          "after": 0.24198738092149671
+        },
+        "truck_volume": {
+          "before": 0.2421128070702124,
+          "after": 0.24211280670268398
+        },
+        "native_to_truck_max_distance": {
+          "before": 3.060386382312002e-06,
+          "after": 3.0603863821179755e-06
+        },
+        "truck_to_native_max_distance": {
+          "before": 1.854873901967738e-06,
+          "after": 1.854873901948112e-06
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/D4",
+      "capture": "001",
+      "changes": {
+        "mesh_volume": {
+          "before": 0.21999570515736636,
+          "after": 0.2199956946884337
+        },
+        "truck_volume": {
+          "before": 0.2203492258037912,
+          "after": 0.2203492254103921
+        },
+        "native_to_truck_max_distance": {
+          "before": 2.808339589505342e-06,
+          "after": 2.808339589453885e-06
+        },
+        "truck_to_native_max_distance": {
+          "before": 1.7021105037696834e-06,
+          "after": 1.7021105035465417e-06
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/D5",
+      "capture": "001",
+      "changes": {
+        "mesh_volume": {
+          "before": 0.2419873906228983,
+          "after": 0.2419545074040125
+        },
+        "truck_volume": {
+          "before": 0.24211280707055724,
+          "after": 0.2421128067030288
+        },
+        "native_to_truck_max_distance": {
+          "before": 3.0603859336823444e-06,
+          "after": 3.060385933896199e-06
+        },
+        "truck_to_native_max_distance": {
+          "before": 1.8548732681674978e-06,
+          "after": 1.8548732677505177e-06
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/D6",
+      "capture": "001",
+      "changes": {
+        "mesh_volume": {
+          "before": 0.2419873906228983,
+          "after": 0.2419545074040125
+        },
+        "truck_volume": {
+          "before": 0.24211280707055724,
+          "after": 0.2421128067030288
+        },
+        "native_to_truck_max_distance": {
+          "before": 3.0603859336823444e-06,
+          "after": 3.060385933896199e-06
+        },
+        "truck_to_native_max_distance": {
+          "before": 1.8548732681674978e-06,
+          "after": 1.8548732677505177e-06
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/D7",
+      "capture": "001",
+      "changes": {
+        "mesh_volume": {
+          "before": 0.2419873906228983,
+          "after": 0.2419545074040125
+        },
+        "truck_volume": {
+          "before": 0.24211280707055724,
+          "after": 0.2421128067030288
+        },
+        "native_to_truck_max_distance": {
+          "before": 3.0603859336823444e-06,
+          "after": 3.060385933896199e-06
+        },
+        "truck_to_native_max_distance": {
+          "before": 1.8548732681674978e-06,
+          "after": 1.8548732677505177e-06
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/D8",
+      "capture": "001",
+      "changes": {
+        "mesh_volume": {
+          "before": 0.21999570515769049,
+          "after": 0.21999569468875782
+        },
+        "truck_volume": {
+          "before": 0.2203492258041651,
+          "after": 0.22034922541076607
+        },
+        "native_to_truck_max_distance": {
+          "before": 2.808339137578811e-06,
+          "after": 2.8083391376844004e-06
+        },
+        "truck_to_native_max_distance": {
+          "before": 1.7021098692759168e-06,
+          "after": 1.7021098693189298e-06
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/D9",
+      "capture": "001",
+      "changes": {
+        "mesh_volume": {
+          "before": 0.2419873906228983,
+          "after": 0.2419545074040125
+        },
+        "truck_volume": {
+          "before": 0.24211280707055724,
+          "after": 0.2421128067030288
+        },
+        "native_to_truck_max_distance": {
+          "before": 3.0603859336823444e-06,
+          "after": 3.060385933896199e-06
+        },
+        "truck_to_native_max_distance": {
+          "before": 1.8548732681674978e-06,
+          "after": 1.8548732677505177e-06
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/E1",
+      "capture": "001",
+      "changes": {
+        "mesh_volume": {
+          "before": 0.2419873906228983,
+          "after": 0.2419545074040125
+        },
+        "truck_volume": {
+          "before": 0.24211280707055724,
+          "after": 0.2421128067030288
+        },
+        "native_to_truck_max_distance": {
+          "before": 3.0603859336823444e-06,
+          "after": 3.060385933896199e-06
+        },
+        "truck_to_native_max_distance": {
+          "before": 1.8548732681674978e-06,
+          "after": 1.8548732677505177e-06
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/E2",
+      "capture": "001",
+      "changes": {
+        "mesh_volume": {
+          "before": 0.2419873906228983,
+          "after": 0.2419545074040125
+        },
+        "truck_volume": {
+          "before": 0.24211280707055724,
+          "after": 0.2421128067030288
+        },
+        "native_to_truck_max_distance": {
+          "before": 3.0603859336823444e-06,
+          "after": 3.060385933896199e-06
+        },
+        "truck_to_native_max_distance": {
+          "before": 1.8548732681674978e-06,
+          "after": 1.8548732677505177e-06
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/E3",
+      "capture": "001",
+      "changes": {
+        "mesh_volume": {
+          "before": 0.21999570515769049,
+          "after": 0.21999569468875782
+        },
+        "truck_volume": {
+          "before": 0.2203492258041651,
+          "after": 0.22034922541076607
+        },
+        "native_to_truck_max_distance": {
+          "before": 2.808339137578811e-06,
+          "after": 2.8083391376844004e-06
+        },
+        "truck_to_native_max_distance": {
+          "before": 1.7021098692759168e-06,
+          "after": 1.7021098693189298e-06
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A6",
+      "capture": "001",
+      "changes": {
+        "mesh_volume": {
+          "before": 0.755547957738605,
+          "after": 0.7555479432294981
+        },
+        "truck_volume": {
+          "before": 0.756076211691599,
+          "after": 0.7560762110228361
+        },
+        "native_to_truck_max_distance": {
+          "before": 3.5644795258261545e-06,
+          "after": 3.564479525902428e-06
+        },
+        "truck_to_native_max_distance": {
+          "before": 2.1604000651208024e-06,
+          "after": 2.16040006476261e-06
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A6",
+      "capture": "004",
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6943733769470334,
+          "after": 0.6943733624379275
+        },
+        "truck_volume": {
+          "before": 0.6949145385550867,
+          "after": 0.6949145378020686
+        },
+        "native_to_truck_max_distance": {
+          "before": 3.5644795258261545e-06,
+          "after": 3.564479525902428e-06
+        },
+        "truck_to_native_max_distance": {
+          "before": 2.1604000647361656e-06,
+          "after": 2.1604000646883747e-06
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A7",
+      "capture": "001",
+      "changes": {
+        "mesh_volume": {
+          "before": 0.755547957738605,
+          "after": 0.7555479432294981
+        },
+        "truck_volume": {
+          "before": 0.756076211691599,
+          "after": 0.7560762110228361
+        },
+        "native_to_truck_max_distance": {
+          "before": 3.5644795258261545e-06,
+          "after": 3.564479525902428e-06
+        },
+        "truck_to_native_max_distance": {
+          "before": 2.1604000651208024e-06,
+          "after": 2.16040006476261e-06
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A7",
+      "capture": "004",
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6943733769470334,
+          "after": 0.6943733624379275
+        },
+        "truck_volume": {
+          "before": 0.6949145385550867,
+          "after": 0.6949145378020686
+        },
+        "native_to_truck_max_distance": {
+          "before": 3.5644795258261545e-06,
+          "after": 3.564479525902428e-06
+        },
+        "truck_to_native_max_distance": {
+          "before": 2.1604000647361656e-06,
+          "after": 2.1604000646883747e-06
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A8",
+      "capture": "001",
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7555479577386048,
+          "after": 0.7555479432294981
+        },
+        "truck_volume": {
+          "before": 0.756076211691599,
+          "after": 0.7560762110228361
+        },
+        "native_to_truck_max_distance": {
+          "before": 3.564479525892088e-06,
+          "after": 3.5644795258577836e-06
+        },
+        "truck_to_native_max_distance": {
+          "before": 2.160400065828261e-06,
+          "after": 2.160400064834296e-06
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A8",
+      "capture": "004",
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6943733769470336,
+          "after": 0.6943733624379272
+        },
+        "truck_volume": {
+          "before": 0.6949145385550868,
+          "after": 0.6949145378020687
+        },
+        "native_to_truck_max_distance": {
+          "before": 3.564479525892088e-06,
+          "after": 3.5644795258577836e-06
+        },
+        "truck_to_native_max_distance": {
+          "before": 2.160400064845563e-06,
+          "after": 2.160400064637312e-06
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A9",
+      "capture": "001",
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7555479577386048,
+          "after": 0.7555479432294981
+        },
+        "truck_volume": {
+          "before": 0.756076211691599,
+          "after": 0.7560762110228361
+        },
+        "native_to_truck_max_distance": {
+          "before": 3.564479525892088e-06,
+          "after": 3.5644795258577836e-06
+        },
+        "truck_to_native_max_distance": {
+          "before": 2.160400065828261e-06,
+          "after": 2.160400064834296e-06
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A9",
+      "capture": "004",
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6943733769470336,
+          "after": 0.6943733624379272
+        },
+        "truck_volume": {
+          "before": 0.6949145385550868,
+          "after": 0.6949145378020687
+        },
+        "native_to_truck_max_distance": {
+          "before": 3.564479525892088e-06,
+          "after": 3.5644795258577836e-06
+        },
+        "truck_to_native_max_distance": {
+          "before": 2.160400064845563e-06,
+          "after": 2.160400064637312e-06
+        }
+      }
+    }
+  ],
+  "regressions": [],
+  "unchanged_successful_results_and_comparisons": 195
+}

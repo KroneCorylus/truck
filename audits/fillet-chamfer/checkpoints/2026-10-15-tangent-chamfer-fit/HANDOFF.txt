@@ -1,0 +1,77 @@
+TANGENT CHAMFER FITTING — 2026-10-15
+
+Implementation/proof c4706b38a3118322407abae9bbc091ba7fe23955; this checkpoint records its clean full capture.
+User says CONTINUE and commit achievements, do not stop until done or told.
+No push, PR, delegates, consumer changes or kernel pin changes.
+
+COMPLETED
+Private chamfer contact fitting now refines geometric distance between support
+pcurves and spatial splines to min(tol,1e-7), using bounded nearest parameters
+and up to257 samples (preserving larger initial counts). Sample-averaged knots
+avoid dense interpolation instability. Ruled-surface orientation uses its own
+normalized parameter range. Public APIs and global tolerances are unchanged.
+Two solid regressions and one interpolation unit test fail on the parent; a
+simple-chamfer control passes there. Tests cover scales, rigid motion, reversal,
+shifted NURBS parameters, analytic material/bevels, immutability, closed meshes,
+STEP and dense affine derivatives. Final release counts [502, 0, 1];
+all-target Clippy, action smoke and15 replay tests pass. Intermediate failed and
+interrupted runs are explicitly retained and labeled in the proof report.
+
+Native A4 explicitly expanded contour proof selects3 edges, gives valid1solid
+STEP and sampled maximum difference 6.1772021936943812e-06. Original capture
+seed/data remain separate. Automatic capture is STILL SEED-ONLY. Proof archive
+d446d81bb3b994636df57e5d3bdfbf4c8156167b4479fb16615582d36d1f599e; raw target/tangent-chamfer-fit-proof. Final proof was
+regenerated after the final replay build, because full cargo tests can rebuild
+examples with unified features and change the executable hash.
+
+FULL CLEAN CAPTURE
+396 native entries pass /648 operation records. 222 constructions,
+208 limited comparison passes. 195 prior successful result/comparison
+records EXACT unchanged; 27 prior successful records have numerical changes.
+No previous successful check regressions. Statuses: {"input-import-failed": 96, "operation-succeeded": 222, "operation-failed": 195, "unhandled-intent": 126, "input-inconsistent": 9}.
+Archive 7717 members, SHA256 d205f54b28111c7f33a0676201492b4d5f9b2bde0571df1f9d67e5a3debbd84d.
+Raw target/occt-capture-tangent-chamfer-fit. Sequence inputs come from native
+execution each time, not previous Truck results. No full-parity/speed claim.
+
+NEXT WORK
+1. Separate simple_chamfer two-edge face panic. Read target/simple-chamfer-two-edge-panic.txt.
+   Half-cylinder top bounded by one arc and one chord uses the same front/back
+   neighboring edge; cut_face_by_curve writes3 positions into a2-edge boundary
+   and Face::new panics. Add parent-failing tests before fixing. A possible small
+   repair is to cut the already-trimmed neighbor at the second end, retain its
+   middle segment and replace only the two boundary entries, preserving sense.
+   Do not claim a closed-solid operation from a simple face-patch test alone.
+2. Complete native chamfer contour capture and first-assignment semantics.
+   Read target/chamfer-propagation-notes.txt and native BRepTest_ChamferCommands.cxx.
+   One builder mirrors Add/AddDA/parameter gates; later seeds already in an
+   existing contour are ignored by native command (first assignment wins).
+   Keep original seeds plus complete physical contour edges, effective/ignored
+   assignments, and explicit schema validation. Never silently fall back to seed
+   when a new capture lacks scope. Match seed membership, deduplicate complete
+   contours, and reject unsupported curved reference propagation honestly.
+   Existing expanded A4 fixture is ready as an end-to-end proof.
+
+Other gaps: C1 input fidelity (curve/support and vertex/curve gaps), curved
+reference-face support,88 native inputs without solids,4 missing fixture names,
+operation failures, sampled discrepancies and old PCurve precision test. See
+previous bounded/public-data checkpoint reports for provenance and specifics.
+The corrected C1 material oracle is .002952545064816 from adaptive native GK,
+not the unstable ordinary volume .002960726849837509.
+
+METHOD
+AGENTS.md: parent-failing tests; never weaken; shared solid/STEP harness;
+CARGO_BUILD_JOBS=12; rustfmt +nightly --config skip_children=true on touched files,
+never cargo fmt. Run relevant tests/Clippy/smoke, build replay LAST, freeze final
+source/executable/data, save proof and commit implementation. Then clean capture,
+archive comparison, catalog/HTML/handoff and documentation commit. No push.
+
+Full capture uses --occt ../investigations/sequential-holes-2026-10-10/occt
+--library-path target/occt-sdk/usr/lib64 --plugin target/occt-chamfer-capture-plugin
+--replay target/release/examples/replay_occt_blend
+--data-path target/occt-public-chamfer-data --workers4 --timeout120 --output NEWDIR.
+Native SDK is7.9.3; existing OCCT checkout patches are unrelated and unchanged.
+Consumer ../PiezaCAD. Force-add ignored JSON/ZIP/STEP; preserve raw capture bytes.
+T3 browser tab_1, local server8765; DOM works, screenshots fail in this session.
+Scripts target/package-tangent-fit-proof.py, write-tangent-fit-proof-report.py,
+package-tangent-fit-capture.py, write-tangent-fit-checkpoint.py. Checkpoint script
+is not idempotent; do not rerun after creation/coverage append.
