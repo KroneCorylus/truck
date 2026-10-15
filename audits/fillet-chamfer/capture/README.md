@@ -62,9 +62,12 @@ python3 -m unittest discover -s audits/fillet-chamfer/capture -p 'test_*.py'
 
 Fifteen Rust tests cover physical selection, per-edge fillet radii, equal and
 unequal chamfer distances, reference-plane identity, planar distance/angle
-conversion on acute, right and obtuse corners, impossible-angle rejection, duplicate assignments and rejected unsupported/invalid intent. Five
+conversion on acute, right and obtuse corners, impossible-angle rejection, duplicate assignments and rejected unsupported/invalid intent. Eight
 Python/Tcl tests cover command selection, native caller scope, interleaved command
-numbering and preservation of success/error behavior.
+numbering, preservation of success/error behavior, and replay of confirmed native
+rejections. A rejected native operation has no reference shape: its valid input
+is replayed, its native failure is retained separately, and no shape comparison
+is attempted. Missing or corrupt evidence remains capture-incomplete.
 
 Chamfer captures retain the native mode and every requested distance/angle.
 Face-dependent modes also record an analytic reference plane when available.

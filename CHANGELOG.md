@@ -6,6 +6,8 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Replay complete captured inputs when the native command explicitly rejects them. Keep the native failure separate from Truck outcomes and skip shape comparison without a native result; missing or corrupt capture evidence remains incomplete.
+
 - Replay distance-and-angle chamfers between nonperpendicular planar supports using their oriented corner angle. Preserve reference-face setbacks and reject singular or impossible angle requests; acute/obtuse wedge regressions verify material, bevel normals, rigid motion, closed meshes and STEP.
 
 - Capture and replay native chamfer commands with physical edge selections and reference-plane identity. Equal distances and planar two-distance requests reach the existing kernel APIs; distance-and-angle replay is supported for perpendicular planar faces. Preserve native Tcl scope/error behavior and explicitly reject ambiguous, invalid or unsupported requests.

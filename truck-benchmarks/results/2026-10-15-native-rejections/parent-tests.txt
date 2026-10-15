@@ -1,0 +1,23 @@
+F.F.....
+======================================================================
+FAIL: test_confirmed_native_rejection_replays_input_without_shape_comparison (test_capture.RejectedCaptureTests.test_confirmed_native_rejection_replays_input_without_shape_comparison)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/krone/Development/Pieza_WS/truck/audits/fillet-chamfer/capture/test_capture.py", line 148, in test_confirmed_native_rejection_replays_input_without_shape_comparison
+    self.assertEqual(len(calls), 2)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: 1 != 2
+
+======================================================================
+FAIL: test_truck_success_against_native_rejection_does_not_invent_a_comparison (test_capture.RejectedCaptureTests.test_truck_success_against_native_rejection_does_not_invent_a_comparison)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/krone/Development/Pieza_WS/truck/audits/fillet-chamfer/capture/test_capture.py", line 158, in test_truck_success_against_native_rejection_does_not_invent_a_comparison
+    self.assertEqual(len(calls), 2)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: 1 != 2
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.024s
+
+FAILED (failures=2)

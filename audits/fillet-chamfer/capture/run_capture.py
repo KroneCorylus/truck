@@ -49,10 +49,20 @@ def run_case(case, sources, args, env):
                   baseline_native_status=case['occt_run'], captures=[])
     for capture in sorted((directory / 'capture').glob('*.input.json')):
         prefix = str(capture).removesuffix('.input.json')
-        # A failed export can leave partial JSON; only complete input/output pairs replay.
+        # A native rejection has no output; replay only when its input export is complete.
         try:
             task = json.loads(capture.read_text())
-            native_result = json.loads(Path(prefix + '.result.json').read_text())
+            if not Path(prefix + '.input.step').is_file():
+                raise ValueError('Missing captured STEP input')
+            native_path = Path(prefix + '.result.json')
+            if native_path.is_file():
+                native_result = json.loads(native_path.read_text())
+            else:
+                log = Path(prefix + '.capture.log').read_text().splitlines()
+                if not (log and log[0].startswith('input_captured 1 ')
+                        and log[-1] == 'native_return_code 1'):
+                    raise ValueError('Missing native output without a confirmed native rejection')
+                native_result = dict(status='operation-failed', returncode=1)
         except (ValueError, OSError) as error:
             result['captures'].append(dict(prefix=Path(prefix).name,
                                            status='capture-incomplete', error=str(error)))
@@ -70,7 +80,8 @@ def run_case(case, sources, args, env):
         else:
             truck = dict(result=dict(status='harness-error', error='Missing replay report'))
         comparison = None
-        if truck.get('result', {}).get('step_prepared'):
+        if (truck.get('result', {}).get('step_prepared')
+                and native_result.get('status') != 'operation-failed'):
             log, compare_code, compare_timeout, compare_elapsed = execute(
                 [str(args.plugin / 'compare_shapes'), prefix + '.result.brep',
                  prefix + '.truck.step', prefix + '.comparison.json'],

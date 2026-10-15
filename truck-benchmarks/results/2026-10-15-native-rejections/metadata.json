@@ -1,0 +1,164 @@
+{
+  "parent": "ab12f1149c8a3bef3834e6624012166408b86216",
+  "source_sha256": {
+    "CHANGELOG.md": "2cf51adbe8b1b3ae1b81272c70d515e0b30e2cd6044e0bdf5a1b29edcfb25544",
+    "audits/fillet-chamfer/capture/README.md": "b4de6fc0d19c2abdc09ca4ed05555b1c6d0011b4c5c4761c045e97237a9c9a47",
+    "audits/fillet-chamfer/capture/run_capture.py": "a4324242e9581ebffa5c286a2dc89f739528230432fd25ed755ff67c90be4589",
+    "audits/fillet-chamfer/capture/test_capture.py": "a213f42d271d37c60b2901c99345f60821fc9dd540e049fdeab7c4a2b0757cd8"
+  },
+  "artifact_sha256": {
+    "bugs/moddata_1/bug119/capture/001.capture.log": "111aa94724b5bc933ed3dc641b68f6a16561f21a381f58d43b5ef2b3c2177bb4",
+    "bugs/moddata_1/bug119/capture/001.input.brep": "b47684401fe37014c76f5fe5966ba689e4360b787568909045dd9c73ba2b0820",
+    "bugs/moddata_1/bug119/capture/001.input.json": "a046b15bf4cae7674c0e0c855e157f9ea56f31b5bd48fb3111e35b7b95dcfc4b",
+    "bugs/moddata_1/bug119/capture/001.input.step": "31889fba5fc768d3fc0a15a52e791f888c5ffbf228a8b89639c1449321a03c27",
+    "bugs/moddata_1/bug119/capture/001.truck.json": "9d4cd8ecf017702db9b8b9ea572f093737d553f463647448994e68b7759cee51",
+    "bugs/moddata_1/bug119/capture/001.truck.log": "0e7ca4e571d969922c7525f43a7244a5bd42b5bbf0aa1a37992f522903fc9d47",
+    "bugs/moddata_1/bug119/console.log": "21fe75976ebee10317e692b064a8b7c5bf6063769df7b2cd69b6ca39dce06d07",
+    "bugs/moddata_1/bug119/draw.log": "5c9539ec6a2325f88f934607b4541f008a5c19f370717558e289edf28788fc24",
+    "bugs/moddata_1/bug119/run.tcl": "255917cdf8b0767bf901f83da2d6a5badbb082b3662dc6327e86d1154cf9ca6f",
+    "bugs/moddata_1/bug203/capture/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "bugs/moddata_1/bug203/capture/001.comparison.json": "7a63608219870314e16d3ddfbde1362e6423e192ac2c46ec6b8f418c03767b57",
+    "bugs/moddata_1/bug203/capture/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bugs/moddata_1/bug203/capture/001.input.brep": "b47684401fe37014c76f5fe5966ba689e4360b787568909045dd9c73ba2b0820",
+    "bugs/moddata_1/bug203/capture/001.input.json": "c01713d7189faf8ace265afc658c1badafd161e7adb404ea5df259bfd96b851f",
+    "bugs/moddata_1/bug203/capture/001.input.step": "31889fba5fc768d3fc0a15a52e791f888c5ffbf228a8b89639c1449321a03c27",
+    "bugs/moddata_1/bug203/capture/001.result.brep": "e0e84e3469eee00944210c2d2a4874d9e7747776b91cb60ce4bca5aacdfd64cc",
+    "bugs/moddata_1/bug203/capture/001.result.json": "e5557171ea323feb3f22bf63036aaaa4bdc4a26399c0aa382c425898c3d739b0",
+    "bugs/moddata_1/bug203/capture/001.result.step": "8e953ada92e8cb3177953e21b1ed2b0eddd044e9c9018237266a84348c372eae",
+    "bugs/moddata_1/bug203/capture/001.truck.json": "9db9677c85bf3d2cf1d597ccbf2232cf412d979899256bd431e7eeacd07cd138",
+    "bugs/moddata_1/bug203/capture/001.truck.log": "d60f0410968d5f01c34b8176f3560f18749274e8c3a7a176b7f242f6e689420f",
+    "bugs/moddata_1/bug203/capture/001.truck.step": "9d5f29707674237b8f21faf1013aaf820b56b07caeb5d593dd4159d4f1669586",
+    "bugs/moddata_1/bug203/console.log": "a556b97d65e3275e8f9cd18c37347b9d42b3d8d5aec80ee2056ce7be7ff4fbed",
+    "bugs/moddata_1/bug203/draw.log": "f67ea469ea5c7e39a6614d28568216ef67ae589f4f3c5008af7689b865c6e95a",
+    "bugs/moddata_1/bug203/run.tcl": "4fc9d5255c4642b083b9e094244d68cef7ef3f6dcdf6bb9d40b1fd0976668294",
+    "display.log": "8fd588a019045493d2982412a0736acd7a80ab1fe5a9cbc1b6bff8a366bb0c6d",
+    "results.json": "8e7a70d20031209a026f21ec372cf95985026f3aa1930ce268eb697ecb879732",
+    "runtime.log": "1bce096d463b23cf544fa6b93bca8c017dd101b2be60e9ae5f9b2c03e89beed7"
+  },
+  "archive_sha256": "79a0ab7b13a5cf905152e145e8ca87376ba3ed2a505bc5462d63f31b8ba136db",
+  "native_rejection": {
+    "prefix": "001",
+    "task": {
+      "schema_version": 1,
+      "operation": "fillet",
+      "selection_deflection": 1e-05,
+      "native_valid": true,
+      "solids": 1,
+      "volume": 999999.9999999998,
+      "area": 60000,
+      "selection": [
+        {
+          "radius": 50,
+          "curve_type": 0,
+          "point_count": 2
+        },
+        {
+          "radius": 50,
+          "curve_type": 0,
+          "point_count": 2
+        },
+        {
+          "radius": 50,
+          "curve_type": 0,
+          "point_count": 2
+        },
+        {
+          "radius": 50,
+          "curve_type": 0,
+          "point_count": 2
+        }
+      ]
+    },
+    "native_result": {
+      "status": "operation-failed",
+      "returncode": 1
+    },
+    "truck": {
+      "comparison": "unverified",
+      "result": {
+        "code": "OutsideNeighbour",
+        "error": "TRUCK_OUTSIDE_NEIGHBOUR: The moved boundary leaves its neighbouring face. (fillet_solid_edges / validate_input)",
+        "input_unchanged": true,
+        "selected_edges": 4,
+        "status": "operation-failed"
+      },
+      "schema_version": 1,
+      "stage": "blend",
+      "tolerance": 0.001
+    },
+    "elapsed_seconds": 0.0030712079997101682,
+    "sampled_comparison": null,
+    "comparison": "unverified"
+  },
+  "success_control": {
+    "prefix": "001",
+    "task": {
+      "schema_version": 1,
+      "operation": "chamfer",
+      "selection_deflection": 1e-05,
+      "native_valid": true,
+      "solids": 1,
+      "volume": 999999.9999999998,
+      "area": 60000,
+      "selection": [
+        {
+          "mode": "distance-angle",
+          "distance": 5,
+          "angle_degrees": 45,
+          "reference_plane": {
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "normal": [
+              0,
+              1,
+              0
+            ]
+          },
+          "curve_type": 0,
+          "point_count": 2
+        }
+      ]
+    },
+    "native_result": {
+      "native_valid": true,
+      "solids": 1,
+      "volume": 998749.9999999999,
+      "area": 59682.10678118655
+    },
+    "truck": {
+      "comparison": "unverified",
+      "result": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 998750.0,
+        "selected_edges": 1,
+        "status": "operation-succeeded",
+        "step_prepared": true
+      },
+      "schema_version": 1,
+      "stage": "output-consistency",
+      "tolerance": 0.001
+    },
+    "elapsed_seconds": 0.004982729999937874,
+    "sampled_comparison": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 998749.9999999999,
+      "truck_volume": 998749.9999999998,
+      "native_to_truck_max_distance": 7.105427357601002e-15,
+      "native_to_truck_samples": 1595,
+      "truck_to_native_max_distance": 1.88411095042053e-15,
+      "truck_to_native_samples": 1595
+    },
+    "comparison": "unverified"
+  },
+  "validation": "Two new runner tests fail on parent; all eight capture and 19 audit tests pass. Rust/kernel/native plugin unchanged; previous 15 release replay tests, Clippy and benchmark smoke retained, not rerun for this Python-only change."
+}

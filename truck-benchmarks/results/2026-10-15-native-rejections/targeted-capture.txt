@@ -1,0 +1,2 @@
+1/2 bugs/moddata_1/bug119: passed ['operation-failed']
+2/2 bugs/moddata_1/bug203: passed ['operation-succeeded']

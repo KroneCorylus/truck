@@ -1,12 +1,15 @@
 """The capture wrapper must preserve native Tcl scope, results and errors."""
 
+import json
 from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
 import shutil
 import subprocess
 import tempfile
 import unittest
 
-from run_capture import selected_cases
+from run_capture import run_case, selected_cases
 
 
 class WrapperTests(unittest.TestCase):
@@ -105,6 +108,73 @@ class SelectionTests(unittest.TestCase):
                  dict(id='bugs/a/unrelated', occt_run='passed', commands=[])]
         self.assertEqual(selected_cases(dict(cases=cases), []), cases[:2])
         self.assertEqual(selected_cases(dict(cases=cases), ['*chamfer']), [cases[1]])
+
+
+class RejectedCaptureTests(unittest.TestCase):
+    def capture(self, log, *, input_json=True, input_step=True, result_json=None,
+                truck_status='operation-failed'):
+        with tempfile.TemporaryDirectory() as temp:
+            args = SimpleNamespace(output=Path(temp), draw='DRAWEXE', replay=Path('replay'),
+                                   plugin=Path('plugin'), timeout=10)
+            task = dict(operation='fillet', selection=[dict(radius=50, points=[[0, 0, 0], [0, 0, 100]])])
+            calls = []
+
+            def execute(command, directory, env, timeout):
+                calls.append(command)
+                prefix = directory / 'capture' / '001'
+                if command[0] == 'DRAWEXE':
+                    prefix.parent.mkdir()
+                    prefix.with_suffix('.input.json').write_text(json.dumps(task) if input_json else '{')
+                    if input_step:
+                        prefix.with_suffix('.input.step').write_text('input fixture')
+                    if log is not None:
+                        prefix.with_suffix('.capture.log').write_text(log)
+                    if result_json is not None:
+                        prefix.with_suffix('.result.json').write_text(result_json)
+                elif command[0] == 'replay':
+                    report = dict(comparison='unverified', result=dict(status=truck_status,
+                                  input_unchanged=True, step_prepared=truck_status=='operation-succeeded'))
+                    prefix.with_suffix('.truck.json').write_text(json.dumps(report))
+                else:
+                    self.fail('A rejected native operation has no reference shape to compare')
+                return '', 0, False, 0.
+
+            with patch('run_capture.execute', side_effect=execute), patch('run_capture.classify', return_value=dict(status='passed')):
+                result = run_case(dict(id='bugs/grid/case', occt_run='passed'), {}, args, {})
+            return result['captures'][0], calls
+
+    def test_confirmed_native_rejection_replays_input_without_shape_comparison(self):
+        capture, calls = self.capture('input_captured 1 message {}\nnative_return_code 1\n')
+        self.assertEqual(len(calls), 2)
+        self.assertEqual(capture['native_result'], dict(status='operation-failed', returncode=1))
+        self.assertEqual(capture['truck']['result']['status'], 'operation-failed')
+        self.assertTrue(capture['truck']['result']['input_unchanged'])
+        self.assertEqual(capture['task']['selection'], [dict(radius=50, point_count=2)])
+        self.assertIsNone(capture['sampled_comparison'])
+        self.assertEqual(capture['comparison'], 'unverified')
+
+    def test_truck_success_against_native_rejection_does_not_invent_a_comparison(self):
+        capture, calls = self.capture('input_captured 1 message {}\nnative_return_code 1\n', truck_status='operation-succeeded')
+        self.assertEqual(len(calls), 2)
+        self.assertEqual(capture['truck']['result']['status'], 'operation-succeeded')
+        self.assertEqual(capture['native_result']['status'], 'operation-failed')
+        self.assertIsNone(capture['sampled_comparison'])
+        self.assertEqual(capture['comparison'], 'unverified')
+
+    def test_missing_or_corrupt_capture_evidence_remains_incomplete(self):
+        confirmed = 'input_captured 1 message {}\nnative_return_code 1\n'
+        scenarios = [dict(log=None), dict(log=''),
+                     dict(log='input_captured 1 message {}\nnative_return_code 0\n'),
+                     dict(log='input_captured 0 message export-error\nnative_return_code 1\n'),
+                     dict(log='input_captured 1 message {}\nnative_return_code 2\n'),
+                     dict(log=confirmed, input_json=False), dict(log=confirmed, input_step=False),
+                     dict(log=confirmed, result_json='{')]
+        for scenario in scenarios:
+            with self.subTest(scenario=scenario):
+                capture, calls = self.capture(**scenario)
+                self.assertEqual(len(calls), 1)
+                self.assertEqual(capture['status'], 'capture-incomplete')
+                self.assertNotIn('truck', capture)
 
 
 if __name__ == '__main__':
