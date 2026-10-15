@@ -354,6 +354,16 @@ def apply_runs(cases, occt, directory, captured=False):
                 raise ValueError(f'Missing or stale artifact archive: {archive}')
             with zipfile.ZipFile(archive) as zipped:
                 archived = {name: hashlib.sha256(zipped.read(name)).hexdigest() for name in zipped.namelist()}
+        if 'test_data' in manifest:
+            if manifest.get('test_data_verified') is not True:
+                raise ValueError(f'Unverified external test data: {path}')
+            data = manifest['test_data']
+            for name, digest in data['external_files'].items():
+                member = data.get('archive_members', {}).get(name)
+                valid = (archived.get(member) == digest if archived is not None
+                         else Path(name).is_file() and sha(Path(name)) == digest)
+                if not valid:
+                    raise ValueError(f'Missing or stale external test data: {name}')
         for result in manifest['cases']:
             if result['id'] not in by_id:
                 raise ValueError(f'Unknown execution case: {result["id"]}')

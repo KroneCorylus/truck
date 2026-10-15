@@ -109,6 +109,14 @@ class SelectionTests(unittest.TestCase):
         self.assertEqual(selected_cases(dict(cases=cases), []), cases[:2])
         self.assertEqual(selected_cases(dict(cases=cases), ['*chamfer']), [cases[1]])
 
+    def test_passing_dedicated_chamfers_are_selected_when_helpers_build_the_command(self):
+        passing = dict(id='chamfer/equal_dist/A1', occt_run='passed', commands=[])
+        cases = [passing, dict(id='chamfer/equal_dist/A2', occt_run='skipped', commands=[]),
+                 dict(id='chamfer/dist_angle/A3', occt_run='known-failure', commands=[]),
+                 dict(id='bugs/grid/other', occt_run='passed', commands=[])]
+        self.assertEqual(selected_cases(dict(cases=cases), []), [passing])
+        self.assertEqual(selected_cases(dict(cases=cases), ['chamfer/*']), [passing])
+
 
 class RejectedCaptureTests(unittest.TestCase):
     def capture(self, log, *, input_json=True, input_step=True, result_json=None,

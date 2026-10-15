@@ -30,6 +30,16 @@ def sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
+def data_configuration(occt, extra_paths):
+    extra_paths = [path.resolve() for path in extra_paths]
+    for path in extra_paths:
+        if not path.is_dir():
+            raise ValueError(f'External test data directory is missing: {path}')
+    return dict(search_paths=[str((occt / 'data').resolve()), *map(str, extra_paths)],
+                external_files={str(p): sha(p) for root in extra_paths
+                                for p in sorted(root.rglob('*')) if p.is_file()})
+
+
 def tcl_word(value):
     return '"' + re.sub(r'([\\"$\[\]])', r'\\\1', str(value)).replace('\n', '\\n').replace('\r', '\\r') + '"'
 
@@ -146,6 +156,8 @@ def main():
     parser.add_argument('--catalog', type=Path, default=HERE / 'catalog.json')
     parser.add_argument('--case', action='append', default=[], help='Case ID glob, repeatable')
     parser.add_argument('--include-missing', action='store_true')
+    parser.add_argument('--data-path', type=Path, action='append', default=[],
+                        help='Additional test data directory; repeatable, content hashes recorded')
     parser.add_argument('--draw', default='DRAWEXE')
     parser.add_argument('--workers', type=int, default=2)
     parser.add_argument('--timeout', type=float, default=120)
@@ -156,6 +168,7 @@ def main():
     args.draw = shutil.which(args.draw)
     if not args.draw:
         parser.error('DRAWEXE was not found')
+    data = data_configuration(args.occt, args.data_path)
     catalog = json.loads(args.catalog.read_text())
     cases = [c for c in catalog['cases'] if
              (args.include_missing or c['dependency_status'] != 'missing-in-checkout') and
@@ -168,6 +181,7 @@ def main():
                     scope='Unmodified OCCT harness execution; no Truck comparison or proof of blend geometry.',
                     source_revision=catalog['snapshots']['occt']['revision'],
                     runner_sha256=sha(__file__), workers=args.workers,
+                    test_data=data, test_data_verified=False,
                     draw=dict(path=args.draw, sha256=sha(args.draw)),
                     harness_sha256={str(p.relative_to(args.occt)): sha(p)
                                     for p in sorted((args.occt / 'src/DrawResources').glob('*')) if p.is_file()},
@@ -177,7 +191,7 @@ def main():
         env.update(LD_LIBRARY_PATH=str(args.library_path), CASROOT=str(args.occt),
                    CSF_DrawPluginDefaults=str(args.occt / 'src/DrawResources'),
                    DRAWDEFAULT=str(args.occt / 'src/DrawResources/DrawDefault'),
-                   CSF_TestScriptsPath=str(args.occt / 'tests'), CSF_TestDataPath=str(args.occt / 'data'),
+                   CSF_TestScriptsPath=str(args.occt / 'tests'), CSF_TestDataPath=os.pathsep.join(data['search_paths']),
                    CSF_ShadersDirectory=str(args.occt / 'src/Shaders'))
         version, code, timed_out, _ = execute([args.draw, '-v', '-c', 'pload ALL; puts [dversion]; exit'],
                                               args.output, env, 30)
@@ -195,6 +209,11 @@ def main():
                 temporary.write_text(json.dumps(manifest, indent=2) + '\n')
                 temporary.replace(args.output / 'results.json')
                 print(f'{len(manifest["cases"])}/{len(cases)} {result["id"]}: {result["status"]}', flush=True)
+
+    if data_configuration(args.occt, args.data_path) != data:
+        raise RuntimeError('External test data changed during execution')
+    manifest['test_data_verified'] = True
+    (args.output / 'results.json').write_text(json.dumps(manifest, indent=2) + '\n')
 
 
 if __name__ == '__main__':

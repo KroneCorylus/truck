@@ -62,7 +62,7 @@ python3 -m unittest discover -s audits/fillet-chamfer/capture -p 'test_*.py'
 
 Fifteen Rust tests cover physical selection, per-edge fillet radii, equal and
 unequal chamfer distances, reference-plane identity, planar distance/angle
-conversion on acute, right and obtuse corners, impossible-angle rejection, duplicate assignments and rejected unsupported/invalid intent. Eight
+conversion on acute, right and obtuse corners, impossible-angle rejection, duplicate assignments and rejected unsupported/invalid intent. Nine
 Python/Tcl tests cover command selection, native caller scope, interleaved command
 numbering, preservation of success/error behavior, and replay of confirmed native
 rejections. A rejected native operation has no reference shape: its valid input
@@ -97,3 +97,15 @@ probes or counted as passing when only dimension-defined controls are available.
 
 The first instrumented baseline and its observed gaps are documented in
 `baseline/REPORT.md`. Later kernel fixes do not retroactively alter those results.
+
+## External native test data
+
+Both `run_occt.py` and `capture/run_capture.py` accept repeatable `--data-path DIR`.
+The default OCCT data directory stays first. Additional directories and every file's
+SHA-256 are recorded in `test_data`; the runner checks them again before marking
+`test_data_verified` true. Keep the directories unchanged throughout execution.
+For native tests whose static catalog says missing-in-checkout, use
+`--include-missing` with the additional directory. Run the unchanged native cases
+and rebuild the catalog before capture: only native-passing entries are selected.
+Dedicated chamfer grids are selected even when their Tcl helpers build commands
+dynamically. External data does not establish a passing test or Truck parity.

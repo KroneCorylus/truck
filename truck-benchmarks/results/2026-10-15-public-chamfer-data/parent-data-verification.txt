@@ -1,0 +1,14 @@
+........F.............
+======================================================================
+FAIL: test_execution_checks_external_data_verification_and_archived_bytes (test_build_catalog.CatalogTests.test_execution_checks_external_data_verification_and_archived_bytes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/krone/Development/Pieza_WS/truck/audits/fillet-chamfer/test_build_catalog.py", line 145, in test_execution_checks_external_data_verification_and_archived_bytes
+    with self.assertRaisesRegex(ValueError, 'test data'):
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 22 tests in 0.040s
+
+FAILED (failures=1)

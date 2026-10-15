@@ -133,6 +133,37 @@ void registerCommands() {
         self.assertEqual(case['comparison'], 'unverified')
         self.assertEqual(len(runs), 1)
 
+    def test_execution_checks_external_data_verification_and_archived_bytes(self):
+        case, _, log = self.execution_fixture()
+        data_file = self.put('external/shape.brep', 'shape bytes')
+        path = self.root / 'runs/first/results.json'
+        manifest = json.loads(path.read_text())
+        manifest['test_data'] = dict(search_paths=[str(data_file.parent)],
+                                    external_files={str(data_file): audit.sha(data_file)})
+        manifest['test_data_verified'] = False
+        path.write_text(json.dumps(manifest))
+        with self.assertRaisesRegex(ValueError, 'test data'):
+            audit.apply_runs([case], self.root / 'occt', self.root / 'runs')
+        manifest['test_data_verified'] = True
+        path.write_text(json.dumps(manifest))
+        audit.apply_runs([case], self.root / 'occt', self.root / 'runs')
+        data_file.write_text('changed')
+        with self.assertRaisesRegex(ValueError, 'test data'):
+            audit.apply_runs([case], self.root / 'occt', self.root / 'runs')
+        archive = path.parent / 'artifacts.zip'
+        with zipfile.ZipFile(archive, 'w') as zipped:
+            zipped.write(log, 'bugs/grid/a/console.log')
+            zipped.writestr('data/shape.brep', 'shape bytes')
+        manifest['artifact_archive'] = archive.name
+        manifest['artifact_archive_sha256'] = audit.sha(archive)
+        manifest['test_data']['archive_members'] = {str(data_file): 'data/shape.brep'}
+        path.write_text(json.dumps(manifest))
+        audit.apply_runs([case], self.root / 'occt', self.root / 'runs')
+        manifest['test_data']['archive_members'][str(data_file)] = 'missing'
+        path.write_text(json.dumps(manifest))
+        with self.assertRaisesRegex(ValueError, 'test data'):
+            audit.apply_runs([case], self.root / 'occt', self.root / 'runs')
+
     def test_execution_rejects_changed_source_and_missing_log(self):
         case, source, log = self.execution_fixture()
         log.unlink()

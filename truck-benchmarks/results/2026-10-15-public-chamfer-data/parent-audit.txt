@@ -1,0 +1,23 @@
+...............EE....
+======================================================================
+ERROR: test_external_data_preserves_default_search_path_and_records_exact_bytes (test_run_occt.ExternalDataTests.test_external_data_preserves_default_search_path_and_records_exact_bytes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/krone/Development/Pieza_WS/truck/audits/fillet-chamfer/test_run_occt.py", line 49, in test_external_data_preserves_default_search_path_and_records_exact_bytes
+    data = run_occt.data_configuration(occt, [external])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'run_occt' has no attribute 'data_configuration'
+
+======================================================================
+ERROR: test_missing_external_data_directory_is_not_silently_ignored (test_run_occt.ExternalDataTests.test_missing_external_data_directory_is_not_silently_ignored)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/krone/Development/Pieza_WS/truck/audits/fillet-chamfer/test_run_occt.py", line 60, in test_missing_external_data_directory_is_not_silently_ignored
+    run_occt.data_configuration(Path(temp), [Path(temp) / 'missing'])
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'run_occt' has no attribute 'data_configuration'
+
+----------------------------------------------------------------------
+Ran 21 tests in 0.036s
+
+FAILED (errors=2)

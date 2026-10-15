@@ -1,0 +1,21 @@
+....F....
+======================================================================
+FAIL: test_passing_dedicated_chamfers_are_selected_when_helpers_build_the_command (test_capture.SelectionTests.test_passing_dedicated_chamfers_are_selected_when_helpers_build_the_command)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/krone/Development/Pieza_WS/truck/audits/fillet-chamfer/capture/test_capture.py", line 117, in test_passing_dedicated_chamfers_are_selected_when_helpers_build_the_command
+    self.assertEqual(selected_cases(dict(cases=cases), []), [passing])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [] != [{'id': 'chamfer/equal_dist/A1', 'occt_run': 'passed', 'commands': []}]
+
+Second list contains 1 additional elements.
+First extra element 0:
+{'id': 'chamfer/equal_dist/A1', 'occt_run': 'passed', 'commands': []}
+
+- []
++ [{'commands': [], 'id': 'chamfer/equal_dist/A1', 'occt_run': 'passed'}]
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.023s
+
+FAILED (failures=1)

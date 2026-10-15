@@ -10,6 +10,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 import fnmatch
 import json
+import os
 from pathlib import Path
 import shutil
 import sys
@@ -17,12 +18,13 @@ import subprocess
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
-from run_occt import case_sources, classify, execute, isolated_display, sha, tcl_word
+from run_occt import case_sources, classify, data_configuration, execute, isolated_display, sha, tcl_word
 
 
 def selected_cases(catalog, patterns):
     return [c for c in catalog['cases'] if c['occt_run'] == 'passed'
-            and {'blend', 'chamf'}.intersection(c['commands']) and
+            and ({'blend', 'chamf'}.intersection(c['commands'])
+                 or c['id'].startswith('chamfer/')) and
             (not patterns or any(fnmatch.fnmatchcase(c['id'], p) for p in patterns))]
 
 
@@ -112,6 +114,8 @@ def main():
     parser.add_argument('--replay', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--case', action='append', default=[])
+    parser.add_argument('--data-path', type=Path, action='append', default=[],
+                        help='Additional test data directory; repeatable, content hashes recorded')
     parser.add_argument('--workers', type=int, default=2)
     parser.add_argument('--timeout', type=float, default=120)
     args = parser.parse_args()
@@ -123,6 +127,7 @@ def main():
     if not args.draw or not args.replay.is_file() or not all(
             (args.plugin / name).is_file() for name in ['libTKBlendAudit.so', 'compare_shapes']):
         parser.error('Build DRAW plugin and replay example first; DRAWEXE must be available')
+    data = data_configuration(args.occt, args.data_path)
     catalog = json.loads((HERE.parent / 'catalog.json').read_text())
     cases = selected_cases(catalog, args.case)
     if not cases:
@@ -137,6 +142,7 @@ def main():
     manifest = dict(kernel_revision=git('rev-parse', 'HEAD'),
                     kernel_tracked_changes=git('status', '--porcelain', '--untracked-files=no'),
                     kernel_source_sha256={name: sha(truck_root / name) for name in sorted(set(kernel_paths))},
+                    test_data=data, test_data_verified=False,
                     schema_version=1, started_utc=datetime.now(timezone.utc).isoformat(),
                     scope=__doc__, snapshots=catalog['snapshots'],
                     source_sha256={str(p): sha(p) for p in [Path(__file__),
@@ -155,7 +161,7 @@ def main():
                    CSF_DrawPluginDefaults=str(args.occt / 'src/DrawResources'),
                    DRAWDEFAULT=str(args.occt / 'src/DrawResources/DrawDefault'),
                    CSF_TestScriptsPath=str(args.occt / 'tests'),
-                   CSF_TestDataPath=str(args.occt / 'data'),
+                   CSF_TestDataPath=os.pathsep.join(data['search_paths']),
                    CSF_ShadersDirectory=str(args.occt / 'src/Shaders'))
         version, code, timed_out, _ = execute([args.draw, '-v', '-c',
             'pload ALL; pload -BlendAudit BLENDAUDIT; puts [dversion]; exit'], args.output, env, 30)
@@ -176,6 +182,11 @@ def main():
                             for c in result['captures']]
                 print(f'{len(manifest["cases"])}/{len(cases)} {result["id"]}: '
                       f'{result["native"]["status"]} {outcomes}', flush=True)
+
+    if data_configuration(args.occt, args.data_path) != data:
+        raise RuntimeError('External test data changed during execution')
+    manifest['test_data_verified'] = True
+    (args.output / 'results.json').write_text(json.dumps(manifest, indent=2) + '\n')
 
 
 if __name__ == '__main__':

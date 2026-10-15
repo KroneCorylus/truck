@@ -1,0 +1,4 @@
+1/4 chamfer/dist_dist/A2: passed ['unhandled-intent']
+2/4 chamfer/dist_angle/A2: passed ['unhandled-intent']
+3/4 chamfer/equal_dist/A2: passed ['operation-succeeded']
+4/4 chamfer/equal_dist_sequence/A4: passed ['operation-succeeded', 'operation-failed', 'operation-succeeded', 'operation-succeeded', 'operation-failed', 'operation-failed', 'operation-failed', 'operation-failed']
