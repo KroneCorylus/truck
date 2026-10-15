@@ -1,0 +1,96 @@
+{
+  "kernel_revision": "e3fab5a68a5d3d3aafdd365336f95af0e6270b94",
+  "native": {
+    "passed": 396
+  },
+  "captures": 648,
+  "before_statuses": {
+    "input-import-failed": 96,
+    "operation-succeeded": 231,
+    "operation-failed": 202,
+    "unhandled-intent": 110,
+    "input-inconsistent": 9
+  },
+  "after_statuses": {
+    "input-import-failed": 96,
+    "operation-succeeded": 231,
+    "operation-failed": 202,
+    "unhandled-intent": 110,
+    "input-inconsistent": 9
+  },
+  "capture_scopes": {
+    "fillet-native-contours": 161,
+    "chamfer-native-contours": 487
+  },
+  "unchanged_intent_records": 644,
+  "successful_checks": {
+    "constructed": 231,
+    "input_unchanged": 231,
+    "geometry_consistent": 231,
+    "mesh_closed": 231,
+    "step_prepared": 231,
+    "native_valid": 231,
+    "truck_step_valid": 231,
+    "single_solid": 231,
+    "sampled_distance": 220
+  },
+  "limited_comparison_passes": 220,
+  "status_changes": [],
+  "scope_changes": [
+    {
+      "case": "blend/complex/G9",
+      "capture": "002",
+      "scope": [
+        {
+          "index": 1,
+          "constant_radius": 4.9,
+          "contour_edges": 3
+        }
+      ]
+    },
+    {
+      "case": "blend/simple/Q7",
+      "capture": "002",
+      "scope": [
+        {
+          "index": 1,
+          "constant_radius": 2,
+          "contour_edges": 3
+        }
+      ]
+    },
+    {
+      "case": "blend/simple/X1",
+      "capture": "002",
+      "scope": [
+        {
+          "index": 1,
+          "constant_radius": 15,
+          "contour_edges": 3
+        }
+      ]
+    },
+    {
+      "case": "bugs/modalg_4/bug828",
+      "capture": "001",
+      "scope": [
+        {
+          "index": 1,
+          "constant_radius": 10,
+          "contour_edges": 6
+        },
+        {
+          "index": 2,
+          "constant_radius": 10,
+          "contour_edges": 6
+        }
+      ]
+    }
+  ],
+  "changed_scope_check_losses": [],
+  "unchanged_intent_regressions": [],
+  "numeric_changes": [],
+  "exact_successful_results_excluding_scope_label": 231,
+  "seed_capture_changes": [],
+  "native_reference_changes": []
+}
