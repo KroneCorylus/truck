@@ -11,7 +11,7 @@ use truck_shapeops::SplitClosedEdgesAndFaces;
 use truck_stepio::{out::*, r#in::Table};
 
 const TOL: f64 = 0.001;
-const STEP_TOL: f64 = TOLERANCE / 10.;
+const CHAMFER_STEP_TOL: f64 = TOLERANCE / 10.;
 
 fn import(path: &str) -> Result<Solid, String> {
     let text = std::fs::read_to_string(path).map_err(|e| e.to_string())?;
@@ -427,8 +427,14 @@ fn replay(prefix: &str, stage: &Cell<&'static str>) -> Result<Value, String> {
             )
         }
     };
-    let mut report = replay_task(prefix, stage, &task, schema)?;
+    let step_tol = if task["operation"] == "chamfer" {
+        CHAMFER_STEP_TOL
+    } else {
+        TOL / 20.
+    };
+    let mut report = replay_task(prefix, stage, &task, schema, step_tol)?;
     report["selection_scope"] = json!(scope);
+    report["step_fitting_tolerance"] = json!(step_tol);
     Ok(report)
 }
 
@@ -437,6 +443,7 @@ fn replay_task(
     stage: &Cell<&'static str>,
     task: &Value,
     schema: u64,
+    step_tol: f64,
 ) -> Result<Value, String> {
     stage.set("import-and-preprocess");
     let input = match import(&format!("{prefix}.input.step")) {
@@ -535,7 +542,7 @@ fn replay_task(
         .remove_degenerate_faces()
         .remove_unused_attrs();
     stage.set("step-export");
-    let prepared = prepare_for_step(&result.solid.compress(), STEP_TOL);
+    let prepared = prepare_for_step(&result.solid.compress(), step_tol);
     if let Some(prepared) = &prepared {
         let design = StepDesign::from_model(StepModel::from(prepared));
         std::fs::write(
@@ -564,7 +571,7 @@ fn main() {
             Ok(Err(error)) => json!({"status":"harness-error","error":error}),
             Err(_) => json!({"status":"panic"}),
         };
-    let report = json!({"schema_version":1,"tolerance":TOL,"step_fitting_tolerance":STEP_TOL,"comparison":"unverified","stage":stage.get(),"result":result});
+    let report = json!({"schema_version":1,"tolerance":TOL,"comparison":"unverified","stage":stage.get(),"result":result});
     std::fs::write(
         Path::new(&format!("{prefix}.truck.json")),
         serde_json::to_string_pretty(&report).unwrap(),
@@ -1205,5 +1212,43 @@ mod native_contour_tests {
             result["selected_edges"], 3,
             "Legacy replay cannot silently expand its seed"
         );
+    }
+}
+
+#[cfg(test)]
+mod fillet_step_tolerance_tests {
+    use super::*;
+
+    #[test]
+    fn fillet_replay_preserves_its_supported_step_fitting_budget() {
+        let directory =
+            std::env::temp_dir().join(format!("truck-fillet-export-budget-{}", std::process::id()));
+        std::fs::create_dir_all(&directory).unwrap();
+        let prefix = directory.join("001");
+        let prefix = prefix.to_str().unwrap();
+        let step = include_str!("../tests/fixtures/replay-step-tolerances/D4.step");
+        let task = include_str!("../tests/fixtures/replay-step-tolerances/D4.json");
+        std::fs::write(format!("{prefix}.input.step"), step).unwrap();
+        std::fs::write(format!("{prefix}.input.json"), task).unwrap();
+        let result = replay(prefix, &Cell::new("start")).unwrap();
+        assert_eq!(result["status"], "operation-succeeded", "{result}");
+        assert_eq!(result["selection_scope"], "seed-only", "{result}");
+        assert_eq!(result["selected_edges"], 1, "{result}");
+        for field in [
+            "input_unchanged",
+            "geometry_consistent",
+            "mesh_closed",
+            "step_prepared",
+        ] {
+            assert_eq!(result[field], true, "{field}: {result}");
+        }
+        assert_eq!(
+            std::fs::read_to_string(format!("{prefix}.input.step")).unwrap(),
+            step
+        );
+        let output = import(&format!("{prefix}.truck.step")).unwrap();
+        replay_common::assert_topology(&output, &[0]);
+        replay_common::blend::assert_step(&output, 3435781.0157892024, TOL);
+        std::fs::remove_dir_all(directory).unwrap();
     }
 }

@@ -1,0 +1,19 @@
+{
+  "parent_revision": "2346b975f9760071ee6b71f6efa2d354dbd698e2",
+  "source_sha256": {
+    "truck-shapeops/examples/replay_occt_blend.rs": "78c5e75727ff3a1cb9e110f6c7796374f7a13eed4be4c2fdf63821545c4396a1",
+    "truck-shapeops/tests/fixtures/replay-step-tolerances/D4.step": "e3216147c32cb505b53a58872bcd2bd46a02a59edbd60695f97381af300b1471",
+    "truck-shapeops/tests/fixtures/replay-step-tolerances/D4.json": "65a0d620b36c23d4c49faa67853e150711338811c7897b1b1dc81408cfbec3bf",
+    "truck-shapeops/tests/fixtures/replay-step-tolerances/README.md": "d31873409c39fc251463d3cb8559a036c6c84667d0cfb13dd78703eefbde520a"
+  },
+  "step_fitting_tolerances": {
+    "chamfer": 1e-07,
+    "fillet": 5e-05
+  },
+  "replay_tests": 25,
+  "executable_sha256": {
+    "target/release/examples/replay_occt_blend": "fe50005149b67022f784a6b6a75f35ceea122c22e3b535dea9feda7b32322d7c",
+    "target/occt-contour-capture-plugin/libTKBlendAudit.so": "25f98b5629aff171ce4f10fccf4646e745510afdb25d4c6bc2fde146bcfa88f7",
+    "target/occt-contour-capture-plugin/compare_shapes": "c9215123784a8c9e656fbbbd2ab169852418d68e7c0592c48652d658ead74a41"
+  }
+}

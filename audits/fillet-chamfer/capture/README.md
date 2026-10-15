@@ -60,12 +60,13 @@ cargo test -p truck-shapeops --example replay_occt_blend
 python3 -m unittest discover -s audits/fillet-chamfer/capture -p 'test_*.py'
 ```
 
-Twenty-four Rust tests cover physical selection, per-edge fillet radii, equal and
+Twenty-five Rust tests cover physical selection, per-edge fillet radii, equal and
 unequal chamfer distances, reference-plane identity, planar distance/angle
 conversion on acute, right and obtuse corners, impossible-angle rejection, duplicate
 assignments and rejected unsupported/invalid intent. Native-contour regressions
 cover expansion, missing scope, seed membership, first-assignment behavior, legacy
-labels, unknown schemas and a closed STEP round trip. Ten
+labels, unknown schemas, a closed STEP round trip and preserved fillet export
+budgets. Ten
 Python/Tcl tests cover command selection, native caller scope, interleaved command
 numbering, preservation of success/error behavior, and replay of confirmed native
 rejections and summaries of complete contour selections. A rejected native
@@ -115,9 +116,12 @@ probes or counted as passing when only dimension-defined controls are available.
   editing/history stability or practical latency. All comparison statuses remain
   unverified; measured differences are retained for investigation.
 - Modeling tolerance is 0.001, selection matching 0.0001, tessellation 0.001 and
-  STEP fitting 0.0000001. Replay fits are kept below kernel consistency
-  tolerance; the A4 regression checks the exported/reimported solid with the
-  shared solid and STEP harnesses. Native test tolerances and model scale may differ.
+  chamfer STEP fitting 0.0000001, and fillet STEP fitting 0.00005. Each structured
+  replay result records its actual `step_fitting_tolerance`. Chamfer fits stay
+  below kernel consistency tolerance; A4 checks a strict exported/reimported
+  solid. Fillets retain their supported subdivision budget and the exporter's
+  robust STEP tessellation contract; D4 checks that round trip with the shared
+  STEP harness. Native test tolerances and model scale may differ.
 - Per-process wall times include instrumentation and contention; they are not
   comparative performance benchmarks. The installed native binary is not a build
   of the locally modified OCCT source checkout.
