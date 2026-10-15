@@ -457,11 +457,18 @@
           "path": "truck-benchmarks/results/2026-10-15-chamfer-replay/REPORT.md",
           "find": "# Native chamfer capture",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-15-chamfer-angle/REPORT.md",
+          "find": "# Planar distance-and-angle",
+          "role": "test"
         }
       ],
       "required_outcome": "Produce a chamfer with the requested setback and angle, including non-right-angle supports, using any equivalent parameterization.",
       "verification": [
-        "At 99c956da, perpendicular planar distance/angle replay converts d1=d0*tan(angle) and preserves the reference face. Native controls at30 degrees pass; corpus bugs/moddata_1/bug203 initial distance5/angle45 chamfer now captures and constructs. Independent volume998750 matches native Truck STEP within3.493e-10. Nonperpendicular and curved-reference angle requests remain unsupported; later native fillet failure is not replayed."
+        "At 99c956da, perpendicular planar distance/angle replay converts d1=d0*tan(angle) and preserves the reference face. Native controls at30 degrees pass; corpus bugs/moddata_1/bug203 initial distance5/angle45 chamfer now captures and constructs. Independent volume998750 matches native Truck STEP within3.493e-10. Nonperpendicular and curved-reference angle requests remain unsupported; later native fillet failure is not replayed.",
+        "At 56f1c0ee, planar distance/angle replay covers acute and obtuse corners using oriented support normals and the sine rule. Eight native controls validate both reference faces and rigid motion; 15 replay tests pass. The full clean capture preserves all 106 previous successful records exactly, with 97 limited comparison passes. Missing chamfer fixtures and curved-support scope remain open."
       ]
     },
     {
@@ -3410,6 +3417,12 @@
           "path": "audits/fillet-chamfer/capture/2026-10-15-chamfer-replay/REPORT.md",
           "find": "# Full capture after native chamfer",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-15-chamfer-angle/REPORT.md",
+          "find": "# Planar distance-and-angle",
+          "role": "test"
         }
       ],
       "required_outcome": "Deliver blend results usable for closed meshing, STEP interchange and further modeling while preserving dimensions and validity.",
@@ -3448,7 +3461,8 @@
         "Full clean replay at 946914f8 (kernel f6fa8d15): all 156 native entries pass; 161 captures contain 80 constructed outputs, 37 construction failures, 22 import failures, 11 inconsistent inputs, eight unhandled intents, two timeouts and one incomplete capture. Zero panics. G9 capture 002 changes from panic to Unsupported imported geometry; all other operation statuses are unchanged. All 80 constructions remain immutable/consistent/closed/STEP-prepared/native-valid single solids, with identical reported mesh volumes, STEP volumes and maximum sampled distances. Seventy-eight pass combined limited comparisons; G1 and tolerance-grid A1 differences and H2/H4 timeouts remain. Full parity remains unverified. See audits/fillet-chamfer/capture/2026-10-12-seam-junction/REPORT.md.",
         "The clean 35c6e2cf full capture has 104 valid constructions and 95 limited comparison passes. All 101 preceding successful result/comparison records are exactly unchanged. Three formerly unhandled unequal-radius captures now construct; five are attempted unsupported-topology failures. Full parity remains unverified.",
         "The clean dbb54343 full capture has 105 valid constructions and 96 limited comparison passes. The F1 spherical pcurve import is recovered; 104 preceding successful result/comparison records are exactly unchanged. Two remaining import failures are closed-shell inputs with no native solid entity. Full parity remains unverified.",
-        "The clean 99c956da full capture adds one real chamfer case:157 native entries,162 captures,106 valid constructions,97 limited comparison passes. All105 preceding successful result/comparison records are exactly unchanged. Seven synthetic chamfer controls and one fillet control are separate proof, not corpus recovery.279 dedicated chamfer fixtures remain missing-data skips."
+        "The clean 99c956da full capture adds one real chamfer case:157 native entries,162 captures,106 valid constructions,97 limited comparison passes. All105 preceding successful result/comparison records are exactly unchanged. Seven synthetic chamfer controls and one fillet control are separate proof, not corpus recovery.279 dedicated chamfer fixtures remain missing-data skips.",
+        "At 56f1c0ee, planar distance/angle replay covers acute and obtuse corners using oriented support normals and the sine rule. Eight native controls validate both reference faces and rigid motion; 15 replay tests pass. The full clean capture preserves all 106 previous successful records exactly, with 97 limited comparison passes. Missing chamfer fixtures and curved-support scope remain open."
       ]
     },
     {

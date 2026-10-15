@@ -1,0 +1,36 @@
+{
+  "kernel_revision": "56f1c0ee962f5e3f3e3f088080d5731e662eec3b",
+  "native": {
+    "passed": 157
+  },
+  "captures": 162,
+  "before_statuses": {
+    "input-import-failed": 2,
+    "operation-succeeded": 106,
+    "operation-failed": 53,
+    "capture-incomplete": 1
+  },
+  "after_statuses": {
+    "input-import-failed": 2,
+    "operation-succeeded": 106,
+    "operation-failed": 53,
+    "capture-incomplete": 1
+  },
+  "successful_checks": {
+    "constructed": 106,
+    "input_unchanged": 106,
+    "geometry_consistent": 106,
+    "mesh_closed": 106,
+    "step_prepared": 106,
+    "native_valid": 106,
+    "truck_step_valid": 106,
+    "single_solid": 106,
+    "sampled_distance": 97
+  },
+  "limited_comparison_passes": 97,
+  "status_changes": [],
+  "check_changes": [],
+  "numeric_changes": [],
+  "regressions": [],
+  "unchanged_successful_results_and_comparisons": 106
+}
