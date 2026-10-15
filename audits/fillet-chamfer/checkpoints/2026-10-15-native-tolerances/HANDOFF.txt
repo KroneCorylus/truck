@@ -1,0 +1,77 @@
+STORED NATIVE TOLERANCES — 2026-10-15
+User says continue and commit achievements; do not stop until done or told.
+
+COMPLETED
+c8f6fc9cc51d6d50a330323cee0230b7acafa505: shared shape_tolerances.hpp records finite nonnegative maximum face/edge/
+vertex budgets. Capture: stored_tolerances; comparison: native_tolerances and
+truck_step_tolerances. Header included in runtime fingerprints. No geometry,
+threshold, validity flag, kernel API or parity verdict changes.
+Parent-failing box control: exact volume6000, zero sampled distance despite
+budgets .05/.1/.2. 68 byte-verified proof members SHA
+ a71e2ae15d464bf5ac769984618f5d6243db5d0cc2eb520016a1276ebfe6dc0f.
+13 capture +22 audit tests; C++ warnings build, Clippy, smoke, final replay pass.
+Prior33replay/504kernelpasses not rerun; source unchanged.
+
+FULL CLEAN CAPTURE
+Raw target/occt-capture-native-tolerances, runtime c8f6fc9cc51d6d50a330323cee0230b7acafa505.
+396nativepass,648captures (487chamfer,161fillet); all648sameintent.
+{"input-import-failed": 96, "operation-succeeded": 231, "operation-failed": 202, "unhandled-intent": 110, "input-inconsistent": 9}
+231constructions all immutable/consistent/closedmesh/preparedSTEP/validsingle;
+220limitedsamplepasses. All231successful results/comparisons EXACT excluding
+newfields; all native properties EXACT. No regressions/statuschanges.
+Native results28/647 above .001; inputs7/648; TruckSTEP0/231.
+One rejected native operation lacks result BREP. H4 native22.9741069520462
+versusTruck1e-5; tolblend_simple/A1 native.00235108915834048. Both already
+mismatches. Every220limitedpass native budget<=.001. Budgets ARE NOT actualerrors.
+Archive 7744members SHA b2d83e50c5c4a44992aa5bc3423d3cb9dbe9dd075358ee537c09dba87ee1ae01.
+
+NEXT
+1. Independent G1/H4 geometry oracles before changing Truck to match references.
+   G1 native tolerance4.39707311635729e-5 does not explain its ~.9875 mismatch.
+   H4 native inflated budgets/concave material require independent checks.
+2. Other mismatches G5,J6,J8,K2,K3,K4,tolblend_simple/A1,
+   chamfer/dist_dist_complex/A1,equal_dist/A2.
+3. Solver/scope coverage, curved references, C1 gaps/shells/missingfixtures,
+   full-solid two-edge attachment, prior PCurve precision assertion (never loosen),
+   continuity/editing/latency. Full parity still unverified.
+
+EXPLORATION (untracked; not production proof yet)
+G1/H4 tighter STEP1e-7 does not remove discrepancies; G5 exceeds fitting budget.
+Correct rational-parameter section probe shows strict fit errors G1~.0005585,
+G5~.0005713,H4~7e-14 within.001 even over actual trim ranges. Early comparisons
+using ContactCircle angular parameter were INVALID; corrected via to_same_geometry.
+Scripts target/check-parabolic-fillet.cpp and parabolic-fillet-inspection.log:
+provisional G1 native radius residual.143 vsTruck4.6e-6; native planecontactz
+residual.492 vsTruck.000217. MUST validate analytic input supports/center curve
+before claiming anything. Expected G1 surface z=y²/2000+5x, endplane x=200,
+radius1000. Center C(q)=(-800,q*(1-1/g),q²/2000-4000+26000/g),g=sqrt(26+q²/1e6).
+This is a sampled radial residual, not full-surface distance certification.
+H4 independent270degree cylinder control has expected additive concave material;
+actual H4 native removesmaterial, Truckadds. Independent integral provisional
+expected volume13159710.462164925 vsTruck13159710.046042852. Separate quadrature
+and fitted-trim error before any hard claim. Native classifier nearpole unreliable
+under inflated tolerance. Retain diagnostic limitations.
+
+METHOD
+Originalscope: audits/fillet-chamfer/checkpoints/2026-10-12/HANDOFF.txt objective;
+latercheckpoints documentresolvedgaps. ReadAGENTS.md, neverweakenexistingtests.
+Parentfailingregressions, sharedsolid/STEPharness; no cargofmt. Use rustfmt+nightly
+--config skip_children=true on touchedfiles. CARGO_BUILD_JOBS=12. Relevanttests,
+Clippy/smoke, buildreplayLAST; no source/executable edits duringclean captures.
+Commitimplementation+proof, thencleanfullcapture+catalog/HTML/handoffcommit.
+Do not repeatcompletedfullcapturewithoutsourcechanges/specificnewconcern.
+Force-addignoredJSON/ZIP/STEP; diffcheckexcludeSTEP. No speed/fullparityclaims.
+
+Runtime: --occt ../investigations/sequential-holes-2026-10-10/occt
+--library-path target/occt-sdk/usr/lib64
+--plugin target/occt-tolerance-capture-plugin
+--replay target/release/examples/replay_occt_blend
+--data-path target/occt-public-chamfer-data --workers4 --timeout120 --outputNEW.
+SDK7.9.3. Existingnativecheckoutpatchesunrelated, leavealone. Consumer../PiezaCAD.
+Oldplugin target/occt-chamfer-capture-plugin remainsseed-only; DON'Treuseit.
+
+
+
+Current plugin target/occt-tolerance-capture-plugin; older plugins omit metadata.
+Scripts target/package-native-tolerance-full.py and write-native-tolerance-checkpoint.py
+are completed non-idempotent packaging. T3tab_1/server8765; preview hidden by user.
