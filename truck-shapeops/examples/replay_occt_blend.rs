@@ -205,13 +205,134 @@ fn as_wire(edges: &[Edge]) -> Option<Wire> {
     Some(wire)
 }
 
+fn captured_vector(value: &Value) -> Option<Vector3> {
+    let values = value.as_array()?;
+    if values.len() != 3 {
+        return None;
+    }
+    let v = Vector3::new(
+        values[0].as_f64()?,
+        values[1].as_f64()?,
+        values[2].as_f64()?,
+    );
+    v.is_finite().then_some(v)
+}
+
+fn chamfer_selection(input: &Solid, selection: &[Value]) -> Result<Vec<(Edge, [f64; 2])>, Value> {
+    let invalid = |reason: &str| json!({"status":"harness-error","error":reason});
+    let unsupported = |reason: &str| json!({"status":"unhandled-intent","reason":reason});
+    if selection.is_empty() {
+        return Err(invalid("Missing chamfer selections"));
+    }
+    let mut selected = Vec::new();
+    let mut assignments = std::collections::HashMap::new();
+    for chosen in selection {
+        let mode = chosen["mode"].as_str().unwrap_or("");
+        let positive = |v: &Value| {
+            v.as_f64()
+                .filter(|v| v.is_finite() && *v > 0.)
+                .ok_or_else(|| invalid("Invalid captured chamfer distance"))
+        };
+        let mut distances = match mode {
+            "equal-distance" => [positive(&chosen["distance"])?; 2],
+            "two-distances" => [
+                positive(&chosen["distances"][0])?,
+                positive(&chosen["distances"][1])?,
+            ],
+            "distance-angle" => {
+                let d = positive(&chosen["distance"])?;
+                let angle = chosen["angle_degrees"]
+                    .as_f64()
+                    .filter(|a| a.is_finite() && *a > 0. && *a < 90.)
+                    .ok_or_else(|| invalid("Invalid captured chamfer angle"))?;
+                [d, d * angle.to_radians().tan()]
+            }
+            _ => return Err(unsupported("Unsupported chamfer parameter mode")),
+        };
+        if distances.iter().any(|d| !d.is_finite() || *d <= 0.) {
+            return Err(invalid("Invalid derived chamfer distance"));
+        }
+        let reference = if mode == "equal-distance" {
+            None
+        } else {
+            let p = captured_vector(&chosen["reference_plane"]["origin"]);
+            let n = captured_vector(&chosen["reference_plane"]["normal"]);
+            let (Some(p), Some(n)) = (p, n) else {
+                return Err(unsupported(
+                    "Face-dependent chamfers require a captured reference plane",
+                ));
+            };
+            if n.magnitude2() < TOLERANCE * TOLERANCE {
+                return Err(invalid("Invalid reference plane normal"));
+            }
+            Some((Point3::from_vec(p), n.normalize()))
+        };
+        let matched = match_selection(input, chosen)
+            .map_err(|error| json!({"status":"selection-unmatched","error":error}))?;
+        let requested = distances;
+        for edge in matched {
+            distances = requested;
+            if let Some((origin, normal)) = reference {
+                let adjacent: Vec<_> = input
+                    .face_iter()
+                    .filter(|f| f.edge_iter().any(|e| e.id() == edge.id()))
+                    .collect();
+                let planes: Option<Vec<_>> = adjacent
+                    .iter()
+                    .map(|f| match f.surface().elementary() {
+                        Some((Elementary::Plane(p), _)) => Some(p),
+                        _ => None,
+                    })
+                    .collect();
+                let planes = planes.filter(|p| p.len() == 2).ok_or_else(|| {
+                    unsupported("Face-dependent chamfers currently require two planar supports")
+                })?;
+                let sides: Vec<_> = planes
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, p)| {
+                        Plane::normal(p).cross(normal).magnitude() < 1e-8
+                            && (p.origin() - origin).dot(normal).abs() < TOL / 10.
+                    })
+                    .map(|(i, _)| i)
+                    .collect();
+                let [side] = sides.as_slice() else {
+                    return Err(
+                        json!({"status":"selection-unmatched","error":"Reference plane does not uniquely match an adjacent face"}),
+                    );
+                };
+                if mode == "distance-angle"
+                    && planes[0].normal().dot(planes[1].normal()).abs() > 1e-8
+                {
+                    return Err(unsupported(
+                        "Distance-angle replay currently requires perpendicular planar supports",
+                    ));
+                }
+                if *side == 1 {
+                    distances.swap(0, 1);
+                }
+            }
+            if let Some(previous) = assignments.insert(edge.id(), distances) {
+                if previous != distances {
+                    return Err(invalid(
+                        "Conflicting chamfer distances for the same physical edge",
+                    ));
+                }
+            } else {
+                selected.push((edge, distances));
+            }
+        }
+    }
+    Ok(selected)
+}
+
 fn replay(prefix: &str, stage: &Cell<&'static str>) -> Result<Value, String> {
     let task: Value = serde_json::from_str(
         &std::fs::read_to_string(format!("{prefix}.input.json")).map_err(|e| e.to_string())?,
     )
     .map_err(|e| e.to_string())?;
-    if task["operation"] != "fillet" {
-        return Ok(json!({"status":"unhandled-intent","reason":"Only fillets are captured"}));
+    if task["operation"] != "fillet" && task["operation"] != "chamfer" {
+        return Ok(json!({"status":"unhandled-intent","reason":"Unsupported captured operation"}));
     }
     stage.set("import-and-preprocess");
     let input = match import(&format!("{prefix}.input.step")) {
@@ -224,49 +345,76 @@ fn replay(prefix: &str, stage: &Cell<&'static str>) -> Result<Value, String> {
     }
     let before = serde_json::to_string(&input.compress()).map_err(|e| e.to_string())?;
     let selection = task["selection"].as_array().ok_or("Missing selection")?;
-    let radius = selection
-        .first()
-        .and_then(|s| s["radius"].as_f64())
-        .ok_or("Missing radius")?;
-    if !radius.is_finite() || radius <= 0. {
-        return Err("Invalid captured radius".into());
-    }
-    let mut edges = Vec::new();
-    let mut selected = Vec::new();
-    let mut radii = std::collections::HashMap::new();
-    stage.set("physical-selection");
-    for chosen in selection {
-        let chosen_radius = chosen["radius"].as_f64().ok_or("Missing radius")?;
-        if !chosen_radius.is_finite() || chosen_radius <= 0. {
-            return Err("Invalid captured radius".into());
-        }
-        match match_selection(&input, chosen) {
-            Ok(matched) => {
-                for edge in matched {
-                    if let Some(previous) = radii.insert(edge.id(), chosen_radius) {
-                        if previous != chosen_radius {
-                            return Err("Conflicting radii for the same physical edge".into());
-                        }
-                    } else {
-                        selected.push((edge.id(), chosen_radius));
-                        edges.push(edge);
+    let (ids, result) = if task["operation"] == "chamfer" {
+        stage.set("physical-selection");
+        let selected = match chamfer_selection(&input, selection) {
+            Ok(selected) => selected,
+            Err(report) => return Ok(report),
+        };
+        let assignments: Vec<_> = selected.iter().map(|(e, d)| (e.id(), *d)).collect();
+        let edges: Vec<_> = selected.into_iter().map(|(e, _)| e).collect();
+        let ids: Vec<_> = edges.iter().map(|e| e.id()).collect();
+        let distance = assignments[0].1[0];
+        let equal = assignments.iter().all(|(_, d)| *d == [distance; 2]);
+        stage.set("blend");
+        let result =
+            try_chamfer_solid_edges_with_distances(&input, &assignments, TOL).or_else(|error| {
+                if equal {
+                    if let Some(wire) = as_wire(&edges) {
+                        return try_chamfer_solid_along_wire(
+                            &input, &wire, distance, distance, TOL,
+                        );
                     }
                 }
-            }
-            Err(error) => return Ok(json!({"status":"selection-unmatched","error":error})),
+                Err(error)
+            });
+        (ids, result)
+    } else {
+        let radius = selection
+            .first()
+            .and_then(|s| s["radius"].as_f64())
+            .ok_or("Missing radius")?;
+        if !radius.is_finite() || radius <= 0. {
+            return Err("Invalid captured radius".into());
         }
-    }
-    let ids: Vec<_> = edges.iter().map(|e| e.id()).collect();
-    let equal = selected.iter().all(|&(_, r)| r == radius);
-    stage.set("blend");
-    let result = try_fillet_solid_edges_with_radii(&input, &selected, TOL).or_else(|error| {
-        if equal {
-            if let Some(wire) = as_wire(&edges) {
-                return try_fillet_solid_along_wire(&input, &wire, radius, TOL);
+        let mut edges = Vec::new();
+        let mut selected = Vec::new();
+        let mut radii = std::collections::HashMap::new();
+        stage.set("physical-selection");
+        for chosen in selection {
+            let chosen_radius = chosen["radius"].as_f64().ok_or("Missing radius")?;
+            if !chosen_radius.is_finite() || chosen_radius <= 0. {
+                return Err("Invalid captured radius".into());
+            }
+            match match_selection(&input, chosen) {
+                Ok(matched) => {
+                    for edge in matched {
+                        if let Some(previous) = radii.insert(edge.id(), chosen_radius) {
+                            if previous != chosen_radius {
+                                return Err("Conflicting radii for the same physical edge".into());
+                            }
+                        } else {
+                            selected.push((edge.id(), chosen_radius));
+                            edges.push(edge);
+                        }
+                    }
+                }
+                Err(error) => return Ok(json!({"status":"selection-unmatched","error":error})),
             }
         }
-        Err(error)
-    });
+        let ids: Vec<_> = edges.iter().map(|e| e.id()).collect();
+        let equal = selected.iter().all(|&(_, r)| r == radius);
+        stage.set("blend");
+        let result = try_fillet_solid_edges_with_radii(&input, &selected, TOL).or_else(|error| {
+            if equal {
+                if let Some(wire) = as_wire(&edges) {
+                    return try_fillet_solid_along_wire(&input, &wire, radius, TOL);
+                }
+            }
+            Err(error)
+        });
+        (ids, result)
+    };
     let unchanged =
         before == serde_json::to_string(&input.compress()).map_err(|e| e.to_string())?;
     let result = match result {
@@ -496,4 +644,164 @@ mod unequal_radius_tests {
     fn unequal_wedge_radii_reach_the_solid_solver() { check("B5"); }
     #[test]
     fn unequal_cylindrical_lip_radii_reach_the_solid_solver() { check("C4"); }
+}
+
+#[cfg(test)]
+#[path = "../tests/common/mod.rs"]
+mod replay_common;
+
+#[cfg(test)]
+mod chamfer_replay_tests {
+    use super::*;
+
+    fn check(name: &str, parameters: Value, d0: f64, d1: f64) {
+        let directory = std::env::temp_dir().join(format!(
+            "truck-chamfer-replay-{}-{name}",
+            std::process::id()
+        ));
+        std::fs::create_dir_all(&directory).unwrap();
+        let prefix = directory.join("001");
+        let prefix = prefix.to_str().unwrap();
+        let step = unequal_fixture::case("A2").step;
+        std::fs::write(format!("{prefix}.input.step"), step).unwrap();
+        let mut chosen = parameters;
+        chosen["points"] = json!([[0., 0., 30.], [10., 0., 30.]]);
+        let task = json!({"operation":"chamfer","selection":[chosen.clone()]});
+        std::fs::write(format!("{prefix}.input.json"), task.to_string()).unwrap();
+        let result = replay(prefix, &Cell::new("start")).unwrap();
+        assert_eq!(result["status"], "operation-succeeded", "{result}");
+        for field in [
+            "input_unchanged",
+            "geometry_consistent",
+            "mesh_closed",
+            "step_prepared",
+        ] {
+            assert_eq!(result[field], true, "{field}: {result}");
+        }
+        assert!((result["mesh_volume"].as_f64().unwrap() - (6000. - 5. * d0 * d1)).abs() < 1e-6);
+        let output = import(&format!("{prefix}.truck.step")).unwrap();
+        replay_common::assert_solid(&output, 6000. - 5. * d0 * d1, &[0], TOL);
+        replay_common::blend::assert_step(&output, 6000. - 5. * d0 * d1, TOL);
+        let a = Point3::new(5., 0., 30. - d0);
+        let b = Point3::new(5., d1, 30.);
+        let expected = Vector3::new(0., -d0, d1).normalize();
+        assert!(output.face_iter().any(|f| {
+            let s = f.oriented_surface();
+            let pa = s.search_parameter(a, None, 20);
+            let pb = s.search_parameter(b, None, 20);
+            pa.zip(pb)
+                .is_some_and(|((u, v), _)| s.normal(u, v).dot(expected) > 1. - 1e-6)
+        }));
+        assert_eq!(
+            std::fs::read_to_string(format!("{prefix}.input.step")).unwrap(),
+            step
+        );
+        let mut duplicate = task.clone();
+        duplicate["selection"].as_array_mut().unwrap().push(chosen);
+        std::fs::write(format!("{prefix}.input.json"), duplicate.to_string()).unwrap();
+        assert_eq!(replay(prefix, &Cell::new("start")).unwrap(), result);
+        std::fs::remove_dir_all(directory).unwrap();
+    }
+
+    #[test]
+    fn equal_distance_chamfers_use_physical_edges() {
+        check(
+            "equal",
+            json!({"mode":"equal-distance","distance":2.}),
+            2.,
+            2.,
+        );
+    }
+
+    #[test]
+    fn unequal_chamfer_distances_preserve_the_reference_face() {
+        for normal in [[0., -1., 0.], [0., 1., 0.]] {
+            check(
+                if normal[1] < 0. {
+                    "unequal"
+                } else {
+                    "inverted-plane"
+                },
+                json!({"mode":"two-distances","distances":[2.,3.],
+                    "reference_plane":{"origin":[0.,0.,0.],"normal":normal}}),
+                2.,
+                3.,
+            );
+        }
+        check(
+            "other-side",
+            json!({"mode":"two-distances","distances":[2.,3.],
+            "reference_plane":{"origin":[0.,0.,30.],"normal":[0.,0.,1.]}}),
+            3.,
+            2.,
+        );
+    }
+
+    #[test]
+    fn perpendicular_distance_angle_chamfers_preserve_the_angle() {
+        check(
+            "angle",
+            json!({"mode":"distance-angle","distance":2.,"angle_degrees":30.,
+            "reference_plane":{"origin":[0.,0.,0.],"normal":[0.,-1.,0.]}}),
+            2.,
+            2. * (std::f64::consts::PI / 6.).tan(),
+        );
+    }
+    #[test]
+    fn invalid_ambiguous_and_unsupported_chamfer_intents_do_not_construct() {
+        let directory =
+            std::env::temp_dir().join(format!("truck-chamfer-invalid-{}", std::process::id()));
+        std::fs::create_dir_all(&directory).unwrap();
+        let prefix = directory.join("001");
+        let prefix = prefix.to_str().unwrap();
+        std::fs::write(
+            format!("{prefix}.input.step"),
+            unequal_fixture::case("A2").step,
+        )
+        .unwrap();
+        let equal =
+            json!({"mode":"equal-distance","distance":2.,"points":[[0.,0.,30.],[10.,0.,30.]]});
+        let mut invalid = equal.clone();
+        invalid["distance"] = json!(-1.);
+        let mut conflict = equal.clone();
+        conflict["distance"] = json!(3.);
+        let mut missing = equal.clone();
+        missing["mode"] = json!("two-distances");
+        missing["distances"] = json!([2., 3.]);
+        let mut wrong = missing.clone();
+        wrong["reference_plane"] = json!({"origin":[0.,20.,0.],"normal":[0.,1.,0.]});
+        let mut angle = equal.clone();
+        angle["mode"] = json!("distance-angle");
+        angle["angle_degrees"] = json!(90.);
+        for (selection, status) in [
+            (json!([invalid]), "harness-error"),
+            (json!([equal, conflict]), "harness-error"),
+            (json!([missing]), "unhandled-intent"),
+            (json!([wrong]), "selection-unmatched"),
+            (json!([angle]), "harness-error"),
+        ] {
+            std::fs::write(
+                format!("{prefix}.input.json"),
+                json!({"operation":"chamfer","selection":selection}).to_string(),
+            )
+            .unwrap();
+            let result = replay(prefix, &Cell::new("start")).unwrap();
+            assert_eq!(result["status"], status, "{result}");
+            assert!(!Path::new(&format!("{prefix}.truck.step")).exists());
+        }
+        let case = unequal_fixture::case("B5");
+        std::fs::write(format!("{prefix}.input.step"), case.step).unwrap();
+        let (a, b, _) = case.edges[0];
+        let selection = json!({"mode":"distance-angle","distance":0.1,"angle_degrees":30.,
+            "reference_plane":{"origin":[0.,1.,0.],"normal":[0.,1.,0.]},
+            "points":[[a.x,a.y,a.z],[b.x,b.y,b.z]]});
+        let result = chamfer_selection(
+            &import(&format!("{prefix}.input.step")).unwrap(),
+            &[selection],
+        )
+        .unwrap_err();
+        assert_eq!(result["status"], "unhandled-intent");
+        assert!(result["reason"].as_str().unwrap().contains("perpendicular"));
+        std::fs::remove_dir_all(directory).unwrap();
+    }
 }

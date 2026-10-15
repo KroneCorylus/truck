@@ -6,6 +6,8 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Capture and replay native chamfer commands with physical edge selections and reference-plane identity. Equal distances and planar two-distance requests reach the existing kernel APIs; distance-and-angle replay is supported for perpendicular planar faces. Preserve native Tcl scope/error behavior and explicitly reject ambiguous, invalid or unsupported requests.
+
 - Preserve linear STEP parameter curves on spheres through an exact longitude/latitude coordinate map, including inverted and affine support placements. Correct spherical mixed derivative order and sign. Regressions cover points, derivatives, cutting, invalid geometry, and the hemisphere/box F1 input and fillet with independent material, radius, normals, face history, closed meshes and STEP.
 
 - Added `try_fillet_solid_edges_with_radii` for atomic constant-radius fillets on separate straight edges, including plane/cylinder lips. Equal radii retain existing solid-fillet behavior; unequal-radius corners remain unsupported. The native replay now preserves per-edge radii and rejects conflicting assignments.

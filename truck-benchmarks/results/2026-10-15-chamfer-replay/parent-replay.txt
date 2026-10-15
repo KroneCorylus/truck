@@ -1,0 +1,44 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 3.14s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running unittests examples/replay_occt_blend.rs (target/release/examples/replay_occt_blend-bd2259d8fa5b09df)
+
+running 3 tests
+test chamfer_replay_tests::unequal_chamfer_distances_preserve_the_reference_face ... FAILED
+test chamfer_replay_tests::equal_distance_chamfers_use_physical_edges ... FAILED
+test chamfer_replay_tests::perpendicular_distance_angle_chamfers_preserve_the_angle ... FAILED
+
+failures:
+
+---- chamfer_replay_tests::unequal_chamfer_distances_preserve_the_reference_face stdout ----
+
+thread 'chamfer_replay_tests::unequal_chamfer_distances_preserve_the_reference_face' (78363) panicked at truck-shapeops/examples/replay_occt_blend.rs:520:9:
+assertion `left == right` failed: {"reason":"Only fillets are captured","status":"unhandled-intent"}
+  left: String("unhandled-intent")
+ right: "operation-succeeded"
+
+---- chamfer_replay_tests::equal_distance_chamfers_use_physical_edges stdout ----
+
+thread 'chamfer_replay_tests::equal_distance_chamfers_use_physical_edges' (78361) panicked at truck-shapeops/examples/replay_occt_blend.rs:520:9:
+assertion `left == right` failed: {"reason":"Only fillets are captured","status":"unhandled-intent"}
+  left: String("unhandled-intent")
+ right: "operation-succeeded"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- chamfer_replay_tests::perpendicular_distance_angle_chamfers_preserve_the_angle stdout ----
+
+thread 'chamfer_replay_tests::perpendicular_distance_angle_chamfers_preserve_the_angle' (78362) panicked at truck-shapeops/examples/replay_occt_blend.rs:520:9:
+assertion `left == right` failed: {"reason":"Only fillets are captured","status":"unhandled-intent"}
+  left: String("unhandled-intent")
+ right: "operation-succeeded"
+
+
+failures:
+    chamfer_replay_tests::equal_distance_chamfers_use_physical_edges
+    chamfer_replay_tests::perpendicular_distance_angle_chamfers_preserve_the_angle
+    chamfer_replay_tests::unequal_chamfer_distances_preserve_the_reference_face
+
+test result: FAILED. 0 passed; 3 failed; 0 ignored; 0 measured; 8 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-shapeops --example replay_occt_blend`

@@ -20,6 +20,12 @@ sys.path.insert(0, str(HERE.parent))
 from run_occt import case_sources, classify, execute, isolated_display, sha, tcl_word
 
 
+def selected_cases(catalog, patterns):
+    return [c for c in catalog['cases'] if c['occt_run'] == 'passed'
+            and {'blend', 'chamf'}.intersection(c['commands']) and
+            (not patterns or any(fnmatch.fnmatchcase(c['id'], p) for p in patterns))]
+
+
 def run_case(case, sources, args, env):
     directory = args.output / case['id']
     directory.mkdir(parents=True)
@@ -75,7 +81,7 @@ def run_case(case, sources, args, env):
                                   returncode=compare_code, elapsed_seconds=compare_elapsed)
             else:
                 comparison = json.loads(Path(prefix + '.comparison.json').read_text())
-        task['selection'] = [dict(radius=s['radius'], curve_type=s['curve_type'],
+        task['selection'] = [dict(**{k: v for k, v in s.items() if k != 'points'},
                                   point_count=len(s['points'])) for s in task['selection']]
         result['captures'].append(dict(prefix=Path(prefix).name, task=task,
                                       native_result=native_result, truck=truck,
@@ -107,11 +113,9 @@ def main():
             (args.plugin / name).is_file() for name in ['libTKBlendAudit.so', 'compare_shapes']):
         parser.error('Build DRAW plugin and replay example first; DRAWEXE must be available')
     catalog = json.loads((HERE.parent / 'catalog.json').read_text())
-    cases = [c for c in catalog['cases'] if c['occt_run'] == 'passed'
-             and 'blend' in c['commands'] and (not args.case or
-             any(fnmatch.fnmatchcase(c['id'], pattern) for pattern in args.case))]
+    cases = selected_cases(catalog, args.case)
     if not cases:
-        parser.error('No passing native blend cases selected')
+        parser.error('No passing native blend/chamfer cases selected')
     sources = {c['id']: case_sources(c, args.occt) for c in cases}
     args.output.mkdir(parents=True, exist_ok=False)
     truck_root = HERE.parents[2]

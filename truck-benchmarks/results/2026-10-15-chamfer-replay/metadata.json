@@ -1,0 +1,561 @@
+{
+  "parent": "ef9b6cde3af93f30a4788ec3d70f382cd023495c",
+  "source_sha256": {
+    "CHANGELOG.md": "f302c41d5355d16de78f0eaf6da6f4711c8e2f1e0eca6fb8144f3f267e9411d6",
+    "truck-shapeops/examples/replay_occt_blend.rs": "15bb0c29d5e7151077e613d7a12d18725b21731a025819254897b24626adf568",
+    "audits/fillet-chamfer/capture/README.md": "82cb013d054fb379689948cfa842428482b5abc9f15835ddd4fbe3519bdf8f3d",
+    "audits/fillet-chamfer/capture/run_capture.py": "cc44e640b8f082fc91499651620c2008320f03eb501461f54bc1c75fee4d0c95",
+    "audits/fillet-chamfer/capture/test_capture.py": "cb685f8bb05e5b3a4095834ca72e7290f74a8755f113778d334898eb08f33d3c",
+    "audits/fillet-chamfer/capture/blend_capture.cpp": "f8fa2c4bc01220aa0e7c4644b360287b4afe17a9a62664c7985067ae4c6c1c01",
+    "audits/fillet-chamfer/capture/blend_capture.tcl": "828e3bf2e7a29d279dbfaa0e9db08d2d20f120ffcd455901683f1797d514b83a",
+    "truck-benchmarks/results/2026-10-15-chamfer-replay/probes.tcl": "cf32a0c019ed82128db65d3928e98c43837c859648fee752cf972e61d6baf8bf"
+  },
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "truck-shapeops",
+        "--example",
+        "replay_occt_blend"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--release",
+        "-p",
+        "truck-shapeops",
+        "-p",
+        "truck-benchmarks",
+        "--all-targets"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "bench",
+        "-p",
+        "truck-benchmarks",
+        "--bench",
+        "actions",
+        "--",
+        "--test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--release",
+        "-p",
+        "truck-shapeops",
+        "--example",
+        "replay_occt_blend"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "bash",
+        "audits/fillet-chamfer/capture/build.sh",
+        "target/occt-sdk",
+        "target/occt-chamfer-capture-plugin"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "audits/fillet-chamfer/capture",
+        "-p",
+        "test_*.py"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "executable_sha256": {
+    "target/release/examples/replay_occt_blend": "e8a1f7fa65adf27e2c4fcf7b21506be29d0d0042cd801046f6025b0741f90ce7",
+    "target/occt-chamfer-capture-plugin/libTKBlendAudit.so": "42b26a30142a3452f8a92cbbc68037b2f9802e332e306d58f89a91b570730420",
+    "target/occt-chamfer-capture-plugin/compare_shapes": "476c2efb758a6c3f7b075f2fcbdddc1ccf07b54baca5dac934abe6420616bcf3"
+  },
+  "probe_checks": [
+    {
+      "prefix": "001",
+      "expected_volume": 5940.0,
+      "absolute_volume_error": 9.094947017729282e-13,
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 5940,
+        "truck_volume": 5939.999999999999,
+        "native_to_truck_max_distance": 5.975640711496539e-15,
+        "native_to_truck_samples": 1593,
+        "truck_to_native_max_distance": 3.607797795906347e-15,
+        "truck_to_native_samples": 1523
+      },
+      "result": {
+        "comparison": "unverified",
+        "result": {
+          "geometry_consistent": true,
+          "input_unchanged": true,
+          "mesh_closed": true,
+          "mesh_volume": 5940.0,
+          "selected_edges": 1,
+          "status": "operation-succeeded",
+          "step_prepared": true
+        },
+        "schema_version": 1,
+        "stage": "output-consistency",
+        "tolerance": 0.001
+      }
+    },
+    {
+      "prefix": "002",
+      "expected_volume": 5910.0,
+      "absolute_volume_error": 9.094947017729282e-13,
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 5910,
+        "truck_volume": 5909.999999999999,
+        "native_to_truck_max_distance": 3.972054645195637e-15,
+        "native_to_truck_samples": 1591,
+        "truck_to_native_max_distance": 1.0778315928076987e-15,
+        "truck_to_native_samples": 1591
+      },
+      "result": {
+        "comparison": "unverified",
+        "result": {
+          "geometry_consistent": true,
+          "input_unchanged": true,
+          "mesh_closed": true,
+          "mesh_volume": 5910.0,
+          "selected_edges": 1,
+          "status": "operation-succeeded",
+          "step_prepared": true
+        },
+        "schema_version": 1,
+        "stage": "output-consistency",
+        "tolerance": 0.001
+      }
+    },
+    {
+      "prefix": "003",
+      "expected_volume": 5910.0,
+      "absolute_volume_error": 9.094947017729282e-13,
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 5910,
+        "truck_volume": 5910,
+        "native_to_truck_max_distance": 3.9283700765566935e-15,
+        "native_to_truck_samples": 1591,
+        "truck_to_native_max_distance": 1.1801832636420706e-15,
+        "truck_to_native_samples": 1591
+      },
+      "result": {
+        "comparison": "unverified",
+        "result": {
+          "geometry_consistent": true,
+          "input_unchanged": true,
+          "mesh_closed": true,
+          "mesh_volume": 5910.0,
+          "selected_edges": 1,
+          "status": "operation-succeeded",
+          "step_prepared": true
+        },
+        "schema_version": 1,
+        "stage": "output-consistency",
+        "tolerance": 0.001
+      }
+    },
+    {
+      "prefix": "004",
+      "expected_volume": 5965.358983848622,
+      "absolute_volume_error": 1.8189894035458565e-12,
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 5965.358983848622,
+        "truck_volume": 5965.358983848621,
+        "native_to_truck_max_distance": 5.407139474782739e-15,
+        "native_to_truck_samples": 1593,
+        "truck_to_native_max_distance": 3.5665644669189445e-15,
+        "truck_to_native_samples": 1593
+      },
+      "result": {
+        "comparison": "unverified",
+        "result": {
+          "geometry_consistent": true,
+          "input_unchanged": true,
+          "mesh_closed": true,
+          "mesh_volume": 5965.358983848622,
+          "selected_edges": 1,
+          "status": "operation-succeeded",
+          "step_prepared": true
+        },
+        "schema_version": 1,
+        "stage": "output-consistency",
+        "tolerance": 0.001
+      }
+    },
+    {
+      "prefix": "005",
+      "expected_volume": 5974.247779607694,
+      "absolute_volume_error": 1.8189894035458565e-12,
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 5974.2477796076855,
+        "truck_volume": 5974.247779607693,
+        "native_to_truck_max_distance": 6.676124710113433e-15,
+        "native_to_truck_samples": 1593,
+        "truck_to_native_max_distance": 1.4895204919483639e-15,
+        "truck_to_native_samples": 1593
+      },
+      "result": {
+        "comparison": "unverified",
+        "result": {
+          "geometry_consistent": true,
+          "input_unchanged": true,
+          "mesh_closed": true,
+          "mesh_volume": 5974.209686629542,
+          "selected_edges": 1,
+          "status": "operation-succeeded",
+          "step_prepared": true
+        },
+        "schema_version": 1,
+        "stage": "output-consistency",
+        "tolerance": 0.001
+      }
+    },
+    {
+      "prefix": "006",
+      "expected_volume": 5940.0,
+      "absolute_volume_error": 8.949427865445614e-10,
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 5940.000000000002,
+        "truck_volume": 5939.999999998606,
+        "native_to_truck_max_distance": 1.3205266610362279e-11,
+        "native_to_truck_samples": 1593,
+        "truck_to_native_max_distance": 1.4781503312593044e-11,
+        "truck_to_native_samples": 1523
+      },
+      "result": {
+        "comparison": "unverified",
+        "result": {
+          "geometry_consistent": true,
+          "input_unchanged": true,
+          "mesh_closed": true,
+          "mesh_volume": 5939.999999997926,
+          "selected_edges": 1,
+          "status": "operation-succeeded",
+          "step_prepared": true
+        },
+        "schema_version": 1,
+        "stage": "output-consistency",
+        "tolerance": 0.001
+      }
+    },
+    {
+      "prefix": "007",
+      "expected_volume": 5910.0,
+      "absolute_volume_error": 8.130882633849978e-10,
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 5910.000000000001,
+        "truck_volume": 5909.999999998798,
+        "native_to_truck_max_distance": 1.4692469058920188e-11,
+        "native_to_truck_samples": 1591,
+        "truck_to_native_max_distance": 2.4267328496926697e-11,
+        "truck_to_native_samples": 1591
+      },
+      "result": {
+        "comparison": "unverified",
+        "result": {
+          "geometry_consistent": true,
+          "input_unchanged": true,
+          "mesh_closed": true,
+          "mesh_volume": 5910.000000000259,
+          "selected_edges": 1,
+          "status": "operation-succeeded",
+          "step_prepared": true
+        },
+        "schema_version": 1,
+        "stage": "output-consistency",
+        "tolerance": 0.001
+      }
+    },
+    {
+      "prefix": "008",
+      "expected_volume": 5965.358983848622,
+      "absolute_volume_error": 6.220943760126829e-10,
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 5965.358983848626,
+        "truck_volume": 5965.358983847003,
+        "native_to_truck_max_distance": 2.837143514578568e-11,
+        "native_to_truck_samples": 1593,
+        "truck_to_native_max_distance": 3.2376817698863134e-11,
+        "truck_to_native_samples": 1593
+      },
+      "result": {
+        "comparison": "unverified",
+        "result": {
+          "geometry_consistent": true,
+          "input_unchanged": true,
+          "mesh_closed": true,
+          "mesh_volume": 5965.358983849007,
+          "selected_edges": 1,
+          "status": "operation-succeeded",
+          "step_prepared": true
+        },
+        "schema_version": 1,
+        "stage": "output-consistency",
+        "tolerance": 0.001
+      }
+    }
+  ],
+  "corpus_case": {
+    "prefix": "001",
+    "task": {
+      "schema_version": 1,
+      "operation": "chamfer",
+      "selection_deflection": 1e-05,
+      "native_valid": true,
+      "solids": 1,
+      "volume": 999999.9999999998,
+      "area": 60000,
+      "selection": [
+        {
+          "mode": "distance-angle",
+          "distance": 5,
+          "angle_degrees": 45,
+          "reference_plane": {
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "normal": [
+              0,
+              1,
+              0
+            ]
+          },
+          "curve_type": 0,
+          "point_count": 2
+        }
+      ]
+    },
+    "native_result": {
+      "native_valid": true,
+      "solids": 1,
+      "volume": 998749.9999999999,
+      "area": 59682.10678118655
+    },
+    "truck": {
+      "comparison": "unverified",
+      "result": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 998750.0,
+        "selected_edges": 1,
+        "status": "operation-succeeded",
+        "step_prepared": true
+      },
+      "schema_version": 1,
+      "stage": "output-consistency",
+      "tolerance": 0.001
+    },
+    "elapsed_seconds": 0.004690009999990252,
+    "sampled_comparison": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 998749.9999999999,
+      "truck_volume": 998749.9999999998,
+      "native_to_truck_max_distance": 7.105427357601002e-15,
+      "native_to_truck_samples": 1595,
+      "truck_to_native_max_distance": 1.88411095042053e-15,
+      "truck_to_native_samples": 1595
+    },
+    "comparison": "unverified"
+  },
+  "corpus_independent_step": "valid 1\nsolids 1\nvolume 998749.99999999965\nexpected 998750\nabsolute_error 3.4924596548080444e-10\nmax_edge_vertex_tolerance 9.9999999999999995e-08\n",
+  "performance_claim": "None; benchmark smoke only",
+  "validation_scope": "Capture/replay tooling changed; kernel geometry unchanged. Replay tests, all-target shapeops/benchmark Clippy, action smoke, native plugin build and wrapper tests. Previous kernel release suites remain at 493 passes, 0 failures, 1 existing ignore.",
+  "artifact_sha256": {
+    "probes/capture/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "probes/capture/001.comparison.json": "dacb00aeae9ffcbe149d4242371cad135b51dcb97338812dc6c88bb2b844bbce",
+    "probes/capture/001.independent.txt": "7fb91437ad5baa4f488702ca3a72d210a6ff7836f75d3836d7d8d5f90e38bbc0",
+    "probes/capture/001.input.brep": "1156c9306f8c1ca6e859f2254b8aa4f577a93045c5c651fd6575f8f3338d598f",
+    "probes/capture/001.input.json": "fc8b725b2a5262b8c4f9fbcef2c454ac84a64460cf59ba51db4c5f6334d7b629",
+    "probes/capture/001.input.step": "5cb9c52cfab21d6681a49d840e9e98396d9d5fc6e2b073d3b6292f0723b47944",
+    "probes/capture/001.result.brep": "1fa538c366bbfbf9cc5a3fa581366ad901f26b54315cb1a5337a776008c9dd3f",
+    "probes/capture/001.result.json": "c892830b53ca7f3cbef4d15d804375aba06c9a2b5353d0234ba0db51786ba6c4",
+    "probes/capture/001.result.step": "711e8376a29b02f0707a20c47f3973bc2cf1f2777e18e539d40e8908bc10e821",
+    "probes/capture/001.truck.json": "93523691ce6b7930c667423f06988937a013e805054f25d701d29aacbbc7f8e7",
+    "probes/capture/001.truck.log": "64b8bba4f19f9aff518aaaf8d689c9864de0701e2fb801037ac5fa3e125c9ec4",
+    "probes/capture/001.truck.step": "2f4081552aabd6139be36520b8f16f1fe7323156aa35699e13d6b059685c3e48",
+    "probes/capture/002.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "probes/capture/002.comparison.json": "f2956fdd06c50da00df2491bdc9ca68750ca927da21577fae5be2363842c6232",
+    "probes/capture/002.independent.txt": "4558edec3316dab81d77a000d881e5ec0f7c8e639b0a2008147f5416d225081f",
+    "probes/capture/002.input.brep": "1156c9306f8c1ca6e859f2254b8aa4f577a93045c5c651fd6575f8f3338d598f",
+    "probes/capture/002.input.json": "3f4524c0e2a0720bfa9a865b9449a20970bd2d54a1f56cef3ade66e27bedd215",
+    "probes/capture/002.input.step": "6e93c88bcb77c1939337675e69c710522603663b89d4fcf1809612c738fd88a1",
+    "probes/capture/002.result.brep": "6ac67e7b46c5b951c064f7ea1c818427d3a5368a1bdf0bb699448966519558cc",
+    "probes/capture/002.result.json": "3f4722a0c2a6d9dba775dcbc48a3d2587c5e506343ebe29f76359704eddff35b",
+    "probes/capture/002.result.step": "4d2bc7d893c1d290e0f85bf51eb62f09d8f1967b58044b129081ae2a50aa8f0b",
+    "probes/capture/002.truck.json": "cf14d836e0f727be4e0a5b6e3b97d28da1f9b00f0494287d7c81111d5bd1dacd",
+    "probes/capture/002.truck.log": "7bdc2d0f370a5ef5e7246bb104e7f2e5e7f2b8b3631355c9ce39c77a3d8ea277",
+    "probes/capture/002.truck.step": "8c05e2c2158681c32ffb33c46399925a1edb20c9ff3fd49364fe5a4e2b2632ff",
+    "probes/capture/003.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "probes/capture/003.comparison.json": "9ae264344081547b4c708379ca9cf5c876b21000133aa70e119b04b3b8b4ba9e",
+    "probes/capture/003.independent.txt": "4558edec3316dab81d77a000d881e5ec0f7c8e639b0a2008147f5416d225081f",
+    "probes/capture/003.input.brep": "1156c9306f8c1ca6e859f2254b8aa4f577a93045c5c651fd6575f8f3338d598f",
+    "probes/capture/003.input.json": "8b2fb6ac4adc64b39536d919e6012b03bb0cbf3e6d4f2538d5c8ab1c6dee221e",
+    "probes/capture/003.input.step": "807f633735d02068d98967fc90b81f1e7351a4e4cb226ca462129f5f405825c9",
+    "probes/capture/003.result.brep": "17fb8a5ba067cf672dba05eb4fb89e7b2154ef759f7ecfe024e7ec2182f7796e",
+    "probes/capture/003.result.json": "3f4722a0c2a6d9dba775dcbc48a3d2587c5e506343ebe29f76359704eddff35b",
+    "probes/capture/003.result.step": "f789b26e4d2ff77a90d9d0a1d2d014267a9dcb03721e0c6662e609a2d32f3a32",
+    "probes/capture/003.truck.json": "cf14d836e0f727be4e0a5b6e3b97d28da1f9b00f0494287d7c81111d5bd1dacd",
+    "probes/capture/003.truck.log": "7bdc2d0f370a5ef5e7246bb104e7f2e5e7f2b8b3631355c9ce39c77a3d8ea277",
+    "probes/capture/003.truck.step": "5df38022df7c75b2d854a35a2a816f8ccf0be6a9620a2f20e99d8165de9ac499",
+    "probes/capture/004.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "probes/capture/004.comparison.json": "48da41438d31963a2b329c2b4a619a2f238467fa9448e5bb19d753bd1c60e1fd",
+    "probes/capture/004.independent.txt": "30263cd69a90d712ad07da3b6a1c2ea64aeac3ea8b65d293f92cae8da4cc648d",
+    "probes/capture/004.input.brep": "1156c9306f8c1ca6e859f2254b8aa4f577a93045c5c651fd6575f8f3338d598f",
+    "probes/capture/004.input.json": "fb4df0cc29dcf51b3081a2a8fda30646ea00fc175a57cfc3243e5870a195b9e7",
+    "probes/capture/004.input.step": "0ecd2dba450281917faa403a6ed1482495a4545045ba9a4106cdf743b5efde4f",
+    "probes/capture/004.result.brep": "46da675fbb180f22b57003780ffe4ec6ef748e8ef7a936c5898ba5325e1386f3",
+    "probes/capture/004.result.json": "072aea8df04763b14f35569c47c3cd3f25356f313f4014bf7970e85b7eb8a098",
+    "probes/capture/004.result.step": "c346b0a0f726a3579ee2c6cf959ae0e9c71b5fea03ccd8506a7ab0ca4f166b90",
+    "probes/capture/004.truck.json": "d2cbbb51e385340493322d2a5b27ff08402f170765d9fe930febf9e385adc423",
+    "probes/capture/004.truck.log": "a2645aaca70fd4584db4c3689d7f0fbb2fe18d8175fb931498bd64592dac04b1",
+    "probes/capture/004.truck.step": "fa23865c606e68a7cb43c6ca9717ccf71906c7f2c3020b645986c4e94d7e82c6",
+    "probes/capture/005.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "probes/capture/005.comparison.json": "c49bc2977ff1a7559d6d13952393e702b7e923020a1937beadbe935655becd67",
+    "probes/capture/005.independent.txt": "a4cca7150e7924c56e34003df3c4fec55e6990d78576b5e599bbd9027018fb42",
+    "probes/capture/005.input.brep": "1156c9306f8c1ca6e859f2254b8aa4f577a93045c5c651fd6575f8f3338d598f",
+    "probes/capture/005.input.json": "0681bc7e0384a4c72526236c90dac8f1d8b3eb5162269b5d39682fe2ee4243b7",
+    "probes/capture/005.input.step": "016c8f11d579e549017ef913f91ee809d3058f7fe111b77e648f6ac2b23521ab",
+    "probes/capture/005.result.brep": "f3a36f44d7bfef3be439fbd9e2bc2de6494e9f5b699311a3f96728a4494a157a",
+    "probes/capture/005.result.json": "ea92986de8113d483b299a992152801d52e68cd44e577ef6b2cf00adad4113c2",
+    "probes/capture/005.result.step": "2fd717c04587e9e8a08c876e26ba5a34b865ca1b819eff0a02d85a33acf2c6ac",
+    "probes/capture/005.truck.json": "5cf712460bf861a2509a12c870b72582112e4de90f1cf90c038bf80b056780fa",
+    "probes/capture/005.truck.log": "cae00f2bfd749215817c4e3222f951db61955d1f5c45eea2dac75774b82c0e04",
+    "probes/capture/005.truck.step": "5a0d77aa038c444675cab6c0789df96c8cc21c4ebd631e5705328c06ace4aa3f",
+    "probes/capture/006.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "probes/capture/006.comparison.json": "874a2fadc95e26257e9dbbccb465033a680a06c4edffda0b05da802c70cddf4f",
+    "probes/capture/006.independent.txt": "69c91fa86ebfa7ff642d91745a0c3c1e178ab1ae564a6966a19d93fb5655126c",
+    "probes/capture/006.input.brep": "e5c86e09e4314ee80755c4946591213d389b8bd83c4ca3fe3cea9ed74d19cc9f",
+    "probes/capture/006.input.json": "71de292a0d1a69c49f3f6cefba6608becff3d39ee514cff316133ab482d1fcb0",
+    "probes/capture/006.input.step": "7e3b1f05ba80d0ebc0d1b702aad363250454c6e849a5406a5dbeaa827ed72006",
+    "probes/capture/006.result.brep": "75ba9d2c6bc54cda4a5a7d8f48e3e42ecf8cb4f891e32c140b86f462d1187d54",
+    "probes/capture/006.result.json": "6e044074ec0de7e34eb092c3986ba2b76a2312f846c9bcabc061553de6706a05",
+    "probes/capture/006.result.step": "589edcb09901853a90401091800a7111b95472981b291aa330ea9904c057383b",
+    "probes/capture/006.truck.json": "026bee581c5c470aec70ae0bb8f903c3deaf367fca7a62d9a04fb8bf682d2300",
+    "probes/capture/006.truck.log": "2a9d9fe308a64937abe450bc7b4251ea8066c5fd58daa4104e9b172df1d09190",
+    "probes/capture/006.truck.step": "99cf54ff56f030e829f957a0fbf40721c0fd395aca41a5d743844dcb67b65d80",
+    "probes/capture/007.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "probes/capture/007.comparison.json": "107af6841c6d9227524770665b9d671619ae0e86f80d93c232de3dcf98e1cd08",
+    "probes/capture/007.independent.txt": "8d25a012bfa7044de3669b49df458de0bad3e400826c4da3119958f49aac80c8",
+    "probes/capture/007.input.brep": "e5c86e09e4314ee80755c4946591213d389b8bd83c4ca3fe3cea9ed74d19cc9f",
+    "probes/capture/007.input.json": "3702cc18e4d2eb036589bde622a1ceec8b9f688a67b2981f8c6d1aca8d920cd9",
+    "probes/capture/007.input.step": "081e7b07e40c1164904201b1bcf9c830cb5048737a63d0e39f41075ea821a827",
+    "probes/capture/007.result.brep": "86627049019a4165bfcf43b1ba748526714bceaef26acfb0ab3fc2ed2a96d4eb",
+    "probes/capture/007.result.json": "e1ca9f950f374f4c4bd441f6c182ff9a9ed048d5284b8915386942242bcb5b65",
+    "probes/capture/007.result.step": "5b2c7548e071588e277e53171587b100e0dacd8af9c5c35fb995cc59133ef3d3",
+    "probes/capture/007.truck.json": "ad4018a5d5a68df7df01a85411f71289eb49a8f3d9827f9c8d3d85de5dfbd95c",
+    "probes/capture/007.truck.log": "d8ba9feef432c8fe7f34e001286e99e2d8e31c9695321545eabe13ed02c213a9",
+    "probes/capture/007.truck.step": "7fa539ee3460d12b10657fd384bb209321ad42cff598271adc8084ccb7f0390b",
+    "probes/capture/008.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "probes/capture/008.comparison.json": "9342dad806468b14f842017cd1de5e9fe4a23f91a499eac61fc58d30743f9642",
+    "probes/capture/008.independent.txt": "cf9af4a31874cb3597e6e80c9fc9523f46b0bbb4e223c906adf99c7871442d25",
+    "probes/capture/008.input.brep": "e5c86e09e4314ee80755c4946591213d389b8bd83c4ca3fe3cea9ed74d19cc9f",
+    "probes/capture/008.input.json": "1944a6be5a6d334758eacf7f487a98e28760f1d3f3104e9256bbf676ce0e4402",
+    "probes/capture/008.input.step": "cfc97552357d9eb0fb2c9ab45c3b174a62e41d4f47e2880dcdaa112a694d9f0d",
+    "probes/capture/008.result.brep": "a6625f33173fd3236a0f6a44f9592eb1791be4a9da3a368e5c9d2dbc2977b6a3",
+    "probes/capture/008.result.json": "072aea8df04763b14f35569c47c3cd3f25356f313f4014bf7970e85b7eb8a098",
+    "probes/capture/008.result.step": "d21a006583dcd4c70fbac84c9a008c0c72c9833f2814527f0761571c8a9460df",
+    "probes/capture/008.truck.json": "6a5ee714eacd6779ffd01d6031414fd8b0d7bcc6d64deadfc4c611200eaf6142",
+    "probes/capture/008.truck.log": "a7cd39fbe0d410c1c2eec0aac839bdff989081ce4885ff1df2a1457d156c8663",
+    "probes/capture/008.truck.step": "4a88f14d69367e32f04ccc065307480a639bc13c739feef9ab8a79a583530bb0",
+    "probes/display.log": "065dae57c7b83a6f324f898d1d708b4632dd5edc46f4bdbbd4ace74c0e892065",
+    "probes/expected-volumes.json": "e0e7d1c9928d4eda9e5571bb09bd5dab5dfa9987f0f616ace1462b3e80fb0016",
+    "probes/native.log": "a640f68293924ed43484322a3e2abfa2288031b558661ddcd94026c776c63124",
+    "probes/run.tcl": "f93269f77dd7bc169e8bd75dcd6f7e29b75d9cbb8ca5d3930d02060860d4fe44",
+    "bug203/bugs/moddata_1/bug203/capture/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "bug203/bugs/moddata_1/bug203/capture/001.comparison.json": "7a63608219870314e16d3ddfbde1362e6423e192ac2c46ec6b8f418c03767b57",
+    "bug203/bugs/moddata_1/bug203/capture/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bug203/bugs/moddata_1/bug203/capture/001.input.brep": "b47684401fe37014c76f5fe5966ba689e4360b787568909045dd9c73ba2b0820",
+    "bug203/bugs/moddata_1/bug203/capture/001.input.json": "c01713d7189faf8ace265afc658c1badafd161e7adb404ea5df259bfd96b851f",
+    "bug203/bugs/moddata_1/bug203/capture/001.input.step": "d6c2c109a6773075766f0434645cfddefa6d0d2afacdc7c3b08346e30519881f",
+    "bug203/bugs/moddata_1/bug203/capture/001.result.brep": "e0e84e3469eee00944210c2d2a4874d9e7747776b91cb60ce4bca5aacdfd64cc",
+    "bug203/bugs/moddata_1/bug203/capture/001.result.json": "e5557171ea323feb3f22bf63036aaaa4bdc4a26399c0aa382c425898c3d739b0",
+    "bug203/bugs/moddata_1/bug203/capture/001.result.step": "868e365975263e7f5910efd6ea07fc95be2685fa15b415924999722661c4615f",
+    "bug203/bugs/moddata_1/bug203/capture/001.truck.json": "9db9677c85bf3d2cf1d597ccbf2232cf412d979899256bd431e7eeacd07cd138",
+    "bug203/bugs/moddata_1/bug203/capture/001.truck.log": "d60f0410968d5f01c34b8176f3560f18749274e8c3a7a176b7f242f6e689420f",
+    "bug203/bugs/moddata_1/bug203/capture/001.truck.step": "38e1565963f5a929ebbda0850f75a4129276ec8261adcb8cb64686603f18089b",
+    "bug203/bugs/moddata_1/bug203/console.log": "a556b97d65e3275e8f9cd18c37347b9d42b3d8d5aec80ee2056ce7be7ff4fbed",
+    "bug203/bugs/moddata_1/bug203/draw.log": "40a2326ceaea2218e7cd1da7adc453fcbb603bfee91355a84c495005764c3d7b",
+    "bug203/bugs/moddata_1/bug203/run.tcl": "84ed684b5447fb84072a46196114ba2ae7640bb2c67f04cdee239b0663636c23",
+    "bug203/display.log": "3129beebcb1a1e9b48ec79c02507dc621885f69787166aafe2dae15fdb3a8a46",
+    "bug203/independent-step.txt": "ed3aead3568cddc46aae86f12f051aa2ef7ce0d460bd4d8084fd08dbb43a5148",
+    "bug203/results.json": "67c7caf420bc307e775003be9db736a3e73a5a2e9b7b7fab2dadbcb6dd5cc22d",
+    "bug203/runtime.log": "1bce096d463b23cf544fa6b93bca8c017dd101b2be60e9ae5f9b2c03e89beed7"
+  },
+  "archive_sha256": "c2c0d666d54f1f335bfafde92797bd39c183183e24a78bdede5a4f7a434c47ea"
+}

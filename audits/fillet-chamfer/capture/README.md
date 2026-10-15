@@ -1,7 +1,7 @@
 # Physical blend capture and replay
 
-This tool records actual input solids, requested radii and physical edge curves
-from OCCT's `blend` command, then tries equivalent Truck constructions. It does
+This tool records actual input solids, requested blend parameters and physical edge curves
+from OCCT's `blend` and `chamf` commands, then tries equivalent Truck constructions. It does
 not use ordinal edge IDs across kernels. Instrumented runs are separate from the
 unchanged native corpus executions under `../runs`; neither successful construction
 nor sampled shape agreement establishes complete feature parity.
@@ -48,9 +48,9 @@ python3 audits/fillet-chamfer/capture/run_capture.py \
   --output target/new-capture --workers 2 --timeout 120
 ```
 
-Only catalog entries with a recorded native pass and a discovered `blend` token
+Only catalog entries with a recorded native pass and a discovered `blend` or `chamf` token
 are selected. `--case 'blend/simple/A*'` narrows the selection. Some lexical hits
-never execute `blend` and produce no capture. Each native case runs in a fresh
+never execute a wrapped command and produce no capture. Each native case runs in a fresh
 process on an isolated virtual display. Each replay/comparison has its own timeout;
 fresh output directories are required. Outputs are observational JSON, never
 automatic parity verdicts.
@@ -60,15 +60,26 @@ cargo test -p truck-shapeops --example replay_occt_blend
 python3 -m unittest discover -s audits/fillet-chamfer/capture -p 'test_*.py'
 ```
 
-Five Rust tests cover split/reversed/repeated physical selections, incomplete
-and ambiguous matches, invalid points, branches and disconnected wires. Two Tcl
-wrapper tests check caller scope and preservation of success/error behavior.
+Twelve Rust tests cover physical selection, per-edge fillet radii, equal and
+unequal chamfer distances, reference-plane identity, perpendicular distance/angle
+conversion, duplicate assignments and rejected unsupported/invalid intent. Five
+Python/Tcl tests cover command selection, native caller scope, interleaved command
+numbering and preservation of success/error behavior.
+
+Chamfer captures retain the native mode and every requested distance/angle.
+Face-dependent modes also record an analytic reference plane when available.
+Replay maps that plane to exactly one adjacent face, independently of face order
+and plane normal sign. Two-distance replay requires two planar supports;
+distance/angle replay additionally requires perpendicular supports and converts
+`d1 = d0 * tan(angle)`. Equal-distance requests use the existing solid/wire chamfer
+routes. Unsupported face geometry is reported as unhandled intent. Missing native
+data remains missing: the dedicated chamfer fixtures are not replaced by synthetic
+probes or counted as passing when only dimension-defined controls are available.
 
 ## Limits
 
 - This route does not yet express unequal-radius corners, variable laws, tangent
-  expansion, disconnected contour sequencing, open shells, multiple solids or
-  chamfer commands. Rejection here does not prove no equivalent Truck route exists.
+  expansion, open shells or multiple solids. Rejection here does not prove no equivalent Truck route exists.
 - STEP conversion and closed-edge healing can fail before a blend is attempted.
   Those failures require separate diagnosis and are not fillet solver verdicts.
 - Selection matching and output comparison use finite samples, not certified
