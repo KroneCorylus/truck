@@ -1,0 +1,33 @@
+.F...........
+======================================================================
+FAIL: test_fillet_contour_summary_preserves_final_laws_and_settings (test_capture.RejectedCaptureTests.test_fillet_contour_summary_preserves_final_laws_and_settings)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/krone/Development/Pieza_WS/truck/audits/fillet-chamfer/capture/test_capture.py", line 254, in test_fillet_contour_summary_preserves_final_laws_and_settings
+    self.assertEqual(capture['task']['contours'], [
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        dict(index=1, constant_radius=3, edges=[dict(curve_type=0, point_count=2)] * 2),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        dict(index=2, constant_radius=None, edges=[dict(curve_type=0, point_count=2)])])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [{'in[60 chars]points': [[0, 0, 0], [1, 0, 0]]}, {'curve_type[140 chars]]}]}] != [{'in[60 chars]point_count': 2}, {'curve_type': 0, 'point_cou[92 chars]2}]}]
+
+First differing element 0:
+{'ind[59 chars]points': [[0, 0, 0], [1, 0, 0]]}, {'curve_type[36 chars]]]}]}
+{'ind[59 chars]point_count': 2}, {'curve_type': 0, 'point_count': 2}]}
+
+  [{'constant_radius': 3,
+-   'edges': [{'curve_type': 0, 'points': [[0, 0, 0], [1, 0, 0]]},
+-             {'curve_type': 0, 'points': [[0, 0, 0], [1, 0, 0]]}],
++   'edges': [{'curve_type': 0, 'point_count': 2},
++             {'curve_type': 0, 'point_count': 2}],
+    'index': 1},
+   {'constant_radius': None,
+-   'edges': [{'curve_type': 0, 'points': [[0, 0, 0], [1, 0, 0]]}],
++   'edges': [{'curve_type': 0, 'point_count': 2}],
+    'index': 2}]
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.032s
+
+FAILED (failures=1)

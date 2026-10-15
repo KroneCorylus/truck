@@ -20,3 +20,16 @@ foreach {command input} {blend audit_blend_input chamf audit_chamfer_input} {
     return -options $options $value
     }]
 }
+
+# Observe successful native configuration calls in the same caller scope.
+foreach command {tolblend continuityblend} {
+    if {[llength [info commands $command]] == 0} {continue}
+    rename $command audit_original_$command
+    proc $command {args} [string map [list @command@ $command] {
+        set code [catch {uplevel 1 [linsert $args 0 audit_original_@command@]} value options]
+        if {$code == 0} {
+            catch {uplevel 1 [linsert $args 0 audit_blend_settings @command@]}
+        }
+        return -options $options $value
+    }]
+}

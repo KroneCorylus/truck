@@ -454,6 +454,138 @@ fn chamfer_selection(
     Ok(selected)
 }
 
+fn fillet_contour_selection(input: &Solid, task: &Value) -> Result<Vec<(Edge, f64)>, Value> {
+    let invalid = |reason: &str| json!({"status":"harness-error","error":reason});
+    let unsupported = |reason: &str| json!({"status":"unhandled-intent","reason":reason});
+    let config = task["native_settings"]
+        .as_object()
+        .ok_or_else(|| invalid("Missing native fillet settings"))?;
+    for key in [
+        "angular_tolerance",
+        "spine_tolerance",
+        "parametric_tolerance",
+        "approximation_3d_tolerance",
+        "deflection",
+        "continuity_angle",
+    ] {
+        if !config
+            .get(key)
+            .and_then(Value::as_f64)
+            .is_some_and(f64::is_finite)
+        {
+            return Err(invalid("Invalid native fillet tolerance"));
+        }
+    }
+    if !matches!(
+        config.get("continuity").and_then(Value::as_str),
+        Some("C0" | "C1" | "C2")
+    ) {
+        return Err(invalid("Invalid native fillet continuity"));
+    }
+    if config["continuity"] != "C1" {
+        return Err(unsupported(
+            "Native fillet approximation continuity is not supported",
+        ));
+    }
+    match config.get("representation").and_then(Value::as_str) {
+        Some("rational") => {}
+        Some("quasi-angular" | "polynomial") => {
+            return Err(unsupported("Native fillet representation is not supported"))
+        }
+        _ => return Err(invalid("Invalid native fillet representation")),
+    }
+    let contours = task["contours"]
+        .as_array()
+        .ok_or_else(|| invalid("Missing native fillet contours"))?;
+    let seeds = task["selection"]
+        .as_array()
+        .filter(|s| !s.is_empty())
+        .ok_or_else(|| invalid("Missing fillet selections"))?;
+    let mut selected = Vec::new();
+    let mut owners = std::collections::HashMap::new();
+    let mut indices = HashSet::new();
+    for contour in contours {
+        let index = contour["index"]
+            .as_u64()
+            .filter(|i| *i > 0)
+            .ok_or_else(|| invalid("Invalid native fillet contour index"))?;
+        if !indices.insert(index) {
+            return Err(invalid("Duplicate native fillet contour index"));
+        }
+        let law = contour
+            .get("constant_radius")
+            .ok_or_else(|| invalid("Missing native fillet radius law"))?;
+        if law.is_null() {
+            return Err(unsupported(
+                "Variable-radius native fillet contours are not supported",
+            ));
+        }
+        let radius = law
+            .as_f64()
+            .filter(|r| r.is_finite())
+            .ok_or_else(|| invalid("Invalid native fillet radius law"))?;
+        if radius <= 0. {
+            return Err(unsupported("Nonpositive effective native fillet radius"));
+        }
+        let members = contour["edges"]
+            .as_array()
+            .filter(|e| !e.is_empty())
+            .ok_or_else(|| invalid("Empty native fillet contour"))?;
+        let mut edges = Vec::new();
+        for member in members {
+            for edge in match_selection(input, member)
+                .map_err(|error| json!({"status":"selection-unmatched","error":error}))?
+            {
+                if let Some(previous) = owners.insert(edge.id(), index) {
+                    if previous != index {
+                        return Err(invalid(
+                            "Physical edge belongs to multiple native fillet contours",
+                        ));
+                    }
+                } else {
+                    selected.push((edge.clone(), radius));
+                    edges.push(edge);
+                }
+            }
+        }
+        if as_wire(&edges).is_none() {
+            return Err(
+                json!({"status":"selection-unmatched","error":"Native fillet contour does not match one connected unbranched wire"}),
+            );
+        }
+    }
+    let mut used = HashSet::new();
+    for seed in seeds {
+        if !seed["radius"].as_f64().is_some_and(f64::is_finite) {
+            return Err(invalid("Invalid captured fillet seed radius"));
+        }
+        let index = seed["contour_index"]
+            .as_u64()
+            .ok_or_else(|| invalid("Missing native fillet seed contour index"))?;
+        if index != 0 && !indices.contains(&index) {
+            return Err(invalid("Fillet seed refers to a missing native contour"));
+        }
+        let matched = match_selection(input, seed)
+            .map_err(|error| json!({"status":"selection-unmatched","error":error}))?;
+        if matched
+            .iter()
+            .any(|e| owners.get(&e.id()).copied().unwrap_or(0) != index)
+        {
+            return Err(invalid("Native fillet contour does not contain its seed"));
+        }
+        if index != 0 {
+            used.insert(index);
+        }
+    }
+    if used != indices {
+        return Err(invalid("Native fillet contour has no selected seed"));
+    }
+    if selected.is_empty() {
+        return Err(unsupported("No native-effective fillet selections"));
+    }
+    Ok(selected)
+}
+
 fn replay(prefix: &str, stage: &Cell<&'static str>) -> Result<Value, String> {
     let task: Value = serde_json::from_str(
         &std::fs::read_to_string(format!("{prefix}.input.json")).map_err(|e| e.to_string())?,
@@ -467,7 +599,7 @@ fn replay(prefix: &str, stage: &Cell<&'static str>) -> Result<Value, String> {
         Some(value) => value.as_u64().ok_or("Invalid capture schema version")?,
     };
     let scope = match (task["operation"].as_str(), schema) {
-        (Some("chamfer"), 2) => "native-contours",
+        (Some("chamfer"), 2) | (Some("fillet"), 3) => "native-contours",
         (Some("fillet" | "chamfer"), 1) => "seed-only",
         _ => {
             return Ok(
@@ -544,38 +676,56 @@ fn replay_task(
             });
         (ids, result)
     } else {
-        let radius = selection
-            .first()
-            .and_then(|s| s["radius"].as_f64())
-            .ok_or("Missing radius")?;
-        if !radius.is_finite() || radius <= 0. {
-            return Err("Invalid captured radius".into());
-        }
-        let mut edges = Vec::new();
-        let mut selected = Vec::new();
-        let mut radii = std::collections::HashMap::new();
         stage.set("physical-selection");
-        for chosen in selection {
-            let chosen_radius = chosen["radius"].as_f64().ok_or("Missing radius")?;
-            if !chosen_radius.is_finite() || chosen_radius <= 0. {
+        let (edges, selected) = if schema == 3 {
+            let assignments = match fillet_contour_selection(&input, task) {
+                Ok(selected) => selected,
+                Err(report) => return Ok(report),
+            };
+            let selected = assignments
+                .iter()
+                .map(|(e, radius)| (e.id(), *radius))
+                .collect::<Vec<_>>();
+            let edges = assignments.into_iter().map(|(e, _)| e).collect::<Vec<_>>();
+            (edges, selected)
+        } else {
+            let radius = selection
+                .first()
+                .and_then(|s| s["radius"].as_f64())
+                .ok_or("Missing radius")?;
+            if !radius.is_finite() || radius <= 0. {
                 return Err("Invalid captured radius".into());
             }
-            match match_selection(&input, chosen) {
-                Ok(matched) => {
-                    for edge in matched {
-                        if let Some(previous) = radii.insert(edge.id(), chosen_radius) {
-                            if previous != chosen_radius {
-                                return Err("Conflicting radii for the same physical edge".into());
+            let mut edges = Vec::new();
+            let mut selected = Vec::new();
+            let mut radii = std::collections::HashMap::new();
+            stage.set("physical-selection");
+            for chosen in selection {
+                let chosen_radius = chosen["radius"].as_f64().ok_or("Missing radius")?;
+                if !chosen_radius.is_finite() || chosen_radius <= 0. {
+                    return Err("Invalid captured radius".into());
+                }
+                match match_selection(&input, chosen) {
+                    Ok(matched) => {
+                        for edge in matched {
+                            if let Some(previous) = radii.insert(edge.id(), chosen_radius) {
+                                if previous != chosen_radius {
+                                    return Err(
+                                        "Conflicting radii for the same physical edge".into()
+                                    );
+                                }
+                            } else {
+                                selected.push((edge.id(), chosen_radius));
+                                edges.push(edge);
                             }
-                        } else {
-                            selected.push((edge.id(), chosen_radius));
-                            edges.push(edge);
                         }
                     }
+                    Err(error) => return Ok(json!({"status":"selection-unmatched","error":error})),
                 }
-                Err(error) => return Ok(json!({"status":"selection-unmatched","error":error})),
             }
-        }
+            (edges, selected)
+        };
+        let radius = selected[0].1;
         let ids: Vec<_> = edges.iter().map(|e| e.id()).collect();
         let equal = selected.iter().all(|&(_, r)| r == radius);
         stage.set("blend");
@@ -1391,5 +1541,194 @@ mod fillet_step_tolerance_tests {
         replay_common::assert_topology(&output, &[0]);
         replay_common::blend::assert_step(&output, 3435781.0157892024, TOL);
         std::fs::remove_dir_all(directory).unwrap();
+    }
+}
+
+#[cfg(test)]
+mod fillet_contour_tests {
+    use super::*;
+
+    fn fixture(name: &str) -> Value {
+        serde_json::from_str(match name {
+            "box" => include_str!("../tests/fixtures/fillet-contours/box-replaced.json"),
+            "single" => include_str!("../tests/fixtures/fillet-contours/A4-single.json"),
+            "replaced" => include_str!("../tests/fixtures/fillet-contours/A4-replaced.json"),
+            "zero" => include_str!("../tests/fixtures/fillet-contours/A4-zero-replaced.json"),
+            "variable" => include_str!("../tests/fixtures/fillet-contours/A4-variable.json"),
+            _ => unreachable!(),
+        })
+        .unwrap()
+    }
+
+    fn run(name: &str, task: &Value, is_box: bool, volume: f64) -> Value {
+        let directory = std::env::temp_dir().join(format!(
+            "truck-fillet-contour-{}-{name}",
+            std::process::id()
+        ));
+        std::fs::create_dir_all(&directory).unwrap();
+        let prefix = directory.join("001");
+        let prefix = prefix.to_str().unwrap();
+        let step = if is_box {
+            include_str!("../tests/fixtures/fillet-contours/box.step")
+        } else {
+            include_str!("../tests/fixtures/fillet-contours/A4.step")
+        };
+        std::fs::write(format!("{prefix}.input.step"), step).unwrap();
+        std::fs::write(format!("{prefix}.input.json"), task.to_string()).unwrap();
+        let result = replay(prefix, &Cell::new("start")).unwrap();
+        assert_eq!(
+            std::fs::read_to_string(format!("{prefix}.input.step")).unwrap(),
+            step
+        );
+        if result["status"] == "operation-succeeded" {
+            for field in [
+                "input_unchanged",
+                "geometry_consistent",
+                "mesh_closed",
+                "step_prepared",
+            ] {
+                assert_eq!(result[field], true, "{result}");
+            }
+            let input = import(&format!("{prefix}.input.step")).unwrap();
+            let mut selected = Vec::new();
+            for contour in task["contours"].as_array().unwrap() {
+                let radius = contour["constant_radius"].as_f64().unwrap();
+                for member in contour["edges"].as_array().unwrap() {
+                    selected.extend(
+                        match_selection(&input, member)
+                            .unwrap()
+                            .into_iter()
+                            .map(|e| (e, radius)),
+                    );
+                }
+            }
+            let assignments: Vec<_> = selected.iter().map(|(e, r)| (e.id(), *r)).collect();
+            let edges: Vec<_> = selected.iter().map(|(e, _)| e.clone()).collect();
+            let solid = try_fillet_solid_edges_with_radii(&input, &assignments, TOL)
+                .or_else(|_| {
+                    try_fillet_solid_along_wire(
+                        &input,
+                        &as_wire(&edges).unwrap(),
+                        selected[0].1,
+                        TOL,
+                    )
+                })
+                .unwrap()
+                .solid;
+            replay_common::assert_solid(&solid, volume, &[0], TOL);
+            let output = import(&format!("{prefix}.truck.step")).unwrap();
+            replay_common::assert_topology(&output, &[0]);
+            replay_common::blend::assert_step(&output, volume, TOL);
+        }
+        std::fs::remove_dir_all(directory).unwrap();
+        result
+    }
+
+    #[test]
+    fn native_fillet_contour_reaches_the_solver_in_full() {
+        for (name, volume) in [
+            ("single", 0.5634899567596924),
+            ("replaced", 0.5632421564730637),
+            ("zero", 0.5634899567596924),
+        ] {
+            let mut task = fixture(name);
+            for reverse in [false, true] {
+                if reverse {
+                    task["contours"][0]["edges"]
+                        .as_array_mut()
+                        .unwrap()
+                        .reverse();
+                    for edge in task["contours"][0]["edges"].as_array_mut().unwrap() {
+                        edge["points"].as_array_mut().unwrap().reverse();
+                    }
+                }
+                let result = run(&format!("{name}-{reverse}"), &task, false, volume);
+                assert_eq!(result["status"], "operation-succeeded", "{result}");
+                assert_eq!(result["selection_scope"], "native-contours");
+                assert_eq!(result["selected_edges"], 3, "{result}");
+                assert_eq!(result["input_unchanged"], true, "{result}");
+            }
+        }
+    }
+
+    #[test]
+    fn final_native_radius_replaces_earlier_seed_assignments() {
+        let volume = 6000. - (1. - std::f64::consts::PI / 4.) * 3_f64.powi(2) * 30.;
+        let result = run("box", &fixture("box"), true, volume);
+        assert_eq!(result["status"], "operation-succeeded", "{result}");
+        assert_eq!(result["selected_edges"], 1, "{result}");
+    }
+
+    #[test]
+    fn variable_native_fillet_contours_never_replay_only_their_seeds() {
+        let result = run("variable", &fixture("variable"), false, 0.);
+        assert_eq!(result["status"], "unhandled-intent", "{result}");
+        assert_eq!(
+            result["reason"],
+            "Variable-radius native fillet contours are not supported"
+        );
+    }
+
+    #[test]
+    fn nonrational_native_fillet_representations_are_explicitly_unhandled() {
+        for mode in ["quasi-angular", "polynomial"] {
+            let mut task = fixture("single");
+            task["native_settings"]["representation"] = json!(mode);
+            assert_eq!(run(mode, &task, false, 0.)["status"], "unhandled-intent");
+        }
+    }
+
+    #[test]
+    fn unsupported_native_fillet_continuity_is_explicit() {
+        for continuity in ["C0", "C2"] {
+            let mut task = fixture("single");
+            task["native_settings"]["continuity"] = json!(continuity);
+            assert_eq!(
+                run(continuity, &task, false, 0.)["status"],
+                "unhandled-intent"
+            );
+        }
+    }
+
+    #[test]
+    fn incomplete_native_fillet_scope_cannot_fall_back_to_seeds() {
+        for field in ["contours", "native_settings"] {
+            let mut task = fixture("single");
+            task.as_object_mut().unwrap().remove(field);
+            assert_eq!(run(field, &task, false, 0.)["status"], "harness-error");
+        }
+        let mut task = fixture("single");
+        task["contours"][0]["edges"] = json!([]);
+        assert_eq!(run("empty", &task, false, 0.)["status"], "harness-error");
+        let mut task = fixture("single");
+        task["selection"][0]["contour_index"] = json!(2);
+        assert_eq!(
+            run("wrong-index", &task, false, 0.)["status"],
+            "harness-error"
+        );
+        let mut task = fixture("single");
+        task["selection"][0]["contour_index"] = json!(0);
+        assert_eq!(
+            run("ignored-active-seed", &task, false, 0.)["status"],
+            "harness-error"
+        );
+        let mut task = fixture("single");
+        let points = task["selection"][0]["points"].clone();
+        let edges = task["contours"][0]["edges"].as_array_mut().unwrap();
+        let seed_index = edges.iter().position(|e| e["points"] == points).unwrap();
+        edges.remove(seed_index);
+        assert_eq!(
+            run("missing-seed", &task, false, 0.)["status"],
+            "harness-error"
+        );
+        let mut task = fixture("single");
+        task["contours"][0]
+            .as_object_mut()
+            .unwrap()
+            .remove("constant_radius");
+        assert_eq!(
+            run("missing-law", &task, false, 0.)["status"],
+            "harness-error"
+        );
     }
 }

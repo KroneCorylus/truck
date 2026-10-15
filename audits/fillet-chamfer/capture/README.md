@@ -87,9 +87,9 @@ edges and compatible assignments. Conflicting active assignments, contradictory
 ignored records and missing/empty active scope are rejected explicitly. An
 ignored duplicate must belong to a previously applied assignment. No effective
 selection is reported as unhandled intent rather than a successful no-op.
-Results carry `selection_scope`: `native-contours` for schema-2 chamfers,
+Results carry `selection_scope`: `native-contours` for schema-2 chamfers and schema-3 fillets,
 `seed-only` for legacy schema 1 (including old hand-written records without a
-version) and current fillet captures. Unknown versions are rejected. Historical
+version). Unknown versions are rejected. Historical
 seed-only evidence is not upgraded. Summary manifests retain point counts;
 complete raw contour samples remain in the archived input JSON.
 
@@ -105,10 +105,38 @@ reach the existing wire chamfer route, with side ordering preserved. Unsupported
 data remains missing: the dedicated chamfer fixtures are not replaced by synthetic
 probes or counted as passing when only dimension-defined controls are available.
 
+## Final native fillet contours
+
+Fillet schema 3 preserves raw seed radii and records each seed's final contour
+index, plus complete contour edges and the final constant radius. A null radius
+means the native contour is nonconstant. Capture queries the whole contour after
+all `Add` calls: repeated seed assignments can replace radii, and different seed
+radii can introduce a variable law. Pre-build per-edge radius queries are not
+used because propagated edges can still report zero before native construction.
+
+The capture runner starts a fresh DRAW process and installs the settings observer
+before test setup. Successful `tolblend` and `continuityblend` calls are observed
+with native numeric conversion; queries and native errors preserve their behavior.
+Initial settings mirror the pinned native command's defaults. Native contour
+discovery receives those exact settings. Failed observation invalidates further
+fillet capture rather than silently using stale settings. This setup contract
+does not support attaching the observer to an already configured DRAW session.
+
+Optional R/Q/P modes are captured. Replay currently supports rational C1 fillets,
+constant positive contour radii and the existing solid/wire solver routes. It
+rejects variable contours, quasi-angular/polynomial representation and C0/C2
+internal approximation continuity without replaying a subset. Native tolerances
+are retained as evidence; Truck continues to use its independently stated fixed
+modeling and export tolerances. These comparisons do not establish equivalence
+of the solvers' internal approximation settings. Legacy schema-1 fillets remain
+explicitly labeled seed-only. Captured contour membership must cover all active
+seeds, and every contour must be connected, unbranched and associated with a seed.
+
 ## Limits
 
-- This route does not yet express unequal-radius corners, variable laws, tangent
-  expansion for fillets, open shells or multiple solids. Face-dependent chamfer
+- This route does not yet express unequal-radius corners, variable laws,
+  nonrational fillet representations, C0/C2 internal approximation continuity,
+  open shells or multiple solids. Face-dependent chamfer
   contours still require a planar seed reference and either two planar supports
   or a perpendicular plane/cylinder rim at every matched edge. Rejection here does not prove no equivalent Truck route exists.
 - STEP conversion and closed-edge healing can fail before a blend is attempted.

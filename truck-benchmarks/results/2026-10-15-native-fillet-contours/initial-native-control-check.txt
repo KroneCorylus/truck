@@ -1,0 +1,16 @@
+1 2 3 rational 5942.057504117301
+2 1 0.03 rational 0.5634899567596924
+3 2 0.04 rational 0.5632421564730637
+4 2 0.03 rational 0.5634899567596924
+5 2 None rational 0.5633880930967833
+6 3 0.04 rational 0.5632421564730637
+7 1 0.03 rational 0.5634899567596924
+8 1 0.03 quasi-angular 0.5634899567596924
+9 1 0.03 polynomial 0.5634899567596924
+10 1 0.03 rational 0.5634899567596924
+11 2 0.03 rational 0.5634899567596924
+Traceback (most recent call last):
+  File "/home/krone/Development/Pieza_WS/truck/target/capture-fillet-controls.py", line 65, in <module>
+    assert (out/'tangent_after.result.brep').read_bytes()==(out/'A4.input.brep').read_bytes()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

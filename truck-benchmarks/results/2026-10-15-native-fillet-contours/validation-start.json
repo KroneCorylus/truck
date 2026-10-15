@@ -1,0 +1,18 @@
+{
+  "parent_revision": "6b07572a15221d8ec45eaf3e5b647b69f05cbbae",
+  "source_sha256": {
+    "truck-shapeops/examples/replay_occt_blend.rs": "35b18d1517cc9d79720077beeba524aa820e9ae23bb4fc19780be008d83aac0a",
+    "audits/fillet-chamfer/capture/blend_capture.cpp": "ad9537bde37e9ddf6542d181a22d202c349d105900e8a540979773bfbaee6f00",
+    "audits/fillet-chamfer/capture/blend_capture.tcl": "8f4baaa779dd6106ccedb126e018e24bb454d870599268b0dc77b0d0131ac63a",
+    "audits/fillet-chamfer/capture/run_capture.py": "be32b0efcb8c8391ad1349b647b10537ff7bac34cb9b29379e121624bb18513d",
+    "audits/fillet-chamfer/capture/test_capture.py": "1a469c42b1370bbc4f6d95867f18f276070f78ae4c326655659488e307b767da",
+    "truck-shapeops/tests/fixtures/fillet-contours/A4-replaced.json": "66437ca60b46b0a4a6f5d9d689b5b79c0edcc4bac92b896cad813754ff3f5f46",
+    "truck-shapeops/tests/fixtures/fillet-contours/A4-single.json": "8df1b09c5852cb36dc3f9a0ee3e3ce63fe5156a4dfd09079a2823a8c62d7028b",
+    "truck-shapeops/tests/fixtures/fillet-contours/A4-variable.json": "787d620ff3d05e7619a1fdf49724dc65204a2d3b312de91ad218506c5667e540",
+    "truck-shapeops/tests/fixtures/fillet-contours/A4-zero-replaced.json": "caa186344a7b357ab42e793e1b614b7def7254ce7a350752bb2353a1272c1ff5",
+    "truck-shapeops/tests/fixtures/fillet-contours/A4.step": "1be2f36698c32d5dc1e73fd4be78d8013956058fa5493bc13d4cd08823ea8736",
+    "truck-shapeops/tests/fixtures/fillet-contours/README.md": "84b3cb040c158bc025616ffef711f22f7a98acc7b5bee60b68744c78ab28227d",
+    "truck-shapeops/tests/fixtures/fillet-contours/box-replaced.json": "c3204f0bba7a9e28220f40e52f862f0a4cfd268c7e5161414ed7ddcd1824c7a9",
+    "truck-shapeops/tests/fixtures/fillet-contours/box.step": "e3fab4ecfbbc87dc8390377676027c0a950e1cf30095c94458625b5f4594253c"
+  }
+}

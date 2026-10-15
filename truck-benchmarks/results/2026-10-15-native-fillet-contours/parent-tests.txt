@@ -1,0 +1,63 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 3.45s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running unittests examples/replay_occt_blend.rs (target/release/examples/replay_occt_blend-bd2259d8fa5b09df)
+
+running 6 tests
+test fillet_contour_tests::final_native_radius_replaces_earlier_seed_assignments ... FAILED
+test fillet_contour_tests::nonrational_native_fillet_representations_are_explicitly_unhandled ... FAILED
+test fillet_contour_tests::unsupported_native_fillet_continuity_is_explicit ... FAILED
+test fillet_contour_tests::native_fillet_contour_reaches_the_solver_in_full ... FAILED
+test fillet_contour_tests::variable_native_fillet_contours_never_replay_only_their_seeds ... FAILED
+test fillet_contour_tests::incomplete_native_fillet_scope_cannot_fall_back_to_seeds ... ok
+
+failures:
+
+---- fillet_contour_tests::final_native_radius_replaces_earlier_seed_assignments stdout ----
+
+thread 'fillet_contour_tests::final_native_radius_replaces_earlier_seed_assignments' (1284636) panicked at truck-shapeops/examples/replay_occt_blend.rs:1508:9:
+assertion `left == right` failed: {"error":"Unsupported capture schema version","status":"harness-error"}
+  left: String("harness-error")
+ right: "operation-succeeded"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- fillet_contour_tests::nonrational_native_fillet_representations_are_explicitly_unhandled stdout ----
+
+thread 'fillet_contour_tests::nonrational_native_fillet_representations_are_explicitly_unhandled' (1284639) panicked at truck-shapeops/examples/replay_occt_blend.rs:1527:13:
+assertion `left == right` failed
+  left: String("harness-error")
+ right: "unhandled-intent"
+
+---- fillet_contour_tests::unsupported_native_fillet_continuity_is_explicit stdout ----
+
+thread 'fillet_contour_tests::unsupported_native_fillet_continuity_is_explicit' (1284640) panicked at truck-shapeops/examples/replay_occt_blend.rs:1536:13:
+assertion `left == right` failed
+  left: String("harness-error")
+ right: "unhandled-intent"
+
+---- fillet_contour_tests::native_fillet_contour_reaches_the_solver_in_full stdout ----
+
+thread 'fillet_contour_tests::native_fillet_contour_reaches_the_solver_in_full' (1284638) panicked at truck-shapeops/examples/replay_occt_blend.rs:1496:17:
+assertion `left == right` failed: {"error":"Unsupported capture schema version","status":"harness-error"}
+  left: String("harness-error")
+ right: "operation-succeeded"
+
+---- fillet_contour_tests::variable_native_fillet_contours_never_replay_only_their_seeds stdout ----
+
+thread 'fillet_contour_tests::variable_native_fillet_contours_never_replay_only_their_seeds' (1284641) panicked at truck-shapeops/examples/replay_occt_blend.rs:1515:9:
+assertion `left == right` failed: {"error":"Unsupported capture schema version","status":"harness-error"}
+  left: String("harness-error")
+ right: "unhandled-intent"
+
+
+failures:
+    fillet_contour_tests::final_native_radius_replaces_earlier_seed_assignments
+    fillet_contour_tests::native_fillet_contour_reaches_the_solver_in_full
+    fillet_contour_tests::nonrational_native_fillet_representations_are_explicitly_unhandled
+    fillet_contour_tests::unsupported_native_fillet_continuity_is_explicit
+    fillet_contour_tests::variable_native_fillet_contours_never_replay_only_their_seeds
+
+test result: FAILED. 1 passed; 5 failed; 0 ignored; 0 measured; 27 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-shapeops --example replay_occt_blend`

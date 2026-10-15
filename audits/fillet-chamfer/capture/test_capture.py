@@ -99,6 +99,45 @@ puts [file exists capture/001.capture.log]
 ''')
         self.assertEqual(output.strip().splitlines(), ['1 native-error {CHAMFER CUSTOM}', '1'])
 
+    def test_fillet_setting_observer_preserves_native_scope_and_return(self):
+        output = self.run_wrapper('''
+proc blend {args} {return unused}
+proc tolblend {args} {upvar 1 setting value; set value updated; return native-settings}
+proc continuityblend {args} {return native-continuity}
+proc audit_blend_settings {args} {
+    if {[lindex $args 0] eq "tolblend"} {
+        upvar 1 setting value
+        if {$value ne "updated"} {error scope}
+    }
+    puts [list observed {*}$args]
+}
+# WRAPPER
+proc scenario {} {
+    set setting original
+    puts [tolblend 0.0123456789 1e-4 1e-5 1e-3]
+    puts $setting
+}
+scenario
+puts [continuityblend C2 0.02]
+''')
+        self.assertEqual(output.strip().splitlines(), [
+            'observed tolblend 0.0123456789 1e-4 1e-5 1e-3',
+            'native-settings', 'updated',
+            'observed continuityblend C2 0.02', 'native-continuity'])
+
+    def test_fillet_setting_native_errors_are_not_observed(self):
+        output = self.run_wrapper('''
+proc blend {args} {return unused}
+proc tolblend {args} {return -code error -errorcode {SETTINGS NATIVE} invalid}
+proc continuityblend {args} {return native-continuity}
+proc audit_blend_settings {args} {puts observed; error observer-error}
+# WRAPPER
+set code [catch {tolblend bad} message options]
+puts [list $code $message [dict get $options -errorcode]]
+puts [continuityblend C1]
+''')
+        self.assertEqual(output.strip().splitlines(), ['1 invalid {SETTINGS NATIVE}', 'observed', 'native-continuity'])
+
 
 class SelectionTests(unittest.TestCase):
     def test_native_chamfer_tokens_are_selected_without_relabeling_missing_fixtures(self):
@@ -203,6 +242,19 @@ class RejectedCaptureTests(unittest.TestCase):
         self.assertEqual(selected[1]['contour_edges'], [])
         self.assertEqual(selected[0]['point_count'], 2)
         self.assertNotIn('points', selected[0])
+
+    def test_fillet_contour_summary_preserves_final_laws_and_settings(self):
+        edge = dict(curve_type=0, points=[[0, 0, 0], [1, 0, 0]])
+        task = dict(schema_version=3, operation='fillet',
+                    native_settings=dict(representation='rational'),
+                    selection=[dict(radius=2, contour_index=1, **edge)],
+                    contours=[dict(index=1, constant_radius=3, edges=[edge, edge]),
+                              dict(index=2, constant_radius=None, edges=[edge])])
+        capture, _ = self.capture('input_captured 1 message {}\nnative_return_code 1\n', task=task)
+        self.assertEqual(capture['task']['contours'], [
+            dict(index=1, constant_radius=3, edges=[dict(curve_type=0, point_count=2)] * 2),
+            dict(index=2, constant_radius=None, edges=[dict(curve_type=0, point_count=2)])])
+        self.assertEqual(capture['task']['native_settings'], task['native_settings'])
 
 
 if __name__ == '__main__':

@@ -6,6 +6,8 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Capture final native fillet contours and radius assignments after all seeds, including overwritten radii and variable-law classification. Observe native tolerance/continuity changes without changing Tcl scope or return behavior. Replay expands constant rational C1 contours atomically, retains legacy seed-only behavior, and explicitly rejects unsupported laws and representations.
+
 - Propagate captured chamfer reference sides along oriented complete contours. Unequal-distance and angle replay now supports perpendicular plane/cylinder rims and retains consistent setbacks across changing side faces; native regressions verify both contour directions, reference normal signs, material and STEP.
 
 - Preserve the supported fillet replay STEP fitting tolerance while keeping stricter chamfer fits. Record the actual per-operation export tolerance; a native D4 regression preserves export preparation and the documented robust STEP round trip.

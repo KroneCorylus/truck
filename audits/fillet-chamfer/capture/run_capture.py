@@ -103,6 +103,8 @@ def run_case(case, sources, args, env):
             else:
                 comparison = json.loads(Path(prefix + '.comparison.json').read_text())
         task['selection'] = [selection_summary(s) for s in task['selection']]
+        for contour in task.get('contours', []):
+            contour['edges'] = [selection_summary(edge) for edge in contour['edges']]
         result['captures'].append(dict(prefix=Path(prefix).name, task=task,
                                       native_result=native_result, truck=truck,
                                       elapsed_seconds=elapsed, sampled_comparison=comparison,

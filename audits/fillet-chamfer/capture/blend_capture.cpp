@@ -3,6 +3,7 @@
 #include <BRepBuilderAPI_Copy.hxx>
 #include <BRepCheck_Analyzer.hxx>
 #include <BRepFilletAPI_MakeChamfer.hxx>
+#include <BRepFilletAPI_MakeFillet.hxx>
 #include <BRepGProp.hxx>
 #include <BRepTools.hxx>
 #include <DBRep.hxx>
@@ -20,6 +21,7 @@
 #include <iomanip>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 namespace {
 constexpr double deflection = 0.00001;
@@ -63,26 +65,109 @@ void edge_geometry(std::ostream& out, const TopoDS_Edge& edge) {
   out << ']';
 }
 
+// The runner loads this observer in a fresh DRAW process before any test setup.
+struct FilletSettings {
+  double angular = 1e-2, approximation3d = 1e-4, parametric = 1e-5, deflection = 1e-3;
+  double continuity_angle = 1e-2;
+  GeomAbs_Shape continuity = GeomAbs_C1;
+  bool valid = true;
+} fillet_settings;
+
+int settings(Draw_Interpretor& di, int argc, const char** argv) {
+  try {
+    if (argc < 2) throw std::runtime_error("missing setting command");
+    const std::string command(argv[1]);
+    if (argc == 2 && (command == "tolblend" || command == "continuityblend")) return 0;
+    auto number = [](const char* value) {
+      const double result = Draw::Atof(value);
+      if (!std::isfinite(result)) throw std::runtime_error("nonfinite fillet setting");
+      return result;
+    };
+    if (command == "tolblend" && argc == 6) {
+      fillet_settings.angular = number(argv[2]);
+      fillet_settings.approximation3d = number(argv[3]);
+      fillet_settings.parametric = number(argv[4]);
+      fillet_settings.deflection = number(argv[5]);
+    } else if (command == "continuityblend" && (argc == 3 || argc == 4)) {
+      const std::string continuity(argv[2]);
+      if (continuity.size() < 2) throw std::runtime_error("invalid continuity token");
+      fillet_settings.continuity = continuity[1] == '0' ? GeomAbs_C0
+          : continuity[1] == '2' ? GeomAbs_C2 : GeomAbs_C1;
+      if (argc == 4) fillet_settings.continuity_angle = std::abs(number(argv[3]));
+    } else throw std::runtime_error("unexpected fillet setting arguments");
+    return 0;
+  } catch (const Standard_Failure& error) {
+    di << "Audit settings: " << error.GetMessageString();
+  } catch (const std::exception& error) {
+    di << "Audit settings: " << error.what();
+  }
+  fillet_settings.valid = false;
+  return 1;
+}
+
 int input(Draw_Interpretor& di, int argc, const char** argv) {
   try {
-    if (argc < 5 || (argc - 3) % 2 != 0)
-      throw std::runtime_error("expected prefix, shape, radius/edge pairs");
+    if (argc < 5) throw std::runtime_error("expected prefix, shape, radius/edge pairs");
+    if (!fillet_settings.valid) throw std::runtime_error("native fillet settings were not captured");
     const auto shape = DBRep::Get(argv[2]);
     const std::string prefix = std::string(argv[1]) + ".input";
     export_shape(shape, prefix);
-    std::ofstream out(prefix + ".json");
-    out.exceptions(std::ios::failbit | std::ios::badbit);
-    out << std::setprecision(17) << "{\"schema_version\":1,\"operation\":\"fillet\",\"selection_deflection\":" << deflection << ',';
-    properties(out, shape);
-    out << ",\"selection\":[";
+    ChFi3d_FilletShape mode = ChFi3d_Rational;
+    if (argc % 2 == 0) {
+      const std::string flag(argv[argc - 1]);
+      if (flag == "Q" || flag == "q") mode = ChFi3d_QuasiAngular;
+      else if (flag == "P" || flag == "p") mode = ChFi3d_Polynomial;
+    }
+    BRepFilletAPI_MakeFillet builder(shape, mode);
+    const auto& config = fillet_settings;
+    builder.SetParams(config.angular, 1e-4, config.parametric,
+                      config.approximation3d, config.parametric, config.deflection);
+    builder.SetContinuity(config.continuity, config.continuity_angle);
+    std::vector<std::pair<double, TopoDS_Edge>> seeds;
     for (int i = 3; i + 1 < argc; i += 2) {
       const double radius = Draw::Atof(argv[i]);
       const auto edge = TopoDS::Edge(DBRep::Get(argv[i+1], TopAbs_EDGE));
       if (edge.IsNull() || !std::isfinite(radius)) throw std::runtime_error("invalid radius or edge");
-      if (i != 3) out << ',';
-      out << "{\"radius\":" << radius << ',';
-      edge_geometry(out, edge);
+      seeds.emplace_back(radius, edge);
+      builder.Add(radius, edge);
+    }
+    std::ofstream out(prefix + ".json");
+    out.exceptions(std::ios::failbit | std::ios::badbit);
+    out << std::setprecision(17) << "{\"schema_version\":3,\"operation\":\"fillet\",\"selection_deflection\":" << deflection << ',';
+    properties(out, shape);
+    out << ",\"native_settings\":{\"representation\":\""
+        << (mode == ChFi3d_Rational ? "rational" : mode == ChFi3d_QuasiAngular ? "quasi-angular" : "polynomial")
+        << "\",\"angular_tolerance\":" << config.angular
+        << ",\"spine_tolerance\":0.0001,\"parametric_tolerance\":" << config.parametric
+        << ",\"approximation_3d_tolerance\":" << config.approximation3d
+        << ",\"deflection\":" << config.deflection
+        << ",\"continuity\":\"" << (config.continuity == GeomAbs_C0 ? "C0" : config.continuity == GeomAbs_C2 ? "C2" : "C1")
+        << "\",\"continuity_angle\":" << config.continuity_angle << '}'
+        << ",\"selection\":[";
+    for (std::size_t i = 0; i < seeds.size(); ++i) {
+      if (i != 0) out << ',';
+      const auto& seed = seeds[i];
+      out << "{\"radius\":" << seed.first << ",\"contour_index\":" << builder.Contour(seed.second) << ',';
+      edge_geometry(out, seed.second);
       out << '}';
+    }
+    out << "],\"contours\":[";
+    for (int contour = 1; contour <= builder.NbContours(); ++contour) {
+      if (contour != 1) out << ',';
+      out << "{\"index\":" << contour << ",\"constant_radius\":";
+      if (builder.IsConstant(contour)) {
+        const double radius = builder.Radius(contour);
+        if (!std::isfinite(radius)) throw std::runtime_error("nonfinite contour radius");
+        out << radius;
+      } else out << "null";
+      out << ",\"edges\":[";
+      for (int j = 1; j <= builder.NbEdges(contour); ++j) {
+        if (j != 1) out << ',';
+        out << '{';
+        edge_geometry(out, builder.Edge(contour, j));
+        out << '}';
+      }
+      out << "]}";
     }
     out << "]}\n";
     return 0;
@@ -211,6 +296,7 @@ int output(Draw_Interpretor& di, int argc, const char** argv) {
 }
 
 extern "C" Standard_EXPORT void PLUGINFACTORY(Draw_Interpretor& di) {
+  di.Add("audit_blend_settings", "audit_blend_settings native-command arguments", __FILE__, settings, "Blend audit");
   di.Add("audit_blend_input", "audit_blend_input prefix shape radius edge ...", __FILE__, input, "Blend audit");
   di.Add("audit_chamfer_input", "audit_chamfer_input prefix shape edge parameters ...", __FILE__, chamfer_input, "Blend audit");
   di.Add("audit_blend_output", "audit_blend_output prefix shape", __FILE__, output, "Blend audit");

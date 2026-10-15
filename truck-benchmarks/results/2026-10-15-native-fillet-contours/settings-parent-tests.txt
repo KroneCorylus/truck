@@ -1,0 +1,57 @@
+.........FF.
+======================================================================
+FAIL: test_fillet_setting_native_errors_are_not_observed (test_capture.WrapperTests.test_fillet_setting_native_errors_are_not_observed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/krone/Development/Pieza_WS/truck/audits/fillet-chamfer/capture/test_capture.py", line 139, in test_fillet_setting_native_errors_are_not_observed
+    self.assertEqual(output.strip().splitlines(), ['1 invalid {SETTINGS NATIVE}', 'observed', 'native-continuity'])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['1 invalid {SETTINGS NATIVE}', 'native-continuity'] != ['1 invalid {SETTINGS NATIVE}', 'observed', 'native-continuity']
+
+First differing element 1:
+'native-continuity'
+'observed'
+
+Second list contains 1 additional elements.
+First extra element 2:
+'native-continuity'
+
+- ['1 invalid {SETTINGS NATIVE}', 'native-continuity']
++ ['1 invalid {SETTINGS NATIVE}', 'observed', 'native-continuity']
+?                                ++++++++++++
+
+
+======================================================================
+FAIL: test_fillet_setting_observer_preserves_native_scope_and_return (test_capture.WrapperTests.test_fillet_setting_observer_preserves_native_scope_and_return)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/krone/Development/Pieza_WS/truck/audits/fillet-chamfer/capture/test_capture.py", line 123, in test_fillet_setting_observer_preserves_native_scope_and_return
+    self.assertEqual(output.strip().splitlines(), [
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        'observed tolblend 0.0123456789 1e-4 1e-5 1e-3',
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        'native-settings', 'updated',
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        'observed continuityblend C2 0.02', 'native-continuity'])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['native-settings', 'updated', 'native-continuity'] != ['observed tolblend 0.0123456789 1e-4 1e-5 [88 chars]ity']
+
+First differing element 0:
+'native-settings'
+'observed tolblend 0.0123456789 1e-4 1e-5 1e-3'
+
+Second list contains 2 additional elements.
+First extra element 3:
+'observed continuityblend C2 0.02'
+
+- ['native-settings', 'updated', 'native-continuity']
++ ['observed tolblend 0.0123456789 1e-4 1e-5 1e-3',
++  'native-settings',
++  'updated',
++  'observed continuityblend C2 0.02',
++  'native-continuity']
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.030s
+
+FAILED (failures=2)
