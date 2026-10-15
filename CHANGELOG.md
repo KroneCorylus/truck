@@ -6,6 +6,8 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Trim imported bounded STEP edge curves to their endpoint vertices in 2D and 3D. Preserve spline parameters, edge senses and full closed domains; reject unmatched or reversed intervals. Polynomial, rational, polyline and native solid regressions verify exact curves, consistency, material, rigid motion and STEP.
+
 - Allow explicit external fixture directories in native audit and capture runners, retaining the default data path and recording/verifying file hashes. Include native-passing dedicated chamfer cases whose helpers construct commands dynamically.
 
 - Replay complete captured inputs when the native command explicitly rejects them. Keep the native failure separate from Truck outcomes and skip shape comparison without a native result; missing or corrupt capture evidence remains incomplete.

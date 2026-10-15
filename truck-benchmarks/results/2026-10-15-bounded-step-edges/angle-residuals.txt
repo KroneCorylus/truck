@@ -1,0 +1,12 @@
+edge 88: "cannot locate bounded edge start"
+range (-0.02245653540143, 0.424905260965), full endpoint errors 0.022458561638427882 0.022445308078821155
+exact None, nearest Some((1.8824943499645792e-6, 8.505849922280552e-6))
+exact None, nearest Some((0.40246015808630126, 6.532676812955727e-5))
+edge 970: "cannot locate bounded edge start"
+range (0.0, 1.0), full endpoint errors 0.000020339072476218657 0.000008511900999999544
+exact None, nearest Some((-0.0010157734382507208, 9.653862745725539e-6))
+exact None, nearest Some((1.000414219493431, 5.263223968905306e-6))
+edge 1329: "bounded edge start lies outside its curve domain"
+range (0.0, 1.0), full endpoint errors 0.00007109842524127267 0.00006533943200083615
+exact None, nearest Some((-0.0038498814549662416, 3.55339442551777e-5))
+exact None, nearest Some((1.0033952034673257, 3.651559667624863e-5))

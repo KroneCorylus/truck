@@ -1,0 +1,3 @@
+1/3 chamfer/equal_dist_sequence/C1: passed ['operation-failed', 'operation-failed', 'operation-failed', 'input-inconsistent', 'input-inconsistent', 'input-import-failed', 'input-inconsistent', 'input-inconsistent']
+2/3 chamfer/dist_dist_sequence/C1: passed ['unhandled-intent', 'unhandled-intent', 'unhandled-intent', 'input-inconsistent', 'input-inconsistent', 'input-inconsistent', 'input-inconsistent', 'input-inconsistent']
+3/3 chamfer/dist_angle_sequence/C1: passed ['unhandled-intent', 'input-import-failed', 'input-import-failed', 'input-import-failed', 'input-import-failed', 'input-import-failed', 'input-import-failed', 'input-import-failed']

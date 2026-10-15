@@ -1,0 +1,39 @@
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/truck-stepio)
+    Finished `release` profile [optimized] target(s) in 0.67s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/bounded_import_edges.rs (target/release/deps/bounded_import_edges-9d45a71c0da10741)
+
+running 4 tests
+test polyline_edges_trim_inside_one_or_multiple_segments ... FAILED
+test bounded_edges_reject_unmatched_and_reversed_parameter_intervals ... FAILED
+test spline_edges_trim_to_vertices_in_both_dimensions_and_senses ... FAILED
+test full_closed_spline_edges_keep_distinct_endpoint_parameters ... ok
+
+failures:
+
+---- polyline_edges_trim_inside_one_or_multiple_segments stdout ----
+
+thread 'polyline_edges_trim_inside_one_or_multiple_segments' (283207) panicked at truck-stepio/tests/bounded_import_edges.rs:100:13:
+assertion failed: curve.front().near(&p) && curve.back().near(&q)
+
+---- bounded_edges_reject_unmatched_and_reversed_parameter_intervals stdout ----
+
+thread 'bounded_edges_reject_unmatched_and_reversed_parameter_intervals' (283205) panicked at truck-stepio/tests/bounded_import_edges.rs:71:9:
+assertion failed: edge.parse_curve2d().is_err()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- spline_edges_trim_to_vertices_in_both_dimensions_and_senses stdout ----
+
+thread 'spline_edges_trim_to_vertices_in_both_dimensions_and_senses' (283208) panicked at truck-stepio/tests/bounded_import_edges.rs:45:17:
+assertion failed: (c2.range_tuple().0 - a).abs() < 1e-8 && (c2.range_tuple().1 - b).abs() < 1e-8
+
+
+failures:
+    bounded_edges_reject_unmatched_and_reversed_parameter_intervals
+    polyline_edges_trim_inside_one_or_multiple_segments
+    spline_edges_trim_to_vertices_in_both_dimensions_and_senses
+
+test result: FAILED. 1 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-stepio --test bounded_import_edges`

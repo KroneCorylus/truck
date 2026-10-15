@@ -2482,6 +2482,37 @@ where
     Ok((u, v))
 }
 
+fn trim_bounded_edge<C, P>(mut curve: C, p: P, q: P) -> Result<C, StepConvertingError>
+where
+    C: Cut<Point = P> + SearchParameter<D1, Point = P>,
+    P: Copy + Tolerance, {
+    if !curve.front().near(&p) {
+        let u = curve
+            .search_parameter(p, None, 100)
+            .ok_or("cannot locate bounded edge start")?;
+        let (a, b) = curve.range_tuple();
+        if !u.is_finite() || u < a || u >= b {
+            return Err("bounded edge start lies outside its curve domain".into());
+        }
+        curve = curve.cut(u);
+    }
+    if !curve.back().near(&q) {
+        // A polyline cut changes its parameterization; locate the end on the retained part.
+        let v = curve
+            .search_parameter(q, None, 100)
+            .ok_or("cannot locate bounded edge end")?;
+        let (a, b) = curve.range_tuple();
+        if !v.is_finite() || v <= a || v > b {
+            return Err("bounded edge endpoints must follow the curve direction".into());
+        }
+        curve.cut(v);
+    }
+    if !curve.front().near(&p) || !curve.back().near(&q) {
+        return Err("bounded edge trimming does not preserve its vertices".into());
+    }
+    Ok(curve)
+}
+
 impl EdgeCurve {
     pub fn parse_curve2d(&self) -> Result<Curve2D, StepConvertingError> {
         let p = Point2::from(&self.edge_start.vertex_geometry);
@@ -2505,7 +2536,7 @@ impl EdgeCurve {
                 let q = line.projection(q);
                 Curve2D::Line(Line(p, q))
             }
-            CurveAny::BoundedCurve(b) => b.as_ref().try_into()?,
+            CurveAny::BoundedCurve(b) => trim_bounded_edge(b.as_ref().try_into()?, p, q)?,
             CurveAny::Conic(curve) => match curve.as_ref() {
                 Conic::Circle(circle) => {
                     let mat =
@@ -2610,7 +2641,7 @@ impl EdgeCurve {
     ) -> Result<Curve3D, StepConvertingError> {
         let mut curve = match curve {
             CurveAny::Line(_) => Curve3D::Line(Line(p, q)),
-            CurveAny::BoundedCurve(b) => b.as_ref().try_into()?,
+            CurveAny::BoundedCurve(b) => trim_bounded_edge(b.as_ref().try_into()?, p, q)?,
             CurveAny::Conic(curve) => match curve.as_ref() {
                 Conic::Circle(circle) => {
                     let mat =
