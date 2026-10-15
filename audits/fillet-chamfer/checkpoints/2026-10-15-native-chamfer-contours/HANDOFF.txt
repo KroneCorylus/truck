@@ -1,0 +1,80 @@
+COMPLETE NATIVE CHAMFER CONTOURS — 2026-10-15
+User says CONTINUE and commit achievements, do not stop until done or told.
+No pushes, PRs, delegates, consumer changes or kernel pin changes.
+
+COMPLETED
+2346b975 captures/replays native chamfer contours with first-assignment semantics.
+099ccb7ea7a6f07aaf8e352238c413197fb99edb restores fillet export fitting budgets after the first full run exposed
+13 STEP preparation regressions from globally tightened tolerance. All failed
+run bytes remain in results/2026-10-15-fillet-replay-export/initial-full-capture.zip
+(7676 members; SHA bc042ec67c48bcce23dc0d08ff03f971decba2270c0a9876e77df1fc60d2eed9).
+Final per-operation fits: chamfer1e-7, fillet5e-5. Actual tolerance is recorded in
+result.step_fitting_tolerance. Kernel/API exporter contracts are unchanged.
+
+25 replay tests pass; ten new Rust regressions fail on their respective parents.
+22 audit+10capture tests pass; one new Python regression failsparent. All-target
+Clippy/action smoke/final replaybuild pass. Kernel unchanged sincec26b6780,
+which had504releasepasses/0fail/1existingignore. Do not claim repeatedkerneltests.
+Eight nativecontrols:7construct,1native-rejected/Truck-unhandled; all3modes,
+firstwins,invalid gates,differentseedinsidepriorcontour,legacyfillet; inputBREP
+bytesunchanged. AutomaticA4/001selects3edges,validsingleSTEP,maxsample2.2291e-8.
+D4 result/comparison EXACT restored to c26 stablebaseline afterbudgetcorrection.
+Proofs results/2026-10-15-native-chamfer-contours and2026-10-15-fillet-replay-export.
+
+STABLE FULL CAPTURE
+Raw target/occt-capture-native-chamfer-contours-stable, cleanrevision099ccb7ea7a6f07aaf8e352238c413197fb99edb.
+396nativepasses/648captures: {"fillet-seed-only": 161, "chamfer-native-contours": 487}.
+58 corrected-intentrecords; 590 unchangedintent.
+Rawseeds and native referenceproperties EXACT unchanged. No prior successful
+check regression for unchangedintent. 2 changed-scope check losses are
+separatelylisted; don'tclaim oldseed-only successes satisfiedfullnativeintent.
+Statuses {"input-import-failed": 96, "operation-succeeded": 221, "operation-failed": 182, "unhandled-intent": 132, "selection-unmatched": 8, "input-inconsistent": 9}.
+221 constructionsallgeometry/input/mesh/nativeSTEPchecks pass;
+210 limitedcomparisons, 11 sampled discrepancies.
+165 prior results/comparisons exactexcludingnewmetadata; 55 numeric/
+selectionchanges. Archive7714members SHA3dfeebfe1bd343a1ff1ad0af724e222b063619431ca6d1727705d02972c24fb1.
+Native sequences use independentnativeinputs, notTruck-outputchains.
+
+NEXT
+1. All8 selection-unmatched records are reference-plane propagation failures,
+   NOT physicaledge mismatch. Cases dist_angle/A3; dist_angle_complex/A4,A5;
+   dist_angle_sequence/A4 and corresponding dist_dist grids. Their firstseed
+   reference is a verticalplane; the complete contour turns through anarc onto
+   anotherverticalplane. Applyingseedplane to allmembers fails ontheotherline.
+   Native reference side mustpropagate; curvedsupportface mapping isalsooutside
+   currentreplay scope. Do notrelaxphysicalmatching toforceit. NativeA4 first
+   contour isline/quartercircle/line withconstanttopplane andvaryingsidefaces.
+   Inspect existingwirechamfer sidepropagation andnativeface identity APIs.
+   Remaining sampled differences are separatelyrecorded; separateSTEP fidelity
+   fromreplay/solver capabilities.
+2. Fillet tangent propagation remainsseed-only. Read
+   target/fillet-contour-propagation-notes.txt and nativeBLEND implementation.
+   Fillet Add(radius,E) can overwriteper-edge radii on anexistingcontour; NOT
+   chamferfirstwins. IsConstant/Radius/GetLaw need nativeproof afterallAdds,
+   especially unassignedtangentedges anddifferentseedradii. OptionalR/Q/P and
+   globaltolblend/continuityblend state needevidence beforefullintentclaims.
+3. Curvedreferencefaces,shellinputs,C1inputgaps,4missingfixtures,unsupportedops,
+   full-solidtwoedgeattachment,priorPCurveprecisionfailure,editing/continuity.
+
+METHOD
+Originalscope: audits/fillet-chamfer/checkpoints/2026-10-12/HANDOFF.txt objective;
+latercheckpoints documentresolvedgaps. ReadAGENTS.md, neverweakenexistingtests.
+Parentfailingregressions, sharedsolid/STEPharness; no cargofmt. Use rustfmt+nightly
+--config skip_children=true on touchedfiles. CARGO_BUILD_JOBS=12. Relevanttests,
+Clippy/smoke, buildreplayLAST; no source/executable edits duringclean captures.
+Commitimplementation+proof, thencleanfullcapture+catalog/HTML/handoffcommit.
+Do not repeatcompletedfullcapturewithoutsourcechanges/specificnewconcern.
+Force-addignoredJSON/ZIP/STEP; diffcheckexcludeSTEP. No speed/fullparityclaims.
+
+Runtime: --occt ../investigations/sequential-holes-2026-10-10/occt
+--library-path target/occt-sdk/usr/lib64
+--plugin target/occt-contour-capture-plugin
+--replay target/release/examples/replay_occt_blend
+--data-path target/occt-public-chamfer-data --workers4 --timeout120 --outputNEW.
+SDK7.9.3. Existingnativecheckoutpatchesunrelated, leavealone. Consumer../PiezaCAD.
+Oldplugin target/occt-chamfer-capture-plugin remainsseed-only; DON'Treuseit.
+
+Scripts target/package-stable-native-contour-capture.py and
+write-native-contour-checkpoint.py (notidempotent). Initial globalfit run raw
+ target/occt-capture-native-chamfer-contours isREGRESSED, notstable.
+T3tab_1/server8765 forHTML; DOM/linkchecks work, screenshotsfailedpreviously.
