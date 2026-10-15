@@ -1,0 +1,61 @@
+CHAMFER REPLAY CHECKPOINT — 2026-10-15
+
+Implementation/proof: 99c956da1839bc2a170fb8b24a4e65aa8174f0f4. A documentation commit records the clean capture,
+catalog and HTML report beside this handoff. Latest user instruction: commit and STOP at the next stable achievement, with
+an HTML report of completed and remaining work. This checkpoint satisfies that
+requested stop; the overall remaining audit gaps are not complete. No push/PR or PiezaCAD changes.
+
+106 constructions / 97 limited comparison passes across162 captures,157 native
+entries all passing. All105 previous successful result/comparison records exactly
+unchanged. Only added capture bugs/moddata_1/bug203 initial chamfer.53 failures,
+2 imports,1 incomplete,0 unhandled/panics/timeouts. Seven synthetic chamfer controls
+plus one fillet control remain outside corpus counts.279 dedicated chamfer cases
+are skipped for missing data; they are not recovered by this group.
+Full capture: audits/fillet-chamfer/capture/2026-10-15-chamfer-replay/.
+SHA256 c321556746a17521226b13dc12b888b9f076f0d3b8d190dfbd103d0d1124cb02.
+
+Capture now wraps blend and chamf in native caller scope, with one sequence index.
+C++ plugin retains physical edge samples and equal-distance, two-distance, or
+angle parameters. Native equal chamfer uses atof; other modes Draw::Atof.
+Reference planes are recorded where available. Replay matches them to exactly
+one adjacent face independent of IDs/normal sign. Planar two-distance supported;
+angle mode restricted to perpendicular planar supports, d1=d0*tan(angle).
+Equal requests reuse solid/wire chamfer APIs. Conflicting aliases/invalid inputs
+reject; missing/ambiguous planes and unsupported scope remain explicit statuses.
+No kernel geometry/public API/dependency/consumer change.
+
+Proof: truck-benchmarks/results/2026-10-15-chamfer-replay/.
+Two parent wrapper failures and three parent replay success failures.12 replay
+release tests and5 capture tests pass; all-target Clippy including benchmarks,
+action smoke, native plugin build and19 audit tests pass. Tests use common solid
+and STEP harness plus independent material and bevel normals. Previous unchanged
+kernel baseline493 passes/0fails/1ignore; not wholesale rerun for tooling-only work.
+Native probes:10x20x30 box, length30 edge, V=6000-30*d0*d1/2; angle d1=d0*tan30.
+Seven chamfer probes+interleaved fillet, original/rotated/translated frames; valid
+single solids; max sampled distance3.238e-11. bug203 cube100/d5/angle45 volume998750,
+native Truck STEP error3.493e-10. Later native fillet failure check not replayed.
+Proof archive119 verified members. No speed or global-distance claim.
+
+NEXT: extend distance/angle replay beyond perpendicular planes only after deriving
+its side convention and validating acute/obtuse native prisms independently.
+Current negative regression intentionally rejects a nonperpendicular wedge.
+If extending scope, rewrite that assertion first to at least equal strength per
+AGENTS.md, preserving invalid/unsupported cases. Capture/physical face mapping is
+now available for focused native experiments. Do not assume tangent/arc distances
+on curved supports share the planar convention.
+
+Other remaining work unchanged:53 solver failures;9 discrepancies;closed-shell
+imports B5/J7(native0solids);incomplete bug119;missing279chamferfixtures;broader
+collision/variable-radius/2D;PCurve precision baseline;PiezaCAD integration.
+See prior spherical-pcurves handoff for detailed cases and proof locations.
+
+METHOD: read AGENTS.md;parent-failing regressions;never weaken tests;CARGO_BUILD_JOBS=12;
+no cargo fmt, only rustfmt +nightly --config skip_children=true touched files.
+Freeze sources during builds/captures;commit implementation/proof before clean
+full capture. Force-add JSON/STEP/ZIP;preserve rawbytes;diff check excludes*.step.
+No delegates authorized. Consumer../PiezaCAD. No performance claims without medians.
+Plugin for this group:target/occt-chamfer-capture-plugin (older plugin lacks chamf).
+Full runner command is in previous handoff, use this plugin and a new output dir.
+Ignored scripts:target/validate-chamfer-replay.py,package-chamfer-proof.py,
+package-chamfer-capture.py,write-chamfer-checkpoint.py. Native raw controls in
+ target/chamfer-native-probes-final and target/chamfer-bug203.

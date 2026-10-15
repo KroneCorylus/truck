@@ -361,9 +361,18 @@
           "path": "truck-shapeops/tests/nonconvex_chamfer.rs",
           "find": "fn chamfers_meet_at_a_reentrant_planar_corner",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-15-chamfer-replay/REPORT.md",
+          "find": "# Native chamfer capture",
+          "role": "test"
         }
       ],
-      "required_outcome": "Bevel selected edges by equal specified setbacks on both supports, including convex and concave material."
+      "required_outcome": "Bevel selected edges by equal specified setbacks on both supports, including convex and concave material.",
+      "verification": [
+        "At 99c956da, native chamf commands are physically captured and replayed. Equal distances reuse the solid/wire kernel APIs. Dimension-defined box controls, including rigid motion, pass independent material, closed meshes and native-valid STEP; these controls remain separate from the 279 missing-data dedicated chamfer cases."
+      ]
     },
     {
       "id": "C02",
@@ -400,9 +409,18 @@
           "path": "truck-shapeops/tests/r5_chamfer_after_fillet.rs",
           "find": "fn asymmetric_distances_follow_wire_orientation",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-15-chamfer-replay/REPORT.md",
+          "find": "# Native chamfer capture",
+          "role": "test"
         }
       ],
-      "required_outcome": "Bevel with independently specified setbacks on the intended two support faces; orientation or storage order must not silently exchange them."
+      "required_outcome": "Bevel with independently specified setbacks on the intended two support faces; orientation or storage order must not silently exchange them.",
+      "verification": [
+        "At 99c956da, captured two-distance chamfers on planar supports preserve reference-face identity through geometric plane matching, not ordinal face IDs. Tests cover both faces and reversed plane normals, deduplicated physical aliases and conflicting assignments. Native box controls verify unequal bevel normals/material and STEP in original and transformed frames."
+      ]
     },
     {
       "id": "C03",
@@ -433,9 +451,18 @@
           "path": "cad-core/src/document.rs",
           "find": "pub struct Chamfer",
           "role": "implementation"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-15-chamfer-replay/REPORT.md",
+          "find": "# Native chamfer capture",
+          "role": "test"
         }
       ],
-      "required_outcome": "Produce a chamfer with the requested setback and angle, including non-right-angle supports, using any equivalent parameterization."
+      "required_outcome": "Produce a chamfer with the requested setback and angle, including non-right-angle supports, using any equivalent parameterization.",
+      "verification": [
+        "At 99c956da, perpendicular planar distance/angle replay converts d1=d0*tan(angle) and preserves the reference face. Native controls at30 degrees pass; corpus bugs/moddata_1/bug203 initial distance5/angle45 chamfer now captures and constructs. Independent volume998750 matches native Truck STEP within3.493e-10. Nonperpendicular and curved-reference angle requests remain unsupported; later native fillet failure is not replayed."
+      ]
     },
     {
       "id": "C04",
@@ -3371,6 +3398,18 @@
           "path": "audits/fillet-chamfer/capture/2026-10-14-spherical-pcurves/REPORT.md",
           "find": "# Full capture after spherical",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-15-chamfer-replay/REPORT.md",
+          "find": "# Native chamfer capture",
+          "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-15-chamfer-replay/REPORT.md",
+          "find": "# Full capture after native chamfer",
+          "role": "test"
         }
       ],
       "required_outcome": "Deliver blend results usable for closed meshing, STEP interchange and further modeling while preserving dimensions and validity.",
@@ -3408,7 +3447,8 @@
         "Seam-junction checkpoint f6fa8d15: parent-failing seam-selection and native G9 input regressions; 349 shapeops release tests pass, 0 fail, 1 existing ignored across 68 targets. All-target Clippy and action smoke pass. Final targeted G9 replay reports Unsupported imported geometry without panic. Full native replay after this fix is pending at the user-requested stop. See truck-benchmarks/results/2026-10-12-seam-junction/REPORT.md.",
         "Full clean replay at 946914f8 (kernel f6fa8d15): all 156 native entries pass; 161 captures contain 80 constructed outputs, 37 construction failures, 22 import failures, 11 inconsistent inputs, eight unhandled intents, two timeouts and one incomplete capture. Zero panics. G9 capture 002 changes from panic to Unsupported imported geometry; all other operation statuses are unchanged. All 80 constructions remain immutable/consistent/closed/STEP-prepared/native-valid single solids, with identical reported mesh volumes, STEP volumes and maximum sampled distances. Seventy-eight pass combined limited comparisons; G1 and tolerance-grid A1 differences and H2/H4 timeouts remain. Full parity remains unverified. See audits/fillet-chamfer/capture/2026-10-12-seam-junction/REPORT.md.",
         "The clean 35c6e2cf full capture has 104 valid constructions and 95 limited comparison passes. All 101 preceding successful result/comparison records are exactly unchanged. Three formerly unhandled unequal-radius captures now construct; five are attempted unsupported-topology failures. Full parity remains unverified.",
-        "The clean dbb54343 full capture has 105 valid constructions and 96 limited comparison passes. The F1 spherical pcurve import is recovered; 104 preceding successful result/comparison records are exactly unchanged. Two remaining import failures are closed-shell inputs with no native solid entity. Full parity remains unverified."
+        "The clean dbb54343 full capture has 105 valid constructions and 96 limited comparison passes. The F1 spherical pcurve import is recovered; 104 preceding successful result/comparison records are exactly unchanged. Two remaining import failures are closed-shell inputs with no native solid entity. Full parity remains unverified.",
+        "The clean 99c956da full capture adds one real chamfer case:157 native entries,162 captures,106 valid constructions,97 limited comparison passes. All105 preceding successful result/comparison records are exactly unchanged. Seven synthetic chamfer controls and one fillet control are separate proof, not corpus recovery.279 dedicated chamfer fixtures remain missing-data skips."
       ]
     },
     {
