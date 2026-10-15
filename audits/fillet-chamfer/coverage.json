@@ -385,6 +385,12 @@
           "path": "audits/fillet-chamfer/capture/2026-10-15-tangent-chamfer-fit/REPORT.md",
           "find": "# Full tangent",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-15-two-edge-face-trimming/REPORT.md",
+          "find": "# Shared-neighbor",
+          "role": "test"
         }
       ],
       "required_outcome": "Bevel selected edges by equal specified setbacks on both supports, including convex and concave material.",
@@ -392,7 +398,8 @@
         "At 99c956da, native chamf commands are physically captured and replayed. Equal distances reuse the solid/wire kernel APIs. Dimension-defined box controls, including rigid motion, pass independent material, closed meshes and native-valid STEP; these controls remain separate from the 279 missing-data dedicated chamfer cases.",
         "At 8c1942c7, verified public fixtures enable 261 formerly skipped native chamfer cases: 239 pass, 22 known failures, 18 still missing. Full clean capture has 648 operations, 222 valid constructions and 208 limited comparisons; all 106 prior successful records exactly unchanged. Native tangent propagation, curved-reference scope and C1 bounded-spline input trimming remain explicit gaps; no parity upgrade.",
         "At 3795c051, bounded STEP edge trimming recovers four C1 inputs to operation handling; no new chamfer constructions. All 222 prior successful records and comparisons remain exactly unchanged in 648 captures. Eight prior inconsistent inputs reject earlier and nine remain inconsistent; no tolerance or parity upgrade.",
-        "At c4706b38, refined contact fits and normalized ruled-surface orientation preserve small/shifted tangent chamfers with parent-failing material/mesh/STEP regressions. Explicit native A4 three-edge contour proof is valid with sampled maximum difference6.18e-06. Automatic capture remains seed-only; full capture222 constructions/208 limited comparisons, no prior successful check regressions. No parity upgrade."
+        "At c4706b38, refined contact fits and normalized ruled-surface orientation preserve small/shifted tangent chamfers with parent-failing material/mesh/STEP regressions. Explicit native A4 three-edge contour proof is valid with sampled maximum difference6.18e-06. Automatic capture remains seed-only; full capture222 constructions/208 limited comparisons, no prior successful check regressions. No parity upgrade.",
+        "At c26b6780, simple chamfer and fillet face patches trim a shared arc/chord neighbor sequentially instead of panicking. Parent-failing tests verify analytic contacts and retained chord, orientation, representations and immutable input. Face-patch scope only; full capture 222 constructions/208 limited comparisons with no prior successful check regressions. No parity upgrade."
       ]
     },
     {
@@ -688,12 +695,19 @@
           "path": "truck-benchmarks/results/2026-10-14-unequal-radii/REPORT.md",
           "find": "# Per-edge radii",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-15-two-edge-face-trimming/REPORT.md",
+          "find": "# Shared-neighbor",
+          "role": "test"
         }
       ],
       "required_outcome": "Blend lips and rims formed by planes and cylinders, for holes, bosses and channels in either material sense.",
       "verification": [
         "At 4a3e11d4, imported cylinders and conic extrusions receive finite support domains bounded by their complete rational boundary control hulls. Affine conic inclusion/search preserves elliptical, sheared and oblique sweeps; cylinder conversion retains the fitted height and STEP export measures perpendicular radius. Native F8, eight cylinder variants, curved extrema and bounded/off-surface checks pass. Full release modeling/shapeops/STEP: 488 passed, 0 failed, 3 existing ignored; Clippy and action smoke pass. This resolves the previously recorded finite extrusion domain failures; unsupported boundary representations and other import failures remain open.",
-        "At 35c6e2cf, draft/angle/C4 rounds the two opposite cylindrical lips of a height-20 semiannulus (radii 2 and 10) with radii 2 and 1. Independent Green-integral volume is 2988.725888734009; native integration of Truck STEP differs by 5.912e-12. Both sampled distance directions are below 3.109e-14. These are sampled checks, not certified global bounds."
+        "At 35c6e2cf, draft/angle/C4 rounds the two opposite cylindrical lips of a height-20 semiannulus (radii 2 and 10) with radii 2 and 1. Independent Green-integral volume is 2988.725888734009; native integration of Truck STEP differs by 5.912e-12. Both sampled distance directions are below 3.109e-14. These are sampled checks, not certified global bounds.",
+        "At c26b6780, simple chamfer and fillet face patches trim a shared arc/chord neighbor sequentially instead of panicking. Parent-failing tests verify analytic contacts and retained chord, orientation, representations and immutable input. Face-patch scope only; full capture 222 constructions/208 limited comparisons with no prior successful check regressions. No parity upgrade."
       ]
     },
     {
@@ -3703,6 +3717,12 @@
           "path": "truck-shapeops/examples/replay_occt_blend.rs",
           "find": "mod unequal_radius_tests",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-15-two-edge-face-trimming/REPORT.md",
+          "find": "# Shared-neighbor",
+          "role": "test"
         }
       ],
       "required_outcome": "Handle invalid, empty, duplicate or stale selections and invalid numeric parameters deterministically without panic or input mutation.",
@@ -3710,7 +3730,8 @@
         "At 9285a3a0, exact coincident adjacent wire ends are connected, tangent face loops are split, generated plane/cylinder-generator pcurves become spatial lines, and complete affine-circle bounds fit cylinder supports. Native Z1 preprocessing passes both modes and rigid transforms with geometry consistency, independent volume, closed meshes and STEP round trips. Invalid crossing counts and failed conversions preserve the polyline cache; unrelated coincident vertices and nonzero gaps are retained. Full release shapeops/STEP: 408 passed, 0 failed, 1 existing ignored; Clippy and action smoke pass. Subsequent native Z1 fillet replay remains to be measured; preprocessing success alone is not blend parity.",
         "At clean HEAD 6351c68b, the full tangent-input replay passes all 156 native entries and constructs 70 of 161 captured Truck tasks. All 70 preserve input and geometry consistency; 69 have closed Truck meshes, 69 prepare STEP, 68 yield native-valid single-solid STEP and 67 meet the combined limited checks including bidirectional sampled distance <=0.001. Z1 now succeeds, with maximum sampled distances about 3.48e-5. Newly reachable Q4 capture 2 has an open mesh, exports two solids and differs by 1.20840; D4 export, tolerance A1 and I3/J9 timeouts remain. Zero panics; no full parity verdict.",
         "Separate-contour failure is atomic: a selection containing a valid individual round and an oversized round fails without changing the input in either selection order. Shared-support contours remain rejected.",
-        "At 35c6e2cf, regressions reject invalid/nonfinite per-edge radii, duplicate/unknown edges, oversized rounds, connected unequal-radius selections, overlapping parallel rounds and conflicting captured assignments. Valid nonoverlapping unequal rounds sharing a planar support pass material and STEP checks. Input preservation is asserted for success and failure."
+        "At 35c6e2cf, regressions reject invalid/nonfinite per-edge radii, duplicate/unknown edges, oversized rounds, connected unequal-radius selections, overlapping parallel rounds and conflicting captured assignments. Valid nonoverlapping unequal rounds sharing a planar support pass material and STEP checks. Input preservation is asserted for success and failure.",
+        "At c26b6780, simple chamfer and fillet face patches trim a shared arc/chord neighbor sequentially instead of panicking. Parent-failing tests verify analytic contacts and retained chord, orientation, representations and immutable input. Face-patch scope only; full capture 222 constructions/208 limited comparisons with no prior successful check regressions. No parity upgrade."
       ]
     },
     {
