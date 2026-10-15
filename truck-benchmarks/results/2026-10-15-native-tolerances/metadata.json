@@ -1,0 +1,218 @@
+{
+  "parent_revision": "24e5c23b13bc5d78adbc797bdfc3f7e2e983fbda",
+  "source_sha256": {
+    "audits/fillet-chamfer/capture/blend_capture.cpp": "2c30c40c5bf1f380781d9da996e880d421fa6651255b2a7a0dd93c24dee7770c",
+    "audits/fillet-chamfer/capture/blend_capture.tcl": "8f4baaa779dd6106ccedb126e018e24bb454d870599268b0dc77b0d0131ac63a",
+    "audits/fillet-chamfer/capture/compare_shapes.cpp": "4101db77b0cd4382fff2ccc0ea19aca9070c145546d14f5bde9602dcd189ce4b",
+    "audits/fillet-chamfer/capture/shape_tolerances.hpp": "a98d099dde75072d678bf7f444ecde390fa71fd3abe01115cb4f60b99b753651",
+    "audits/fillet-chamfer/capture/run_capture.py": "9a72e14e51a8c62a8d79fc3141b82dbe9b4272150fa3dd2acdaa74d20663b499",
+    "truck-shapeops/examples/replay_occt_blend.rs": "35b18d1517cc9d79720077beeba524aa820e9ae23bb4fc19780be008d83aac0a"
+  },
+  "replay_tests_unchanged_since_e3fab5a6": 33,
+  "executable_sha256": {
+    "target/release/examples/replay_occt_blend": "a4d011d9e1b5ebc1229a402075cbb909b94ec9a03e012c29b5d2d132aee75ddf",
+    "target/occt-tolerance-capture-plugin/libTKBlendAudit.so": "ec471ca02beacb0989997d70d5e4e809ba82775f5c922c30f60211ac3cef9244",
+    "target/occt-tolerance-capture-plugin/compare_shapes": "4b98c99d824766c0cd1d4b6f250a9a01a5c23e06896dc7b1100eefddf1af74c2"
+  },
+  "targeted_proof": {
+    "blend/simple/G1": {
+      "input_tolerances": {
+        "face": 1e-06,
+        "edge": 1.0000000000000002e-06,
+        "vertex": 1.0000000000000002e-06
+      },
+      "result": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 132184980.39192003,
+        "selected_edges": 1,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 5e-05,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 132189932.40065464,
+        "truck_volume": 132185649.9747912,
+        "native_to_truck_max_distance": 0.9874986974855128,
+        "native_to_truck_samples": 921,
+        "truck_to_native_max_distance": 0.018545749048141102,
+        "truck_to_native_samples": 886,
+        "native_tolerances": {
+          "face": 1e-06,
+          "edge": 5.84507414645427e-06,
+          "vertex": 4.39707311635729e-05
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1.634383777318178e-06,
+          "vertex": 1.634383777318178e-06
+        }
+      }
+    },
+    "blend/simple/H4": {
+      "input_tolerances": {
+        "face": 1e-06,
+        "edge": 1.00000000720453e-06,
+        "vertex": 1.00000000720453e-06
+      },
+      "result": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 13159628.445614986,
+        "selected_edges": 1,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 5e-05,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 13151259.698596016,
+        "truck_volume": 13159710.046042852,
+        "native_to_truck_max_distance": 0.0021806666550459528,
+        "native_to_truck_samples": 1104,
+        "truck_to_native_max_distance": 4.142110055441669,
+        "truck_to_native_samples": 1209,
+        "native_tolerances": {
+          "face": 1e-06,
+          "edge": 22.9741069520461,
+          "vertex": 22.9741069520462
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-05,
+          "vertex": 1e-05
+        }
+      }
+    },
+    "blend/tolblend_simple/A1": {
+      "input_tolerances": {
+        "face": 5e-07,
+        "edge": 5e-07,
+        "vertex": 5e-07
+      },
+      "result": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 29054.88141623006,
+        "selected_edges": 4,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 5e-05,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 29055.053293964895,
+        "truck_volume": 29055.062123632302,
+        "native_to_truck_max_distance": 0.022376472569611394,
+        "native_to_truck_samples": 1874,
+        "truck_to_native_max_distance": 0.022376472569611394,
+        "truck_to_native_samples": 1862,
+        "native_tolerances": {
+          "face": 0.00235108915834048,
+          "edge": 0.00235108915834048,
+          "vertex": 0.00235108915834048
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      }
+    }
+  },
+  "archive_sha256": "a71e2ae15d464bf5ac769984618f5d6243db5d0cc2eb520016a1276ebfe6dc0f",
+  "artifact_sha256": {
+    "blend/simple/G1/capture/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "blend/simple/G1/capture/001.comparison.json": "c3b03e7d9dbac22c983ef1df6497a1cccca70e48e9508b396775c013c363776b",
+    "blend/simple/G1/capture/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "blend/simple/G1/capture/001.input.brep": "8a9d2feb919c0fa1cd8b67251a53f6b65af66e8bc36a3e60452d24cdace5b79b",
+    "blend/simple/G1/capture/001.input.json": "2d92f742f70722884f85f21a0ce10c93ac9a56cf119b5d0c69853a0b8d42b8a0",
+    "blend/simple/G1/capture/001.input.step": "da823ec3f7dd24764d1d5dea5638e33eed7015961f8f65f8c06301fbb9851354",
+    "blend/simple/G1/capture/001.result.brep": "dfadffbf54cd35bd5384653648cf3e4e15c8a3542e240a2e0c5ffc463b132543",
+    "blend/simple/G1/capture/001.result.json": "bdd901df08c01c815d2fa0c3de70abf7f6417e4efec980a97cb63423306dfd43",
+    "blend/simple/G1/capture/001.result.step": "353b8dd18acea2d5a699e1d4932c0d6c90ce826bf92a3cfd59b7a0448a1500e8",
+    "blend/simple/G1/capture/001.truck.json": "d87d6b560e606f23a0d068d782b5b46125617bc027a0cf3b22781a1dfdd8bc14",
+    "blend/simple/G1/capture/001.truck.log": "73b66a9dd689ee68327e1febbd542a2f7fb17f0101dceb0caafcf9aa6e37a560",
+    "blend/simple/G1/capture/001.truck.step": "5ccc672b103427df6bc28c903ba228ef8f72b291257319a59592338ae04cc21d",
+    "blend/simple/G1/console.log": "673a5f701bc8840a874ef10fcde30940357119871356890dae36ae2d3694d6c2",
+    "blend/simple/G1/draw.log": "2f0cc19ced802ae729133c09c969451cfdf8bd03bc9f734c4c2f9fea0c38ffd1",
+    "blend/simple/G1/run.tcl": "9ffb5857b210c9f2fb14059c5b8df1eb319211e944e91c02c6eed1dcc334fa52",
+    "blend/simple/H4/capture/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "blend/simple/H4/capture/001.comparison.json": "5735c20dec193d25588ef2bb8f6c534339af5078913668b075e109bca6fff008",
+    "blend/simple/H4/capture/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "blend/simple/H4/capture/001.input.brep": "7586600f7eb25f31372d271611731afc9a13c50f3e49f64fc742acb087702285",
+    "blend/simple/H4/capture/001.input.json": "fa41423b05e47380dae7dedc1d6a6ae9b2e91bff0f08c8c7d2fb889b79043b19",
+    "blend/simple/H4/capture/001.input.step": "0c26f187da1122cb25a347d6404e0b8594b201578f0134ec13d44b4c728d4cd6",
+    "blend/simple/H4/capture/001.result.brep": "28a323585ea4ecf71612d4912d5e4c2df64c0d06cddb6e4d1e3d79edb03e4110",
+    "blend/simple/H4/capture/001.result.json": "d809f82409343d0fac162e6005334a287bd2632d2614b3ce82661e39fd5106d4",
+    "blend/simple/H4/capture/001.result.step": "cd7adfbd0c50f197f4c94905561fffe1f19a17b460dc268b72e7d18fcd8073f1",
+    "blend/simple/H4/capture/001.truck.json": "6ed74ecba9f8200a14a240dac7a8492f9a51ad7edf4091dd50127e63fcaad886",
+    "blend/simple/H4/capture/001.truck.log": "c627ca44c3db6af51e6ad407f29ccccc02746b178a4415f5a505c1e8d8f30375",
+    "blend/simple/H4/capture/001.truck.step": "113c9091b5556a66e7688d1ed2b32e303742e90941bb54889804ac299300a0fe",
+    "blend/simple/H4/console.log": "b052d0c64129626378af9d1ed10b6a072ea597a142fc04dcea3ef2c193509e1e",
+    "blend/simple/H4/draw.log": "ca4b2f8ac96aeb6a86b7a86a98e8c5501176770e6afb14b749573e9a564a2919",
+    "blend/simple/H4/run.tcl": "68859afa52ed87abe31e6b9f9fbc7ef94ba051e8f1dc661197ba446794883d55",
+    "blend/tolblend_simple/A1/capture/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "blend/tolblend_simple/A1/capture/001.comparison.json": "88d6448c006acb4ddcd6dffafd2476b08b2d24c6f6aacee531f6145f997af7fc",
+    "blend/tolblend_simple/A1/capture/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "blend/tolblend_simple/A1/capture/001.input.brep": "a6af0f06dfad5c0d3dec2a111a8fd7942607137391530138557b375989ebb525",
+    "blend/tolblend_simple/A1/capture/001.input.json": "485f3355f08584dba864f8220bf8911d14722ebbd88724b75eb4e20d99710690",
+    "blend/tolblend_simple/A1/capture/001.input.step": "79912a7ad79a1697b2f87fbd7d8e7d7f126bf3ddc259e1df39973b5cbc9758a8",
+    "blend/tolblend_simple/A1/capture/001.result.brep": "23631e1affa2bfdf559942ab8b844f725ce149022ca2548a3bd9a2d04092d2ea",
+    "blend/tolblend_simple/A1/capture/001.result.json": "6207b778b24b46bbd07a21457ab1eb51ce4640818cb96c0bba021ffb90de8dc7",
+    "blend/tolblend_simple/A1/capture/001.result.step": "3e41f847fc1f0056a2bf39e5247507f116694ad38c4918d8c36d73df60d80b4b",
+    "blend/tolblend_simple/A1/capture/001.truck.json": "507d07f319a9fb8c614e860a2aef0ecb3a367637c57ac1fe3c50136ec3540295",
+    "blend/tolblend_simple/A1/capture/001.truck.log": "f8c0c3fd31b6a9e727a48b9be5d6189f1ea9ace191c87f4823aae3d20b16baff",
+    "blend/tolblend_simple/A1/capture/001.truck.step": "a8f0c2720d0b57414e5d049e6654f1dc9bb3a339128c967b37ddbf5404dfbc00",
+    "blend/tolblend_simple/A1/console.log": "9e6246feb2b5d52034d945a052f4f06bd10e4e5bf2f61d6f08ca98bb2742f644",
+    "blend/tolblend_simple/A1/draw.log": "8c8ab74431f26c9ad6b877d7f1222cffd10404688d209ae2127e6718b79bd188",
+    "blend/tolblend_simple/A1/run.tcl": "a6da2273b4d71f2ac6a63485416bcc23ae78f2c589ebbdcbd7a7ccf048478377",
+    "results.json": "85e1cdb4367dac8b35a33f8802827651cd3041857132ea4f3a938fda7b4962ba",
+    "runtime.log": "1bce096d463b23cf544fa6b93bca8c017dd101b2be60e9ae5f9b2c03e89beed7",
+    "box-parent/control.tcl": "af8e4e7fa5894eab622097bb30f19f5bd3f3ebd43fdcd30f606a1c8dade45a3f",
+    "box-parent/display.log": "d193dcb206168ba0028cb25a89436a5823b9939ac452af9bdc1a78d8e86c9242",
+    "box-parent/controlled.result.brep": "d3c1fe7d5ea932a18ef76514d77bf8dedab1f51b3931a7291ce3f18a66f3cb7c",
+    "box-parent/controlled.result.step": "b019273623c7f471ee5917191ec09cb79fcf03ec2aaeccce37d89a1e85406054",
+    "box-parent/controlled.result.json": "64cc6aec3eece6709b44d0e38194a2455f0500672b68d65a5f2c7d6dcd1999d3",
+    "box-parent/native.log": "9adf87297433125f721a6d7ce503b4f81af60831e8bf1f1c5f36dd2eeab40abd",
+    "box-parent/comparison.json": "1874754e7a3310fd978a535436e241acd73a932d68b68c0e186add4a151c25e4",
+    "box-parent/comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "box-proof/control.tcl": "af8e4e7fa5894eab622097bb30f19f5bd3f3ebd43fdcd30f606a1c8dade45a3f",
+    "box-proof/display.log": "54045201501a426d4b662fa992372b4d1abf9b50f95fb4e9a56dd755a3acbebb",
+    "box-proof/controlled.result.brep": "d3c1fe7d5ea932a18ef76514d77bf8dedab1f51b3931a7291ce3f18a66f3cb7c",
+    "box-proof/controlled.result.step": "39f149fb98c73f742d2fc67afae139841ebce9e660cb7f561cf3b750eccb9474",
+    "box-proof/controlled.result.json": "c1e4777c15908456df158b85e2784ead172afe06cdff561c83cc0b27774e7a3d",
+    "box-proof/native.log": "9adf87297433125f721a6d7ce503b4f81af60831e8bf1f1c5f36dd2eeab40abd",
+    "box-proof/comparison.json": "a93c8e492156d33f54e83515d2d20a5c08573ee16ceb38afd9b4cf26e7e505e7",
+    "box-proof/comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "diagnostics/prove-native-tolerances.py": "55da5910e23cf97d2c6f07a5a54911f18bc5bf5d7305f99300388456928f24b3",
+    "diagnostics/inventory-shape-tolerances.cpp": "478e9152c75323bb612383f500e59e0adbd69410c3d640cddc06751b571a3e79",
+    "diagnostics/native-tolerance-inventory.tsv": "b73e004e0eb95687bc2be1279027209265b3abb0426adacf36e721b0b235120d",
+    "diagnostics/inspect-concave-sector.cpp": "6f9d8cc3e32cef0b706d597a364c021c82f0d5142f472adbf553eb3d0251aa76",
+    "diagnostics/concave-sector-inspection.log": "366cbe4f46866d62482df33fc00c7f6ba195597d6db61457ad3672cdf72ab141"
+  },
+  "inventory_sha256": "b205fb269c2655ecb4c4ca23c29ee5f55b154a63edb670b57b1e7348062c341f",
+  "native_control_parent_failed": true
+}

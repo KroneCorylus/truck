@@ -1,3 +1,4 @@
+#include "shape_tolerances.hpp"
 #include <BRepAdaptor_Curve.hxx>
 #include <BRepAdaptor_Surface.hxx>
 #include <BRepBuilderAPI_Copy.hxx>
@@ -47,6 +48,7 @@ void properties(std::ostream& out, const TopoDS_Shape& shape) {
     throw std::runtime_error("nonfinite shape properties");
   out << "\"native_valid\":" << (BRepCheck_Analyzer(shape).IsValid() ? "true" : "false")
       << ",\"solids\":" << solids << ",\"volume\":" << volume.Mass() << ",\"area\":" << area.Mass();
+  blend_audit::write_shape_tolerances(out, shape, "stored_tolerances");
 }
 
 void edge_geometry(std::ostream& out, const TopoDS_Edge& edge) {

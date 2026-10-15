@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/home/krone/Development/Pieza_WS/truck/target/prove-native-tolerances.py", line 22, in <module>
+    assert result.get('stored_tolerances')==expected,result
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'native_valid': True, 'solids': 1, 'volume': 5999.999999999999, 'area': 2200}

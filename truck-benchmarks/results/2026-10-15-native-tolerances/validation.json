@@ -1,0 +1,17 @@
+{
+  "parent_revision": "24e5c23b13bc5d78adbc797bdfc3f7e2e983fbda",
+  "source_sha256": {
+    "audits/fillet-chamfer/capture/blend_capture.cpp": "2c30c40c5bf1f380781d9da996e880d421fa6651255b2a7a0dd93c24dee7770c",
+    "audits/fillet-chamfer/capture/blend_capture.tcl": "8f4baaa779dd6106ccedb126e018e24bb454d870599268b0dc77b0d0131ac63a",
+    "audits/fillet-chamfer/capture/compare_shapes.cpp": "4101db77b0cd4382fff2ccc0ea19aca9070c145546d14f5bde9602dcd189ce4b",
+    "audits/fillet-chamfer/capture/shape_tolerances.hpp": "a98d099dde75072d678bf7f444ecde390fa71fd3abe01115cb4f60b99b753651",
+    "audits/fillet-chamfer/capture/run_capture.py": "9a72e14e51a8c62a8d79fc3141b82dbe9b4272150fa3dd2acdaa74d20663b499",
+    "truck-shapeops/examples/replay_occt_blend.rs": "35b18d1517cc9d79720077beeba524aa820e9ae23bb4fc19780be008d83aac0a"
+  },
+  "replay_tests_unchanged_since_e3fab5a6": 33,
+  "executable_sha256": {
+    "target/release/examples/replay_occt_blend": "a4d011d9e1b5ebc1229a402075cbb909b94ec9a03e012c29b5d2d132aee75ddf",
+    "target/occt-tolerance-capture-plugin/libTKBlendAudit.so": "ec471ca02beacb0989997d70d5e4e809ba82775f5c922c30f60211ac3cef9244",
+    "target/occt-tolerance-capture-plugin/compare_shapes": "4b98c99d824766c0cd1d4b6f250a9a01a5c23e06896dc7b1100eefddf1af74c2"
+  }
+}

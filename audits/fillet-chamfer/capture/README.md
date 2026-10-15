@@ -132,6 +132,22 @@ of the solvers' internal approximation settings. Legacy schema-1 fillets remain
 explicitly labeled seed-only. Captured contour membership must cover all active
 seeds, and every contour must be connected, unbranched and associated with a seed.
 
+## Stored shape tolerances
+
+Input and native result metadata include `stored_tolerances`, the maximum stored
+face, edge and vertex tolerance in model units. STEP comparisons separately
+record `native_tolerances` and `truck_step_tolerances`. These are native topology
+budgets, not measured geometric errors or certified distance bounds. Reading
+them does not change shapes, validity flags, comparison distances or thresholds.
+The shared native helper is included in the capture source hashes.
+
+A `native_valid` result is evaluated using the reference shape's own tolerances.
+It does not establish accuracy at the replay comparison threshold of 0.001.
+For example, the native H4 result has edge/vertex tolerances about 22.97, despite
+input tolerances near 1e-6. Conversely, an exact box can have deliberately large
+stored tolerances and zero measured boundary difference. Use both diagnostics;
+do not turn the stored budget into a synthetic geometry-error measurement.
+
 ## Limits
 
 - This route does not yet express unequal-radius corners, variable laws,

@@ -1,3 +1,4 @@
+#include "shape_tolerances.hpp"
 #include <BRepAdaptor_Curve.hxx>
 #include <BRepAdaptor_Surface.hxx>
 #include <BRepBuilderAPI_MakeVertex.hxx>
@@ -102,7 +103,10 @@ int main(int argc, char** argv) {
         << ",\"native_to_truck_max_distance\":" << forward.maximum
         << ",\"native_to_truck_samples\":" << forward.samples
         << ",\"truck_to_native_max_distance\":" << reverse.maximum
-        << ",\"truck_to_native_samples\":" << reverse.samples << "}\n";
+        << ",\"truck_to_native_samples\":" << reverse.samples;
+    blend_audit::write_shape_tolerances(out, native, "native_tolerances");
+    blend_audit::write_shape_tolerances(out, truck, "truck_step_tolerances");
+    out << "}\n";
     return 0;
   } catch (const Standard_Failure& error) {
     std::cerr << error.GetMessageString() << '\n';

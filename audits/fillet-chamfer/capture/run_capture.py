@@ -156,6 +156,7 @@ def main():
                     scope=__doc__, snapshots=catalog['snapshots'],
                     source_sha256={str(p): sha(p) for p in [Path(__file__),
                         HERE / 'blend_capture.cpp', HERE / 'blend_capture.tcl', HERE / 'compare_shapes.cpp',
+                        HERE / 'shape_tolerances.hpp',
                         HERE.parent / 'run_occt.py',
                         HERE.parents[2] / 'truck-shapeops/examples/replay_occt_blend.rs']},
                     executable_sha256={str(p): sha(p) for p in [Path(args.draw), args.replay,
