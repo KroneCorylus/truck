@@ -1,0 +1,258 @@
+{
+  "kernel_revision": "48a1032fc769831ad0754c6639015ff77d59f505",
+  "native": {
+    "passed": 396
+  },
+  "captures": 648,
+  "before_statuses": {
+    "input-import-failed": 96,
+    "operation-succeeded": 221,
+    "operation-failed": 182,
+    "unhandled-intent": 132,
+    "selection-unmatched": 8,
+    "input-inconsistent": 9
+  },
+  "after_statuses": {
+    "input-import-failed": 96,
+    "operation-succeeded": 231,
+    "operation-failed": 202,
+    "unhandled-intent": 110,
+    "input-inconsistent": 9
+  },
+  "capture_scopes": {
+    "fillet-seed-only": 161,
+    "chamfer-native-contours": 487
+  },
+  "unchanged_intent_records": 648,
+  "successful_checks": {
+    "constructed": 231,
+    "input_unchanged": 231,
+    "geometry_consistent": 231,
+    "mesh_closed": 231,
+    "step_prepared": 231,
+    "native_valid": 231,
+    "truck_step_valid": 231,
+    "single_solid": 231,
+    "sampled_distance": 220
+  },
+  "limited_comparison_passes": 220,
+  "status_changes": [
+    {
+      "case": "chamfer/dist_angle/A3",
+      "capture": "001",
+      "changed_scope": false,
+      "before": "selection-unmatched",
+      "after": "operation-failed"
+    },
+    {
+      "case": "chamfer/dist_angle/A9",
+      "capture": "001",
+      "changed_scope": false,
+      "before": "unhandled-intent",
+      "after": "operation-failed"
+    },
+    {
+      "case": "chamfer/dist_angle/B2",
+      "capture": "001",
+      "changed_scope": false,
+      "before": "unhandled-intent",
+      "after": "operation-failed"
+    },
+    {
+      "case": "chamfer/dist_angle/F4",
+      "capture": "001",
+      "changed_scope": false,
+      "before": "unhandled-intent",
+      "after": "operation-failed"
+    },
+    {
+      "case": "chamfer/dist_angle_complex/A4",
+      "capture": "001",
+      "changed_scope": false,
+      "before": "selection-unmatched",
+      "after": "operation-failed"
+    },
+    {
+      "case": "chamfer/dist_angle_complex/A5",
+      "capture": "001",
+      "changed_scope": false,
+      "before": "selection-unmatched",
+      "after": "operation-failed"
+    },
+    {
+      "case": "chamfer/dist_angle_complex/C2",
+      "capture": "001",
+      "changed_scope": false,
+      "before": "unhandled-intent",
+      "after": "operation-failed"
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A4",
+      "capture": "001",
+      "changed_scope": false,
+      "before": "selection-unmatched",
+      "after": "operation-succeeded"
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A7",
+      "capture": "001",
+      "changed_scope": false,
+      "before": "unhandled-intent",
+      "after": "operation-succeeded"
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A7",
+      "capture": "004",
+      "changed_scope": false,
+      "before": "unhandled-intent",
+      "after": "operation-succeeded"
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A9",
+      "capture": "001",
+      "changed_scope": false,
+      "before": "unhandled-intent",
+      "after": "operation-succeeded"
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A9",
+      "capture": "004",
+      "changed_scope": false,
+      "before": "unhandled-intent",
+      "after": "operation-succeeded"
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/C2",
+      "capture": "005",
+      "changed_scope": false,
+      "before": "unhandled-intent",
+      "after": "operation-failed"
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/C2",
+      "capture": "010",
+      "changed_scope": false,
+      "before": "unhandled-intent",
+      "after": "operation-failed"
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/C3",
+      "capture": "001",
+      "changed_scope": false,
+      "before": "unhandled-intent",
+      "after": "operation-failed"
+    },
+    {
+      "case": "chamfer/dist_dist/A3",
+      "capture": "001",
+      "changed_scope": false,
+      "before": "selection-unmatched",
+      "after": "operation-failed"
+    },
+    {
+      "case": "chamfer/dist_dist/A9",
+      "capture": "001",
+      "changed_scope": false,
+      "before": "unhandled-intent",
+      "after": "operation-failed"
+    },
+    {
+      "case": "chamfer/dist_dist/B2",
+      "capture": "001",
+      "changed_scope": false,
+      "before": "unhandled-intent",
+      "after": "operation-failed"
+    },
+    {
+      "case": "chamfer/dist_dist/F4",
+      "capture": "001",
+      "changed_scope": false,
+      "before": "unhandled-intent",
+      "after": "operation-failed"
+    },
+    {
+      "case": "chamfer/dist_dist_complex/A4",
+      "capture": "001",
+      "changed_scope": false,
+      "before": "selection-unmatched",
+      "after": "operation-failed"
+    },
+    {
+      "case": "chamfer/dist_dist_complex/A5",
+      "capture": "001",
+      "changed_scope": false,
+      "before": "selection-unmatched",
+      "after": "operation-failed"
+    },
+    {
+      "case": "chamfer/dist_dist_complex/C2",
+      "capture": "001",
+      "changed_scope": false,
+      "before": "unhandled-intent",
+      "after": "operation-failed"
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A4",
+      "capture": "001",
+      "changed_scope": false,
+      "before": "selection-unmatched",
+      "after": "operation-succeeded"
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A7",
+      "capture": "001",
+      "changed_scope": false,
+      "before": "unhandled-intent",
+      "after": "operation-succeeded"
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A7",
+      "capture": "004",
+      "changed_scope": false,
+      "before": "unhandled-intent",
+      "after": "operation-succeeded"
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A9",
+      "capture": "001",
+      "changed_scope": false,
+      "before": "unhandled-intent",
+      "after": "operation-succeeded"
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A9",
+      "capture": "004",
+      "changed_scope": false,
+      "before": "unhandled-intent",
+      "after": "operation-succeeded"
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/C2",
+      "capture": "005",
+      "changed_scope": false,
+      "before": "unhandled-intent",
+      "after": "operation-failed"
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/C2",
+      "capture": "010",
+      "changed_scope": false,
+      "before": "unhandled-intent",
+      "after": "operation-failed"
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/C3",
+      "capture": "001",
+      "changed_scope": false,
+      "before": "unhandled-intent",
+      "after": "operation-failed"
+    }
+  ],
+  "scope_changes": [],
+  "changed_scope_check_losses": [],
+  "unchanged_intent_regressions": [],
+  "numeric_changes": [],
+  "exact_successful_results_excluding_scope_label": 221,
+  "seed_capture_changes": [],
+  "native_reference_changes": []
+}

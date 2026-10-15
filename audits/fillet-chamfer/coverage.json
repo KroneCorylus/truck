@@ -3,7 +3,7 @@
     "title": "Fillet and chamfer feature parity audit",
     "baseline": "OCCT V7_9_3 source inventory plus the recorded Truck/Pieza revisions. Includes 3D, 2D, related workflows and all textual candidates under the discovery rules.",
     "meaning_of_all": "Every dedicated test-grid entry, matching registered test/helper, discovered blend command and retained reference in this pinned checkout. This is not a claim about all mathematical configurations or current/future OCCT releases.",
-    "execution": "All 1,026 inventoried entries have recorded native OCCT harness attempts. The latest clean capture runs 396 passing native entries and records 648 operations: 487 complete native chamfer contours and 161 seed-only fillet requests. Capture separates input, selection, unsupported intent, construction, mesh and sampled STEP outcomes; source and artifact hashes are checked. 221 constructions pass validity checks and 210 meet limited comparisons at 0.001. Every case-level full-parity verdict remains unverified.",
+    "execution": "All 1,026 inventoried entries have recorded native OCCT harness attempts. The latest clean capture runs 396 passing native entries and records 648 operations: 487 complete native chamfer contours and 161 seed-only fillet requests. Capture separates input, selection, unsupported intent, construction, mesh and sampled STEP outcomes; source and artifact hashes are checked. 231 constructions pass validity checks and 220 meet limited comparisons at 0.001. Every case-level full-parity verdict remains unverified.",
     "mapping": "Capability assessments describe observable outcomes supported or restricted by reviewed source evidence. Per-case tags and links are automated hints; they do not prove Truck handles that fixture.",
     "objective": "Achieve at least OCCT-level fillet/chamfer capabilities and robustness for equivalent modeling tasks in Truck/Pieza.",
     "equivalence": "Judge the requested geometry, dimensions, validity, editing behavior and practical performance. Different APIs, algorithms, languages, surface representations and internal operation sequences are acceptable. Missing a corresponding OCCT method is not evidence of a feature gap."
@@ -474,6 +474,12 @@
           "path": "audits/fillet-chamfer/capture/2026-10-15-native-chamfer-contours/REPORT.md",
           "find": "# Complete native",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-15-chamfer-reference-contours/REPORT.md",
+          "find": "# Chamfer reference",
+          "role": "test"
         }
       ],
       "required_outcome": "Bevel with independently specified setbacks on the intended two support faces; orientation or storage order must not silently exchange them.",
@@ -482,7 +488,8 @@
         "At 8c1942c7, verified public fixtures enable 261 formerly skipped native chamfer cases: 239 pass, 22 known failures, 18 still missing. Full clean capture has 648 operations, 222 valid constructions and 208 limited comparisons; all 106 prior successful records exactly unchanged. Native tangent propagation, curved-reference scope and C1 bounded-spline input trimming remain explicit gaps; no parity upgrade.",
         "At 3795c051, bounded STEP edge trimming recovers four C1 inputs to operation handling; no new chamfer constructions. All 222 prior successful records and comparisons remain exactly unchanged in 648 captures. Eight prior inconsistent inputs reject earlier and nine remain inconsistent; no tolerance or parity upgrade.",
         "At c4706b38, refined contact fits and normalized ruled-surface orientation preserve small/shifted tangent chamfers with parent-failing material/mesh/STEP regressions. Explicit native A4 three-edge contour proof is valid with sampled maximum difference6.18e-06. Automatic capture remains seed-only; full capture222 constructions/208 limited comparisons, no prior successful check regressions. No parity upgrade.",
-        "At 099ccb7e following 2346b975, native chamfer schema2 captures complete contours and first-assignment/ignored semantics. Parent-failing replay validation prevents seed fallback. Automatic A4 applies3edges with valid STEP and sampled maximum2.23e-8. Fillets remainseed-only and retain5e-5exportfits; chamfersuse1e-7. Fullcapture221 constructions/210 limitedcomparisons; 58 corrected-intentrecords, no prior successful checkregressions forunchangedintent. No parityupgrade."
+        "At 099ccb7e following 2346b975, native chamfer schema2 captures complete contours and first-assignment/ignored semantics. Parent-failing replay validation prevents seed fallback. Automatic A4 applies3edges with valid STEP and sampled maximum2.23e-8. Fillets remainseed-only and retain5e-5exportfits; chamfersuse1e-7. Fullcapture221 constructions/210 limitedcomparisons; 58 corrected-intentrecords, no prior successful checkregressions forunchangedintent. No parityupgrade.",
+        "At 48a1032f, replay propagates planar seed reference sides across complete oriented chamfer contours, including perpendicular plane/cylinder rims. Two parent-failing native regressions verify both directions and normal signs, exact setbacks and solid/STEP checks. Full capture: 231 constructions, 220 limited comparisons; all648 intents unchanged and no successful check regressions. Fillets remain seed-only. No parity upgrade."
       ]
     },
     {
@@ -550,6 +557,12 @@
           "path": "audits/fillet-chamfer/capture/2026-10-15-native-chamfer-contours/REPORT.md",
           "find": "# Complete native",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-15-chamfer-reference-contours/REPORT.md",
+          "find": "# Chamfer reference",
+          "role": "test"
         }
       ],
       "required_outcome": "Produce a chamfer with the requested setback and angle, including non-right-angle supports, using any equivalent parameterization.",
@@ -559,7 +572,8 @@
         "At 8c1942c7, verified public fixtures enable 261 formerly skipped native chamfer cases: 239 pass, 22 known failures, 18 still missing. Full clean capture has 648 operations, 222 valid constructions and 208 limited comparisons; all 106 prior successful records exactly unchanged. Native tangent propagation, curved-reference scope and C1 bounded-spline input trimming remain explicit gaps; no parity upgrade.",
         "At 3795c051, bounded STEP edge trimming recovers four C1 inputs to operation handling; no new chamfer constructions. All 222 prior successful records and comparisons remain exactly unchanged in 648 captures. Eight prior inconsistent inputs reject earlier and nine remain inconsistent; no tolerance or parity upgrade.",
         "At c4706b38, refined contact fits and normalized ruled-surface orientation preserve small/shifted tangent chamfers with parent-failing material/mesh/STEP regressions. Explicit native A4 three-edge contour proof is valid with sampled maximum difference6.18e-06. Automatic capture remains seed-only; full capture222 constructions/208 limited comparisons, no prior successful check regressions. No parity upgrade.",
-        "At 099ccb7e following 2346b975, native chamfer schema2 captures complete contours and first-assignment/ignored semantics. Parent-failing replay validation prevents seed fallback. Automatic A4 applies3edges with valid STEP and sampled maximum2.23e-8. Fillets remainseed-only and retain5e-5exportfits; chamfersuse1e-7. Fullcapture221 constructions/210 limitedcomparisons; 58 corrected-intentrecords, no prior successful checkregressions forunchangedintent. No parityupgrade."
+        "At 099ccb7e following 2346b975, native chamfer schema2 captures complete contours and first-assignment/ignored semantics. Parent-failing replay validation prevents seed fallback. Automatic A4 applies3edges with valid STEP and sampled maximum2.23e-8. Fillets remainseed-only and retain5e-5exportfits; chamfersuse1e-7. Fullcapture221 constructions/210 limitedcomparisons; 58 corrected-intentrecords, no prior successful checkregressions forunchangedintent. No parityupgrade.",
+        "At 48a1032f, replay propagates planar seed reference sides across complete oriented chamfer contours, including perpendicular plane/cylinder rims. Two parent-failing native regressions verify both directions and normal signs, exact setbacks and solid/STEP checks. Full capture: 231 constructions, 220 limited comparisons; all648 intents unchanged and no successful check regressions. Fillets remain seed-only. No parity upgrade."
       ]
     },
     {
@@ -1443,6 +1457,12 @@
           "path": "audits/fillet-chamfer/capture/2026-10-15-native-chamfer-contours/REPORT.md",
           "find": "# Complete native",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-15-chamfer-reference-contours/REPORT.md",
+          "find": "# Chamfer reference",
+          "role": "test"
         }
       ],
       "required_outcome": "Round or bevel a tangent chain continuously across edge splits and changes of support face.",
@@ -1450,7 +1470,8 @@
         "At 67cf761f, captured Q4 operation 2 no longer returns an invalid success: intersecting planar contact loops fail with OutsideNeighbour at validate_trims, preserving the input. Native OCCT rolls the ball onto the existing cylindrical roof and adds two BSpline transition patches; that construction remains missing. The imported input passes independent volume and closed-mesh checks, and a smaller radius-0.2 fillet passes solid and STEP checks. Full shapeops: 328 passed, zero failed, one existing ignored; Clippy and action smoke pass. Evidence: truck-benchmarks/results/2026-10-12-roof-contact-guard/REPORT.md. This targeted replay postdates the 012ace79 full capture and does not change its historical counts.",
         "At 11fea9e8, Q4 operation 2 now succeeds through closed-wire continuation from the flat roof onto its tangent cylindrical neighbor. The regression replaces the intermediate rejection with a stronger successful-solid contract: independently integrated volume, contact radius/normals, input preservation, closed meshes and STEP at scales 0.25/1/10 with transforms/reversal. A periodic trim/hole unit prevents contacts leaving the new support. Targeted native comparison yields one valid solid, Truck STEP volume 149.08379605764409 versus native 149.08377356777387, and bidirectional sampled distances below 0.00033. Full shapeops: 329 passed, zero failed, one existing ignored; Clippy and action smoke pass. Construction median 3.815339 ms, STEP 189.600051 ms; the parent rejects. Open-wire propagation, multiple neighboring supports within one original edge, holes and global collisions remain outside the new verified scope. Evidence: truck-benchmarks/results/2026-10-12-roof-support-continuation/REPORT.md. Historical 012ace79 full-capture counts are unchanged until a fresh corpus replay is recorded.",
         "The clean a83a0f5c full capture confirms Q4 operation 2 is the sole change in limited pass/fail outcomes: it now has a closed mesh, one native-valid STEP solid and sampled distances below 0.00033. All 70 constructed results now have closed meshes and native-valid single-solid STEP; 69 pass combined limited comparisons. The 161 capture statuses remain 70 constructed, 32 construction failures, 25 import failures, 23 inconsistent inputs, eight unhandled, two timeouts and one incomplete, with zero panics. Tolerance-grid A1 still differs; G1 trim failure and I3/J9 timeouts remain. Evidence: audits/fillet-chamfer/capture/2026-10-12-roof-continuation/REPORT.md. No full parity verdict is assigned.",
-        "At 099ccb7e following 2346b975, native chamfer schema2 captures complete contours and first-assignment/ignored semantics. Parent-failing replay validation prevents seed fallback. Automatic A4 applies3edges with valid STEP and sampled maximum2.23e-8. Fillets remainseed-only and retain5e-5exportfits; chamfersuse1e-7. Fullcapture221 constructions/210 limitedcomparisons; 58 corrected-intentrecords, no prior successful checkregressions forunchangedintent. No parityupgrade."
+        "At 099ccb7e following 2346b975, native chamfer schema2 captures complete contours and first-assignment/ignored semantics. Parent-failing replay validation prevents seed fallback. Automatic A4 applies3edges with valid STEP and sampled maximum2.23e-8. Fillets remainseed-only and retain5e-5exportfits; chamfersuse1e-7. Fullcapture221 constructions/210 limitedcomparisons; 58 corrected-intentrecords, no prior successful checkregressions forunchangedintent. No parityupgrade.",
+        "At 48a1032f, replay propagates planar seed reference sides across complete oriented chamfer contours, including perpendicular plane/cylinder rims. Two parent-failing native regressions verify both directions and normal signs, exact setbacks and solid/STEP checks. Full capture: 231 constructions, 220 limited comparisons; all648 intents unchanged and no successful check regressions. Fillets remain seed-only. No parity upgrade."
       ]
     },
     {
@@ -3558,6 +3579,12 @@
           "path": "audits/fillet-chamfer/capture/2026-10-15-native-chamfer-contours/REPORT.md",
           "find": "# Complete native",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-15-chamfer-reference-contours/REPORT.md",
+          "find": "# Chamfer reference",
+          "role": "test"
         }
       ],
       "required_outcome": "Deliver blend results usable for closed meshing, STEP interchange and further modeling while preserving dimensions and validity.",
@@ -3602,7 +3629,8 @@
         "At 8c1942c7, verified public fixtures enable 261 formerly skipped native chamfer cases: 239 pass, 22 known failures, 18 still missing. Full clean capture has 648 operations, 222 valid constructions and 208 limited comparisons; all 106 prior successful records exactly unchanged. Native tangent propagation, curved-reference scope and C1 bounded-spline input trimming remain explicit gaps; no parity upgrade.",
         "At 3795c051, bounded STEP edge trimming recovers four C1 inputs to operation handling; no new chamfer constructions. All 222 prior successful records and comparisons remain exactly unchanged in 648 captures. Eight prior inconsistent inputs reject earlier and nine remain inconsistent; no tolerance or parity upgrade.",
         "At c4706b38, refined contact fits and normalized ruled-surface orientation preserve small/shifted tangent chamfers with parent-failing material/mesh/STEP regressions. Explicit native A4 three-edge contour proof is valid with sampled maximum difference6.18e-06. Automatic capture remains seed-only; full capture222 constructions/208 limited comparisons, no prior successful check regressions. No parity upgrade.",
-        "At 099ccb7e following 2346b975, native chamfer schema2 captures complete contours and first-assignment/ignored semantics. Parent-failing replay validation prevents seed fallback. Automatic A4 applies3edges with valid STEP and sampled maximum2.23e-8. Fillets remainseed-only and retain5e-5exportfits; chamfersuse1e-7. Fullcapture221 constructions/210 limitedcomparisons; 58 corrected-intentrecords, no prior successful checkregressions forunchangedintent. No parityupgrade."
+        "At 099ccb7e following 2346b975, native chamfer schema2 captures complete contours and first-assignment/ignored semantics. Parent-failing replay validation prevents seed fallback. Automatic A4 applies3edges with valid STEP and sampled maximum2.23e-8. Fillets remainseed-only and retain5e-5exportfits; chamfersuse1e-7. Fullcapture221 constructions/210 limitedcomparisons; 58 corrected-intentrecords, no prior successful checkregressions forunchangedintent. No parityupgrade.",
+        "At 48a1032f, replay propagates planar seed reference sides across complete oriented chamfer contours, including perpendicular plane/cylinder rims. Two parent-failing native regressions verify both directions and normal signs, exact setbacks and solid/STEP checks. Full capture: 231 constructions, 220 limited comparisons; all648 intents unchanged and no successful check regressions. Fillets remain seed-only. No parity upgrade."
       ]
     },
     {
@@ -3764,6 +3792,12 @@
           "path": "audits/fillet-chamfer/capture/2026-10-15-native-chamfer-contours/REPORT.md",
           "find": "# Complete native",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-15-chamfer-reference-contours/REPORT.md",
+          "find": "# Chamfer reference",
+          "role": "test"
         }
       ],
       "required_outcome": "Handle invalid, empty, duplicate or stale selections and invalid numeric parameters deterministically without panic or input mutation.",
@@ -3773,7 +3807,8 @@
         "Separate-contour failure is atomic: a selection containing a valid individual round and an oversized round fails without changing the input in either selection order. Shared-support contours remain rejected.",
         "At 35c6e2cf, regressions reject invalid/nonfinite per-edge radii, duplicate/unknown edges, oversized rounds, connected unequal-radius selections, overlapping parallel rounds and conflicting captured assignments. Valid nonoverlapping unequal rounds sharing a planar support pass material and STEP checks. Input preservation is asserted for success and failure.",
         "At c26b6780, simple chamfer and fillet face patches trim a shared arc/chord neighbor sequentially instead of panicking. Parent-failing tests verify analytic contacts and retained chord, orientation, representations and immutable input. Face-patch scope only; full capture 222 constructions/208 limited comparisons with no prior successful check regressions. No parity upgrade.",
-        "At 099ccb7e following 2346b975, native chamfer schema2 captures complete contours and first-assignment/ignored semantics. Parent-failing replay validation prevents seed fallback. Automatic A4 applies3edges with valid STEP and sampled maximum2.23e-8. Fillets remainseed-only and retain5e-5exportfits; chamfersuse1e-7. Fullcapture221 constructions/210 limitedcomparisons; 58 corrected-intentrecords, no prior successful checkregressions forunchangedintent. No parityupgrade."
+        "At 099ccb7e following 2346b975, native chamfer schema2 captures complete contours and first-assignment/ignored semantics. Parent-failing replay validation prevents seed fallback. Automatic A4 applies3edges with valid STEP and sampled maximum2.23e-8. Fillets remainseed-only and retain5e-5exportfits; chamfersuse1e-7. Fullcapture221 constructions/210 limitedcomparisons; 58 corrected-intentrecords, no prior successful checkregressions forunchangedintent. No parityupgrade.",
+        "At 48a1032f, replay propagates planar seed reference sides across complete oriented chamfer contours, including perpendicular plane/cylinder rims. Two parent-failing native regressions verify both directions and normal signs, exact setbacks and solid/STEP checks. Full capture: 231 constructions, 220 limited comparisons; all648 intents unchanged and no successful check regressions. Fillets remain seed-only. No parity upgrade."
       ]
     },
     {

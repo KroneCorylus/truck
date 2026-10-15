@@ -1,0 +1,68 @@
+CHAMFER REFERENCE CONTOURS — 2026-10-15
+User says CONTINUE and commit achievements; do not stop until done or told.
+No pushes, PRs, delegates, consumer changes or kernel pin changes.
+
+COMPLETED
+48a1032fc769831ad0754c6639015ff77d59f505: match seed reference plane, propagate side by oriented face traversal,
+retain local ordered setbacks and use existing unequal wire chamfer API.
+Supports planar pairs and perpendicular plane/cylinder rims. Other curved
+supports and curved reference seeds are still unhandled. No kernel changes.
+27 replay tests pass; 2 regressions failed parent2191a343. Tests cover four
+orientation combinations per case, exact face setbacks, immutable input,
+material and shared solid/STEP harness. Clippy/action smoke/final build pass.
+Targeted A4 unequal+angle:3edges, valid1solidSTEP, nativevolume delta<5e-12,
+maxsample2.229100205894138e-8. 212 verified proof members, SHA
+f755d5266931d4947d59ea799311b8198b968b20212f75f43de0731060d0e0ee.
+Previous full kernel validation504passes remains unchanged, not repeated here.
+
+FULL CLEAN CAPTURE
+Raw target/occt-capture-reference-contours-stable; revision48a1032fc769831ad0754c6639015ff77d59f505.
+396nativepasses/648captures:487completechamfer/161seed-onlyfillet.
+All648capturedintents andnativeproperties EXACT unchanged. No successfulcheck
+regressions. Statuses{"input-import-failed": 96, "operation-succeeded": 231, "operation-failed": 202, "unhandled-intent": 110, "input-inconsistent": 9}.
+231 constructions allimmutable/consistent/closedmesh/nativevalidSTEP;
+220 limitedcomparisons, 11 sampleddifferences.
+221 prior successfulresults/comparisons exact; 0 numericchanges.
+7744 archivedmembers SHAaa1d106710b8ee87114683f35105d36047c8f072dbc478f55fd4e557dd2b6a8c.
+Native sequences use independentnativeinputs, NOTTruckoutputchains.
+
+NEXT
+1. Fillet tangent propagation/radius laws remainseed-only. Read
+   target/fillet-contour-propagation-notes.txt (updated with native probes).
+   target/inspect-fillet-contour.cpp and .log prove five native A4 controls:
+   single.03seed propagateswholecontour; repeatedseed.04overwrites;
+   differentseed.04yieldsvariablelaw; overwriteboth.04restoresconstantlaw.
+   All5nativeBuildvalid. BEFOREBuild peredgeRadius canreturn0onunassignededges
+   although wholecontourIsConstant/Radius correctlyreturns.03. Capture after
+   ALLAdds and usewholecontourconstantquery. Rejectvariablelawswholecontour.
+   NativeIsConstant usesPrecision::Confusion; preserveallrawradiusrequests.
+   RepresentationQ/Pandglobaltolblend/continuityblendneedexplicitcontract;
+   querystringsmayroundsettings, cannotclaimexactsettingbyteswithoutproof.
+   This investigation is exploratory, not a completed capture implementation.
+2. Remaining sampled discrepancies, curvedreferencefaces, inputgaps/shells,
+   unsupportedconstruction,4missingfixtures,fullsolidtwoedgeattachment,
+   existingPCurveprecisionfailure (neverweakenassertion),continuity/editing.
+
+METHOD
+Originalscope: audits/fillet-chamfer/checkpoints/2026-10-12/HANDOFF.txt objective;
+latercheckpoints documentresolvedgaps. ReadAGENTS.md, neverweakenexistingtests.
+Parentfailingregressions, sharedsolid/STEPharness; no cargofmt. Use rustfmt+nightly
+--config skip_children=true on touchedfiles. CARGO_BUILD_JOBS=12. Relevanttests,
+Clippy/smoke, buildreplayLAST; no source/executable edits duringclean captures.
+Commitimplementation+proof, thencleanfullcapture+catalog/HTML/handoffcommit.
+Do not repeatcompletedfullcapturewithoutsourcechanges/specificnewconcern.
+Force-addignoredJSON/ZIP/STEP; diffcheckexcludeSTEP. No speed/fullparityclaims.
+
+Runtime: --occt ../investigations/sequential-holes-2026-10-10/occt
+--library-path target/occt-sdk/usr/lib64
+--plugin target/occt-contour-capture-plugin
+--replay target/release/examples/replay_occt_blend
+--data-path target/occt-public-chamfer-data --workers4 --timeout120 --outputNEW.
+SDK7.9.3. Existingnativecheckoutpatchesunrelated, leavealone. Consumer../PiezaCAD.
+Oldplugin target/occt-chamfer-capture-plugin remainsseed-only; DON'Treuseit.
+
+
+Scripts target/package-reference-contour-full.py and
+ target/write-reference-contour-checkpoint.py are non-idempotent packaging.
+T3tab_1/localserver8765; userhidpreview, preservevisibility. DOM/linkchecks
+available, previousscreenshotsfailed. Priorcheckpoint hasolderhistory/details.
