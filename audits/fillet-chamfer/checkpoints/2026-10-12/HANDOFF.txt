@@ -1,3 +1,12 @@
+LATEST CHECKPOINT — 2026-10-15
+Work resumed after this historical handoff and is now paused again at the user's
+request. Read ../2026-10-15-native-tolerances/HANDOFF.txt and report.html there.
+Latest implementation c8f6fc9c; full-capture checkpoint afa34ecb.
+396 native cases, 648 operation records, 231 constructions, 220 limited sampled
+passes. Full parity remains unverified. Resume only when asked.
+
+HISTORICAL HANDOFF FOLLOWS
+
 FILLET / CHAMFER FEATURE-PARITY HANDOFF
 Checkpoint: 2026-10-12. User: Krone.
 

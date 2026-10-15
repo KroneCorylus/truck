@@ -1,5 +1,11 @@
 STORED NATIVE TOLERANCES — 2026-10-15
-User says continue and commit achievements; do not stop until done or told.
+STOP STATE
+User requested: stop on the next checkpoint, commit and report progress/work left.
+Paused at the validated tolerance checkpoint. Resume implementation only when asked.
+Implementation c8f6fc9c; full capture/catalog/HTML checkpoint afa34ecb.
+No tracked implementation changes remain. G1/H4 exploration below is preliminary;
+no geometry correction or parity upgrade is claimed from it.
+Report: report.html in this directory. No push, PR or consumer/pin changes.
 
 COMPLETED
 c8f6fc9cc51d6d50a330323cee0230b7acafa505: shared shape_tolerances.hpp records finite nonnegative maximum face/edge/
