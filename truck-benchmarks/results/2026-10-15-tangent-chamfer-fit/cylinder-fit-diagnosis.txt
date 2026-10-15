@@ -1,0 +1,9 @@
+shifted false, count 129 side 0, same 0.00000013150364221173863 near 0.00000009524093315932377, included true
+shifted false, count 129 side 1, same 0.00004731049309758521 near 0.0000473097703044083, included true
+shifted false, count 257 side 0, same 505.38026594109067 near 524.3937889056925, included true
+shifted false, count 257 side 1, same 383.6182417542488 near 432.85304619907697, included true
+shifted false, count 513 side 0, same 211797657251008740000 near 209888841475568070000, included false
+
+thread 'main' (638875) panicked at target/inspect-cylinder-fit.rs:119:234:
+called `Option::unwrap()` on a `None` value
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

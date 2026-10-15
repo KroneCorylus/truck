@@ -1,0 +1,25 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 1.99s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/tangent_chamfer_fit.rs (target/release/deps/tangent_chamfer_fit-5cf333bab899bdaf)
+
+running 2 tests
+test simple_chamfer_keeps_contact_curves_on_its_ruled_surface ... ok
+test tangent_chamfers_preserve_material_contacts_and_step_across_scales ... FAILED
+
+failures:
+
+---- tangent_chamfers_preserve_material_contacts_and_step_across_scales stdout ----
+
+thread 'tangent_chamfers_preserve_material_contacts_and_step_across_scales' (492844) panicked at truck-shapeops/tests/tangent_chamfer_fit.rs:85:87:
+called `Result::unwrap()` on an `Err` value: Diagnostic { code: BlendConstructionFailed, operation: "chamfer_solid_along_wire", stage: "validate_geometry", message: "Blend construction failed; the numerical or geometric constraint could not be resolved.", context: Context { operand: None, shell_index: Some(0), face_index: Some(8), edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    tangent_chamfers_preserve_material_contacts_and_step_across_scales
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-shapeops --test tangent_chamfer_fit`

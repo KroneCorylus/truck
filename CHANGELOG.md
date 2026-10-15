@@ -6,6 +6,8 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Refine chamfer contact splines when their ruled surface would separate from the exact support curves at kernel consistency tolerance. Use sample-averaged knots to keep dense contact interpolation stable, and orient ruled chamfers in their own parameter chart. Preserve small-scale tangent contours, material, bevel normals, shifted curve parameters, reversed selections, rigid motion and STEP without relaxing geometric validation.
+
 - Trim imported bounded STEP edge curves to their endpoint vertices in 2D and 3D. Preserve spline parameters, edge senses and full closed domains; reject unmatched or reversed intervals. Polynomial, rational, polyline and native solid regressions verify exact curves, consistency, material, rigid motion and STEP.
 
 - Allow explicit external fixture directories in native audit and capture runners, retaining the default data path and recording/verifying file hashes. Include native-passing dedicated chamfer cases whose helpers construct commands dynamically.

@@ -1,0 +1,10 @@
+{
+  "parent": "4fedc1227d34664b33a15e24f73efa7e4cec7c99",
+  "source_sha256": {
+    "truck-shapeops/src/fillet/chamfer.rs": "7d9117267c988cb2c0214d4399fcf24902f776b482dbcf230ee5ca9ed9390925",
+    "truck-shapeops/tests/tangent_chamfer_fit.rs": "01e316f7d6d9e8cce0950b0820e579349cb6ec6a26f124ea40ed4e55b20f2b7c",
+    "CHANGELOG.md": "ed3c174eeab8b1963e9eabfa26e36125959841ddc5553bda8a6a8ef79fbde4e2"
+  },
+  "native_contour_scope": "Explicit native builder contour inspection expanded to three physical edge selections; automatic capture still seed-only",
+  "replay_sha256": "0b18340ec78ab84837b8a6243c85733a9e89474c575e7584a2ca256f6a40e597"
+}

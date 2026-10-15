@@ -1,0 +1,30 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 10.85s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/conical_blends.rs (target/release/deps/conical_blends-0e0814ae3d292c2c)
+
+running 2 tests
+test concave_plane_cone_rims_preserve_cavity_orientation ... ok
+test plane_cone_rims_preserve_radius_and_distances ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 11.41s
+
+     Running tests/curved_blend_representation.rs (target/release/deps/curved_blend_representation-98426a1d2728b953)
+
+running 4 tests
+test analytic_cylinder_rim ... ok
+test nurbs_cylinder_rim ... ok
+test reparameterized_nurbs_cylinder_rim ... ok
+test fillet_parameter_domains_preserve_step_geometry ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.88s
+
+     Running tests/tangent_chamfer_fit.rs (target/release/deps/tangent_chamfer_fit-5cf333bab899bdaf)
+
+running 3 tests
+test simple_chamfer_keeps_contact_curves_on_its_ruled_surface ... ok
+test shifted_curve_domains_preserve_bevel_orientation_and_material ... ok
+test tangent_chamfers_preserve_material_contacts_and_step_across_scales ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s

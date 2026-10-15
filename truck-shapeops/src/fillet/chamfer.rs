@@ -11,32 +11,22 @@ const MIN_SAMPLES: usize = 4;
 /// At each sample the in-face direction on `surface_i` is the surface tangent perpendicular to the
 /// edge, pointing into the face. The contact point is the point of `surface_i` nearest to the point
 /// at distance `d_i` along that direction. Returns, for each surface, the samples in parameter
-/// space and in space, together with the sample parameters.
+/// space and in space at the supplied parameters.
 #[allow(clippy::type_complexity)]
 fn sample_contact_points<C, S>(
     edge: &C,
     surface0: &S,
     surface1: &S,
     (d0, d1): (f64, f64),
-    tol: f64,
-) -> Option<(Vec<f64>, [Vec<(Point2, Point3)>; 2])>
+    params: &[f64],
+) -> Option<[Vec<(Point2, Point3)>; 2]>
 where
     C: FilletedCurve<S> + ParameterDivision1D<Point = Point3>,
     S: FilletedSurface<C> + SearchNearestParameter<D2, Point = Point3>,
 {
-    let (t0, t1) = edge.range_tuple();
-    let n = edge
-        .parameter_division((t0, t1), tol)
-        .0
-        .len()
-        .max(MIN_SAMPLES);
-    let params: Vec<f64> = (0..n)
-        .map(|i| t0 + (t1 - t0) * i as f64 / (n - 1) as f64)
-        .collect();
-
     let contact = |surface: &S, distance: f64, sign: f64, hint: &mut Option<(f64, f64)>| {
-        let mut samples = Vec::with_capacity(n);
-        for &t in &params {
+        let mut samples = Vec::with_capacity(params.len());
+        for &t in params {
             let p = edge.subs(t);
             let e = edge.der(t).normalize();
             let uv = surface.search_parameter(p, *hint, 100)?;
@@ -57,16 +47,91 @@ where
     };
     let samples0 = contact(surface0, d0, 1.0, &mut None)?;
     let samples1 = contact(surface1, d1, -1.0, &mut None)?;
-    Some((params, [samples0, samples1]))
+    Some([samples0, samples1])
 }
 
 fn interpolate<P>(params: &[f64], points: impl Iterator<Item = P>) -> BSplineCurve<P>
 where P: ControlPoint<f64> + Copy {
     let (t0, t1) = (params[0], params[params.len() - 1]);
-    let mut knot_vec = KnotVec::uniform_knot(3, params.len() - 3);
-    knot_vec.transform(t1 - t0, t0);
+    let averaged_knots = params[1..params.len() - 1]
+        .windows(3)
+        .map(|p| p[0] + (p[1] - p[0]) / 3. + (p[2] - p[0]) / 3.);
+    let knot_vec = KnotVec::from(
+        [t0; 4]
+            .into_iter()
+            .chain(averaged_knots)
+            .chain([t1; 4])
+            .collect::<Vec<_>>(),
+    );
     let parameter_points: Vec<_> = params.iter().copied().zip(points).collect();
     BSplineCurve::interpole(knot_vec, parameter_points)
+}
+
+#[allow(clippy::type_complexity)]
+fn fit_contact_curves<C, S>(
+    edge: &C,
+    surface0: &S,
+    surface1: &S,
+    distances: (f64, f64),
+    tol: f64,
+) -> Option<(
+    Vec<f64>,
+    [PCurve<BSplineCurve<Point2>, S>; 2],
+    [BSplineCurve<Point3>; 2],
+)>
+where
+    C: FilletedCurve<S> + ParameterDivision1D<Point = Point3>,
+    S: FilletedSurface<C> + SearchNearestParameter<D2, Point = Point3>,
+{
+    let (t0, t1) = edge.range_tuple();
+    let mut count = edge
+        .parameter_division((t0, t1), tol)
+        .0
+        .len()
+        .max(MIN_SAMPLES);
+    let budget = count.max(257);
+    let fit_tolerance2 = tol.min(TOLERANCE * 0.1).powi(2);
+    loop {
+        let params: Vec<_> = (0..count)
+            .map(|i| t0 + (t1 - t0) * i as f64 / (count - 1) as f64)
+            .collect();
+        let samples = sample_contact_points(edge, surface0, surface1, distances, &params)?;
+        let pcurves = std::array::from_fn(|i| {
+            PCurve::new(
+                interpolate(&params, samples[i].iter().map(|s| s.0)),
+                if i == 0 {
+                    surface0.clone()
+                } else {
+                    surface1.clone()
+                },
+            )
+        });
+        let curves = std::array::from_fn(|i| interpolate(&params, samples[i].iter().map(|s| s.1)));
+        // The ruled surface must contain its support pcurves at kernel consistency tolerance.
+        let fits = params.windows(2).all(|pair| {
+            (0..=4).all(|i| {
+                let t = pair[0] + (pair[1] - pair[0]) * i as f64 / 4.;
+                (0..2).all(|side| {
+                    let point = pcurves[side].subs(t);
+                    point.distance2(curves[side].subs(t)) <= fit_tolerance2
+                        || curves[side]
+                            .search_nearest_parameter(point, Some(t), 100)
+                            .filter(|u| u.is_finite())
+                            .is_some_and(|u| {
+                                point.distance2(curves[side].subs(u.clamp(t0, t1)))
+                                    <= fit_tolerance2
+                            })
+                })
+            })
+        });
+        if fits {
+            return Some((params, pcurves, curves));
+        }
+        count = count.checked_mul(2)?.checked_sub(1)?;
+        if count > budget {
+            return None;
+        }
+    }
 }
 
 fn ruling_edge<C, S>(
@@ -110,18 +175,8 @@ where
     let surface1 = face1.oriented_surface();
     let edge_curve = chamfered_edge.oriented_curve();
 
-    let (params, [samples0, samples1]) =
-        sample_contact_points(&edge_curve, &surface0, &surface1, (d0, d1), tol)?;
-    let pcurve0 = PCurve::new(
-        interpolate(&params, samples0.iter().map(|s| s.0)),
-        surface0.clone(),
-    );
-    let pcurve1 = PCurve::new(
-        interpolate(&params, samples1.iter().map(|s| s.0)),
-        surface1.clone(),
-    );
-    let curve0 = interpolate(&params, samples0.iter().map(|s| s.1));
-    let curve1 = interpolate(&params, samples1.iter().map(|s| s.1));
+    let (params, [pcurve0, pcurve1], [curve0, curve1]) =
+        fit_contact_curves(&edge_curve, &surface0, &surface1, (d0, d1), tol)?;
 
     let (new_face0, chamfer_edge0, _) =
         cut_face_by_curve(face0, pcurve0.to_same_geometry(), chamfered_edge_id)?;
@@ -295,22 +350,9 @@ where
             );
         };
         let curve = edge.oriented_curve();
-        let (params, samples) = sample_contact_points(&curve, &s0, &s1, (d0, d1), tol)
+        let (params, pcurves, [c0, c1]) = fit_contact_curves(&curve, &s0, &s1, (d0, d1), tol)
             .ok_or_else(|| failed().stage("find_contact").selection(index))?;
-        let contact: [C; 2] = [
-            PCurve::new(
-                interpolate(&params, samples[0].iter().map(|s| s.0)),
-                s0.clone(),
-            )
-            .to_same_geometry(),
-            PCurve::new(
-                interpolate(&params, samples[1].iter().map(|s| s.0)),
-                s1.clone(),
-            )
-            .to_same_geometry(),
-        ];
-        let c0 = interpolate(&params, samples[0].iter().map(|s| s.1));
-        let c1 = interpolate(&params, samples[1].iter().map(|s| s.1));
+        let contact: [C; 2] = pcurves.map(|curve| curve.to_same_geometry());
         // Reject collapsed/reversed offsets and fits that separate the contact edge from
         // either its supporting face or the ruled chamfer by more than the fitting tolerance.
         for pair in params.windows(2) {
@@ -345,7 +387,8 @@ where
         let uv1 = s1.search_parameter(p, None, 100).ok_or_else(failed)?;
         let outward = s0.normal(uv0.0, uv0.1) + s1.normal(uv1.0, uv1.1);
         let mut surface = BSplineSurface::homotopy(c0.clone(), c1.clone());
-        let swap = surface.normal(t, 0.5).dot(outward) < 0.0;
+        let ((u0, u1), (v0, v1)) = surface.range_tuple();
+        let swap = surface.normal((u0 + u1) / 2., (v0 + v1) / 2.).dot(outward) < 0.0;
         if swap {
             surface = BSplineSurface::homotopy(c1, c0);
         }
@@ -443,4 +486,32 @@ where
         );
     }
     Ok(faces.into())
+}
+
+#[cfg(test)]
+mod contact_interpolation_tests {
+    use super::*;
+
+    #[test]
+    fn dense_affine_contact_samples_preserve_points_and_derivatives() {
+        for (a, b) in [(0., 1.), (2., 5.)] {
+            for count in [4, 17, 129, 257] {
+                let params: Vec<_> = (0..count)
+                    .map(|i| a + (b - a) * i as f64 / (count - 1) as f64)
+                    .collect();
+                let point = |t: f64| Point3::new(1. + 2. * t, -3. + 0.5 * t, 5. - 4. * t);
+                let curve = interpolate(&params, params.iter().map(|&t| point(t)));
+                assert_eq!(curve.range_tuple(), (a, b));
+                for i in 0..=1024 {
+                    let t = a + (b - a) * i as f64 / 1024.;
+                    assert!(
+                        curve.subs(t).distance(point(t)) < 1e-9,
+                        "{count} samples, t={t}"
+                    );
+                    assert!(curve.der(t).distance(Vector3::new(2., 0.5, -4.)) < 1e-7);
+                    assert!(curve.der2(t).magnitude() < 1e-6);
+                }
+            }
+        }
+    }
 }
