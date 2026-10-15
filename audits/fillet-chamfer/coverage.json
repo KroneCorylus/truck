@@ -373,12 +373,19 @@
           "path": "audits/fillet-chamfer/capture/2026-10-15-public-chamfer-data/REPORT.md",
           "find": "# Full public chamfer",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-15-bounded-step-edges/REPORT.md",
+          "find": "# Full bounded",
+          "role": "test"
         }
       ],
       "required_outcome": "Bevel selected edges by equal specified setbacks on both supports, including convex and concave material.",
       "verification": [
         "At 99c956da, native chamf commands are physically captured and replayed. Equal distances reuse the solid/wire kernel APIs. Dimension-defined box controls, including rigid motion, pass independent material, closed meshes and native-valid STEP; these controls remain separate from the 279 missing-data dedicated chamfer cases.",
-        "At 8c1942c7, verified public fixtures enable 261 formerly skipped native chamfer cases: 239 pass, 22 known failures, 18 still missing. Full clean capture has 648 operations, 222 valid constructions and 208 limited comparisons; all 106 prior successful records exactly unchanged. Native tangent propagation, curved-reference scope and C1 bounded-spline input trimming remain explicit gaps; no parity upgrade."
+        "At 8c1942c7, verified public fixtures enable 261 formerly skipped native chamfer cases: 239 pass, 22 known failures, 18 still missing. Full clean capture has 648 operations, 222 valid constructions and 208 limited comparisons; all 106 prior successful records exactly unchanged. Native tangent propagation, curved-reference scope and C1 bounded-spline input trimming remain explicit gaps; no parity upgrade.",
+        "At 3795c051, bounded STEP edge trimming recovers four C1 inputs to operation handling; no new chamfer constructions. All 222 prior successful records and comparisons remain exactly unchanged in 648 captures. Eight prior inconsistent inputs reject earlier and nine remain inconsistent; no tolerance or parity upgrade."
       ]
     },
     {
@@ -428,12 +435,19 @@
           "path": "audits/fillet-chamfer/capture/2026-10-15-public-chamfer-data/REPORT.md",
           "find": "# Full public chamfer",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-15-bounded-step-edges/REPORT.md",
+          "find": "# Full bounded",
+          "role": "test"
         }
       ],
       "required_outcome": "Bevel with independently specified setbacks on the intended two support faces; orientation or storage order must not silently exchange them.",
       "verification": [
         "At 99c956da, captured two-distance chamfers on planar supports preserve reference-face identity through geometric plane matching, not ordinal face IDs. Tests cover both faces and reversed plane normals, deduplicated physical aliases and conflicting assignments. Native box controls verify unequal bevel normals/material and STEP in original and transformed frames.",
-        "At 8c1942c7, verified public fixtures enable 261 formerly skipped native chamfer cases: 239 pass, 22 known failures, 18 still missing. Full clean capture has 648 operations, 222 valid constructions and 208 limited comparisons; all 106 prior successful records exactly unchanged. Native tangent propagation, curved-reference scope and C1 bounded-spline input trimming remain explicit gaps; no parity upgrade."
+        "At 8c1942c7, verified public fixtures enable 261 formerly skipped native chamfer cases: 239 pass, 22 known failures, 18 still missing. Full clean capture has 648 operations, 222 valid constructions and 208 limited comparisons; all 106 prior successful records exactly unchanged. Native tangent propagation, curved-reference scope and C1 bounded-spline input trimming remain explicit gaps; no parity upgrade.",
+        "At 3795c051, bounded STEP edge trimming recovers four C1 inputs to operation handling; no new chamfer constructions. All 222 prior successful records and comparisons remain exactly unchanged in 648 captures. Eight prior inconsistent inputs reject earlier and nine remain inconsistent; no tolerance or parity upgrade."
       ]
     },
     {
@@ -483,13 +497,20 @@
           "path": "audits/fillet-chamfer/capture/2026-10-15-public-chamfer-data/REPORT.md",
           "find": "# Full public chamfer",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-15-bounded-step-edges/REPORT.md",
+          "find": "# Full bounded",
+          "role": "test"
         }
       ],
       "required_outcome": "Produce a chamfer with the requested setback and angle, including non-right-angle supports, using any equivalent parameterization.",
       "verification": [
         "At 99c956da, perpendicular planar distance/angle replay converts d1=d0*tan(angle) and preserves the reference face. Native controls at30 degrees pass; corpus bugs/moddata_1/bug203 initial distance5/angle45 chamfer now captures and constructs. Independent volume998750 matches native Truck STEP within3.493e-10. Nonperpendicular and curved-reference angle requests remain unsupported; later native fillet failure is not replayed.",
         "At 56f1c0ee, planar distance/angle replay covers acute and obtuse corners using oriented support normals and the sine rule. Eight native controls validate both reference faces and rigid motion; 15 replay tests pass. The full clean capture preserves all 106 previous successful records exactly, with 97 limited comparison passes. Missing chamfer fixtures and curved-support scope remain open.",
-        "At 8c1942c7, verified public fixtures enable 261 formerly skipped native chamfer cases: 239 pass, 22 known failures, 18 still missing. Full clean capture has 648 operations, 222 valid constructions and 208 limited comparisons; all 106 prior successful records exactly unchanged. Native tangent propagation, curved-reference scope and C1 bounded-spline input trimming remain explicit gaps; no parity upgrade."
+        "At 8c1942c7, verified public fixtures enable 261 formerly skipped native chamfer cases: 239 pass, 22 known failures, 18 still missing. Full clean capture has 648 operations, 222 valid constructions and 208 limited comparisons; all 106 prior successful records exactly unchanged. Native tangent propagation, curved-reference scope and C1 bounded-spline input trimming remain explicit gaps; no parity upgrade.",
+        "At 3795c051, bounded STEP edge trimming recovers four C1 inputs to operation handling; no new chamfer constructions. All 222 prior successful records and comparisons remain exactly unchanged in 648 captures. Eight prior inconsistent inputs reject earlier and nine remain inconsistent; no tolerance or parity upgrade."
       ]
     },
     {
@@ -3456,6 +3477,12 @@
           "path": "audits/fillet-chamfer/capture/2026-10-15-public-chamfer-data/REPORT.md",
           "find": "# Full public chamfer",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "audits/fillet-chamfer/capture/2026-10-15-bounded-step-edges/REPORT.md",
+          "find": "# Full bounded",
+          "role": "test"
         }
       ],
       "required_outcome": "Deliver blend results usable for closed meshing, STEP interchange and further modeling while preserving dimensions and validity.",
@@ -3497,7 +3524,8 @@
         "The clean 99c956da full capture adds one real chamfer case:157 native entries,162 captures,106 valid constructions,97 limited comparison passes. All105 preceding successful result/comparison records are exactly unchanged. Seven synthetic chamfer controls and one fillet control are separate proof, not corpus recovery.279 dedicated chamfer fixtures remain missing-data skips.",
         "At 56f1c0ee, planar distance/angle replay covers acute and obtuse corners using oriented support normals and the sine rule. Eight native controls validate both reference faces and rigid motion; 15 replay tests pass. The full clean capture preserves all 106 previous successful records exactly, with 97 limited comparison passes. Missing chamfer fixtures and curved-support scope remain open.",
         "At 5412b627, confirmed native rejections replay without shape comparison. Full clean capture: 106 unchanged constructions, 97 limited passes, 54 operation-failed records (53 prior plus native-rejected bug119), two imports, zero incomplete/panic/timeout records. No recovered construction or parity claim.",
-        "At 8c1942c7, verified public fixtures enable 261 formerly skipped native chamfer cases: 239 pass, 22 known failures, 18 still missing. Full clean capture has 648 operations, 222 valid constructions and 208 limited comparisons; all 106 prior successful records exactly unchanged. Native tangent propagation, curved-reference scope and C1 bounded-spline input trimming remain explicit gaps; no parity upgrade."
+        "At 8c1942c7, verified public fixtures enable 261 formerly skipped native chamfer cases: 239 pass, 22 known failures, 18 still missing. Full clean capture has 648 operations, 222 valid constructions and 208 limited comparisons; all 106 prior successful records exactly unchanged. Native tangent propagation, curved-reference scope and C1 bounded-spline input trimming remain explicit gaps; no parity upgrade.",
+        "At 3795c051, bounded STEP edge trimming recovers four C1 inputs to operation handling; no new chamfer constructions. All 222 prior successful records and comparisons remain exactly unchanged in 648 captures. Eight prior inconsistent inputs reject earlier and nine remain inconsistent; no tolerance or parity upgrade."
       ]
     },
     {

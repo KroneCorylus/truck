@@ -1,0 +1,164 @@
+{
+  "kernel_revision": "3795c05123186de9475df2efba934796b7e7dd3f",
+  "native": {
+    "passed": 396
+  },
+  "captures": 648,
+  "before_statuses": {
+    "input-import-failed": 88,
+    "operation-succeeded": 222,
+    "operation-failed": 193,
+    "unhandled-intent": 124,
+    "input-inconsistent": 21
+  },
+  "after_statuses": {
+    "input-import-failed": 96,
+    "operation-succeeded": 222,
+    "operation-failed": 195,
+    "unhandled-intent": 126,
+    "input-inconsistent": 9
+  },
+  "successful_checks": {
+    "constructed": 222,
+    "input_unchanged": 222,
+    "geometry_consistent": 222,
+    "mesh_closed": 222,
+    "step_prepared": 222,
+    "native_valid": 222,
+    "truck_step_valid": 222,
+    "single_solid": 222,
+    "sampled_distance": 208
+  },
+  "limited_comparison_passes": 208,
+  "status_changes": [
+    {
+      "case": "chamfer/dist_angle_sequence/C1",
+      "capture": "002",
+      "before": "input-inconsistent",
+      "after": "input-import-failed"
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/C1",
+      "capture": "003",
+      "before": "input-inconsistent",
+      "after": "input-import-failed"
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/C1",
+      "capture": "004",
+      "before": "input-inconsistent",
+      "after": "input-import-failed"
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/C1",
+      "capture": "005",
+      "before": "input-inconsistent",
+      "after": "input-import-failed"
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/C1",
+      "capture": "006",
+      "before": "input-inconsistent",
+      "after": "input-import-failed"
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/C1",
+      "capture": "007",
+      "before": "input-inconsistent",
+      "after": "input-import-failed"
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/C1",
+      "capture": "008",
+      "before": "input-inconsistent",
+      "after": "input-import-failed"
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/C1",
+      "capture": "002",
+      "before": "input-inconsistent",
+      "after": "unhandled-intent"
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/C1",
+      "capture": "003",
+      "before": "input-inconsistent",
+      "after": "unhandled-intent"
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/C1",
+      "capture": "002",
+      "before": "input-inconsistent",
+      "after": "operation-failed"
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/C1",
+      "capture": "003",
+      "before": "input-inconsistent",
+      "after": "operation-failed"
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/C1",
+      "capture": "006",
+      "before": "input-inconsistent",
+      "after": "input-import-failed"
+    }
+  ],
+  "check_changes": [
+    {
+      "case": "chamfer/equal_dist_sequence/C1",
+      "capture": "002",
+      "before": {
+        "constructed": false,
+        "input_unchanged": false,
+        "geometry_consistent": false,
+        "mesh_closed": false,
+        "step_prepared": false,
+        "native_valid": false,
+        "truck_step_valid": false,
+        "single_solid": false,
+        "sampled_distance": false
+      },
+      "after": {
+        "constructed": false,
+        "input_unchanged": true,
+        "geometry_consistent": false,
+        "mesh_closed": false,
+        "step_prepared": false,
+        "native_valid": false,
+        "truck_step_valid": false,
+        "single_solid": false,
+        "sampled_distance": false
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/C1",
+      "capture": "003",
+      "before": {
+        "constructed": false,
+        "input_unchanged": false,
+        "geometry_consistent": false,
+        "mesh_closed": false,
+        "step_prepared": false,
+        "native_valid": false,
+        "truck_step_valid": false,
+        "single_solid": false,
+        "sampled_distance": false
+      },
+      "after": {
+        "constructed": false,
+        "input_unchanged": true,
+        "geometry_consistent": false,
+        "mesh_closed": false,
+        "step_prepared": false,
+        "native_valid": false,
+        "truck_step_valid": false,
+        "single_solid": false,
+        "sampled_distance": false
+      }
+    }
+  ],
+  "numeric_changes": [],
+  "regressions": [],
+  "unchanged_successful_results_and_comparisons": 222
+}
