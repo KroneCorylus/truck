@@ -28,6 +28,14 @@ def selected_cases(catalog, patterns):
             (not patterns or any(fnmatch.fnmatchcase(c['id'], p) for p in patterns))]
 
 
+def selection_summary(selection):
+    result = {k: v for k, v in selection.items() if k != 'points'}
+    result['point_count'] = len(selection['points'])
+    if 'contour_edges' in result:
+        result['contour_edges'] = [selection_summary(edge) for edge in result['contour_edges']]
+    return result
+
+
 def run_case(case, sources, args, env):
     directory = args.output / case['id']
     directory.mkdir(parents=True)
@@ -94,8 +102,7 @@ def run_case(case, sources, args, env):
                                   returncode=compare_code, elapsed_seconds=compare_elapsed)
             else:
                 comparison = json.loads(Path(prefix + '.comparison.json').read_text())
-        task['selection'] = [dict(**{k: v for k, v in s.items() if k != 'points'},
-                                  point_count=len(s['points'])) for s in task['selection']]
+        task['selection'] = [selection_summary(s) for s in task['selection']]
         result['captures'].append(dict(prefix=Path(prefix).name, task=task,
                                       native_result=native_result, truck=truck,
                                       elapsed_seconds=elapsed, sampled_comparison=comparison,

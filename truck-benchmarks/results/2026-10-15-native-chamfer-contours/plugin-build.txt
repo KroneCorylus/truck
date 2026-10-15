@@ -1,0 +1,2 @@
+$ bash audits/fillet-chamfer/capture/build.sh target/occt-sdk target/occt-contour-capture-plugin
+exit_code 0

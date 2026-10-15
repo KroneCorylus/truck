@@ -120,11 +120,12 @@ class SelectionTests(unittest.TestCase):
 
 class RejectedCaptureTests(unittest.TestCase):
     def capture(self, log, *, input_json=True, input_step=True, result_json=None,
-                truck_status='operation-failed'):
+                truck_status='operation-failed', task=None):
         with tempfile.TemporaryDirectory() as temp:
             args = SimpleNamespace(output=Path(temp), draw='DRAWEXE', replay=Path('replay'),
                                    plugin=Path('plugin'), timeout=10)
-            task = dict(operation='fillet', selection=[dict(radius=50, points=[[0, 0, 0], [0, 0, 100]])])
+            if task is None:
+                task = dict(operation='fillet', selection=[dict(radius=50, points=[[0, 0, 0], [0, 0, 100]])])
             calls = []
 
             def execute(command, directory, env, timeout):
@@ -183,6 +184,25 @@ class RejectedCaptureTests(unittest.TestCase):
                 self.assertEqual(len(calls), 1)
                 self.assertEqual(capture['status'], 'capture-incomplete')
                 self.assertNotIn('truck', capture)
+
+    def test_native_contour_summary_preserves_scope_without_repeating_point_arrays(self):
+        edge = dict(curve_type=0, points=[[0, 0, 0], [1, 0, 0]])
+        chosen = dict(mode='equal-distance', distance=1, native_applied=True,
+                      ignored_reason=None, contour_edges=[edge, edge], **edge)
+        ignored = dict(mode='equal-distance', distance=-1, native_applied=False,
+                       ignored_reason='already-selected', contour_edges=[], **edge)
+        task = dict(schema_version=2, operation='chamfer', selection=[chosen, ignored])
+        capture, _ = self.capture('input_captured 1 message {}\nnative_return_code 1\n', task=task)
+        selected = capture['task']['selection']
+        self.assertEqual(capture['task']['schema_version'], 2)
+        self.assertEqual(selected[0]['contour_edges'], [dict(curve_type=0, point_count=2)] * 2)
+        self.assertTrue(selected[0]['native_applied'])
+        self.assertIsNone(selected[0]['ignored_reason'])
+        self.assertFalse(selected[1]['native_applied'])
+        self.assertEqual(selected[1]['ignored_reason'], 'already-selected')
+        self.assertEqual(selected[1]['contour_edges'], [])
+        self.assertEqual(selected[0]['point_count'], 2)
+        self.assertNotIn('points', selected[0])
 
 
 if __name__ == '__main__':

@@ -1,0 +1,4 @@
+Parent clean capture c26b6780, A4/001: schema_version=1, selected seed count=1; complete native contour scope is absent.
+Original metadata SHA256 4763b2fa0e961edc135a789a670c5877d4585384cfcb796cae12ebae15fcefa1.
+Current automatic capture: schema_version=2, one applied seed, three physical contour edges.
+Current captured metadata SHA256 2b6ff8a71b02ec6e98ed6c8ea850c8f0d6b5dd75bcc0ae072337b8fe77fb69d4.

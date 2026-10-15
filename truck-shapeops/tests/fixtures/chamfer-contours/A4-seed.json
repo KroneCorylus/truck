@@ -1,0 +1,1 @@
+{"schema_version":1,"operation":"chamfer","selection_deflection":1.0000000000000001e-05,"native_valid":true,"solids":1,"volume":0.5638101060825006,"area":4.8414205920664672,"selection":[{"mode":"equal-distance","distance":0.029999999999999999,"curve_type":0,"points":[[-0.34387806598358284,0.60483003453493134,0.5],[-0.34756098803950525,-0.29516242992526071,0.5]]}]}

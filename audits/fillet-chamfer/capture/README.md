@@ -60,16 +60,39 @@ cargo test -p truck-shapeops --example replay_occt_blend
 python3 -m unittest discover -s audits/fillet-chamfer/capture -p 'test_*.py'
 ```
 
-Fifteen Rust tests cover physical selection, per-edge fillet radii, equal and
+Twenty-four Rust tests cover physical selection, per-edge fillet radii, equal and
 unequal chamfer distances, reference-plane identity, planar distance/angle
-conversion on acute, right and obtuse corners, impossible-angle rejection, duplicate assignments and rejected unsupported/invalid intent. Nine
+conversion on acute, right and obtuse corners, impossible-angle rejection, duplicate
+assignments and rejected unsupported/invalid intent. Native-contour regressions
+cover expansion, missing scope, seed membership, first-assignment behavior, legacy
+labels, unknown schemas and a closed STEP round trip. Ten
 Python/Tcl tests cover command selection, native caller scope, interleaved command
 numbering, preservation of success/error behavior, and replay of confirmed native
-rejections. A rejected native operation has no reference shape: its valid input
+rejections and summaries of complete contour selections. A rejected native
+operation has no reference shape: its valid input
 is replayed, its native failure is retained separately, and no shape comparison
 is attempted. Missing or corrupt evidence remains capture-incomplete.
 
-Chamfer captures retain the native mode and every requested distance/angle.
+Chamfer capture schema 2 retains the native mode, seed and every requested
+parameter. One native chamfer builder mirrors the command's parameter gates and
+first-assignment behavior. Each selection records `native_applied`,
+`ignored_reason` and `contour_edges` with complete sampled physical geometry.
+Later seeds inside an existing contour are ignored as `already-selected`;
+invalid parameter gates and rejected additions are recorded separately.
+
+Replay requires schema-2 scope, matches every contour member, verifies seed
+membership and a connected unbranched selection, and deduplicates imported split
+edges and compatible assignments. Conflicting active assignments, contradictory
+ignored records and missing/empty active scope are rejected explicitly. An
+ignored duplicate must belong to a previously applied assignment. No effective
+selection is reported as unhandled intent rather than a successful no-op.
+Results carry `selection_scope`: `native-contours` for schema-2 chamfers,
+`seed-only` for legacy schema 1 (including old hand-written records without a
+version) and current fillet captures. Unknown versions are rejected. Historical
+seed-only evidence is not upgraded. Summary manifests retain point counts;
+complete raw contour samples remain in the archived input JSON.
+
+Chamfer captures retain every requested distance/angle.
 Face-dependent modes also record an analytic reference plane when available.
 Replay maps that plane to exactly one adjacent face, independently of face order
 and plane normal sign. Two-distance replay requires two planar supports;
@@ -82,7 +105,9 @@ probes or counted as passing when only dimension-defined controls are available.
 ## Limits
 
 - This route does not yet express unequal-radius corners, variable laws, tangent
-  expansion, open shells or multiple solids. Rejection here does not prove no equivalent Truck route exists.
+  expansion for fillets, open shells or multiple solids. Face-dependent chamfer
+  contours still require a reference plane and two planar supports at every
+  matched edge. Rejection here does not prove no equivalent Truck route exists.
 - STEP conversion and closed-edge healing can fail before a blend is attempted.
   Those failures require separate diagnosis and are not fillet solver verdicts.
 - Selection matching and output comparison use finite samples, not certified
@@ -90,7 +115,9 @@ probes or counted as passing when only dimension-defined controls are available.
   editing/history stability or practical latency. All comparison statuses remain
   unverified; measured differences are retained for investigation.
 - Modeling tolerance is 0.001, selection matching 0.0001, tessellation 0.001 and
-  STEP fitting 0.00005. Native test tolerances and model scale may differ.
+  STEP fitting 0.0000001. Replay fits are kept below kernel consistency
+  tolerance; the A4 regression checks the exported/reimported solid with the
+  shared solid and STEP harnesses. Native test tolerances and model scale may differ.
 - Per-process wall times include instrumentation and contention; they are not
   comparative performance benchmarks. The installed native binary is not a build
   of the locally modified OCCT source checkout.

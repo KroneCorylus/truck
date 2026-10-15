@@ -1,0 +1,24 @@
+{
+  "parent_revision": "aa3611024339c9b8a6879542023f7dac5301f721",
+  "source_sha256": {
+    "truck-shapeops/examples/replay_occt_blend.rs": "80f69ec51b30fb3791f32e4a7587ccf8083797dc84f8b5fd609ecb96f2b74e70",
+    "audits/fillet-chamfer/capture/blend_capture.cpp": "2ac7b5c30ca255ee38d295309ea21821f5d52c4bb2ac71b721a64b5e9666bb8e",
+    "audits/fillet-chamfer/capture/build.sh": "8cf25ceb98836d89a57edc6f199339355c8c3111925e378b706a62bb0d7a4958",
+    "audits/fillet-chamfer/capture/run_capture.py": "17eed10fb07eea4b3ffbc602851e095df4efa3e662a55d76c0cb37cf3c57a607",
+    "audits/fillet-chamfer/capture/test_capture.py": "cf905486866617237875a00014a854e51e482d8ffeee279e8ffb2968bdc77474",
+    "truck-shapeops/tests/fixtures/chamfer-contours/A4.step": "67c07f84f4e0d23c84528df85c6a29553e6868a3ecdc3438465dc46e5f23254c",
+    "truck-shapeops/tests/fixtures/chamfer-contours/A4-seed.json": "4763b2fa0e961edc135a789a670c5877d4585384cfcb796cae12ebae15fcefa1",
+    "truck-shapeops/tests/fixtures/chamfer-contours/A4-expanded.json": "a5a236e60a190ea9a9c6892bc664990c0e8437d5b57fd94f9b1f3ef2253d9579",
+    "truck-shapeops/tests/fixtures/chamfer-contours/README.md": "d86d61efd879062c5338c8dab75714d527df053c34fe59393a9367b6f7bb3268"
+  },
+  "unchanged_kernel_validation": "truck-benchmarks/results/2026-10-15-two-edge-face-trimming/metadata.json",
+  "replay_tests": 24,
+  "audit_tests": 22,
+  "capture_tests": 10,
+  "step_fitting_tolerance": 1e-07,
+  "executable_sha256": {
+    "target/release/examples/replay_occt_blend": "31aa329a74bebc6d29614eb7e690d65d8288cf429d5a1d4d67a2061afb9f5f1c",
+    "target/occt-contour-capture-plugin/libTKBlendAudit.so": "25f98b5629aff171ce4f10fccf4646e745510afdb25d4c6bc2fde146bcfa88f7",
+    "target/occt-contour-capture-plugin/compare_shapes": "c9215123784a8c9e656fbbbd2ab169852418d68e7c0592c48652d658ead74a41"
+  }
+}

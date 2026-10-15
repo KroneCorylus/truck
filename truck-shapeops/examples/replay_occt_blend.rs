@@ -11,6 +11,7 @@ use truck_shapeops::SplitClosedEdgesAndFaces;
 use truck_stepio::{out::*, r#in::Table};
 
 const TOL: f64 = 0.001;
+const STEP_TOL: f64 = TOLERANCE / 10.;
 
 fn import(path: &str) -> Result<Solid, String> {
     let text = std::fs::read_to_string(path).map_err(|e| e.to_string())?;
@@ -218,7 +219,11 @@ fn captured_vector(value: &Value) -> Option<Vector3> {
     v.is_finite().then_some(v)
 }
 
-fn chamfer_selection(input: &Solid, selection: &[Value]) -> Result<Vec<(Edge, [f64; 2])>, Value> {
+fn chamfer_selection(
+    input: &Solid,
+    selection: &[Value],
+    native_contours: bool,
+) -> Result<Vec<(Edge, [f64; 2])>, Value> {
     let invalid = |reason: &str| json!({"status":"harness-error","error":reason});
     let unsupported = |reason: &str| json!({"status":"unhandled-intent","reason":reason});
     if selection.is_empty() {
@@ -227,6 +232,42 @@ fn chamfer_selection(input: &Solid, selection: &[Value]) -> Result<Vec<(Edge, [f
     let mut selected = Vec::new();
     let mut assignments = std::collections::HashMap::new();
     for chosen in selection {
+        let contour = if native_contours {
+            let applied = chosen["native_applied"]
+                .as_bool()
+                .ok_or_else(|| invalid("Missing native chamfer assignment state"))?;
+            let contour = chosen["contour_edges"]
+                .as_array()
+                .ok_or_else(|| invalid("Missing native chamfer contour scope"))?;
+            if !applied {
+                if !contour.is_empty()
+                    || !matches!(
+                        chosen["ignored_reason"].as_str(),
+                        Some("already-selected" | "invalid-parameters" | "not-added")
+                    )
+                {
+                    return Err(invalid("Contradictory ignored native chamfer assignment"));
+                }
+                if chosen["ignored_reason"] == "already-selected" {
+                    let seed = match_selection(input, chosen)
+                        .map_err(|error| json!({"status":"selection-unmatched","error":error}))?;
+                    if seed.iter().any(|e| !assignments.contains_key(&e.id())) {
+                        return Err(invalid(
+                            "Ignored seed is not covered by an earlier native assignment",
+                        ));
+                    }
+                }
+                continue;
+            }
+            if contour.is_empty() || !chosen["ignored_reason"].is_null() {
+                return Err(invalid(
+                    "Empty or contradictory active native chamfer contour",
+                ));
+            }
+            Some(contour)
+        } else {
+            None
+        };
         let mode = chosen["mode"].as_str().unwrap_or("");
         let positive = |v: &Value| {
             v.as_f64()
@@ -267,8 +308,32 @@ fn chamfer_selection(input: &Solid, selection: &[Value]) -> Result<Vec<(Edge, [f
             }
             Some((Point3::from_vec(p), n.normalize()))
         };
-        let matched = match_selection(input, chosen)
+        let seed = match_selection(input, chosen)
             .map_err(|error| json!({"status":"selection-unmatched","error":error}))?;
+        let matched = if let Some(contour) = contour {
+            let mut edges = Vec::new();
+            let mut seen = HashSet::new();
+            for member in contour {
+                for edge in match_selection(input, member)
+                    .map_err(|error| json!({"status":"selection-unmatched","error":error}))?
+                {
+                    if seen.insert(edge.id()) {
+                        edges.push(edge);
+                    }
+                }
+            }
+            if seed.iter().any(|e| !seen.contains(&e.id())) {
+                return Err(invalid("Native chamfer contour does not contain its seed"));
+            }
+            if as_wire(&edges).is_none() {
+                return Err(
+                    json!({"status":"selection-unmatched","error":"Native contour does not match one connected unbranched wire"}),
+                );
+            }
+            edges
+        } else {
+            seed
+        };
         let requested = distances;
         for edge in matched {
             distances = requested;
@@ -335,6 +400,9 @@ fn chamfer_selection(input: &Solid, selection: &[Value]) -> Result<Vec<(Edge, [f
             }
         }
     }
+    if selected.is_empty() {
+        return Err(unsupported("No native-effective chamfer selections"));
+    }
     Ok(selected)
 }
 
@@ -346,6 +414,30 @@ fn replay(prefix: &str, stage: &Cell<&'static str>) -> Result<Value, String> {
     if task["operation"] != "fillet" && task["operation"] != "chamfer" {
         return Ok(json!({"status":"unhandled-intent","reason":"Unsupported captured operation"}));
     }
+    let schema = match task.get("schema_version") {
+        None => 1,
+        Some(value) => value.as_u64().ok_or("Invalid capture schema version")?,
+    };
+    let scope = match (task["operation"].as_str(), schema) {
+        (Some("chamfer"), 2) => "native-contours",
+        (Some("fillet" | "chamfer"), 1) => "seed-only",
+        _ => {
+            return Ok(
+                json!({"status":"harness-error","error":"Unsupported capture schema version"}),
+            )
+        }
+    };
+    let mut report = replay_task(prefix, stage, &task, schema)?;
+    report["selection_scope"] = json!(scope);
+    Ok(report)
+}
+
+fn replay_task(
+    prefix: &str,
+    stage: &Cell<&'static str>,
+    task: &Value,
+    schema: u64,
+) -> Result<Value, String> {
     stage.set("import-and-preprocess");
     let input = match import(&format!("{prefix}.input.step")) {
         Ok(solid) => solid,
@@ -359,7 +451,7 @@ fn replay(prefix: &str, stage: &Cell<&'static str>) -> Result<Value, String> {
     let selection = task["selection"].as_array().ok_or("Missing selection")?;
     let (ids, result) = if task["operation"] == "chamfer" {
         stage.set("physical-selection");
-        let selected = match chamfer_selection(&input, selection) {
+        let selected = match chamfer_selection(&input, selection, schema == 2) {
             Ok(selected) => selected,
             Err(report) => return Ok(report),
         };
@@ -443,7 +535,7 @@ fn replay(prefix: &str, stage: &Cell<&'static str>) -> Result<Value, String> {
         .remove_degenerate_faces()
         .remove_unused_attrs();
     stage.set("step-export");
-    let prepared = prepare_for_step(&result.solid.compress(), TOL / 20.);
+    let prepared = prepare_for_step(&result.solid.compress(), STEP_TOL);
     if let Some(prepared) = &prepared {
         let design = StepDesign::from_model(StepModel::from(prepared));
         std::fs::write(
@@ -472,7 +564,7 @@ fn main() {
             Ok(Err(error)) => json!({"status":"harness-error","error":error}),
             Err(_) => json!({"status":"panic"}),
         };
-    let report = json!({"schema_version":1,"tolerance":TOL,"comparison":"unverified","stage":stage.get(),"result":result});
+    let report = json!({"schema_version":1,"tolerance":TOL,"step_fitting_tolerance":STEP_TOL,"comparison":"unverified","stage":stage.get(),"result":result});
     std::fs::write(
         Path::new(&format!("{prefix}.truck.json")),
         serde_json::to_string_pretty(&report).unwrap(),
@@ -940,5 +1032,178 @@ mod chamfer_replay_tests {
             assert!(!Path::new(&format!("{prefix}.truck.step")).exists());
         }
         std::fs::remove_dir_all(directory).unwrap();
+    }
+}
+
+#[cfg(test)]
+mod native_contour_tests {
+    use super::*;
+
+    fn task() -> Value {
+        let mut original: Value = serde_json::from_str(include_str!(
+            "../tests/fixtures/chamfer-contours/A4-seed.json"
+        ))
+        .unwrap();
+        let expanded: Value = serde_json::from_str(include_str!(
+            "../tests/fixtures/chamfer-contours/A4-expanded.json"
+        ))
+        .unwrap();
+        original["schema_version"] = json!(2);
+        original["selection"][0]["native_applied"] = json!(true);
+        original["selection"][0]["ignored_reason"] = Value::Null;
+        original["selection"][0]["contour_edges"] = expanded["selection"].clone();
+        original
+    }
+
+    fn run(name: &str, task: &Value) -> Value {
+        let directory = std::env::temp_dir().join(format!(
+            "truck-native-contour-{}-{name}",
+            std::process::id()
+        ));
+        std::fs::create_dir_all(&directory).unwrap();
+        let prefix = directory.join("001");
+        let prefix = prefix.to_str().unwrap();
+        let step = include_str!("../tests/fixtures/chamfer-contours/A4.step");
+        std::fs::write(format!("{prefix}.input.step"), step).unwrap();
+        std::fs::write(format!("{prefix}.input.json"), task.to_string()).unwrap();
+        let result = replay(prefix, &Cell::new("start")).unwrap();
+        assert_eq!(
+            std::fs::read_to_string(format!("{prefix}.input.step")).unwrap(),
+            step
+        );
+        if result["status"] == "operation-succeeded" && result["selected_edges"] == 3 {
+            let output = import(&format!("{prefix}.truck.step")).unwrap();
+            replay_common::assert_solid(&output, 0.5630665232959563, &[0], TOL);
+            replay_common::blend::assert_step(&output, 0.5630665232959563, TOL);
+        }
+        std::fs::remove_dir_all(directory).unwrap();
+        result
+    }
+
+    #[test]
+    fn explicit_complete_contour_preserves_the_step_round_trip() {
+        let expanded: Value = serde_json::from_str(include_str!(
+            "../tests/fixtures/chamfer-contours/A4-expanded.json"
+        ))
+        .unwrap();
+        let result = run("explicit-round-trip", &expanded);
+        assert_eq!(result["status"], "operation-succeeded", "{result}");
+        assert_eq!(result["selected_edges"], 3, "{result}");
+    }
+
+    #[test]
+    fn native_contour_scope_expands_the_seed_to_all_three_edges() {
+        let result = run("complete", &task());
+        assert_eq!(result["selection_scope"], "native-contours", "{result}");
+        assert_eq!(result["status"], "operation-succeeded", "{result}");
+        assert_eq!(result["selected_edges"], 3, "{result}");
+        for field in [
+            "input_unchanged",
+            "geometry_consistent",
+            "mesh_closed",
+            "step_prepared",
+        ] {
+            assert_eq!(result[field], true, "{result}");
+        }
+    }
+
+    #[test]
+    fn native_contour_scope_cannot_fall_back_to_a_seed() {
+        for field in ["native_applied", "contour_edges"] {
+            let mut task = task();
+            task["selection"][0].as_object_mut().unwrap().remove(field);
+            assert_eq!(run(field, &task)["status"], "harness-error");
+        }
+        let mut task = task();
+        task["selection"][0]["contour_edges"] = json!([]);
+        assert_eq!(run("empty", &task)["status"], "harness-error");
+    }
+
+    #[test]
+    fn native_contour_scope_requires_seed_membership() {
+        let mut task = task();
+        task["selection"][0]["contour_edges"]
+            .as_array_mut()
+            .unwrap()
+            .pop();
+        let result = run("missing-seed", &task);
+        assert_eq!(result["status"], "harness-error", "{result}");
+    }
+
+    #[test]
+    fn native_first_assignment_ignores_later_contour_parameters() {
+        let mut task = task();
+        let mut ignored = task["selection"][0].clone();
+        ignored["distance"] = json!(-2.);
+        ignored["native_applied"] = json!(false);
+        ignored["ignored_reason"] = json!("already-selected");
+        ignored["contour_edges"] = json!([]);
+        task["selection"].as_array_mut().unwrap().push(ignored);
+        let result = run("ignored-duplicate", &task);
+        assert_eq!(result["status"], "operation-succeeded", "{result}");
+        assert_eq!(result["selected_edges"], 3, "{result}");
+    }
+
+    #[test]
+    fn native_contour_assignments_deduplicate_and_reject_conflicts() {
+        let mut task = task();
+        let member = task["selection"][0]["contour_edges"][0].clone();
+        task["selection"][0]["contour_edges"]
+            .as_array_mut()
+            .unwrap()
+            .push(member);
+        let duplicate = task["selection"][0].clone();
+        task["selection"].as_array_mut().unwrap().push(duplicate);
+        let result = run("active-duplicate", &task);
+        assert_eq!(result["status"], "operation-succeeded", "{result}");
+        assert_eq!(result["selected_edges"], 3, "{result}");
+        task["selection"][1]["distance"] = json!(0.02);
+        let result = run("active-conflict", &task);
+        assert_eq!(result["status"], "harness-error", "{result}");
+    }
+
+    #[test]
+    fn ignored_native_assignments_require_consistent_scope() {
+        for reason in [
+            Value::Null,
+            json!("invented-reason"),
+            json!("already-selected"),
+        ] {
+            let mut task = task();
+            task["selection"][0]["native_applied"] = json!(false);
+            task["selection"][0]["ignored_reason"] = reason;
+            let result = run("contradictory-ignored", &task);
+            assert_eq!(result["status"], "harness-error", "{result}");
+        }
+        let mut task = task();
+        task["selection"][0]["native_applied"] = json!(false);
+        task["selection"][0]["ignored_reason"] = json!("invalid-parameters");
+        task["selection"][0]["contour_edges"] = json!([]);
+        task["selection"][0]["distance"] = json!(0.);
+        let result = run("no-effective-selection", &task);
+        assert_eq!(result["status"], "unhandled-intent", "{result}");
+    }
+
+    #[test]
+    fn unknown_capture_schemas_do_not_replay() {
+        let mut task = task();
+        task["schema_version"] = json!(3);
+        let result = run("unknown-schema", &task);
+        assert_eq!(result["status"], "harness-error", "{result}");
+    }
+
+    #[test]
+    fn legacy_native_seeds_are_explicitly_labeled() {
+        let mut task = task();
+        task["schema_version"] = json!(1);
+        for field in ["native_applied", "ignored_reason", "contour_edges"] {
+            task["selection"][0].as_object_mut().unwrap().remove(field);
+        }
+        let result = run("legacy", &task);
+        assert_eq!(result["selection_scope"], "seed-only", "{result}");
+        assert_ne!(
+            result["selected_edges"], 3,
+            "Legacy replay cannot silently expand its seed"
+        );
     }
 }

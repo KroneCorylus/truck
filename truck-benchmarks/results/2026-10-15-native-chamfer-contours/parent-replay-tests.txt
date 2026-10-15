@@ -1,0 +1,100 @@
+Rust replay production source restored from aa3611024339c9b8a6879542023f7dac5301f721; final regression module appended.
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 3.11s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running unittests examples/replay_occt_blend.rs (target/release/examples/replay_occt_blend-bd2259d8fa5b09df)
+
+running 9 tests
+test native_contour_tests::native_first_assignment_ignores_later_contour_parameters ... FAILED
+test native_contour_tests::native_contour_assignments_deduplicate_and_reject_conflicts ... FAILED
+test native_contour_tests::native_contour_scope_requires_seed_membership ... FAILED
+test native_contour_tests::native_contour_scope_expands_the_seed_to_all_three_edges ... FAILED
+test native_contour_tests::ignored_native_assignments_require_consistent_scope ... FAILED
+test native_contour_tests::native_contour_scope_cannot_fall_back_to_a_seed ... FAILED
+test native_contour_tests::legacy_native_seeds_are_explicitly_labeled ... FAILED
+test native_contour_tests::unknown_capture_schemas_do_not_replay ... FAILED
+test native_contour_tests::explicit_complete_contour_preserves_the_step_round_trip ... FAILED
+
+failures:
+
+---- native_contour_tests::native_first_assignment_ignores_later_contour_parameters stdout ----
+
+thread 'native_contour_tests::native_first_assignment_ignores_later_contour_parameters' (1002348) panicked at truck-shapeops/examples/replay_occt_blend.rs:1053:9:
+assertion `left == right` failed: {"error":"Invalid captured chamfer distance","status":"harness-error"}
+  left: String("harness-error")
+ right: "operation-succeeded"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- native_contour_tests::native_contour_assignments_deduplicate_and_reject_conflicts stdout ----
+
+thread 'native_contour_tests::native_contour_assignments_deduplicate_and_reject_conflicts' (1002344) panicked at truck-shapeops/examples/replay_occt_blend.rs:1069:9:
+assertion `left == right` failed: {"geometry_consistent":true,"input_unchanged":true,"mesh_closed":true,"mesh_volume":0.5633455429625817,"selected_edges":1,"status":"operation-succeeded","step_prepared":true}
+  left: Number(1)
+ right: 3
+
+---- native_contour_tests::native_contour_scope_requires_seed_membership stdout ----
+
+thread 'native_contour_tests::native_contour_scope_requires_seed_membership' (1002347) panicked at truck-shapeops/examples/replay_occt_blend.rs:1040:9:
+assertion `left == right` failed: {"geometry_consistent":true,"input_unchanged":true,"mesh_closed":true,"mesh_volume":0.5633455429625817,"selected_edges":1,"status":"operation-succeeded","step_prepared":true}
+  left: String("operation-succeeded")
+ right: "harness-error"
+
+---- native_contour_tests::native_contour_scope_expands_the_seed_to_all_three_edges stdout ----
+
+thread 'native_contour_tests::native_contour_scope_expands_the_seed_to_all_three_edges' (1002346) panicked at truck-shapeops/examples/replay_occt_blend.rs:1007:9:
+assertion `left == right` failed: {"geometry_consistent":true,"input_unchanged":true,"mesh_closed":true,"mesh_volume":0.5633455429625817,"selected_edges":1,"status":"operation-succeeded","step_prepared":true}
+  left: Null
+ right: "native-contours"
+
+---- native_contour_tests::ignored_native_assignments_require_consistent_scope stdout ----
+
+thread 'native_contour_tests::ignored_native_assignments_require_consistent_scope' (1002342) panicked at truck-shapeops/examples/replay_occt_blend.rs:1086:13:
+assertion `left == right` failed: {"geometry_consistent":true,"input_unchanged":true,"mesh_closed":true,"mesh_volume":0.5633455429625817,"selected_edges":1,"status":"operation-succeeded","step_prepared":true}
+  left: String("operation-succeeded")
+ right: "harness-error"
+
+---- native_contour_tests::native_contour_scope_cannot_fall_back_to_a_seed stdout ----
+
+thread 'native_contour_tests::native_contour_scope_cannot_fall_back_to_a_seed' (1002345) panicked at truck-shapeops/examples/replay_occt_blend.rs:1025:13:
+assertion `left == right` failed
+  left: String("operation-succeeded")
+ right: "harness-error"
+
+---- native_contour_tests::legacy_native_seeds_are_explicitly_labeled stdout ----
+
+thread 'native_contour_tests::legacy_native_seeds_are_explicitly_labeled' (1002343) panicked at truck-shapeops/examples/replay_occt_blend.rs:1113:9:
+assertion `left == right` failed: {"geometry_consistent":true,"input_unchanged":true,"mesh_closed":true,"mesh_volume":0.5633455429625817,"selected_edges":1,"status":"operation-succeeded","step_prepared":true}
+  left: Null
+ right: "seed-only"
+
+---- native_contour_tests::unknown_capture_schemas_do_not_replay stdout ----
+
+thread 'native_contour_tests::unknown_capture_schemas_do_not_replay' (1002349) panicked at truck-shapeops/examples/replay_occt_blend.rs:1102:9:
+assertion `left == right` failed: {"geometry_consistent":true,"input_unchanged":true,"mesh_closed":true,"mesh_volume":0.5633455429625817,"selected_edges":1,"status":"operation-succeeded","step_prepared":true}
+  left: String("operation-succeeded")
+ right: "harness-error"
+
+---- native_contour_tests::explicit_complete_contour_preserves_the_step_round_trip stdout ----
+
+thread 'native_contour_tests::explicit_complete_contour_preserves_the_step_round_trip' (1002341) panicked at truck-shapeops/examples/../tests/common/mod.rs:52:9:
+assertion `left == right` failed: tessellated mesh of shell 0 is not closed
+  left: Oriented
+ right: Closed
+
+
+failures:
+    native_contour_tests::explicit_complete_contour_preserves_the_step_round_trip
+    native_contour_tests::ignored_native_assignments_require_consistent_scope
+    native_contour_tests::legacy_native_seeds_are_explicitly_labeled
+    native_contour_tests::native_contour_assignments_deduplicate_and_reject_conflicts
+    native_contour_tests::native_contour_scope_cannot_fall_back_to_a_seed
+    native_contour_tests::native_contour_scope_expands_the_seed_to_all_three_edges
+    native_contour_tests::native_contour_scope_requires_seed_membership
+    native_contour_tests::native_first_assignment_ignores_later_contour_parameters
+    native_contour_tests::unknown_capture_schemas_do_not_replay
+
+test result: FAILED. 0 passed; 9 failed; 0 ignored; 0 measured; 15 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p truck-shapeops --example replay_occt_blend`
+exit_code 101

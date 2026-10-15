@@ -1,0 +1,22 @@
+..F.......
+======================================================================
+FAIL: test_native_contour_summary_preserves_scope_without_repeating_point_arrays (test_capture.RejectedCaptureTests.test_native_contour_summary_preserves_scope_without_repeating_point_arrays)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/krone/Development/Pieza_WS/truck/audits/fillet-chamfer/capture/test_capture.py", line 198, in test_native_contour_summary_preserves_scope_without_repeating_point_arrays
+    self.assertEqual(selected[0]['contour_edges'], [dict(curve_type=0, point_count=2)] * 2)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [{'cu[15 chars]points': [[0, 0, 0], [1, 0, 0]]}, {'curve_type[35 chars]0]]}] != [{'cu[15 chars]point_count': 2}, {'curve_type': 0, 'point_count': 2}]
+
+First differing element 0:
+{'curve_type': 0, 'points': [[0, 0, 0], [1, 0, 0]]}
+{'curve_type': 0, 'point_count': 2}
+
++ [{'curve_type': 0, 'point_count': 2}, {'curve_type': 0, 'point_count': 2}]
+- [{'curve_type': 0, 'points': [[0, 0, 0], [1, 0, 0]]},
+-  {'curve_type': 0, 'points': [[0, 0, 0], [1, 0, 0]]}]
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.026s
+
+FAILED (failures=1)

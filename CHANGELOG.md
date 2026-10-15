@@ -6,6 +6,8 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Capture complete native chamfer tangent contours and first-assignment semantics. Replay validates expanded scope, distinguishes legacy seed-only captures, rejects incomplete or contradictory intent, and fits STEP output below kernel consistency tolerance. Native-contour and STEP round-trip regressions preserve the full requested selection.
+
 - Trim both ends of a shared neighboring edge sequentially when a fillet or chamfer cuts an arc-and-chord face. Preserve its retained middle segment and face orientation, and return failure for invalid face boundaries instead of panicking. Public face-patch regressions verify both operations, face encodings, swapped supports, shifted NURBS parameters, rigid motion and analytic contacts.
 
 - Refine chamfer contact splines when their ruled surface would separate from the exact support curves at kernel consistency tolerance. Use sample-averaged knots to keep dense contact interpolation stable, and orient ruled chamfers in their own parameter chart. Preserve small-scale tangent contours, material, bevel normals, shifted curve parameters, reversed selections, rigid motion and STEP without relaxing geometric validation.

@@ -1,0 +1,1256 @@
+{
+  "parent_revision": "aa3611024339c9b8a6879542023f7dac5301f721",
+  "source_sha256": {
+    "truck-shapeops/examples/replay_occt_blend.rs": "80f69ec51b30fb3791f32e4a7587ccf8083797dc84f8b5fd609ecb96f2b74e70",
+    "audits/fillet-chamfer/capture/blend_capture.cpp": "2ac7b5c30ca255ee38d295309ea21821f5d52c4bb2ac71b721a64b5e9666bb8e",
+    "audits/fillet-chamfer/capture/build.sh": "8cf25ceb98836d89a57edc6f199339355c8c3111925e378b706a62bb0d7a4958",
+    "audits/fillet-chamfer/capture/run_capture.py": "17eed10fb07eea4b3ffbc602851e095df4efa3e662a55d76c0cb37cf3c57a607",
+    "audits/fillet-chamfer/capture/test_capture.py": "cf905486866617237875a00014a854e51e482d8ffeee279e8ffb2968bdc77474",
+    "truck-shapeops/tests/fixtures/chamfer-contours/A4.step": "67c07f84f4e0d23c84528df85c6a29553e6868a3ecdc3438465dc46e5f23254c",
+    "truck-shapeops/tests/fixtures/chamfer-contours/A4-seed.json": "4763b2fa0e961edc135a789a670c5877d4585384cfcb796cae12ebae15fcefa1",
+    "truck-shapeops/tests/fixtures/chamfer-contours/A4-expanded.json": "a5a236e60a190ea9a9c6892bc664990c0e8437d5b57fd94f9b1f3ef2253d9579",
+    "truck-shapeops/tests/fixtures/chamfer-contours/README.md": "d86d61efd879062c5338c8dab75714d527df053c34fe59393a9367b6f7bb3268"
+  },
+  "unchanged_kernel_validation": "truck-benchmarks/results/2026-10-15-two-edge-face-trimming/metadata.json",
+  "replay_tests": 24,
+  "audit_tests": 22,
+  "capture_tests": 10,
+  "step_fitting_tolerance": 1e-07,
+  "executable_sha256": {
+    "target/release/examples/replay_occt_blend": "31aa329a74bebc6d29614eb7e690d65d8288cf429d5a1d4d67a2061afb9f5f1c",
+    "target/occt-contour-capture-plugin/libTKBlendAudit.so": "25f98b5629aff171ce4f10fccf4646e745510afdb25d4c6bc2fde146bcfa88f7",
+    "target/occt-contour-capture-plugin/compare_shapes": "c9215123784a8c9e656fbbbd2ab169852418d68e7c0592c48652d658ead74a41"
+  },
+  "artifact_archive": "native-evidence.zip",
+  "artifact_archive_sha256": "be4b37516d1322497609101e75e594d4ec76eb8226d6d06ac62c951fde09f2a0",
+  "artifact_sha256": {
+    "automatic/chamfer/equal_dist_sequence/A4/capture/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/001.comparison.json": "9b0dc47953564e18460033f9f6d64aa4097ff443f6acb6540e1662b17fdeccc3",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/001.input.brep": "677f27e9cdcf2b3548da3d0a84ec1913565392fc07b458569140eba431583e70",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/001.input.json": "2b6ff8a71b02ec6e98ed6c8ea850c8f0d6b5dd75bcc0ae072337b8fe77fb69d4",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/001.input.step": "3ffe82622bc58e983ee07667a9d9c290cfd84b712e3c7225cd6970b13df322ae",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/001.result.brep": "7a60ac2dfcebcf4e359f10fa408dec4da8d80330744db36ba80523ba60504b0c",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/001.result.json": "4696f6fc6d74f031c079f46e0a286d2bf133b67f0bb6f455116fd74a2f805093",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/001.result.step": "c926d5d516e01868a1b77bc30cbe89f499cfaf50ea549c3ec1c45497baa923bb",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/001.truck.json": "ce190ad9268f057db6257b3e90409fdea10be7dd06c67b074acf94687693452d",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/001.truck.log": "45fbf8b35e86e46e8965d20808081f1807833bfe1c39ae3f34cf71ef6bbea4aa",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/001.truck.step": "d76567c5be16eb86befd64cad773bbdf9422d23f8819c60bf21ced4b7f271af6",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/002.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/002.input.brep": "7a60ac2dfcebcf4e359f10fa408dec4da8d80330744db36ba80523ba60504b0c",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/002.input.json": "41889b0149e063ff9e0ce99247d275bd5bec52458ee1736e10f94a5edea7b270",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/002.input.step": "01526b874ec2a717eea583c4af4c933190d650c3968456ae917e95866877dada",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/002.result.brep": "a791c6665e65729bdbda023f945d4c5d01bc34a0af9b79b70cc21999c9f08b79",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/002.result.json": "142b3a26c8356d5de24671d714e86baf2a58444c5150d5debc8a9e231da324f2",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/002.result.step": "079282970b6a1731b1893fff65c24ed20357a8ff9371cce01aa79309d6918e6f",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/002.truck.json": "67915c6de2e7df7b5177850521393393fe5ed7c2f057f14a6dca1eaab44cd724",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/002.truck.log": "e1df685d821356cf43d02c82be4e598a0c62eb017926f2740bd65ec7cb3d1992",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/003.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/003.comparison.json": "04216f8d513644c816681469ba638a11d10e9b4be97dd51d79e81588ad5ce85a",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/003.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/003.input.brep": "a791c6665e65729bdbda023f945d4c5d01bc34a0af9b79b70cc21999c9f08b79",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/003.input.json": "9b2c06cccd0090a5e829fffd04433b017d8ec83f9bb3a592372c612858126fa6",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/003.input.step": "9ac7639bd2e1365f31469044b22856e8b529f5fdf21e25c76a24fcda92b46521",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/003.result.brep": "580e7f4852ca0bb6183ec7fa0da580e925152b475833135b5a12e0bb170efdcb",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/003.result.json": "7082a5e6be10a5da7810430c99ff92fd41145b46ef8ee331e9bd782b47f07291",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/003.result.step": "de986187cd7f1b42d0d52ce5c765525863b4f22ef03acbdd7d2df3688b76e511",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/003.truck.json": "46aa18d00d451fbae41de4407fb5ba6bbd1b2b4d8f92b3dba2c824365c22c4a3",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/003.truck.log": "b0e02473e11e48d6da31f16901a0303040ebe1aaa5264a93de6e10f5782eba31",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/003.truck.step": "4d463cfd0f6e8d6957ca1dd13205046ffcbb08d6b84b831f89d1b5e85064dda2",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/004.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/004.comparison.json": "d62a25e9426cf80beae49cc3279df13d3feab49fa21767756bcb031551ed1eda",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/004.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/004.input.brep": "580e7f4852ca0bb6183ec7fa0da580e925152b475833135b5a12e0bb170efdcb",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/004.input.json": "f88f83c23206f1cb52157fcc672d964c558bc03d68eda093c891675a724d3945",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/004.input.step": "3f6ffe5f0234b3db2d0f166765c6292ab9b6785db22ac3b3904850370c23e6a6",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/004.result.brep": "3b0bda4ec8190f6875f36a7771f84687cc63a59bbe1849b965d2a66bcea4b1c6",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/004.result.json": "0919e0214cc75846598f88ffb88d58ca2998ceffbc8bb3425815dd31b705dffa",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/004.result.step": "2bb42b9fd1d421443172e97b40f437cc293c8708239f31590b601a4737adbd6c",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/004.truck.json": "b441ffd2e67ed9dfa11620755901a9c33ff356428de8f6d8f3748461c2152233",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/004.truck.log": "78a539cbd4fcde29ae068aa7975ac5c0b095fd5fcd73e3793fcba1d10fa884a7",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/004.truck.step": "d270a2286946bb07c17be101b05e35ba814624413101042baaade2a0a4203d3b",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/005.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/005.input.brep": "3b0bda4ec8190f6875f36a7771f84687cc63a59bbe1849b965d2a66bcea4b1c6",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/005.input.json": "054dca3315fe0c578ba880abd78c15ac4da936615b472c3c363a4899eb0ee27c",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/005.input.step": "bde2e50a6d697c41ea2866312dab012d692c14224de30f98546cce3b3b7fa378",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/005.result.brep": "69fa8f49313d6686cbfd8143ee75f9ad12e607dcf759584f1540a561f2520041",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/005.result.json": "8f86a1a1e391311e380540059fa83ab61a4d95928b548b459487ab4aed3bdd0a",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/005.result.step": "8ecef98a4c727170380ea5a2c26186ffd1dc046a39c9c1174b910238fe2f875c",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/005.truck.json": "67915c6de2e7df7b5177850521393393fe5ed7c2f057f14a6dca1eaab44cd724",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/005.truck.log": "e1df685d821356cf43d02c82be4e598a0c62eb017926f2740bd65ec7cb3d1992",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/006.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/006.input.brep": "69fa8f49313d6686cbfd8143ee75f9ad12e607dcf759584f1540a561f2520041",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/006.input.json": "3bf35151e14e3fab54d7b8df1b90d1bfd6605f4850f164363ddaa3fdcf4f40ce",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/006.input.step": "9b4e9c92c4083102ff66453404e995686eb1bd1969ca8e31e4e7854d71ef8703",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/006.result.brep": "a06fafdb22a70ddadc40cefa72b3da69ca28ff9dbf8afaa21761e5085dccf36f",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/006.result.json": "d383d2ee70e7d8b1df197ca810dfc93d956fcade4f81794923bc5e829037ffc6",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/006.result.step": "f864adecb2eb91b128fbfce8317f7b7f03593641fef422753ae3923fbd8b16ca",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/006.truck.json": "67915c6de2e7df7b5177850521393393fe5ed7c2f057f14a6dca1eaab44cd724",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/006.truck.log": "e1df685d821356cf43d02c82be4e598a0c62eb017926f2740bd65ec7cb3d1992",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/007.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/007.input.brep": "a06fafdb22a70ddadc40cefa72b3da69ca28ff9dbf8afaa21761e5085dccf36f",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/007.input.json": "e8f9d402f5d79b5ccd6cc759e124d286a9a39bf0c928e1e33e47cb2917f3876e",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/007.input.step": "2b27e477a1afb25a4421b51f7cd3fb1bf54ab3749c2e50e482e440027c8b695b",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/007.result.brep": "3c30cc3d051b7ae3c5cf31c9dfcc96804047737c6487897c4a51811be8f6945e",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/007.result.json": "816fe4c5d74b5a198bf5a1b8ed96d1f62a942c2b03f8d0847a9183673109082e",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/007.result.step": "5365c3648c58065a162f73fed5bc9b878ecdbfcad2637485dfa2604f089264e8",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/007.truck.json": "67915c6de2e7df7b5177850521393393fe5ed7c2f057f14a6dca1eaab44cd724",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/007.truck.log": "e1df685d821356cf43d02c82be4e598a0c62eb017926f2740bd65ec7cb3d1992",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/008.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/008.input.brep": "3c30cc3d051b7ae3c5cf31c9dfcc96804047737c6487897c4a51811be8f6945e",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/008.input.json": "d0bfb289117b836531f87315469350504b75dfe0f0d17678fea53a0090c3a2c2",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/008.input.step": "76a4d28e14371b48f9bad63c212c895f9ca55b1821d4cfb32809c130916bdcb3",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/008.result.brep": "e03cbedf8f4cfa4e59e6cbd2a462b53fb3630f2c2518f17d83142ac175f60dd2",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/008.result.json": "cfb41d6c1e37fd45fa1d2f2782405b52d1e226df72a81d99b0048fe7145fe868",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/008.result.step": "723ccf44bddafad4ebfe83a344e6e8e59324b559e39f2ca82a42e1bb6b883d9f",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/008.truck.json": "67915c6de2e7df7b5177850521393393fe5ed7c2f057f14a6dca1eaab44cd724",
+    "automatic/chamfer/equal_dist_sequence/A4/capture/008.truck.log": "e1df685d821356cf43d02c82be4e598a0c62eb017926f2740bd65ec7cb3d1992",
+    "automatic/chamfer/equal_dist_sequence/A4/console.log": "fa5862edfee68687bec93ac33200ebc3c3124a15e6de4a5409e2964bb9a2b568",
+    "automatic/chamfer/equal_dist_sequence/A4/draw.log": "7fc1bed9c07d1a51066103e050fc79016de2a0841a34cb52871a5893f01f3338",
+    "automatic/chamfer/equal_dist_sequence/A4/images/A4.png": "cc2e145dec74c7299f8bcd5a3a3fd5d45ae85f3401930d2615422e48fdb78287",
+    "automatic/chamfer/equal_dist_sequence/A4/run.tcl": "2bf17303227fc59717dc5e888896cd3f920f76c9d2a6f26f513997e07e97061f",
+    "automatic/display.log": "d01a88518cc3a73da1c9678370b95a691ac80b1bddd1e3c2fbb7477e44e04d96",
+    "automatic/results.json": "5c119772938c7a8d06207609ee46a9908c872a23a4a8902529be8abbda98fb11",
+    "automatic/runtime.log": "1bce096d463b23cf544fa6b93bca8c017dd101b2be60e9ae5f9b2c03e89beed7",
+    "controls/A4.input.brep": "677f27e9cdcf2b3548da3d0a84ec1913565392fc07b458569140eba431583e70",
+    "controls/box_input_after.result.brep": "1156c9306f8c1ca6e859f2254b8aa4f577a93045c5c651fd6575f8f3338d598f",
+    "controls/box_input_after.result.json": "64cc6aec3eece6709b44d0e38194a2455f0500672b68d65a5f2c7d6dcd1999d3",
+    "controls/box_input_after.result.step": "d9a9bcc7681c688d84f566fa364d1d9f5c588c597338a5ae8fb1e78a29e03988",
+    "controls/capture/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "controls/capture/001.comparison.json": "dacb00aeae9ffcbe149d4242371cad135b51dcb97338812dc6c88bb2b844bbce",
+    "controls/capture/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "controls/capture/001.input.brep": "1156c9306f8c1ca6e859f2254b8aa4f577a93045c5c651fd6575f8f3338d598f",
+    "controls/capture/001.input.json": "34b011f8487fa3d21c31c7cf7b5e61e2ec427afdcaf7843a0ab901debe98d195",
+    "controls/capture/001.input.step": "03fb2cd26e7e5c88097fc88814248a74024bcae93696d2bdab4ecc492463cba6",
+    "controls/capture/001.result.brep": "1fa538c366bbfbf9cc5a3fa581366ad901f26b54315cb1a5337a776008c9dd3f",
+    "controls/capture/001.result.json": "c892830b53ca7f3cbef4d15d804375aba06c9a2b5353d0234ba0db51786ba6c4",
+    "controls/capture/001.result.step": "049a401a291cf8a4c31cabb3d5703de92d060456a45e95354b4902872b840d61",
+    "controls/capture/001.truck.json": "48d6735007a048281c1eba23222301f486f824273ccfbca1bc6a23a93d1a0208",
+    "controls/capture/001.truck.log": "04dd4934eb91eeae83288ba7bd0fa65c19138b1c0eafcba67c0bda02b2acf371",
+    "controls/capture/001.truck.step": "cef21cede3d7c19caee71e218178d325afaae8cdd121906087607a41c1ac104e",
+    "controls/capture/002.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "controls/capture/002.comparison.json": "dacb00aeae9ffcbe149d4242371cad135b51dcb97338812dc6c88bb2b844bbce",
+    "controls/capture/002.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "controls/capture/002.input.brep": "1156c9306f8c1ca6e859f2254b8aa4f577a93045c5c651fd6575f8f3338d598f",
+    "controls/capture/002.input.json": "612f3023edbd02cb056cf80491d64e61b66ffb39a6e1952e8b546b4bc4a66594",
+    "controls/capture/002.input.step": "8cdb2a184650110ed9617584a2fc0cce43b3361c8843e9881fa60c04690f85bc",
+    "controls/capture/002.result.brep": "1fa538c366bbfbf9cc5a3fa581366ad901f26b54315cb1a5337a776008c9dd3f",
+    "controls/capture/002.result.json": "c892830b53ca7f3cbef4d15d804375aba06c9a2b5353d0234ba0db51786ba6c4",
+    "controls/capture/002.result.step": "2b21135b835969ff4a8c436150505b3f8e9cfa801ee6cc7bf1df87b1e0aaba8e",
+    "controls/capture/002.truck.json": "48d6735007a048281c1eba23222301f486f824273ccfbca1bc6a23a93d1a0208",
+    "controls/capture/002.truck.log": "04dd4934eb91eeae83288ba7bd0fa65c19138b1c0eafcba67c0bda02b2acf371",
+    "controls/capture/002.truck.step": "c8ee15edc9ca386df3581c01ccec048e18e4e9e76eb4061ed35d1edc301bd03c",
+    "controls/capture/003.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "controls/capture/003.comparison.json": "9ae264344081547b4c708379ca9cf5c876b21000133aa70e119b04b3b8b4ba9e",
+    "controls/capture/003.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "controls/capture/003.input.brep": "1156c9306f8c1ca6e859f2254b8aa4f577a93045c5c651fd6575f8f3338d598f",
+    "controls/capture/003.input.json": "89f62c6840524f9615bd83a25bef342eb74a5ca3e670ce3ec97943ad56a7b7e6",
+    "controls/capture/003.input.step": "89507b0309d0828e7f36d1b3f9e9684946928090240f1af8e78e22b39e63344c",
+    "controls/capture/003.result.brep": "17fb8a5ba067cf672dba05eb4fb89e7b2154ef759f7ecfe024e7ec2182f7796e",
+    "controls/capture/003.result.json": "3f4722a0c2a6d9dba775dcbc48a3d2587c5e506343ebe29f76359704eddff35b",
+    "controls/capture/003.result.step": "9ffdf4125d7e057bc6e92f3f12547cde71ab89e2d5a65c9bcb2671ffb0dab7fb",
+    "controls/capture/003.truck.json": "0fb455cd72666cbd3f8f37433ccb129e996072682680309e5aeace9152501ffe",
+    "controls/capture/003.truck.log": "d0438a9f059dfe4e4f7cb9e061d0104db6f1256b9034e580af3db3cbed376adf",
+    "controls/capture/003.truck.step": "3addd945940b2e18f2484a3fe62a34b7b3d37986f1055fb1f19166f7d16a5636",
+    "controls/capture/004.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "controls/capture/004.comparison.json": "7f53397970b2267cc22db2490f771865d6395db3880800a08b8f15317f37b921",
+    "controls/capture/004.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "controls/capture/004.input.brep": "1156c9306f8c1ca6e859f2254b8aa4f577a93045c5c651fd6575f8f3338d598f",
+    "controls/capture/004.input.json": "7c6c3c7ae6043e8a9465c51262bf8b47dd39951136212f86b57e38bd8eb81095",
+    "controls/capture/004.input.step": "89ca26662429cb6d65d0a270281b0c87ae92a6e1ef5136dafbb45bc13202bfc3",
+    "controls/capture/004.result.brep": "ee02947e262f76dc39ab61cb13d52a0ccbabd0fb7d29db503f6877dd05981b1b",
+    "controls/capture/004.result.json": "26e6a4aa5fa05a7608a7e9acc576ad7cca5dd70a87c80b2cd61a22f6cf0b82e0",
+    "controls/capture/004.result.step": "68b6245d5b87246441b363261eea99899192e933b5d2c956ce29351c23a9ac57",
+    "controls/capture/004.truck.json": "1ee31f13f5c9a75f1195975018ca7972dd0c88e4976d6ab4c94fd44c8dc42175",
+    "controls/capture/004.truck.log": "2eff399e85bda01fbf885573338aa381c96cdfaf320c443c9e15de8303cbe17e",
+    "controls/capture/004.truck.step": "16f99f6f2c2b58fab9e43214610835fe5aa216bdb88606cf85023ea2bb04b684",
+    "controls/capture/005.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "controls/capture/005.comparison.json": "74e30558b3215b654131b64c6131ed624072209de4962f41b410a35ccd1e5e0b",
+    "controls/capture/005.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "controls/capture/005.input.brep": "1156c9306f8c1ca6e859f2254b8aa4f577a93045c5c651fd6575f8f3338d598f",
+    "controls/capture/005.input.json": "651b2fc8a3c87af76e7b0925c7fe539e3b8561281d6c61eaeb962b11a76e6c35",
+    "controls/capture/005.input.step": "b4abc4ec1afaf15e9b9ad6f02d91db3eb6bdb83ab6e67498a1bd63d899cfa135",
+    "controls/capture/005.result.brep": "478a24b17d54e820e93a75d37935453ed3844fba63e9ec0512f877ede93d9fa7",
+    "controls/capture/005.result.json": "0f56f25eb56ddad0ee633513ef9da46626d3242de0a6bbcee306d2ad7477e106",
+    "controls/capture/005.result.step": "b9af3ce94f12f2903c58151a11544898e4c58f8ca24f3e3e8622f9f97f8bd740",
+    "controls/capture/005.truck.json": "48d6735007a048281c1eba23222301f486f824273ccfbca1bc6a23a93d1a0208",
+    "controls/capture/005.truck.log": "04dd4934eb91eeae83288ba7bd0fa65c19138b1c0eafcba67c0bda02b2acf371",
+    "controls/capture/005.truck.step": "14639265a92ca3da32e616b1503c2044a7cf9099973d519049c513e9996221ad",
+    "controls/capture/006.capture.log": "111aa94724b5bc933ed3dc641b68f6a16561f21a381f58d43b5ef2b3c2177bb4",
+    "controls/capture/006.input.brep": "1156c9306f8c1ca6e859f2254b8aa4f577a93045c5c651fd6575f8f3338d598f",
+    "controls/capture/006.input.json": "e34be89000a3b9afd207c905ae004f0d758b993c8967dbd55886db9f45a7e696",
+    "controls/capture/006.input.step": "3cab1ed10a19f1b794fedc6c1f13597cf9acd7989e1be6fe63ae675c11ccfc4b",
+    "controls/capture/006.truck.json": "8b90a36fc9f1ee8d1bc44172176c346439f5e929c36f535604d5a346e14e2295",
+    "controls/capture/006.truck.log": "1b8598ab063973faf79d0d7a38366ad52026eb0e436fc2eee43a054f3eaa4784",
+    "controls/capture/007.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "controls/capture/007.comparison.json": "c49bc2977ff1a7559d6d13952393e702b7e923020a1937beadbe935655becd67",
+    "controls/capture/007.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "controls/capture/007.input.brep": "1156c9306f8c1ca6e859f2254b8aa4f577a93045c5c651fd6575f8f3338d598f",
+    "controls/capture/007.input.json": "0681bc7e0384a4c72526236c90dac8f1d8b3eb5162269b5d39682fe2ee4243b7",
+    "controls/capture/007.input.step": "0d7bd65d923d50b64d819743f32e09fa569b08fbe411311466440dc3ccbe9bb1",
+    "controls/capture/007.result.brep": "f3a36f44d7bfef3be439fbd9e2bc2de6494e9f5b699311a3f96728a4494a157a",
+    "controls/capture/007.result.json": "ea92986de8113d483b299a992152801d52e68cd44e577ef6b2cf00adad4113c2",
+    "controls/capture/007.result.step": "0a0babb49671cb89790372bd7872690c4bc37c16cf8115328f1722b6f212ba6c",
+    "controls/capture/007.truck.json": "44384bd0d4a98c8e22668669b128d564807e20316a9cd7b0fb11f36ec3acdc78",
+    "controls/capture/007.truck.log": "d96b2c4ba41450d38cbf39bfaafc46f7d6b52ae9c9bbbd7525339a5c4ce2e725",
+    "controls/capture/007.truck.step": "bd4e4df2994691086bd0b92dbb51b15b1ce50e920bd5aa79b02542c3e657c842",
+    "controls/capture/008.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "controls/capture/008.comparison.json": "9b0dc47953564e18460033f9f6d64aa4097ff443f6acb6540e1662b17fdeccc3",
+    "controls/capture/008.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "controls/capture/008.input.brep": "4e8daf1113254ddea8888fde06c5dfb1b3c928c6baa4675797580a0ac725a4c5",
+    "controls/capture/008.input.json": "b277967a84054d9ea2e0ad7aff353b799d3d845e19a95cf8977bd5a910bbda1a",
+    "controls/capture/008.input.step": "4b0bb4ff22e3ab72f7c952aa51959745ac41d5bac32e9a83284655e8fe29f000",
+    "controls/capture/008.result.brep": "a6ebbcf79dc10b5a87334f1916fb72aa8b54cea617ebef0c0d98f92013cc0952",
+    "controls/capture/008.result.json": "4696f6fc6d74f031c079f46e0a286d2bf133b67f0bb6f455116fd74a2f805093",
+    "controls/capture/008.result.step": "7db076782754d76d0b1b9bb7a533107f941b442362e26b0e10e5465f755d366a",
+    "controls/capture/008.truck.json": "ce190ad9268f057db6257b3e90409fdea10be7dd06c67b074acf94687693452d",
+    "controls/capture/008.truck.log": "45fbf8b35e86e46e8965d20808081f1807833bfe1c39ae3f34cf71ef6bbea4aa",
+    "controls/capture/008.truck.step": "607203f19f25cd0519927d8a5034524a7e547f3f1511b0fe6120b7001d9ed29b",
+    "controls/controls.log": "076bb1840628a338c0fd67921f1cfa6016519754187df875aee568e33ff7a264",
+    "controls/controls.tcl": "38046fa5b0af14cc044a90b86ca6c42e2f1720442f6de5ec3f7eac7a03e72447",
+    "controls/display.log": "905352d1371a8eb3cfe510aa32dd7bfdc11f07e404cee98c43d6551101afe8d7",
+    "controls/results.json": "98f6d769a789345cfdbb86bd9bf78ae0eee2ecad2404536c11274aecab2a4d99",
+    "controls/tangent_input_after.result.brep": "4e8daf1113254ddea8888fde06c5dfb1b3c928c6baa4675797580a0ac725a4c5",
+    "controls/tangent_input_after.result.json": "cda4131eb018dff70b28d8dff37ee96a791bb6f8afd6b14ef32ef4c07d01cb66",
+    "controls/tangent_input_after.result.step": "7bc100726f023396200c94ce90a48405034041366979370037a712a10c3a3920",
+    "parent/001.input.json": "4763b2fa0e961edc135a789a670c5877d4585384cfcb796cae12ebae15fcefa1",
+    "tools/prove-native-chamfer-contours.py": "587ad2b197ae86c2d8805ae8f1601409f386b4c6bbc56b3f268160a14de09892",
+    "tools/package-native-chamfer-contours.py": "d1082ea93d2550eea0f39d46a20ca1b7239a9101cbc3a0c61d035e41b14ebb06",
+    "data/00-001_F": "be6d798bfa2025f93c015bf0dbb31f8d13eb66bb6dd609db757a160a96e83736",
+    "data/01-4_K1(hlacg01).draw": "f1408be6b23b16db43ae002939d104c4153d188f98a34317eee84dcf4c77490a",
+    "data/02-4_L1(hlacg03).draw": "a4c6d9ce9071ca0490b0ed40c90204e6a51df0634edfe9229027e33b4c2422c9",
+    "data/03-4_M1(hlacg04).draw": "e85f9d7a8e50a4f2d83f08661f3a885e14d2f47895dfe86ff95418fe3b031032",
+    "data/04-4_N1(hlacg05).draw": "10db00e75c062c75487f4f8d31ca86c5038a81972e2125b09f2bf1d266dd8da8",
+    "data/05-4_P1(hlacg07).draw": "98afd2377bee2b7c66320900553bb08f2c619104d7791092d5907da2525f4f00",
+    "data/06-4_Q1(hlacg08).draw": "027bc036e073706e29f1d3b213aff2d2308fbd3f6bd622ce5bc80c63cc2c02c2",
+    "data/07-8_B1.draw": "d3f7e7dad274c5397f173d1be18513132050b635b71bf56996892deec0366876",
+    "data/08-8_J1.draw": "3d9d9fbc6c6132bf56a3b435f6283cd5ce0d1ca1a7f1a18b74dce12aab27eb94",
+    "data/09-CCH_001_ahdb.rle": "5b2ff66edff3777cd07b726971ac7ace7daf1a17a730dc765fc3e5d36dc4e750",
+    "data/10-CCH_001_bhdc.rle": "f9015072cd69c43125e8abadaa725a776ac8eb1a57db8807d12a78a323628e71",
+    "data/11-CCH_001_chez.rle": "152427180112b79d04f4969e6ea6c4ddab386b7f45dedd9957c0075aa7cb4e15",
+    "data/12-CCH_001_chfa.rle": "f79c0a91dc0a7750c11fd79dc0392ad4d6b488368a2c5e68e6c8f1fffb4b2c0e",
+    "data/13-CCH_001_dhdd.rle": "a2df174e06027aaad4c9cd37db20ac780d2ed52684f8380b66ae5362e2ad5582",
+    "data/14-CCH_001_ehdg.rle": "171b9b24cc7dc741d9c581eca2e2dde3013ccca856da2627ed076d4bbe4f27ee",
+    "data/15-CCH_001_ghdh.rle": "1571ebcd33d97dba663fd0162c19f84ecd54dea75ae4e539f7dfaa4d4bf9fcf3",
+    "data/16-CCH_001_ghfb.rle": "6f48f2a21237a552438bd84080a5fcfb9f0cc8b24b317ca0a6332e6f68b69113",
+    "data/17-CCH_001_hhdi.rle": "69ed78a6ebc021673c84338b12cc76fa3c429446072773d51bda4dd368d008c1",
+    "data/18-CCH_001_ihdj.rle": "2d9f094c28664cd3cdb1f3a5a3acc5a3a2ef996be28f5a74360508024122efff",
+    "data/19-CCH_001_jhdk.rle": "be57bd816c9d8807eb5212a04bea2b02e1d2407d460606511023b03ac0567ab8",
+    "data/20-CCH_001_khdl.rle": "7d3390358066cc59f4e0cf2045f4cb2c8d19ab087c15ded39099f2d959a54c86",
+    "data/21-CCH_001_lhdm.rle": "35cfbcc3f9aa2761b0666a718c91b8930e17a8864283df9357b4394bed48920d",
+    "data/22-CCH_001_qhff.rle": "70e7ddc19d08eab2d92590857977774217fb7d6fe69287957ca198a53e67793f",
+    "data/23-CCH_a.rle": "94af92594cbd13fe60cbb533ae0d1376370cd23bafff5202dd9b1583b2403a6e",
+    "data/24-CCH_osa__hfe.rle": "57296e2e3204f6f810e7e43b95ed00db9dcaaafe3c627e69ce0caae95c2d2d5b",
+    "data/25-CCH_testchet.rle": "8bc18d9906a7140017f33d43ee1f69acf69fbde2488a2c95555e9231c1ed1b46",
+    "data/26-CFI_cts21348.rle": "7eb71f8565b8ac0d068d61573f98546cbfb47b11aac80047bccbec2b4e4025fb",
+    "data/27-CFI_pro10391.rle": "cff6f349d812d30010e9ad179a84bdafa6f32e4c464fc7c5541cd53c46a20730",
+    "data/28-CFI_pro14552.rle": "646874ed428036db6e3d5d724ffe3fee036c54efa74542595eaabf300a7de6c2",
+    "data/29-propag": "2d5bcb64644c65dcfd02032d7da605002e70108bd0743150ed90d8eb4c495d5f",
+    "data/30-test-fillet.brep": "42fcbb9ea7836612d26aa59ca7f6bf73fcfc95ad4e0a3246f4a7bfc8e40ced64",
+    "data/31-testKPart": "282beed4d33a2186ef906b9725f2a46d57b40ae22c8539283eb917b34ea33398",
+    "data/provenance.json": "240cc32f064aa77dbb077d475e07321c6cb6ed200d077fb0e548d4f7c7183315"
+  },
+  "automatic_A4_result": {
+    "geometry_consistent": true,
+    "input_unchanged": true,
+    "mesh_closed": true,
+    "mesh_volume": 0.5630093646319957,
+    "selected_edges": 3,
+    "selection_scope": "native-contours",
+    "status": "operation-succeeded",
+    "step_prepared": true
+  },
+  "automatic_A4_comparison": {
+    "schema_version": 1,
+    "comparison": "sampled-only",
+    "native_valid": true,
+    "truck_step_valid": true,
+    "native_solids": 1,
+    "truck_solids": 1,
+    "native_volume": 0.5630665232959563,
+    "truck_volume": 0.5630665232913654,
+    "native_to_truck_max_distance": 2.229100205894138e-08,
+    "native_to_truck_samples": 4845,
+    "truck_to_native_max_distance": 1.9109888631014344e-08,
+    "truck_to_native_samples": 4845
+  },
+  "native_controls": [
+    {
+      "index": 1,
+      "selection": [
+        {
+          "mode": "equal-distance",
+          "distance": 2,
+          "curve_type": 0,
+          "points": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              30
+            ]
+          ],
+          "native_applied": true,
+          "ignored_reason": null,
+          "contour_edges": [
+            {
+              "curve_type": 0,
+              "points": [
+                [
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  30
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "mode": "equal-distance",
+          "distance": 3,
+          "curve_type": 0,
+          "points": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              30
+            ]
+          ],
+          "native_applied": false,
+          "ignored_reason": "already-selected",
+          "contour_edges": []
+        }
+      ],
+      "result": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 5940.0,
+        "selected_edges": 1,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 5940,
+        "truck_volume": 5939.999999999999,
+        "native_to_truck_max_distance": 5.975640711496539e-15,
+        "native_to_truck_samples": 1593,
+        "truck_to_native_max_distance": 3.607797795906347e-15,
+        "truck_to_native_samples": 1523
+      }
+    },
+    {
+      "index": 2,
+      "selection": [
+        {
+          "mode": "equal-distance",
+          "distance": 0,
+          "curve_type": 0,
+          "points": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              30
+            ]
+          ],
+          "native_applied": false,
+          "ignored_reason": "invalid-parameters",
+          "contour_edges": []
+        },
+        {
+          "mode": "equal-distance",
+          "distance": 2,
+          "curve_type": 0,
+          "points": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              30
+            ]
+          ],
+          "native_applied": true,
+          "ignored_reason": null,
+          "contour_edges": [
+            {
+              "curve_type": 0,
+              "points": [
+                [
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  30
+                ]
+              ]
+            }
+          ]
+        }
+      ],
+      "result": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 5940.0,
+        "selected_edges": 1,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 5940,
+        "truck_volume": 5939.999999999999,
+        "native_to_truck_max_distance": 5.975640711496539e-15,
+        "native_to_truck_samples": 1593,
+        "truck_to_native_max_distance": 3.607797795906347e-15,
+        "truck_to_native_samples": 1523
+      }
+    },
+    {
+      "index": 3,
+      "selection": [
+        {
+          "mode": "two-distances",
+          "distances": [
+            2,
+            3
+          ],
+          "reference_plane": {
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "normal": [
+              1,
+              0,
+              0
+            ]
+          },
+          "curve_type": 0,
+          "points": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              30
+            ]
+          ],
+          "native_applied": true,
+          "ignored_reason": null,
+          "contour_edges": [
+            {
+              "curve_type": 0,
+              "points": [
+                [
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  30
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "mode": "two-distances",
+          "distances": [
+            4,
+            5
+          ],
+          "reference_plane": {
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "normal": [
+              1,
+              0,
+              0
+            ]
+          },
+          "curve_type": 0,
+          "points": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              30
+            ]
+          ],
+          "native_applied": false,
+          "ignored_reason": "already-selected",
+          "contour_edges": []
+        }
+      ],
+      "result": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 5910.0,
+        "selected_edges": 1,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 5910,
+        "truck_volume": 5910,
+        "native_to_truck_max_distance": 3.9283700765566935e-15,
+        "native_to_truck_samples": 1591,
+        "truck_to_native_max_distance": 1.1801832636420706e-15,
+        "truck_to_native_samples": 1591
+      }
+    },
+    {
+      "index": 4,
+      "selection": [
+        {
+          "mode": "distance-angle",
+          "distance": 2,
+          "angle_degrees": 30,
+          "reference_plane": {
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "normal": [
+              1,
+              0,
+              0
+            ]
+          },
+          "curve_type": 0,
+          "points": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              30
+            ]
+          ],
+          "native_applied": true,
+          "ignored_reason": null,
+          "contour_edges": [
+            {
+              "curve_type": 0,
+              "points": [
+                [
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  30
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "mode": "distance-angle",
+          "distance": 3,
+          "angle_degrees": 60,
+          "reference_plane": {
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "normal": [
+              1,
+              0,
+              0
+            ]
+          },
+          "curve_type": 0,
+          "points": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              30
+            ]
+          ],
+          "native_applied": false,
+          "ignored_reason": "already-selected",
+          "contour_edges": []
+        }
+      ],
+      "result": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 5965.358983848622,
+        "selected_edges": 1,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 5965.358983848622,
+        "truck_volume": 5965.358983848621,
+        "native_to_truck_max_distance": 5.407139474782739e-15,
+        "native_to_truck_samples": 1593,
+        "truck_to_native_max_distance": 3.5596458096434965e-15,
+        "truck_to_native_samples": 1593
+      }
+    },
+    {
+      "index": 5,
+      "selection": [
+        {
+          "mode": "distance-angle",
+          "distance": 2,
+          "angle_degrees": 90,
+          "reference_plane": {
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "normal": [
+              1,
+              0,
+              0
+            ]
+          },
+          "curve_type": 0,
+          "points": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              30
+            ]
+          ],
+          "native_applied": false,
+          "ignored_reason": "invalid-parameters",
+          "contour_edges": []
+        },
+        {
+          "mode": "distance-angle",
+          "distance": 2,
+          "angle_degrees": 45,
+          "reference_plane": {
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "normal": [
+              1,
+              0,
+              0
+            ]
+          },
+          "curve_type": 0,
+          "points": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              30
+            ]
+          ],
+          "native_applied": true,
+          "ignored_reason": null,
+          "contour_edges": [
+            {
+              "curve_type": 0,
+              "points": [
+                [
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  30
+                ]
+              ]
+            }
+          ]
+        }
+      ],
+      "result": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 5940.0,
+        "selected_edges": 1,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 5939.999999999998,
+        "truck_volume": 5939.999999999999,
+        "native_to_truck_max_distance": 5.420799638382024e-15,
+        "native_to_truck_samples": 1593,
+        "truck_to_native_max_distance": 1.1102230246251565e-15,
+        "truck_to_native_samples": 1593
+      }
+    },
+    {
+      "index": 6,
+      "selection": [
+        {
+          "mode": "equal-distance",
+          "distance": 0,
+          "curve_type": 0,
+          "points": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              30
+            ]
+          ],
+          "native_applied": false,
+          "ignored_reason": "invalid-parameters",
+          "contour_edges": []
+        }
+      ],
+      "result": {
+        "reason": "No native-effective chamfer selections",
+        "selection_scope": "native-contours",
+        "status": "unhandled-intent"
+      },
+      "comparison": null
+    },
+    {
+      "index": 7,
+      "selection": [
+        {
+          "radius": 2,
+          "curve_type": 0,
+          "points": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              30
+            ]
+          ]
+        }
+      ],
+      "result": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 5974.209686629542,
+        "selected_edges": 1,
+        "selection_scope": "seed-only",
+        "status": "operation-succeeded",
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 5974.2477796076855,
+        "truck_volume": 5974.247779607693,
+        "native_to_truck_max_distance": 6.676124710113433e-15,
+        "native_to_truck_samples": 1593,
+        "truck_to_native_max_distance": 1.4895204919483639e-15,
+        "truck_to_native_samples": 1593
+      }
+    },
+    {
+      "index": 8,
+      "selection": [
+        {
+          "mode": "equal-distance",
+          "distance": 0.03,
+          "curve_type": 0,
+          "points": [
+            [
+              -0.34387806598358284,
+              0.6048300345349313,
+              0.5
+            ],
+            [
+              -0.34756098803950525,
+              -0.2951624299252607,
+              0.5
+            ]
+          ],
+          "native_applied": true,
+          "ignored_reason": null,
+          "contour_edges": [
+            {
+              "curve_type": 0,
+              "points": [
+                [
+                  0.36755971712142954,
+                  0.7019195475561267,
+                  0.5
+                ],
+                [
+                  -0.2434696897040149,
+                  0.7044199836909608,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "curve_type": 1,
+              "points": [
+                [
+                  -0.24346968970401492,
+                  0.704419983690961,
+                  0.5
+                ],
+                [
+                  -0.24627445282278954,
+                  0.704392123567056,
+                  0.5
+                ],
+                [
+                  -0.2490773312495765,
+                  0.7042856112973664,
+                  0.5
+                ],
+                [
+                  -0.25187611982752667,
+                  0.7041005306801258,
+                  0.5
+                ],
+                [
+                  -0.254668616617468,
+                  0.7038370273269979,
+                  0.5
+                ],
+                [
+                  -0.25745262463027535,
+                  0.7034953085485168,
+                  0.5
+                ],
+                [
+                  -0.26022595355534556,
+                  0.7030756431909864,
+                  0.5
+                ],
+                [
+                  -0.2629864214838181,
+                  0.7025783614249658,
+                  0.5
+                ],
+                [
+                  -0.2657318566251861,
+                  0.7020038544855087,
+                  0.5
+                ],
+                [
+                  -0.26846009901594614,
+                  0.7013525743643609,
+                  0.5
+                ],
+                [
+                  -0.2711690022189439,
+                  0.700625033454356,
+                  0.5
+                ],
+                [
+                  -0.27385643501207757,
+                  0.6998218041462927,
+                  0.5
+                ],
+                [
+                  -0.27652028306503085,
+                  0.698943518378607,
+                  0.5
+                ],
+                [
+                  -0.2791584506027166,
+                  0.6979908671401973,
+                  0.5
+                ],
+                [
+                  -0.281768862054122,
+                  0.6969645999267904,
+                  0.5
+                ],
+                [
+                  -0.28434946368525826,
+                  0.6958655241512777,
+                  0.5
+                ],
+                [
+                  -0.2868982252149304,
+                  0.6946945045084852,
+                  0.5
+                ],
+                [
+                  -0.28941314141205504,
+                  0.6934524622948779,
+                  0.5
+                ],
+                [
+                  -0.2918922336732706,
+                  0.6921403746837317,
+                  0.5
+                ],
+                [
+                  -0.29433355157959806,
+                  0.6907592739563452,
+                  0.5
+                ],
+                [
+                  -0.2967351744309275,
+                  0.6893102466898955,
+                  0.5
+                ],
+                [
+                  -0.2990952127571238,
+                  0.6877944329025762,
+                  0.5
+                ],
+                [
+                  -0.30141180980456195,
+                  0.6862130251566918,
+                  0.5
+                ],
+                [
+                  -0.3036831429969228,
+                  0.6845672676204119,
+                  0.5
+                ],
+                [
+                  -0.30590742536910004,
+                  0.6828584550889257,
+                  0.5
+                ],
+                [
+                  -0.30808290697308993,
+                  0.6810879319657659,
+                  0.5
+                ],
+                [
+                  -0.3102078762547582,
+                  0.6792570912051018,
+                  0.5
+                ],
+                [
+                  -0.31228066140040034,
+                  0.6773673732158378,
+                  0.5
+                ],
+                [
+                  -0.3142996316520365,
+                  0.6754202647283749,
+                  0.5
+                ],
+                [
+                  -0.316263198590406,
+                  0.6734172976249295,
+                  0.5
+                ],
+                [
+                  -0.3181698173846515,
+                  0.6713600477343298,
+                  0.5
+                ],
+                [
+                  -0.32001798800771053,
+                  0.6692501335922367,
+                  0.5
+                ],
+                [
+                  -0.32180625641645755,
+                  0.6670892151677654,
+                  0.5
+                ],
+                [
+                  -0.3235332156956686,
+                  0.6648789925575089,
+                  0.5
+                ],
+                [
+                  -0.3251975071649077,
+                  0.662621204647992,
+                  0.5
+                ],
+                [
+                  -0.326797821447465,
+                  0.6603176277476075,
+                  0.5
+                ],
+                [
+                  -0.32833289950050537,
+                  0.6579700741891096,
+                  0.5
+                ],
+                [
+                  -0.3298015336056167,
+                  0.6555803909037669,
+                  0.5
+                ],
+                [
+                  -0.3312025683189793,
+                  0.6531504579682941,
+                  0.5
+                ],
+                [
+                  -0.33253490138040787,
+                  0.6506821871257067,
+                  0.5
+                ],
+                [
+                  -0.33379748458055153,
+                  0.6481775202812626,
+                  0.5
+                ],
+                [
+                  -0.3349893245855701,
+                  0.6456384279746736,
+                  0.5
+                ],
+                [
+                  -0.3361094837186364,
+                  0.6430669078297884,
+                  0.5
+                ],
+                [
+                  -0.337157080697651,
+                  0.6404649829829678,
+                  0.5
+                ],
+                [
+                  -0.3381312913285884,
+                  0.6378347004913881,
+                  0.5
+                ],
+                [
+                  -0.3390313491539294,
+                  0.6351781297225237,
+                  0.5
+                ],
+                [
+                  -0.3398565460556696,
+                  0.6324973607260787,
+                  0.5
+                ],
+                [
+                  -0.34060623281242924,
+                  0.6297945025896458,
+                  0.5
+                ],
+                [
+                  -0.3412798196102261,
+                  0.6270716817793873,
+                  0.5
+                ],
+                [
+                  -0.3418767765065101,
+                  0.6243310404670444,
+                  0.5
+                ],
+                [
+                  -0.3423966338470945,
+                  0.6215747348445883,
+                  0.5
+                ],
+                [
+                  -0.34283898263565454,
+                  0.6188049334278434,
+                  0.5
+                ],
+                [
+                  -0.34320347485550434,
+                  0.6160238153504128,
+                  0.5
+                ],
+                [
+                  -0.3434898237433982,
+                  0.6132335686492509,
+                  0.5
+                ],
+                [
+                  -0.34369780401514066,
+                  0.610436388543232,
+                  0.5
+                ],
+                [
+                  -0.3438272520428282,
+                  0.607634475706067,
+                  0.5
+                ],
+                [
+                  -0.3438780659835831,
+                  0.6048300345349301,
+                  0.5
+                ]
+              ]
+            },
+            {
+              "curve_type": 0,
+              "points": [
+                [
+                  -0.34387806598358284,
+                  0.6048300345349313,
+                  0.5
+                ],
+                [
+                  -0.34756098803950525,
+                  -0.2951624299252607,
+                  0.5
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "mode": "equal-distance",
+          "distance": 0.02,
+          "curve_type": 0,
+          "points": [
+            [
+              0.36755971712142954,
+              0.7019195475561267,
+              0.5
+            ],
+            [
+              -0.2434696897040149,
+              0.7044199836909608,
+              0.5
+            ]
+          ],
+          "native_applied": false,
+          "ignored_reason": "already-selected",
+          "contour_edges": []
+        }
+      ],
+      "result": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 0.5630093646319957,
+        "selected_edges": 3,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 0.5630665232959563,
+        "truck_volume": 0.5630665232913654,
+        "native_to_truck_max_distance": 2.229100205894138e-08,
+        "native_to_truck_samples": 4845,
+        "truck_to_native_max_distance": 1.9109888631014344e-08,
+        "truck_to_native_samples": 4845
+      }
+    }
+  ],
+  "native_input_brep_unchanged": {
+    "box": true,
+    "tangent": true
+  }
+}
