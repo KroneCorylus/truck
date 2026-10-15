@@ -6,6 +6,8 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Replay distance-and-angle chamfers between nonperpendicular planar supports using their oriented corner angle. Preserve reference-face setbacks and reject singular or impossible angle requests; acute/obtuse wedge regressions verify material, bevel normals, rigid motion, closed meshes and STEP.
+
 - Capture and replay native chamfer commands with physical edge selections and reference-plane identity. Equal distances and planar two-distance requests reach the existing kernel APIs; distance-and-angle replay is supported for perpendicular planar faces. Preserve native Tcl scope/error behavior and explicitly reject ambiguous, invalid or unsupported requests.
 
 - Preserve linear STEP parameter curves on spheres through an exact longitude/latitude coordinate map, including inverted and affine support placements. Correct spherical mixed derivative order and sign. Regressions cover points, derivatives, cutting, invalid geometry, and the hemisphere/box F1 input and fillet with independent material, radius, normals, face history, closed meshes and STEP.

@@ -279,8 +279,11 @@ fn chamfer_selection(input: &Solid, selection: &[Value]) -> Result<Vec<(Edge, [f
                     .collect();
                 let planes: Option<Vec<_>> = adjacent
                     .iter()
-                    .map(|f| match f.surface().elementary() {
-                        Some((Elementary::Plane(p), _)) => Some(p),
+                    .map(|f| match f.oriented_surface().elementary() {
+                        Some((Elementary::Plane(p), forward)) => {
+                            let normal = p.normal() * if forward { 1. } else { -1. };
+                            Some((p, normal))
+                        }
                         _ => None,
                     })
                     .collect();
@@ -290,7 +293,7 @@ fn chamfer_selection(input: &Solid, selection: &[Value]) -> Result<Vec<(Edge, [f
                 let sides: Vec<_> = planes
                     .iter()
                     .enumerate()
-                    .filter(|(_, p)| {
+                    .filter(|(_, (p, _))| {
                         Plane::normal(p).cross(normal).magnitude() < 1e-8
                             && (p.origin() - origin).dot(normal).abs() < TOL / 10.
                     })
@@ -301,12 +304,21 @@ fn chamfer_selection(input: &Solid, selection: &[Value]) -> Result<Vec<(Edge, [f
                         json!({"status":"selection-unmatched","error":"Reference plane does not uniquely match an adjacent face"}),
                     );
                 };
-                if mode == "distance-angle"
-                    && planes[0].normal().dot(planes[1].normal()).abs() > 1e-8
-                {
-                    return Err(unsupported(
-                        "Distance-angle replay currently requires perpendicular planar supports",
-                    ));
+                if mode == "distance-angle" {
+                    let cos_beta = -planes[0].1.dot(planes[1].1);
+                    let sin_beta = planes[0].1.cross(planes[1].1).magnitude();
+                    let tangent = requested[1] / requested[0];
+                    // Sine rule in the corner section: d1 = d0 sin(alpha) / sin(beta + alpha).
+                    let denominator = sin_beta + cos_beta * tangent;
+                    if sin_beta <= 1e-12 || denominator <= 1e-12 {
+                        return Err(invalid(
+                            "Chamfer angle has no finite positive setback on these supports",
+                        ));
+                    }
+                    distances[1] = requested[1] / denominator;
+                    if !distances[1].is_finite() || distances[1] <= 0. {
+                        return Err(invalid("Invalid derived chamfer distance"));
+                    }
                 }
                 if *side == 1 {
                     distances.swap(0, 1);
@@ -747,6 +759,144 @@ mod chamfer_replay_tests {
             2. * (std::f64::consts::PI / 6.).tan(),
         );
     }
+    fn check_wedge_angle(acute: bool) {
+        let directory = std::env::temp_dir().join(format!(
+            "truck-chamfer-wedge-{}-{acute}",
+            std::process::id()
+        ));
+        std::fs::create_dir_all(&directory).unwrap();
+        let prefix = directory.join("001");
+        let prefix = prefix.to_str().unwrap();
+        std::fs::write(
+            format!("{prefix}.input.step"),
+            unequal_fixture::case("B5").step,
+        )
+        .unwrap();
+        let base = import(&format!("{prefix}.input.step")).unwrap();
+        let (corner, rays, angle): (Point3, [Vector3; 2], f64) = if acute {
+            (
+                Point3::new(5., 1., 0.),
+                [-Vector3::unit_x(), Vector3::new(-4., -1., 0.).normalize()],
+                30.,
+            )
+        } else {
+            (
+                Point3::new(1., 0., 0.),
+                [Vector3::new(4., 1., 0.).normalize(), -Vector3::unit_x()],
+                5.,
+            )
+        };
+        let beta = rays[0].dot(rays[1]).acos();
+        let alpha = angle.to_radians();
+        let d = 0.1;
+        let other = d * alpha.sin() / (beta + alpha).sin();
+        let volume = 15. - 2.5 * d * other * beta.sin();
+        for transform in [
+            Matrix4::identity(),
+            Matrix4::from_translation(Vector3::new(12., -9., 7.))
+                * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.73)),
+        ] {
+            let input = builder::transformed(&base, transform);
+            let prepared = prepare_for_step(&input.compress(), TOL / 20.).unwrap();
+            let step = StepDisplay::new(
+                Default::default(),
+                StepDesign::from_model(StepModel::from(&prepared)),
+            )
+            .to_string();
+            std::fs::write(format!("{prefix}.input.step"), &step).unwrap();
+            for side in 0..2 {
+                for sign in [-1., 1.] {
+                    let point = transform.transform_point(corner);
+                    let end = transform.transform_point(corner + 5. * Vector3::unit_z());
+                    let normal =
+                        transform.transform_vector(rays[side].cross(Vector3::unit_z()) * sign);
+                    let chosen = json!({"mode":"distance-angle", "distance":d, "angle_degrees":angle,
+                        "reference_plane":{"origin":[point.x,point.y,point.z], "normal":[normal.x,normal.y,normal.z]},
+                        "points":[[point.x,point.y,point.z],[end.x,end.y,end.z]]});
+                    std::fs::write(
+                        format!("{prefix}.input.json"),
+                        json!({"operation":"chamfer", "selection":[chosen]}).to_string(),
+                    )
+                    .unwrap();
+                    let result = replay(prefix, &Cell::new("start")).unwrap();
+                    assert_eq!(result["status"], "operation-succeeded", "{result}");
+                    for field in [
+                        "input_unchanged",
+                        "geometry_consistent",
+                        "mesh_closed",
+                        "step_prepared",
+                    ] {
+                        assert_eq!(result[field], true, "{field}: {result}");
+                    }
+                    assert!((result["mesh_volume"].as_f64().unwrap() - volume).abs() < 1e-6);
+                    let output = import(&format!("{prefix}.truck.step")).unwrap();
+                    replay_common::assert_solid(&output, volume, &[0], TOL);
+                    replay_common::blend::assert_step(&output, volume, TOL);
+                    let a = transform
+                        .transform_point(corner + d * rays[side] + 2.5 * Vector3::unit_z());
+                    let b = transform
+                        .transform_point(corner + other * rays[1 - side] + 2.5 * Vector3::unit_z());
+                    let mut expected = (b - a)
+                        .cross(transform.transform_vector(Vector3::unit_z()))
+                        .normalize();
+                    if expected.dot(point + 2.5 * transform.transform_vector(Vector3::unit_z()) - a)
+                        < 0.
+                    {
+                        expected = -expected;
+                    }
+                    assert!(output.face_iter().any(|f| {
+                        let surface = f.oriented_surface();
+                        surface
+                            .search_parameter(a, None, 20)
+                            .zip(surface.search_parameter(b, None, 20))
+                            .is_some_and(|((u, v), _)| {
+                                surface.normal(u, v).dot(expected) > 1. - 1e-6
+                            })
+                    }));
+                    assert_eq!(
+                        std::fs::read_to_string(format!("{prefix}.input.step")).unwrap(),
+                        step
+                    );
+                }
+            }
+        }
+        std::fs::remove_dir_all(directory).unwrap();
+    }
+
+    #[test]
+    fn acute_distance_angle_chamfers_preserve_the_angle() { check_wedge_angle(true); }
+
+    #[test]
+    fn obtuse_distance_angle_chamfers_preserve_the_angle() { check_wedge_angle(false); }
+
+    #[test]
+    fn impossible_distance_angle_chamfers_do_not_construct() {
+        let directory =
+            std::env::temp_dir().join(format!("truck-chamfer-impossible-{}", std::process::id()));
+        std::fs::create_dir_all(&directory).unwrap();
+        let prefix = directory.join("001");
+        let prefix = prefix.to_str().unwrap();
+        std::fs::write(
+            format!("{prefix}.input.step"),
+            unequal_fixture::case("B5").step,
+        )
+        .unwrap();
+        for angle in [0.25_f64.atan().to_degrees(), 30.] {
+            let chosen = json!({"mode":"distance-angle", "distance":0.1, "angle_degrees":angle,
+                "reference_plane":{"origin":[0.,0.,0.], "normal":[0.,-1.,0.]},
+                "points":[[1.,0.,0.],[1.,0.,5.]]});
+            std::fs::write(
+                format!("{prefix}.input.json"),
+                json!({"operation":"chamfer", "selection":[chosen]}).to_string(),
+            )
+            .unwrap();
+            let result = replay(prefix, &Cell::new("start")).unwrap();
+            assert_eq!(result["status"], "harness-error", "{result}");
+            assert!(!Path::new(&format!("{prefix}.truck.step")).exists());
+        }
+        std::fs::remove_dir_all(directory).unwrap();
+    }
+
     #[test]
     fn invalid_ambiguous_and_unsupported_chamfer_intents_do_not_construct() {
         let directory =
@@ -789,19 +939,6 @@ mod chamfer_replay_tests {
             assert_eq!(result["status"], status, "{result}");
             assert!(!Path::new(&format!("{prefix}.truck.step")).exists());
         }
-        let case = unequal_fixture::case("B5");
-        std::fs::write(format!("{prefix}.input.step"), case.step).unwrap();
-        let (a, b, _) = case.edges[0];
-        let selection = json!({"mode":"distance-angle","distance":0.1,"angle_degrees":30.,
-            "reference_plane":{"origin":[0.,1.,0.],"normal":[0.,1.,0.]},
-            "points":[[a.x,a.y,a.z],[b.x,b.y,b.z]]});
-        let result = chamfer_selection(
-            &import(&format!("{prefix}.input.step")).unwrap(),
-            &[selection],
-        )
-        .unwrap_err();
-        assert_eq!(result["status"], "unhandled-intent");
-        assert!(result["reason"].as_str().unwrap().contains("perpendicular"));
         std::fs::remove_dir_all(directory).unwrap();
     }
 }

@@ -60,9 +60,9 @@ cargo test -p truck-shapeops --example replay_occt_blend
 python3 -m unittest discover -s audits/fillet-chamfer/capture -p 'test_*.py'
 ```
 
-Twelve Rust tests cover physical selection, per-edge fillet radii, equal and
-unequal chamfer distances, reference-plane identity, perpendicular distance/angle
-conversion, duplicate assignments and rejected unsupported/invalid intent. Five
+Fifteen Rust tests cover physical selection, per-edge fillet radii, equal and
+unequal chamfer distances, reference-plane identity, planar distance/angle
+conversion on acute, right and obtuse corners, impossible-angle rejection, duplicate assignments and rejected unsupported/invalid intent. Five
 Python/Tcl tests cover command selection, native caller scope, interleaved command
 numbering and preservation of success/error behavior.
 
@@ -70,8 +70,8 @@ Chamfer captures retain the native mode and every requested distance/angle.
 Face-dependent modes also record an analytic reference plane when available.
 Replay maps that plane to exactly one adjacent face, independently of face order
 and plane normal sign. Two-distance replay requires two planar supports;
-distance/angle replay additionally requires perpendicular supports and converts
-`d1 = d0 * tan(angle)`. Equal-distance requests use the existing solid/wire chamfer
+distance/angle replay uses the oriented angle between planar supports and converts
+`d1 = d0 * sin(angle) / sin(beta + angle)` (corner angle `beta`). Equal-distance requests use the existing solid/wire chamfer
 routes. Unsupported face geometry is reported as unhandled intent. Missing native
 data remains missing: the dedicated chamfer fixtures are not replaced by synthetic
 probes or counted as passing when only dimension-defined controls are available.

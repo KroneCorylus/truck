@@ -1,0 +1,460 @@
+{
+  "parent": "6b85a39fa015ca7cb900fc1a7dc297817c8043be",
+  "source_sha256": {
+    "CHANGELOG.md": "1f94ade6de0b67c40273a36e3bac3216959e03b5d0cf0ec2b629040953f7a592",
+    "truck-shapeops/examples/replay_occt_blend.rs": "d420e935bbeb4aa138bccdc6e1196dd8712bf834359e181e5fee10c45314feca",
+    "audits/fillet-chamfer/capture/README.md": "2283f242721ebf61d3909989db9cd600aa6f94efa1988c9047d799e186192769",
+    "truck-benchmarks/results/2026-10-15-chamfer-angle/probes.tcl": "6c726ff3641a5fd84580e1601f90a24f6c16bc19346954089541649373aa01f9"
+  },
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "truck-shapeops",
+        "--example",
+        "replay_occt_blend"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--release",
+        "-p",
+        "truck-shapeops",
+        "-p",
+        "truck-benchmarks",
+        "--all-targets"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "bench",
+        "-p",
+        "truck-benchmarks",
+        "--bench",
+        "actions",
+        "--",
+        "--test"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--release",
+        "-p",
+        "truck-shapeops",
+        "--example",
+        "replay_occt_blend"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "audits/fillet-chamfer/capture",
+        "-p",
+        "test_*.py"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "executable_sha256": {
+    "target/release/examples/replay_occt_blend": "9831adaf1c5ba3896eae466950b549fa928fa3a5e2e49920d82511906b4689a5",
+    "target/occt-chamfer-capture-plugin/libTKBlendAudit.so": "42b26a30142a3452f8a92cbbc68037b2f9802e332e306d58f89a91b570730420",
+    "target/occt-chamfer-capture-plugin/compare_shapes": "476c2efb758a6c3f7b075f2fcbdddc1ccf07b54baca5dac934abe6420616bcf3"
+  },
+  "documentation_note": "README test count corrected after validation; executable sources unchanged.",
+  "native_probe_note": "Native ordinals after rigid motion verified with inverse-transformed endpoint and plane coordinates; corrected probe-only selection. No replay source changes.",
+  "probe_checks": [
+    {
+      "prefix": "001",
+      "expected_volume": 14.995638559245325,
+      "absolute_volume_error": 9.944045586962602e-12,
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 14.995638559245311,
+        "truck_volume": 14.99563855925527,
+        "native_to_truck_max_distance": 1.4138683375057706e-12,
+        "native_to_truck_samples": 1499,
+        "truck_to_native_max_distance": 1.4187084562740933e-12,
+        "truck_to_native_samples": 1499
+      },
+      "result": {
+        "comparison": "unverified",
+        "result": {
+          "geometry_consistent": true,
+          "input_unchanged": true,
+          "mesh_closed": true,
+          "mesh_volume": 14.995638559255275,
+          "selected_edges": 1,
+          "status": "operation-succeeded",
+          "step_prepared": true
+        },
+        "schema_version": 1,
+        "stage": "output-consistency",
+        "tolerance": 0.001
+      }
+    },
+    {
+      "prefix": "002",
+      "expected_volume": 14.995638559245325,
+      "absolute_volume_error": 9.803713396649982e-12,
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 14.995638559245304,
+        "truck_volume": 14.995638559255132,
+        "native_to_truck_max_distance": 1.9919151597385612e-12,
+        "native_to_truck_samples": 1501,
+        "truck_to_native_max_distance": 1.9897378299135533e-12,
+        "truck_to_native_samples": 1501
+      },
+      "result": {
+        "comparison": "unverified",
+        "result": {
+          "geometry_consistent": true,
+          "input_unchanged": true,
+          "mesh_closed": true,
+          "mesh_volume": 14.995638559255134,
+          "selected_edges": 1,
+          "status": "operation-succeeded",
+          "step_prepared": true
+        },
+        "schema_version": 1,
+        "stage": "output-consistency",
+        "tolerance": 0.001
+      }
+    },
+    {
+      "prefix": "003",
+      "expected_volume": 14.996635286135104,
+      "absolute_volume_error": 8.348877145181177e-13,
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 14.996635286135103,
+        "truck_volume": 14.996635286135941,
+        "native_to_truck_max_distance": 9.01403693274131e-13,
+        "native_to_truck_samples": 1499,
+        "truck_to_native_max_distance": 1.0000652427415094e-12,
+        "truck_to_native_samples": 1499
+      },
+      "result": {
+        "comparison": "unverified",
+        "result": {
+          "geometry_consistent": true,
+          "input_unchanged": true,
+          "mesh_closed": true,
+          "mesh_volume": 14.996635286135243,
+          "selected_edges": 1,
+          "status": "operation-succeeded",
+          "step_prepared": true
+        },
+        "schema_version": 1,
+        "stage": "output-consistency",
+        "tolerance": 0.001
+      }
+    },
+    {
+      "prefix": "004",
+      "expected_volume": 14.996635286135104,
+      "absolute_volume_error": 9.041656312547275e-13,
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 14.996635286135103,
+        "truck_volume": 14.996635286136009,
+        "native_to_truck_max_distance": 9.023731290492498e-13,
+        "native_to_truck_samples": 1499,
+        "truck_to_native_max_distance": 1.0000652427415094e-12,
+        "truck_to_native_samples": 1499
+      },
+      "result": {
+        "comparison": "unverified",
+        "result": {
+          "geometry_consistent": true,
+          "input_unchanged": true,
+          "mesh_closed": true,
+          "mesh_volume": 14.996635286135351,
+          "selected_edges": 1,
+          "status": "operation-succeeded",
+          "step_prepared": true
+        },
+        "schema_version": 1,
+        "stage": "output-consistency",
+        "tolerance": 0.001
+      }
+    },
+    {
+      "prefix": "005",
+      "expected_volume": 14.995638559245325,
+      "absolute_volume_error": 1.6683543435647152e-11,
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 14.99563855924547,
+        "truck_volume": 14.99563855926102,
+        "native_to_truck_max_distance": 2.785367174719678e-12,
+        "native_to_truck_samples": 1499,
+        "truck_to_native_max_distance": 3.049789107089116e-12,
+        "truck_to_native_samples": 1499
+      },
+      "result": {
+        "comparison": "unverified",
+        "result": {
+          "geometry_consistent": true,
+          "input_unchanged": true,
+          "mesh_closed": true,
+          "mesh_volume": 14.99563855925384,
+          "selected_edges": 1,
+          "status": "operation-succeeded",
+          "step_prepared": true
+        },
+        "schema_version": 1,
+        "stage": "output-consistency",
+        "tolerance": 0.001
+      }
+    },
+    {
+      "prefix": "006",
+      "expected_volume": 14.995638559245325,
+      "absolute_volume_error": 1.547029171433678e-11,
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 14.995638559245439,
+        "truck_volume": 14.995638559259598,
+        "native_to_truck_max_distance": 3.980670319941733e-12,
+        "native_to_truck_samples": 1501,
+        "truck_to_native_max_distance": 4.0023726234485666e-12,
+        "truck_to_native_samples": 1501
+      },
+      "result": {
+        "comparison": "unverified",
+        "result": {
+          "geometry_consistent": true,
+          "input_unchanged": true,
+          "mesh_closed": true,
+          "mesh_volume": 14.99563855925368,
+          "selected_edges": 1,
+          "status": "operation-succeeded",
+          "step_prepared": true
+        },
+        "schema_version": 1,
+        "stage": "output-consistency",
+        "tolerance": 0.001
+      }
+    },
+    {
+      "prefix": "007",
+      "expected_volume": 14.996635286135104,
+      "absolute_volume_error": 5.867306640539027e-12,
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 14.99663528613511,
+        "truck_volume": 14.99663528612802,
+        "native_to_truck_max_distance": 1.1690547830822714e-11,
+        "native_to_truck_samples": 1499,
+        "truck_to_native_max_distance": 1.1678332019420235e-11,
+        "truck_to_native_samples": 1499
+      },
+      "result": {
+        "comparison": "unverified",
+        "result": {
+          "geometry_consistent": true,
+          "input_unchanged": true,
+          "mesh_closed": true,
+          "mesh_volume": 14.996635286132218,
+          "selected_edges": 1,
+          "status": "operation-succeeded",
+          "step_prepared": true
+        },
+        "schema_version": 1,
+        "stage": "output-consistency",
+        "tolerance": 0.001
+      }
+    },
+    {
+      "prefix": "008",
+      "expected_volume": 14.996635286135104,
+      "absolute_volume_error": 2.5277557824665564e-12,
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 14.996635286135108,
+        "truck_volume": 14.996635286131356,
+        "native_to_truck_max_distance": 8.708025364157339e-12,
+        "native_to_truck_samples": 1499,
+        "truck_to_native_max_distance": 8.790654813575082e-12,
+        "truck_to_native_samples": 1499
+      },
+      "result": {
+        "comparison": "unverified",
+        "result": {
+          "geometry_consistent": true,
+          "input_unchanged": true,
+          "mesh_closed": true,
+          "mesh_volume": 14.996635286132687,
+          "selected_edges": 1,
+          "status": "operation-succeeded",
+          "step_prepared": true
+        },
+        "schema_version": 1,
+        "stage": "output-consistency",
+        "tolerance": 0.001
+      }
+    }
+  ],
+  "performance_claim": "None; benchmark smoke only",
+  "validation_scope": "Replay tooling only; 15 release replay tests, all-target shapeops/benchmark Clippy, action smoke and five wrapper tests. Previous unchanged kernel baseline: 493 passes, 0 failures, 1 existing ignore.",
+  "artifact_sha256": {
+    "probes/capture/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "probes/capture/001.comparison.json": "9a03e57cfaa24071e53e659603f3bd38d68658df8fd3e21f5bf583839a706528",
+    "probes/capture/001.independent.txt": "a1a1c255809ea90fafc1f9b2a18dd6c982a28585793ca2b3fb3bcd76dc302444",
+    "probes/capture/001.input.brep": "ea9323c9d23edc4571e6df29b2198cfd862a4743f5c27035ebc80f972ff408f9",
+    "probes/capture/001.input.json": "1d9e56e1a3249e178e7a2d2c1c5b6acaa785dd4a7b2ac5453b80518aa4991532",
+    "probes/capture/001.input.step": "ebe1da093cb6ace5a1e3626f37c609c872dcc254358637449b2c3e58a67abb73",
+    "probes/capture/001.result.brep": "2176c5e317e8c1cf9e0c61bc05afbaf7eae836c3197aa549c0828334a7f6f461",
+    "probes/capture/001.result.json": "2f6af3e238f829946a609e7a78f2b71c6ec48d8266258e85682d7b0d4c565f86",
+    "probes/capture/001.result.step": "18a764e742cdf005f6fc0bf64ec1a912b0c808961117f746a3153dba35a3048e",
+    "probes/capture/001.truck.json": "fa10822f6e4ec044b14d34447e6c099efb14fe2ded1518c9950d1b9fc504566d",
+    "probes/capture/001.truck.log": "b84cd8f244ebf3eb889286824b8f433fcde52643d9d5b6a65430ae70413ae954",
+    "probes/capture/001.truck.step": "fe387cf825ed360008e7be606fab55db5f5d089b630628047f1b3909adcafec2",
+    "probes/capture/002.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "probes/capture/002.comparison.json": "775aa9458955513176d312777c45e4062961dfbd11f156d492217b24af3271ca",
+    "probes/capture/002.independent.txt": "dbcafdae25ee2455be5ea0b33cbd6581e351b75ceddd5915847d899e83719eac",
+    "probes/capture/002.input.brep": "ea9323c9d23edc4571e6df29b2198cfd862a4743f5c27035ebc80f972ff408f9",
+    "probes/capture/002.input.json": "79db45ee3a6ca41aa057cc40be93e3351dbf60c5d2309b1b1965bce9f8bafe81",
+    "probes/capture/002.input.step": "1190e656c8ed191500a3b55e437eb8416380790a3e897f5da5cf5c4a1fdf989b",
+    "probes/capture/002.result.brep": "65ad78e91219d6a8c9161b5420bba9cb5b7e6678a5371bd59f14f01d407156a3",
+    "probes/capture/002.result.json": "848921ff2bff7813f87bcbd2552a9090ce0f96a0e16414e53ae6ef229bacffef",
+    "probes/capture/002.result.step": "22eae0a47a99da50e5e98903e34d4a831a4c992dc1a92f8a01d85777256747e6",
+    "probes/capture/002.truck.json": "22a2008327b0e8e23df4df623d066527c5b4f0ca5be905862bc360fc730c50d9",
+    "probes/capture/002.truck.log": "cb5dfd349b56903045ae711556dcc9b85c2b6634409e24364502cf68a72e5254",
+    "probes/capture/002.truck.step": "3dcc81b78f221a87e6700a32c5a3d968611b5329d5d5faa2282e2a3afcc0dc63",
+    "probes/capture/003.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "probes/capture/003.comparison.json": "1613d18ab0f431b7f855209d36e61c99e84e4bffa9173f5bafc401c89f5dc472",
+    "probes/capture/003.independent.txt": "0cc6f78b326ae13df9e5db2c4b95879c6fa0bb842bc8942d1526a49d45290eb6",
+    "probes/capture/003.input.brep": "ea9323c9d23edc4571e6df29b2198cfd862a4743f5c27035ebc80f972ff408f9",
+    "probes/capture/003.input.json": "a6390a0efcdbfe54e596c5521279e9ccdc117b6c78a52e77e3039bdbdc300098",
+    "probes/capture/003.input.step": "0a04e9145c70f8b811afc8033f4018a93c21dea69b363c294720a03aa6aee34f",
+    "probes/capture/003.result.brep": "d86bad1a4de4375d596db669f3d58c7c5f15da9c29b400dfed6cdbce7a589639",
+    "probes/capture/003.result.json": "246154515af190dc705c8d01ae5df1bfb1d1ed9fa95c9ddf04e49f44a289dae6",
+    "probes/capture/003.result.step": "15259dcbb0563b626851a902e370223b500b353bdaafd7d67ab0e10338aa6c4c",
+    "probes/capture/003.truck.json": "6eb3edf5ed89c288d89c30349851d3b68cc165507cbfa9c604b0081f11e65ea2",
+    "probes/capture/003.truck.log": "ce8e63876acdb13e607f150ce31ff637f658361aea1fbd51109f2a4a111b2fb9",
+    "probes/capture/003.truck.step": "20bbf74fa817ddf56ef7c7a33a6b9e69a2d7b37aa6126de6480727115aefb74f",
+    "probes/capture/004.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "probes/capture/004.comparison.json": "0a6f61e1926fe7873cba6e7a5543534718878a7c962cd4d4435c5ed889bedd7b",
+    "probes/capture/004.independent.txt": "8b56343a9361bf6462d5cd9733245b2f836c5b1942fd21288c52364d25e11d63",
+    "probes/capture/004.input.brep": "ea9323c9d23edc4571e6df29b2198cfd862a4743f5c27035ebc80f972ff408f9",
+    "probes/capture/004.input.json": "e585c5b647b25341f284039cf39e1cf19583ff16f6892e45c0580fe547cf7416",
+    "probes/capture/004.input.step": "e9f8bed22d95dd72ce88a407744cf8379a5ac599773965b58b3a5f8e2a6ead1b",
+    "probes/capture/004.result.brep": "6d38be8cd77431a1d5a96b07dcbefadc5b86b612c35913a495908aabae9fab0c",
+    "probes/capture/004.result.json": "eada972ad2af56f8afa0e3269a4b0abe9ae362069b46ecdcf85ef5ec547eac8e",
+    "probes/capture/004.result.step": "6ddf0bf84d73b4bb6cbd0bc0be4b57897d296932a4838ed78b70bf03cfee276e",
+    "probes/capture/004.truck.json": "40996341146da3cc2b15490a81af912b071cca910b8d8b6ca8b449aeb11a4809",
+    "probes/capture/004.truck.log": "9e1c423d769506d281a8176b7b2f991ea8f2b19c1680c4d994abedc263a56097",
+    "probes/capture/004.truck.step": "0083c4ab1cff3aa570e848b1d36cf9637251aa4cd5eb0d4a06a199952408dcbb",
+    "probes/capture/005.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "probes/capture/005.comparison.json": "17db0c663bf021c5d36b08a942689ab7f2f81da5c73acbffdcff717c3aa8a9e0",
+    "probes/capture/005.independent.txt": "2c9d73f34cb25ffff7b6156a88c6eaa38e93551ad30852be0dd1786e22e16f4f",
+    "probes/capture/005.input.brep": "bcf16b08b6ba00bff0d26fce50c9a365f645b6431b87d9230b63e193aaefbe12",
+    "probes/capture/005.input.json": "8a5db21c06c8e99f667cc45ba9058c4b78abe44056da6d338615551b13e55791",
+    "probes/capture/005.input.step": "e0162e6ed66bbedf7dd6bed6d2f9d48d7176be0a12e5279291a191680cc7449b",
+    "probes/capture/005.result.brep": "773ca105bc64ba1726b93ebe31eb0d1e094cc16c8927fd5229893220bcaed4f7",
+    "probes/capture/005.result.json": "2b00022a46f2cd3f8a3d8d85b8a4b062c80a2f9c0dffa5c349186568e062fd06",
+    "probes/capture/005.result.step": "6f21a0d5c569aa4457fbc1e2c81de33c5a05650525b28fbed1c9d14f1b34607f",
+    "probes/capture/005.truck.json": "03c3263e5b10b19b04aa70c50146d6c74677e058962170282f87623c70525185",
+    "probes/capture/005.truck.log": "317df65699b7c40113899dbb3d27fa9d06f246eb5a0eab80cd4c6d5b25077fae",
+    "probes/capture/005.truck.step": "9c357000aa8c3b2fab43f33d0ce98d3e2f5f74e8d545138462573be1d922d8fb",
+    "probes/capture/006.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "probes/capture/006.comparison.json": "c12fc2c1be9a8fd5c2a751cfb03d8bad8b341643e8be53e3b1fb1d7182e94787",
+    "probes/capture/006.independent.txt": "09199cea4a73f2e2dd2ea7547ce59dd1279807d31ed8ffc0e63f5888fac757d2",
+    "probes/capture/006.input.brep": "bcf16b08b6ba00bff0d26fce50c9a365f645b6431b87d9230b63e193aaefbe12",
+    "probes/capture/006.input.json": "cca2be62faeabe1f36eaf383218e899db7901685b03abac4a3f6603b18cf123f",
+    "probes/capture/006.input.step": "9191f6de93ba36ef3e5062dc29280da8a5f62ad3f4b3b838cae882fe96dda5b4",
+    "probes/capture/006.result.brep": "84080071c36b4fbdf5e74d562418f70ed2252a74393cf0bacc4a197efdc581f6",
+    "probes/capture/006.result.json": "6e96a1ab71bd55ed7ea0529bad9496855e1877748f01ed2d1a25f48bda017b49",
+    "probes/capture/006.result.step": "a480def3a01ad1bfd5af52e414b170368ce2d144dd0d8327ab7a85c21989313f",
+    "probes/capture/006.truck.json": "66273a3711ed1c732c7f9f94f68d61dd9115777aab8b7d4876efdc8a0d9db985",
+    "probes/capture/006.truck.log": "0a736daab6b75c7f1fae0d6cb4109344a8378259449089b13b41b0ea07743197",
+    "probes/capture/006.truck.step": "bca8c24682934023b077c94014cbdc61bc5e8895913063a3fefcb0737db66489",
+    "probes/capture/007.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "probes/capture/007.comparison.json": "e5e8b148d1637bc2fde0fe2e144a47fac2a1e4e7c2140986fac5f4b877786dc1",
+    "probes/capture/007.independent.txt": "e8acb0689605e6fd138dd9c0c9a7eb5fbf6c626bfa81f7b6481ea1430ea1dd38",
+    "probes/capture/007.input.brep": "bcf16b08b6ba00bff0d26fce50c9a365f645b6431b87d9230b63e193aaefbe12",
+    "probes/capture/007.input.json": "7387eb627044cf86cfa5409206f6383a3b17074913d1efa105273833d27bdfa7",
+    "probes/capture/007.input.step": "5b61545e76f8c66bbda96544bbc94162afd74733413ba5f1c064578ab02dd56b",
+    "probes/capture/007.result.brep": "192fb189bc8174a4402862e86676fcc4e1097109ace86897a4c459dd45119b4d",
+    "probes/capture/007.result.json": "bcdeb22ef442be6873785980a6f38c01b4a543b48b24269fa071257f14b23b0b",
+    "probes/capture/007.result.step": "45cebe361b1b2f2cf11bf096ba5d6486c2574de6a634797460e72c674926ff8a",
+    "probes/capture/007.truck.json": "69e4fdb075b81d531c80958465e51063845b94faa5742598f433cb2da6783c13",
+    "probes/capture/007.truck.log": "ada8cb4e8ea28f3a061a7f92e8f03be4250c522a5957df3491897d3a14f8d16b",
+    "probes/capture/007.truck.step": "aeee666a83eca0ef52216767610b697219e6c6a5a96f2e715a7d2d9a383a554f",
+    "probes/capture/008.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "probes/capture/008.comparison.json": "1a6342586e93c4a682f97ffe741d310703513d4812a9d363563c0bac7fc915db",
+    "probes/capture/008.independent.txt": "675e75294671f8116acf764ccc30072d051382e7d691818bd480a53697d74126",
+    "probes/capture/008.input.brep": "bcf16b08b6ba00bff0d26fce50c9a365f645b6431b87d9230b63e193aaefbe12",
+    "probes/capture/008.input.json": "529110797ff6631d103ea4b295627e0fb4ed05681ffcde0f3c410fed457eae0a",
+    "probes/capture/008.input.step": "4535b2e99911a9f7467c660b0eb9948a59a76cff292958da9b801b4a9072860a",
+    "probes/capture/008.result.brep": "9d23172e93023402946c7455a7ee0c35092437cb7804cf1e80a7ad1721ddd115",
+    "probes/capture/008.result.json": "72bf51df380bcf64eef79962ec41aa91692151862be86669f4a2e731f219d37e",
+    "probes/capture/008.result.step": "30f6a5d510806030d5c5e043b3701ada906f9354a13c63c1c8bc94b8a4375a33",
+    "probes/capture/008.truck.json": "21e2cdf2fcb982253de96e892582a7425e4c4e1313572d793acd8973fa634d4d",
+    "probes/capture/008.truck.log": "1b5f07d686568cdeaf433a3cb2b94b65888c8d7cb5feae475565bca1ae83c1cd",
+    "probes/capture/008.truck.step": "b11943008865742fcf1fb8cc6d199ff6dc62f895c4c6b0ae73f2efdc43a3bdcc",
+    "probes/display.log": "e83157a91a2ac449775b8fa3fbfb05b8035f37d2bd48502b2a579cde70c2e41b",
+    "probes/expected-volumes.json": "12cda6057a5f5b299aefb5d5a986f466e061954d80f0083e8d4ed39c83192cd6",
+    "probes/native.log": "35e43d152488fa31dde4faa1a010cff533e464f9feb077b4cabb69f66d0f38fc",
+    "probes/run.tcl": "8ccc63b436edbbc203fa9be7d05d4f1f9bea7d61f446246ab76993459188a297"
+  },
+  "archive_sha256": "8a904bb5a1ed977f1f6d9427e1d530e999667d130494eb8a044581a440708a66"
+}
