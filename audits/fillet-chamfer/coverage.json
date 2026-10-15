@@ -3423,6 +3423,12 @@
           "path": "truck-benchmarks/results/2026-10-15-chamfer-angle/REPORT.md",
           "find": "# Planar distance-and-angle",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-15-native-rejections/REPORT.md",
+          "find": "# Confirmed native rejection",
+          "role": "test"
         }
       ],
       "required_outcome": "Deliver blend results usable for closed meshing, STEP interchange and further modeling while preserving dimensions and validity.",
@@ -3462,7 +3468,8 @@
         "The clean 35c6e2cf full capture has 104 valid constructions and 95 limited comparison passes. All 101 preceding successful result/comparison records are exactly unchanged. Three formerly unhandled unequal-radius captures now construct; five are attempted unsupported-topology failures. Full parity remains unverified.",
         "The clean dbb54343 full capture has 105 valid constructions and 96 limited comparison passes. The F1 spherical pcurve import is recovered; 104 preceding successful result/comparison records are exactly unchanged. Two remaining import failures are closed-shell inputs with no native solid entity. Full parity remains unverified.",
         "The clean 99c956da full capture adds one real chamfer case:157 native entries,162 captures,106 valid constructions,97 limited comparison passes. All105 preceding successful result/comparison records are exactly unchanged. Seven synthetic chamfer controls and one fillet control are separate proof, not corpus recovery.279 dedicated chamfer fixtures remain missing-data skips.",
-        "At 56f1c0ee, planar distance/angle replay covers acute and obtuse corners using oriented support normals and the sine rule. Eight native controls validate both reference faces and rigid motion; 15 replay tests pass. The full clean capture preserves all 106 previous successful records exactly, with 97 limited comparison passes. Missing chamfer fixtures and curved-support scope remain open."
+        "At 56f1c0ee, planar distance/angle replay covers acute and obtuse corners using oriented support normals and the sine rule. Eight native controls validate both reference faces and rigid motion; 15 replay tests pass. The full clean capture preserves all 106 previous successful records exactly, with 97 limited comparison passes. Missing chamfer fixtures and curved-support scope remain open.",
+        "At 5412b627, confirmed native rejections replay without shape comparison. Full clean capture: 106 unchanged constructions, 97 limited passes, 54 operation-failed records (53 prior plus native-rejected bug119), two imports, zero incomplete/panic/timeout records. No recovered construction or parity claim."
       ]
     },
     {

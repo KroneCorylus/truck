@@ -1,0 +1,46 @@
+NATIVE REJECTIONS — 2026-10-15
+
+Implementation/proof 5412b62723e49cf50b8133daae26fdae5cefdf7b; documentation follows.
+User says continue and commit achievements; do not stop until done or instructed.
+No push/PR/consumer changes. Full capture clean and frozen.
+
+Runner replays complete input after explicit native rejection (successful input
+export marker, return code1). Native failure retained separately; no native shape
+comparison. Missing/corrupt inputs or logs remain incomplete. Two parent failures;
+eight capture plus19 audit tests pass. Rust/native plugin unchanged.
+
+Full capture157 native entries/162 captures.106 constructions,97 limited passes,
+all106 prior successful records EXACTLY unchanged.54 operation failures include
+53 prior failures plus bug119's native-rejected request.2 imports,0 incomplete,
+0 panics/timeouts/unhandled.2245 archive files, SHA256 df40561a33bc3dc3a3de61401311f64a11e65b644e1fb350e2f2d5d279079b8c.
+Previous angle group56f1c0ee and documentation ab12f114 cover nonperpendicular
+planar chamfers. Report links all evidence; prior kernel baseline493/0/1ignore.
+
+NEXT PUBLIC DATA WORK
+Found github.com/a-betenev/opencascade-dataset, revision
+ d78a7a9e6de57699261fa03641ec1b5bafac39a1.
+32 of36 missing chamfer filenames exist (535523 bytes), potentially261/279cases.
+Still missing CCH_001_ahev.rle,CCH_001_ahew.rle,CCH_001_chde.rle,CFI_pro10129.rle.
+Do not count cases until native runs. Source tree/head JSON in target/occt-public-
+dataset-tree.json and -head.json. Fetch script target/fetch-chamfer-public-data.py
+checks Git blob SHA1 and size, records SHA256 and pinned raw URLs in
+ target/chamfer-public-data-provenance.json; files target/occt-public-chamfer-data.
+Use an explicit additional data directory for native runners, preserve default
+CSF_TestDataPath and record external file hashes in manifests. Do not alter the
+pinned OCCT source or overwrite its fixtures. Add parent-failing tests first.
+Runner selection currently lexical blend/chamf; dedicated chamfer commands are
+built dynamically in helpers, so passing dedicated cases need explicit selection
+support with a regression. Native cases should be run unchanged first, then
+captured. Keep dataset-source identity and hashes; no blanket capability upgrade.
+
+OTHER READ-ONLY SCOUTING
+Experimentally added a MANIFOLD_SOLID_BREP reference to copied CLOSED_SHELL inputs
+in target/closed-shell-experiment; originals remain unchanged. B5 yields immutable
+UnsupportedGeometry with4selected edges. J7 exceeded120seconds and was terminated.
+Do not silently promote shells or claim recovered imports. PCurve precision test
+remains open (absolute tolerance at ~2.83e9). Other53failures,9discrepancies remain.
+
+METHOD: parent-failing tests, no weakening; frozen builds/captures; grouped proof
+commit then full capture and HTML/catalog commit. CARGO_BUILD_JOBS=12, no cargofmt.
+Use rustfmt +nightly --config skip_children=true. Force-add JSON/ZIP, preserve
+rawbytes, diff-check excludes*.step. No delegates. Consumer../PiezaCAD.
