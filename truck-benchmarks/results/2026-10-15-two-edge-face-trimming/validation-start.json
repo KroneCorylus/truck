@@ -1,0 +1,7 @@
+{
+  "parent_revision": "1e0c5b193762876a9ecd95a6f8d0b396ab723e82",
+  "source_sha256": {
+    "truck-shapeops/src/fillet/mod.rs": "50949a94c4f58cb7c01869d115061c30883efc6099974f09195630b9cecbe940",
+    "truck-shapeops/tests/two_edge_face_trimming.rs": "30099c5983494d79077cd233308069f1c1efd3254564e58ac14b4583b010245c"
+  }
+}

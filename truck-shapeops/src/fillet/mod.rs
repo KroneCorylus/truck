@@ -164,7 +164,18 @@ where
 {
     let (front_edge, back_edge) = find_adjacent_edge(face, filleted_edge_id)?;
     let (new_front_edge, front_der) = cut_at_front(&mut curve, &front_edge)?;
-    let (new_back_edge, back_der) = cut_at_back(&mut curve, &back_edge)?;
+    let shared_neighbor = front_edge.is_same(&back_edge);
+    let back_source = if shared_neighbor {
+        &new_front_edge
+    } else {
+        &back_edge
+    };
+    let (new_back_edge, back_der) = cut_at_back(&mut curve, back_source)?;
+    let new_front_edge = if shared_neighbor {
+        new_back_edge.clone()
+    } else {
+        new_front_edge
+    };
 
     let fillet_edge = Edge::new(new_front_edge.back(), new_back_edge.front(), curve);
     let new_boundaries = face
@@ -172,22 +183,26 @@ where
         .iter()
         .cloned()
         .map(|mut boundary| {
-            if let Some(idx) = boundary.iter().position(|edge0| edge0.is_same(&front_edge)) {
-                let len = boundary.len();
-                if face.orientation() {
-                    boundary[idx] = new_front_edge.clone();
-                    boundary[(idx + 1) % len] = fillet_edge.clone();
-                    boundary[(idx + 2) % len] = new_back_edge.clone();
+            for edge in boundary.iter_mut() {
+                let replacement = if edge.is_same(&front_edge) {
+                    &new_front_edge
+                } else if edge.id() == filleted_edge_id {
+                    &fillet_edge
+                } else if edge.is_same(&back_edge) {
+                    &new_back_edge
                 } else {
-                    boundary[(len + idx - 2) % len] = new_back_edge.inverse();
-                    boundary[(len + idx - 1) % len] = fillet_edge.inverse();
-                    boundary[idx] = new_front_edge.inverse();
-                }
+                    continue;
+                };
+                *edge = if face.orientation() {
+                    replacement.clone()
+                } else {
+                    replacement.inverse()
+                };
             }
             boundary
         })
         .collect::<Vec<_>>();
-    let mut new_face = Face::new(new_boundaries, face.surface());
+    let mut new_face = Face::try_new(new_boundaries, face.surface()).ok()?;
     if !face.orientation() {
         new_face.invert();
     }

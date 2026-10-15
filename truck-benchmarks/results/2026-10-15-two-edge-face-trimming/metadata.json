@@ -1,0 +1,24 @@
+{
+  "parent_revision": "1e0c5b193762876a9ecd95a6f8d0b396ab723e82",
+  "source_sha256": {
+    "truck-shapeops/src/fillet/mod.rs": "50949a94c4f58cb7c01869d115061c30883efc6099974f09195630b9cecbe940",
+    "truck-shapeops/tests/two_edge_face_trimming.rs": "30099c5983494d79077cd233308069f1c1efd3254564e58ac14b4583b010245c"
+  },
+  "affected_test_counts": [
+    504,
+    0,
+    1
+  ],
+  "replay_tests": 15,
+  "replay_sha256": "923a4fc0908ce3ae78e66e9207bc156028aecbae78ec8748645b87fd98886184",
+  "log_sha256": {
+    "parent-tests.txt": "20371258aad75832e1e338343154aa37d7de84aa0677a356eac50fb187406685",
+    "focused-tests.txt": "f9c5bee680548b77e9e56afb99ff63c2e8991ee3ea8aaaffa156c20b5c22987a",
+    "initial-coarse-fillet-test.txt": "c1fddb76b97451eb8a43ad2d5919e54cca3c74c96724025123ef6e75e6186916",
+    "affected-tests.txt": "af40ad90382b7260aa5cacea109b82487da7aeced6a89c79830298baf0b5e1d7",
+    "replay-tests.txt": "9ebedbbdb0ee52ee0d2e49b38dfb19978cc2b2f6262add11cea3e947980c685c",
+    "clippy.txt": "694bcd2752c42d9bc15ee839a959a6970990c72b064f2813b03abff47f1e1dac",
+    "actions-smoke.txt": "abf9ed849421be1b5d38836e01d37cde99305d14ac69ef3f485a06af3d53259a",
+    "replay-build.txt": "ea1a672d006df1384ed30243ce166a241b040e9ca1da09d2be37f1f10001ace2"
+  }
+}
