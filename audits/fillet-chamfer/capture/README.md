@@ -95,11 +95,13 @@ complete raw contour samples remain in the archived input JSON.
 
 Chamfer captures retain every requested distance/angle.
 Face-dependent modes also record an analytic reference plane when available.
-Replay maps that plane to exactly one adjacent face, independently of face order
-and plane normal sign. Two-distance replay requires two planar supports;
+Replay maps that plane to exactly one adjacent seed face, independently of face
+order and plane normal sign, then propagates its side along the oriented contour.
+Two-distance replay accepts planar supports and perpendicular plane/cylinder rims;
 distance/angle replay uses the oriented angle between planar supports and converts
-`d1 = d0 * sin(angle) / sin(beta + angle)` (corner angle `beta`). Equal-distance requests use the existing solid/wire chamfer
-routes. Unsupported face geometry is reported as unhandled intent. Missing native
+`d1 = d0 * sin(angle) / sin(beta + angle)` (corner angle `beta`). Perpendicular
+plane/cylinder rims use beta = 90 degrees. Consistent unequal setback pairs also
+reach the existing wire chamfer route, with side ordering preserved. Unsupported face geometry is reported as unhandled intent. Missing native
 data remains missing: the dedicated chamfer fixtures are not replaced by synthetic
 probes or counted as passing when only dimension-defined controls are available.
 
@@ -107,8 +109,8 @@ probes or counted as passing when only dimension-defined controls are available.
 
 - This route does not yet express unequal-radius corners, variable laws, tangent
   expansion for fillets, open shells or multiple solids. Face-dependent chamfer
-  contours still require a reference plane and two planar supports at every
-  matched edge. Rejection here does not prove no equivalent Truck route exists.
+  contours still require a planar seed reference and either two planar supports
+  or a perpendicular plane/cylinder rim at every matched edge. Rejection here does not prove no equivalent Truck route exists.
 - STEP conversion and closed-edge healing can fail before a blend is attempted.
   Those failures require separate diagnosis and are not fillet solver verdicts.
 - Selection matching and output comparison use finite samples, not certified

@@ -1,0 +1,14 @@
+{
+  "parent_revision": "2191a34387fe11b2a1385d4516bb55592cd85ecf",
+  "source_sha256": {
+    "truck-shapeops/examples/replay_occt_blend.rs": "745bc459bdbe7a660888a5878b1099fce0def74d8bb7575ed607a2a4e52caad3",
+    "audits/fillet-chamfer/capture/blend_capture.cpp": "2ac7b5c30ca255ee38d295309ea21821f5d52c4bb2ac71b721a64b5e9666bb8e",
+    "audits/fillet-chamfer/capture/run_capture.py": "17eed10fb07eea4b3ffbc602851e095df4efa3e662a55d76c0cb37cf3c57a607"
+  },
+  "replay_tests": 27,
+  "executable_sha256": {
+    "target/release/examples/replay_occt_blend": "6597feeabacd97cffb6b1543337c2866bf638e2f512186a921345a9af3e6ba19",
+    "target/occt-contour-capture-plugin/libTKBlendAudit.so": "25f98b5629aff171ce4f10fccf4646e745510afdb25d4c6bc2fde146bcfa88f7",
+    "target/occt-contour-capture-plugin/compare_shapes": "c9215123784a8c9e656fbbbd2ab169852418d68e7c0592c48652d658ead74a41"
+  }
+}

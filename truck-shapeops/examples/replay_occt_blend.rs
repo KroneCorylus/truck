@@ -332,46 +332,94 @@ fn chamfer_selection(
             }
             edges
         } else {
-            seed
+            seed.clone()
+        };
+        let wire = as_wire(&matched);
+        let reference_side = if let Some((origin, normal)) = reference {
+            let wire = wire.as_ref().ok_or_else(|| {
+                unsupported("Reference propagation requires one connected contour")
+            })?;
+            let mut reference_side = None;
+            for seed in &seed {
+                let edge = wire.iter().find(|e| e.id() == seed.id()).unwrap();
+                let sides: Vec<_> = input
+                    .face_iter()
+                    .filter_map(|face| {
+                        let boundary = face.edge_iter().find(|e| e.id() == edge.id())?;
+                        let Some((Elementary::Plane(plane), _)) =
+                            face.oriented_surface().elementary()
+                        else {
+                            return None;
+                        };
+                        (plane.normal().cross(normal).magnitude() < 1e-8
+                            && (plane.origin() - origin).dot(normal).abs() < TOL / 10.)
+                            .then_some(boundary.front() != edge.front())
+                    })
+                    .collect();
+                let [side] = sides.as_slice() else {
+                    return Err(
+                        json!({"status":"selection-unmatched","error":"Reference plane does not uniquely match an adjacent seed face"}),
+                    );
+                };
+                if reference_side
+                    .replace(*side)
+                    .is_some_and(|previous| previous != *side)
+                {
+                    return Err(unsupported("Seed pieces have inconsistent reference sides"));
+                }
+            }
+            reference_side
+        } else {
+            None
         };
         let requested = distances;
         for edge in matched {
             distances = requested;
-            if let Some((origin, normal)) = reference {
+            if let Some(reference_side) = reference_side {
+                let oriented = wire
+                    .as_ref()
+                    .unwrap()
+                    .iter()
+                    .find(|e| e.id() == edge.id())
+                    .unwrap();
                 let adjacent: Vec<_> = input
                     .face_iter()
                     .filter(|f| f.edge_iter().any(|e| e.id() == edge.id()))
                     .collect();
-                let planes: Option<Vec<_>> = adjacent
-                    .iter()
-                    .map(|f| match f.oriented_surface().elementary() {
-                        Some((Elementary::Plane(p), forward)) => {
-                            let normal = p.normal() * if forward { 1. } else { -1. };
-                            Some((p, normal))
-                        }
-                        _ => None,
-                    })
-                    .collect();
-                let planes = planes.filter(|p| p.len() == 2).ok_or_else(|| {
-                    unsupported("Face-dependent chamfers currently require two planar supports")
-                })?;
-                let sides: Vec<_> = planes
+                if adjacent.len() != 2 {
+                    return Err(unsupported(
+                        "Reference propagation requires two adjacent faces",
+                    ));
+                }
+                let sides: Vec<_> = adjacent
                     .iter()
                     .enumerate()
-                    .filter(|(_, (p, _))| {
-                        Plane::normal(p).cross(normal).magnitude() < 1e-8
-                            && (p.origin() - origin).dot(normal).abs() < TOL / 10.
+                    .filter_map(|(index, face)| {
+                        let boundary = face.edge_iter().find(|e| e.id() == edge.id()).unwrap();
+                        ((boundary.front() != oriented.front()) == reference_side).then_some(index)
                     })
-                    .map(|(i, _)| i)
                     .collect();
                 let [side] = sides.as_slice() else {
-                    return Err(
-                        json!({"status":"selection-unmatched","error":"Reference plane does not uniquely match an adjacent face"}),
-                    );
+                    return Err(unsupported(
+                        "Contour faces do not define unique oriented sides",
+                    ));
+                };
+                let supports: Vec<_> = adjacent
+                    .iter()
+                    .map(|f| f.oriented_surface().elementary())
+                    .collect();
+                let (cos_beta, sin_beta) = match (&supports[0], &supports[1]) {
+                    (Some((Elementary::Plane(a), forward_a)), Some((Elementary::Plane(b), forward_b))) => {
+                        let a = a.normal() * if *forward_a { 1. } else { -1. };
+                        let b = b.normal() * if *forward_b { 1. } else { -1. };
+                        (-a.dot(b), a.cross(b).magnitude())
+                    }
+                    (Some((Elementary::Plane(p), _)), Some((Elementary::Cylinder { axis, .. }, _)))
+                    | (Some((Elementary::Cylinder { axis, .. }, _)), Some((Elementary::Plane(p), _)))
+                        if p.normal().cross(*axis).magnitude() < 1e-8 => (0., 1.),
+                    _ => return Err(unsupported("Face-dependent chamfers require planar supports or a perpendicular plane/cylinder rim")),
                 };
                 if mode == "distance-angle" {
-                    let cos_beta = -planes[0].1.dot(planes[1].1);
-                    let sin_beta = planes[0].1.cross(planes[1].1).magnitude();
                     let tangent = requested[1] / requested[0];
                     // Sine rule in the corner section: d1 = d0 sin(alpha) / sin(beta + alpha).
                     let denominator = sin_beta + cos_beta * tangent;
@@ -465,16 +513,31 @@ fn replay_task(
         let assignments: Vec<_> = selected.iter().map(|(e, d)| (e.id(), *d)).collect();
         let edges: Vec<_> = selected.into_iter().map(|(e, _)| e).collect();
         let ids: Vec<_> = edges.iter().map(|e| e.id()).collect();
-        let distance = assignments[0].1[0];
-        let equal = assignments.iter().all(|(_, d)| *d == [distance; 2]);
         stage.set("blend");
         let result =
             try_chamfer_solid_edges_with_distances(&input, &assignments, TOL).or_else(|error| {
-                if equal {
-                    if let Some(wire) = as_wire(&edges) {
-                        return try_chamfer_solid_along_wire(
-                            &input, &wire, distance, distance, TOL,
-                        );
+                if let Some(wire) = as_wire(&edges) {
+                    let ordered: Option<Vec<_>> = wire
+                        .iter()
+                        .map(|edge| {
+                            let mut distances =
+                                assignments.iter().find(|(id, _)| *id == edge.id())?.1;
+                            let boundary = input
+                                .face_iter()
+                                .find_map(|face| face.edge_iter().find(|e| e.id() == edge.id()))?;
+                            if boundary.front() != edge.front() {
+                                distances.swap(0, 1);
+                            }
+                            Some(distances)
+                        })
+                        .collect();
+                    if let Some(ordered) = ordered {
+                        let [d0, d1] = ordered[0];
+                        if ordered.iter().all(|d| {
+                            (d[0] - d0).abs() <= 1e-12 * d0 && (d[1] - d1).abs() <= 1e-12 * d1
+                        }) {
+                            return try_chamfer_solid_along_wire(&input, &wire, d0, d1, TOL);
+                        }
                     }
                 }
                 Err(error)
@@ -1062,7 +1125,9 @@ mod native_contour_tests {
         original
     }
 
-    fn run(name: &str, task: &Value) -> Value {
+    fn run(name: &str, task: &Value) -> Value { run_with_volume(name, task, 0.5630665232959563) }
+
+    fn run_with_volume(name: &str, task: &Value, volume: f64) -> Value {
         let directory = std::env::temp_dir().join(format!(
             "truck-native-contour-{}-{name}",
             std::process::id()
@@ -1073,6 +1138,29 @@ mod native_contour_tests {
         let step = include_str!("../tests/fixtures/chamfer-contours/A4.step");
         std::fs::write(format!("{prefix}.input.step"), step).unwrap();
         std::fs::write(format!("{prefix}.input.json"), task.to_string()).unwrap();
+        if matches!(
+            task["selection"][0]["mode"].as_str(),
+            Some("two-distances" | "distance-angle")
+        ) {
+            let input = import(&format!("{prefix}.input.step")).unwrap();
+            let assignments =
+                chamfer_selection(&input, task["selection"].as_array().unwrap(), true).unwrap();
+            let top_distance = if task["selection"][0]["mode"] == "two-distances" {
+                0.04
+            } else {
+                0.03 * 60_f64.to_radians().tan()
+            };
+            for (edge, distances) in assignments {
+                let adjacent: Vec<_> = input
+                    .face_iter()
+                    .filter(|f| f.edge_iter().any(|e| e.id() == edge.id()))
+                    .collect();
+                for (face, distance) in adjacent.iter().zip(distances) {
+                    let is_top = matches!(face.oriented_surface().elementary(), Some((Elementary::Plane(p), _)) if p.normal().z.abs() > 0.99);
+                    assert!((distance - if is_top { top_distance } else { 0.03 }).abs() < 1e-12);
+                }
+            }
+        }
         let result = replay(prefix, &Cell::new("start")).unwrap();
         assert_eq!(
             std::fs::read_to_string(format!("{prefix}.input.step")).unwrap(),
@@ -1080,11 +1168,64 @@ mod native_contour_tests {
         );
         if result["status"] == "operation-succeeded" && result["selected_edges"] == 3 {
             let output = import(&format!("{prefix}.truck.step")).unwrap();
-            replay_common::assert_solid(&output, 0.5630665232959563, &[0], TOL);
-            replay_common::blend::assert_step(&output, 0.5630665232959563, TOL);
+            replay_common::assert_solid(&output, volume, &[0], TOL);
+            replay_common::blend::assert_step(&output, volume, TOL);
         }
         std::fs::remove_dir_all(directory).unwrap();
         result
+    }
+
+    fn check_reference_contour(name: &str, source: &str, volume: f64) {
+        for reverse in [false, true] {
+            for flip in [false, true] {
+                let mut task: Value = serde_json::from_str(source).unwrap();
+                let selection = &mut task["selection"][0];
+                if reverse {
+                    selection["contour_edges"].as_array_mut().unwrap().reverse();
+                    for member in selection["contour_edges"].as_array_mut().unwrap() {
+                        member["points"].as_array_mut().unwrap().reverse();
+                    }
+                    selection["points"].as_array_mut().unwrap().reverse();
+                }
+                if flip {
+                    for n in selection["reference_plane"]["normal"]
+                        .as_array_mut()
+                        .unwrap()
+                    {
+                        *n = json!(-n.as_f64().unwrap());
+                    }
+                }
+                let result = run_with_volume(&format!("{name}-{reverse}-{flip}"), &task, volume);
+                assert_eq!(result["status"], "operation-succeeded", "{result}");
+                assert_eq!(result["selected_edges"], 3, "{result}");
+                for field in [
+                    "input_unchanged",
+                    "geometry_consistent",
+                    "mesh_closed",
+                    "step_prepared",
+                ] {
+                    assert_eq!(result[field], true, "{result}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn unequal_contour_propagates_the_seed_reference_side() {
+        check_reference_contour(
+            "unequal",
+            include_str!("../tests/fixtures/chamfer-contours/A4-dist_dist_sequence.json"),
+            0.5628218039597621,
+        );
+    }
+
+    #[test]
+    fn angle_contour_propagates_the_seed_reference_side() {
+        check_reference_contour(
+            "angle",
+            include_str!("../tests/fixtures/chamfer-contours/A4-dist_angle_sequence.json"),
+            0.5625311455212756,
+        );
     }
 
     #[test]

@@ -6,6 +6,8 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Propagate captured chamfer reference sides along oriented complete contours. Unequal-distance and angle replay now supports perpendicular plane/cylinder rims and retains consistent setbacks across changing side faces; native regressions verify both contour directions, reference normal signs, material and STEP.
+
 - Preserve the supported fillet replay STEP fitting tolerance while keeping stricter chamfer fits. Record the actual per-operation export tolerance; a native D4 regression preserves export preparation and the documented robust STEP round trip.
 
 - Capture complete native chamfer tangent contours and first-assignment semantics. Replay validates expanded scope, distinguishes legacy seed-only captures, rejects incomplete or contradictory intent, and fits chamfer STEP output below kernel consistency tolerance. Native-contour and STEP round-trip regressions preserve the full requested selection.

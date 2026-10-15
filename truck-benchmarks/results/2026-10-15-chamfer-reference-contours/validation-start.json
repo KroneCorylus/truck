@@ -1,0 +1,8 @@
+{
+  "parent_revision": "2191a34387fe11b2a1385d4516bb55592cd85ecf",
+  "source_sha256": {
+    "truck-shapeops/examples/replay_occt_blend.rs": "745bc459bdbe7a660888a5878b1099fce0def74d8bb7575ed607a2a4e52caad3",
+    "audits/fillet-chamfer/capture/blend_capture.cpp": "2ac7b5c30ca255ee38d295309ea21821f5d52c4bb2ac71b721a64b5e9666bb8e",
+    "audits/fillet-chamfer/capture/run_capture.py": "17eed10fb07eea4b3ffbc602851e095df4efa3e662a55d76c0cb37cf3c57a607"
+  }
+}
