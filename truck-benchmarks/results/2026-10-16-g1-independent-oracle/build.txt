@@ -1,0 +1,2 @@
+$ g++ -std=c++17 -O2 -Wall -Wextra -Wpedantic -isystem target/occt-sdk/usr/include/opencascade /home/krone/Development/Pieza_WS/truck/truck-benchmarks/results/2026-10-16-g1-independent-oracle/check_g1.cpp -Ltarget/occt-sdk/usr/lib64 -Wl,-rpath-link,target/occt-sdk/usr/lib64 -lTKDESTEP -lTKXSBase -lTKFillet -lTKTopAlgo -lTKGeomAlgo -lTKBRep -lTKGeomBase -lTKG3d -lTKG2d -lTKMath -lTKernel -o /home/krone/Development/Pieza_WS/truck/target/check-g1-oracle
+exit_code 0

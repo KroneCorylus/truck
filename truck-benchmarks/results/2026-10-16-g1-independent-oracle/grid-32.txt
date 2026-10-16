@@ -1,0 +1,16 @@
+$ /home/krone/Development/Pieza_WS/truck/target/check-g1-oracle /home/krone/Development/Pieza_WS/truck/target/occt-capture-native-tolerances/blend/simple/G1/capture/001.input.brep /home/krone/Development/Pieza_WS/truck/target/occt-capture-native-tolerances/blend/simple/G1/capture/001.result.brep /home/krone/Development/Pieza_WS/truck/target/occt-capture-native-tolerances/blend/simple/G1/capture/001.truck.step 32
+parabola focal=500 origin=0,0,0 xdir=0,0,1 ydir=0,-1,0 extrusion=-0.19611613513818407,-0,-0.98058067569092022
+input face=1 type=8 support=2 residual=2.2737367544323206e-13
+input face=2 type=0 support=3 residual=2.2737367544323206e-13
+input face=3 type=0 support=0 residual=0
+input face=4 type=0 support=1 residual=0
+input volume=133333333.33333358 analytic=133333333.33333333
+controls samples=4635 exact_residual=3.4106051316484809e-13 shifted_radius_error=3.5015566834939449e-13 exact_plane_error=4.5474735088646412e-13 invalid_domain_and_bracket_rejected=1
+native sampled_radius_residual=0.14305547886340264 location=186.09592279636524,969.45273779255717,1430.4796139818261 faces=5 splines=1 samples=1283 plane_contact_residual=0.49215388370294022 contacts=98 plane_contact_distance=0.348719394275459 core_residual=0.022168151233131539 extension_residual=0.14305547886340264 qmax=1052.7559364854501 worstq=1050.2135406062912
+Truck sampled_radius_residual=4.5934380068501923e-06 location=192.9600150238935,935.04368609290509,1464.800075120439 faces=5 splines=1 samples=1283 plane_contact_residual=0.00021720845029449265 contacts=98 plane_contact_distance=0.00021459696460890355 core_residual=2.8344893507892266e-06 extension_residual=4.5934380068501923e-06 qmax=1052.0529123092715 worstq=1051.123005736194
+rebuilt tight=0 valid=1
+native-default sampled_radius_residual=0.14305547886340264 location=186.09592279652239,969.45273779202557,1430.4796139826119 faces=5 splines=1 samples=1283 plane_contact_residual=0.49215388370157598 contacts=98 plane_contact_distance=0.34871939427481591 core_residual=0.022168151233131539 extension_residual=0.14305547886340264 qmax=1052.755936485446 worstq=1050.2135406064522
+rebuilt tight=1 valid=1
+native-tight sampled_radius_residual=0.14305547886442582 location=186.09592279640358,969.45273779243621,1430.4796139820178 faces=5 splines=1 samples=1283 plane_contact_residual=0.49215380249984264 contacts=98 plane_contact_distance=0.34871933675190264 core_residual=0.022168158166437024 extension_residual=0.14305547886442582 qmax=1052.7559364854515 worstq=1050.2135406063353
+input_unchanged=1
+exit_code 0

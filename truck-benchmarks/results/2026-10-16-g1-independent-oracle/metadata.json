@@ -1,0 +1,309 @@
+{
+  "parent_revision": "e0aa92fa5e6e2b92b436b4c7f6d780f352ed8dd4",
+  "baseline_revision": "c8f6fc9cc51d6d50a330323cee0230b7acafa505",
+  "baseline_manifest_sha256": "370064ad12f529d764a12587d44f2a9da6d73b3f1f99ef36bf3465ef5eafed9d",
+  "baseline_archive_sha256": "b2d83e50c5c4a44992aa5bc3423d3cb9dbe9dd075358ee537c09dba87ee1ae01",
+  "source_sha256": {
+    "truck-benchmarks/results/2026-10-16-g1-independent-oracle/check_g1.cpp": "624618a030a43bdf8b2f4e7cfadaff56523a6e2a1281ac229d71548a19b5dd24"
+  },
+  "executable_sha256": "4c0cc8005d4dccf8a1de0330cd914ff5298ecc73066a328ac84373592d8521ea",
+  "libraries_sha256": {
+    "/lib64/libTKDESTEP.so.7.9": "025afdb6a14daca55860b613a3774f1f71abf4a1bf4afc551f8a52a3b59a6db3",
+    "/lib64/libTKXSBase.so.7.9": "7ffea711d6764e22691ce9e02d08af52dfc4d07dc27740dadf0a1d1fa95f3493",
+    "/lib64/libTKFillet.so.7.9": "98b023dddfa18f285da1037234638f142f2cf8c82df07e5c0cc39d5ebb456ade",
+    "/lib64/libTKTopAlgo.so.7.9": "e27be7f4138763c0ac0f82e477b0ee277519d6b5c37ddc6b9ae97018592ccef1",
+    "/lib64/libTKGeomAlgo.so.7.9": "389c67e1b7371882ed9804dfd2b573278a2b009bb80a496176bbfdfdbf9e28d0",
+    "/lib64/libTKBRep.so.7.9": "7d07ff2f68ec0b494f3caa16f222e3238774dd864c7eef5d9f8fe5c892156709",
+    "/lib64/libTKGeomBase.so.7.9": "0d6e11af384206ea11df7438c089442174a4413e9725a809d7b7ad5a502dae56",
+    "/lib64/libTKG3d.so.7.9": "c9dc250c81492e8f9446bff17018d64a93fc5ab009487509bf1c27810a3b3c12",
+    "/lib64/libTKG2d.so.7.9": "7ef79098c6b07c05ad9acac089fe3fb4e8550f26f19c5a2f42de59c450cf71a2",
+    "/lib64/libTKMath.so.7.9": "b0ea8007475ab8b85192bb5a6ec606a7b5f04859ac645c42ad18a5a54f43fe4d",
+    "/lib64/libTKernel.so.7.9": "655ae806fb993152c14ed1b9ad7bd18b81a5ac31fc79c945d190f7c8f64bc0fb",
+    "/lib64/libstdc++.so.6": "fc224ee3cc56b9b3e58453bfb9a0cac3a696e60fd33ba48b6a30eb22b76cc867",
+    "/lib64/libm.so.6": "16a03ce6d24c8a46742206d4a9c1d35bb6577ae2384f153dc6ef4a4b62b5357f",
+    "/lib64/libgcc_s.so.1": "c71a62b5ef442ab8cf4470874dee6f2383d73a744f0006b6d287412f131c2e09",
+    "/lib64/libc.so.6": "a5c5ad9d59d3c69eda93aa8f82930ba06cc4e893a113e66c85ad6e96243d53c8",
+    "/lib64/libTKDE.so.7.9": "1905ba60b07967122a3a3b9b05218ea8e5d6b27c80200cb7c84bf47208af3779",
+    "/lib64/libTKXCAF.so.7.9": "df1afe6724b30ae39d31bebeb002b5a8d934c352595f9cf821912d36c0e28d6b",
+    "/lib64/libTKLCAF.so.7.9": "c1e878b32990e75996ea7199493fb3d99578df7c320d6f867e162da4fd2b400d",
+    "/lib64/libTKShHealing.so.7.9": "a3ca6af500c7ec0b900049cd84760757f65d717e3fb529af1e0e3dfdd9ad9ff8",
+    "/lib64/libTKBool.so.7.9": "7467d4d0996a9c2567a2f7b5c03c4022af81a63ca49b9a874649eef187099f71",
+    "/lib64/libTKBO.so.7.9": "f9284f414c79dac5d9733f6f45142551fc69aaeedc4eea6c369edcf3f94ef0fa",
+    "/lib64/libtbb.so.12": "681793b56397297127e3f493b8bcd6718ea859779a7fdf2e9eb4bb22ede06623",
+    "/lib64/libTKVCAF.so.7.9": "7f1ec5b9eda771080413a2bf1c7740a6330ff42a9d612681bb2474a9eb55c4dd",
+    "/lib64/libTKV3d.so.7.9": "9b9f3de75194582ebb7230dbee28996e7a3063d105fea6621260a6adfe81c440",
+    "/lib64/libTKService.so.7.9": "4e9ef00ce97e193557e2ca4fcf842c889cbb3bb86c9944c6a0a738cf55b38e36",
+    "/lib64/libTKCAF.so.7.9": "b628df8dd35de29a7482b368d79f2dca46f7120d302e2f10e67a56626b5730a6",
+    "/lib64/libTKCDF.so.7.9": "1b3d4255d3331600b489a8b14266d0547859cecc7922d6392c9d72bfad1f92d7",
+    "/lib64/libTKPrim.so.7.9": "1fa2933404dcd2c95e22e7a8703b8a9be3cb8c485dc175389f11a046fec3e64e",
+    "/lib64/libTKMesh.so.7.9": "031f5259343be29d7e782db5c58021a1c48137eda09581d0aa6dcf3c2715698d",
+    "/lib64/libTKHLR.so.7.9": "992bae41f644683602236628f2671b88f443c421e1dffc5cd99845a7cb8eb335",
+    "/lib64/libX11.so.6": "95b9ecfbde1b73c7f7380ae643e8ade9555234607a47d7e131ae6365a9899244",
+    "/lib64/libfontconfig.so.1": "ab67796a1071ee7fe53d89d4ece93a3805134d9c21931687a4f05fa5132036fd",
+    "/lib64/libfreetype.so.6": "8b3027d90bfcbdf021679e4ea72b8479d59b51bb3c4af4839fc4e32c51d07018",
+    "/lib64/libxcb.so.1": "15fd80f8917a44ec68c17a322648a5c576c3fc3bc7745c691573bd6d24ade7eb",
+    "/lib64/libxml2.so.2": "8473a76caaed1e702f5c4f2dfac69b4aa92d2f18217edcf23c73214ea7750ab5",
+    "/lib64/libz.so.1": "bbde8faec092a7c67b8bd76bbba4a826e61b05c171b97004ce6b308c5a090351",
+    "/lib64/libbz2.so.1": "ef3c4ed7e70d03d7c406fb1cea9552e74d0b20006e7d8f66a60dc1a6009f4800",
+    "/lib64/libpng16.so.16": "65cb04d6c4ec5c031f2f43a58ec5adc4bc9652be5703bb9fa1178f84a2e40446",
+    "/lib64/libharfbuzz.so.0": "1ad30cd84f030ac9aa2bda6edba150d612cab3534da0e42fd1102dffc286e5e5",
+    "/lib64/libbrotlidec.so.1": "741003cabf4d023b2575ef51711d0af57a2b78e904dbfda147b60074d8817aad",
+    "/lib64/libXau.so.6": "78e2e7a514a6844530b099c7dfb184a9992f7b0681c30105281ddb8e48dc8a59",
+    "/lib64/liblzma.so.5": "18b4994cd29a3e39f35ad719702925740703e76057fb2ce8c0eb7c7ce7a3acef",
+    "/lib64/libglib-2.0.so.0": "e9a6099dac743c8f910fb201da63f45ad6d7b4025110409474ec2661e57fa91e",
+    "/lib64/libgraphite2.so.3": "1e1e6f204c01d7e790d4d8fa55205ac030926863565327724ad1bea0b05071b8",
+    "/lib64/libbrotlicommon.so.1": "e2ba6cb211c8fd041aa820af30f606e54a089fc6038a021f7a320033f8c7d77f",
+    "/lib64/libpcre2-8.so.0": "473aeb0704abc871886650c553b43bb300395d73fe4088620329459b5ddbf4be"
+  },
+  "input_sha256": {
+    "blend/simple/G1/capture/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "blend/simple/G1/capture/001.comparison.json": "c3b03e7d9dbac22c983ef1df6497a1cccca70e48e9508b396775c013c363776b",
+    "blend/simple/G1/capture/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "blend/simple/G1/capture/001.input.brep": "8a9d2feb919c0fa1cd8b67251a53f6b65af66e8bc36a3e60452d24cdace5b79b",
+    "blend/simple/G1/capture/001.input.json": "2d92f742f70722884f85f21a0ce10c93ac9a56cf119b5d0c69853a0b8d42b8a0",
+    "blend/simple/G1/capture/001.input.step": "b1a7e6a2ee1e12724f9946aeccd9e75551e2e9914673f7f534bdb0f4a62f9f27",
+    "blend/simple/G1/capture/001.result.brep": "dfadffbf54cd35bd5384653648cf3e4e15c8a3542e240a2e0c5ffc463b132543",
+    "blend/simple/G1/capture/001.result.json": "bdd901df08c01c815d2fa0c3de70abf7f6417e4efec980a97cb63423306dfd43",
+    "blend/simple/G1/capture/001.result.step": "df50349553f93b75364c3edf57d681da51bbfc2fe1c74553290a6c2dd9f06578",
+    "blend/simple/G1/capture/001.truck.json": "d87d6b560e606f23a0d068d782b5b46125617bc027a0cf3b22781a1dfdd8bc14",
+    "blend/simple/G1/capture/001.truck.log": "73b66a9dd689ee68327e1febbd542a2f7fb17f0101dceb0caafcf9aa6e37a560",
+    "blend/simple/G1/capture/001.truck.step": "b08dff24d2705f356e6dba10123b0629a6b31a19be892c02f15c93cda6cf25a5",
+    "blend/simple/G1/console.log": "673a5f701bc8840a874ef10fcde30940357119871356890dae36ae2d3694d6c2",
+    "blend/simple/G1/draw.log": "221043d8b72d9cf790ed48410eebab44345f7a166efa910614f1b5c32c90f618",
+    "blend/simple/G1/run.tcl": "5a05107f9ba90ff4541fa155cf0c8b9f3953522fc9e50e3d78565ee04cac7f7d"
+  },
+  "settings": {
+    "representation": "rational",
+    "angular_tolerance": 0.01,
+    "spine_tolerance": 0.0001,
+    "parametric_tolerance": 1e-05,
+    "approximation_3d_tolerance": 0.0001,
+    "deflection": 0.001,
+    "continuity": "C1",
+    "continuity_angle": 0.01
+  },
+  "summary": {
+    "32": {
+      "native": {
+        "sampled_radius_residual": 0.14305547886340264,
+        "location": [
+          186.09592279636524,
+          969.4527377925572,
+          1430.479613981826
+        ],
+        "faces": 5.0,
+        "splines": 1.0,
+        "samples": 1283.0,
+        "plane_contact_residual": 0.4921538837029402,
+        "contacts": 98.0,
+        "plane_contact_distance": 0.348719394275459,
+        "core_residual": 0.02216815123313154,
+        "extension_residual": 0.14305547886340264,
+        "qmax": 1052.75593648545,
+        "worstq": 1050.2135406062912
+      },
+      "Truck": {
+        "sampled_radius_residual": 4.593438006850192e-06,
+        "location": [
+          192.9600150238935,
+          935.0436860929051,
+          1464.800075120439
+        ],
+        "faces": 5.0,
+        "splines": 1.0,
+        "samples": 1283.0,
+        "plane_contact_residual": 0.00021720845029449265,
+        "contacts": 98.0,
+        "plane_contact_distance": 0.00021459696460890355,
+        "core_residual": 2.8344893507892266e-06,
+        "extension_residual": 4.593438006850192e-06,
+        "qmax": 1052.0529123092715,
+        "worstq": 1051.123005736194
+      },
+      "native-default": {
+        "sampled_radius_residual": 0.14305547886340264,
+        "location": [
+          186.0959227965224,
+          969.4527377920256,
+          1430.479613982612
+        ],
+        "faces": 5.0,
+        "splines": 1.0,
+        "samples": 1283.0,
+        "plane_contact_residual": 0.492153883701576,
+        "contacts": 98.0,
+        "plane_contact_distance": 0.3487193942748159,
+        "core_residual": 0.02216815123313154,
+        "extension_residual": 0.14305547886340264,
+        "qmax": 1052.755936485446,
+        "worstq": 1050.2135406064522
+      },
+      "native-tight": {
+        "sampled_radius_residual": 0.14305547886442582,
+        "location": [
+          186.09592279640358,
+          969.4527377924362,
+          1430.4796139820178
+        ],
+        "faces": 5.0,
+        "splines": 1.0,
+        "samples": 1283.0,
+        "plane_contact_residual": 0.49215380249984264,
+        "contacts": 98.0,
+        "plane_contact_distance": 0.34871933675190264,
+        "core_residual": 0.022168158166437024,
+        "extension_residual": 0.14305547886442582,
+        "qmax": 1052.7559364854515,
+        "worstq": 1050.2135406063353
+      }
+    },
+    "64": {
+      "native": {
+        "sampled_radius_residual": 0.14305547886340264,
+        "location": [
+          186.09592279636524,
+          969.4527377925572,
+          1430.479613981826
+        ],
+        "faces": 5.0,
+        "splines": 1.0,
+        "samples": 4581.0,
+        "plane_contact_residual": 0.4921538837029402,
+        "contacts": 192.0,
+        "plane_contact_distance": 0.348719394275459,
+        "core_residual": 0.022181239529004415,
+        "extension_residual": 0.14305547886340264,
+        "qmax": 1052.75593648545,
+        "worstq": 1050.2135406062912
+      },
+      "Truck": {
+        "sampled_radius_residual": 4.593438006850192e-06,
+        "location": [
+          192.9600150238935,
+          935.0436860929051,
+          1464.800075120439
+        ],
+        "faces": 5.0,
+        "splines": 1.0,
+        "samples": 4573.0,
+        "plane_contact_residual": 0.00021720845029449265,
+        "contacts": 192.0,
+        "plane_contact_distance": 0.00021459696460890355,
+        "core_residual": 2.8344893507892266e-06,
+        "extension_residual": 4.593438006850192e-06,
+        "qmax": 1052.0529123092715,
+        "worstq": 1051.123005736194
+      },
+      "native-default": {
+        "sampled_radius_residual": 0.14305547886340264,
+        "location": [
+          186.0959227965224,
+          969.4527377920256,
+          1430.479613982612
+        ],
+        "faces": 5.0,
+        "splines": 1.0,
+        "samples": 4581.0,
+        "plane_contact_residual": 0.492153883701576,
+        "contacts": 192.0,
+        "plane_contact_distance": 0.3487193942748159,
+        "core_residual": 0.022181239529118102,
+        "extension_residual": 0.14305547886340264,
+        "qmax": 1052.755936485446,
+        "worstq": 1050.2135406064522
+      },
+      "native-tight": {
+        "sampled_radius_residual": 0.14305547886442582,
+        "location": [
+          186.09592279640358,
+          969.4527377924362,
+          1430.4796139820178
+        ],
+        "faces": 5.0,
+        "splines": 1.0,
+        "samples": 4581.0,
+        "plane_contact_residual": 0.49215380249984264,
+        "contacts": 192.0,
+        "plane_contact_distance": 0.34871933675190264,
+        "core_residual": 0.022181247266644277,
+        "extension_residual": 0.14305547886442582,
+        "qmax": 1052.7559364854515,
+        "worstq": 1050.2135406063353
+      }
+    },
+    "128": {
+      "native": {
+        "sampled_radius_residual": 0.14305547886340264,
+        "location": [
+          186.09592279636524,
+          969.4527377925572,
+          1430.479613981826
+        ],
+        "faces": 5.0,
+        "splines": 1.0,
+        "samples": 17219.0,
+        "plane_contact_residual": 0.4921538837029402,
+        "contacts": 380.0,
+        "plane_contact_distance": 0.348719394275459,
+        "core_residual": 0.022181239529004415,
+        "extension_residual": 0.14305547886340264,
+        "qmax": 1052.757912154697,
+        "worstq": 1050.2135406062912
+      },
+      "Truck": {
+        "sampled_radius_residual": 4.593438006850192e-06,
+        "location": [
+          192.9600150238935,
+          935.0436860929051,
+          1464.800075120439
+        ],
+        "faces": 5.0,
+        "splines": 1.0,
+        "samples": 17205.0,
+        "plane_contact_residual": 0.00021731739207098144,
+        "contacts": 380.0,
+        "plane_contact_distance": 0.0002149467585980359,
+        "core_residual": 2.909620661739609e-06,
+        "extension_residual": 4.593438006850192e-06,
+        "qmax": 1052.0529123092715,
+        "worstq": 1051.123005736194
+      },
+      "native-default": {
+        "sampled_radius_residual": 0.14305547886340264,
+        "location": [
+          186.0959227965224,
+          969.4527377920256,
+          1430.479613982612
+        ],
+        "faces": 5.0,
+        "splines": 1.0,
+        "samples": 17219.0,
+        "plane_contact_residual": 0.492153883701576,
+        "contacts": 380.0,
+        "plane_contact_distance": 0.3487193942748159,
+        "core_residual": 0.022181239529118102,
+        "extension_residual": 0.14305547886340264,
+        "qmax": 1052.7579121546992,
+        "worstq": 1050.2135406064522
+      },
+      "native-tight": {
+        "sampled_radius_residual": 0.14305547886442582,
+        "location": [
+          186.09592279640358,
+          969.4527377924362,
+          1430.4796139820178
+        ],
+        "faces": 5.0,
+        "splines": 1.0,
+        "samples": 17219.0,
+        "plane_contact_residual": 0.49215380249984264,
+        "contacts": 380.0,
+        "plane_contact_distance": 0.34871933675190264,
+        "core_residual": 0.022181247266644277,
+        "extension_residual": 0.14305547886442582,
+        "qmax": 1052.757912154707,
+        "worstq": 1050.2135406063353
+      }
+    }
+  }
+}
