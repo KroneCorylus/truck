@@ -1,0 +1,1960 @@
+{
+  "kernel_revision": "35c11b96d361080a6eaad5ed4fd7b7a4eff363c9",
+  "native": {
+    "passed": 396
+  },
+  "captures": 648,
+  "before_statuses": {
+    "input-import-failed": 96,
+    "operation-succeeded": 356,
+    "operation-failed": 173,
+    "unhandled-intent": 14,
+    "input-inconsistent": 9
+  },
+  "after_statuses": {
+    "input-import-failed": 96,
+    "operation-succeeded": 359,
+    "operation-failed": 170,
+    "unhandled-intent": 14,
+    "input-inconsistent": 9
+  },
+  "capture_scopes": {
+    "fillet-native-contours": 161,
+    "chamfer-native-contours": 487
+  },
+  "unchanged_intent_records": 648,
+  "successful_checks": {
+    "constructed": 359,
+    "input_unchanged": 359,
+    "geometry_consistent": 359,
+    "mesh_closed": 359,
+    "step_prepared": 359,
+    "native_valid": 359,
+    "truck_step_valid": 359,
+    "single_solid": 359,
+    "sampled_distance": 340
+  },
+  "limited_comparison_passes": 340,
+  "status_changes": [
+    {
+      "case": "chamfer/dist_angle/F3",
+      "capture": "001",
+      "changed_scope": false,
+      "before": "operation-failed",
+      "after": "operation-succeeded"
+    },
+    {
+      "case": "chamfer/dist_dist/F3",
+      "capture": "001",
+      "changed_scope": false,
+      "before": "operation-failed",
+      "after": "operation-succeeded"
+    },
+    {
+      "case": "chamfer/equal_dist/F3",
+      "capture": "001",
+      "changed_scope": false,
+      "before": "operation-failed",
+      "after": "operation-succeeded"
+    }
+  ],
+  "scope_changes": [],
+  "changed_scope_check_losses": [],
+  "unchanged_intent_regressions": [],
+  "numeric_changes": [
+    {
+      "case": "blend/simple/C7",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 76156.12826103393,
+          "after": 76156.43891748613
+        }
+      }
+    },
+    {
+      "case": "blend/simple/F2",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 1534542.974576775,
+          "after": 1534542.303526234
+        }
+      }
+    },
+    {
+      "case": "blend/simple/G1",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 132184980.39192003,
+          "after": 132185151.39578646
+        }
+      }
+    },
+    {
+      "case": "blend/simple/G3",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 2294136.9843814196,
+          "after": 2294138.3646855573
+        }
+      }
+    },
+    {
+      "case": "blend/simple/G5",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 2292134.3686765283,
+          "after": 2292137.3630690686
+        }
+      }
+    },
+    {
+      "case": "blend/simple/G9",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 370853.5065856865,
+          "after": 370854.1650737061
+        }
+      }
+    },
+    {
+      "case": "blend/simple/I3",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 979691.1574855208,
+          "after": 979695.2136148596
+        }
+      }
+    },
+    {
+      "case": "blend/simple/J6",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 1560449.8471156908,
+          "after": 1560447.0012083144
+        }
+      }
+    },
+    {
+      "case": "blend/simple/J8",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 772395.3995266288,
+          "after": 772390.739191649
+        }
+      }
+    },
+    {
+      "case": "blend/simple/K2",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 905612.8350111032,
+          "after": 905609.0254486417
+        }
+      }
+    },
+    {
+      "case": "blend/simple/K3",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 905613.0148815837,
+          "after": 905608.1398420414
+        }
+      }
+    },
+    {
+      "case": "blend/simple/K4",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 214207.02817010845,
+          "after": 214205.85839167904
+        }
+      }
+    },
+    {
+      "case": "blend/simple/Q4",
+      "capture": "002",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 149.06810749673005,
+          "after": 149.0631844537809
+        }
+      }
+    },
+    {
+      "case": "blend/tolblend_simple/D4",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 29111.318383537004,
+          "after": 29111.311992511357
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A6",
+      "capture": "002",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7563826697014752,
+          "after": 0.7564281243848425
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A6",
+      "capture": "003",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.746635533173461,
+          "after": 0.7466741008950315
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A6",
+      "capture": "004",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7296092072291845,
+          "after": 0.7296475153006958
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A6",
+      "capture": "007",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6987747430260796,
+          "after": 0.6988488394627846
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A6",
+      "capture": "008",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6894548069035022,
+          "after": 0.6895356114871464
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A6",
+      "capture": "009",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6815505378140895,
+          "after": 0.6816313420379561
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A7",
+      "capture": "002",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7575490236749417,
+          "after": 0.7575791713495539
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A7",
+      "capture": "003",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7491337194485368,
+          "after": 0.7491599267198215
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A7",
+      "capture": "004",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7326147486860942,
+          "after": 0.7326397270392876
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A7",
+      "capture": "005",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7230235845631768,
+          "after": 0.7230878395817099
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A7",
+      "capture": "006",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7138126213373336,
+          "after": 0.7138818648441864
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A7",
+      "capture": "007",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7041313934288421,
+          "after": 0.7042050835611947
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A7",
+      "capture": "008",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6959907736712584,
+          "after": 0.6960666454655661
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A7",
+      "capture": "009",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6867854756253114,
+          "after": 0.6868610253732229
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A8",
+      "capture": "002",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7563826697014752,
+          "after": 0.7564281243848425
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A8",
+      "capture": "003",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.746635533173461,
+          "after": 0.7466741008950315
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A8",
+      "capture": "004",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7296092072291845,
+          "after": 0.7296475153006958
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A8",
+      "capture": "007",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6987747430260796,
+          "after": 0.6988488394627846
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A8",
+      "capture": "008",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6894548069035022,
+          "after": 0.6895356114871464
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A8",
+      "capture": "009",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6815505378140895,
+          "after": 0.6816313420379561
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A9",
+      "capture": "002",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7575490236749417,
+          "after": 0.7575791713495539
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A9",
+      "capture": "003",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7491337194485368,
+          "after": 0.7491599267198215
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A9",
+      "capture": "004",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.732614748686094,
+          "after": 0.7326397270392874
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A9",
+      "capture": "005",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7230235845631768,
+          "after": 0.7230878395817099
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A9",
+      "capture": "006",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7138126213373327,
+          "after": 0.7138818648441859
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A9",
+      "capture": "007",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7041313934288403,
+          "after": 0.7042050835611938
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A9",
+      "capture": "008",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6959907736712568,
+          "after": 0.6960666454655652
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A9",
+      "capture": "009",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6867854756253098,
+          "after": 0.686861025373222
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/C2",
+      "capture": "002",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 141.40348829380855,
+          "after": 141.39982820107136
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/C2",
+      "capture": "003",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 140.73437699664768,
+          "after": 140.7307617274898
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/C2",
+      "capture": "004",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 140.7041619619678,
+          "after": 140.70054669280955
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/C2",
+      "capture": "006",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 140.06216350504093,
+          "after": 140.0590144915179
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/C2",
+      "capture": "007",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 139.90880255948554,
+          "after": 139.90670511649162
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/C2",
+      "capture": "008",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 139.68626679001545,
+          "after": 139.68416934702188
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/C2",
+      "capture": "009",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 139.63970287208488,
+          "after": 139.63760542909088
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/C3",
+      "capture": "003",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 106.95959042022336,
+          "after": 106.95959304779767
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/C4",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 14669415.656060664,
+          "after": 14668949.374163903
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A6",
+      "capture": "002",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7599626711033571,
+          "after": 0.7600006852136475
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A6",
+      "capture": "003",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7513245628493467,
+          "after": 0.751347486934065
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A6",
+      "capture": "004",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7365527711712447,
+          "after": 0.7365755263308285
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A6",
+      "capture": "005",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7286895367048284,
+          "after": 0.7287726043206701
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A6",
+      "capture": "006",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7212214608315061,
+          "after": 0.7212821652124645
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A6",
+      "capture": "007",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7121348893106197,
+          "after": 0.7121946951383684
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A6",
+      "capture": "008",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7037036388548925,
+          "after": 0.7037750659501331
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A6",
+      "capture": "009",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6968147535997299,
+          "after": 0.6968861795252207
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A7",
+      "capture": "002",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7611465979717442,
+          "after": 0.7611729838491116
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A7",
+      "capture": "003",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7538563287024727,
+          "after": 0.7538817041190945
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A7",
+      "capture": "004",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.739608391149158,
+          "after": 0.739634827094854
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A7",
+      "capture": "005",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7307767879471466,
+          "after": 0.7308336767343299
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A7",
+      "capture": "006",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7223308824025728,
+          "after": 0.7223928556633313
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A7",
+      "capture": "007",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7139303737447645,
+          "after": 0.7139941209609059
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A7",
+      "capture": "008",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7068631376300627,
+          "after": 0.7069274067900478
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A7",
+      "capture": "009",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6986412618530279,
+          "after": 0.6987052572730755
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A8",
+      "capture": "002",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7599626711033571,
+          "after": 0.7600006852136475
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A8",
+      "capture": "003",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7513245628493467,
+          "after": 0.751347486934065
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A8",
+      "capture": "004",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7365527711712447,
+          "after": 0.7365755263308285
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A8",
+      "capture": "005",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7286895367048284,
+          "after": 0.7287726043206701
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A8",
+      "capture": "006",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7212214608315061,
+          "after": 0.7212821652124645
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A8",
+      "capture": "007",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7121348893106197,
+          "after": 0.7121946951383684
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A8",
+      "capture": "008",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7037036388548925,
+          "after": 0.7037750659501331
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A8",
+      "capture": "009",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6968147535997299,
+          "after": 0.6968861795252207
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A9",
+      "capture": "002",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7611465979717442,
+          "after": 0.7611729838491116
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A9",
+      "capture": "003",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7538563287024727,
+          "after": 0.7538817041190945
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A9",
+      "capture": "004",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7396083911491584,
+          "after": 0.7396348270948544
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A9",
+      "capture": "005",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7307767879471466,
+          "after": 0.73083367673433
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A9",
+      "capture": "006",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.722330882402575,
+          "after": 0.7223928556633323
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A9",
+      "capture": "007",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7139303737447666,
+          "after": 0.7139941209609071
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A9",
+      "capture": "008",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7068631376300649,
+          "after": 0.7069274067900487
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A9",
+      "capture": "009",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6986412618530301,
+          "after": 0.6987052572730765
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/C2",
+      "capture": "002",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 141.51728415434994,
+          "after": 141.5138269400252
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/C2",
+      "capture": "003",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 140.87314229238092,
+          "after": 140.86973100589162
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/C2",
+      "capture": "004",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 140.8648866298452,
+          "after": 140.86147534335532
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/C2",
+      "capture": "006",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 140.62348806875826,
+          "after": 140.62018933049316
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/C2",
+      "capture": "007",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 140.57982959905556,
+          "after": 140.57765208445417
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/C2",
+      "capture": "008",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 139.93682255381108,
+          "after": 139.9346450392094
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/C2",
+      "capture": "009",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 139.92033622873825,
+          "after": 139.9181587141368
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/C3",
+      "capture": "003",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 106.9114937275632,
+          "after": 106.91120264438996
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/C4",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 14670959.56595665,
+          "after": 14670493.173296534
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A6",
+      "capture": "002",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7378901156719652,
+          "after": 0.7379445524751912
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A6",
+      "capture": "003",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7233160237871332,
+          "after": 0.7233623566520225
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A6",
+      "capture": "004",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6943733624379275,
+          "after": 0.6944185168015559
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A6",
+      "capture": "005",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6797036321317206,
+          "after": 0.6798189866057216
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A6",
+      "capture": "006",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6653962170802488,
+          "after": 0.6654911970014364
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A6",
+      "capture": "007",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6488496732561224,
+          "after": 0.6489323664058483
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A6",
+      "capture": "008",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6349698372447641,
+          "after": 0.6350386333623083
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A6",
+      "capture": "009",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6318032977613607,
+          "after": 0.631872044528696
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A7",
+      "capture": "002",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7378901156719652,
+          "after": 0.7379445524751912
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A7",
+      "capture": "003",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7233160237871332,
+          "after": 0.7233623566520225
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A7",
+      "capture": "004",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6943733624379275,
+          "after": 0.6944185168015559
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A7",
+      "capture": "005",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6797036321317206,
+          "after": 0.6798189866057216
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A7",
+      "capture": "006",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6653962170802488,
+          "after": 0.6654911970014364
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A7",
+      "capture": "007",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6488496732561224,
+          "after": 0.6489323664058483
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A7",
+      "capture": "008",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6349698372447641,
+          "after": 0.6350386333623083
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A7",
+      "capture": "009",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.621636631094694,
+          "after": 0.6217053778620294
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A8",
+      "capture": "002",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7378901156719652,
+          "after": 0.7379445524751912
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A8",
+      "capture": "003",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7233160237871332,
+          "after": 0.7233623566520225
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A8",
+      "capture": "004",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6943733624379272,
+          "after": 0.6944185168015555
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A8",
+      "capture": "005",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6797036321317206,
+          "after": 0.6798189866057216
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A8",
+      "capture": "006",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6653862753373272,
+          "after": 0.6654917419945959
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A8",
+      "capture": "007",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6488297897702795,
+          "after": 0.6489334563919968
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A8",
+      "capture": "008",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6349499537589212,
+          "after": 0.6350397233484569
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A8",
+      "capture": "009",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6317834142755177,
+          "after": 0.6318731345148447
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A9",
+      "capture": "002",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7378901156719652,
+          "after": 0.7379445524751912
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A9",
+      "capture": "003",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.7233160237871332,
+          "after": 0.7233623566520225
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A9",
+      "capture": "004",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6943733624379272,
+          "after": 0.6944185168015555
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A9",
+      "capture": "005",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6797036321317206,
+          "after": 0.6798189866057216
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A9",
+      "capture": "006",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6653862753373272,
+          "after": 0.6654917419945959
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A9",
+      "capture": "007",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6488297897702795,
+          "after": 0.6489334563919968
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A9",
+      "capture": "008",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6349499537589212,
+          "after": 0.6350397233484569
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A9",
+      "capture": "009",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 0.6317834142755177,
+          "after": 0.6318731345148447
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/C2",
+      "capture": "002",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 141.58144016112342,
+          "after": 141.5779996375276
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/C2",
+      "capture": "003",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 141.19792921620217,
+          "after": 141.1944919811128
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/C2",
+      "capture": "004",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 141.18048455779626,
+          "after": 141.17704732270695
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/C2",
+      "capture": "006",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 140.04450591605683,
+          "after": 140.042253207682
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/C2",
+      "capture": "007",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 139.7805705445686,
+          "after": 139.7787337432915
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/C2",
+      "capture": "008",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 139.39706288815324,
+          "after": 139.39522608687642
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/C2",
+      "capture": "009",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 139.32211758786295,
+          "after": 139.3202807865858
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/C3",
+      "capture": "003",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 106.85192643646633,
+          "after": 106.85112199095607
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/C4",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 14670959.56595665,
+          "after": 14670493.173296534
+        }
+      }
+    },
+    {
+      "case": "draft/angle/F1",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 21453.370065536375,
+          "after": 21453.36073458323
+        }
+      }
+    },
+    {
+      "case": "feat/featlf/E4",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 8.733970157346395,
+          "after": 8.73397070464735
+        }
+      }
+    },
+    {
+      "case": "feat/featlf/E5",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 8.733970157346395,
+          "after": 8.73397070464735
+        }
+      }
+    }
+  ],
+  "exact_successful_results": 220,
+  "seed_capture_changes": [],
+  "native_reference_changes": [],
+  "stored_tolerances": {
+    "threshold": 0.001,
+    "inputs": [
+      {
+        "case": "chamfer/dist_angle_sequence/B5",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.01538612357827674,
+          "vertex": 0.015386123578276744
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle_sequence/B7",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.015385866787860681,
+          "vertex": 0.015385866787860684
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle_sequence/B8",
+        "capture": "003",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.09823449952410898,
+          "vertex": 0.11256746834283206
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_dist_sequence/B5",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.015385866784913394,
+          "vertex": 0.015385866784913398
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_dist_sequence/B6",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.015386123576832314,
+          "vertex": 0.015386123576832318
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/equal_dist_sequence/B6",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.015385866785128127,
+          "vertex": 0.01538586678512813
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/equal_dist_sequence/B8",
+        "capture": "003",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.06347812877808842,
+          "vertex": 0.06923484078027042
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      }
+    ],
+    "native_results": [
+      {
+        "case": "blend/simple/D1",
+        "capture": "001",
+        "tolerances": {
+          "face": 0.0001,
+          "edge": 0.8964317893944277,
+          "vertex": 1.2642307919977536
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/simple/F5",
+        "capture": "001",
+        "tolerances": {
+          "face": 0.02190790727118659,
+          "edge": 0.02190790727118659,
+          "vertex": 0.021907907271186598
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/simple/F7",
+        "capture": "001",
+        "tolerances": {
+          "face": 1e-06,
+          "edge": 1.000000006123234e-06,
+          "vertex": 0.04540290569850494
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/simple/F9",
+        "capture": "001",
+        "tolerances": {
+          "face": 1e-06,
+          "edge": 0.005381662689997078,
+          "vertex": 0.008350113249638094
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/simple/G2",
+        "capture": "001",
+        "tolerances": {
+          "face": 0.0001,
+          "edge": 0.058118986044292886,
+          "vertex": 0.08523407424694941
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/simple/H4",
+        "capture": "001",
+        "tolerances": {
+          "face": 1e-06,
+          "edge": 22.974106952046146,
+          "vertex": 22.974106952046153
+        },
+        "status": "operation-succeeded",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/tolblend_simple/A1",
+        "capture": "001",
+        "tolerances": {
+          "face": 0.002351089158340483,
+          "edge": 0.002351089158340483,
+          "vertex": 0.0023510891583404837
+        },
+        "status": "operation-succeeded",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/tolblend_simple/A2",
+        "capture": "001",
+        "tolerances": {
+          "face": 0.01616354954173985,
+          "edge": 0.01616354954173985,
+          "vertex": 0.016163549541739857
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/tolblend_simple/D3",
+        "capture": "001",
+        "tolerances": {
+          "face": 0.07389052197953262,
+          "edge": 0.08021622051706867,
+          "vertex": 0.16809285098977023
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/tolblend_simple/D5",
+        "capture": "001",
+        "tolerances": {
+          "face": 0.008070814689590054,
+          "edge": 0.008070814689590054,
+          "vertex": 0.008070814689590058
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle/F1",
+        "capture": "001",
+        "tolerances": {
+          "face": 0.0001,
+          "edge": 0.0692833518221263,
+          "vertex": 0.06928335182212686
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle_sequence/B5",
+        "capture": "001",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.01538612357827674,
+          "vertex": 0.015386123578276744
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle_sequence/B5",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.01538612357827674,
+          "vertex": 0.015696123578276745
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle_sequence/B7",
+        "capture": "001",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.015385866787860681,
+          "vertex": 0.015385866787860684
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle_sequence/B7",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 5e-05,
+          "vertex": 0.016005866787860687
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle_sequence/B8",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.09823449952410898,
+          "vertex": 0.11256746834283206
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle_sequence/B8",
+        "capture": "003",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.09823449952410898,
+          "vertex": 0.11256746834283206
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_dist_complex/B5",
+        "capture": "001",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.00036173254411125385,
+          "vertex": 0.0010531067408991698
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_dist_sequence/B5",
+        "capture": "001",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.015385866784913394,
+          "vertex": 0.015385866784913398
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_dist_sequence/B5",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 5e-05,
+          "vertex": 0.0160058667849134
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_dist_sequence/B6",
+        "capture": "001",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.015386123576832314,
+          "vertex": 0.015386123576832318
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_dist_sequence/B6",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 5e-05,
+          "vertex": 0.01600612357683232
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/equal_dist_complex/B6",
+        "capture": "001",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.00044441723946461964,
+          "vertex": 0.0012931407907644137
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/equal_dist_complex/C1",
+        "capture": "001",
+        "tolerances": {
+          "face": 3.050212492887909e-06,
+          "edge": 0.0011785994935571728,
+          "vertex": 0.0020450305471271255
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/equal_dist_sequence/B6",
+        "capture": "001",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.015385866785128127,
+          "vertex": 0.01538586678512813
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/equal_dist_sequence/B6",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 5e-05,
+          "vertex": 0.016005866785128133
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/equal_dist_sequence/B8",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.06347812877808842,
+          "vertex": 0.06923484078027042
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/equal_dist_sequence/B8",
+        "capture": "003",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.06347812877808842,
+          "vertex": 0.06923484078027042
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      }
+    ],
+    "truck_step": [],
+    "native_result_count": 647,
+    "truck_step_count": 359
+  }
+}

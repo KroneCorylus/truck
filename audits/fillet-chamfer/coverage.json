@@ -3,7 +3,7 @@
     "title": "Fillet and chamfer feature parity audit",
     "baseline": "OCCT V7_9_3 source inventory plus the recorded Truck/Pieza revisions. Includes 3D, 2D, related workflows and all textual candidates under the discovery rules.",
     "meaning_of_all": "Every dedicated test-grid entry, matching registered test/helper, discovered blend command and retained reference in this pinned checkout. This is not a claim about all mathematical configurations or current/future OCCT releases.",
-    "execution": "All 1,026 inventoried entries have native attempts. Latest clean capture at 05901a28:396 native passes,648 operations,487 complete chamfer and161 complete fillet scopes;356 constructions/337 limited sampled passes at0.001. All352 prior constructions retain checks;352 complete prior results/comparisons exact,0 numerical changes recorded. No prior successful check regressed. Independent cone contact proof explains nine native setback discrepancies without changing raw verdicts. Full parity remains unverified.",
+    "execution": "All 1,026 inventoried entries have native attempts. Latest clean capture at 35c11b96:396 native passes,648 operations,487 complete chamfer and161 complete fillet scopes;359 constructions/340 limited sampled passes at0.001. All356 prior constructions retain checks;220 complete prior results/comparisons exact,136 numerical changes recorded. No prior successful check regressed. Independent native-error proofs retain raw verdicts. Full parity remains unverified;stopped at user-requested checkpoint.",
     "mapping": "Capability assessments describe observable outcomes supported or restricted by reviewed source evidence. Per-case tags and links are automated hints; they do not prove Truck handles that fixture.",
     "objective": "Achieve at least OCCT-level fillet/chamfer capabilities and robustness for equivalent modeling tasks in Truck/Pieza.",
     "equivalence": "Judge the requested geometry, dimensions, validity, editing behavior and practical performance. Different APIs, algorithms, languages, surface representations and internal operation sequences are acceptable. Missing a corresponding OCCT method is not evidence of a feature gap."
@@ -462,6 +462,12 @@
           "path": "truck-benchmarks/results/2026-10-16-curved-chamfer-terminals/REPORT.md",
           "find": "# Planar chamfers crossing",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-16-conic-contact-extension/REPORT.md",
+          "find": "# Exact conic contact",
+          "role": "test"
         }
       ],
       "required_outcome": "Bevel selected edges by equal specified setbacks on both supports, including convex and concave material.",
@@ -478,7 +484,8 @@
         "Independent plane/cone contact oracle: nine corpus pairs and sixteen control pairs verified. Native changes first unequal setback on acute rims; Truck sampled contact error below9e-9, all16controlanalyticvolume/STEPchecks pass. Native angle-quadrant fold reproduced; raw comparison verdicts retained, no full-parity upgrade.",
         "At4211cfe0, isolated equal/unequal chamfers retry theexistingstraight-edge solver after a miter rejects consumedneighbors.2parent-failingtests/6variants,3nativecontrols,fullshapeops393pass,39replay,Clippy/smoke. Fullcapture312construct/292limitedpasses;no priorcheckregressions. Existing oversized/collision guards unchanged. No parityupgrade.",
         "At b5c98d1a, replay converts native equal/unequal cylindrical chord distances on longitudinal plane/cylinder edges while preserving reference sides. Three parent-failing tests, six constructed variants, 21 native controls with independent material/contact checks;42 replay tests,13 capture tests,Clippy/smoke pass. Full capture:312 constructions/293 limited passes;no prior successful check regressed. Kernel distance contract unchanged;distance-angle remains unsupported here. No parity upgrade.",
-        "At ac5b8fa3, planar chamfers cross curved terminal boundaries using existing intersection and bounded trimming. Two parent-failing tests/four constructed variants,oversized guards,six independent native controls. Full shapeops 396 pass,42 replay tests,Clippy/smoke. Clean capture:352 constructions/333 limited passes;no prior successful check regressed. No parity upgrade."
+        "At ac5b8fa3, planar chamfers cross curved terminal boundaries using existing intersection and bounded trimming. Two parent-failing tests/four constructed variants,oversized guards,six independent native controls. Full shapeops 396 pass,42 replay tests,Clippy/smoke. Clean capture:352 constructions/333 limited passes;no prior successful check regressed. No parity upgrade.",
+        "At 35c11b96, planar chamfer contacts extend exact conics and their extruded cylinder generators;mesh interior ruling fixes material loss. Three parent failures,eight variants,oversized guards,six native controls. Full shapeops 400 and meshalgo 98 pass,46 replay tests,Clippy/smoke. Clean capture:359 constructions/340 limited passes;no prior successful check regressed. No parity upgrade."
       ]
     },
     {
@@ -594,6 +601,12 @@
           "path": "truck-benchmarks/results/2026-10-16-curved-chamfer-terminals/REPORT.md",
           "find": "# Planar chamfers crossing",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-16-conic-contact-extension/REPORT.md",
+          "find": "# Exact conic contact",
+          "role": "test"
         }
       ],
       "required_outcome": "Bevel with independently specified setbacks on the intended two support faces; orientation or storage order must not silently exchange them.",
@@ -610,7 +623,8 @@
         "Independent plane/cone contact oracle: nine corpus pairs and sixteen control pairs verified. Native changes first unequal setback on acute rims; Truck sampled contact error below9e-9, all16controlanalyticvolume/STEPchecks pass. Native angle-quadrant fold reproduced; raw comparison verdicts retained, no full-parity upgrade.",
         "At4211cfe0, isolated equal/unequal chamfers retry theexistingstraight-edge solver after a miter rejects consumedneighbors.2parent-failingtests/6variants,3nativecontrols,fullshapeops393pass,39replay,Clippy/smoke. Fullcapture312construct/292limitedpasses;no priorcheckregressions. Existing oversized/collision guards unchanged. No parityupgrade.",
         "At b5c98d1a, replay converts native equal/unequal cylindrical chord distances on longitudinal plane/cylinder edges while preserving reference sides. Three parent-failing tests, six constructed variants, 21 native controls with independent material/contact checks;42 replay tests,13 capture tests,Clippy/smoke pass. Full capture:312 constructions/293 limited passes;no prior successful check regressed. Kernel distance contract unchanged;distance-angle remains unsupported here. No parity upgrade.",
-        "At ac5b8fa3, planar chamfers cross curved terminal boundaries using existing intersection and bounded trimming. Two parent-failing tests/four constructed variants,oversized guards,six independent native controls. Full shapeops 396 pass,42 replay tests,Clippy/smoke. Clean capture:352 constructions/333 limited passes;no prior successful check regressed. No parity upgrade."
+        "At ac5b8fa3, planar chamfers cross curved terminal boundaries using existing intersection and bounded trimming. Two parent-failing tests/four constructed variants,oversized guards,six independent native controls. Full shapeops 396 pass,42 replay tests,Clippy/smoke. Clean capture:352 constructions/333 limited passes;no prior successful check regressed. No parity upgrade.",
+        "At 35c11b96, planar chamfer contacts extend exact conics and their extruded cylinder generators;mesh interior ruling fixes material loss. Three parent failures,eight variants,oversized guards,six native controls. Full shapeops 400 and meshalgo 98 pass,46 replay tests,Clippy/smoke. Clean capture:359 constructions/340 limited passes;no prior successful check regressed. No parity upgrade."
       ]
     },
     {
@@ -1892,6 +1906,12 @@
           "path": "truck-benchmarks/results/2026-10-16-curved-chamfer-terminals/REPORT.md",
           "find": "# Planar chamfers crossing",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-16-conic-contact-extension/REPORT.md",
+          "find": "# Exact conic contact",
+          "role": "test"
         }
       ],
       "required_outcome": "Terminate one blend across a neighborhood of several end faces without gaps, overlaps or damage to unrelated geometry.",
@@ -1900,7 +1920,8 @@
         "At 0522d735, an independent G1 rolling-radius/contact oracle verifies native input supports, radius1000 and analytic controls across three sample grids. Native maximum radius residual0.14305548 and plane-contact distance0.34871939 exceed Truck STEP values4.5934381e-6 and0.00021494676. Default/tight native rebuilds reproduce the discrepancy. Both existing two-edge fillet solid/STEP regressions pass unchanged. This identifies sampled native reference error without changing geometry, thresholds or the 231/220 corpus counts; G1 remains a sampled mismatch and no global bound/full parity is claimed.",
         "At 71edbef1, open chamfers rebuild a shared terminal face with both end bridges. Two parent-failing regressions cover six equal/unequal,scaled,transformed/reversed variants with analytic material/cone/normals and shared solid/STEP checks. Three native controls export valid single STEP,maxsample6.97e-9. Fullshapeops391pass/0fail/1existingignored,33replay,Clippy/smoke pass. Cleanfullcapture:231construct/220limitedpasses,all231successful results/comparisons exactly unchanged. No parity upgrade.",
         "At4211cfe0, isolated equal/unequal chamfers retry theexistingstraight-edge solver after a miter rejects consumedneighbors.2parent-failingtests/6variants,3nativecontrols,fullshapeops393pass,39replay,Clippy/smoke. Fullcapture312construct/292limitedpasses;no priorcheckregressions. Existing oversized/collision guards unchanged. No parityupgrade.",
-        "At ac5b8fa3, planar chamfers cross curved terminal boundaries using existing intersection and bounded trimming. Two parent-failing tests/four constructed variants,oversized guards,six independent native controls. Full shapeops 396 pass,42 replay tests,Clippy/smoke. Clean capture:352 constructions/333 limited passes;no prior successful check regressed. No parity upgrade."
+        "At ac5b8fa3, planar chamfers cross curved terminal boundaries using existing intersection and bounded trimming. Two parent-failing tests/four constructed variants,oversized guards,six independent native controls. Full shapeops 396 pass,42 replay tests,Clippy/smoke. Clean capture:352 constructions/333 limited passes;no prior successful check regressed. No parity upgrade.",
+        "At 35c11b96, planar chamfer contacts extend exact conics and their extruded cylinder generators;mesh interior ruling fixes material loss. Three parent failures,eight variants,oversized guards,six native controls. Full shapeops 400 and meshalgo 98 pass,46 replay tests,Clippy/smoke. Clean capture:359 constructions/340 limited passes;no prior successful check regressed. No parity upgrade."
       ]
     },
     {

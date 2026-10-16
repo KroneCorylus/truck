@@ -1,8 +1,8 @@
 LATEST CHECKPOINT — 2026-10-16
-Work active. Read ../2026-10-16-longitudinal-plane-angles/HANDOFF.txt and report.html.
-Implementation 05901a28 supports plane-reference longitudinal cylinder angles.
-Full capture:356 constructions/337 limited passes;no prior check regressions.
-Continue until done or stopped. Full parity remains unverified.
+STOPPED at user's request. Read ../2026-10-16-conic-contact-extension/HANDOFF.txt and report.html.
+Implementation 35c11b96 supports exact conic chamfer contacts and correct mesh material.
+Full capture:359 constructions/340 limited passes;no prior check regressions.
+Do not resume until instructed. Full parity remains unverified.
 
 HISTORICAL HANDOFF FOLLOWS
 
