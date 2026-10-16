@@ -1,0 +1,6 @@
+{
+  "revision": "18232e095c86fe892390c74398136c16d32c0776",
+  "test_sha256": "f5e33701244a32aaddb1ec8002afc9ab75169606511e97ad65e6f0d6bed573d3",
+  "tests_failed": 2,
+  "stage": "trim_end_faces"
+}

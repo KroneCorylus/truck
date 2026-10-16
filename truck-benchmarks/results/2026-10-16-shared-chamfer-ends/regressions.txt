@@ -1,0 +1,11 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 7.52s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/two_edge_chamfer_caps.rs (target/release/deps/two_edge_chamfer_caps-41ce0d3940db00f1)
+
+running 2 tests
+test equal_chamfer_closes_both_ends_on_one_terminal_face ... ok
+test unequal_chamfer_preserves_side_distances_on_shared_caps ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s

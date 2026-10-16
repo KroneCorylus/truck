@@ -260,7 +260,8 @@ where
 /// seams between consecutive supporting faces must meet those points without extending the
 /// contact curves. This includes the rim of a prism with filleted vertical edges.
 ///
-/// Open ends must terminate on a single face at the contact endpoints. The chamfer must fit
+/// Each open end must terminate on a single face at the contact endpoints; both ends may
+/// share that face. The chamfer must fit
 /// inside its supporting faces and avoid distant faces. Branching selections and non-tangent
 /// corners are unsupported. Original faces retain their
 /// order, followed by one ruled chamfer face per wire edge. Returns `None` on failed construction.
@@ -426,6 +427,7 @@ where
             (&trimmed.vertices[n][1], Point2::new(t, sides[k].1)),
             surfaces[k].to_same_geometry(),
         ));
+        let mut ends: Vec<(usize, Vec<usize>)> = Vec::new();
         for j in [0, n] {
             let vertex = if j == 0 {
                 wire.front_vertex().unwrap()
@@ -440,9 +442,19 @@ where
                         && !f.edge_iter().any(|e| wire.iter().any(|w| w.id() == e.id()))
                 })
                 .collect();
-            let [(index, face)] = candidates.as_slice() else {
+            let [(index, _)] = candidates.as_slice() else {
                 return Err(failed().stage("trim_end_faces"));
             };
+            if let Some((_, junctions)) = ends.iter_mut().find(|(i, _)| i == index) {
+                junctions.push(j);
+            } else {
+                ends.push((*index, vec![j]));
+            }
+        }
+        // Apply both end bridges together when they trim the same terminal face.
+        for (index, junctions) in ends {
+            let face = &shell[index];
+            let mut used = vec![false; junctions.len()];
             let mut loops = Vec::new();
             for boundary in face.boundaries() {
                 let mut pieces = Vec::new();
@@ -454,18 +466,31 @@ where
                     boundary.push_back(pieces[i].clone());
                     let (a, b) = (pieces[i].back(), pieces[(i + 1) % pieces.len()].front());
                     if a != b {
-                        if cross[j].front() == a && cross[j].back() == b {
-                            boundary.push_back(cross[j].clone());
-                        } else if cross[j].back() == a && cross[j].front() == b {
-                            boundary.push_back(cross[j].inverse());
-                        } else {
-                            return Err(failed().stage("trim_end_faces"));
-                        }
+                        let (bridge, edge) = junctions
+                            .iter()
+                            .enumerate()
+                            .find_map(|(i, &j)| {
+                                if used[i] {
+                                    None
+                                } else if cross[j].front() == a && cross[j].back() == b {
+                                    Some((i, cross[j].clone()))
+                                } else if cross[j].back() == a && cross[j].front() == b {
+                                    Some((i, cross[j].inverse()))
+                                } else {
+                                    None
+                                }
+                            })
+                            .ok_or_else(|| failed().stage("trim_end_faces"))?;
+                        boundary.push_back(edge);
+                        used[bridge] = true;
                     }
                 }
                 loops.push(boundary);
             }
-            trimmed.faces[*index] = Face::try_new(loops, face.oriented_surface())
+            if used.iter().any(|used| !used) {
+                return Err(failed().stage("trim_end_faces"));
+            }
+            trimmed.faces[index] = Face::try_new(loops, face.oriented_surface())
                 .map_err(|_| failed().stage("trim_end_faces"))?;
         }
     }

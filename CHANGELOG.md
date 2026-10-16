@@ -6,6 +6,8 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Chamfers along open wires now rebuild a shared terminal face with both end bridges, preserving complete solids when a curved rim has a two-edge cap.
+
 - Record maximum stored face, edge and vertex tolerances for captured shapes and both sides of native STEP comparisons. Keep tolerance budgets separate from validity and measured distances; a native control proves exact geometry can carry large tolerances, and the audit exposes inflated reference tolerances without changing comparison thresholds.
 
 - Capture final native fillet contours and radius assignments after all seeds, including overwritten radii and variable-law classification. Observe native tolerance/continuity changes without changing Tcl scope or return behavior. Replay expands constant rational C1 contours atomically, retains legacy seed-only behavior, and explicitly rejects unsupported laws and representations.
