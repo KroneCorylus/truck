@@ -219,6 +219,32 @@ fn captured_vector(value: &Value) -> Option<Vector3> {
     v.is_finite().then_some(v)
 }
 
+fn longitudinal_cylinder(input: &Solid, edge: &Edge) -> Option<(usize, f64)> {
+    let Curve::Line(line) = edge.curve() else {
+        return None;
+    };
+    let direction = (line.1 - line.0).normalize();
+    if !direction.is_finite() {
+        return None;
+    }
+    let adjacent: Vec<_> = input
+        .face_iter()
+        .filter(|f| f.edge_iter().any(|e| e.id() == edge.id()))
+        .map(|f| f.oriented_surface().elementary())
+        .collect();
+    let (plane, axis, radius, side) = match adjacent.as_slice() {
+        [Some((Elementary::Plane(p), _)), Some((Elementary::Cylinder { axis, radius, .. }, _))] => {
+            (p, axis, radius, 1)
+        }
+        [Some((Elementary::Cylinder { axis, radius, .. }, _)), Some((Elementary::Plane(p), _))] => {
+            (p, axis, radius, 0)
+        }
+        _ => return None,
+    };
+    (plane.normal().dot(*axis).abs() < 1e-8 && direction.cross(*axis).magnitude() < 1e-8)
+        .then_some((side, *radius))
+}
+
 fn chamfer_selection(
     input: &Solid,
     selection: &[Value],
@@ -451,6 +477,7 @@ fn chamfer_selection(
         };
         let requested = distances;
         for edge in matched {
+            let longitudinal = longitudinal_cylinder(input, &edge);
             distances = requested;
             if let Some(reference_side) = reference_side {
                 let oriented = wire
@@ -485,24 +512,28 @@ fn chamfer_selection(
                     .iter()
                     .map(|f| f.oriented_surface().elementary())
                     .collect();
-                let (cos_beta, sin_beta) = match (&supports[0], &supports[1]) {
+                let linear_section = match (&supports[0], &supports[1]) {
                     (Some((Elementary::Plane(a), forward_a)), Some((Elementary::Plane(b), forward_b))) => {
                         let a = a.normal() * if *forward_a { 1. } else { -1. };
                         let b = b.normal() * if *forward_b { 1. } else { -1. };
-                        (-a.dot(b), a.cross(b).magnitude())
+                        Some((-a.dot(b), a.cross(b).magnitude()))
                     }
                     (Some((Elementary::Plane(p), _)), Some((Elementary::Cylinder { axis, .. }, _)))
                     | (Some((Elementary::Cylinder { axis, .. }, _)), Some((Elementary::Plane(p), _)))
-                        if p.normal().cross(*axis).magnitude() < 1e-8 => (0., 1.),
+                        if p.normal().cross(*axis).magnitude() < 1e-8 => Some((0., 1.)),
                     (Some((Elementary::Plane(p), plane_forward)), Some((Elementary::Cone { axis, half_angle, .. }, cone_forward)))
                     | (Some((Elementary::Cone { axis, half_angle, .. }, cone_forward)), Some((Elementary::Plane(p), plane_forward)))
                         if p.normal().cross(*axis).magnitude() < 1e-8 => {
                             let sign = if plane_forward == cone_forward { 1. } else { -1. };
-                            (sign * p.normal().dot(*axis) * half_angle.0.sin(), half_angle.0.cos())
+                            Some((sign * p.normal().dot(*axis) * half_angle.0.sin(), half_angle.0.cos()))
                         }
-                    _ => return Err(unsupported("Face-dependent chamfers require planar supports or a perpendicular plane/cylinder or plane/cone rim")),
+                    _ if longitudinal.is_some() => None,
+                    _ => return Err(unsupported("Face-dependent chamfers require planar supports, a perpendicular plane/cylinder or plane/cone rim, or a longitudinal plane/cylinder edge")),
                 };
                 if mode == "distance-angle" {
+                    let (cos_beta, sin_beta) = linear_section.ok_or_else(|| {
+                        unsupported("Distance-angle chamfers on longitudinal cylindrical edges require curved-section conversion")
+                    })?;
                     let tangent = requested[1] / requested[0];
                     // Sine rule in the corner section: d1 = d0 sin(alpha) / sin(beta + alpha).
                     let denominator = sin_beta + cos_beta * tangent;
@@ -518,6 +549,19 @@ fn chamfer_selection(
                 }
                 if *side == 1 {
                     distances.swap(0, 1);
+                }
+            }
+            if let Some((side, radius)) = longitudinal {
+                let ratio = distances[side] / radius / 2.;
+                if !(ratio > 0. && ratio < std::f64::consts::FRAC_1_SQRT_2) {
+                    return Err(unsupported(
+                        "Cylinder chord exceeds the local tangent-projection branch",
+                    ));
+                }
+                // OCCT measures a chord; the kernel projects a tangent offset onto the cylinder.
+                distances[side] = radius * (2. * ratio.asin()).tan();
+                if !distances[side].is_finite() || distances[side] <= 0. {
+                    return Err(unsupported("Cylinder chord has no finite tangent offset"));
                 }
             }
             if let Some(previous) = assignments.insert(edge.id(), distances) {
@@ -2232,5 +2276,194 @@ mod conical_reference_tests {
             );
         }
         assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
+    }
+}
+
+#[cfg(test)]
+mod longitudinal_chamfer_distance_tests {
+    use super::*;
+
+    fn task(mode: &str, cylinder_reference: bool) -> Value {
+        let text = match (mode, cylinder_reference) {
+            ("equal", _) => include_str!("../tests/fixtures/chamfer-longitudinal/001.json"),
+            ("unequal", false) => include_str!("../tests/fixtures/chamfer-longitudinal/002.json"),
+            ("unequal", true) => include_str!("../tests/fixtures/chamfer-longitudinal/003.json"),
+            _ => unreachable!(),
+        };
+        serde_json::from_str(text).unwrap()
+    }
+
+    fn transform_points(member: &mut Value, transform: Matrix4) {
+        let points = member["points"].as_array_mut().unwrap();
+        for p in points.iter_mut() {
+            let point = transform.transform_point(Point3::from_vec(captured_vector(p).unwrap()));
+            *p = json!([point.x, point.y, point.z]);
+        }
+        points.reverse();
+    }
+
+    fn check(mode: &str, cylinder_reference: bool, moved: bool) {
+        let scale: f64 = if moved { 0.2 } else { 1. };
+        let transform = if moved {
+            Matrix4::from_translation(Vector3::new(13., -7., 23.))
+                * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.73))
+        } else {
+            Matrix4::identity()
+        } * Matrix4::from_scale(scale);
+        let directory = std::env::temp_dir().join(format!(
+            "truck-longitudinal-distance-{}-{mode}-{cylinder_reference}-{moved}",
+            std::process::id()
+        ));
+        std::fs::create_dir_all(&directory).unwrap();
+        let prefix = directory.join("001");
+        let prefix = prefix.to_str().unwrap();
+        std::fs::write(
+            format!("{prefix}.input.step"),
+            include_str!("../tests/fixtures/chamfer-longitudinal/half-cylinder.step"),
+        )
+        .unwrap();
+        let mut input =
+            builder::transformed(&import(&format!("{prefix}.input.step")).unwrap(), transform);
+        if moved {
+            input = Solid::new(
+                input
+                    .boundaries()
+                    .iter()
+                    .map(|s| s.iter().cloned().rev().collect())
+                    .collect(),
+            );
+        }
+        let prepared = prepare_for_step(&input.compress(), CHAMFER_STEP_TOL).unwrap();
+        let step = StepDisplay::new(
+            Default::default(),
+            StepDesign::from_model(StepModel::from(&prepared)),
+        )
+        .to_string();
+        std::fs::write(format!("{prefix}.input.step"), &step).unwrap();
+        let mut task = task(mode, cylinder_reference);
+        let chosen = &mut task["selection"][0];
+        transform_points(chosen, transform);
+        for member in chosen["contour_edges"].as_array_mut().unwrap() {
+            transform_points(member, transform);
+        }
+        let (planar, chord): (f64, f64) = if mode == "equal" {
+            (0.5, 0.5)
+        } else {
+            (0.7, 1.5)
+        };
+        if mode == "equal" {
+            chosen["distance"] = json!(chord * scale);
+        } else {
+            chosen["distances"] = if cylinder_reference {
+                json!([chord * scale, planar * scale])
+            } else {
+                json!([planar * scale, chord * scale])
+            };
+            if cylinder_reference {
+                let origin = transform.transform_point(Point3::new(0., 0., 37.));
+                let axis = transform.transform_vector(-Vector3::unit_z() * 7.);
+                chosen["reference_cylinder"] = json!({"origin":[origin.x,origin.y,origin.z],"axis":[axis.x,axis.y,axis.z],"radius":5.*scale});
+            } else {
+                let origin = transform.transform_point(Point3::origin());
+                let normal = transform.transform_vector(Vector3::unit_y()).normalize();
+                chosen["reference_plane"] = json!({"origin":[origin.x,origin.y,origin.z],"normal":[normal.x,normal.y,normal.z]});
+            }
+        }
+        let before = serde_json::to_string(&input.compress()).unwrap();
+        let psi = 2. * (chord / 10.).asin();
+        let assignments = chamfer_selection(&input, &[chosen.clone()], true).unwrap();
+        assert_eq!(assignments.len(), 1);
+        for (edge, distances) in assignments {
+            let adjacent: Vec<_> = input
+                .face_iter()
+                .filter(|f| f.edge_iter().any(|e| e.id() == edge.id()))
+                .collect();
+            for (face, distance) in adjacent.iter().zip(distances) {
+                let expected = match face.oriented_surface().elementary().unwrap().0 {
+                    Elementary::Cylinder { .. } => 5. * psi.tan(),
+                    Elementary::Plane(_) => planar,
+                    _ => panic!("unexpected support"),
+                } * scale;
+                assert!(
+                    (distance - expected).abs() < 1e-12,
+                    "{distance} != {expected}"
+                );
+            }
+        }
+        assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
+        std::fs::write(format!("{prefix}.input.json"), task.to_string()).unwrap();
+        let result = replay(prefix, &Cell::new("start")).unwrap();
+        assert_eq!(result["status"], "operation-succeeded", "{result}");
+        assert_eq!(result["selected_edges"], 1);
+        for field in [
+            "input_unchanged",
+            "geometry_consistent",
+            "mesh_closed",
+            "step_prepared",
+        ] {
+            assert_eq!(result[field], true, "{field}: {result}");
+        }
+        assert_eq!(
+            step,
+            std::fs::read_to_string(format!("{prefix}.input.step")).unwrap()
+        );
+        let expected = (std::f64::consts::PI * 125.
+            - 5. * (25. * psi - 5. * (5. - planar) * psi.sin()))
+            * scale.powi(3);
+        let output = import(&format!("{prefix}.truck.step")).unwrap();
+        replay_common::assert_solid(&output, expected, &[0], TOL);
+        replay_common::blend::assert_step(&output, expected, TOL);
+        let inverse = transform.invert().unwrap();
+        let q = Point3::new(5. * psi.cos(), 5. * psi.sin(), 0.);
+        let p = Point3::new(5. - planar, 0., 0.);
+        for target in [
+            p,
+            q,
+            p + 10. * Vector3::unit_z(),
+            q + 10. * Vector3::unit_z(),
+        ] {
+            assert!(output
+                .vertex_iter()
+                .any(|v| inverse.transform_point(v.point()).distance(target) < 1e-6));
+        }
+        std::fs::remove_dir_all(directory).unwrap();
+    }
+
+    #[test]
+    fn equal_chamfer_uses_native_cylinder_chord_distance() {
+        for moved in [false, true] {
+            check("equal", false, moved);
+        }
+    }
+    #[test]
+    fn unequal_longitudinal_chamfers_preserve_both_reference_sides() {
+        for moved in [false, true] {
+            for cylinder_reference in [false, true] {
+                check("unequal", cylinder_reference, moved);
+            }
+        }
+    }
+    #[test]
+    fn longitudinal_chord_conversion_rejects_nonlocal_contacts() {
+        let path = std::env::temp_dir().join(format!(
+            "truck-longitudinal-guards-{}.step",
+            std::process::id()
+        ));
+        std::fs::write(
+            &path,
+            include_str!("../tests/fixtures/chamfer-longitudinal/half-cylinder.step"),
+        )
+        .unwrap();
+        let input = import(path.to_str().unwrap()).unwrap();
+        let before = serde_json::to_string(&input.compress()).unwrap();
+        for distance in [8., 10., 11., 1e300] {
+            let mut task = task("equal", false);
+            task["selection"][0]["distance"] = json!(distance);
+            let error =
+                chamfer_selection(&input, task["selection"].as_array().unwrap(), true).unwrap_err();
+            assert_eq!(error["status"], "unhandled-intent");
+        }
+        assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
+        std::fs::remove_file(path).unwrap();
     }
 }

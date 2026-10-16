@@ -1,0 +1,10 @@
+{
+  "revision": "48e89fdb479e9312710e53ca64d80243785ae8ce",
+  "fixture_sha256": {
+    "truck-shapeops/tests/fixtures/chamfer-longitudinal/001.json": "37d44c4ffb3e6915d3aca265e8d8852a6c06dd3665b073a47353974227cf264f",
+    "truck-shapeops/tests/fixtures/chamfer-longitudinal/002.json": "dbe1f08f1bd625a600a269200bc2367db3b13b4cbe01ec31dccb89302ff3f45c",
+    "truck-shapeops/tests/fixtures/chamfer-longitudinal/003.json": "d7bec02fc8a3da80acf588fc1a19c5dd4da07eef81000537e86805f7882d2b4a",
+    "truck-shapeops/tests/fixtures/chamfer-longitudinal/half-cylinder.step": "34f9573474dee0dede98ee2aeaa0f96a233f9222b9558c35335091e0a54d4ffc"
+  },
+  "test_sha256": "afe92461c347e5401553410437f81872aee1f20e14538da48b221d3747b6699c"
+}

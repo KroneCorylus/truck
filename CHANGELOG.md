@@ -6,6 +6,10 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Replay equal and unequal native chamfers on longitudinal plane/cylinder edges
+  using cylindrical chord distances, converted to the kernel’s documented tangent
+  offsets. Preserve reference-face sides and reject contacts outside that local branch.
+
 - Retry an isolated chamfer with the existing straight-edge solver when a miter
   would consume a short neighboring edge. Supporting faces must remain valid;
   failed retries preserve the original diagnostic.
