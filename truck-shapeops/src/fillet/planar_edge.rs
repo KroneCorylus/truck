@@ -145,6 +145,7 @@ pub(super) fn blend(
                 end,
                 &line,
                 tol,
+                matches!(blend, Blend::Chamfer(_)),
                 &mut replacements,
                 &mut removed,
             )
@@ -261,7 +262,7 @@ pub(super) fn blend(
                     .cloned()
                     .or_else(|| shell.vertex_iter().find(|v| v.point().near(&position)))
                     .unwrap_or_else(|| Vertex::new(position));
-                let piece = trim_edge(edge, vertex, &point, tol)
+                let piece = trim_edge(edge, vertex, &point, tol, false)
                     .ok_or_else(|| error(Code::OutsideNeighbour))?;
                 replacements.insert(edge.id(), piece);
                 point
@@ -556,7 +557,10 @@ fn extend_surface(surface: Surface, boundaries: &[Wire], tol: f64) -> Surface {
         return surface;
     };
     let vector = extrusion.extruding_vector();
-    let curve = extrusion.entity_curve();
+    let curve = crate::local::extend_conic(
+        extrusion.entity_curve(),
+        boundaries.iter().flat_map(|w| sample_wire(w, tol)),
+    );
     let origin = curve.subs(curve.range_tuple().0);
     let (mut start, mut end) = (0_f64, 1_f64);
     for point in boundaries.iter().flat_map(|w| sample_wire(w, tol)) {
@@ -565,7 +569,11 @@ fn extend_surface(surface: Surface, boundaries: &[Wire], tol: f64) -> Surface {
         end = end.max(t);
     }
     if start == 0. && end == 1. {
-        return surface;
+        return if curve.range_tuple() == extrusion.entity_curve().range_tuple() {
+            surface
+        } else {
+            ExtrudedCurve::by_extrusion(curve, vector).into()
+        };
     }
     // Boundary samples bound the analytic curve only up to their tessellation tolerance.
     let margin = tol / vector.magnitude();
@@ -653,7 +661,13 @@ fn section(
     Some((normals, contacts, Some(center)))
 }
 
-fn trim_edge(old: &Edge, vertex: &Vertex, point: &Vertex, tol: f64) -> Option<Edge> {
+fn trim_edge(
+    old: &Edge,
+    vertex: &Vertex,
+    point: &Vertex,
+    tol: f64,
+    extend_conics: bool,
+) -> Option<Edge> {
     let absolute = old.absolute_clone();
     let curve = absolute.curve();
     let front = absolute.front() == vertex;
@@ -663,6 +677,36 @@ fn trim_edge(old: &Edge, vertex: &Vertex, point: &Vertex, tol: f64) -> Option<Ed
         .and_then(|t| absolute.cut_with_parameter(point, t))
     {
         return Some(if front { b } else { a });
+    }
+    if let (true, Curve::Conic(conic)) = (extend_conics, &curve) {
+        let inverse = conic.transform().invert()?;
+        let local = inverse.transform_point(point.point());
+        let (mut a, mut b) = conic.entity().range_tuple();
+        let lower = front == conic.orientation();
+        let near = if lower { a } else { b };
+        // Keep the continuation beside the moved endpoint across the periodic seam.
+        let angle = local.y.atan2(local.x);
+        let angle =
+            angle + std::f64::consts::TAU * ((near - angle) / std::f64::consts::TAU).round();
+        if lower {
+            a = angle;
+        } else {
+            b = angle;
+        }
+        if !(b > a && b - a < std::f64::consts::TAU) {
+            return None;
+        }
+        let extended = conic.map_ref(|_| TrimmedCurve::new(UnitCircle::<Point3>::new(), (a, b)));
+        let (a, b) = extended.range_tuple();
+        let (from, to) = if front {
+            (point, absolute.back())
+        } else {
+            (absolute.front(), point)
+        };
+        if !extended.subs(a).near(&from.point()) || !extended.subs(b).near(&to.point()) {
+            return None;
+        }
+        return Some(Edge::new(from, to, extended.into()));
     }
     let other = if front {
         absolute.back()
@@ -697,6 +741,7 @@ fn trim_contact(
     end: usize,
     line: &Line<Point3>,
     tol: f64,
+    extend_conics: bool,
     replacements: &mut HashMap<EdgeID, Edge>,
     removed: &mut rustc_hash::FxHashSet<EdgeID>,
 ) -> Option<(Vertex, Vec<(Edge, Vertex, usize)>)> {
@@ -724,7 +769,7 @@ fn trim_contact(
                 return Some((other.clone(), path));
             }
             let point = Vertex::new(point);
-            if let Some(piece) = trim_edge(old, &current, &point, tol) {
+            if let Some(piece) = trim_edge(old, &current, &point, tol, extend_conics) {
                 replacements.insert(old.id(), piece);
                 return Some((point, path));
             }

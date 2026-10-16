@@ -1,0 +1,32 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 2.02s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/conic_contact_extension.rs (target/release/deps/conic_contact_extension-3d12d15993569a7f)
+
+running 3 tests
+test oversized_stem_chamfers_reject_without_input_mutation ... ok
+test unequal_chamfer_extends_the_terminal_circle ... FAILED
+test equal_chamfer_extends_the_terminal_circle ... FAILED
+
+failures:
+
+---- unequal_chamfer_extends_the_terminal_circle stdout ----
+
+thread 'unequal_chamfer_extends_the_terminal_circle' (578552) panicked at truck-shapeops/tests/conic_contact_extension.rs:110:6:
+called `Result::unwrap()` on an `Err` value: Diagnostic { code: OutsideNeighbour, operation: "chamfer_solid_edge", stage: "intersect_end_faces", message: "The moved boundary leaves its neighbouring face.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- equal_chamfer_extends_the_terminal_circle stdout ----
+
+thread 'equal_chamfer_extends_the_terminal_circle' (578550) panicked at truck-shapeops/tests/conic_contact_extension.rs:110:6:
+called `Result::unwrap()` on an `Err` value: Diagnostic { code: OutsideNeighbour, operation: "chamfer_solid_edge", stage: "intersect_end_faces", message: "The moved boundary leaves its neighbouring face.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+
+
+failures:
+    equal_chamfer_extends_the_terminal_circle
+    unequal_chamfer_extends_the_terminal_circle
+
+test result: FAILED. 1 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p truck-shapeops --test conic_contact_extension`

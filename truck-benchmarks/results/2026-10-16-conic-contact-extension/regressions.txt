@@ -1,0 +1,14 @@
+   Compiling truck-meshalgo v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-meshalgo)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 8.97s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/conic_contact_extension.rs (target/release/deps/conic_contact_extension-3d12d15993569a7f)
+
+running 4 tests
+test oversized_stem_chamfers_reject_without_input_mutation ... ok
+test extended_cylinder_mesh_preserves_the_verified_step_material ... ok
+test equal_chamfer_extends_the_terminal_circle ... ok
+test unequal_chamfer_extends_the_terminal_circle ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s

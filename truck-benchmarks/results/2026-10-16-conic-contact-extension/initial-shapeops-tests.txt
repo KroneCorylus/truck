@@ -1,0 +1,253 @@
+$ cargo test --release -p truck-shapeops
+   Compiling truck-meshalgo v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-meshalgo)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 1m 58s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running unittests src/lib.rs (target/release/deps/truck_shapeops-ee3a1558f73a21f9)
+
+running 56 tests
+test fillet::along_wire::tests::contact_intersections_reseed_parallel_endpoint_tangents ... ok
+test fillet::along_wire::tests::contact_intersections_reject_disjoint_curves_and_invalid_hints ... ok
+test fillet::along_wire::tests::contact_intersections_stay_inside_trimmed_domains ... ok
+test fillet::along_wire::tests::curved_contact_edges_keep_their_trimmed_domains ... ok
+test fillet::along_wire::tests::straight_contact_edges_extend_only_toward_the_chain_endpoint ... ok
+test fillet::modeling::output_tests::topological_closure_does_not_accept_off_surface_boundaries ... ok
+test fillet::continued_support::tests::continued_contacts_respect_a_trimmed_cylinder_and_its_hole_across_the_seam ... ok
+test fillet::projected_section::tests::oblique_plane_section_preserves_exact_conic_at_different_scales ... ok
+test healing::split_closed_faces::tests::incomplete_or_branching_boundary_graph_is_rejected ... ok
+test healing::split_closed_faces::tests::degenerate_seam_has_no_divisor ... ok
+test healing::split_closed_faces::tests::failed_curve_conversion_leaves_poly_edges_unchanged ... ok
+test healing::split_closed_faces::tests::isolated_polar_excursions_ignore_boundary_start_and_direction ... ok
+test healing::split_closed_faces::tests::nonpolar_shared_or_empty_excursions_are_preserved ... ok
+test healing::split_closed_faces::tests::divisor_avoids_existing_seam_endpoints ... ok
+test healing::split_closed_faces::tests::odd_divisor_crossings_leave_poly_edges_unchanged ... ok
+test healing::split_closed_faces::tests::stationary_periodic_tangent_is_not_a_collapsed_pole ... ok
+test healing::tests::coincident_wire_repair_preserves_unrelated_vertices_and_nonzero_gaps ... ok
+test healing::tests::test_split_closed_edges ... ok
+test healing::tests::double_closed_boundary_cylinder ... ok
+test healing::tests::test_split_closed_face_simple_cylinder_case ... ok
+test healing::tests::test_split_closed_face_cylinder_with_hole ... ok
+test healing::tests::too_simple_cylinder ... ok
+test local::intersect::section_tests::oblique_cone_sections_satisfy_both_surfaces ... ok
+test healing::tests::test_split_closed_face_cylinder_with_rotated_hole ... ok
+test healing::tests::many_closed_boundary_cylinder ... ok
+test transversal::divide_face::tests::division_traces_cut_edges_without_solving_them ... ok
+test transversal::divide_face::tests::divide_plane_test ... ok
+test fillet::planar::tests::dense_circle_discards_distant_segment_pairs ... ok
+test transversal::intersection_curve::tests::flat_contact_accepts_normal_roundoff_without_a_curvature_budget ... ok
+test transversal::integrate::through_hole::tests::section_accepts_reversed_curve_parameters ... ok
+test transversal::integrate::through_hole::tests::ambiguous_and_unsupported_cuts_defer_to_general_boolean ... ok
+test transversal::intersection_curve::tests::smooth_polar_tangency_has_the_same_curvature_classification_as_regular_contact ... ok
+test transversal::loops_store::tests::boundary_splits_keep_contacts_and_endpoints_but_not_samples_along_an_edge ... ok
+test transversal::intersection_curve::tests::samples_crossing_a_periodic_seam_still_name_their_points ... ok
+test transversal::loops_store::tests::boundary_boxes_preserve_near_edge_contacts ... ok
+test transversal::loops_store::tests::four_branches_at_interior_vertex ... ok
+test transversal::polyline_construction::tests::construct_polylines_positive0 ... ok
+test transversal::polyline_construction::tests::construct_polylines_positive2 ... ok
+test transversal::integrate::through_hole::tests::batch_rejects_overlapping_touching_nested_and_unsupported_cutters ... ok
+test transversal::polyline_construction::tests::construct_polylines_positive3 ... ok
+test transversal::polyline_construction::tests::construct_polylines_positive1 ... ok
+test transversal::intersection_curve::tests::intersection_curve_sphere_case ... ok
+test transversal::intersection_curve::tests::tangency_refinement_scales_with_mesh_error_and_curvature ... ok
+test transversal::intersection_curve::tests::tangent_contact_refines_a_mesh_seed ... ok
+test transversal::intersection_curve::tests::polar_curvature_preserves_crossings_and_rejects_a_cone_apex ... ok
+test fillet::chamfer::contact_interpolation_tests::dense_affine_contact_samples_preserve_points_and_derivatives ... ok
+test fillet::planar::tests::bounds_retain_every_contact_pair ... ok
+test transversal::intersection_curve::tests::tangent_curvature_classification ... ok
+test healing::tests::step_import ... ok
+test fillet::planar::tests::bounds_preserve_exhaustive_boundary_decisions ... ok
+test transversal::faces_classification::tests::independent_intersection ... ok
+test transversal::divide_face::tests::independent_intersection ... ok
+test transversal::intersection_curve::tests::collide_parabola ... ok
+test transversal::loops_store::tests::crossing_edges ... ok
+test transversal::loops_store::tests::independent_intersection ... ok
+test transversal::loops_store::tests::rotated_intersection ... ok
+
+test result: ok. 56 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+
+     Running tests/R10-sequential-fillet.rs (target/release/deps/R10_sequential_fillet-fb6bd51e7e27b261)
+
+running 4 tests
+test first_fillet_input_and_second_wire_control ... ok
+test adjacent_second_fillet_must_not_panic_or_mutate_input ... ok
+test smaller_second_radius_on_original_fixture_preserves_geometry_and_history ... ok
+test sequential_radii_sizes_and_edge_orders ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.56s
+
+     Running tests/R12-face-extrude-round.rs (target/release/deps/R12_face_extrude_round-76261653155613be)
+
+running 5 tests
+test step_round_trip ... ok
+test disk_face_extension ... ok
+test planar_face_with_two_circular_holes ... ok
+test annular_face_extension ... ok
+test subsequent_booleans ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.41s
+
+     Running tests/R7-R8-extrude-remove.rs (target/release/deps/R7_R8_extrude_remove-f0832d1903829077)
+
+running 4 tests
+test sequential_conic_union_then_subtract ... ok
+test reflected_conics_cut_in_the_positive_z_direction ... ok
+test equivalent_conics_must_preserve_the_reference_volume ... ok
+test original_nurbs_remove_preserves_the_reference_volume ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.48s
+
+     Running tests/analytic_holes.rs (target/release/deps/analytic_holes-1bdcccfc9bc0dc6b)
+
+running 10 tests
+test cap_parameter_origins_do_not_change_the_cut_height ... ok
+test through_hole_preserves_remote_faces_and_exact_circles ... ok
+test reversed_axis_and_many_arc_segments_make_exact_holes ... ok
+test mixed_through_and_blind_batch_preserves_general_boolean_behavior ... ok
+test batch_combines_new_holes_and_empty_space_without_rebuilding_old_walls ... ok
+test concave_outline_uses_material_winding ... ok
+test overlapping_and_blind_cuts_after_an_exact_hole_use_the_general_solver ... ok
+test batch_holes_preserve_faces_and_exact_curves_under_transforms ... ok
+test repeated_holes_under_rigid_transforms_keep_unchanged_faces ... ok
+test thin_cylindrical_wall_and_empty_space_preserve_faces ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+
+     Running tests/annular_booleans.rs (target/release/deps/annular_booleans-75585652c8190ae0)
+
+running 1 test
+test annular_cuts_preserve_the_inner_web_and_counterbores_preserve_the_through_hole ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+
+     Running tests/app_sphere_bore.rs (target/release/deps/app_sphere_bore-4fcc18982a475873)
+
+running 1 test
+test app_revolved_sphere_in_equal_radius_bore ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/bench_plate.rs (target/release/deps/bench_plate-4ba14a1c7f7f44d8)
+
+running 1 test
+test plate_with_holes ... ignored
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/blend_limits.rs (target/release/deps/blend_limits-c0babdf1458ff779)
+
+running 2 tests
+test near_limit_chamfer_preserves_miter_contract ... ok
+test near_limit_fillet_retains_valid_small_faces ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.61s
+
+     Running tests/boolean.rs (target/release/deps/boolean-70442bfb51ff43a4)
+
+running 27 tests
+test subtract_cylinder_on_plane ... ok
+test punched_cube_edges_are_smooth ... ok
+test punched_cube_mesh_closed ... ok
+test subtract_boxes_sharing_edge ... ok
+test cube_is_valid ... ok
+test union_stacked_cubes ... ok
+test union_inner_box_sharing_faces ... ok
+test cylinder_is_valid ... ok
+test union_disjoint_cubes ... ok
+test punched_cube ... ok
+test union_boxes_sharing_edge ... ok
+test union_offset_stacked_cubes ... ok
+test union_boxes_sharing_corner ... ok
+test union_cylinder_on_plane ... ok
+test intersect_inner_box_sharing_faces ... ok
+test subtract_flush_pocket ... ok
+test union_offset_stacked_cubes_counts ... ok
+test subtract_stacked_cube ... ok
+test union_cylinder_standing_on_cube ... ok
+test punched_cube_rotated_seam ... ok
+test tangent_steinmetz_union ... ok
+test sphere_is_valid ... ok
+test tangent_steinmetz_intersection ... ok
+test tangent_rod_in_equal_width_slot ... ok
+test punched_cube_tolerance_stability ... ok
+test union_sphere_on_plane ... ok
+test tangent_sphere_in_equal_radius_bore ... ok
+
+test result: ok. 27 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/boolean_cache.rs (target/release/deps/boolean_cache-870d803600c0cce1)
+
+running 2 tests
+test sampling_does_not_change_equality_or_serialization ... ok
+test cached_and_uncached_booleans_are_identical ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running tests/boolean_hole_fillet.rs (target/release/deps/boolean_hole_fillet-17d5b831372cc273)
+
+running 1 test
+test boolean_hole_rims_are_closed_consistent_and_have_the_expected_volume ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.93s
+
+     Running tests/chamfer.rs (target/release/deps/chamfer-1af5df2b04e81921)
+
+running 3 tests
+test chamfer_cube_asymmetric ... ok
+test chamfer_cube_symmetric ... ok
+test chamfer_edge_of_half_cylinder ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/chamfer_general.rs (target/release/deps/chamfer_general-861dcc4b338d5228)
+
+running 15 tests
+test a_flat_face_seam_is_not_a_concave_chamfer ... ok
+test concave_chamfers_reject_collapsed_neighbours ... ok
+test oversized_unequal_distances_preserve_the_input ... ok
+test an_untouched_four_edge_vertex_does_not_block_a_chamfer ... ok
+test asymmetric_three_edge_corner_matches_an_affine_scaled_reference ... ok
+test three_edge_corners_do_not_require_a_globally_convex_body ... ok
+test chamfers_reject_hole_collisions_without_changing_the_body ... ok
+test concave_chamfers_measure_distances_on_oblique_support_faces ... ok
+test isolated_inset_edges_have_valid_planar_terminations ... ok
+test mixed_three_way_chamfer_has_a_transition_face_above_the_inside_bevel ... ok
+test asymmetric_inset_chamfers_keep_their_contact_distances_and_order ... ok
+test concave_cavity_edges_and_mixed_disjoint_selections_preserve_volume ... ok
+test mixed_corner_transitions_support_distinct_setbacks_and_both_ends ... ok
+test concave_chamfers_add_material_and_preserve_distance_sides ... ok
+test holes_elsewhere_do_not_disable_a_planar_chamfer ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/channel_boundary.rs (target/release/deps/channel_boundary-d8b7ade1aafac7c4)
+
+running 1 test
+test a_cut_along_cylinder_seams_keeps_each_straight_rim_whole ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/channel_rim_blends.rs (target/release/deps/channel_rim_blends-a2c67df77f2ae1ca)
+
+running 4 tests
+test channel_lip_blends_reject_collapsed_outer_walls_without_mutation ... ok
+test cylindrical_channel_lips_round_independently_and_together ... ok
+test cylindrical_channel_lips_chamfer_with_equal_and_unequal_distances ... ok
+test connected_channel_rims_share_exact_miters_and_preserve_the_circular_channel ... FAILED
+
+failures:
+
+---- connected_channel_rims_share_exact_miters_and_preserve_the_circular_channel stdout ----
+
+thread 'connected_channel_rims_share_exact_miters_and_preserve_the_circular_channel' (597980) panicked at truck-shapeops/tests/channel_rim_blends.rs:166:74:
+fillet true, distances [0.2, 0.2], selection [0, 2]: Diagnostic { code: OutsideNeighbour, operation: "fillet_solid_edges", stage: "intersect_end_faces", message: "The moved boundary leaves its neighbouring face.", context: Context { operand: None, shell_index: Some(0), face_index: Some(6), edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    connected_channel_rims_share_exact_miters_and_preserve_the_circular_channel
+
+test result: FAILED. 3 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.14s
+
+error: test failed, to rerun pass `-p truck-shapeops --test channel_rim_blends`
+exit_code 101

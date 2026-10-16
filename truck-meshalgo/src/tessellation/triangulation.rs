@@ -1009,7 +1009,7 @@ where S: PreMeshableSurface {
     let mut triangulation = Cdt::new();
     let mut boundary_map = HashMap::<FixedVertexHandle, Point3>::default();
     let bounds: BoundingBox<Point2> = polyboundary.loops.iter().flatten().map(|p| p.uv).collect();
-    let divisions = surface.parameter_division(
+    let mut divisions = surface.parameter_division(
         (
             (bounds.min().x, bounds.max().x),
             (bounds.min().y, bounds.max().y),
@@ -1019,7 +1019,20 @@ where S: PreMeshableSurface {
     let (udiv, vdiv) = (&divisions.0, &divisions.1);
     let single_direction =
         (udiv.len() > 2 && vdiv.len() == 2) || (udiv.len() == 2 && vdiv.len() > 2);
-    // When one axis has no interior grid lines, trim gaps need free refinement.
+    // Oblique trims can discard the curved grid's end rulings. Seed an interior one.
+    let trimmed_grid = single_direction
+        && polyboundary.loops.iter().any(|boundary| {
+            boundary.iter().circular_tuple_windows().any(|(a, b)| {
+                let delta = b.uv - a.uv;
+                delta.x.abs() > TOLERANCE && delta.y.abs() > TOLERANCE
+            })
+        });
+    if trimmed_grid && udiv.len() > 2 {
+        divisions.1.insert(1, (vdiv[0] + vdiv[1]) / 2.);
+    } else if trimmed_grid {
+        divisions.0.insert(1, (udiv[0] + udiv[1]) / 2.);
+    }
+    // Trims on a grid curved in only one direction still need free refinement.
     // Balance those triangles in physical space to avoid repeated UV slivers.
     let metric = MeshMetric::new(surface, bounds, single_direction);
     polyboundary.insert_to(&mut triangulation, &mut boundary_map, &metric);

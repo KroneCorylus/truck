@@ -1,0 +1,32 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 8.18s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/conic_contact_extension.rs (target/release/deps/conic_contact_extension-3d12d15993569a7f)
+
+running 3 tests
+test oversized_stem_chamfers_reject_without_input_mutation ... ok
+test unequal_chamfer_extends_the_terminal_circle ... FAILED
+test equal_chamfer_extends_the_terminal_circle ... FAILED
+
+failures:
+
+---- unequal_chamfer_extends_the_terminal_circle stdout ----
+
+thread 'unequal_chamfer_extends_the_terminal_circle' (579709) panicked at truck-shapeops/tests/common/mod.rs:77:5:
+volume 521.9064969700761 differs from expected 522.8987719781295 by more than 0.13090522643596014
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- equal_chamfer_extends_the_terminal_circle stdout ----
+
+thread 'equal_chamfer_extends_the_terminal_circle' (579707) panicked at truck-shapeops/tests/common/mod.rs:77:5:
+volume 521.9525082408045 differs from expected 522.9469178406702 by more than 0.13089544874642922
+
+
+failures:
+    equal_chamfer_extends_the_terminal_circle
+    unequal_chamfer_extends_the_terminal_circle
+
+test result: FAILED. 1 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+error: test failed, to rerun pass `-p truck-shapeops --test conic_contact_extension`

@@ -9,7 +9,7 @@ use truck_modeling::{Curve, Elementary, Face, Surface};
 /// A parameter rectangle `((u0, u1), (v0, v1))` of a surface.
 pub type Domain = ((f64, f64), (f64, f64));
 
-pub(super) fn extend_conic(curve: &Curve, points: impl Iterator<Item = Point3>) -> Curve {
+pub(crate) fn extend_conic(curve: &Curve, points: impl Iterator<Item = Point3>) -> Curve {
     let Curve::Conic(conic) = curve else {
         return curve.clone();
     };

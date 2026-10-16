@@ -7,6 +7,7 @@ mod replace;
 mod shell;
 pub use delete::{delete_face, try_delete_face};
 pub use draft::{draft, try_draft};
+pub(crate) use intersect::extend_conic;
 pub use intersect::{intersect_surfaces, parameter_domain, try_intersect_surfaces, Domain};
 pub use replace::{replace_surfaces, try_replace_surfaces};
 use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};
