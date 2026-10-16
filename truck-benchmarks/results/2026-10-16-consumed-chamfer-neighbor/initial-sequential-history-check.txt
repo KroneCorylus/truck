@@ -1,0 +1,70 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 11.95s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/chamfer_general.rs (target/release/deps/chamfer_general-861dcc4b338d5228)
+
+running 15 tests
+test a_flat_face_seam_is_not_a_concave_chamfer ... ok
+test concave_chamfers_reject_collapsed_neighbours ... ok
+test oversized_unequal_distances_preserve_the_input ... ok
+test an_untouched_four_edge_vertex_does_not_block_a_chamfer ... ok
+test asymmetric_three_edge_corner_matches_an_affine_scaled_reference ... ok
+test three_edge_corners_do_not_require_a_globally_convex_body ... ok
+test chamfers_reject_hole_collisions_without_changing_the_body ... ok
+test concave_chamfers_measure_distances_on_oblique_support_faces ... ok
+test isolated_inset_edges_have_valid_planar_terminations ... ok
+test mixed_three_way_chamfer_has_a_transition_face_above_the_inside_bevel ... ok
+test asymmetric_inset_chamfers_keep_their_contact_distances_and_order ... ok
+test mixed_corner_transitions_support_distinct_setbacks_and_both_ends ... ok
+test concave_cavity_edges_and_mixed_disjoint_selections_preserve_volume ... ok
+test concave_chamfers_add_material_and_preserve_distance_sides ... ok
+test holes_elsewhere_do_not_disable_a_planar_chamfer ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/consumed_chamfer_neighbor.rs (target/release/deps/consumed_chamfer_neighbor-64cfee97acc11b81)
+
+running 2 tests
+test equal_chamfer_consumes_a_short_neighbor_without_removing_its_support ... ok
+test unequal_chamfer_consumes_a_short_neighbor_and_preserves_setbacks ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/mixed_chamfer_pair.rs (target/release/deps/mixed_chamfer_pair-c93e620f23497a50)
+
+running 2 tests
+test transitions_at_both_ends_share_the_vertical_bevel_and_reject_collisions ... ok
+test mixed_chamfer_pairs_have_a_planar_corner_transition ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+     Running tests/r11_corners.rs (target/release/deps/r11_corners-899b70f547d5fc44)
+
+running 8 tests
+test invalid_parameters_and_selections_leave_input_unchanged ... ok
+test unsupported_pyramid_fillets_leave_input_unchanged ... ok
+test sequential_chamfers_preserve_material_and_history ... FAILED
+test chamfer_fixture_table_and_order ... ok
+test miters_at_both_ends_and_next_to_a_spherical_corner ... ok
+test pyramid_chamfers_preserve_setbacks_at_four_edge_vertices ... ok
+test skewed_two_edge_fillets_form_valid_miters ... ok
+test fillet_fixture_table_and_order ... ok
+
+failures:
+
+---- sequential_chamfers_preserve_material_and_history stdout ----
+
+thread 'sequential_chamfers_preserve_material_and_history' (345721) panicked at truck-shapeops/tests/r11_corners.rs:65:9:
+assertion `left == right` failed
+  left: 0
+ right: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    sequential_chamfers_preserve_material_and_history
+
+test result: FAILED. 7 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s
+
+error: test failed, to rerun pass `-p truck-shapeops --test r11_corners`

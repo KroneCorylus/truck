@@ -1,0 +1,6 @@
+{
+  "revision": "ed603e7d12892bc434d335147ebbfd33687c3a4e",
+  "test_sha256": "274906508a1a20c2d23fcc214e980537b9adfed0901b132fe42d2fadf0049627",
+  "result": "0 passed, 2 failed with OutsideNeighbour",
+  "sequential_test_sha256": "34d94e2d272fbc361212a3a46e2f09bbb0a8e3a0b699890a22ac4e6d3f24151e"
+}

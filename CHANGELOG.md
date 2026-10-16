@@ -6,6 +6,10 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Retry an isolated chamfer with the existing straight-edge solver when a miter
+  would consume a short neighboring edge. Supporting faces must remain valid;
+  failed retries preserve the original diagnostic.
+
 - Chamfers along open wires now rebuild a shared terminal face with both end bridges, preserving complete solids when a curved rim has a two-edge cap.
 
 - Record maximum stored face, edge and vertex tolerances for captured shapes and both sides of native STEP comparisons. Keep tolerance budgets separate from validity and measured distances; a native control proves exact geometry can carry large tolerances, and the audit exposes inflated reference tolerances without changing comparison thresholds.

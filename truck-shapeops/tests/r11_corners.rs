@@ -312,8 +312,7 @@ fn chamfer_fixture_table_and_order() {
 }
 
 #[test]
-fn sequential_chamfers_reproduce_kernel_gap() {
-    use truck_base::diagnostics::Code;
+fn sequential_chamfers_preserve_material_and_history() {
     for count in [2, 3] {
         for reverse in [false, true] {
             let input = fixture();
@@ -331,10 +330,35 @@ fn sequential_chamfers_reproduce_kernel_gap() {
             common::assert_solid(&first.solid, chamfer_volume(1), &[0], TOL);
             // Resolve the shortened remaining edge on the new solid, independently of app references.
             let before = snapshot(&first.solid);
-            let error =
+            let second =
                 try_chamfer_solid_edge(&first.solid, edge_at(&first.solid, axes[1]), 0.2, 0.2, TOL)
-                    .unwrap_err();
-            assert_eq!(error.code, Code::OutsideNeighbour);
+                    .unwrap();
+            common::assert_solid(&second.solid, chamfer_volume(2), &[0], TOL);
+            common::blend::assert_step(&second.solid, chamfer_volume(2), TOL);
+            assert_eq!(second.generated_faces.len(), 1);
+            let mut accounted = std::collections::HashSet::new();
+            for face in first.solid.face_iter() {
+                let successors: Vec<_> = second
+                    .solid
+                    .face_iter()
+                    .filter(|f| f.id() == face.id())
+                    .chain(
+                        second
+                            .modified_faces
+                            .iter()
+                            .filter_map(|(id, f)| (*id == face.id()).then_some(f)),
+                    )
+                    .collect();
+                assert_eq!(successors.len(), 1);
+                assert!(accounted.insert(successors[0].id()));
+            }
+            assert!(accounted.insert(second.generated_faces[0].id()));
+            assert_eq!(accounted.len(), second.solid.face_iter().count());
+            assert!(second
+                .solid
+                .face_iter()
+                .all(|f| accounted.contains(&f.id())));
+            assert_convex_geometry(&second);
             assert_eq!(before, snapshot(&first.solid));
         }
     }

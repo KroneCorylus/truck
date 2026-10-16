@@ -421,6 +421,8 @@ pub fn chamfer_solid_edges(
     try_chamfer_solid_edges(solid, edges, distance, tol).ok()
 }
 
+/// An isolated chamfer may consume short neighboring edges while retaining their support faces.
+///
 /// Diagnostic variant of [`chamfer_solid_edges`]. Unsupported junctions return
 /// [`Code::UnsupportedTopology`]; distances that do not fit return [`Code::OutsideNeighbour`].
 pub fn try_chamfer_solid_edges(
@@ -447,10 +449,12 @@ pub fn try_chamfer_solid_edges(
     let shell =
         super::chamfer_edges::chamfer_edges(&solid.boundaries()[index], edges, distance, tol)
             .or_else(|error| {
+                let retry_outside = edges.len() == 1 && error.code == Code::OutsideNeighbour;
                 if matches!(
                     error.code,
                     Code::NonPlanarFace | Code::UnsupportedGeometry | Code::UnsupportedTopology
-                ) {
+                ) || retry_outside
+                {
                     super::planar_edge::blend_edges(
                         &solid.boundaries()[index],
                         &edges
@@ -459,6 +463,7 @@ pub fn try_chamfer_solid_edges(
                             .collect::<Vec<_>>(),
                         tol,
                     )
+                    .map_err(|next| if retry_outside { error } else { next })
                 } else {
                     Err(error)
                 }
@@ -472,6 +477,7 @@ pub fn try_chamfer_solid_edges(
 /// Each tuple contains an edge ID and distances in shell face order. All selected edges
 /// must lie in one shell. Planar neighborhoods have three edges per touched vertex;
 /// straight plane/cylinder lips and connected planar rim edges are also supported.
+/// An isolated chamfer may consume short neighboring edges while retaining their support faces.
 /// On cylindrical supports, distances use the nearest point to the perpendicular tangent
 /// offset. Unrelated curved faces and inner boundary loops are preserved. Two-edge bevels
 /// use a triangular transition when their contacts on the unselected edge differ. Mixed three-edge corners use a
@@ -506,10 +512,12 @@ pub fn try_chamfer_solid_edges_with_distances(
     let shell =
         super::chamfer_miter::chamfer(&solid.boundaries()[index], &selected, &distances, tol)
             .or_else(|error| {
+                let retry_outside = edges.len() == 1 && error.code == Code::OutsideNeighbour;
                 if matches!(
                     error.code,
                     Code::NonPlanarFace | Code::UnsupportedGeometry | Code::UnsupportedTopology
-                ) {
+                ) || retry_outside
+                {
                     super::planar_edge::blend_edges(
                         &solid.boundaries()[index],
                         &edges
@@ -518,6 +526,7 @@ pub fn try_chamfer_solid_edges_with_distances(
                             .collect::<Vec<_>>(),
                         tol,
                     )
+                    .map_err(|next| if retry_outside { error } else { next })
                 } else {
                     Err(error)
                 }

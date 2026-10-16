@@ -1,0 +1,57 @@
+[
+  {
+    "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-consumed-chamfer-neighbor/capture/001",
+    "radial": 2,
+    "vertical": 2,
+    "scale": 1,
+    "expected_volume": 975.8333333333334,
+    "native": {
+      "native_valid": true,
+      "solids": 1,
+      "volume": 975.8333333333333,
+      "area": 578.5979797464468,
+      "stored_tolerances": {
+        "face": 1e-07,
+        "edge": 1e-07,
+        "vertex": 0.0001
+      }
+    }
+  },
+  {
+    "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-consumed-chamfer-neighbor/capture/002",
+    "radial": 2,
+    "vertical": 1,
+    "scale": 1,
+    "expected_volume": 985.4166666666666,
+    "native": {
+      "native_valid": true,
+      "solids": 1,
+      "volume": 985.4166666666666,
+      "area": 584.1331382325741,
+      "stored_tolerances": {
+        "face": 1e-07,
+        "edge": 1e-07,
+        "vertex": 0.0001
+      }
+    }
+  },
+  {
+    "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-consumed-chamfer-neighbor/capture/003",
+    "radial": 2,
+    "vertical": 1,
+    "scale": 0.2,
+    "expected_volume": 7.883333333333335,
+    "native": {
+      "native_valid": true,
+      "solids": 1,
+      "volume": 7.883333333333331,
+      "area": 23.365325529302957,
+      "stored_tolerances": {
+        "face": 1e-07,
+        "edge": 1e-07,
+        "vertex": 0.0001
+      }
+    }
+  }
+]
+Native consumed-neighbor material, scope and input immutability verified
