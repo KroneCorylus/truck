@@ -6,6 +6,10 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Let planar chamfers cross curved terminal boundaries using the existing
+  curve/surface intersection routine. Intersections must remain within the
+  terminal edge’s parameter range; trimming and support-face validation stay in force.
+
 - Replay equal and unequal native chamfers on longitudinal plane/cylinder edges
   using cylindrical chord distances, converted to the kernel’s documented tangent
   offsets. Preserve reference-face sides and reject contacts outside that local branch.

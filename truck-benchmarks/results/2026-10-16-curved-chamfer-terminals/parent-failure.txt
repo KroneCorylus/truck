@@ -1,0 +1,32 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 8.26s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/curved_chamfer_terminals.rs (target/release/deps/curved_chamfer_terminals-37056a1700d5bf51)
+
+running 3 tests
+test curved_terminal_chamfers_reject_consumed_supports_without_mutation ... ok
+test equal_chamfer_crosses_a_curved_terminal_rim ... FAILED
+test unequal_chamfer_crosses_a_curved_terminal_rim ... FAILED
+
+failures:
+
+---- equal_chamfer_crosses_a_curved_terminal_rim stdout ----
+
+thread 'equal_chamfer_crosses_a_curved_terminal_rim' (468967) panicked at truck-shapeops/tests/curved_chamfer_terminals.rs:80:6:
+called `Result::unwrap()` on an `Err` value: Diagnostic { code: UnsupportedGeometry, operation: "chamfer_solid_edge", stage: "intersect_end_faces", message: "The geometry is outside the supported scope of this operation.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- unequal_chamfer_crosses_a_curved_terminal_rim stdout ----
+
+thread 'unequal_chamfer_crosses_a_curved_terminal_rim' (468968) panicked at truck-shapeops/tests/curved_chamfer_terminals.rs:80:6:
+called `Result::unwrap()` on an `Err` value: Diagnostic { code: UnsupportedGeometry, operation: "chamfer_solid_edge", stage: "intersect_end_faces", message: "The geometry is outside the supported scope of this operation.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+
+
+failures:
+    equal_chamfer_crosses_a_curved_terminal_rim
+    unequal_chamfer_crosses_a_curved_terminal_rim
+
+test result: FAILED. 1 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-shapeops --test curved_chamfer_terminals`

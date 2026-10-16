@@ -422,6 +422,7 @@ pub fn chamfer_solid_edges(
 }
 
 /// An isolated chamfer may consume short neighboring edges while retaining their support faces.
+/// Planar chamfers may cross curved terminal edges within their existing parameter bounds.
 ///
 /// Diagnostic variant of [`chamfer_solid_edges`]. Unsupported junctions return
 /// [`Code::UnsupportedTopology`]; distances that do not fit return [`Code::OutsideNeighbour`].
@@ -478,6 +479,7 @@ pub fn try_chamfer_solid_edges(
 /// must lie in one shell. Planar neighborhoods have three edges per touched vertex;
 /// straight plane/cylinder lips and connected planar rim edges are also supported.
 /// An isolated chamfer may consume short neighboring edges while retaining their support faces.
+/// Planar chamfers may cross curved terminal edges within their existing parameter bounds.
 /// On cylindrical supports, distances use the nearest point to the perpendicular tangent
 /// offset. Unrelated curved faces and inner boundary loops are preserved. Two-edge bevels
 /// use a triangular transition when their contacts on the unselected edge differ. Mixed three-edge corners use a

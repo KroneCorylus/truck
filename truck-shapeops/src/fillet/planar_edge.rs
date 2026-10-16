@@ -212,7 +212,7 @@ pub(super) fn blend(
         {
             let direction = edge.back().point() - edge.front().point();
             let curve = edge.curve();
-            if !curve
+            let straight = curve
                 .parameter_division(curve.range_tuple(), tol)
                 .1
                 .iter()
@@ -221,13 +221,30 @@ pub(super) fn blend(
                         .cross(direction.normalize())
                         .magnitude()
                         <= TOLERANCE
-                })
-            {
-                return Err(error(Code::UnsupportedGeometry));
-            }
-            let line = Line(vertex.point(), vertex.point() + direction.normalize());
-            let position = line_intersection(&surface, &line, vertex.point())
+                });
+            let position = if straight {
+                let line = Line(vertex.point(), vertex.point() + direction.normalize());
+                line_intersection(&surface, &line, vertex.point())
+                    .ok_or_else(|| error(Code::BlendConstructionFailed))?
+            } else if matches!(surface.elementary(), Some((Elementary::Plane(_), _))) {
+                let hint = surface
+                    .search_nearest_parameter(vertex.point(), None, 100)
+                    .ok_or_else(|| error(Code::BlendConstructionFailed))?;
+                let parameter = curve
+                    .search_parameter(vertex.point(), None, 100)
+                    .ok_or_else(|| error(Code::BlendConstructionFailed))?;
+                let (_, parameter) = algo::surface::search_intersection_parameter(
+                    &surface, hint, &curve, parameter, 100,
+                )
                 .ok_or_else(|| error(Code::BlendConstructionFailed))?;
+                let range = curve.range_tuple();
+                if !(range.0..=range.1).contains(&parameter) {
+                    return Err(error(Code::OutsideNeighbour));
+                }
+                curve.subs(parameter)
+            } else {
+                return Err(error(Code::UnsupportedGeometry));
+            };
             let other = if edge.front() == vertex {
                 edge.back()
             } else {
