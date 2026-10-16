@@ -194,6 +194,16 @@ void reference_geometry(std::ostream& out, const TopoDS_Face& face) {
           << "],\"axis\":[" << axis.X() << ',' << axis.Y() << ',' << axis.Z()
           << "],\"radius\":" << cylinder.Radius() << '}';
     }
+    if (surface.GetType() == GeomAbs_Cone) {
+      const auto cone = surface.Cone();
+      const auto p = cone.Apex();
+      const auto axis = cone.Axis().Direction();
+      const double sign = cone.SemiAngle() > 0 ? 1. : -1.;
+      out << ",\"reference_cone\":{\"apex\":[" << p.X() << ',' << p.Y() << ',' << p.Z()
+          << "],\"axis\":[" << sign * axis.X() << ',' << sign * axis.Y() << ',' << sign * axis.Z()
+          << "],\"half_angle_radians\":" << std::abs(cone.SemiAngle()) << '}';
+    }
+
     return;
   }
   const auto plane = surface.Plane();

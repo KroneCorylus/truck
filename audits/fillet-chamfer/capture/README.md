@@ -60,7 +60,7 @@ cargo test -p truck-shapeops --example replay_occt_blend
 python3 -m unittest discover -s audits/fillet-chamfer/capture -p 'test_*.py'
 ```
 
-Thirty-six Rust tests cover physical selection, per-edge fillet radii, equal and
+Thirty-nine Rust tests cover physical selection, per-edge fillet radii, equal and
 unequal chamfer distances, reference-plane identity, planar distance/angle
 conversion on acute, right and obtuse corners, impossible-angle rejection, duplicate
 assignments and rejected unsupported/invalid intent. Native-contour regressions
@@ -94,19 +94,26 @@ seed-only evidence is not upgraded. Summary manifests retain point counts;
 complete raw contour samples remain in the archived input JSON.
 
 Chamfer captures retain every requested distance/angle.
-Face-dependent modes also record an analytic reference plane or cylinder when available.
+Face-dependent modes also record an analytic reference plane, cylinder or cone when available.
 The optional schema-2 `reference_cylinder` contains an axis origin, axis direction
 and radius; cylindrical references retain `reference_plane: null`. Replay matches
 exactly one adjacent seed face by plane identity or cylinder axis line and radius,
 independently of face order, normal/axis sign, or origin position along the axis.
 It then propagates that reference side along the oriented contour. Missing reference
 geometry remains unsupported; malformed or ambiguous cylinders are rejected.
+The optional `reference_cone` contains the apex, opening axis and positive
+half-angle in radians. Cone matching preserves the nappe: reversing its opening
+axis or moving its apex changes the surface. Malformed or ambiguous references
+are rejected. Cone regressions cover both slopes and both reference sides,
+unequal distances, angle conversion, transformations and analytic material.
 Cylinder regressions cover unequal distances, distance/angle conversion, transforms,
 scale, reversed samples, equivalent axis descriptions, analytic material and STEP.
-Two-distance replay accepts planar supports and perpendicular plane/cylinder rims;
-distance/angle replay uses the oriented angle between planar supports and converts
+Two-distance replay accepts planar supports and perpendicular plane/cylinder
+or plane/cone rims;
+distance/angle replay uses the oriented angle between supports and converts
 `d1 = d0 * sin(angle) / sin(beta + angle)` (corner angle `beta`). Perpendicular
-plane/cylinder rims use beta = 90 degrees. Consistent unequal setback pairs also
+plane/cylinder rims use beta = 90 degrees. For plane/cone rims the oriented
+cone normal determines beta; the plane must be perpendicular to the cone axis. Consistent unequal setback pairs also
 reach the existing wire chamfer route, with side ordering preserved. Unsupported face geometry is reported as unhandled intent. Missing native
 data remains missing: the dedicated chamfer fixtures are not replaced by synthetic
 probes or counted as passing when only dimension-defined controls are available.

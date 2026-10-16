@@ -296,16 +296,40 @@ fn chamfer_selection(
         enum Reference {
             Plane(Point3, Vector3),
             Cylinder(Point3, Vector3, f64),
+            Cone(Point3, Vector3, f64),
         }
         let reference = if mode == "equal-distance" {
             None
         } else {
             let plane = &chosen["reference_plane"];
             let cylinder = &chosen["reference_cylinder"];
-            if !plane.is_null() && !cylinder.is_null() {
+            let cone = &chosen["reference_cone"];
+            if [plane, cylinder, cone]
+                .iter()
+                .filter(|value| !value.is_null())
+                .count()
+                > 1
+            {
                 return Err(invalid("Ambiguous captured reference surface"));
             }
-            if !cylinder.is_null() {
+            if !cone.is_null() {
+                let apex = captured_vector(&cone["apex"]);
+                let axis = captured_vector(&cone["axis"]);
+                let angle = cone["half_angle_radians"]
+                    .as_f64()
+                    .filter(|a| a.is_finite() && *a > 0. && *a < std::f64::consts::FRAC_PI_2);
+                let (Some(apex), Some(axis), Some(angle)) = (apex, axis, angle) else {
+                    return Err(invalid("Invalid reference cone"));
+                };
+                if !axis.magnitude2().is_finite() || axis.magnitude2() < TOLERANCE * TOLERANCE {
+                    return Err(invalid("Invalid reference cone axis"));
+                }
+                Some(Reference::Cone(
+                    Point3::from_vec(apex),
+                    axis.normalize(),
+                    angle,
+                ))
+            } else if !cylinder.is_null() {
                 let origin = captured_vector(&cylinder["origin"]);
                 let axis = captured_vector(&cylinder["axis"]);
                 let radius = cylinder["radius"]
@@ -327,7 +351,7 @@ fn chamfer_selection(
                 let n = captured_vector(&plane["normal"]);
                 let (Some(p), Some(n)) = (p, n) else {
                     return Err(unsupported(
-                        "Face-dependent chamfers require a captured reference plane or cylinder",
+                        "Face-dependent chamfers require a captured reference plane, cylinder or cone",
                     ));
                 };
                 if n.magnitude2() < TOLERANCE * TOLERANCE {
@@ -391,6 +415,18 @@ fn chamfer_selection(
                                 actual_axis.cross(*axis).magnitude() < 1e-8
                                     && (actual_origin - origin).cross(*axis).magnitude() < TOL / 10.
                                     && (actual_radius - radius).abs() < TOL / 10.
+                            }
+                            (
+                                Reference::Cone(apex, axis, angle),
+                                Elementary::Cone {
+                                    apex: actual_apex,
+                                    axis: actual_axis,
+                                    half_angle,
+                                },
+                            ) => {
+                                (actual_axis - axis).magnitude() < 1e-8
+                                    && actual_apex.distance(*apex) < TOL / 10.
+                                    && (half_angle.0 - angle).abs() < 1e-8
                             }
                             _ => false,
                         };
@@ -458,7 +494,13 @@ fn chamfer_selection(
                     (Some((Elementary::Plane(p), _)), Some((Elementary::Cylinder { axis, .. }, _)))
                     | (Some((Elementary::Cylinder { axis, .. }, _)), Some((Elementary::Plane(p), _)))
                         if p.normal().cross(*axis).magnitude() < 1e-8 => (0., 1.),
-                    _ => return Err(unsupported("Face-dependent chamfers require planar supports or a perpendicular plane/cylinder rim")),
+                    (Some((Elementary::Plane(p), plane_forward)), Some((Elementary::Cone { axis, half_angle, .. }, cone_forward)))
+                    | (Some((Elementary::Cone { axis, half_angle, .. }, cone_forward)), Some((Elementary::Plane(p), plane_forward)))
+                        if p.normal().cross(*axis).magnitude() < 1e-8 => {
+                            let sign = if plane_forward == cone_forward { 1. } else { -1. };
+                            (sign * p.normal().dot(*axis) * half_angle.0.sin(), half_angle.0.cos())
+                        }
+                    _ => return Err(unsupported("Face-dependent chamfers require planar supports or a perpendicular plane/cylinder or plane/cone rim")),
                 };
                 if mode == "distance-angle" {
                     let tangent = requested[1] / requested[0];
@@ -1973,5 +2015,222 @@ mod cylindrical_reference_tests {
             );
             assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
         });
+    }
+}
+
+#[cfg(test)]
+mod conical_reference_tests {
+    use super::*;
+
+    fn fixture(widening: bool) -> (&'static str, &'static str) {
+        if widening {
+            (
+                include_str!("../tests/fixtures/chamfer-cone-reference/widening.step"),
+                include_str!("../tests/fixtures/chamfer-cone-reference/widening.json"),
+            )
+        } else {
+            (
+                include_str!("../tests/fixtures/chamfer-cone-reference/narrowing.step"),
+                include_str!("../tests/fixtures/chamfer-cone-reference/narrowing.json"),
+            )
+        }
+    }
+
+    fn chosen(widening: bool, cone: bool) -> Value {
+        let task: Value = serde_json::from_str(fixture(widening).1).unwrap();
+        let mut chosen = task["selection"][0].clone();
+        if cone {
+            chosen["reference_plane"] = Value::Null;
+            chosen["reference_cone"] = json!({
+                "apex":[0.,0.,if widening {-15.} else {25.}],
+                "axis":[0.,0.,if widening {1.} else {-1.}],
+                "half_angle_radians":0.2_f64.atan()});
+        }
+        chosen
+    }
+
+    fn transform_points(member: &mut Value, transform: Matrix4, reverse: bool) {
+        let points = member["points"].as_array_mut().unwrap();
+        for p in points.iter_mut() {
+            let point = transform.transform_point(Point3::from_vec(captured_vector(p).unwrap()));
+            *p = json!([point.x, point.y, point.z]);
+        }
+        if reverse {
+            points.reverse();
+        }
+    }
+
+    fn check(angle: bool, moved: bool, widening: bool, cone: bool) {
+        let scale: f64 = if moved { 0.2 } else { 1. };
+        let transform = if moved {
+            Matrix4::from_translation(Vector3::new(13., -7., 23.))
+                * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.73))
+        } else {
+            Matrix4::identity()
+        } * Matrix4::from_scale(scale);
+        let directory = std::env::temp_dir().join(format!(
+            "truck-cone-reference-{}-{angle}-{moved}-{widening}-{cone}",
+            std::process::id()
+        ));
+        std::fs::create_dir_all(&directory).unwrap();
+        let prefix = directory.join("001");
+        let prefix = prefix.to_str().unwrap();
+        std::fs::write(format!("{prefix}.input.step"), fixture(widening).0).unwrap();
+        let input =
+            builder::transformed(&import(&format!("{prefix}.input.step")).unwrap(), transform);
+        let input_volume = std::f64::consts::PI * 10. * 49. / 3.;
+        replay_common::assert_solid(&input, input_volume * scale.powi(3), &[0], TOL);
+        let prepared = prepare_for_step(&input.compress(), CHAMFER_STEP_TOL).unwrap();
+        let step = StepDisplay::new(
+            Default::default(),
+            StepDesign::from_model(StepModel::from(&prepared)),
+        )
+        .to_string();
+        std::fs::write(format!("{prefix}.input.step"), &step).unwrap();
+        let mut chosen = chosen(widening, cone);
+        transform_points(&mut chosen, transform, moved);
+        for member in chosen["contour_edges"].as_array_mut().unwrap() {
+            transform_points(member, transform, moved);
+        }
+        if cone {
+            let apex =
+                transform.transform_point(Point3::new(0., 0., if widening { -15. } else { 25. }));
+            let axis =
+                transform.transform_vector(Vector3::unit_z() * if widening { 7. } else { -7. });
+            chosen["reference_cone"]["apex"] = json!([apex.x, apex.y, apex.z]);
+            chosen["reference_cone"]["axis"] = json!([axis.x, axis.y, axis.z]);
+        } else {
+            let p =
+                Point3::from_vec(captured_vector(&chosen["reference_plane"]["origin"]).unwrap());
+            let n = captured_vector(&chosen["reference_plane"]["normal"]).unwrap();
+            let p = transform.transform_point(p);
+            let n = transform.transform_vector(n);
+            chosen["reference_plane"] = json!({"origin":[p.x,p.y,p.z],"normal":[n.x,n.y,n.z]});
+        }
+        let slope: f64 = if widening { 0.2 } else { -0.2 };
+        let g = (1. + slope * slope).sqrt();
+        let d0 = 0.3;
+        let d1 = if angle {
+            d0 * 30_f64.to_radians().tan() * g / (1. + slope * 30_f64.to_radians().tan())
+        } else {
+            0.7
+        };
+        let (radial, along) = if cone { (d1, d0) } else { (d0, d1) };
+        if angle {
+            chosen["mode"] = json!("distance-angle");
+            chosen["distance"] = json!(d0 * scale);
+            chosen["angle_degrees"] = json!(30.);
+            chosen.as_object_mut().unwrap().remove("distances");
+        } else {
+            chosen["distances"] = json!([d0 * scale, d1 * scale]);
+        }
+        let before = serde_json::to_string(&input.compress()).unwrap();
+        let assignments = chamfer_selection(&input, &[chosen.clone()], true).unwrap();
+        assert_eq!(assignments.len(), 2);
+        for (edge, distances) in assignments {
+            let adjacent: Vec<_> = input
+                .face_iter()
+                .filter(|f| f.edge_iter().any(|e| e.id() == edge.id()))
+                .collect();
+            for (face, distance) in adjacent.iter().zip(distances) {
+                let expected = match face.oriented_surface().elementary().unwrap().0 {
+                    Elementary::Cone { .. } => along,
+                    Elementary::Plane(_) => radial,
+                    _ => panic!("unexpected support"),
+                } * scale;
+                assert!((distance - expected).abs() < 1e-12);
+            }
+        }
+        assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
+        let task = json!({"schema_version":2,"operation":"chamfer","selection":[chosen]});
+        std::fs::write(format!("{prefix}.input.json"), task.to_string()).unwrap();
+        let result = replay(prefix, &Cell::new("start")).unwrap();
+        assert_eq!(result["status"], "operation-succeeded", "{result}");
+        assert_eq!(result["selected_edges"], 2);
+        for field in [
+            "input_unchanged",
+            "geometry_consistent",
+            "mesh_closed",
+            "step_prepared",
+        ] {
+            assert_eq!(result[field], true, "{field}: {result}");
+        }
+        assert_eq!(
+            step,
+            std::fs::read_to_string(format!("{prefix}.input.step")).unwrap()
+        );
+        let vertical = along / g;
+        let top = if widening { 5. } else { 3. };
+        let expected = (input_volume
+            - std::f64::consts::PI
+                * (top * radial * vertical
+                    - slope * radial * vertical * vertical / 3.
+                    - radial * radial * vertical / 3.))
+            * scale.powi(3);
+        let output = import(&format!("{prefix}.truck.step")).unwrap();
+        replay_common::assert_solid(&output, expected, &[0], TOL);
+        replay_common::blend::assert_step(&output, expected, TOL);
+        std::fs::remove_dir_all(directory).unwrap();
+    }
+
+    #[test]
+    fn conical_reference_preserves_unequal_sides() {
+        for moved in [false, true] {
+            for widening in [false, true] {
+                for cone in [false, true] {
+                    check(false, moved, widening, cone);
+                }
+            }
+        }
+    }
+    #[test]
+    fn conical_reference_preserves_distance_angle() {
+        for moved in [false, true] {
+            for widening in [false, true] {
+                for cone in [false, true] {
+                    check(true, moved, widening, cone);
+                }
+            }
+        }
+    }
+    #[test]
+    fn conical_reference_rejects_wrong_and_invalid_descriptors() {
+        let path = std::env::temp_dir().join(format!(
+            "truck-cone-reference-guards-{}.step",
+            std::process::id()
+        ));
+        std::fs::write(&path, fixture(false).0).unwrap();
+        let input = import(path.to_str().unwrap()).unwrap();
+        std::fs::remove_file(path).unwrap();
+        let before = serde_json::to_string(&input.compress()).unwrap();
+        for (field, value, status) in [
+            ("apex", json!([0., 0., 26.]), "selection-unmatched"),
+            ("axis", json!([0., 0., 1.]), "selection-unmatched"),
+            ("half_angle_radians", json!(0.3), "selection-unmatched"),
+            ("apex", json!([0., 0.]), "harness-error"),
+            ("axis", json!([0., 0., 0.]), "harness-error"),
+            ("axis", json!([0., 0., 1e308]), "harness-error"),
+            ("half_angle_radians", json!(-0.2), "harness-error"),
+            (
+                "half_angle_radians",
+                json!(std::f64::consts::FRAC_PI_2),
+                "harness-error",
+            ),
+            ("half_angle_radians", Value::Null, "harness-error"),
+        ] {
+            let mut chosen = chosen(false, true);
+            chosen["reference_cone"][field] = value;
+            let error = chamfer_selection(&input, &[chosen], true).unwrap_err();
+            assert_eq!(error["status"], status, "{error}");
+        }
+        for name in ["reference_plane", "reference_cylinder"] {
+            let mut conflict = chosen(false, true);
+            conflict[name] = json!({});
+            assert_eq!(
+                chamfer_selection(&input, &[conflict], true).unwrap_err()["status"],
+                "harness-error"
+            );
+        }
+        assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
     }
 }
