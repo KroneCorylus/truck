@@ -1,0 +1,147 @@
+CURVED TERMINAL CHAMFER BOUNDARIES — 2026-10-16
+ACTIVE: Continue work and commit achievements until done or told to stop.
+
+COMPLETED
+ac5b8fa3500314e277d914a7a22233c758416808: planar_edge terminal walks use existing curve/surface intersection for
+curved boundaries when the blend is planar. Root constrained to existing curve
+range; trimming and face validation unchanged. Straight-boundary behavior intact.
+Two parent failures at4d8548cc; four equal/unequal/transformed/scaled/face-order
+variants; third oversized-input test passes on parent and fixed code.
+Quarter-annular cylinder R1,innerR.25,length1; conical end length.2 toR.95.
+Independent section-integral volume evaluated40/80digits with two quadratures.
+Six native controls valid single solids, independent material, unchanged input,
+robust STEP. Maximum sampled control distance 4.049468120209827e-08.
+Full shapeops 396 pass/0 fail/1 existing ignored;
+42 replay tests,Clippy,actions smoke,final replay build pass.
+Proof truck-benchmarks/results/2026-10-16-curved-chamfer-terminals/REPORT.md.
+Raw target/native-curved-chamfer-terminals.
+
+FULL CLEAN CAPTURE
+Raw target/occt-capture-curved-chamfer-terminals; runtime ac5b8fa3500314e277d914a7a22233c758416808.
+396 native pass,648 records (487 chamfer/161 fillet complete scopes).
+All intents/native properties unchanged. All312 old constructions retain checks;
+312 exact prior result/comparison records,0 numerical changes.
+{"input-import-failed": 96, "operation-succeeded": 352, "operation-failed": 171, "unhandled-intent": 20, "input-inconsistent": 9}
+Limited sampled passes 333; constructed discrepancies 19.
+Archive 8107 members SHA256 efca69963094f07b78daa739bdef31fa7698bad6c252898392c902fe70cf3ad4.
+Previous b5c98d1a/4d8548cc chord conversion:312 constructions/293 limited passes;
+A2 improved0.00132718→0.00062106;12 unequal requests reached construction but failed.
+Earlier4211cfe0/48e89fdb consumed-neighbor routing:+33 constructions/limited passes.
+Earliered603e7d cone contact oracle explains9 native setback discrepancies;
+raw verdicts retained. G1/H4 proofs already exist; do not rediscover.
+
+DIAGNOSTIC CAUTION
+Old target/build-longitudinal-failure-probe.py uses an instrumented COPY of
+pre-fix planar_edge.rs at target/longitudinal_planar_edge_probe.rs. It correctly
+localized the old A6/005 rejection to line226 and a quadratic BSpline terminal
+boundary. Do not use that stale private source to diagnose the new kernel.
+Refresh the copied source and matching release externs if a new probe is needed.
+
+NEXT
+Inspect full comparison changes and remaining construction failures first.
+The following independent angle work remains unapplied:
+Next candidate: plane-reference distance-angle on longitudinal plane/cylinder edges.
+Keep cylinder-reference distance-angle unsupported until its convention is resolved.
+Current b5c98d1a supports only equal and two-distance chords; do not undo that conversion.
+
+Native evidence:
+ target/native-longitudinal-offset-angle-controls contains 12 native controls,
+ convex/concave, plane offsets -2/0/2, R5,H10, plane distance.7 or cylinder chord1.5,
+ angle30. Initial scalar-oracle failure is retained in
+ target/longitudinal-offset-angle-controls.txt (first four controls passed, fifth failed).
+ Helpers target/validate-longitudinal-offset-angle-controls.py,
+ target/analyze-longitudinal-offset-angles.py, target/native-section-vertices.cpp.
+ Do not recapture/overwrite these raw controls without preserving originals.
+
+Stronger plane-reference proof now exists:
+ target/native-plane-angle-oracle.cpp extracts actual analytic native bevel planes;
+ target/check-native-plane-angles.py verifies contact vertices lie on them and
+ measures angle to reference plane. Output target/native-plane-angle-proof.txt;
+ raw plane-angle-proof.json. Exactly one analytic bevel plane per control.
+ Requested30 degrees: convex h+2 ->47.294898328645274; concave h+2 ->20.511460028020405.
+ Other four plane-reference controls give30 within1e-12. Plane setback.7 preserved.
+ Corresponding native material errors against the exact 30-degree construction:
+ -0.6298351858989406 and +0.8598790045034548. Native outputs are valid; stored
+ tolerances can be1e-4. These errors are not tessellation uncertainty.
+ Native source ChFiKPart_ComputeData_ChAsymPlnCyl.cxx straight overload line415:
+ cosA1=DirSOrC.Dot(VecTranslPln.Normalized()),sinA1=sqrt(1-cosA1²), unsigned offset
+ information. This is an attribution lead; no source fix or full attribution done.
+
+Cylinder-reference caution:
+ Convex center-plane native case matches angle at ORIGINAL spine tangent.
+ Concave center-plane native case gives47.25385312 there but30 at NEW contact tangent
+ (psi17.25385312). Do not label every provisional material mismatch a native defect
+ until the angle contract is resolved. Raw analysis.json measures all12 contacts.
+
+Proposed next implementation (NOT APPLIED/NOT TESTED):
+ For a plane reference, exact section geometry gives the cylinder contact.
+ Take the selected edge in the plane face's oriented edge_iter order. n is the
+ plane's outward normal, axis is that edge's direction, T=n.cross(axis) is inward
+ along the plane. S is seed point, P=S+distance*T. Ray U=-T*cos(alpha)-n*sin(alpha)
+ starts at P toward the cylinder through the solid side of the plane.
+ Circle center C is cylinder-axis projection of S. Solve |P+tU-C|²=R².
+ Pick the first positive ray root, require finite contact on the inward cylinder
+ branch (positive dot with cylinder face's inward tangent, positive radial dot
+ with S-C). Convert chord |Q-S| through the existing b5c98d1a conversion.
+ Oriented face edge_iter + oriented surface normals are consistent with existing
+ planar_edge::section; each face's inward tangent is normal.cross(own edge axis).
+ Return explicit unsupported intent for missing/nonlocal contacts and cylinder ref.
+ Keep exact-line/axis/plane guards; no generic curved-edge approximation.
+
+Independent test oracle for h-offset radiusR section:
+ S=(sqrt(R²-h²),h), planeP=(S.x+sign*a,h), sign=-1 convex,+1 concave.
+ U=(-sign*cos(alpha),sin(alpha)); first positive root of circle intersection yieldsQ.
+ psi=atan2(Q.y,Q.x)-asin(h/R). Removed area=
+ abs(cross(S,P)+cross(P,Q)-R²*psi)/2.
+ Convex input area=R²*acos(h/R)-h*sqrt(R²-h²); concave is rectangle16*(8-h)-that.
+ Multiply remaining area byH. Test actual STEP contact vertices and analytic bevel
+ plane angle as well as shared solid/STEP and immutable input. Proposed controls
+ six plane-reference cases (capture001,003,005,007,009,011), transformed/scaled and
+ reversed face order/point order. Need parent-failing tests FIRST.
+ Native comparison should pass the four correct controls; for two wrong native
+ angles use independent requested geometry and retain raw discrepancy verdicts.
+ No source/test edits for this candidate have been made yet.
+
+Existing completed chord helpers:
+ target/validate-longitudinal-distances.py, replay-longitudinal-distances.py,
+ package-longitudinal-distance-proof.py, package-longitudinal-distance-full.py,
+ write-longitudinal-distance-checkpoint.py.
+Original scratch target/longitudinal-distance-tests.rs and helper/apply scripts are
+already implemented at b5c98d1a; do not reapply them.
+
+Remaining unhandled inventory at b5c98d1a (20 records):
+Plane-reference longitudinal angle scope: dist_angle_complex/A7,A9 and
+ dist_angle_sequence/A7,A9 steps005/006 (6 records; complex selects9 edges).
+Cylinder-reference longitudinal angles: dist_angle_complex/A6,A8 and sequence
+ A6,A8 steps005/006; dist_angle/A2 has mixed references (7 records total).
+Other unsupported support pairs: dist_angle/E5 (ellipse seed),dist_dist/E5
+ (ellipse seed),dist_dist/A2 (6 line seeds, mixed references; equalA2 now constructs).
+Four missing nonanalytic references: dist_angle_sequence/C1/001 and
+ dist_dist_sequence/C1/001..003. Keep exact requests and complete selections.
+
+Prepared but UNAPPLIED/UNCOMPILED angle prototypes:
+ target/longitudinal-plane-angle-helper.rs implements the ray/cylinder contact
+ with positive-root, inward-branch and finite checks. It must be called only after
+ the existing longitudinal support guard, and only for a plane reference.
+ target/longitudinal-plane-angle-tests.rs contains two positive tests with12
+ variants (6 offset/convexity shapes × identity/transformed/reversed face order),
+ plus unsupported-cylinder-reference/nonlocal/no-contact guards. Copy odd captures
+001,003,005,007,009,011 from native-longitudinal-offset-angle-controls into
+ tests/fixtures/chamfer-longitudinal-angle as NNN.step/NNN.json. Tests include
+ actual STEP contact vertices, bevel plane and independent material. Need parent
+ failure before implementing; do not assume prototypes compile or pass.
+
+METHOD
+Read AGENTS.md. Parent-failing tests; no weakened assertions; shared solid/STEP.
+CARGO_BUILD_JOBS=12; rustfmt +nightly --config skip_children=true; no cargo fmt.
+Freeze production during builds/tests/captures. Relevant release checks,Clippy,
+actions smoke; build replay LAST. Commit implementation/proof before clean capture,
+then HTML/catalog/handoff. Force-add JSON/ZIP/STEP; diff check excludes *.step.
+No push/PR,consumer/pin changes,subagents,unsupported speed/full-parity claims.
+Plugin target/occt-cone-reference-plugin; SDK target/occt-sdk/usr/lib64;
+OCCT ../investigations/sequential-holes-2026-10-10/occt; public data
+ target/occt-public-chamfer-data; workers4,timeout120,fresh output.
+Helpers target/validate-curved-chamfer-terminals.py,replay-curved-chamfer-terminals.py,
+package-curved-chamfer-proof.py,package-curved-chamfer-full.py,
+write-curved-chamfer-checkpoint.py. Packaging is not idempotent.
+Browser hidden tab_3, HTTP server8765.
