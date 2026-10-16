@@ -1,0 +1,57 @@
+CYLINDRICAL CHAMFER REFERENCES — 2026-10-16
+ACTIVE: Continue work and commit verified achievements until done or told to stop.
+
+COMPLETED
+f96cb1051acc83eed1e142b1d8ae062f874ead54: optional schema-2 reference_cylinder(origin,axis,radius), unique adjacent
+seed-face matching, existing oriented contour-side propagation. Axis sign/origin
+shift irrelevant. Malformed/ambiguous cylinders rejected. Geometry solver unchanged.
+3 parent-failing tests, 8 constructed variants, shared solid/STEP and analytic material.
+36 replay tests,13 capture tests,Clippy,actions smoke,final replay build pass.
+Three native cylinder-reference controls, valid single STEP,maxsample6.97e-9.
+Proof truck-benchmarks/results/2026-10-16-cylinder-references/REPORT.md, metadata.json,native-evidence.zip.
+Raw target/native-cylinder-reference-parent and target/native-cylinder-reference-final.
+
+FULL CLEAN CAPTURE
+Raw target/occt-capture-cylinder-references, runtime f96cb1051acc83eed1e142b1d8ae062f874ead54.
+396 native passes,648 records,487 chamfer/161 fillet complete contours.
+40 records gain optional cylinder metadata; all requested parameters, scopes
+and native result properties unchanged. All231 prior successful results/comparisons
+EXACT. No prior successful-check regressions.
+{"input-import-failed": 96, "operation-succeeded": 241, "operation-failed": 214, "unhandled-intent": 88, "input-inconsistent": 9}
+Limited sampled comparisons: 230. Archive7774members SHA256 1f277318bf25a6b50aae270755a6955981eceb5e9c01ea6755f3b34dfda956a0.
+
+NEXT
+1. Plane/cone circular rims: add exact cone reference capture/matching and oriented
+   dihedral angle conversion, restricted to planes perpendicular to the cone axis.
+   Current raw native probes target/native-cone-reference-probe; eight controls pass
+   native validity, input immutability and independent volume. They cover narrowing/
+   widening frusta Rbottom5/Rtop3 and vice versa,H10,plane/cone reference,unequal and
+   angle30 requests. Helpers target/cone-reference-native-inputs.cpp and
+   target/probe-cone-references.py. Native semiangle may be negative: capture apex,
+   opening-axis=axis*sign(semiangle),positive half_angle_radians. Cone axis reversal
+   is NOT equivalent (opposite nappe), unlike cylinder. Apex shift is not equivalent.
+   Plane/cone oriented cos(beta)=normal_plane.dot(opening_axis)*sin(half_angle)*cone_sign;
+   sin(beta)=cos(half_angle). Existing sine-rule conversion then applies.
+   Independent volume for full frustum,top radius R,slope k=dr/dz,radial inset a,
+   cone setback q,vertical b=q/sqrt(1+k*k): removed=pi*(R*a*b-k*a*b*b/3-a*a*b/3).
+   Inputvolume=pi*H/3*(Rbottom²+Rbottom*Rtop+Rtop²).
+   Add parent-failing regressions BEFORE implementation, native descriptor harness
+   must fail old plugin. Keep unsupported nonperpendicular supports explicit.
+2. Solver failures: many trim_faces failures are straight-edge sequential chamfers;
+   inspect actual geometry, don't weaken strict trimmed intersection checks.
+3. G1/H4 already have independent analytic proofs; see previous handoffs. Don't
+   reclassify their native reference discrepancies as Truck successes/full parity.
+
+METHOD
+Read AGENTS.md. Parent-failing tests; never loosen assertions. Shared solid/STEP.
+CARGO_BUILD_JOBS=12. rustfmt +nightly --config skip_children=true; no cargo fmt.
+Freeze production sources during builds/tests/captures. Relevant release tests,
+Clippy,actions smoke,build replay LAST. Implementation/proof commit before clean
+full capture; then catalog/HTML/handoff commit. Force-add JSON/ZIP/STEP evidence.
+Diff check excludes *.step. No push/PR,consumer/pin changes,subagents or speed claims.
+Plugin target/occt-cylinder-reference-plugin; SDK target/occt-sdk/usr/lib64.
+Native source ../investigations/sequential-holes-2026-10-10/occt; public data
+ target/occt-public-chamfer-data. Capture workers4 timeout120 freshoutputdir.
+Completed helpers target/validate-cylinder-references.py,replay-cylinder-references.py,
+package-cylinder-reference-proof.py,package-cylinder-reference-full.py,
+write-cylinder-reference-checkpoint.py. Packaging scripts are not idempotent.

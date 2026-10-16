@@ -1,8 +1,8 @@
 LATEST CHECKPOINT — 2026-10-16
-Work is active. Read ../2026-10-16-shared-chamfer-ends/HANDOFF.txt and report.html there.
-Latest kernel fix71edbef1 supports shared chamfer terminal faces.
-Fullcapture remains231constructions/220limitedsamplepasses,allprior successes
-exactly unchanged. Three added native controls prove the new capability.
+Work is active. Read ../2026-10-16-cylinder-references/HANDOFF.txt and report.html there.
+Latest implementation f96cb105 captures and matches cylindrical chamfer references.
+Full capture: 241 constructions/230 limited sampled passes.
+All 231 prior successful results/comparisons exactly unchanged.
 Continue until done or told to stop. Full parity remains unverified.
 
 HISTORICAL HANDOFF FOLLOWS

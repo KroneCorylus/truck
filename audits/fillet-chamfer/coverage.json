@@ -3,7 +3,7 @@
     "title": "Fillet and chamfer feature parity audit",
     "baseline": "OCCT V7_9_3 source inventory plus the recorded Truck/Pieza revisions. Includes 3D, 2D, related workflows and all textual candidates under the discovery rules.",
     "meaning_of_all": "Every dedicated test-grid entry, matching registered test/helper, discovered blend command and retained reference in this pinned checkout. This is not a claim about all mathematical configurations or current/future OCCT releases.",
-    "execution": "All 1,026 inventoried entries have recorded native harness attempts. Latest clean capture at 71edbef1:396native entries pass,648operation records (487complete chamfer contours,161complete fillet contours),231constructions and220limited sampled passes at0.001. All648intents/native properties and231successful results/comparisons exactly unchanged; no regressions. Three added independent native controls prove shared-face chamfer attachment outside the corpus. Full-parity verdicts remain unverified.",
+    "execution": "All 1,026 inventoried entries have recorded native harness attempts. Latest clean capture at f96cb105: 396 native entries pass, 648 operation records (487 complete chamfer contours, 161 complete fillet contours), 241 constructions and 230 limited sampled passes at 0.001. Cylinder references add 10 constructions; all 231 prior successful results/comparisons remain exactly unchanged. Full-parity verdicts remain unverified.",
     "mapping": "Capability assessments describe observable outcomes supported or restricted by reviewed source evidence. Per-case tags and links are automated hints; they do not prove Truck handles that fixture.",
     "objective": "Achieve at least OCCT-level fillet/chamfer capabilities and robustness for equivalent modeling tasks in Truck/Pieza.",
     "equivalence": "Judge the requested geometry, dimensions, validity, editing behavior and practical performance. Different APIs, algorithms, languages, surface representations and internal operation sequences are acceptable. Missing a corresponding OCCT method is not evidence of a feature gap."
@@ -426,6 +426,12 @@
           "path": "truck-benchmarks/results/2026-10-16-shared-chamfer-ends/REPORT.md",
           "find": "# Close both",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-16-cylinder-references/REPORT.md",
+          "find": "# Cylindrical reference",
+          "role": "test"
         }
       ],
       "required_outcome": "Bevel selected edges by equal specified setbacks on both supports, including convex and concave material.",
@@ -436,7 +442,8 @@
         "At c4706b38, refined contact fits and normalized ruled-surface orientation preserve small/shifted tangent chamfers with parent-failing material/mesh/STEP regressions. Explicit native A4 three-edge contour proof is valid with sampled maximum difference6.18e-06. Automatic capture remains seed-only; full capture222 constructions/208 limited comparisons, no prior successful check regressions. No parity upgrade.",
         "At c26b6780, simple chamfer and fillet face patches trim a shared arc/chord neighbor sequentially instead of panicking. Parent-failing tests verify analytic contacts and retained chord, orientation, representations and immutable input. Face-patch scope only; full capture 222 constructions/208 limited comparisons with no prior successful check regressions. No parity upgrade.",
         "At 099ccb7e following 2346b975, native chamfer schema2 captures complete contours and first-assignment/ignored semantics. Parent-failing replay validation prevents seed fallback. Automatic A4 applies3edges with valid STEP and sampled maximum2.23e-8. Fillets remainseed-only and retain5e-5exportfits; chamfersuse1e-7. Fullcapture221 constructions/210 limitedcomparisons; 58 corrected-intentrecords, no prior successful checkregressions forunchangedintent. No parityupgrade.",
-        "At 71edbef1, open chamfers rebuild a shared terminal face with both end bridges. Two parent-failing regressions cover six equal/unequal,scaled,transformed/reversed variants with analytic material/cone/normals and shared solid/STEP checks. Three native controls export valid single STEP,maxsample6.97e-9. Fullshapeops391pass/0fail/1existingignored,33replay,Clippy/smoke pass. Cleanfullcapture:231construct/220limitedpasses,all231successful results/comparisons exactly unchanged. No parity upgrade."
+        "At 71edbef1, open chamfers rebuild a shared terminal face with both end bridges. Two parent-failing regressions cover six equal/unequal,scaled,transformed/reversed variants with analytic material/cone/normals and shared solid/STEP checks. Three native controls export valid single STEP,maxsample6.97e-9. Fullshapeops391pass/0fail/1existingignored,33replay,Clippy/smoke pass. Cleanfullcapture:231construct/220limitedpasses,all231successful results/comparisons exactly unchanged. No parity upgrade.",
+        "At f96cb105, cylindrical chamfer references are captured and matched by axis line/radius, preserving complete-contour side assignments. Three parent-failing regressions and three native controls pass. All36 replay tests,13 capture tests,Clippy/smoke pass. Clean full capture: 241 constructions/230 limited sampled passes; all231 prior successful results/comparisons exactly unchanged. No parity upgrade."
       ]
     },
     {
@@ -516,6 +523,12 @@
           "path": "truck-benchmarks/results/2026-10-16-shared-chamfer-ends/REPORT.md",
           "find": "# Close both",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-16-cylinder-references/REPORT.md",
+          "find": "# Cylindrical reference",
+          "role": "test"
         }
       ],
       "required_outcome": "Bevel with independently specified setbacks on the intended two support faces; orientation or storage order must not silently exchange them.",
@@ -526,7 +539,8 @@
         "At c4706b38, refined contact fits and normalized ruled-surface orientation preserve small/shifted tangent chamfers with parent-failing material/mesh/STEP regressions. Explicit native A4 three-edge contour proof is valid with sampled maximum difference6.18e-06. Automatic capture remains seed-only; full capture222 constructions/208 limited comparisons, no prior successful check regressions. No parity upgrade.",
         "At 099ccb7e following 2346b975, native chamfer schema2 captures complete contours and first-assignment/ignored semantics. Parent-failing replay validation prevents seed fallback. Automatic A4 applies3edges with valid STEP and sampled maximum2.23e-8. Fillets remainseed-only and retain5e-5exportfits; chamfersuse1e-7. Fullcapture221 constructions/210 limitedcomparisons; 58 corrected-intentrecords, no prior successful checkregressions forunchangedintent. No parityupgrade.",
         "At 48a1032f, replay propagates planar seed reference sides across complete oriented chamfer contours, including perpendicular plane/cylinder rims. Two parent-failing native regressions verify both directions and normal signs, exact setbacks and solid/STEP checks. Full capture: 231 constructions, 220 limited comparisons; all648 intents unchanged and no successful check regressions. Fillets remain seed-only. No parity upgrade.",
-        "At 71edbef1, open chamfers rebuild a shared terminal face with both end bridges. Two parent-failing regressions cover six equal/unequal,scaled,transformed/reversed variants with analytic material/cone/normals and shared solid/STEP checks. Three native controls export valid single STEP,maxsample6.97e-9. Fullshapeops391pass/0fail/1existingignored,33replay,Clippy/smoke pass. Cleanfullcapture:231construct/220limitedpasses,all231successful results/comparisons exactly unchanged. No parity upgrade."
+        "At 71edbef1, open chamfers rebuild a shared terminal face with both end bridges. Two parent-failing regressions cover six equal/unequal,scaled,transformed/reversed variants with analytic material/cone/normals and shared solid/STEP checks. Three native controls export valid single STEP,maxsample6.97e-9. Fullshapeops391pass/0fail/1existingignored,33replay,Clippy/smoke pass. Cleanfullcapture:231construct/220limitedpasses,all231successful results/comparisons exactly unchanged. No parity upgrade.",
+        "At f96cb105, cylindrical chamfer references are captured and matched by axis line/radius, preserving complete-contour side assignments. Three parent-failing regressions and three native controls pass. All36 replay tests,13 capture tests,Clippy/smoke pass. Clean full capture: 241 constructions/230 limited sampled passes; all231 prior successful results/comparisons exactly unchanged. No parity upgrade."
       ]
     },
     {
