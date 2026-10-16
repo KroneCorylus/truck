@@ -1,0 +1,69 @@
+PLANE/CONE CHAMFER REFERENCES — 2026-10-16
+ACTIVE: Continue work and commit verified achievements until done or told to stop.
+
+COMPLETED
+54b272d6cc3f82044adeb9172e38891103dbf9cb: optional schema2 reference_cone(apex,opening axis,half_angle_radians).
+Negative native semiangle reverses opening axis. Match unique adjacent seed cone;
+axis reversal/apex shift not equivalent. Existing contour-side propagation.
+Plane/cone rims require plane perpendicular to cone axis; oriented dihedral feeds
+existing sine-rule angle conversion. No geometry solver/fitting/API changes.
+3 parent-failing tests,16 constructed variants;39 replay,13 capture tests,
+Clippy,action smoke,final replay build pass. Eight native controls maxsample
+1.4734521025516756e-7; independent frustum material and valid single STEP.
+Proof378members SHA1ee0a366d8f7f12534bd60bf2b616c4f9575c7c91b6a72062f96ef9057127481.
+Raw target/native-cone-reference-parent/final/probe (probe is fixture-origin).
+
+FULL CLEAN CAPTURE
+Raw target/occt-capture-cone-references;runtime54b272d6cc3f82044adeb9172e38891103dbf9cb.
+396nativepass,648records;487chamfer/161fillet complete scopes.
+42records gain optional cone metadata; all intents/scopes/native properties unchanged.
+All241 prior successful results/comparisons EXACT; no regressions.
+279construct(+38),259limitedsamplepasses(+29);232failed,32unhandled,96importfailed,
+9inconsistent. Nine new unequal-distance discrepancies plus11previous=20total.
+Newdiscrepancies dist_dist/C1,C6,C7,D1,D2,D5,D6,D9,E1 (0.02174..0.04349 maxsample).
+Archive7888members SHA060b5cb08f7f4f051009746697a692a7f11bc20926a6e4e731c577181c83a15a.
+Previous cylindrical change f96cb105/docs97b90078 added10constructions/10passes;
+this continuation totals+48constructions/+39limitedpasses. Not full parity.
+
+NEXT
+1. Investigate nine new unequal-distance discrepancies before solver routing.
+   Extra native control target/native-cone45-reference-probe: both slopes±1,
+   radius5/3 or3/5,H2,refsplane/cone,d0.3d1.7,angle30: all8analytic volumespass.
+   target/native-cone45-swapped-probe usesd0.7d1.3 andangle30; first4(narrowing)
+   pass, widening unequal planar-ref005 fails native analyticvolume assertion:
+   expected100.434683829581,native101.64607225162558; cone-ref007 native101.64598570740277.
+   Native outputs valid, stored tolerances1e-7. Need independently inspectactual
+   contactsetbacks+Truck before attributingcause or changingverdicts.
+   Helpers target/cone45-reference-native-inputs.cpp,probe-cone45-references.py,
+   probe-cone45-swapped.py. Native source ChFiKPart_ComputeData_ChPlnCon.cxx and
+   ChFiKPart_ComputeData_ChAsymPlnCon.cxx may explain branch behavior.
+2. Single-edge planar consumed-neighbor routing: inventory98failed active seeds,
+   81plane/plane,14plane/cylinder,3BSpline/extrusion. See target/single-chamfer-failures-*.
+   Scratch probe target/build-chamfer-failure-probe.py compiles against exact frozen
+   release externs (fingerprint95c9a5594d96e759) and copiedprivate miter code, without
+   changingproduction files. target/chamfer-sequence-a1-probe.txt:
+   dist_angle_sequence/A1/002 direct miter OutsideNeighbour atchamfer_miter.rs270
+   (edge orientation collapses), whereas existing planar_edge::blend_edges yields
+   21faces,closedconsistent shell. Need analytic/STEP proof before routingfallback.
+   Candidate regression:10cube,first vertical corner chamfer atx10y10 sizea1,
+   thenbottomedgey10z0 withbottominsetb2,verticalc1(or2equal). New chamfer consumes
+   shortedge frompriorbevel. Inputvolume1000-a²H/2=995.
+   Removedsecond=Lx*b*c/2-c*(a²/2-a³/(6*b)) for b>a.
+   Candidate change onlysingleedge OutsideNeighbour fallback to existingstraight
+   route, preserveoriginalerror if fallbackfails; must keep all oversized/collapsed
+   existingrejectionsunchanged. Equal/unequal entrypointsbothneedcoverage.
+3. General remaining work as previoushandoffs. G1/H4 independentproofsalreadyexist.
+
+METHOD
+Read AGENTS.md. Parent-failing tests; never loosen assertions. Shared solid/STEP.
+CARGO_BUILD_JOBS=12; rustfmt +nightly --config skip_children=true,no cargo fmt.
+Freeze production during builds/tests/captures; relevantrelease tests,Clippy,
+actions smoke,buildreplayLAST. Implementation+proofcommit beforecleanfullcapture;
+then catalog/HTML/handoffcommit. Force-add JSON/ZIP/STEP. Diffcheck excludes*.step.
+No push/PR,consumer/pin changes,subagents or unsupported speed/parityclaims.
+Plugin target/occt-cone-reference-plugin;SDK target/occt-sdk/usr/lib64.
+Native ../investigations/sequential-holes-2026-10-10/occt;publicdata
+ target/occt-public-chamfer-data. Captureworkers4 timeout120 freshoutput.
+Helpers target/validate-cone-references.py,replay-cone-references.py,
+package-cone-reference-proof.py,package-cone-reference-full.py,
+write-cone-reference-checkpoint.py. Packaging scripts not idempotent.
