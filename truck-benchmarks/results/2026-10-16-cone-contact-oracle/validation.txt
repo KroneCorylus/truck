@@ -1,0 +1,17 @@
+native-cone45-reference-probe 001 native error 1.4210854715202004e-14 truck error -1.8954466440845863e-08
+native-cone45-reference-probe 002 native error 4.263256414560601e-14 truck error -1.6439400951639982e-08
+native-cone45-reference-probe 003 native error -4.263256414560601e-14 truck error -1.0233833336315001e-08
+native-cone45-reference-probe 004 native error 1.4210854715202004e-14 truck error -1.0446356668580847e-08
+native-cone45-reference-probe 005 native error 1.4210854715202004e-14 truck error -1.4801983638790261e-08
+native-cone45-reference-probe 006 native error 9.947598300641403e-14 truck error -8.032742471186793e-09
+native-cone45-reference-probe 007 native error 2.842170943040401e-14 truck error -9.455249028178514e-09
+native-cone45-reference-probe 008 native error 2.842170943040401e-14 truck error -1.0093970104207983e-08
+native-cone45-swapped-probe 001 native error -4.263256414560601e-14 truck error -1.0233833336315001e-08
+native-cone45-swapped-probe 002 native error 9.947598300641403e-14 truck error -3.065414944103395e-08
+native-cone45-swapped-probe 003 native error 0.0 truck error -1.8954466440845863e-08
+native-cone45-swapped-probe 004 native error -1.4210854715202004e-14 truck error -1.4637890899393824e-08
+native-cone45-swapped-probe 005 native error 1.211388422044621 truck error -9.455249028178514e-09
+native-cone45-swapped-probe 006 native error -2.842170943040401e-14 truck error -1.0154153073926864e-08
+native-cone45-swapped-probe 007 native error 1.2295199418058331 truck error -1.4801983638790261e-08
+native-cone45-swapped-probe 008 native error 0.0 truck error -1.4633315004175529e-08
+50 measurements verified: 9 corpus pairs and 16 control pairs; native first-setback fold reproduced

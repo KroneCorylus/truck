@@ -1,0 +1,3503 @@
+{
+  "kernel_revision": "54b272d6cc3f82044adeb9172e38891103dbf9cb",
+  "controls": [
+    {
+      "folder": "native-cone45-reference-probe",
+      "index": 0,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/001",
+      "expected_plane": 0.3,
+      "expected_cone": 0.7,
+      "expected_volume": 101.1955331425844,
+      "native_setback_mismatch": false,
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/001.input.brep": "5ce99008afa8982067b4e6f5d0de100c2f516c4703dc7121b8dce5f0ccea259f",
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/001.input.step": "02606ec8f7bd7a793e12b1149fb17a36c0097706313983876004659751a4a66a",
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/001.input.json": "500a23538d152eb16acb59bd3d9404e09df6c65c03557d74b7581754c192f297"
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 101.19553314258441,
+        "truck_volume": 101.19553312362993,
+        "native_to_truck_max_distance": 3.0921798114814314e-09,
+        "native_to_truck_samples": 654,
+        "truck_to_native_max_distance": 7.50898669001857e-08,
+        "truck_to_native_samples": 1136,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 101.17806632828804,
+        "selected_edges": 2,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      }
+    },
+    {
+      "folder": "native-cone45-reference-probe",
+      "index": 1,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/002",
+      "expected_plane": 0.3,
+      "expected_cone": 0.5795554957734409,
+      "expected_volume": 101.45251909957594,
+      "native_setback_mismatch": false,
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/002.input.brep": "5ce99008afa8982067b4e6f5d0de100c2f516c4703dc7121b8dce5f0ccea259f",
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/002.input.step": "609a813cacdeb38445887edc071007b3df7792400ac1be91aae28572a869be68",
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/002.input.json": "4c51013308580c88abcb786f6041431e3df350fae015fc5caf788681785eb4d6"
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 101.45251909957598,
+        "truck_volume": 101.45251908313654,
+        "native_to_truck_max_distance": 3.0921798114814314e-09,
+        "native_to_truck_samples": 654,
+        "truck_to_native_max_distance": 7.103368454448063e-08,
+        "truck_to_native_samples": 1136,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 101.4331333385715,
+        "selected_edges": 2,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      }
+    },
+    {
+      "folder": "native-cone45-reference-probe",
+      "index": 2,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/003",
+      "expected_plane": 0.7,
+      "expected_cone": 0.3,
+      "expected_volume": 101.30171580086888,
+      "native_setback_mismatch": false,
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/003.input.brep": "5ce99008afa8982067b4e6f5d0de100c2f516c4703dc7121b8dce5f0ccea259f",
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/003.input.step": "95bfcad365b8e72b1df4e8ad94d41cb6d4a739eb5caabf9c0ba6f91bad47f680",
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/003.input.json": "84d0901683f321680f0dda49bf5b6a5dd23b7dd9a1a2ee3f852cb3a72d019818"
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 101.30171580086883,
+        "truck_volume": 101.30171579063504,
+        "native_to_truck_max_distance": 2.796626749280828e-09,
+        "native_to_truck_samples": 654,
+        "truck_to_native_max_distance": 2.7413760681043162e-08,
+        "truck_to_native_samples": 1136,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 101.274572475343,
+        "selected_edges": 2,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      }
+    },
+    {
+      "folder": "native-cone45-reference-probe",
+      "index": 3,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/004",
+      "expected_plane": 0.5795554957734409,
+      "expected_cone": 0.3,
+      "expected_volume": 101.51396014905684,
+      "native_setback_mismatch": false,
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/004.input.brep": "5ce99008afa8982067b4e6f5d0de100c2f516c4703dc7121b8dce5f0ccea259f",
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/004.input.step": "b16a6b9e2d50294259596b520db6fe79371cf9519d25ef99526776e09dd17b30",
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/004.input.json": "51a51e1e88da937a2184075d62454de95ed6cbf5709f5f1f955466c499c5e1af"
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 101.51396014905686,
+        "truck_volume": 101.51396013861049,
+        "native_to_truck_max_distance": 2.7966277289887313e-09,
+        "native_to_truck_samples": 654,
+        "truck_to_native_max_distance": 3.2962886522746395e-08,
+        "truck_to_native_samples": 1136,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 101.48673159725821,
+        "selected_edges": 2,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      }
+    },
+    {
+      "folder": "native-cone45-reference-probe",
+      "index": 4,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/005",
+      "expected_plane": 0.3,
+      "expected_cone": 0.7,
+      "expected_volume": 100.41646576559704,
+      "native_setback_mismatch": false,
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/005.input.brep": "71f0778a09f630fd1daf2bbb1f6b42acbca86507f3583165bb04ce11175c5ed0",
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/005.input.step": "e38b782ac8dd238289985905648da11400bbde7070c0fac60a279be8e85d6918",
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/005.input.json": "7ca992a1fe28689e2a0e84ff0b8c616e51fafaf4f70f82e98f08a470154289f6"
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 100.41646576559705,
+        "truck_volume": 100.41646575079506,
+        "native_to_truck_max_distance": 3.9240778516624495e-09,
+        "native_to_truck_samples": 654,
+        "truck_to_native_max_distance": 8.79219994587288e-08,
+        "truck_to_native_samples": 1136,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 100.4007888060753,
+        "selected_edges": 2,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      }
+    },
+    {
+      "folder": "native-cone45-reference-probe",
+      "index": 5,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/006",
+      "expected_plane": 0.3,
+      "expected_cone": 0.15529142706151244,
+      "expected_volume": 102.12204096040733,
+      "native_setback_mismatch": false,
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/006.input.brep": "71f0778a09f630fd1daf2bbb1f6b42acbca86507f3583165bb04ce11175c5ed0",
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/006.input.step": "2a155c56a70a4969c952070142e1cabbd08fc6c13cdd113f4b0718f8663392c7",
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/006.input.json": "228f19d588f1565b02337232a573feeef5a0380fa45eb1d37ec9314d7e062c84"
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 102.12204096040743,
+        "truck_volume": 102.12204095237459,
+        "native_to_truck_max_distance": 4.2596783793570335e-09,
+        "native_to_truck_samples": 654,
+        "truck_to_native_max_distance": 8.79219994587288e-08,
+        "truck_to_native_samples": 1136,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 102.10468022573389,
+        "selected_edges": 2,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      }
+    },
+    {
+      "folder": "native-cone45-reference-probe",
+      "index": 6,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/007",
+      "expected_plane": 0.7,
+      "expected_cone": 0.3,
+      "expected_volume": 100.434683829581,
+      "native_setback_mismatch": false,
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/007.input.brep": "71f0778a09f630fd1daf2bbb1f6b42acbca86507f3583165bb04ce11175c5ed0",
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/007.input.step": "33c663d5a398c1313e9886df2ad83f8213456e711f2cbcde8c7fbfca9e24d3a5",
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/007.input.json": "0a95ff0efc976fee5100e2b1c3c34af543378ba95329d9154b5febe8057be9b1"
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 100.43468382958103,
+        "truck_volume": 100.43468382012576,
+        "native_to_truck_max_distance": 4.170530852675022e-09,
+        "native_to_truck_samples": 654,
+        "truck_to_native_max_distance": 8.043927834933129e-08,
+        "truck_to_native_samples": 1136,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 100.41789752513631,
+        "selected_edges": 2,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      }
+    },
+    {
+      "folder": "native-cone45-reference-probe",
+      "index": 7,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/008",
+      "expected_plane": 0.15529142706151244,
+      "expected_cone": 0.3,
+      "expected_volume": 102.12057883059157,
+      "native_setback_mismatch": false,
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/008.input.brep": "71f0778a09f630fd1daf2bbb1f6b42acbca86507f3583165bb04ce11175c5ed0",
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/008.input.step": "0450f1bb977746ced4653c9bb76bac01812e1e34468f93f1bde1b5a4a27a6359",
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/008.input.json": "b01df785b0c00ff9400108fca468f7a23ff5b073de667a42c6b0fd95bba73d3a"
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 102.1205788305916,
+        "truck_volume": 102.1205788204976,
+        "native_to_truck_max_distance": 4.170530852675022e-09,
+        "native_to_truck_samples": 654,
+        "truck_to_native_max_distance": 9.06290553714939e-08,
+        "truck_to_native_samples": 1136,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 102.10362326976629,
+        "selected_edges": 2,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      }
+    },
+    {
+      "folder": "native-cone45-swapped-probe",
+      "index": 0,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/001",
+      "expected_plane": 0.7,
+      "expected_cone": 0.3,
+      "expected_volume": 101.30171580086888,
+      "native_setback_mismatch": false,
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/001.input.brep": "5ce99008afa8982067b4e6f5d0de100c2f516c4703dc7121b8dce5f0ccea259f",
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/001.input.step": "db07be5d750211c2468f6dfc85e5ea9914c23360557647b471ff5273aa3f76b8",
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/001.input.json": "4f7046810b0e7a24bd4476a53f6357bbb057ebf9f1f8b6c06cd82dbf92ebf145"
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 101.30171580086883,
+        "truck_volume": 101.30171579063504,
+        "native_to_truck_max_distance": 2.7966272390711e-09,
+        "native_to_truck_samples": 654,
+        "truck_to_native_max_distance": 2.7413760681043162e-08,
+        "truck_to_native_samples": 1136,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 101.274572475343,
+        "selected_edges": 2,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      }
+    },
+    {
+      "folder": "native-cone45-swapped-probe",
+      "index": 1,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/002",
+      "expected_plane": 0.7,
+      "expected_cone": 1.3522961568046954,
+      "expected_volume": 96.1372674387114,
+      "native_setback_mismatch": false,
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/002.input.brep": "5ce99008afa8982067b4e6f5d0de100c2f516c4703dc7121b8dce5f0ccea259f",
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/002.input.step": "16c4196fb93c41bb6aed1fe908fded90a8bc6007091eb803089da6523f99c82c",
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/002.input.json": "76e00ef11526403203e04fdf773ee0f02dee3b03c0512a364e8c4cb1bbfeb17a"
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 96.1372674387115,
+        "truck_volume": 96.13726740805726,
+        "native_to_truck_max_distance": 3.4465811398406557e-09,
+        "native_to_truck_samples": 654,
+        "truck_to_native_max_distance": 6.051017574054652e-08,
+        "truck_to_native_samples": 1136,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 96.12176556639962,
+        "selected_edges": 2,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      }
+    },
+    {
+      "folder": "native-cone45-swapped-probe",
+      "index": 2,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/003",
+      "expected_plane": 0.3,
+      "expected_cone": 0.7,
+      "expected_volume": 101.1955331425844,
+      "native_setback_mismatch": false,
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/003.input.brep": "5ce99008afa8982067b4e6f5d0de100c2f516c4703dc7121b8dce5f0ccea259f",
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/003.input.step": "d9fce82fa44e58ccc9d1e8f6b394b8d8d5931670d546310612efb51ceab66dcd",
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/003.input.json": "cda973b650505f03018496b1cbbaf45e703be3f71b4e6fdc776ac1e602dca72a"
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 101.1955331425844,
+        "truck_volume": 101.19553312362993,
+        "native_to_truck_max_distance": 3.0921798114814314e-09,
+        "native_to_truck_samples": 654,
+        "truck_to_native_max_distance": 7.50898669001857e-08,
+        "truck_to_native_samples": 1136,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 101.17806632828804,
+        "selected_edges": 2,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      }
+    },
+    {
+      "folder": "native-cone45-swapped-probe",
+      "index": 3,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/004",
+      "expected_plane": 1.3522961568046954,
+      "expected_cone": 0.7,
+      "expected_volume": 96.91779632656147,
+      "native_setback_mismatch": false,
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/004.input.brep": "5ce99008afa8982067b4e6f5d0de100c2f516c4703dc7121b8dce5f0ccea259f",
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/004.input.step": "a654365ed1f213c2b4364dc6d8ed34b38593e05a4db212d8c1f24c5e78635278",
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/004.input.json": "9c315aaac19ef7baef42910cb42c3acb8b35076c4f4b93aac45d53fc1690d6c4"
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 96.91779632656146,
+        "truck_volume": 96.91779631192358,
+        "native_to_truck_max_distance": 3.043079821644675e-09,
+        "native_to_truck_samples": 654,
+        "truck_to_native_max_distance": 8.67003917548459e-08,
+        "truck_to_native_samples": 1136,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 96.90147314072914,
+        "selected_edges": 2,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      }
+    },
+    {
+      "folder": "native-cone45-swapped-probe",
+      "index": 4,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/005",
+      "expected_plane": 0.7,
+      "expected_cone": 0.3,
+      "expected_volume": 100.434683829581,
+      "native_setback_mismatch": true,
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/005.input.brep": "71f0778a09f630fd1daf2bbb1f6b42acbca86507f3583165bb04ce11175c5ed0",
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/005.input.step": "3461f383fe9fb641aae9bc18da313998cb67f758b986a2d2482ffcf8bf25752f",
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/005.input.json": "34c6077eef911022c0392922379b5bfa8ab6601360e7a2ecb5ee78ffae2b445b"
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 101.64607225162563,
+        "truck_volume": 100.43468382012576,
+        "native_to_truck_max_distance": 0.15775768182451147,
+        "native_to_truck_samples": 654,
+        "truck_to_native_max_distance": 0.1325825214719767,
+        "truck_to_native_samples": 1136,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 100.41789752513631,
+        "selected_edges": 2,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      }
+    },
+    {
+      "folder": "native-cone45-swapped-probe",
+      "index": 5,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/006",
+      "expected_plane": 0.7,
+      "expected_cone": 0.36234666314352904,
+      "expected_volume": 99.98769273438353,
+      "native_setback_mismatch": false,
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/006.input.brep": "71f0778a09f630fd1daf2bbb1f6b42acbca86507f3583165bb04ce11175c5ed0",
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/006.input.step": "ec18d9217836ea606128a62a57f572801384187b3264d6b38372061779b7347b",
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/006.input.json": "5b4c9f019821e8f3b80a371c8f340a5d978d21cced669c9ede3e3ad7e21f1f95"
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 99.9876927343835,
+        "truck_volume": 99.98769272422938,
+        "native_to_truck_max_distance": 4.132085729536914e-09,
+        "native_to_truck_samples": 654,
+        "truck_to_native_max_distance": 8.043927834933129e-08,
+        "truck_to_native_samples": 1136,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 99.9711250948033,
+        "selected_edges": 2,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      }
+    },
+    {
+      "folder": "native-cone45-swapped-probe",
+      "index": 6,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/007",
+      "expected_plane": 0.3,
+      "expected_cone": 0.7,
+      "expected_volume": 100.41646576559704,
+      "native_setback_mismatch": true,
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/007.input.brep": "71f0778a09f630fd1daf2bbb1f6b42acbca86507f3583165bb04ce11175c5ed0",
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/007.input.step": "6249a8e9b2f8e3072628f8acd0fd7684635c4b917ca7f5c04c30aa6347611c92",
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/007.input.json": "38370730ca7816b5d7ea4782319d5b08fd17f9bfcb8c3b22e68fb608030ad427"
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 101.64598570740287,
+        "truck_volume": 100.41646575079506,
+        "native_to_truck_max_distance": 0.1577576828297432,
+        "native_to_truck_samples": 654,
+        "truck_to_native_max_distance": 0.13258252147283486,
+        "truck_to_native_samples": 1136,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 100.4007888060753,
+        "selected_edges": 2,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      }
+    },
+    {
+      "folder": "native-cone45-swapped-probe",
+      "index": 7,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/008",
+      "expected_plane": 0.36234666314352904,
+      "expected_cone": 0.7,
+      "expected_volume": 99.96911827042764,
+      "native_setback_mismatch": false,
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/008.input.brep": "71f0778a09f630fd1daf2bbb1f6b42acbca86507f3583165bb04ce11175c5ed0",
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/008.input.step": "d791ec555f2d0f540dafa13b6144ecb6ba47e8841e7ed5c6b2046a93eab5b044",
+        "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/008.input.json": "bce47593724207b01ccea25403114c8427a6ece2e3c68fdb580f24c0b767c21f"
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 99.96911827042764,
+        "truck_volume": 99.96911825579433,
+        "native_to_truck_max_distance": 3.924077851624298e-09,
+        "native_to_truck_samples": 654,
+        "truck_to_native_max_distance": 8.675573681671267e-08,
+        "truck_to_native_samples": 1136,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 99.95348622286633,
+        "selected_edges": 2,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      }
+    }
+  ],
+  "rows": [
+    {
+      "case": "chamfer/dist_dist/C1",
+      "capture": "001",
+      "kind": "native",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/C1/capture/001.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/C1/capture/001.result.brep",
+      "points": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          -0.9999900147630092,
+          -0.004468822470922523,
+          0
+        ],
+        [
+          1,
+          -7.041102451613936e-14,
+          0
+        ]
+      ],
+      "limit": 0.2,
+      "expected_plane": 0.05,
+      "expected_cone": 0.1,
+      "reference": "cone",
+      "d0": 0.1,
+      "d1": 0.05,
+      "native_setback_mismatch": true,
+      "measurement": {
+        "row": 0,
+        "valid": true,
+        "radius": 1,
+        "half_angle": 0.7853981633974483,
+        "volume": 0.9104026787375677,
+        "planar_setbacks": [
+          0.050000000000000044
+        ],
+        "cone_setbacks": [
+          0.05469181606780274
+        ],
+        "planar_spread": 1.1102230246251565e-16,
+        "cone_spread": 0,
+        "planar_circles": 1,
+        "cone_circles": 1
+      },
+      "error_bound": {
+        "plane": 9.71445146547012e-17,
+        "cone": 0.045308183932197266
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/C1",
+      "capture": "001",
+      "kind": "truck",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/C1/capture/001.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/C1/capture/001.truck.step",
+      "points": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          -0.9999900147630092,
+          -0.004468822470922523,
+          0
+        ],
+        [
+          1,
+          -7.041102451613936e-14,
+          0
+        ]
+      ],
+      "limit": 0.2,
+      "expected_plane": 0.05,
+      "expected_cone": 0.1,
+      "reference": "cone",
+      "d0": 0.1,
+      "d1": 0.05,
+      "native_setback_mismatch": true,
+      "measurement": {
+        "row": 1,
+        "valid": true,
+        "radius": 1,
+        "half_angle": 0.7853981633974483,
+        "volume": 0.9056375673903613,
+        "planar_setbacks": [
+          0.050000004485787786
+        ],
+        "cone_setbacks": [
+          0.1000000000000447
+        ],
+        "planar_spread": 8.971576037630768e-09,
+        "cone_spread": 3.14018491736755e-16,
+        "planar_circles": 0,
+        "cone_circles": 0
+      },
+      "error_bound": {
+        "plane": 8.971575801708376e-09,
+        "cone": 4.4857363774838744e-14
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/C6",
+      "capture": "001",
+      "kind": "native",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/C6/capture/001.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/C6/capture/001.result.brep",
+      "points": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0.707106781186546,
+          0.707106781186549
+        ],
+        [
+          0,
+          -6.37806120286854e-15,
+          1
+        ]
+      ],
+      "limit": 0.4,
+      "expected_plane": 0.1,
+      "expected_cone": 0.2,
+      "reference": "cone",
+      "d0": 0.2,
+      "d1": 0.1,
+      "native_setback_mismatch": true,
+      "measurement": {
+        "row": 2,
+        "valid": true,
+        "radius": 1,
+        "half_angle": 0.7853981633974484,
+        "volume": 0.256083764091851,
+        "planar_setbacks": [
+          0.09999999999999998
+        ],
+        "cone_setbacks": [
+          0.10938363213560534
+        ],
+        "planar_spread": 2.220446049250313e-16,
+        "cone_spread": 0,
+        "planar_circles": 1,
+        "cone_circles": 1
+      },
+      "error_bound": {
+        "plane": 1.3877787807814457e-16,
+        "cone": 0.09061636786439467
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/C6",
+      "capture": "001",
+      "kind": "truck",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/C6/capture/001.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/C6/capture/001.truck.step",
+      "points": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0.707106781186546,
+          0.707106781186549
+        ],
+        [
+          0,
+          -6.37806120286854e-15,
+          1
+        ]
+      ],
+      "limit": 0.4,
+      "expected_plane": 0.1,
+      "expected_cone": 0.2,
+      "reference": "cone",
+      "d0": 0.2,
+      "d1": 0.1,
+      "native_setback_mismatch": true,
+      "measurement": {
+        "row": 3,
+        "valid": true,
+        "radius": 1,
+        "half_angle": 0.7853981633974484,
+        "volume": 0.25158601903716393,
+        "planar_setbacks": [
+          0.10000000342370408
+        ],
+        "cone_setbacks": [
+          0.19999999999945575
+        ],
+        "planar_spread": 1.0151367191291172e-08,
+        "cone_spread": 4.710277376051326e-16,
+        "planar_circles": 0,
+        "cone_circles": 0
+      },
+      "error_bound": {
+        "plane": 8.499387665894531e-09,
+        "cone": 5.4449459611567e-13
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/C7",
+      "capture": "001",
+      "kind": "native",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/C7/capture/001.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/C7/capture/001.result.brep",
+      "points": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0.707106781186546,
+          0.707106781186549
+        ],
+        [
+          0,
+          -6.37806120286854e-15,
+          1
+        ]
+      ],
+      "limit": 0.4,
+      "expected_plane": 0.2,
+      "expected_cone": 0.1,
+      "reference": "plane",
+      "d0": 0.2,
+      "d1": 0.1,
+      "native_setback_mismatch": true,
+      "measurement": {
+        "row": 4,
+        "valid": true,
+        "radius": 1,
+        "half_angle": 0.7853981633974484,
+        "volume": 0.25608932936211554,
+        "planar_setbacks": [
+          0.10938363213560542
+        ],
+        "cone_setbacks": [
+          0.09999999999999996
+        ],
+        "planar_spread": 1.1102230246251565e-16,
+        "cone_spread": 0,
+        "planar_circles": 1,
+        "cone_circles": 1
+      },
+      "error_bound": {
+        "plane": 0.09061636786439464,
+        "cone": 4.163336342344337e-17
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/C7",
+      "capture": "001",
+      "kind": "truck",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/C7/capture/001.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/C7/capture/001.truck.step",
+      "points": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0.707106781186546,
+          0.707106781186549
+        ],
+        [
+          0,
+          -6.37806120286854e-15,
+          1
+        ]
+      ],
+      "limit": 0.4,
+      "expected_plane": 0.2,
+      "expected_cone": 0.1,
+      "reference": "plane",
+      "d0": 0.2,
+      "d1": 0.1,
+      "native_setback_mismatch": true,
+      "measurement": {
+        "row": 5,
+        "valid": true,
+        "radius": 1,
+        "half_angle": 0.7853981633974484,
+        "volume": 0.2516944600140285,
+        "planar_setbacks": [
+          0.20000000304329246
+        ],
+        "cone_setbacks": [
+          0.09999999999941071
+        ],
+        "planar_spread": 9.023437663735479e-09,
+        "cone_spread": 4.710277376051326e-16,
+        "planar_circles": 0,
+        "cone_circles": 0
+      },
+      "error_bound": {
+        "plane": 7.55501128324454e-09,
+        "cone": 5.895280175520279e-13
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/D1",
+      "capture": "001",
+      "kind": "native",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/D1/capture/001.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/D1/capture/001.result.brep",
+      "points": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0.707106781186546,
+          0.707106781186549
+        ],
+        [
+          0,
+          -6.37806120286854e-15,
+          1
+        ]
+      ],
+      "limit": 0.4,
+      "expected_plane": 0.1,
+      "expected_cone": 0.2,
+      "reference": "cone",
+      "d0": 0.2,
+      "d1": 0.1,
+      "native_setback_mismatch": true,
+      "measurement": {
+        "row": 6,
+        "valid": true,
+        "radius": 1,
+        "half_angle": 0.7853981633974484,
+        "volume": 0.25608376409185124,
+        "planar_setbacks": [
+          0.09999999999999998
+        ],
+        "cone_setbacks": [
+          0.10938363213560534
+        ],
+        "planar_spread": 2.220446049250313e-16,
+        "cone_spread": 0,
+        "planar_circles": 1,
+        "cone_circles": 1
+      },
+      "error_bound": {
+        "plane": 1.3877787807814457e-16,
+        "cone": 0.09061636786439467
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/D1",
+      "capture": "001",
+      "kind": "truck",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/D1/capture/001.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/D1/capture/001.truck.step",
+      "points": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0.707106781186546,
+          0.707106781186549
+        ],
+        [
+          0,
+          -6.37806120286854e-15,
+          1
+        ]
+      ],
+      "limit": 0.4,
+      "expected_plane": 0.1,
+      "expected_cone": 0.2,
+      "reference": "cone",
+      "d0": 0.2,
+      "d1": 0.1,
+      "native_setback_mismatch": true,
+      "measurement": {
+        "row": 7,
+        "valid": true,
+        "radius": 1,
+        "half_angle": 0.7853981633974484,
+        "volume": 0.25158601903716393,
+        "planar_setbacks": [
+          0.10000000342370408
+        ],
+        "cone_setbacks": [
+          0.19999999999945575
+        ],
+        "planar_spread": 1.0151367191291172e-08,
+        "cone_spread": 4.710277376051326e-16,
+        "planar_circles": 0,
+        "cone_circles": 0
+      },
+      "error_bound": {
+        "plane": 8.499387665894531e-09,
+        "cone": 5.4449459611567e-13
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/D2",
+      "capture": "001",
+      "kind": "native",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/D2/capture/001.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/D2/capture/001.result.brep",
+      "points": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0.707106781186546,
+          0.707106781186549
+        ],
+        [
+          0,
+          -6.37806120286854e-15,
+          1
+        ]
+      ],
+      "limit": 0.4,
+      "expected_plane": 0.2,
+      "expected_cone": 0.1,
+      "reference": "plane",
+      "d0": 0.2,
+      "d1": 0.1,
+      "native_setback_mismatch": true,
+      "measurement": {
+        "row": 8,
+        "valid": true,
+        "radius": 1,
+        "half_angle": 0.7853981633974484,
+        "volume": 0.25608932936211576,
+        "planar_setbacks": [
+          0.10938363213560542
+        ],
+        "cone_setbacks": [
+          0.09999999999999996
+        ],
+        "planar_spread": 1.1102230246251565e-16,
+        "cone_spread": 0,
+        "planar_circles": 1,
+        "cone_circles": 1
+      },
+      "error_bound": {
+        "plane": 0.09061636786439464,
+        "cone": 4.163336342344337e-17
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/D2",
+      "capture": "001",
+      "kind": "truck",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/D2/capture/001.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/D2/capture/001.truck.step",
+      "points": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0.707106781186546,
+          0.707106781186549
+        ],
+        [
+          0,
+          -6.37806120286854e-15,
+          1
+        ]
+      ],
+      "limit": 0.4,
+      "expected_plane": 0.2,
+      "expected_cone": 0.1,
+      "reference": "plane",
+      "d0": 0.2,
+      "d1": 0.1,
+      "native_setback_mismatch": true,
+      "measurement": {
+        "row": 9,
+        "valid": true,
+        "radius": 1,
+        "half_angle": 0.7853981633974484,
+        "volume": 0.2516944600140285,
+        "planar_setbacks": [
+          0.20000000304329246
+        ],
+        "cone_setbacks": [
+          0.09999999999941071
+        ],
+        "planar_spread": 9.023437663735479e-09,
+        "cone_spread": 4.710277376051326e-16,
+        "planar_circles": 0,
+        "cone_circles": 0
+      },
+      "error_bound": {
+        "plane": 7.55501128324454e-09,
+        "cone": 5.895280175520279e-13
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/D5",
+      "capture": "001",
+      "kind": "native",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/D5/capture/001.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/D5/capture/001.result.brep",
+      "points": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0.707106781186546,
+          0.707106781186549
+        ],
+        [
+          0,
+          -6.37806120286854e-15,
+          1
+        ]
+      ],
+      "limit": 0.4,
+      "expected_plane": 0.1,
+      "expected_cone": 0.2,
+      "reference": "cone",
+      "d0": 0.2,
+      "d1": 0.1,
+      "native_setback_mismatch": true,
+      "measurement": {
+        "row": 10,
+        "valid": true,
+        "radius": 1,
+        "half_angle": 0.7853981633974484,
+        "volume": 0.2560837640918517,
+        "planar_setbacks": [
+          0.09999999999999998
+        ],
+        "cone_setbacks": [
+          0.10938363213560534
+        ],
+        "planar_spread": 2.220446049250313e-16,
+        "cone_spread": 0,
+        "planar_circles": 1,
+        "cone_circles": 1
+      },
+      "error_bound": {
+        "plane": 1.3877787807814457e-16,
+        "cone": 0.09061636786439467
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/D5",
+      "capture": "001",
+      "kind": "truck",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/D5/capture/001.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/D5/capture/001.truck.step",
+      "points": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0.707106781186546,
+          0.707106781186549
+        ],
+        [
+          0,
+          -6.37806120286854e-15,
+          1
+        ]
+      ],
+      "limit": 0.4,
+      "expected_plane": 0.1,
+      "expected_cone": 0.2,
+      "reference": "cone",
+      "d0": 0.2,
+      "d1": 0.1,
+      "native_setback_mismatch": true,
+      "measurement": {
+        "row": 11,
+        "valid": true,
+        "radius": 1,
+        "half_angle": 0.7853981633974484,
+        "volume": 0.251586019037536,
+        "planar_setbacks": [
+          0.10000000342370408
+        ],
+        "cone_setbacks": [
+          0.20000000000008974
+        ],
+        "planar_spread": 1.0151367191291172e-08,
+        "cone_spread": 3.1401849173675503e-16,
+        "planar_circles": 0,
+        "cone_circles": 0
+      },
+      "error_bound": {
+        "plane": 8.499387665894531e-09,
+        "cone": 8.989078521119666e-14
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/D6",
+      "capture": "001",
+      "kind": "native",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/D6/capture/001.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/D6/capture/001.result.brep",
+      "points": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0.707106781186546,
+          0.707106781186549
+        ],
+        [
+          0,
+          -6.37806120286854e-15,
+          1
+        ]
+      ],
+      "limit": 0.4,
+      "expected_plane": 0.2,
+      "expected_cone": 0.1,
+      "reference": "plane",
+      "d0": 0.2,
+      "d1": 0.1,
+      "native_setback_mismatch": true,
+      "measurement": {
+        "row": 12,
+        "valid": true,
+        "radius": 1,
+        "half_angle": 0.7853981633974484,
+        "volume": 0.2560893293621169,
+        "planar_setbacks": [
+          0.10938363213560542
+        ],
+        "cone_setbacks": [
+          0.09999999999999996
+        ],
+        "planar_spread": 1.1102230246251565e-16,
+        "cone_spread": 0,
+        "planar_circles": 1,
+        "cone_circles": 1
+      },
+      "error_bound": {
+        "plane": 0.09061636786439464,
+        "cone": 4.163336342344337e-17
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/D6",
+      "capture": "001",
+      "kind": "truck",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/D6/capture/001.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/D6/capture/001.truck.step",
+      "points": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0.707106781186546,
+          0.707106781186549
+        ],
+        [
+          0,
+          -6.37806120286854e-15,
+          1
+        ]
+      ],
+      "limit": 0.4,
+      "expected_plane": 0.2,
+      "expected_cone": 0.1,
+      "reference": "plane",
+      "d0": 0.2,
+      "d1": 0.1,
+      "native_setback_mismatch": true,
+      "measurement": {
+        "row": 13,
+        "valid": true,
+        "radius": 1,
+        "half_angle": 0.7853981633974484,
+        "volume": 0.2516944600144992,
+        "planar_setbacks": [
+          0.20000000304329246
+        ],
+        "cone_setbacks": [
+          0.10000000000004503
+        ],
+        "planar_spread": 9.023437663735479e-09,
+        "cone_spread": 4.710277376051326e-16,
+        "planar_circles": 0,
+        "cone_circles": 0
+      },
+      "error_bound": {
+        "plane": 7.55501128324454e-09,
+        "cone": 4.5255057517352666e-14
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/D9",
+      "capture": "001",
+      "kind": "native",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/D9/capture/001.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/D9/capture/001.result.brep",
+      "points": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0.707106781186546,
+          0.707106781186549
+        ],
+        [
+          0,
+          -6.37806120286854e-15,
+          1
+        ]
+      ],
+      "limit": 0.4,
+      "expected_plane": 0.1,
+      "expected_cone": 0.2,
+      "reference": "cone",
+      "d0": 0.2,
+      "d1": 0.1,
+      "native_setback_mismatch": true,
+      "measurement": {
+        "row": 14,
+        "valid": true,
+        "radius": 1,
+        "half_angle": 0.7853981633974484,
+        "volume": 0.2560837640918519,
+        "planar_setbacks": [
+          0.09999999999999998
+        ],
+        "cone_setbacks": [
+          0.10938363213560534
+        ],
+        "planar_spread": 2.220446049250313e-16,
+        "cone_spread": 0,
+        "planar_circles": 1,
+        "cone_circles": 1
+      },
+      "error_bound": {
+        "plane": 1.3877787807814457e-16,
+        "cone": 0.09061636786439467
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/D9",
+      "capture": "001",
+      "kind": "truck",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/D9/capture/001.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/D9/capture/001.truck.step",
+      "points": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0.707106781186546,
+          0.707106781186549
+        ],
+        [
+          0,
+          -6.37806120286854e-15,
+          1
+        ]
+      ],
+      "limit": 0.4,
+      "expected_plane": 0.1,
+      "expected_cone": 0.2,
+      "reference": "cone",
+      "d0": 0.2,
+      "d1": 0.1,
+      "native_setback_mismatch": true,
+      "measurement": {
+        "row": 15,
+        "valid": true,
+        "radius": 1,
+        "half_angle": 0.7853981633974484,
+        "volume": 0.251586019037536,
+        "planar_setbacks": [
+          0.10000000342370408
+        ],
+        "cone_setbacks": [
+          0.20000000000008974
+        ],
+        "planar_spread": 1.0151367191291172e-08,
+        "cone_spread": 3.1401849173675503e-16,
+        "planar_circles": 0,
+        "cone_circles": 0
+      },
+      "error_bound": {
+        "plane": 8.499387665894531e-09,
+        "cone": 8.989078521119666e-14
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/E1",
+      "capture": "001",
+      "kind": "native",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/E1/capture/001.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/E1/capture/001.result.brep",
+      "points": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0.707106781186546,
+          0.707106781186549
+        ],
+        [
+          0,
+          -6.37806120286854e-15,
+          1
+        ]
+      ],
+      "limit": 0.4,
+      "expected_plane": 0.2,
+      "expected_cone": 0.1,
+      "reference": "plane",
+      "d0": 0.2,
+      "d1": 0.1,
+      "native_setback_mismatch": true,
+      "measurement": {
+        "row": 16,
+        "valid": true,
+        "radius": 1,
+        "half_angle": 0.7853981633974484,
+        "volume": 0.25608932936211715,
+        "planar_setbacks": [
+          0.10938363213560542
+        ],
+        "cone_setbacks": [
+          0.09999999999999996
+        ],
+        "planar_spread": 1.1102230246251565e-16,
+        "cone_spread": 0,
+        "planar_circles": 1,
+        "cone_circles": 1
+      },
+      "error_bound": {
+        "plane": 0.09061636786439464,
+        "cone": 4.163336342344337e-17
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/E1",
+      "capture": "001",
+      "kind": "truck",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/E1/capture/001.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/occt-capture-cone-references/chamfer/dist_dist/E1/capture/001.truck.step",
+      "points": [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0.707106781186546,
+          0.707106781186549
+        ],
+        [
+          0,
+          -6.37806120286854e-15,
+          1
+        ]
+      ],
+      "limit": 0.4,
+      "expected_plane": 0.2,
+      "expected_cone": 0.1,
+      "reference": "plane",
+      "d0": 0.2,
+      "d1": 0.1,
+      "native_setback_mismatch": true,
+      "measurement": {
+        "row": 17,
+        "valid": true,
+        "radius": 1,
+        "half_angle": 0.7853981633974484,
+        "volume": 0.2516944600144992,
+        "planar_setbacks": [
+          0.20000000304329246
+        ],
+        "cone_setbacks": [
+          0.10000000000004503
+        ],
+        "planar_spread": 9.023437663735479e-09,
+        "cone_spread": 4.710277376051326e-16,
+        "planar_circles": 0,
+        "cone_circles": 0
+      },
+      "error_bound": {
+        "plane": 7.55501128324454e-09,
+        "cone": 4.5255057517352666e-14
+      }
+    },
+    {
+      "case": "native-cone45-reference-probe",
+      "capture": "001",
+      "kind": "native",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/001.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/001.result.brep",
+      "points": [
+        [
+          3,
+          0,
+          2.0000000000000004
+        ],
+        [
+          -2.9999900043830037,
+          -0.007744262525516053,
+          2.0000000000000004
+        ],
+        [
+          3,
+          3.4565479560356043e-13,
+          2.0000000000000004
+        ]
+      ],
+      "limit": 1.4,
+      "expected_plane": 0.3,
+      "expected_cone": 0.7,
+      "reference": "plane",
+      "d0": 0.3,
+      "d1": 0.7,
+      "native_setback_mismatch": false,
+      "measurement": {
+        "row": 18,
+        "valid": true,
+        "radius": 3,
+        "half_angle": 0.7853981633974483,
+        "volume": 101.1955331425844,
+        "planar_setbacks": [
+          0.2999999999999998
+        ],
+        "cone_setbacks": [
+          0.6999999999999998
+        ],
+        "planar_spread": 4.440892098500626e-16,
+        "cone_spread": 0,
+        "planar_circles": 1,
+        "cone_circles": 1
+      },
+      "error_bound": {
+        "plane": 3.885780586188048e-16,
+        "cone": 1.1102230246251565e-16
+      }
+    },
+    {
+      "case": "native-cone45-reference-probe",
+      "capture": "001",
+      "kind": "truck",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/001.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/001.truck.step",
+      "points": [
+        [
+          3,
+          0,
+          2.0000000000000004
+        ],
+        [
+          -2.9999900043830037,
+          -0.007744262525516053,
+          2.0000000000000004
+        ],
+        [
+          3,
+          3.4565479560356043e-13,
+          2.0000000000000004
+        ]
+      ],
+      "limit": 1.4,
+      "expected_plane": 0.3,
+      "expected_cone": 0.7,
+      "reference": "plane",
+      "d0": 0.3,
+      "d1": 0.7,
+      "native_setback_mismatch": false,
+      "measurement": {
+        "row": 19,
+        "valid": true,
+        "radius": 3,
+        "half_angle": 0.7853981633974483,
+        "volume": 101.19553312362987,
+        "planar_setbacks": [
+          0.30000000154608975
+        ],
+        "cone_setbacks": [
+          0.6999999999990458
+        ],
+        "planar_spread": 3.0921798455096905e-09,
+        "cone_spread": 1.25607396694702e-15,
+        "planar_circles": 0,
+        "cone_circles": 0
+      },
+      "error_bound": {
+        "plane": 3.092179678976237e-09,
+        "cone": 9.54753704346333e-13
+      }
+    },
+    {
+      "case": "native-cone45-reference-probe",
+      "capture": "002",
+      "kind": "native",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/002.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/002.result.brep",
+      "points": [
+        [
+          3,
+          0,
+          2.0000000000000004
+        ],
+        [
+          -2.9999900043830037,
+          -0.007744262525516053,
+          2.0000000000000004
+        ],
+        [
+          3,
+          3.4565479560356043e-13,
+          2.0000000000000004
+        ]
+      ],
+      "limit": 1.1591109915468818,
+      "expected_plane": 0.3,
+      "expected_cone": 0.5795554957734409,
+      "reference": "plane",
+      "d0": 0,
+      "d1": 0,
+      "native_setback_mismatch": false,
+      "measurement": {
+        "row": 20,
+        "valid": true,
+        "radius": 3,
+        "half_angle": 0.7853981633974483,
+        "volume": 101.45251909957595,
+        "planar_setbacks": [
+          0.2999999999999998
+        ],
+        "cone_setbacks": [
+          0.5795554957734407
+        ],
+        "planar_spread": 4.440892098500626e-16,
+        "cone_spread": 0,
+        "planar_circles": 1,
+        "cone_circles": 1
+      },
+      "error_bound": {
+        "plane": 3.885780586188048e-16,
+        "cone": 2.220446049250313e-16
+      }
+    },
+    {
+      "case": "native-cone45-reference-probe",
+      "capture": "002",
+      "kind": "truck",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/002.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/002.truck.step",
+      "points": [
+        [
+          3,
+          0,
+          2.0000000000000004
+        ],
+        [
+          -2.9999900043830037,
+          -0.007744262525516053,
+          2.0000000000000004
+        ],
+        [
+          3,
+          3.4565479560356043e-13,
+          2.0000000000000004
+        ]
+      ],
+      "limit": 1.1591109915468818,
+      "expected_plane": 0.3,
+      "expected_cone": 0.5795554957734409,
+      "reference": "plane",
+      "d0": 0,
+      "d1": 0,
+      "native_setback_mismatch": false,
+      "measurement": {
+        "row": 21,
+        "valid": true,
+        "radius": 3,
+        "half_angle": 0.7853981633974483,
+        "volume": 101.45251908313665,
+        "planar_setbacks": [
+          0.30000000154608975
+        ],
+        "cone_setbacks": [
+          0.5795554957714624
+        ],
+        "planar_spread": 3.0921798455096905e-09,
+        "cone_spread": 1.25607396694702e-15,
+        "planar_circles": 0,
+        "cone_circles": 0
+      },
+      "error_bound": {
+        "plane": 3.092179678976237e-09,
+        "cone": 1.979156489167965e-12
+      }
+    },
+    {
+      "case": "native-cone45-reference-probe",
+      "capture": "003",
+      "kind": "native",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/003.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/003.result.brep",
+      "points": [
+        [
+          3,
+          0,
+          2.0000000000000004
+        ],
+        [
+          -2.9999900043830037,
+          -0.007744262525516053,
+          2.0000000000000004
+        ],
+        [
+          3,
+          3.4565479560356043e-13,
+          2.0000000000000004
+        ]
+      ],
+      "limit": 1.4,
+      "expected_plane": 0.7,
+      "expected_cone": 0.3,
+      "reference": "cone",
+      "d0": 0.3,
+      "d1": 0.7,
+      "native_setback_mismatch": false,
+      "measurement": {
+        "row": 22,
+        "valid": true,
+        "radius": 3,
+        "half_angle": 0.7853981633974483,
+        "volume": 101.30171580086888,
+        "planar_setbacks": [
+          0.7000000000000002
+        ],
+        "cone_setbacks": [
+          0.3
+        ],
+        "planar_spread": 0,
+        "cone_spread": 0,
+        "planar_circles": 1,
+        "cone_circles": 1
+      },
+      "error_bound": {
+        "plane": 2.220446049250313e-16,
+        "cone": 0.0
+      }
+    },
+    {
+      "case": "native-cone45-reference-probe",
+      "capture": "003",
+      "kind": "truck",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/003.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/003.truck.step",
+      "points": [
+        [
+          3,
+          0,
+          2.0000000000000004
+        ],
+        [
+          -2.9999900043830037,
+          -0.007744262525516053,
+          2.0000000000000004
+        ],
+        [
+          3,
+          3.4565479560356043e-13,
+          2.0000000000000004
+        ]
+      ],
+      "limit": 1.4,
+      "expected_plane": 0.7,
+      "expected_cone": 0.3,
+      "reference": "cone",
+      "d0": 0.3,
+      "d1": 0.7,
+      "native_setback_mismatch": false,
+      "measurement": {
+        "row": 23,
+        "valid": true,
+        "radius": 3,
+        "half_angle": 0.7853981633974483,
+        "volume": 101.30171579063507,
+        "planar_setbacks": [
+          0.7000000013170391
+        ],
+        "cone_setbacks": [
+          0.2999999999988664
+        ],
+        "planar_spread": 2.6340791769996486e-09,
+        "cone_spread": 1.25607396694702e-15,
+        "planar_circles": 0,
+        "cone_circles": 0
+      },
+      "error_bound": {
+        "plane": 2.6340787329104387e-09,
+        "cone": 1.1342212562769895e-12
+      }
+    },
+    {
+      "case": "native-cone45-reference-probe",
+      "capture": "004",
+      "kind": "native",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/004.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/004.result.brep",
+      "points": [
+        [
+          3,
+          0,
+          2.0000000000000004
+        ],
+        [
+          -2.9999900043830037,
+          -0.007744262525516053,
+          2.0000000000000004
+        ],
+        [
+          3,
+          3.4565479560356043e-13,
+          2.0000000000000004
+        ]
+      ],
+      "limit": 1.1591109915468818,
+      "expected_plane": 0.5795554957734409,
+      "expected_cone": 0.3,
+      "reference": "cone",
+      "d0": 0,
+      "d1": 0,
+      "native_setback_mismatch": false,
+      "measurement": {
+        "row": 24,
+        "valid": true,
+        "radius": 3,
+        "half_angle": 0.7853981633974483,
+        "volume": 101.51396014905683,
+        "planar_setbacks": [
+          0.5795554957734401
+        ],
+        "cone_setbacks": [
+          0.3
+        ],
+        "planar_spread": 4.440892098500626e-16,
+        "cone_spread": 0,
+        "planar_circles": 1,
+        "cone_circles": 1
+      },
+      "error_bound": {
+        "plane": 9.992007221626409e-16,
+        "cone": 0.0
+      }
+    },
+    {
+      "case": "native-cone45-reference-probe",
+      "capture": "004",
+      "kind": "truck",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/004.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/004.truck.step",
+      "points": [
+        [
+          3,
+          0,
+          2.0000000000000004
+        ],
+        [
+          -2.9999900043830037,
+          -0.007744262525516053,
+          2.0000000000000004
+        ],
+        [
+          3,
+          3.4565479560356043e-13,
+          2.0000000000000004
+        ]
+      ],
+      "limit": 1.1591109915468818,
+      "expected_plane": 0.5795554957734409,
+      "expected_cone": 0.3,
+      "reference": "cone",
+      "d0": 0,
+      "d1": 0,
+      "native_setback_mismatch": false,
+      "measurement": {
+        "row": 25,
+        "valid": true,
+        "radius": 3,
+        "half_angle": 0.7853981633974483,
+        "volume": 101.51396013861044,
+        "planar_setbacks": [
+          0.5795554971584798
+        ],
+        "cone_setbacks": [
+          0.2999999999988664
+        ],
+        "planar_spread": 2.772018614649596e-09,
+        "cone_spread": 1.25607396694702e-15,
+        "planar_circles": 0,
+        "cone_circles": 0
+      },
+      "error_bound": {
+        "plane": 2.7710481687037714e-09,
+        "cone": 1.1342212562769895e-12
+      }
+    },
+    {
+      "case": "native-cone45-reference-probe",
+      "capture": "005",
+      "kind": "native",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/005.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/005.result.brep",
+      "points": [
+        [
+          5,
+          0,
+          2.0000000000000004
+        ],
+        [
+          -4.999990002596075,
+          -0.00999869688029601,
+          2.0000000000000004
+        ],
+        [
+          5,
+          8.425448519159716e-13,
+          2.0000000000000004
+        ]
+      ],
+      "limit": 1.4,
+      "expected_plane": 0.3,
+      "expected_cone": 0.7,
+      "reference": "plane",
+      "d0": 0.3,
+      "d1": 0.7,
+      "native_setback_mismatch": false,
+      "measurement": {
+        "row": 26,
+        "valid": true,
+        "radius": 5,
+        "half_angle": 0.7853981633974483,
+        "volume": 100.41646576559708,
+        "planar_setbacks": [
+          0.3000000000000007
+        ],
+        "cone_setbacks": [
+          0.6999999999999998
+        ],
+        "planar_spread": 8.881784197001252e-16,
+        "cone_spread": 0,
+        "planar_circles": 1,
+        "cone_circles": 1
+      },
+      "error_bound": {
+        "plane": 1.1657341758564144e-15,
+        "cone": 1.1102230246251565e-16
+      }
+    },
+    {
+      "case": "native-cone45-reference-probe",
+      "capture": "005",
+      "kind": "truck",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/005.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/005.truck.step",
+      "points": [
+        [
+          5,
+          0,
+          2.0000000000000004
+        ],
+        [
+          -4.999990002596075,
+          -0.00999869688029601,
+          2.0000000000000004
+        ],
+        [
+          5,
+          8.425448519159716e-13,
+          2.0000000000000004
+        ]
+      ],
+      "limit": 1.4,
+      "expected_plane": 0.3,
+      "expected_cone": 0.7,
+      "reference": "plane",
+      "d0": 0.3,
+      "d1": 0.7,
+      "native_setback_mismatch": false,
+      "measurement": {
+        "row": 27,
+        "valid": true,
+        "radius": 5,
+        "half_angle": 0.7853981633974483,
+        "volume": 100.41646575079525,
+        "planar_setbacks": [
+          0.30000000095664525
+        ],
+        "cone_setbacks": [
+          0.6999999999990452
+        ],
+        "planar_spread": 1.913289970900678e-09,
+        "cone_spread": 2.51214793389404e-15,
+        "planar_circles": 0,
+        "cone_circles": 0
+      },
+      "error_bound": {
+        "plane": 1.913290248456434e-09,
+        "cone": 9.560478751445817e-13
+      }
+    },
+    {
+      "case": "native-cone45-reference-probe",
+      "capture": "006",
+      "kind": "native",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/006.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/006.result.brep",
+      "points": [
+        [
+          5,
+          0,
+          2.0000000000000004
+        ],
+        [
+          -4.999990002596075,
+          -0.00999869688029601,
+          2.0000000000000004
+        ],
+        [
+          5,
+          8.425448519159716e-13,
+          2.0000000000000004
+        ]
+      ],
+      "limit": 0.6,
+      "expected_plane": 0.3,
+      "expected_cone": 0.15529142706151244,
+      "reference": "plane",
+      "d0": 0,
+      "d1": 0,
+      "native_setback_mismatch": false,
+      "measurement": {
+        "row": 28,
+        "valid": true,
+        "radius": 5,
+        "half_angle": 0.7853981633974483,
+        "volume": 102.12204096040742,
+        "planar_setbacks": [
+          0.3000000000000007
+        ],
+        "cone_setbacks": [
+          0.15529142706151244
+        ],
+        "planar_spread": 8.881784197001252e-16,
+        "cone_spread": 0,
+        "planar_circles": 1,
+        "cone_circles": 1
+      },
+      "error_bound": {
+        "plane": 1.1657341758564144e-15,
+        "cone": 0.0
+      }
+    },
+    {
+      "case": "native-cone45-reference-probe",
+      "capture": "006",
+      "kind": "truck",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/006.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/006.truck.step",
+      "points": [
+        [
+          5,
+          0,
+          2.0000000000000004
+        ],
+        [
+          -4.999990002596075,
+          -0.00999869688029601,
+          2.0000000000000004
+        ],
+        [
+          5,
+          8.425448519159716e-13,
+          2.0000000000000004
+        ]
+      ],
+      "limit": 0.6,
+      "expected_plane": 0.3,
+      "expected_cone": 0.15529142706151244,
+      "reference": "plane",
+      "d0": 0,
+      "d1": 0,
+      "native_setback_mismatch": false,
+      "measurement": {
+        "row": 29,
+        "valid": true,
+        "radius": 5,
+        "half_angle": 0.7853981633974483,
+        "volume": 102.12204095237446,
+        "planar_setbacks": [
+          0.30000000095664525
+        ],
+        "cone_setbacks": [
+          0.15529142706029533
+        ],
+        "planar_spread": 1.913289970900678e-09,
+        "cone_spread": 1.25607396694702e-15,
+        "planar_circles": 0,
+        "cone_circles": 0
+      },
+      "error_bound": {
+        "plane": 1.913290248456434e-09,
+        "cone": 1.217737783304417e-12
+      }
+    },
+    {
+      "case": "native-cone45-reference-probe",
+      "capture": "007",
+      "kind": "native",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/007.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/007.result.brep",
+      "points": [
+        [
+          5,
+          0,
+          2.0000000000000004
+        ],
+        [
+          -4.999990002596075,
+          -0.00999869688029601,
+          2.0000000000000004
+        ],
+        [
+          5,
+          8.425448519159716e-13,
+          2.0000000000000004
+        ]
+      ],
+      "limit": 1.4,
+      "expected_plane": 0.7,
+      "expected_cone": 0.3,
+      "reference": "cone",
+      "d0": 0.3,
+      "d1": 0.7,
+      "native_setback_mismatch": false,
+      "measurement": {
+        "row": 30,
+        "valid": true,
+        "radius": 5,
+        "half_angle": 0.7853981633974483,
+        "volume": 100.43468382958102,
+        "planar_setbacks": [
+          0.7000000000000002
+        ],
+        "cone_setbacks": [
+          0.30000000000000066
+        ],
+        "planar_spread": 0,
+        "cone_spread": 0,
+        "planar_circles": 1,
+        "cone_circles": 1
+      },
+      "error_bound": {
+        "plane": 2.220446049250313e-16,
+        "cone": 6.661338147750939e-16
+      }
+    },
+    {
+      "case": "native-cone45-reference-probe",
+      "capture": "007",
+      "kind": "truck",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/007.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/007.truck.step",
+      "points": [
+        [
+          5,
+          0,
+          2.0000000000000004
+        ],
+        [
+          -4.999990002596075,
+          -0.00999869688029601,
+          2.0000000000000004
+        ],
+        [
+          5,
+          8.425448519159716e-13,
+          2.0000000000000004
+        ]
+      ],
+      "limit": 1.4,
+      "expected_plane": 0.7,
+      "expected_cone": 0.3,
+      "reference": "cone",
+      "d0": 0.3,
+      "d1": 0.7,
+      "native_setback_mismatch": false,
+      "measurement": {
+        "row": 31,
+        "valid": true,
+        "radius": 5,
+        "half_angle": 0.7853981633974483,
+        "volume": 100.43468382012605,
+        "planar_setbacks": [
+          0.7000000008752281
+        ],
+        "cone_setbacks": [
+          0.2999999999988664
+        ],
+        "planar_spread": 1.7504566685033751e-09,
+        "cone_spread": 2.51214793389404e-15,
+        "planar_circles": 0,
+        "cone_circles": 0
+      },
+      "error_bound": {
+        "plane": 1.7504564464587702e-09,
+        "cone": 1.1348492932604631e-12
+      }
+    },
+    {
+      "case": "native-cone45-reference-probe",
+      "capture": "008",
+      "kind": "native",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/008.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/008.result.brep",
+      "points": [
+        [
+          5,
+          0,
+          2.0000000000000004
+        ],
+        [
+          -4.999990002596075,
+          -0.00999869688029601,
+          2.0000000000000004
+        ],
+        [
+          5,
+          8.425448519159716e-13,
+          2.0000000000000004
+        ]
+      ],
+      "limit": 0.6,
+      "expected_plane": 0.15529142706151244,
+      "expected_cone": 0.3,
+      "reference": "cone",
+      "d0": 0,
+      "d1": 0,
+      "native_setback_mismatch": false,
+      "measurement": {
+        "row": 32,
+        "valid": true,
+        "radius": 5,
+        "half_angle": 0.7853981633974483,
+        "volume": 102.12057883059155,
+        "planar_setbacks": [
+          0.15529142706151333
+        ],
+        "cone_setbacks": [
+          0.30000000000000066
+        ],
+        "planar_spread": 8.881784197001252e-16,
+        "cone_spread": 0,
+        "planar_circles": 1,
+        "cone_circles": 1
+      },
+      "error_bound": {
+        "plane": 1.3322676295501878e-15,
+        "cone": 6.661338147750939e-16
+      }
+    },
+    {
+      "case": "native-cone45-reference-probe",
+      "capture": "008",
+      "kind": "truck",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/008.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-reference-probe/capture/008.truck.step",
+      "points": [
+        [
+          5,
+          0,
+          2.0000000000000004
+        ],
+        [
+          -4.999990002596075,
+          -0.00999869688029601,
+          2.0000000000000004
+        ],
+        [
+          5,
+          8.425448519159716e-13,
+          2.0000000000000004
+        ]
+      ],
+      "limit": 0.6,
+      "expected_plane": 0.15529142706151244,
+      "expected_cone": 0.3,
+      "reference": "cone",
+      "d0": 0,
+      "d1": 0,
+      "native_setback_mismatch": false,
+      "measurement": {
+        "row": 33,
+        "valid": true,
+        "radius": 5,
+        "half_angle": 0.7853981633974483,
+        "volume": 102.12057882049774,
+        "planar_setbacks": [
+          0.155291428047593
+        ],
+        "cone_setbacks": [
+          0.2999999999988664
+        ],
+        "planar_spread": 1.9721984045872887e-09,
+        "cone_spread": 2.51214793389404e-15,
+        "planar_circles": 0,
+        "cone_circles": 0
+      },
+      "error_bound": {
+        "plane": 1.972179752840475e-09,
+        "cone": 1.1348492932604631e-12
+      }
+    },
+    {
+      "case": "native-cone45-swapped-probe",
+      "capture": "001",
+      "kind": "native",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/001.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/001.result.brep",
+      "points": [
+        [
+          3,
+          0,
+          2.0000000000000004
+        ],
+        [
+          -2.9999900043830037,
+          -0.007744262525516053,
+          2.0000000000000004
+        ],
+        [
+          3,
+          3.4565479560356043e-13,
+          2.0000000000000004
+        ]
+      ],
+      "limit": 1.4,
+      "expected_plane": 0.7,
+      "expected_cone": 0.3,
+      "reference": "plane",
+      "d0": 0.7,
+      "d1": 0.3,
+      "native_setback_mismatch": false,
+      "measurement": {
+        "row": 34,
+        "valid": true,
+        "radius": 3,
+        "half_angle": 0.7853981633974483,
+        "volume": 101.30171580086888,
+        "planar_setbacks": [
+          0.7000000000000002
+        ],
+        "cone_setbacks": [
+          0.3
+        ],
+        "planar_spread": 0,
+        "cone_spread": 0,
+        "planar_circles": 1,
+        "cone_circles": 1
+      },
+      "error_bound": {
+        "plane": 2.220446049250313e-16,
+        "cone": 0.0
+      }
+    },
+    {
+      "case": "native-cone45-swapped-probe",
+      "capture": "001",
+      "kind": "truck",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/001.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/001.truck.step",
+      "points": [
+        [
+          3,
+          0,
+          2.0000000000000004
+        ],
+        [
+          -2.9999900043830037,
+          -0.007744262525516053,
+          2.0000000000000004
+        ],
+        [
+          3,
+          3.4565479560356043e-13,
+          2.0000000000000004
+        ]
+      ],
+      "limit": 1.4,
+      "expected_plane": 0.7,
+      "expected_cone": 0.3,
+      "reference": "plane",
+      "d0": 0.7,
+      "d1": 0.3,
+      "native_setback_mismatch": false,
+      "measurement": {
+        "row": 35,
+        "valid": true,
+        "radius": 3,
+        "half_angle": 0.7853981633974483,
+        "volume": 101.30171579063507,
+        "planar_setbacks": [
+          0.7000000013170391
+        ],
+        "cone_setbacks": [
+          0.2999999999988664
+        ],
+        "planar_spread": 2.6340791769996486e-09,
+        "cone_spread": 1.25607396694702e-15,
+        "planar_circles": 0,
+        "cone_circles": 0
+      },
+      "error_bound": {
+        "plane": 2.6340787329104387e-09,
+        "cone": 1.1342212562769895e-12
+      }
+    },
+    {
+      "case": "native-cone45-swapped-probe",
+      "capture": "002",
+      "kind": "native",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/002.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/002.result.brep",
+      "points": [
+        [
+          3,
+          0,
+          2.0000000000000004
+        ],
+        [
+          -2.9999900043830037,
+          -0.007744262525516053,
+          2.0000000000000004
+        ],
+        [
+          3,
+          3.4565479560356043e-13,
+          2.0000000000000004
+        ]
+      ],
+      "limit": 2.704592313609391,
+      "expected_plane": 0.7,
+      "expected_cone": 1.3522961568046954,
+      "reference": "plane",
+      "d0": 0,
+      "d1": 0,
+      "native_setback_mismatch": false,
+      "measurement": {
+        "row": 36,
+        "valid": true,
+        "radius": 3,
+        "half_angle": 0.7853981633974483,
+        "volume": 96.13726743871148,
+        "planar_setbacks": [
+          0.7000000000000002
+        ],
+        "cone_setbacks": [
+          1.3522961568046947
+        ],
+        "planar_spread": 0,
+        "cone_spread": 0,
+        "planar_circles": 1,
+        "cone_circles": 1
+      },
+      "error_bound": {
+        "plane": 2.220446049250313e-16,
+        "cone": 6.661338147750939e-16
+      }
+    },
+    {
+      "case": "native-cone45-swapped-probe",
+      "capture": "002",
+      "kind": "truck",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/002.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/002.truck.step",
+      "points": [
+        [
+          3,
+          0,
+          2.0000000000000004
+        ],
+        [
+          -2.9999900043830037,
+          -0.007744262525516053,
+          2.0000000000000004
+        ],
+        [
+          3,
+          3.4565479560356043e-13,
+          2.0000000000000004
+        ]
+      ],
+      "limit": 2.704592313609391,
+      "expected_plane": 0.7,
+      "expected_cone": 1.3522961568046954,
+      "reference": "plane",
+      "d0": 0,
+      "d1": 0,
+      "native_setback_mismatch": false,
+      "measurement": {
+        "row": 37,
+        "valid": true,
+        "radius": 3,
+        "half_angle": 0.7853981633974483,
+        "volume": 96.13726740805716,
+        "planar_setbacks": [
+          0.7000000013170391
+        ],
+        "cone_setbacks": [
+          1.3522961568017706
+        ],
+        "planar_spread": 2.6340791769996486e-09,
+        "cone_spread": 1.25607396694702e-15,
+        "planar_circles": 0,
+        "cone_circles": 0
+      },
+      "error_bound": {
+        "plane": 2.6340787329104387e-09,
+        "cone": 2.925399573055986e-12
+      }
+    },
+    {
+      "case": "native-cone45-swapped-probe",
+      "capture": "003",
+      "kind": "native",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/003.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/003.result.brep",
+      "points": [
+        [
+          3,
+          0,
+          2.0000000000000004
+        ],
+        [
+          -2.9999900043830037,
+          -0.007744262525516053,
+          2.0000000000000004
+        ],
+        [
+          3,
+          3.4565479560356043e-13,
+          2.0000000000000004
+        ]
+      ],
+      "limit": 1.4,
+      "expected_plane": 0.3,
+      "expected_cone": 0.7,
+      "reference": "cone",
+      "d0": 0.7,
+      "d1": 0.3,
+      "native_setback_mismatch": false,
+      "measurement": {
+        "row": 38,
+        "valid": true,
+        "radius": 3,
+        "half_angle": 0.7853981633974483,
+        "volume": 101.1955331425844,
+        "planar_setbacks": [
+          0.2999999999999998
+        ],
+        "cone_setbacks": [
+          0.6999999999999998
+        ],
+        "planar_spread": 4.440892098500626e-16,
+        "cone_spread": 0,
+        "planar_circles": 1,
+        "cone_circles": 1
+      },
+      "error_bound": {
+        "plane": 3.885780586188048e-16,
+        "cone": 1.1102230246251565e-16
+      }
+    },
+    {
+      "case": "native-cone45-swapped-probe",
+      "capture": "003",
+      "kind": "truck",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/003.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/003.truck.step",
+      "points": [
+        [
+          3,
+          0,
+          2.0000000000000004
+        ],
+        [
+          -2.9999900043830037,
+          -0.007744262525516053,
+          2.0000000000000004
+        ],
+        [
+          3,
+          3.4565479560356043e-13,
+          2.0000000000000004
+        ]
+      ],
+      "limit": 1.4,
+      "expected_plane": 0.3,
+      "expected_cone": 0.7,
+      "reference": "cone",
+      "d0": 0.7,
+      "d1": 0.3,
+      "native_setback_mismatch": false,
+      "measurement": {
+        "row": 39,
+        "valid": true,
+        "radius": 3,
+        "half_angle": 0.7853981633974483,
+        "volume": 101.19553312362987,
+        "planar_setbacks": [
+          0.30000000154608975
+        ],
+        "cone_setbacks": [
+          0.6999999999990458
+        ],
+        "planar_spread": 3.0921798455096905e-09,
+        "cone_spread": 1.25607396694702e-15,
+        "planar_circles": 0,
+        "cone_circles": 0
+      },
+      "error_bound": {
+        "plane": 3.092179678976237e-09,
+        "cone": 9.54753704346333e-13
+      }
+    },
+    {
+      "case": "native-cone45-swapped-probe",
+      "capture": "004",
+      "kind": "native",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/004.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/004.result.brep",
+      "points": [
+        [
+          3,
+          0,
+          2.0000000000000004
+        ],
+        [
+          -2.9999900043830037,
+          -0.007744262525516053,
+          2.0000000000000004
+        ],
+        [
+          3,
+          3.4565479560356043e-13,
+          2.0000000000000004
+        ]
+      ],
+      "limit": 2.704592313609391,
+      "expected_plane": 1.3522961568046954,
+      "expected_cone": 0.7,
+      "reference": "cone",
+      "d0": 0,
+      "d1": 0,
+      "native_setback_mismatch": false,
+      "measurement": {
+        "row": 40,
+        "valid": true,
+        "radius": 3,
+        "half_angle": 0.7853981633974483,
+        "volume": 96.91779632656143,
+        "planar_setbacks": [
+          1.3522961568046945
+        ],
+        "cone_setbacks": [
+          0.6999999999999998
+        ],
+        "planar_spread": 4.440892098500626e-16,
+        "cone_spread": 0,
+        "planar_circles": 1,
+        "cone_circles": 1
+      },
+      "error_bound": {
+        "plane": 1.1102230246251565e-15,
+        "cone": 1.1102230246251565e-16
+      }
+    },
+    {
+      "case": "native-cone45-swapped-probe",
+      "capture": "004",
+      "kind": "truck",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/004.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/004.truck.step",
+      "points": [
+        [
+          3,
+          0,
+          2.0000000000000004
+        ],
+        [
+          -2.9999900043830037,
+          -0.007744262525516053,
+          2.0000000000000004
+        ],
+        [
+          3,
+          3.4565479560356043e-13,
+          2.0000000000000004
+        ]
+      ],
+      "limit": 2.704592313609391,
+      "expected_plane": 1.3522961568046954,
+      "expected_cone": 0.7,
+      "reference": "cone",
+      "d0": 0,
+      "d1": 0,
+      "native_setback_mismatch": false,
+      "measurement": {
+        "row": 41,
+        "valid": true,
+        "radius": 3,
+        "half_angle": 0.7853981633974483,
+        "volume": 96.9177963119236,
+        "planar_setbacks": [
+          1.3522961577459496
+        ],
+        "cone_setbacks": [
+          0.6999999999990458
+        ],
+        "planar_spread": 1.887035860903552e-09,
+        "cone_spread": 1.25607396694702e-15,
+        "planar_circles": 0,
+        "cone_circles": 0
+      },
+      "error_bound": {
+        "plane": 1.8847721161563413e-09,
+        "cone": 9.54753704346333e-13
+      }
+    },
+    {
+      "case": "native-cone45-swapped-probe",
+      "capture": "005",
+      "kind": "native",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/005.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/005.result.brep",
+      "points": [
+        [
+          5,
+          0,
+          2.0000000000000004
+        ],
+        [
+          -4.999990002596075,
+          -0.00999869688029601,
+          2.0000000000000004
+        ],
+        [
+          5,
+          8.425448519159716e-13,
+          2.0000000000000004
+        ]
+      ],
+      "limit": 1.4,
+      "expected_plane": 0.7,
+      "expected_cone": 0.3,
+      "reference": "plane",
+      "d0": 0.7,
+      "d1": 0.3,
+      "native_setback_mismatch": true,
+      "measurement": {
+        "row": 42,
+        "valid": true,
+        "radius": 5,
+        "half_angle": 0.7853981633974483,
+        "volume": 101.64607225162563,
+        "planar_setbacks": [
+          0.30437010524589425
+        ],
+        "cone_setbacks": [
+          0.30000000000000066
+        ],
+        "planar_spread": 8.881784197001252e-16,
+        "cone_spread": 0,
+        "planar_circles": 1,
+        "cone_circles": 1
+      },
+      "error_bound": {
+        "plane": 0.39562989475410615,
+        "cone": 6.661338147750939e-16
+      }
+    },
+    {
+      "case": "native-cone45-swapped-probe",
+      "capture": "005",
+      "kind": "truck",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/005.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/005.truck.step",
+      "points": [
+        [
+          5,
+          0,
+          2.0000000000000004
+        ],
+        [
+          -4.999990002596075,
+          -0.00999869688029601,
+          2.0000000000000004
+        ],
+        [
+          5,
+          8.425448519159716e-13,
+          2.0000000000000004
+        ]
+      ],
+      "limit": 1.4,
+      "expected_plane": 0.7,
+      "expected_cone": 0.3,
+      "reference": "plane",
+      "d0": 0.7,
+      "d1": 0.3,
+      "native_setback_mismatch": true,
+      "measurement": {
+        "row": 43,
+        "valid": true,
+        "radius": 5,
+        "half_angle": 0.7853981633974483,
+        "volume": 100.43468382012605,
+        "planar_setbacks": [
+          0.7000000008752281
+        ],
+        "cone_setbacks": [
+          0.2999999999988664
+        ],
+        "planar_spread": 1.7504566685033751e-09,
+        "cone_spread": 2.51214793389404e-15,
+        "planar_circles": 0,
+        "cone_circles": 0
+      },
+      "error_bound": {
+        "plane": 1.7504564464587702e-09,
+        "cone": 1.1348492932604631e-12
+      }
+    },
+    {
+      "case": "native-cone45-swapped-probe",
+      "capture": "006",
+      "kind": "native",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/006.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/006.result.brep",
+      "points": [
+        [
+          5,
+          0,
+          2.0000000000000004
+        ],
+        [
+          -4.999990002596075,
+          -0.00999869688029601,
+          2.0000000000000004
+        ],
+        [
+          5,
+          8.425448519159716e-13,
+          2.0000000000000004
+        ]
+      ],
+      "limit": 1.4,
+      "expected_plane": 0.7,
+      "expected_cone": 0.36234666314352904,
+      "reference": "plane",
+      "d0": 0,
+      "d1": 0,
+      "native_setback_mismatch": false,
+      "measurement": {
+        "row": 44,
+        "valid": true,
+        "radius": 5,
+        "half_angle": 0.7853981633974483,
+        "volume": 99.98769273438353,
+        "planar_setbacks": [
+          0.7000000000000002
+        ],
+        "cone_setbacks": [
+          0.36234666314352865
+        ],
+        "planar_spread": 0,
+        "cone_spread": 0,
+        "planar_circles": 1,
+        "cone_circles": 1
+      },
+      "error_bound": {
+        "plane": 2.220446049250313e-16,
+        "cone": 3.885780586188048e-16
+      }
+    },
+    {
+      "case": "native-cone45-swapped-probe",
+      "capture": "006",
+      "kind": "truck",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/006.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/006.truck.step",
+      "points": [
+        [
+          5,
+          0,
+          2.0000000000000004
+        ],
+        [
+          -4.999990002596075,
+          -0.00999869688029601,
+          2.0000000000000004
+        ],
+        [
+          5,
+          8.425448519159716e-13,
+          2.0000000000000004
+        ]
+      ],
+      "limit": 1.4,
+      "expected_plane": 0.7,
+      "expected_cone": 0.36234666314352904,
+      "reference": "plane",
+      "d0": 0,
+      "d1": 0,
+      "native_setback_mismatch": false,
+      "measurement": {
+        "row": 45,
+        "valid": true,
+        "radius": 5,
+        "half_angle": 0.7853981633974483,
+        "volume": 99.98769272422942,
+        "planar_setbacks": [
+          0.7000000008752281
+        ],
+        "cone_setbacks": [
+          0.3623466631423806
+        ],
+        "planar_spread": 1.7504566685033751e-09,
+        "cone_spread": 1.25607396694702e-15,
+        "planar_circles": 0,
+        "cone_circles": 0
+      },
+      "error_bound": {
+        "plane": 1.7504564464587702e-09,
+        "cone": 1.1490427336557353e-12
+      }
+    },
+    {
+      "case": "native-cone45-swapped-probe",
+      "capture": "007",
+      "kind": "native",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/007.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/007.result.brep",
+      "points": [
+        [
+          5,
+          0,
+          2.0000000000000004
+        ],
+        [
+          -4.999990002596075,
+          -0.00999869688029601,
+          2.0000000000000004
+        ],
+        [
+          5,
+          8.425448519159716e-13,
+          2.0000000000000004
+        ]
+      ],
+      "limit": 1.4,
+      "expected_plane": 0.3,
+      "expected_cone": 0.7,
+      "reference": "cone",
+      "d0": 0.7,
+      "d1": 0.3,
+      "native_setback_mismatch": true,
+      "measurement": {
+        "row": 46,
+        "valid": true,
+        "radius": 5,
+        "half_angle": 0.7853981633974483,
+        "volume": 101.64598570740284,
+        "planar_setbacks": [
+          0.3000000000000007
+        ],
+        "cone_setbacks": [
+          0.3043701052458929
+        ],
+        "planar_spread": 8.881784197001252e-16,
+        "cone_spread": 0,
+        "planar_circles": 1,
+        "cone_circles": 1
+      },
+      "error_bound": {
+        "plane": 1.1657341758564144e-15,
+        "cone": 0.39562989475410704
+      }
+    },
+    {
+      "case": "native-cone45-swapped-probe",
+      "capture": "007",
+      "kind": "truck",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/007.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/007.truck.step",
+      "points": [
+        [
+          5,
+          0,
+          2.0000000000000004
+        ],
+        [
+          -4.999990002596075,
+          -0.00999869688029601,
+          2.0000000000000004
+        ],
+        [
+          5,
+          8.425448519159716e-13,
+          2.0000000000000004
+        ]
+      ],
+      "limit": 1.4,
+      "expected_plane": 0.3,
+      "expected_cone": 0.7,
+      "reference": "cone",
+      "d0": 0.7,
+      "d1": 0.3,
+      "native_setback_mismatch": true,
+      "measurement": {
+        "row": 47,
+        "valid": true,
+        "radius": 5,
+        "half_angle": 0.7853981633974483,
+        "volume": 100.41646575079525,
+        "planar_setbacks": [
+          0.30000000095664525
+        ],
+        "cone_setbacks": [
+          0.6999999999990452
+        ],
+        "planar_spread": 1.913289970900678e-09,
+        "cone_spread": 2.51214793389404e-15,
+        "planar_circles": 0,
+        "cone_circles": 0
+      },
+      "error_bound": {
+        "plane": 1.913290248456434e-09,
+        "cone": 9.560478751445817e-13
+      }
+    },
+    {
+      "case": "native-cone45-swapped-probe",
+      "capture": "008",
+      "kind": "native",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/008.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/008.result.brep",
+      "points": [
+        [
+          5,
+          0,
+          2.0000000000000004
+        ],
+        [
+          -4.999990002596075,
+          -0.00999869688029601,
+          2.0000000000000004
+        ],
+        [
+          5,
+          8.425448519159716e-13,
+          2.0000000000000004
+        ]
+      ],
+      "limit": 1.4,
+      "expected_plane": 0.36234666314352904,
+      "expected_cone": 0.7,
+      "reference": "cone",
+      "d0": 0,
+      "d1": 0,
+      "native_setback_mismatch": false,
+      "measurement": {
+        "row": 48,
+        "valid": true,
+        "radius": 5,
+        "half_angle": 0.7853981633974483,
+        "volume": 99.96911827042766,
+        "planar_setbacks": [
+          0.3623466631435299
+        ],
+        "cone_setbacks": [
+          0.6999999999999998
+        ],
+        "planar_spread": 8.881784197001252e-16,
+        "cone_spread": 0,
+        "planar_circles": 1,
+        "cone_circles": 1
+      },
+      "error_bound": {
+        "plane": 1.3322676295501878e-15,
+        "cone": 1.1102230246251565e-16
+      }
+    },
+    {
+      "case": "native-cone45-swapped-probe",
+      "capture": "008",
+      "kind": "truck",
+      "input": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/008.input.brep",
+      "result": "/home/krone/Development/Pieza_WS/truck/target/native-cone45-swapped-probe/capture/008.truck.step",
+      "points": [
+        [
+          5,
+          0,
+          2.0000000000000004
+        ],
+        [
+          -4.999990002596075,
+          -0.00999869688029601,
+          2.0000000000000004
+        ],
+        [
+          5,
+          8.425448519159716e-13,
+          2.0000000000000004
+        ]
+      ],
+      "limit": 1.4,
+      "expected_plane": 0.36234666314352904,
+      "expected_cone": 0.7,
+      "reference": "cone",
+      "d0": 0,
+      "d1": 0,
+      "native_setback_mismatch": false,
+      "measurement": {
+        "row": 49,
+        "valid": true,
+        "radius": 5,
+        "half_angle": 0.7853981633974483,
+        "volume": 99.96911825579383,
+        "planar_setbacks": [
+          0.36234666408744065
+        ],
+        "cone_setbacks": [
+          0.6999999999990452
+        ],
+        "planar_spread": 1.887910272557747e-09,
+        "cone_spread": 2.51214793389404e-15,
+        "planar_circles": 0,
+        "cone_circles": 0
+      },
+      "error_bound": {
+        "plane": 1.8878667518151815e-09,
+        "cone": 9.560478751445817e-13
+      }
+    }
+  ],
+  "source_artifacts": {
+    "chamfer/dist_dist/C1/capture/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "chamfer/dist_dist/C1/capture/001.comparison.json": "558076c8b8c012bbae786ac99a6627e41a1809b580227a132b8d3358d4624a94",
+    "chamfer/dist_dist/C1/capture/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "chamfer/dist_dist/C1/capture/001.input.brep": "cbfdff0197b8ed789e88c2d371cc54c89552ff8cd68075a4a2767a08ee531aa8",
+    "chamfer/dist_dist/C1/capture/001.input.json": "435a6904442f8dcdfe60f6f11cee290af90d4cfb06bc82495237e8c0e070ab21",
+    "chamfer/dist_dist/C1/capture/001.input.step": "ff51d9960c0494bffc94ac810104cfb16d3f991c211fa162383737127af0d7bb",
+    "chamfer/dist_dist/C1/capture/001.result.brep": "9987bbdbf57ad362293fb5bd727822f366336ff1730bf1ed27461e5b6ddb95b1",
+    "chamfer/dist_dist/C1/capture/001.result.json": "d4ded373d4fe425c332862695e16d2cbb4d65c0c5faed5a363dcfd54dd318629",
+    "chamfer/dist_dist/C1/capture/001.result.step": "de5fe327fc424aa7e30fede3f4d1ac428d93271c86e1ad5394acfd6fd98e0dfc",
+    "chamfer/dist_dist/C1/capture/001.truck.json": "ea86591fe401a9763712d89da0c5971079eddd985cdc81c14a9f08822d333a34",
+    "chamfer/dist_dist/C1/capture/001.truck.log": "ee0aacc9f966931cd2124c7f2311151062ddce9d37361276826978721d4e261d",
+    "chamfer/dist_dist/C1/capture/001.truck.step": "2ac43b4b8245a6eec4afef155a9b53f996fe8ca21377fdc9d8aad1cd36b5f4a8",
+    "chamfer/dist_dist/C6/capture/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "chamfer/dist_dist/C6/capture/001.comparison.json": "51bb3c5ead970dff3f2429353d7237206fe10f1f6e09a7f24eab85ae50bf3c10",
+    "chamfer/dist_dist/C6/capture/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "chamfer/dist_dist/C6/capture/001.input.brep": "bb310dedb99c3690690c98167dd5107321d4428e3e7a22e6ee6e9a9d62259c99",
+    "chamfer/dist_dist/C6/capture/001.input.json": "40e48326153e5104ec808544cfde281ecd74d51827745e1b9dc2d7bc2c76974c",
+    "chamfer/dist_dist/C6/capture/001.input.step": "11c55521d870faa3f34ac880b4f28c03ba68db570673a063355e7963d5793809",
+    "chamfer/dist_dist/C6/capture/001.result.brep": "39609d26cc8eebc81fa5e670f610db3bf400be18666708e2a604c1934803e322",
+    "chamfer/dist_dist/C6/capture/001.result.json": "e1337aa7ab2909265b391eb2ea885f9a627d2e84a59a01aba0bd0ee7fbe5e07d",
+    "chamfer/dist_dist/C6/capture/001.result.step": "f85f3bcd90a81d39ee4607f3acf953a42c0aa8148b7ede14656b0f7794b7bdb8",
+    "chamfer/dist_dist/C6/capture/001.truck.json": "48864b97462255a50e30be9e0a731044e5fdb89c9fff11d20134a426b1655a49",
+    "chamfer/dist_dist/C6/capture/001.truck.log": "3a414ac5862af9ac85128c142aeeae23d3a2af4d95065947e6edab41f600696d",
+    "chamfer/dist_dist/C6/capture/001.truck.step": "8a7f40e44d66b111c4549810ff8399966e7349de56a14e7bcb8a94dcaea0bbd7",
+    "chamfer/dist_dist/C7/capture/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "chamfer/dist_dist/C7/capture/001.comparison.json": "27ff339504d0f43b61176180c769a17c58c6a707e1cf2c6d678596ed194a34a2",
+    "chamfer/dist_dist/C7/capture/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "chamfer/dist_dist/C7/capture/001.input.brep": "bb310dedb99c3690690c98167dd5107321d4428e3e7a22e6ee6e9a9d62259c99",
+    "chamfer/dist_dist/C7/capture/001.input.json": "347dabd9f876c8b483796cc701256854e76d8254e0bcb2a5dc07728ac1e9c0e9",
+    "chamfer/dist_dist/C7/capture/001.input.step": "11c55521d870faa3f34ac880b4f28c03ba68db570673a063355e7963d5793809",
+    "chamfer/dist_dist/C7/capture/001.result.brep": "f31fb25d135e88e7039b01307d6008edf998127e24590828dcb22307b9c7d743",
+    "chamfer/dist_dist/C7/capture/001.result.json": "5ef5113ad98e0fbfde0ebc3c86276164b9e839aa82b297d5fdb541fe6d92ab54",
+    "chamfer/dist_dist/C7/capture/001.result.step": "3add27e8a473a4e29d87343bfee814fb3a8f5770132e2a0c4c5c54292184b545",
+    "chamfer/dist_dist/C7/capture/001.truck.json": "03e3a9283e893892aff4ccd2b4e07ea2f296c9bc20e1e6b33ae001f7cb6f652e",
+    "chamfer/dist_dist/C7/capture/001.truck.log": "e45946b56e16b3e3f1b02644a6d4c46229500d199b0bb409918380f9ded2f68a",
+    "chamfer/dist_dist/C7/capture/001.truck.step": "846c610a719fa261553e9a5965be6013ffeddcb21b4fce254ba21bd976ec2c56",
+    "chamfer/dist_dist/D1/capture/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "chamfer/dist_dist/D1/capture/001.comparison.json": "e1ec705a782cdfcb7780573974b0760d053764f488199942099c5ecd2885b0ee",
+    "chamfer/dist_dist/D1/capture/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "chamfer/dist_dist/D1/capture/001.input.brep": "86f9d9cf9c426da2076d1528de96fbf4a23edeae8558276b439151e59d32391d",
+    "chamfer/dist_dist/D1/capture/001.input.json": "f6b3a12c9c21933459788a24554dd22fd3da5d6b01652c3e18f94a24013b3077",
+    "chamfer/dist_dist/D1/capture/001.input.step": "9ebd29ca95f45eb7bbf62b0d556f20f458c4c6b8f750fa74bef3b03809197ddd",
+    "chamfer/dist_dist/D1/capture/001.result.brep": "9aeef82f284db5e689f868ae3ef4848408b705eb4b307a055c00f6ad10346d04",
+    "chamfer/dist_dist/D1/capture/001.result.json": "e1337aa7ab2909265b391eb2ea885f9a627d2e84a59a01aba0bd0ee7fbe5e07d",
+    "chamfer/dist_dist/D1/capture/001.result.step": "1af14da5609e2b0338ebe06bbf881eb902d898d02173743be57a30ba266a4ace",
+    "chamfer/dist_dist/D1/capture/001.truck.json": "48864b97462255a50e30be9e0a731044e5fdb89c9fff11d20134a426b1655a49",
+    "chamfer/dist_dist/D1/capture/001.truck.log": "3a414ac5862af9ac85128c142aeeae23d3a2af4d95065947e6edab41f600696d",
+    "chamfer/dist_dist/D1/capture/001.truck.step": "16a3b6d6d93508ff86dd6acdedc00e79b36d6061251ac86aebae83aada3bcfd1",
+    "chamfer/dist_dist/D2/capture/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "chamfer/dist_dist/D2/capture/001.comparison.json": "b89f47c724107e21d2d25dc94a325fb1c070bbd09da4568b94d79c30baded0c1",
+    "chamfer/dist_dist/D2/capture/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "chamfer/dist_dist/D2/capture/001.input.brep": "86f9d9cf9c426da2076d1528de96fbf4a23edeae8558276b439151e59d32391d",
+    "chamfer/dist_dist/D2/capture/001.input.json": "5902fd050c39d6fa5563f3b2c0d7b647fddd0984ae72cba74c67ab58d0cfb191",
+    "chamfer/dist_dist/D2/capture/001.input.step": "9ebd29ca95f45eb7bbf62b0d556f20f458c4c6b8f750fa74bef3b03809197ddd",
+    "chamfer/dist_dist/D2/capture/001.result.brep": "07534bddeacc544d0a13aeab5d9bc716b70c5f52b88c84f9d3af5361b6c7bd35",
+    "chamfer/dist_dist/D2/capture/001.result.json": "2af9189c893ad3da249dfbd7a967ad42993d1554f925cc1d7b2574f21236cddb",
+    "chamfer/dist_dist/D2/capture/001.result.step": "ac5b2a9fbf40e34d6de7fb0b01f524d598617b29693ad617eb371e8a32ec6ae4",
+    "chamfer/dist_dist/D2/capture/001.truck.json": "03e3a9283e893892aff4ccd2b4e07ea2f296c9bc20e1e6b33ae001f7cb6f652e",
+    "chamfer/dist_dist/D2/capture/001.truck.log": "e45946b56e16b3e3f1b02644a6d4c46229500d199b0bb409918380f9ded2f68a",
+    "chamfer/dist_dist/D2/capture/001.truck.step": "2833123e3360c9a3ea82f069c4a490ca0e8fff681d998ee75d8058680ed08777",
+    "chamfer/dist_dist/D5/capture/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "chamfer/dist_dist/D5/capture/001.comparison.json": "bcad34101ae2724549e6f8ee3a8c8c98d29b9fca933cee7a4fd7e6c3866294c9",
+    "chamfer/dist_dist/D5/capture/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "chamfer/dist_dist/D5/capture/001.input.brep": "04f3e6f9297a0c25d79aeda83f84b6782f9a8e4715964f9b9b4ac4be76512047",
+    "chamfer/dist_dist/D5/capture/001.input.json": "fa5fdff47918f69dc0171cd9f6e551dff2b6bc6b0561b092b31f882359d00cec",
+    "chamfer/dist_dist/D5/capture/001.input.step": "4ccbcdcdfbaebb175a42b1856bddff70f596cc3f09d07bb1c591a734995e3f41",
+    "chamfer/dist_dist/D5/capture/001.result.brep": "b6b9eb6270d5776f27d681e2ef71a86bc9b7382c5554336f504340a1cc95632c",
+    "chamfer/dist_dist/D5/capture/001.result.json": "a0b2ab6ddfe9dd94159b30bcd7f55d22441376350cc0af0fd478826537eb2d0d",
+    "chamfer/dist_dist/D5/capture/001.result.step": "83eeb0da683e8ad130e3b659cedfa75f5b60e719a0663ddb1ab719ee234667e8",
+    "chamfer/dist_dist/D5/capture/001.truck.json": "eb2ebd7513e0187a1211eb857fe41c016d5ca9e27f26b0de099c671e3f788e20",
+    "chamfer/dist_dist/D5/capture/001.truck.log": "875da0c05a076a437e1ae1d5a999b189a6c4d3a433cc840bc5f4a725b2cd3de9",
+    "chamfer/dist_dist/D5/capture/001.truck.step": "d58a93aab4efa9593632dba6fdcec9c87a0ed12feb9db9dc440ce9ca1e70e7a4",
+    "chamfer/dist_dist/D6/capture/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "chamfer/dist_dist/D6/capture/001.comparison.json": "84a1fcad17f8ebd7bd4a184be081e18b3c63b872592f0f186ead2af3d2cbda3a",
+    "chamfer/dist_dist/D6/capture/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "chamfer/dist_dist/D6/capture/001.input.brep": "04f3e6f9297a0c25d79aeda83f84b6782f9a8e4715964f9b9b4ac4be76512047",
+    "chamfer/dist_dist/D6/capture/001.input.json": "343cacdd4d70a54bf05209c81923c3f108ed70b486510bc4979289dce7d127dc",
+    "chamfer/dist_dist/D6/capture/001.input.step": "6f59ce9efec87ea6955ea741cc0a4ec81cf6861c176f7ea882728de80e3c043d",
+    "chamfer/dist_dist/D6/capture/001.result.brep": "ce995a60dcdc6dd839bfa9cdaa2c2fac1f3d1963bb9cbd38c941e98ed26a63c6",
+    "chamfer/dist_dist/D6/capture/001.result.json": "1197362e6c5201472ebd8bf0ea4d7d66bcc7c7d807063513855a373d6eee9231",
+    "chamfer/dist_dist/D6/capture/001.result.step": "a696a5fcbc53e048c8f811ff701043f54d00f14457d8cb157f8df6fe3dac27eb",
+    "chamfer/dist_dist/D6/capture/001.truck.json": "08adf96e07eaccf6e405f3e268148b65332d99bdf0b171ae82e2b1798ebf2e0a",
+    "chamfer/dist_dist/D6/capture/001.truck.log": "da87b8b24d8c5f1e8157c72cceb1ea9deec1b3361569f19f0c6696875eede3c7",
+    "chamfer/dist_dist/D6/capture/001.truck.step": "451388a193ca1e87ce0f6c38fb4e7b41121d2135b024ce02deb69f874585aa67",
+    "chamfer/dist_dist/D9/capture/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "chamfer/dist_dist/D9/capture/001.comparison.json": "c1380844db08a070a6ac6a1d1d5cbc763f45d5680447e2f68f860e2b2dc670c4",
+    "chamfer/dist_dist/D9/capture/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "chamfer/dist_dist/D9/capture/001.input.brep": "85aaa88bd9cb73550226c8933e463d5771a4d0565c958edaa181debb5e7c6570",
+    "chamfer/dist_dist/D9/capture/001.input.json": "c5c5c03c54226b7e05db04162d5717b316fb29b5f330e51e77584fc6d426d113",
+    "chamfer/dist_dist/D9/capture/001.input.step": "8dd04b03f6c6e4a09357ba2388c3dc0fc93ec46dd972b34e059af98fe1b6bb43",
+    "chamfer/dist_dist/D9/capture/001.result.brep": "f21d40868e6ac7359cb42ebb27c7b10cc2c81cc6c58bb5343d5d522e1e208c01",
+    "chamfer/dist_dist/D9/capture/001.result.json": "a0b2ab6ddfe9dd94159b30bcd7f55d22441376350cc0af0fd478826537eb2d0d",
+    "chamfer/dist_dist/D9/capture/001.result.step": "b3f9e3df09e128ff7b2bd5135fe49f8c8b40658d73d410a5e9b12f95ea027cc3",
+    "chamfer/dist_dist/D9/capture/001.truck.json": "eb2ebd7513e0187a1211eb857fe41c016d5ca9e27f26b0de099c671e3f788e20",
+    "chamfer/dist_dist/D9/capture/001.truck.log": "875da0c05a076a437e1ae1d5a999b189a6c4d3a433cc840bc5f4a725b2cd3de9",
+    "chamfer/dist_dist/D9/capture/001.truck.step": "2938bebfdf8a53d6c950210c4c3c602e06a6555f9c46b14193aa596ddb2fd859",
+    "chamfer/dist_dist/E1/capture/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "chamfer/dist_dist/E1/capture/001.comparison.json": "8a13bc3d861a0cb6e5fd15810d7920b37c1698034b895e9f7210e43bd78c322c",
+    "chamfer/dist_dist/E1/capture/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "chamfer/dist_dist/E1/capture/001.input.brep": "85aaa88bd9cb73550226c8933e463d5771a4d0565c958edaa181debb5e7c6570",
+    "chamfer/dist_dist/E1/capture/001.input.json": "6eb6fcb9cdb302938f5fc7dde344c27dc45896a53b87a37c315649a331b5be0f",
+    "chamfer/dist_dist/E1/capture/001.input.step": "8dd04b03f6c6e4a09357ba2388c3dc0fc93ec46dd972b34e059af98fe1b6bb43",
+    "chamfer/dist_dist/E1/capture/001.result.brep": "b7c84c2c99f91a1d74d6e62ff6a8f12a29350d56447cfdaa63ea90b4bd9cce8b",
+    "chamfer/dist_dist/E1/capture/001.result.json": "6833ddb41f934e1ae4858aa4fea9c21aec87cabd1f47e4255589fa7113b009fc",
+    "chamfer/dist_dist/E1/capture/001.result.step": "f0420ee03037db836f3f8425f963cafe005e9223bb47f7106ff2f20efb8c7104",
+    "chamfer/dist_dist/E1/capture/001.truck.json": "08adf96e07eaccf6e405f3e268148b65332d99bdf0b171ae82e2b1798ebf2e0a",
+    "chamfer/dist_dist/E1/capture/001.truck.log": "da87b8b24d8c5f1e8157c72cceb1ea9deec1b3361569f19f0c6696875eede3c7",
+    "chamfer/dist_dist/E1/capture/001.truck.step": "ada1f8df3246d6caa9ddef4993885a2059fe160298451747023d904247361e1b"
+  },
+  "oracle_sha256": "611e8387e9631f83227242de120353fb56de855eed647084013fab2fd61278e1",
+  "source_sha256": "c373809c4fdcbafc48a33648153cde79728091ddf3a5e53e4f2177fd83a2cc90"
+}

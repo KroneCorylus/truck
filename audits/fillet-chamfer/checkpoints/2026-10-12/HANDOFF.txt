@@ -1,8 +1,8 @@
 LATEST CHECKPOINT — 2026-10-16
-Work is active. Read ../2026-10-16-cone-references/HANDOFF.txt and report.html there.
-Latest implementation54b272d6 captures cone references and handles plane/cone rims.
-Fullcapture279constructions/259limitedsamplepasses;all241prior successes unchanged.
-Nine new discrepancies remain unresolved;20total. Continue until done/told to stop.
+Work is active. Read ../2026-10-16-cone-contact-oracle/HANDOFF.txt and report.html there.
+Nine cone discrepancies explained by independent contact checks: native changes
+requested first setbacks; Truck preserves both. Raw verdicts unchanged.
+Fullbaseline54b272d6:279constructions/259limitedpasses. Continue until done/stopped.
 
 HISTORICAL HANDOFF FOLLOWS
 

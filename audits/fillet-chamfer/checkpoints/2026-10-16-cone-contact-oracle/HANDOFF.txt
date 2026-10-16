@@ -1,0 +1,61 @@
+CONE CONTACT ORACLE — 2026-10-16
+ACTIVE: Continue work and commit achievements until done or told to stop.
+
+COMPLETED
+Independent oracle explains nine newly constructed dist_dist/C1,C6,C7,D1,D2,D5,
+D6,D9,E1 discrepancies. Native first setback0.1→0.0546918160678 or
+0.2→0.1093836321356; second requested setback unchanged. Truck preserves both.
+Max sampled Truck setback error including ring spread8.971575801708376e-9.
+50measurements:9corpus pairs+16control pairs. Nativecontacts explicitlycircular.
+Controls usefrustaH2,radii5/3or3/5,slopes±1,bothrefs,orders.3/.7and.7/.3,angle30.
+14nativecontrols correct;2acuteunequalcontrols replace.7with.3043701052459,
+volumeerrors1.2113884220and1.2295199418. All16Truckanalyticvolume/validsingleSTEP
+checks pass,maxvolumeerror3.065414944103395e-8. Native storedtolerances~1e-7.
+Observed A_effective=A*B/(2*A*cos(beta)-B),beta45°,matchesall11nativeerrors1e-10.
+Source-supported cause:ChFiKPart plane/cone two-distance conversion abs beforeatan
+loses quadrant. Native sources relevantfilesclean at a016080bf6738d6aeae020badee4e888ad1540a5.
+No production geometry/capture/replay/comparison changes; no redundantfullcapture.
+Proof truck-benchmarks/results/2026-10-16-cone-contact-oracle/REPORT.md,run.py,oracle.cpp,analysis.json.
+Archive424members SHA58bfdd0830bb03f88c010125ab99a5bacddd191c57f2ca06ecb220f28f533e0c;108corpusartifacts verifiedagainst committedfullarchive.
+Current runtime54b272d6;fullbaseline279construct/259limitedpasses,232failed,
+32unhandled,96importfailed,9inconsistent.20rawdiscrepanciesretained,nineexplained.
+Latest fullcapture rawtarget/occt-capture-cone-references,committedcapture
+2026-10-16-cone-references. All241previoussuccessfulrecordsEXACT.
+
+NEXT
+Implement/prove single-edge consumed-neighbor routing, then continue solvercoverage.
+2. Single-edge planar consumed-neighbor routing: inventory98failed active seeds,
+   81plane/plane,14plane/cylinder,3BSpline/extrusion. See target/single-chamfer-failures-*.
+   Scratch probe target/build-chamfer-failure-probe.py compiles against exact frozen
+   release externs (fingerprint95c9a5594d96e759) and copiedprivate miter code, without
+   changingproduction files. target/chamfer-sequence-a1-probe.txt:
+   dist_angle_sequence/A1/002 direct miter OutsideNeighbour atchamfer_miter.rs270
+   (edge orientation collapses), whereas existing planar_edge::blend_edges yields
+   21faces,closedconsistent shell. Need analytic/STEP proof before routingfallback.
+   Candidate regression:10cube,first vertical corner chamfer atx10y10 sizea1,
+   thenbottomedgey10z0 withbottominsetb2,verticalc1(or2equal). New chamfer consumes
+   shortedge frompriorbevel. Inputvolume1000-a²H/2=995.
+   Removedsecond=Lx*b*c/2-c*(a²/2-a³/(6*b)) for b>a.
+   Candidate change onlysingleedge OutsideNeighbour fallback to existingstraight
+   route, preserveoriginalerror if fallbackfails; must keep all oversized/collapsed
+   existingrejectionsunchanged. Equal/unequal entrypointsbothneedcoverage.
+
+METHOD
+Read AGENTS.md. Parent-failing tests; never loosen assertions. Shared solid/STEP.
+CARGO_BUILD_JOBS=12; rustfmt +nightly --config skip_children=true,no cargo fmt.
+Freeze production during builds/tests/captures; relevantrelease tests,Clippy,
+actions smoke,buildreplayLAST. Implementation+proofcommit beforecleanfullcapture;
+then catalog/HTML/handoffcommit. Force-add JSON/ZIP/STEP. Diffcheck excludes*.step.
+No push/PR,consumer/pin changes,subagents or unsupported speed/parityclaims.
+Plugin target/occt-cone-reference-plugin;SDK target/occt-sdk/usr/lib64.
+Native ../investigations/sequential-holes-2026-10-10/occt;publicdata
+ target/occt-public-chamfer-data. Captureworkers4 timeout120 freshoutput.
+Helpers target/validate-cone-references.py,replay-cone-references.py,
+package-cone-reference-proof.py,package-cone-reference-full.py,
+write-cone-reference-checkpoint.py. Packaging scripts not idempotent.
+
+Oracle helpers target/package-cone-contact-oracle.py,write-cone-oracle-checkpoint.py.
+Native45 controls target/native-cone45-reference-probe and native-cone45-swapped-probe
+now contain all16Truck replays/comparisons. run.py packagesfreshmeasurements;
+fixture-origin earliernativesummarymaystoponexpectednativeerror,finalanalysisiscomplete.
+T3 tab_3 hidden;server8765. No final stop authorized.
