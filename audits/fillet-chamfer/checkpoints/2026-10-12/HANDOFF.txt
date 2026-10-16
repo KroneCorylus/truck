@@ -1,9 +1,8 @@
-LATEST CHECKPOINT — 2026-10-15
-Work resumed after this historical handoff and is now paused again at the user's
-request. Read ../2026-10-15-native-tolerances/HANDOFF.txt and report.html there.
-Latest implementation c8f6fc9c; full-capture checkpoint afa34ecb.
-396 native cases, 648 operation records, 231 constructions, 220 limited sampled
-passes. Full parity remains unverified. Resume only when asked.
+LATEST CHECKPOINT — 2026-10-16
+User resumed continuous work. Read ../2026-10-16-g1-independent-oracle/HANDOFF.txt and
+report.html there. Evidence commit0522d735 validates G1 independently; production
+capture baseline remains c8f6fc9c,231constructions/220limitedsamplepasses.
+Full parity remains unverified. Continue until done or told to stop.
 
 HISTORICAL HANDOFF FOLLOWS
 

@@ -1709,6 +1709,12 @@
           "path": "truck-shapeops/tests/imported_spherical_pcurves.rs",
           "find": "fn spherical_end_face_fillet_preserves_material_radius_normals_and_history",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-16-g1-independent-oracle/REPORT.md",
+          "find": "# G1:",
+          "role": "test"
         }
       ],
       "required_outcome": "Terminate a blend correctly against oblique end faces while preserving the requested radius and a valid boundary.",
@@ -1718,7 +1724,8 @@
         "At fa1a142d, STEP fitting covers curved fillet trims beyond their contact endpoints. The parent loses conical end geometry; four direct quarter-cone operations verify requested radius/normals, independent volume, native/transformed-reversed selections, finite fitted-domain coverage, closed meshes/STEP, history and immutable inputs. Full release shapeops/STEP: 391 passed, 0 failed, 1 existing ignored; Clippy and action smoke pass. A fresh physical C7 replay reduces the native-to-STEP sampled discrepancy from 4.2283 to below 2.76e-6 in both directions. Finite sampling does not certify global bounds or full parity. Raw comparison/STEP evidence is retained with the validation and capture reports.",
         "At 83eccc89, curved fillets can retain the middle of a two-edge cap boundary and trim both ends on one terminal face. Parent-failing half-cylinder and parabolic-prism regressions verify independent radius/normals/volume, topology, closed meshes, STEP, immutable input and transformed/reversed selections. Full shapeops: 330 passed, zero failed, one existing ignored; the additional parabolic test passes separately (331 distinct passing tests), with Clippy and action smoke. Captured G1 now constructs a native-valid single-solid STEP with volume 132185649.97246, agreeing with independent integral 132185649.98388772. Its OCCT distance discrepancy remains open. Evidence: truck-benchmarks/results/2026-10-12-two-edge-caps/REPORT.md.",
         "The clean 83eccc89 full capture passes all 156 native entries. Of 161 captures, 71 construct (up from 70), 31 fail construction, 25 fail import, 23 have inconsistent inputs, eight have unhandled intent, two time out and one is incomplete. All 71 constructed results preserve input and geometry consistency, close their Truck meshes and yield native-valid single-solid STEP. Sixty-nine meet the combined limited comparisons. G1 is the sole construction-status change: its independently checked result still differs from the captured OCCT surface (sampled distances 0.98750/0.01855). Tolerance-grid A1 also differs; I3/J9 still time out. Zero panics and no full parity verdict. Evidence: audits/fillet-chamfer/capture/2026-10-12-two-edge-caps/REPORT.md.",
-        "At dbb54343, draft/angle/F1 terminates a vertical planar-edge fillet against a sphere. Independent filleted volume is 21454.331120055493; native integration of Truck STEP differs by 0.000298534. Bidirectional sampled distances are below 1.910e-6 at replay tolerance .001. The later native draft operation is not captured."
+        "At dbb54343, draft/angle/F1 terminates a vertical planar-edge fillet against a sphere. Independent filleted volume is 21454.331120055493; native integration of Truck STEP differs by 0.000298534. Bidirectional sampled distances are below 1.910e-6 at replay tolerance .001. The later native draft operation is not captured.",
+        "At 0522d735, an independent G1 rolling-radius/contact oracle verifies native input supports, radius1000 and analytic controls across three sample grids. Native maximum radius residual0.14305548 and plane-contact distance0.34871939 exceed Truck STEP values4.5934381e-6 and0.00021494676. Default/tight native rebuilds reproduce the discrepancy. Both existing two-edge fillet solid/STEP regressions pass unchanged. This identifies sampled native reference error without changing geometry, thresholds or the 231/220 corpus counts; G1 remains a sampled mismatch and no global bound/full parity is claimed."
       ]
     },
     {
@@ -1756,11 +1763,18 @@
           "path": "truck-shapeops/tests/two_edge_blend_caps.rs",
           "find": "fn parabolic_cap_preserves_the_rolling_radius_beyond_its_contact_endpoints",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-16-g1-independent-oracle/REPORT.md",
+          "find": "# G1:",
+          "role": "test"
         }
       ],
       "required_outcome": "Terminate one blend across a neighborhood of several end faces without gaps, overlaps or damage to unrelated geometry.",
       "verification": [
-        "At 83eccc89, curved fillets can retain the middle of a two-edge cap boundary and trim both ends on one terminal face. Parent-failing half-cylinder and parabolic-prism regressions verify independent radius/normals/volume, topology, closed meshes, STEP, immutable input and transformed/reversed selections. Full shapeops: 330 passed, zero failed, one existing ignored; the additional parabolic test passes separately (331 distinct passing tests), with Clippy and action smoke. Captured G1 now constructs a native-valid single-solid STEP with volume 132185649.97246, agreeing with independent integral 132185649.98388772. Its OCCT distance discrepancy remains open. Evidence: truck-benchmarks/results/2026-10-12-two-edge-caps/REPORT.md."
+        "At 83eccc89, curved fillets can retain the middle of a two-edge cap boundary and trim both ends on one terminal face. Parent-failing half-cylinder and parabolic-prism regressions verify independent radius/normals/volume, topology, closed meshes, STEP, immutable input and transformed/reversed selections. Full shapeops: 330 passed, zero failed, one existing ignored; the additional parabolic test passes separately (331 distinct passing tests), with Clippy and action smoke. Captured G1 now constructs a native-valid single-solid STEP with volume 132185649.97246, agreeing with independent integral 132185649.98388772. Its OCCT distance discrepancy remains open. Evidence: truck-benchmarks/results/2026-10-12-two-edge-caps/REPORT.md.",
+        "At 0522d735, an independent G1 rolling-radius/contact oracle verifies native input supports, radius1000 and analytic controls across three sample grids. Native maximum radius residual0.14305548 and plane-contact distance0.34871939 exceed Truck STEP values4.5934381e-6 and0.00021494676. Default/tight native rebuilds reproduce the discrepancy. Both existing two-edge fillet solid/STEP regressions pass unchanged. This identifies sampled native reference error without changing geometry, thresholds or the 231/220 corpus counts; G1 remains a sampled mismatch and no global bound/full parity is claimed."
       ]
     },
     {
@@ -3621,6 +3635,12 @@
           "path": "audits/fillet-chamfer/capture/2026-10-15-native-fillet-contours/REPORT.md",
           "find": "# Final native",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-16-g1-independent-oracle/REPORT.md",
+          "find": "# G1:",
+          "role": "test"
         }
       ],
       "required_outcome": "Deliver blend results usable for closed meshing, STEP interchange and further modeling while preserving dimensions and validity.",
@@ -3667,7 +3687,8 @@
         "At c4706b38, refined contact fits and normalized ruled-surface orientation preserve small/shifted tangent chamfers with parent-failing material/mesh/STEP regressions. Explicit native A4 three-edge contour proof is valid with sampled maximum difference6.18e-06. Automatic capture remains seed-only; full capture222 constructions/208 limited comparisons, no prior successful check regressions. No parity upgrade.",
         "At 099ccb7e following 2346b975, native chamfer schema2 captures complete contours and first-assignment/ignored semantics. Parent-failing replay validation prevents seed fallback. Automatic A4 applies3edges with valid STEP and sampled maximum2.23e-8. Fillets remainseed-only and retain5e-5exportfits; chamfersuse1e-7. Fullcapture221 constructions/210 limitedcomparisons; 58 corrected-intentrecords, no prior successful checkregressions forunchangedintent. No parityupgrade.",
         "At 48a1032f, replay propagates planar seed reference sides across complete oriented chamfer contours, including perpendicular plane/cylinder rims. Two parent-failing native regressions verify both directions and normal signs, exact setbacks and solid/STEP checks. Full capture: 231 constructions, 220 limited comparisons; all648 intents unchanged and no successful check regressions. Fillets remain seed-only. No parity upgrade.",
-        "At e3fab5a6, fillet schema3 captures final whole contours/radius laws after all seed assignments and exact observed native settings. Parent-failing tests preserve repeated-radius replacement, complete scope and explicit unsupported laws/representations. Full capture: 231 constructions/220 limited comparisons, 4 corrected-scope records, no successful check regression for unchanged intent. 0 losses under corrected intent remain explicit. No parity upgrade."
+        "At e3fab5a6, fillet schema3 captures final whole contours/radius laws after all seed assignments and exact observed native settings. Parent-failing tests preserve repeated-radius replacement, complete scope and explicit unsupported laws/representations. Full capture: 231 constructions/220 limited comparisons, 4 corrected-scope records, no successful check regression for unchanged intent. 0 losses under corrected intent remain explicit. No parity upgrade.",
+        "At 0522d735, an independent G1 rolling-radius/contact oracle verifies native input supports, radius1000 and analytic controls across three sample grids. Native maximum radius residual0.14305548 and plane-contact distance0.34871939 exceed Truck STEP values4.5934381e-6 and0.00021494676. Default/tight native rebuilds reproduce the discrepancy. Both existing two-edge fillet solid/STEP regressions pass unchanged. This identifies sampled native reference error without changing geometry, thresholds or the 231/220 corpus counts; G1 remains a sampled mismatch and no global bound/full parity is claimed."
       ]
     },
     {
