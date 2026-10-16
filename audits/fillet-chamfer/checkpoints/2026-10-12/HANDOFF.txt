@@ -1,8 +1,8 @@
 LATEST CHECKPOINT — 2026-10-16
-Work is active. Read ../2026-10-16-cone-contact-oracle/HANDOFF.txt and report.html there.
-Nine cone discrepancies explained by independent contact checks: native changes
-requested first setbacks; Truck preserves both. Raw verdicts unchanged.
-Fullbaseline54b272d6:279constructions/259limitedpasses. Continue until done/stopped.
+Workactive.Read ../2026-10-16-consumed-chamfer-neighbor/HANDOFF.txt and report.html.
+Kernel4211cfe0 supports isolatedchamfers consuming shortneighbor edges.
+Fullcapture312constructions/292limitedpasses;no priorcheckregressions.
+Continue until done/stopped. Fullparityunverified.
 
 HISTORICAL HANDOFF FOLLOWS
 

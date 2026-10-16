@@ -1,0 +1,115 @@
+ISOLATED CHAMFERS CONSUMING SHORT NEIGHBORS — 2026-10-16
+ACTIVE: Continue work and commit achievements until done or told to stop.
+
+COMPLETED
+4211cfe0ba40ccc847279200ad4ebd15189dfb56: tryexistingstraight-edge solver for a singleselectedchamfer whenmiterrejects
+OutsideNeighbour. Equal/unequal entrypoints;originaldiagnosticpreserved ifstraight
+solverrejects. No newgeometryalgorithm,tolerances,publicAPI orcodes.
+Two parent-failing tests ated603e7d;6variants equal/unequal,scale,transforms,
+reversedfaceorder,singleedgeAPI. Independentvolumeoverlap,plane/normals,
+consumededgeremoval,8faces,1generated,immutableinput,sharedsolidSTEP.
+The former sequential-gap test was rewritten before reapplying the fix: its same
+four ordered axis-pair cases now require exact material, solid/STEP, convexity and
+complete history (unchanged faces or one replacement), retaining input immutability.
+This strengthened test also fails on the parent. Initial failure logs are retained.
+Full shapeops: 393 pass / 0 fail / 1 existing ignored;39replay,
+Clippy,actionssmoke,finalreplaybuild pass. Three nativecontrols validanalytic
+singleSTEP,maxsample5.0242958677880805e-15. Prooftruck-benchmarks/results/2026-10-16-consumed-chamfer-neighbor/REPORT.md.
+Rawtarget/native-consumed-chamfer-neighbor;native pluginunchangedcone-reference.
+
+FULL CLEAN CAPTURE
+Rawtarget/occt-capture-consumed-chamfer-neighbor;runtime4211cfe0ba40ccc847279200ad4ebd15189dfb56.
+396nativepass,648records (487chamfer/161filletcomplete scopes). Allintents/native
+propertiesunchanged. All279oldconstructionsretainchecks;279exactoldsuccesses,
+0numericalchanges recorded. No successfulcheckregressions.
+{"input-import-failed": 96, "operation-succeeded": 312, "operation-failed": 199, "unhandled-intent": 32, "input-inconsistent": 9}
+Limitedsamplepasses292. Archive7987members SHA37ea90f8f53e02bc1d334aa064a82f25396717db9d21447645a00b0800858cf1.
+Earliered603e7d independentlyexplains9cone mismatches asnativefirstsetbackfold;
+rawverdictsretained. G1/H4proofsalreadyexist,dontrediscover.
+
+NEXT
+Next candidate after isolated consumed-neighbor routing:
+32unsupported baseline54b272d6:28supportpair,4missing(nonanalytic)reference.
+Many28are straight plane/cylinder lips parallel to cylinder axis (A6/A8 sequence005/006).
+Native ChFiKPart_ComputeData_ChPlnCyl.cxx straight-spine overload uses cylinder
+chord distance D, angle psi=2asin(D/(2R)). Kernel planar_edge::section projects
+seed+tangent*d onto cylinder, so matching local contacts requires d=R*tan(psi),
+restricted to psi<pi/2. Existing kernel API deliberately documents tangent projection;
+change native replay conversion, not kernel distance contract, unless deliberate APIchange.
+Equal-mode must also convert appropriate cylindrical side, likely explains existing
+chamfer/equal_dist/A2 maxsample0.001327 mismatch. Do not change comparisontolerance.
+Distance-angle native straight-spine overload ChFiKPart_ComputeData_ChAsymPlnCyl.cxx:
+plane ref: construct contact P=seed+inward_plane*D, ray at requestedangle toplane,
+intersect exact circle in perpendicular section; chooseunique inwardlocalbranch.
+Cylinder ref: chord D fixes Q, take referenceangle at originalspine tangent, intersect
+plane. IMPORTANT: native control shows cylinder-reference angle is measured from
+the ORIGINAL spine tangent, not tangent atQ. Our initial control oracle used Q
+tangent and correctlyfailed nativecylangle (expected387.976769,native384.115282).
+Correct half-cylinder formula a=R*(1-cos(psi))+R*sin(psi)*tan(alpha) matchesnative.
+Use originalreference tangent/normal in ray construction; validate both
+reference sides, convex/concaveorientation, offsetplanes andinvalidbranches against
+nativecontrols beforeimplementing. No copied opaque native formulas needed: exact
+2D line/circle andline/plane geometry is simpler. Rejectnonlongitudinal edges/variable
+normal pairs; enforceexactaxisparallel line andplaneaxisperpendicularnormal.
+For two-distances only, nativechord conversion may unlock14records independently
+before distance-angle derivation. Needparent-failingnative/replayregressions and
+analyticmaterial/contacts,sharedsolidSTEP. Nonanalyticreference4casesstillunsupported.
+
+Native 5controls:target/native-longitudinal-chamfer-controls; radius5H10 half-cylinder,
+longitudinalgeneratorx5y0,plane y0. Allnativeanalytic material/immutableinputs valid.
+Equal.5 chord mapskernel tangent.501884029031;unequal cylinderchord1.5 maps
+1.552909942405. Helpers target/longitudinal-chamfer-inputs.cpp,
+validate-longitudinal-chamfer-controls.py. Initialwrongangleoracle rawretained
+target/native-longitudinal-chamfer-probe. Production NOT changed for thiscandidate.
+
+Additional native controls verified during consumed-neighbor validation:
+ target/native-longitudinal-offset-controls, 18 controls: convex/concave supports,
+ plane offsets -2,0,2 at radius5, equal.5 and unequal plane.7/cylinder chord1.5
+ with both reference faces. All native outputs match independent Green-theorem
+ section material and are valid single solids, input BREP unchanged.
+ Helpers target/longitudinal-offset-inputs.cpp, validate-longitudinal-offset-controls.py.
+ Chord-to-tangent conversion is unchanged by offset/convexity. Angle cases are not
+ covered by these additional controls; keep distance-angle as a separate achievement.
+
+Prepared, NOT applied: target/longitudinal-distance-tests.rs (3 tests; 6 constructed
+variants plus nonlocal-contact guards), target/longitudinal-distance-helper.rs.
+Proposed next group handles equal and two-distance requests only. Add fixture
+001/002/003 JSON from native-longitudinal-chamfer-controls/capture and 001.input.step
+as half-cylinder.step under tests/fixtures/chamfer-longitudinal. Tests must fail
+on the next committed checkpoint before applying helper/conversion. Native 18
+offset controls verify both face references, convexity and offsets. Tests assert
+actual STEP contact vertices, independent area/volume and shared solid/STEP.
+No production changes yet; scratch helper/tests are not compiled or verified.
+
+ANGLE FOLLOW-UP (NOT implementation-ready):
+12 additional native distance-angle controls in target/native-longitudinal-offset-angle-controls
+use the same convex/concave offset -2/0/2 shapes. All captured outputs valid, but
+our proposed line/circle material oracle fails for some configurations. Raw first
+failure retained in target/longitudinal-offset-angle-controls.txt. Diagnostic
+ target/analyze-longitudinal-offset-angles.py and target/native-section-vertices.cpp
+measure actual native contacts, saved in raw analysis.json. Requested plane angle30
+is measured47.29489833 for convex offset+2 and20.51146003 for concave offset+2.
+Cylinder-reference conventions require care: convex center-plane native result
+matches angle at ORIGINAL spine tangent, while concave center-plane result has
+47.25385312 degrees there and30 degrees at the new contact tangent (psi17.25385312).
+Do not call every proposed-oracle mismatch a native defect without resolving the
+angle contract. Native ChFiKPart_ComputeData_ChAsymPlnCyl.cxx straight overload
+uses sinA1=sqrt(1-cosA1²) and unsigned tangent/chord correction. This is a lead,
+not a completed attribution. Keep next achievement strictly equal/two-distance.
+All18 equal/unequal offset controls already match analytic material independently.
+
+METHOD
+ReadAGENTS.md. Parent-failingtests,neverloosenassertions,sharedsolidSTEP.
+CARGO_BUILD_JOBS=12;rustfmt+nightly --config skip_children=true,no cargo fmt.
+Freezeproductionsourcesduringbuilds/tests/captures. Relevantreleasechecks,
+Clippy,actionssmoke,buildreplayLAST. Kernelchangesfullshapeops includes275s
+originalellipsoidtest;notstalled. Implementation/proofcommit beforecleanfullcapture,
+thenHTML/catalog/handoffcommit. ForceaddJSON/ZIP/STEP;diffcheckexcludes*.step.
+No push/PR,consumer/pinchanges,subagents,speed/fullparityclaims.
+Plugin target/occt-cone-reference-plugin;SDK target/occt-sdk/usr/lib64;
+OCCT ../investigations/sequential-holes-2026-10-10/occt;publicdata
+ target/occt-public-chamfer-data;workers4 timeout120 freshoutput.
+Completedhelpers target/validate-consumed-chamfer-neighbor.py,
+replay-consumed-chamfer-neighbor.py,package-consumed-chamfer-proof.py,
+package-consumed-chamfer-full.py,write-consumed-chamfer-checkpoint.py.
+Packagingnotidempotent. Browserhidden tab_3/server8765.

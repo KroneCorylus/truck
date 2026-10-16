@@ -3,7 +3,7 @@
     "title": "Fillet and chamfer feature parity audit",
     "baseline": "OCCT V7_9_3 source inventory plus the recorded Truck/Pieza revisions. Includes 3D, 2D, related workflows and all textual candidates under the discovery rules.",
     "meaning_of_all": "Every dedicated test-grid entry, matching registered test/helper, discovered blend command and retained reference in this pinned checkout. This is not a claim about all mathematical configurations or current/future OCCT releases.",
-    "execution": "All 1,026 inventoried entries have recorded native harness attempts. Latest clean capture at 54b272d6:396 native entries pass,648 operation records (487 complete chamfer contours,161 complete fillet contours),279 constructions and259 limited sampled passes at0.001. Cone reference/support handling adds38 constructions and29 limited passes; all241 prior successful results/comparisons exactly unchanged. Twenty constructed discrepancies remain. Full-parity verdicts remain unverified. Independent contact oracle explains nine cone discrepancies as native first-setback changes; Truck preserves both requested setbacks in those checks. Raw comparison verdicts remain unchanged.",
+    "execution": "All1,026 inventoried entries have native attempts. Latest clean capture at4211cfe0:396nativepasses,648operations,487completechamfer/161completefilletscopes;312constructions/292limitedsamplepasses at0.001. All279priorconstructionsretainchecks;279priorresults/comparisonsexact,0numericalchanges recorded;no priorcheckregressions. Independentconecontactproof explains9native setbackdiscrepancies withoutchangingrawverdicts. Fullparity remainsunverified.",
     "mapping": "Capability assessments describe observable outcomes supported or restricted by reviewed source evidence. Per-case tags and links are automated hints; they do not prove Truck handles that fixture.",
     "objective": "Achieve at least OCCT-level fillet/chamfer capabilities and robustness for equivalent modeling tasks in Truck/Pieza.",
     "equivalence": "Judge the requested geometry, dimensions, validity, editing behavior and practical performance. Different APIs, algorithms, languages, surface representations and internal operation sequences are acceptable. Missing a corresponding OCCT method is not evidence of a feature gap."
@@ -444,6 +444,12 @@
           "path": "truck-benchmarks/results/2026-10-16-cone-contact-oracle/REPORT.md",
           "find": "# Independent contact",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-16-consumed-chamfer-neighbor/REPORT.md",
+          "find": "# Isolated chamfers",
+          "role": "test"
         }
       ],
       "required_outcome": "Bevel selected edges by equal specified setbacks on both supports, including convex and concave material.",
@@ -457,7 +463,8 @@
         "At 71edbef1, open chamfers rebuild a shared terminal face with both end bridges. Two parent-failing regressions cover six equal/unequal,scaled,transformed/reversed variants with analytic material/cone/normals and shared solid/STEP checks. Three native controls export valid single STEP,maxsample6.97e-9. Fullshapeops391pass/0fail/1existingignored,33replay,Clippy/smoke pass. Cleanfullcapture:231construct/220limitedpasses,all231successful results/comparisons exactly unchanged. No parity upgrade.",
         "At f96cb105, cylindrical chamfer references are captured and matched by axis line/radius, preserving complete-contour side assignments. Three parent-failing regressions and three native controls pass. All36 replay tests,13 capture tests,Clippy/smoke pass. Clean full capture: 241 constructions/230 limited sampled passes; all231 prior successful results/comparisons exactly unchanged. No parity upgrade.",
         "At 54b272d6, conical references and oriented plane/cone rim angles preserve native side assignments. Three parent-failing regressions cover16 constructed variants;8 native controls pass independent material and STEP.39 replay tests,13 capture tests,Clippy/smoke pass. Clean fullcapture279construct/259limitedpasses; all241prior successful results/comparisons exactly unchanged. Nine new discrepancies retained, no parity upgrade.",
-        "Independent plane/cone contact oracle: nine corpus pairs and sixteen control pairs verified. Native changes first unequal setback on acute rims; Truck sampled contact error below9e-9, all16controlanalyticvolume/STEPchecks pass. Native angle-quadrant fold reproduced; raw comparison verdicts retained, no full-parity upgrade."
+        "Independent plane/cone contact oracle: nine corpus pairs and sixteen control pairs verified. Native changes first unequal setback on acute rims; Truck sampled contact error below9e-9, all16controlanalyticvolume/STEPchecks pass. Native angle-quadrant fold reproduced; raw comparison verdicts retained, no full-parity upgrade.",
+        "At4211cfe0, isolated equal/unequal chamfers retry theexistingstraight-edge solver after a miter rejects consumedneighbors.2parent-failingtests/6variants,3nativecontrols,fullshapeops393pass,39replay,Clippy/smoke. Fullcapture312construct/292limitedpasses;no priorcheckregressions. Existing oversized/collision guards unchanged. No parityupgrade."
       ]
     },
     {
@@ -555,6 +562,12 @@
           "path": "truck-benchmarks/results/2026-10-16-cone-contact-oracle/REPORT.md",
           "find": "# Independent contact",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-16-consumed-chamfer-neighbor/REPORT.md",
+          "find": "# Isolated chamfers",
+          "role": "test"
         }
       ],
       "required_outcome": "Bevel with independently specified setbacks on the intended two support faces; orientation or storage order must not silently exchange them.",
@@ -568,7 +581,8 @@
         "At 71edbef1, open chamfers rebuild a shared terminal face with both end bridges. Two parent-failing regressions cover six equal/unequal,scaled,transformed/reversed variants with analytic material/cone/normals and shared solid/STEP checks. Three native controls export valid single STEP,maxsample6.97e-9. Fullshapeops391pass/0fail/1existingignored,33replay,Clippy/smoke pass. Cleanfullcapture:231construct/220limitedpasses,all231successful results/comparisons exactly unchanged. No parity upgrade.",
         "At f96cb105, cylindrical chamfer references are captured and matched by axis line/radius, preserving complete-contour side assignments. Three parent-failing regressions and three native controls pass. All36 replay tests,13 capture tests,Clippy/smoke pass. Clean full capture: 241 constructions/230 limited sampled passes; all231 prior successful results/comparisons exactly unchanged. No parity upgrade.",
         "At 54b272d6, conical references and oriented plane/cone rim angles preserve native side assignments. Three parent-failing regressions cover16 constructed variants;8 native controls pass independent material and STEP.39 replay tests,13 capture tests,Clippy/smoke pass. Clean fullcapture279construct/259limitedpasses; all241prior successful results/comparisons exactly unchanged. Nine new discrepancies retained, no parity upgrade.",
-        "Independent plane/cone contact oracle: nine corpus pairs and sixteen control pairs verified. Native changes first unequal setback on acute rims; Truck sampled contact error below9e-9, all16controlanalyticvolume/STEPchecks pass. Native angle-quadrant fold reproduced; raw comparison verdicts retained, no full-parity upgrade."
+        "Independent plane/cone contact oracle: nine corpus pairs and sixteen control pairs verified. Native changes first unequal setback on acute rims; Truck sampled contact error below9e-9, all16controlanalyticvolume/STEPchecks pass. Native angle-quadrant fold reproduced; raw comparison verdicts retained, no full-parity upgrade.",
+        "At4211cfe0, isolated equal/unequal chamfers retry theexistingstraight-edge solver after a miter rejects consumedneighbors.2parent-failingtests/6variants,3nativecontrols,fullshapeops393pass,39replay,Clippy/smoke. Fullcapture312construct/292limitedpasses;no priorcheckregressions. Existing oversized/collision guards unchanged. No parityupgrade."
       ]
     },
     {
@@ -1831,13 +1845,20 @@
           "path": "truck-benchmarks/results/2026-10-16-shared-chamfer-ends/REPORT.md",
           "find": "# Close both",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-16-consumed-chamfer-neighbor/REPORT.md",
+          "find": "# Isolated chamfers",
+          "role": "test"
         }
       ],
       "required_outcome": "Terminate one blend across a neighborhood of several end faces without gaps, overlaps or damage to unrelated geometry.",
       "verification": [
         "At 83eccc89, curved fillets can retain the middle of a two-edge cap boundary and trim both ends on one terminal face. Parent-failing half-cylinder and parabolic-prism regressions verify independent radius/normals/volume, topology, closed meshes, STEP, immutable input and transformed/reversed selections. Full shapeops: 330 passed, zero failed, one existing ignored; the additional parabolic test passes separately (331 distinct passing tests), with Clippy and action smoke. Captured G1 now constructs a native-valid single-solid STEP with volume 132185649.97246, agreeing with independent integral 132185649.98388772. Its OCCT distance discrepancy remains open. Evidence: truck-benchmarks/results/2026-10-12-two-edge-caps/REPORT.md.",
         "At 0522d735, an independent G1 rolling-radius/contact oracle verifies native input supports, radius1000 and analytic controls across three sample grids. Native maximum radius residual0.14305548 and plane-contact distance0.34871939 exceed Truck STEP values4.5934381e-6 and0.00021494676. Default/tight native rebuilds reproduce the discrepancy. Both existing two-edge fillet solid/STEP regressions pass unchanged. This identifies sampled native reference error without changing geometry, thresholds or the 231/220 corpus counts; G1 remains a sampled mismatch and no global bound/full parity is claimed.",
-        "At 71edbef1, open chamfers rebuild a shared terminal face with both end bridges. Two parent-failing regressions cover six equal/unequal,scaled,transformed/reversed variants with analytic material/cone/normals and shared solid/STEP checks. Three native controls export valid single STEP,maxsample6.97e-9. Fullshapeops391pass/0fail/1existingignored,33replay,Clippy/smoke pass. Cleanfullcapture:231construct/220limitedpasses,all231successful results/comparisons exactly unchanged. No parity upgrade."
+        "At 71edbef1, open chamfers rebuild a shared terminal face with both end bridges. Two parent-failing regressions cover six equal/unequal,scaled,transformed/reversed variants with analytic material/cone/normals and shared solid/STEP checks. Three native controls export valid single STEP,maxsample6.97e-9. Fullshapeops391pass/0fail/1existingignored,33replay,Clippy/smoke pass. Cleanfullcapture:231construct/220limitedpasses,all231successful results/comparisons exactly unchanged. No parity upgrade.",
+        "At4211cfe0, isolated equal/unequal chamfers retry theexistingstraight-edge solver after a miter rejects consumedneighbors.2parent-failingtests/6variants,3nativecontrols,fullshapeops393pass,39replay,Clippy/smoke. Fullcapture312construct/292limitedpasses;no priorcheckregressions. Existing oversized/collision guards unchanged. No parityupgrade."
       ]
     },
     {
