@@ -1,8 +1,9 @@
 LATEST CHECKPOINT — 2026-10-16
-User resumed continuous work. Read ../2026-10-16-g1-independent-oracle/HANDOFF.txt and
-report.html there. Evidence commit0522d735 validates G1 independently; production
-capture baseline remains c8f6fc9c,231constructions/220limitedsamplepasses.
-Full parity remains unverified. Continue until done or told to stop.
+Work is active. Read ../2026-10-16-shared-chamfer-ends/HANDOFF.txt and report.html there.
+Latest kernel fix71edbef1 supports shared chamfer terminal faces.
+Fullcapture remains231constructions/220limitedsamplepasses,allprior successes
+exactly unchanged. Three added native controls prove the new capability.
+Continue until done or told to stop. Full parity remains unverified.
 
 HISTORICAL HANDOFF FOLLOWS
 

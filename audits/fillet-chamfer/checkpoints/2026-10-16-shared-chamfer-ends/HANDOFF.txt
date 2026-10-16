@@ -1,0 +1,64 @@
+SHARED CHAMFER TERMINAL FACES — 2026-10-16
+ACTIVE: User requests continued work and committed achievements until done or told to stop.
+Latest question about remaining work was read-only status steering, not a stop.
+
+COMPLETED
+71edbef189442dcbb3211718f2753c6a5c3b6b8c: chamfer open ends grouped by original terminal face; all bridges applied
+in one reconstruction, each consumed exactly once. Fits/distances/APIs unchanged.
+Two new tests fail on18232e09 at trim_end_faces. Six equal/unequal variants check
+analytic material, cone equation/normals, transforms/reversal/scale, immutable
+input and shared solid/STEP harnesses. New tests unchanged between parent/fix.
+Fullshapeops391pass/0fail/1existingignored;33replaypass;Clippy,actions smoke,
+finalreplaybuild pass. Three native controls valid single STEP, maxsample
+6.966905415601712e-9; maxanalyticvolumeerror~2.14e-8.
+Proof116members SHA821b94cd0ef4b3a87dff48fa50d4a469466153f122aa8860dbc374e49a143264.
+Rawcontrols target/native-shared-chamfer-ends-final. Initialnative run passed,
+but new Python harness used obsolete contour key; final uses contour_edges.
+Earlier0522d735+18232e09: G1 exact rolling-radius/contact oracle and checkpoint.
+
+FULL CLEAN CAPTURE
+Rawtarget/occt-capture-shared-chamfer-ends;revision71edbef189442dcbb3211718f2753c6a5c3b6b8c.
+396nativepass/648captures;487chamfer,161fillet. All648sameintent/nativeproperties.
+231construct/220limitedsamplepasses;202operationfailed,110unhandled,
+96importfailed,9inconsistent. All231successful result/comparison records EXACT;
+no status/numerical/checkregressions. New controls are outside existing corpus.
+Archive7744members SHA5d2fa3ceb8ac74d8295dc8a997d06f9d0bc55ba2c5d875a107805e9e6ed59422.
+
+NEXT
+1. Capture/match cylindrical reference faces for face-dependent chamfers on
+   perpendicular plane/cylinder rims. All110unhandled records are chamfers:
+   82missing reference_plane,28unsupported supportpair. Not all82 necessarily
+   cylindrical; inspect actual native faces first. Preserve exact side assignment,
+   complete contours, legacyplane behavior and unsupportedothercurvedsupports.
+   Native currently reference_plane=null for every nonplane. Could add optional
+   reference_cylinder(origin,axis,radius), match Elementary::Cylinder by radius,
+   parallelaxis and axis-line coincidence; axis sign/origin shift must not matter.
+   Use parent-failing replay/native tests and no fallback that drops selection.
+   Sources:tests/chamfer/data/simple/A2 etc;group paths are aliases.
+2. Other construction failures, complex/consumed supports, variable-radius laws,
+   unequal junctions, inputgaps/shells/fixtures, continuity/editing/latency.
+3. Do not rediscover H4's prior independent proof:2026-10-13-polar-cap-seams
+   REPORT.md already records radius/normals/integral/STEP/pole validity and
+   GKvolume13159710.46449488 vsindependent13159710.462164925. Current untracked
+   target/probe-h4-volume.cpp,h4-volume-gk.log confirm it with tighter quadrature.
+   Native reference still removesmaterial and has22.97budgets; discrepancy remains.
+   G1 proof0522d735 likewise isolates nativeanalyticerror without changing verdicts.
+
+METHOD
+Read truck/AGENTS.md. Parent-failing regressions; shared solid/STEP harnesses;
+never weaken assertions. CARGO_BUILD_JOBS=12. No cargo fmt; rustfmt+nightly
+--config skip_children=true on touchedfiles. Relevant release tests,Clippy,
+actions smoke,buildreplayLAST. No production source/build changes during tests
+or captures. Commit implementation+proof before cleanfullcapture, then docs.
+No redundant fullcapture without source changes/specific concern. Force-add
+ignored JSON/ZIP/STEP. Diffcheck excludes *.step. No performance/fullparityclaims.
+Do not push,create PRs,changeconsumer/pin orspawnsubagents without authorization.
+Consumer../PiezaCAD; nativecheckout unrelatedpatches untouched.
+Runtime --occt ../investigations/sequential-holes-2026-10-10/occt
+--library-path target/occt-sdk/usr/lib64 --plugin target/occt-tolerance-capture-plugin
+--replay target/release/examples/replay_occt_blend
+--data-path target/occt-public-chamfer-data --workers4 --timeout120 --outputNEW.
+Scripts target/validate-shared-chamfer-ends.py,capture-shared-chamfer-ends.py,
+replay-shared-chamfer-ends.py,package-shared-chamfer-proof.py,
+package-shared-chamfer-full.py,write-shared-chamfer-checkpoint.py completed.
+Packaging scripts not idempotent. T3tab_1/server8765; preserve hiddenpreview.
