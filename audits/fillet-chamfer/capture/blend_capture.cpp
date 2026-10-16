@@ -181,11 +181,19 @@ int input(Draw_Interpretor& di, int argc, const char** argv) {
   return 1;
 }
 
-void reference_plane(std::ostream& out, const TopoDS_Face& face) {
+void reference_geometry(std::ostream& out, const TopoDS_Face& face) {
   const BRepAdaptor_Surface surface(face);
   out << ",\"reference_plane\":";
   if (surface.GetType() != GeomAbs_Plane) {
     out << "null";
+    if (surface.GetType() == GeomAbs_Cylinder) {
+      const auto cylinder = surface.Cylinder();
+      const auto p = cylinder.Location();
+      const auto axis = cylinder.Axis().Direction();
+      out << ",\"reference_cylinder\":{\"origin\":[" << p.X() << ',' << p.Y() << ',' << p.Z()
+          << "],\"axis\":[" << axis.X() << ',' << axis.Y() << ',' << axis.Z()
+          << "],\"radius\":" << cylinder.Radius() << '}';
+    }
     return;
   }
   const auto plane = surface.Plane();
@@ -244,7 +252,7 @@ int chamfer_input(Draw_Interpretor& di, int argc, const char** argv) {
           if (!already_selected && valid) builder.Add(d0, d1, edge, TopoDS::Face(face));
           i += 4;
         }
-        reference_plane(out, TopoDS::Face(face));
+        reference_geometry(out, TopoDS::Face(face));
       }
       out << ',';
       edge_geometry(out, edge);

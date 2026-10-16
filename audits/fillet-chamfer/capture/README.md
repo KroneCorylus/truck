@@ -60,13 +60,13 @@ cargo test -p truck-shapeops --example replay_occt_blend
 python3 -m unittest discover -s audits/fillet-chamfer/capture -p 'test_*.py'
 ```
 
-Twenty-five Rust tests cover physical selection, per-edge fillet radii, equal and
+Thirty-six Rust tests cover physical selection, per-edge fillet radii, equal and
 unequal chamfer distances, reference-plane identity, planar distance/angle
 conversion on acute, right and obtuse corners, impossible-angle rejection, duplicate
 assignments and rejected unsupported/invalid intent. Native-contour regressions
 cover expansion, missing scope, seed membership, first-assignment behavior, legacy
 labels, unknown schemas, a closed STEP round trip and preserved fillet export
-budgets. Ten
+budgets. Thirteen
 Python/Tcl tests cover command selection, native caller scope, interleaved command
 numbering, preservation of success/error behavior, and replay of confirmed native
 rejections and summaries of complete contour selections. A rejected native
@@ -94,9 +94,15 @@ seed-only evidence is not upgraded. Summary manifests retain point counts;
 complete raw contour samples remain in the archived input JSON.
 
 Chamfer captures retain every requested distance/angle.
-Face-dependent modes also record an analytic reference plane when available.
-Replay maps that plane to exactly one adjacent seed face, independently of face
-order and plane normal sign, then propagates its side along the oriented contour.
+Face-dependent modes also record an analytic reference plane or cylinder when available.
+The optional schema-2 `reference_cylinder` contains an axis origin, axis direction
+and radius; cylindrical references retain `reference_plane: null`. Replay matches
+exactly one adjacent seed face by plane identity or cylinder axis line and radius,
+independently of face order, normal/axis sign, or origin position along the axis.
+It then propagates that reference side along the oriented contour. Missing reference
+geometry remains unsupported; malformed or ambiguous cylinders are rejected.
+Cylinder regressions cover unequal distances, distance/angle conversion, transforms,
+scale, reversed samples, equivalent axis descriptions, analytic material and STEP.
 Two-distance replay accepts planar supports and perpendicular plane/cylinder rims;
 distance/angle replay uses the oriented angle between planar supports and converts
 `d1 = d0 * sin(angle) / sin(beta + angle)` (corner angle `beta`). Perpendicular

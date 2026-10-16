@@ -293,20 +293,48 @@ fn chamfer_selection(
         if distances.iter().any(|d| !d.is_finite() || *d <= 0.) {
             return Err(invalid("Invalid derived chamfer distance"));
         }
+        enum Reference {
+            Plane(Point3, Vector3),
+            Cylinder(Point3, Vector3, f64),
+        }
         let reference = if mode == "equal-distance" {
             None
         } else {
-            let p = captured_vector(&chosen["reference_plane"]["origin"]);
-            let n = captured_vector(&chosen["reference_plane"]["normal"]);
-            let (Some(p), Some(n)) = (p, n) else {
-                return Err(unsupported(
-                    "Face-dependent chamfers require a captured reference plane",
-                ));
-            };
-            if n.magnitude2() < TOLERANCE * TOLERANCE {
-                return Err(invalid("Invalid reference plane normal"));
+            let plane = &chosen["reference_plane"];
+            let cylinder = &chosen["reference_cylinder"];
+            if !plane.is_null() && !cylinder.is_null() {
+                return Err(invalid("Ambiguous captured reference surface"));
             }
-            Some((Point3::from_vec(p), n.normalize()))
+            if !cylinder.is_null() {
+                let origin = captured_vector(&cylinder["origin"]);
+                let axis = captured_vector(&cylinder["axis"]);
+                let radius = cylinder["radius"]
+                    .as_f64()
+                    .filter(|r| r.is_finite() && *r > 0.);
+                let (Some(origin), Some(axis), Some(radius)) = (origin, axis, radius) else {
+                    return Err(invalid("Invalid reference cylinder"));
+                };
+                if !axis.magnitude2().is_finite() || axis.magnitude2() < TOLERANCE * TOLERANCE {
+                    return Err(invalid("Invalid reference cylinder axis"));
+                }
+                Some(Reference::Cylinder(
+                    Point3::from_vec(origin),
+                    axis.normalize(),
+                    radius,
+                ))
+            } else {
+                let p = captured_vector(&plane["origin"]);
+                let n = captured_vector(&plane["normal"]);
+                let (Some(p), Some(n)) = (p, n) else {
+                    return Err(unsupported(
+                        "Face-dependent chamfers require a captured reference plane or cylinder",
+                    ));
+                };
+                if n.magnitude2() < TOLERANCE * TOLERANCE {
+                    return Err(invalid("Invalid reference plane normal"));
+                }
+                Some(Reference::Plane(Point3::from_vec(p), n.normalize()))
+            }
         };
         let seed = match_selection(input, chosen)
             .map_err(|error| json!({"status":"selection-unmatched","error":error}))?;
@@ -335,7 +363,7 @@ fn chamfer_selection(
             seed.clone()
         };
         let wire = as_wire(&matched);
-        let reference_side = if let Some((origin, normal)) = reference {
+        let reference_side = if let Some(reference) = reference {
             let wire = wire.as_ref().ok_or_else(|| {
                 unsupported("Reference propagation requires one connected contour")
             })?;
@@ -346,19 +374,32 @@ fn chamfer_selection(
                     .face_iter()
                     .filter_map(|face| {
                         let boundary = face.edge_iter().find(|e| e.id() == edge.id())?;
-                        let Some((Elementary::Plane(plane), _)) =
-                            face.oriented_surface().elementary()
-                        else {
-                            return None;
+                        let (surface, _) = face.oriented_surface().elementary()?;
+                        let matches = match (&reference, surface) {
+                            (Reference::Plane(origin, normal), Elementary::Plane(plane)) => {
+                                plane.normal().cross(*normal).magnitude() < 1e-8
+                                    && (plane.origin() - origin).dot(*normal).abs() < TOL / 10.
+                            }
+                            (
+                                Reference::Cylinder(origin, axis, radius),
+                                Elementary::Cylinder {
+                                    origin: actual_origin,
+                                    axis: actual_axis,
+                                    radius: actual_radius,
+                                },
+                            ) => {
+                                actual_axis.cross(*axis).magnitude() < 1e-8
+                                    && (actual_origin - origin).cross(*axis).magnitude() < TOL / 10.
+                                    && (actual_radius - radius).abs() < TOL / 10.
+                            }
+                            _ => false,
                         };
-                        (plane.normal().cross(normal).magnitude() < 1e-8
-                            && (plane.origin() - origin).dot(normal).abs() < TOL / 10.)
-                            .then_some(boundary.front() != edge.front())
+                        matches.then_some(boundary.front() != edge.front())
                     })
                     .collect();
                 let [side] = sides.as_slice() else {
                     return Err(
-                        json!({"status":"selection-unmatched","error":"Reference plane does not uniquely match an adjacent seed face"}),
+                        json!({"status":"selection-unmatched","error":"Reference surface does not uniquely match an adjacent seed face"}),
                     );
                 };
                 if reference_side
@@ -1730,5 +1771,207 @@ mod fillet_contour_tests {
             run("missing-law", &task, false, 0.)["status"],
             "harness-error"
         );
+    }
+}
+
+#[cfg(test)]
+mod cylindrical_reference_tests {
+    use super::*;
+
+    fn chosen() -> Value {
+        let task: Value = serde_json::from_str(include_str!(
+            "../tests/fixtures/chamfer-cylinder-reference/half-cylinder.json"
+        ))
+        .unwrap();
+        let mut chosen = task["selection"][0].clone();
+        chosen["reference_plane"] = Value::Null;
+        chosen["reference_cylinder"] = json!({"origin":[0.,0.,0.],"axis":[0.,0.,1.],"radius":5.});
+        chosen["distances"] = json!([0.3, 0.7]);
+        chosen
+    }
+
+    fn transform_points(member: &mut Value, transform: Matrix4, reverse: bool) {
+        let points = member["points"].as_array_mut().unwrap();
+        for p in points.iter_mut() {
+            let point = transform.transform_point(Point3::from_vec(captured_vector(p).unwrap()));
+            *p = json!([point.x, point.y, point.z]);
+        }
+        if reverse {
+            points.reverse();
+        }
+    }
+
+    fn check(angle: bool, moved: bool, flip_axis: bool) {
+        let scale: f64 = if moved { 0.2 } else { 1. };
+        let transform = if moved {
+            Matrix4::from_translation(Vector3::new(13., -7., 23.))
+                * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.73))
+        } else {
+            Matrix4::identity()
+        } * Matrix4::from_scale(scale);
+        let directory = std::env::temp_dir().join(format!(
+            "truck-cylinder-reference-{}-{angle}-{moved}-{flip_axis}",
+            std::process::id()
+        ));
+        std::fs::create_dir_all(&directory).unwrap();
+        let prefix = directory.join("001");
+        let prefix = prefix.to_str().unwrap();
+        std::fs::write(
+            format!("{prefix}.input.step"),
+            include_str!("../tests/fixtures/chamfer-cylinder-reference/half-cylinder.step"),
+        )
+        .unwrap();
+        let input =
+            builder::transformed(&import(&format!("{prefix}.input.step")).unwrap(), transform);
+        replay_common::assert_solid(
+            &input,
+            std::f64::consts::PI * 125. * scale.powi(3),
+            &[0],
+            TOL,
+        );
+        let prepared = prepare_for_step(&input.compress(), CHAMFER_STEP_TOL).unwrap();
+        let step = StepDisplay::new(
+            Default::default(),
+            StepDesign::from_model(StepModel::from(&prepared)),
+        )
+        .to_string();
+        std::fs::write(format!("{prefix}.input.step"), &step).unwrap();
+        let mut chosen = chosen();
+        transform_points(&mut chosen, transform, moved);
+        for member in chosen["contour_edges"].as_array_mut().unwrap() {
+            transform_points(member, transform, moved);
+        }
+        let origin =
+            transform.transform_point(Point3::new(0., 0., if flip_axis { 37. } else { 0. }));
+        let axis = transform.transform_vector(Vector3::unit_z() * if flip_axis { -7. } else { 1. });
+        chosen["reference_cylinder"] = json!({"origin":[origin.x,origin.y,origin.z],
+            "axis":[axis.x,axis.y,axis.z],"radius":5.*scale});
+        let vertical = 0.3;
+        let radial = if angle {
+            vertical * 60_f64.to_radians().tan()
+        } else {
+            0.7
+        };
+        if angle {
+            chosen["mode"] = json!("distance-angle");
+            chosen["distance"] = json!(vertical * scale);
+            chosen["angle_degrees"] = json!(60.);
+            chosen.as_object_mut().unwrap().remove("distances");
+        } else {
+            chosen["distances"] = json!([vertical * scale, radial * scale]);
+        }
+        let before = serde_json::to_string(&input.compress()).unwrap();
+        let assignments = chamfer_selection(&input, &[chosen.clone()], true).unwrap();
+        assert_eq!(assignments.len(), 1);
+        for (edge, distances) in assignments {
+            let adjacent: Vec<_> = input
+                .face_iter()
+                .filter(|f| f.edge_iter().any(|e| e.id() == edge.id()))
+                .collect();
+            for (face, distance) in adjacent.iter().zip(distances) {
+                let expected = match face.oriented_surface().elementary().unwrap().0 {
+                    Elementary::Cylinder { .. } => vertical,
+                    Elementary::Plane(_) => radial,
+                    _ => panic!("unexpected support"),
+                } * scale;
+                assert!((distance - expected).abs() < 1e-12);
+            }
+        }
+        assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
+        let task = json!({"schema_version":2,"operation":"chamfer","selection":[chosen]});
+        std::fs::write(format!("{prefix}.input.json"), task.to_string()).unwrap();
+        let result = replay(prefix, &Cell::new("start")).unwrap();
+        assert_eq!(result["status"], "operation-succeeded", "{result}");
+        assert_eq!(result["selected_edges"], 1);
+        for field in [
+            "input_unchanged",
+            "geometry_consistent",
+            "mesh_closed",
+            "step_prepared",
+        ] {
+            assert_eq!(result[field], true, "{field}: {result}");
+        }
+        assert_eq!(
+            step,
+            std::fs::read_to_string(format!("{prefix}.input.step")).unwrap()
+        );
+        let expected = (std::f64::consts::PI * 125.
+            - std::f64::consts::PI / 2.
+                * (5. * radial * vertical - radial * radial * vertical / 3.))
+            * scale.powi(3);
+        let output = import(&format!("{prefix}.truck.step")).unwrap();
+        replay_common::assert_solid(&output, expected, &[0], TOL);
+        replay_common::blend::assert_step(&output, expected, TOL);
+        std::fs::remove_dir_all(directory).unwrap();
+    }
+
+    #[test]
+    fn cylindrical_reference_preserves_unequal_sides() {
+        for moved in [false, true] {
+            for flip_axis in [false, true] {
+                check(false, moved, flip_axis);
+            }
+        }
+    }
+
+    #[test]
+    fn cylindrical_reference_preserves_distance_angle() {
+        for moved in [false, true] {
+            for flip_axis in [false, true] {
+                check(true, moved, flip_axis);
+            }
+        }
+    }
+
+    fn with_input(check: impl FnOnce(Solid)) {
+        let path = std::env::temp_dir().join(format!(
+            "truck-cylinder-reference-guards-{}.step",
+            std::process::id()
+        ));
+        std::fs::write(
+            &path,
+            include_str!("../tests/fixtures/chamfer-cylinder-reference/half-cylinder.step"),
+        )
+        .unwrap();
+        let input = import(path.to_str().unwrap()).unwrap();
+        std::fs::remove_file(path).unwrap();
+        check(input);
+    }
+
+    #[test]
+    fn cylindrical_reference_rejects_wrong_and_invalid_descriptors() {
+        with_input(|input| {
+            let before = serde_json::to_string(&input.compress()).unwrap();
+            for (field, value, status) in [
+                ("radius", json!(4.), "selection-unmatched"),
+                ("axis", json!([0., 1., 0.]), "selection-unmatched"),
+                ("origin", json!([1., 0., 0.]), "selection-unmatched"),
+                ("radius", json!(-5.), "harness-error"),
+                ("radius", Value::Null, "harness-error"),
+                ("axis", json!([0., 0., 0.]), "harness-error"),
+                ("origin", json!([0., 0.]), "harness-error"),
+            ] {
+                let mut chosen = chosen();
+                chosen["reference_cylinder"][field] = value;
+                let error = chamfer_selection(&input, &[chosen], true).unwrap_err();
+                assert_eq!(error["status"], status, "{error}");
+            }
+            let mut missing = chosen();
+            missing
+                .as_object_mut()
+                .unwrap()
+                .remove("reference_cylinder");
+            assert_eq!(
+                chamfer_selection(&input, &[missing], true).unwrap_err()["status"],
+                "unhandled-intent"
+            );
+            let mut conflict = chosen();
+            conflict["reference_plane"] = json!({"origin":[0.,0.,10.],"normal":[0.,0.,1.]});
+            assert_eq!(
+                chamfer_selection(&input, &[conflict], true).unwrap_err()["status"],
+                "harness-error"
+            );
+            assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
+        });
     }
 }

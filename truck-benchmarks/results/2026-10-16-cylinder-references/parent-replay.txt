@@ -1,0 +1,40 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 3.69s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running unittests examples/replay_occt_blend.rs (target/release/examples/replay_occt_blend-bd2259d8fa5b09df)
+
+running 3 tests
+test cylindrical_reference_tests::cylindrical_reference_rejects_wrong_and_invalid_descriptors ... FAILED
+test cylindrical_reference_tests::cylindrical_reference_preserves_distance_angle ... FAILED
+test cylindrical_reference_tests::cylindrical_reference_preserves_unequal_sides ... FAILED
+
+failures:
+
+---- cylindrical_reference_tests::cylindrical_reference_rejects_wrong_and_invalid_descriptors stdout ----
+
+thread 'cylindrical_reference_tests::cylindrical_reference_rejects_wrong_and_invalid_descriptors' (185125) panicked at truck-shapeops/examples/replay_occt_blend.rs:1916:17:
+assertion `left == right` failed: {"reason":"Face-dependent chamfers require a captured reference plane","status":"unhandled-intent"}
+  left: String("unhandled-intent")
+ right: "selection-unmatched"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- cylindrical_reference_tests::cylindrical_reference_preserves_distance_angle stdout ----
+
+thread 'cylindrical_reference_tests::cylindrical_reference_preserves_distance_angle' (185123) panicked at truck-shapeops/examples/replay_occt_blend.rs:1823:78:
+called `Result::unwrap()` on an `Err` value: Object {"reason": String("Face-dependent chamfers require a captured reference plane"), "status": String("unhandled-intent")}
+
+---- cylindrical_reference_tests::cylindrical_reference_preserves_unequal_sides stdout ----
+
+thread 'cylindrical_reference_tests::cylindrical_reference_preserves_unequal_sides' (185124) panicked at truck-shapeops/examples/replay_occt_blend.rs:1823:78:
+called `Result::unwrap()` on an `Err` value: Object {"reason": String("Face-dependent chamfers require a captured reference plane"), "status": String("unhandled-intent")}
+
+
+failures:
+    cylindrical_reference_tests::cylindrical_reference_preserves_distance_angle
+    cylindrical_reference_tests::cylindrical_reference_preserves_unequal_sides
+    cylindrical_reference_tests::cylindrical_reference_rejects_wrong_and_invalid_descriptors
+
+test result: FAILED. 0 passed; 3 failed; 0 ignored; 0 measured; 33 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p truck-shapeops --example replay_occt_blend`

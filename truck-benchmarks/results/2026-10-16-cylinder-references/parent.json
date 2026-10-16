@@ -1,0 +1,5 @@
+{
+  "revision": "48cb55cddfcfc4f5aa6457a7c1948c543c531ab7",
+  "test_sha256": "5b19f6a035cf7ad0754a961f3a64a12cd8fe21acd82e04fdee7578a08f1ccca8",
+  "result": "3 failed, 0 passed; missing captured reference plane"
+}

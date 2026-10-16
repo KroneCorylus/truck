@@ -1,0 +1,57 @@
+[
+  {
+    "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-cylinder-reference-final/capture/001",
+    "radial": 0.7,
+    "vertical": 0.3,
+    "scale": 1,
+    "expected_volume": 391.1267145756025,
+    "native": {
+      "native_valid": true,
+      "solids": 1,
+      "volume": 391.1267145756025,
+      "area": 331.5966063823818,
+      "stored_tolerances": {
+        "face": 1e-07,
+        "edge": 1e-07,
+        "vertex": 1.0000000000000002e-07
+      }
+    }
+  },
+  {
+    "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-cylinder-reference-final/capture/002",
+    "radial": 0.519615242270663,
+    "vertical": 0.3,
+    "scale": 1,
+    "expected_volume": 391.5171786286895,
+    "native": {
+      "native_valid": true,
+      "solids": 1,
+      "volume": 391.5171786286895,
+      "area": 331.9482454677754,
+      "stored_tolerances": {
+        "face": 1e-07,
+        "edge": 1e-07,
+        "vertex": 1.0000000000000002e-07
+      }
+    }
+  },
+  {
+    "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-cylinder-reference-final/capture/003",
+    "radial": 0.2,
+    "vertical": 0.9,
+    "scale": 0.1,
+    "expected_volume": 0.3913042145605304,
+    "native": {
+      "native_valid": true,
+      "solids": 1,
+      "volume": 0.39130421456053033,
+      "area": 3.324159073144356,
+      "stored_tolerances": {
+        "face": 1e-07,
+        "edge": 1e-07,
+        "vertex": 1.0000000000000002e-07
+      }
+    }
+  }
+]
+Native cylinder descriptors, side distances, angle, scope and input immutability verified
