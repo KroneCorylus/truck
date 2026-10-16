@@ -1,0 +1,130 @@
+$ python3 audits/fillet-chamfer/build_catalog.py --occt ../investigations/sequential-holes-2026-10-10/occt --app ../PiezaCAD
+{
+  "group": {
+    "blend": 475,
+    "boolean": 22,
+    "bugs": 132,
+    "caf": 26,
+    "chamfer": 279,
+    "de_mesh": 2,
+    "draft": 6,
+    "feat": 12,
+    "fillet2d": 10,
+    "heal": 9,
+    "hlr": 2,
+    "opengl": 12,
+    "opengles2": 5,
+    "opengles3": 12,
+    "perf": 4,
+    "sewing": 7,
+    "v3d": 1,
+    "xcaf": 10
+  },
+  "relevance": {
+    "command-candidate": 185,
+    "dedicated-suite": 764,
+    "reference-only": 77
+  },
+  "dependency_status": {
+    "missing-in-checkout": 713,
+    "no-static-reference": 304,
+    "static-references-found": 9
+  },
+  "comparison": {
+    "unverified": 1026
+  },
+  "occt_run": {
+    "failed": 19,
+    "known-failure": 33,
+    "passed": 534,
+    "skipped": 440
+  },
+  "truck_run": {
+    "captured-replay": 388,
+    "not-run": 638
+  },
+  "cases": 1026,
+  "registered_cases_scanned": 21082,
+  "distinct_case_files": 795,
+  "cases_with_markers": 335,
+  "mechanisms": 51,
+  "source_files": 286,
+  "commands": 33,
+  "unexecuted": 0,
+  "reference_topics": 1,
+  "capabilities": 50
+}
+Catalog generated.
+exit_code 0
+$ python3 audits/fillet-chamfer/build_catalog.py --occt ../investigations/sequential-holes-2026-10-10/occt --app ../PiezaCAD --check
+{
+  "group": {
+    "blend": 475,
+    "boolean": 22,
+    "bugs": 132,
+    "caf": 26,
+    "chamfer": 279,
+    "de_mesh": 2,
+    "draft": 6,
+    "feat": 12,
+    "fillet2d": 10,
+    "heal": 9,
+    "hlr": 2,
+    "opengl": 12,
+    "opengles2": 5,
+    "opengles3": 12,
+    "perf": 4,
+    "sewing": 7,
+    "v3d": 1,
+    "xcaf": 10
+  },
+  "relevance": {
+    "command-candidate": 185,
+    "dedicated-suite": 764,
+    "reference-only": 77
+  },
+  "dependency_status": {
+    "missing-in-checkout": 713,
+    "no-static-reference": 304,
+    "static-references-found": 9
+  },
+  "comparison": {
+    "unverified": 1026
+  },
+  "occt_run": {
+    "failed": 19,
+    "known-failure": 33,
+    "passed": 534,
+    "skipped": 440
+  },
+  "truck_run": {
+    "captured-replay": 388,
+    "not-run": 638
+  },
+  "cases": 1026,
+  "registered_cases_scanned": 21082,
+  "distinct_case_files": 795,
+  "cases_with_markers": 335,
+  "mechanisms": 51,
+  "source_files": 286,
+  "commands": 33,
+  "unexecuted": 0,
+  "reference_topics": 1,
+  "capabilities": 50
+}
+Catalog verified.
+exit_code 0
+$ python3 -m unittest discover -s audits/fillet-chamfer -p test_*.py
+......................
+----------------------------------------------------------------------
+Ran 22 tests in 0.038s
+
+OK
+exit_code 0
+$ python3 -m unittest discover -s audits/fillet-chamfer/capture -p test_*.py
+.............
+----------------------------------------------------------------------
+Ran 13 tests in 0.031s
+
+OK
+exit_code 0

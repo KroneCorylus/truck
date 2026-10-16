@@ -1,8 +1,8 @@
 LATEST CHECKPOINT — 2026-10-16
-Workactive.Read ../2026-10-16-consumed-chamfer-neighbor/HANDOFF.txt and report.html.
-Kernel4211cfe0 supports isolatedchamfers consuming shortneighbor edges.
-Fullcapture312constructions/292limitedpasses;no priorcheckregressions.
-Continue until done/stopped. Fullparityunverified.
+Work active. Read ../2026-10-16-longitudinal-chamfer-distances/HANDOFF.txt and report.html.
+Replay b5c98d1a converts longitudinal cylinder chord distances for equal/unequal chamfers.
+Full capture: 312 constructions / 293 limited passes; no prior check regressions.
+Continue until done or stopped. Full parity remains unverified.
 
 HISTORICAL HANDOFF FOLLOWS
 
