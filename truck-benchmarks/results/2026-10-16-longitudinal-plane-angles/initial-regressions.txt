@@ -1,0 +1,37 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 3.79s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running unittests examples/replay_occt_blend.rs (target/release/examples/replay_occt_blend-bd2259d8fa5b09df)
+
+running 4 tests
+test longitudinal_plane_angle_tests::longitudinal_angles_reject_unsupported_references_and_contacts ... ok
+test longitudinal_plane_angle_tests::concave_longitudinal_chamfers_preserve_the_requested_plane_angle ... FAILED
+test longitudinal_plane_angle_tests::longitudinal_plane_angles_preserve_shallow_and_steep_requests ... FAILED
+test longitudinal_plane_angle_tests::convex_longitudinal_chamfers_preserve_the_requested_plane_angle ... ok
+
+failures:
+
+---- longitudinal_plane_angle_tests::concave_longitudinal_chamfers_preserve_the_requested_plane_angle stdout ----
+
+thread 'longitudinal_plane_angle_tests::concave_longitudinal_chamfers_preserve_the_requested_plane_angle' (535837) panicked at truck-shapeops/examples/replay_occt_blend.rs:2727:9:
+assertion `left == right` failed
+  left: 0
+ right: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- longitudinal_plane_angle_tests::longitudinal_plane_angles_preserve_shallow_and_steep_requests stdout ----
+
+thread 'longitudinal_plane_angle_tests::longitudinal_plane_angles_preserve_shallow_and_steep_requests' (535840) panicked at truck-shapeops/examples/replay_occt_blend.rs:2727:9:
+assertion `left == right` failed
+  left: 0
+ right: 1
+
+
+failures:
+    longitudinal_plane_angle_tests::concave_longitudinal_chamfers_preserve_the_requested_plane_angle
+    longitudinal_plane_angle_tests::longitudinal_plane_angles_preserve_shallow_and_steep_requests
+
+test result: FAILED. 2 passed; 2 failed; 0 ignored; 0 measured; 42 filtered out; finished in 0.07s
+
+error: test failed, to rerun pass `-p truck-shapeops --example replay_occt_blend`

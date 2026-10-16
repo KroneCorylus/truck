@@ -1,0 +1,2305 @@
+{
+  "parent_revision": "f3c67ee9a905873fb3d97e90afb738f895c1e629",
+  "source_sha256": {
+    "truck-shapeops/src/thread.rs": "dde916eefe7df28638b1855f616c915be37065efb06834a0dd38142db209f6ee",
+    "truck-shapeops/src/alternative.rs": "820392cdac5c56f81ccb0388c5d4a95d84994196e724896186a3a6f9a5806697",
+    "truck-shapeops/src/lib.rs": "f5930f4813660153a11f5ea6c5dd7e2b72381119b0a007d9a2936af4f490eee8",
+    "truck-shapeops/src/profile.rs": "f93d5790e8e9e4de18920137b203c073a4c4a46427e914967d6bd6dfe770f444",
+    "truck-shapeops/src/sewing.rs": "a931f29e18a2552f053fb0d7b934752b9182492f2a817d701b16daec4b61e94c",
+    "truck-shapeops/src/fillet/extend_intersection_curve.rs": "4af6cfdeba3558e0b455059bdb67500f7cfc12d7c3007246d8f97c5290615169",
+    "truck-shapeops/src/fillet/edges.rs": "45b075cbad5bcd9523a7b17bf33fe282338acb139ee888ae0cdce828a243ec85",
+    "truck-shapeops/src/fillet/convex.rs": "aa56d71fd2fd6b86f11cf4571b7bc8e6cef4da91615c003a8199438022f7276c",
+    "truck-shapeops/src/fillet/chamfer_edges.rs": "9e7085c8f7aa51cb3f4fabf0ce00426681e3917a80fbc30814c94af4af77bb76",
+    "truck-shapeops/src/fillet/chamfer_miter.rs": "e07d2a3c0b608bf320382ec82d31a3b7808c9638c9021ea993fc1cc267ae7ca3",
+    "truck-shapeops/src/fillet/planar.rs": "050a124d00899b7e43df36edd9c84cf9ea7fa6305c9a93124df791de791fccd6",
+    "truck-shapeops/src/fillet/planar_edge.rs": "518e62899eb949cf52f799b37fa1448aa352a6ecf31a55d5ff522fbef68a90b5",
+    "truck-shapeops/src/fillet/projected_section.rs": "d2ff875824b4107c608673e91aca2e0fb3e0f14f2cb66d98195be1fdc79a873b",
+    "truck-shapeops/src/fillet/along_wire.rs": "6adc3d65f752ab82c97bced17d6d203ee5547a8db6d8154f6a24babf7e780982",
+    "truck-shapeops/src/fillet/chamfer.rs": "00b31ade28d4602448bdbd6ab64006bc15838b826894ff525a3f8c4b78957204",
+    "truck-shapeops/src/fillet/mod.rs": "50949a94c4f58cb7c01869d115061c30883efc6099974f09195630b9cecbe940",
+    "truck-shapeops/src/fillet/modeling.rs": "d367aa6170c3bd25927f98309bcad8b58403f87f109927f05d37311316d2cfb8",
+    "truck-shapeops/src/fillet/planar_fillet.rs": "50c6d956f13d879f457a949b16f5dc15100462b4d02489797c6b88980f3356bb",
+    "truck-shapeops/src/fillet/chamfer_collapse.rs": "1edb9a6fd7914848b2ff4d813dff1f48a3fb0f0e59310a0488e3bbe8f67897b8",
+    "truck-shapeops/src/fillet/additive.rs": "5c2413719042277bad2c2ecfb7e46bf2938be888bee87aac40d37d759cb026d2",
+    "truck-shapeops/src/fillet/continued_support.rs": "c344c88d3dc6cb4ad353688c1f2c79cef30fe6cf30cde0e576efd86303173600",
+    "truck-shapeops/src/healing/mod.rs": "393e50d89792274cf2fdd4f670a418ebf9ce1f4fb93272f1e98cdf5a9c37b7a7",
+    "truck-shapeops/src/healing/split_closed_edges.rs": "0965d54985cc032d9eeca3a60c5a3d7fd1805203254cd208bb63d7d0a686e00a",
+    "truck-shapeops/src/healing/tests.rs": "65945e23e01e22149c3d19f7b853295157ca7b6e0c262c366df7200004d0f587",
+    "truck-shapeops/src/healing/split_closed_faces.rs": "2c46b9aa8fd8f9aaba42afb118c6898f6c2e1c0d2767869570d2206297c86794",
+    "truck-shapeops/src/transversal/mod.rs": "46f5b365049c8b2d1942cac1dab7f766c95fa5707dbda1337fce22d15b70f20e",
+    "truck-shapeops/src/local/delete.rs": "f147dbad6c4df1badeeceba0e486366ed70967dfda293275cf5f82bebb664b69",
+    "truck-shapeops/src/local/replace.rs": "97d8fad850f0326ed1d663d2a31251a683334f2017d82c7f2e7cb42d7fa73c2b",
+    "truck-shapeops/src/local/draft.rs": "8433022ce784efd2477ba72e78fbe02471e7d5a212a4f01a70702556ec6611e5",
+    "truck-shapeops/src/local/intersect.rs": "2f247c1ffde52a62b022ef99d7f53ce32b603da9a546052963c6d8ddf15872cc",
+    "truck-shapeops/src/local/shell.rs": "8c77ca5a07b7fb4a5c1703353f6eb81780d02c52891d27a3c3a879559378d780",
+    "truck-shapeops/src/local/mod.rs": "5783916fa7dcf4d6eb86dc9fa9306209712e17db38bd9a4682dd698921978ef2",
+    "truck-shapeops/src/transversal/divide_face/mod.rs": "7f72278afec62eb7f0571a878a7cbdad01ac6ee8d1cb91f0b089a72ec2e626f6",
+    "truck-shapeops/src/transversal/divide_face/tests.rs": "a27779e32349f02e280e604f968c4087bad4e492da27fb3089ec36f3f853f828",
+    "truck-shapeops/src/transversal/faces_classification/tests.rs": "2ec9dfbeb5c16aaac1a868f16eb7b62d88c025bfcbde870274848e00ca5fb4a5",
+    "truck-shapeops/src/transversal/faces_classification/mod.rs": "645eacc40f9f432322a285f6587baedb1db0df15da67838a1c11642bf526eb4b",
+    "truck-shapeops/src/transversal/integrate/components.rs": "75f27bed964ec69cfaea01f5328d94fa65785cac62acaac87e1dab1540de6719",
+    "truck-shapeops/src/transversal/integrate/mod.rs": "3e3afa51ea2de9b7e30b108ee9b129924b2e37d4d618888344d8e4bfd56620a3",
+    "truck-shapeops/src/transversal/integrate/through_hole.rs": "489e6ffae8d675d54aa8ae5ec13b505fdb8f4cc1426e67e0ed69b33dacfabdef",
+    "truck-shapeops/src/transversal/intersection_curve/tests.rs": "ea8f45c565673bedbe99d4825d330b477cd52133d779719815b3a6bb3c2429c1",
+    "truck-shapeops/src/transversal/intersection_curve/mod.rs": "633109076822fc95c6662c35c66bd7b9b50dc4c07dbde1a4151f2ec570aaf0a4",
+    "truck-shapeops/src/transversal/loops_store/tests.rs": "b1414648e95a02d7db9cd637c0c5cf0b33750b86cc14e41ff7762c135cfba3b2",
+    "truck-shapeops/src/transversal/loops_store/coincident.rs": "441a2173efdb8e0d18209086e79c7663e9c7be13cb3dc726ddfcb26f70617411",
+    "truck-shapeops/src/transversal/loops_store/mod.rs": "2a0b314581374fd846d97402db4cc3d76801ba33df2d8bc6977510b485f503bd",
+    "truck-shapeops/src/transversal/polyline_construction/tests.rs": "cca3f345512a6ebe384e8be792acb8e6a11fae746a73885719aa49f3caefc29e",
+    "truck-shapeops/src/transversal/polyline_construction/mod.rs": "a245bfc2ae1a124d8570695341a90ff30e25a1b4a55d345ca4fd8102b45c2780",
+    "truck-shapeops/src/fillet/planar/tests.rs": "21448b125bfe843008d846765db414bafa184fcc86320220cc9346ae0fc13914",
+    "truck-shapeops/tests/fillet.rs": "1eb84900c7d05ed5ea445557fbd9e1c6528637039c351db0ec229f96ae23c87c",
+    "truck-shapeops/tests/chamfer.rs": "1cae7b366991ce3af1a6ef3d346cdf07396431b5c0a2232e5ae81e1e011b0dff",
+    "truck-shapeops/tests/bench_plate.rs": "c48afe12dfcaf9c938cd8e1582a1c5f3bbaf053b067776e4d8f6a6d89b2656e4",
+    "truck-shapeops/tests/fillet_chain.rs": "ff34e11bc4c36aa08ffb5aa6fa14c5cf0d5f1f8e4f7e7da25ce1440f3a9dfce8",
+    "truck-shapeops/tests/loft.rs": "9775fe82ffd1723c97c41e75c12be46bdac758d78590026ad247603247ea84c6",
+    "truck-shapeops/tests/intersect.rs": "fca2b5b2e30ea0ca030698fa26d90c5a214404cc170941822c452984dcc0be81",
+    "truck-shapeops/tests/fillet_edges.rs": "d6168e153d230ecc33993bcf89fe85bb1854c53e3bbea7fbdfa6df5a1ed1f6a0",
+    "truck-shapeops/tests/boolean_cache.rs": "3d8a788224d0de932b4b1afb3aecafa6469a5e7a5673b576f6fee0b488e3b397",
+    "truck-shapeops/tests/r5_chamfer_after_fillet.rs": "d4f7d8ab5157b983ea64d6fd23333fd86152ccb496702728d5289647ef464ce1",
+    "truck-shapeops/tests/R7-R8-extrude-remove.rs": "41fdfc75aa81af2067856475df388ee123df1d651b4c15e677836c4a72bd6f84",
+    "truck-shapeops/tests/diagnostics.rs": "91fdd16e84de69e878f0e9351bb40602f0e9262b0085a2e078f03e73d1d24737",
+    "truck-shapeops/tests/fixed_sweep.rs": "7184cd04573259166ba0abb987135a2361b4cb6d8945dc32cd7cfed396e4270b",
+    "truck-shapeops/tests/sewing.rs": "055706addb62733bb62e7c46c98bffe05916c59273372b281b1adac3656e6e90",
+    "truck-shapeops/tests/corner_hole.rs": "293e43f038018d82d152d82fba64134ee6bdee3446fa7e6b97ea75b93169130e",
+    "truck-shapeops/tests/app_sphere_bore.rs": "c80a6172fc46bf1d819fa8bb6bfa6371562da90e8363e6b3a8b6407256c52922",
+    "truck-shapeops/tests/nonconvex_chamfer.rs": "5318d002b84aa01542e60f8c77ff76532201249580c98621f952b48b72bd14e5",
+    "truck-shapeops/tests/chamfer_general.rs": "a8bce4f8826b650bed8724f5fd928350edc515c08583b2a3757f8cbec625f599",
+    "truck-shapeops/tests/oblique_fillet_ends.rs": "adc2d9e52694e75a1c473b9749ae0cc7bd0adc65a9bb9c27862a59bf6fe62858",
+    "truck-shapeops/tests/boolean_hole_fillet.rs": "c468243f521ae18e39c9c0bd5f8c00c17bf45545f04c240694d8bb1ee722bd22",
+    "truck-shapeops/tests/drafted_annulus.rs": "9fa3d06cf975e6221949c1537d773541ba6807c1a58f48ad3f2073256234d6e5",
+    "truck-shapeops/tests/nonconvex_shell.rs": "ecd98e6500e98dca3c5aaf0b456088f534604e6ca58e21539ab3722b41a93906",
+    "truck-shapeops/tests/mixed_chamfer_pair.rs": "be139a9426e5b9061da26ce864a06232ba0890467c59a9093c9f3d6ab7dbc1a8",
+    "truck-shapeops/tests/annular_booleans.rs": "a9623c6615f29ce6aeb8103b70dddd95c3ae95ca0d25e946cabbbc55f56814a8",
+    "truck-shapeops/tests/mixed_pair_fillet.rs": "8c168868cc6f3a4d8b93123443db63f2bea8797afc5867c43f27091e75e6e46e",
+    "truck-shapeops/tests/rounded_local_ops.rs": "026b4d5045085a57c7b84ebbfc59a02c64fa9d627d549c944fa9c10514f4cb88",
+    "truck-shapeops/tests/channel_boundary.rs": "ab6b76cc111d9051b48829ed2a926a91ea6dae7a564bc39fd3e366f20a7e311b",
+    "truck-shapeops/tests/channel_rim_blends.rs": "d407ed0a1e00fdd1fa9d5ea9fd8eb3c52e4c0b53e26f68db815d1f8d7370c231",
+    "truck-shapeops/tests/blend_limits.rs": "7673507f658b0162fe579dcefbcc1e02bb396c2663e55b0155e857a76c051094",
+    "truck-shapeops/tests/modeled_thread.rs": "beeee305f86588f60a519695a46292de61adafe682a15b2d7de1683289a986f4",
+    "truck-shapeops/tests/cut_plate_workflows.rs": "cfe882f66f2106f67d12d8f89f41cf46d5753920881d79d4f81fda8ae42336b2",
+    "truck-shapeops/tests/nonconvex_fillet.rs": "1e0b93f69f598e41c89b83e43d594e6cd73b026c000b667e79e8d5d744775188",
+    "truck-shapeops/tests/R10-sequential-fillet.rs": "002a2ea026b04280f5ffafb6c7daae0625cad7e8c3473a814e30ddd641b2d95b",
+    "truck-shapeops/tests/R12-face-extrude-round.rs": "dc031e1a5e7a8990696133ef3791593ef5bc6ce7029b1c516140d1d64702087e",
+    "truck-shapeops/tests/boolean.rs": "3ce9454f59660565e5740d24dc5f84cb528de0972c73b6644e95b32bfbd44624",
+    "truck-shapeops/tests/curved_blend_ends.rs": "647fafe503de641b0de287c5a3b98926b91f34195c4f06e5f918d04c00263574",
+    "truck-shapeops/tests/local_ops.rs": "9ec6390e03fecdfcf3e3a39168d3afaeb4e992c03fdaff3ebb0a34a949fdca55",
+    "truck-shapeops/tests/modeling_blends.rs": "140cc531f4571c75d3c2986c2e5e5da4194aead8d9f04d1cd413392248cf1526",
+    "truck-shapeops/tests/plane_cylinder_lips.rs": "ade151ade0f7e9dfa2db6188e03a83c3dfc0239959f4e23bae31a07782b9bb59",
+    "truck-shapeops/tests/r11_corners.rs": "34d94e2d272fbc361212a3a46e2f09bbb0a8e3a0b699890a22ac4e6d3f24151e",
+    "truck-shapeops/tests/r4_boolean.rs": "70ef7d5e72891eb62d6ffc73d215739b3c6a6285d7796517cdc904b779a6237c",
+    "truck-shapeops/tests/subtract_effect.rs": "08bac89f6ffabcc1b35dab47d97682b46031cd8dfd0607f1bf00f77ca651f31a",
+    "truck-shapeops/tests/sweep.rs": "017a5b672ba433259de5f9ce50d0a6fd7fd9e7dea522889c61360f8c99040b4d",
+    "truck-shapeops/tests/sequential_blends.rs": "1e5801504f1195d5433f6777a515c69228e0fc6264b63eef2514cbb5e34681bb",
+    "truck-shapeops/tests/rib_fillet.rs": "768574e95f0729f39d0b397613113b5bd03ea09b460fccf455a24f5c508f9cc6",
+    "truck-shapeops/tests/collapsed_trim.rs": "570c981da5f2290a32a21b32997a36a7d8d1f6f83f77d113fa1ec1bbf445c6b1",
+    "truck-shapeops/tests/analytic_holes.rs": "ef8ad9867b50537f8a839018a63149c555bb44709ee679c28d4b0bd4b592a3fa",
+    "truck-shapeops/tests/drafted_fillet_miters.rs": "9b4dbe179040ebdf582eb97353566b7dc98d29a5e6b98119085fd47ea59ff1bc",
+    "truck-shapeops/tests/fillet_wire_representation.rs": "301a869be38a3ead0eb7ad646838fbf7df0ecad12a799c366fe0e302b3bedea5",
+    "truck-shapeops/tests/curved_blend_representation.rs": "3c922556f51ba63e8d3bd3cea56206b992b4b96d4a0270c71730c9715de13657",
+    "truck-shapeops/tests/high_valence_fillets.rs": "c46b58b52c1606a0d98b3e235eb243c86280bdb8a67a633427f39fb19e67ea26",
+    "truck-shapeops/tests/conical_blends.rs": "fc63ebf15788202173d0e88d4c0e086a79f5dec2c69ca82648cdf53dd84337f5",
+    "truck-shapeops/tests/spherical_rim_blends.rs": "9e6e27d2db3ee402de52a1dda89832e5af0b6400df964859f24251f9cf8ac367",
+    "truck-shapeops/tests/short_spine_fillets.rs": "2edea33908df728e5e1d8b69da15e04add64706956efc7cb08970618bf8daba6",
+    "truck-shapeops/tests/curved_fillet_step_domain.rs": "10efd3f94d12cba9bf3fb968bd1e7dccbb830328b29f44f7648e85c8042a140f",
+    "truck-shapeops/tests/imported_conic_prisms.rs": "e3550b9ab0be1e187f2b256f094290dbcda9d3eb29ef699e86dc4749a7dbed6b",
+    "truck-shapeops/tests/imported_support_domains.rs": "9c083e59bba26bd8057cb0641650c6d8359d9352af2923cc53f7f20abd83b2e7",
+    "truck-shapeops/tests/tangent_closed_face_split.rs": "9f5a9dc89635d10d489077088633f984f96221f6681cf9a65d888918d9396b22",
+    "truck-shapeops/tests/imported_spherical_mesh.rs": "12bf866cf6a255d4cbcb49ed7416ac30bb99e8c89164bb7ecc006ab0e9a60256",
+    "truck-shapeops/tests/spherical_meridian_step.rs": "fe48737926a6ebfef2e6b4ded76fed0f6cd25d3a7d385265c851c8aeb95ee526",
+    "truck-shapeops/tests/rounded_roof_post.rs": "a00dac3593a6e117cd020e1d467726b9808685355a5eb7ae797ec04bb067cef2",
+    "truck-shapeops/tests/two_edge_blend_caps.rs": "7c9363e1ddf5a064ded8fb0c92e5b1a29e365a486dbbb2d4643fc02e30506d47",
+    "truck-shapeops/tests/imported_spline_pipe.rs": "e55af5a53c4da7b4d950c0f6995ab64d6c0c9da447aaf9d98ad4915434c36ded",
+    "truck-shapeops/tests/parameter_scaled_fillet_mesh.rs": "e30c325c69fd57ff8527eb15c7fde0ed6a911197b1af068912c4d36786a4d63c",
+    "truck-shapeops/tests/spline_pipe_blend.rs": "f0bb9cfd22a630b1e8bc0d7f4b500689420ba7816317851830fedf4f54cc926a",
+    "truck-shapeops/tests/spherical_pole_blend.rs": "613e9ab2ecc85bc61065694d01f009f50a6e01704d794304a3c15afab6977284",
+    "truck-shapeops/tests/imported_toroidal_sectors.rs": "bd48bacaa48e85cefb7c38d54ea9b23e2e78d12043103f7a62864133e87d902e",
+    "truck-shapeops/tests/imported_ellipsoid_sectors.rs": "adfc182af54d7ca0e437bbd08651d1415eab25d71302cefc6d56d59b55f14cbb",
+    "truck-shapeops/tests/imported_spline_prisms.rs": "81971728b32f3fe218cf8875342c95d92a9a55ac37531c14901a859fd207899b",
+    "truck-shapeops/tests/imported_conical_sectors.rs": "473d63b78bec4aeb28a6c3aa6b3cc4dbdd79ce08ef95505355e483b652af6e52",
+    "truck-shapeops/tests/imported_oblique_extrusions.rs": "2c741ae74e67d6b46bef6f7d3d9856263119d7780ea0ecd726c6f5b8fa189c51",
+    "truck-shapeops/tests/imported_polar_excursions.rs": "5c69d44a0d14fe86ec109bd99b31c5af7bd7bc5ac46f5d0f25160a4c215a4504",
+    "truck-shapeops/tests/imported_closed_bezier_prisms.rs": "981066b33e8ae8e3d75c55093dfadb5b4b89125a8322f84936f2936d575e7d9f",
+    "truck-shapeops/tests/separate_fillet_contours.rs": "e4e26279e3329932a15e27f7913554b31b776c22f5ada3dce143ee319360784a",
+    "truck-shapeops/tests/unequal_fillet_radii.rs": "2fce9b2ff6d60311e49348d13b0fa0ef6dd719704c303d5acb0e4da05e034a81",
+    "truck-shapeops/tests/imported_spherical_pcurves.rs": "71410dfa77c788a72fb636faa5a87129577e11d1e099ca7295529e9545e7a83c",
+    "truck-shapeops/tests/imported_bounded_edges.rs": "43f69bb1bb53ec55384a7ea5f369fb1d6d9492ef106422b8dba5ad07913188ff",
+    "truck-shapeops/tests/tangent_chamfer_fit.rs": "07a3b6f66ec1a903db00bcba8eaddd5d981352d693859f9d36f00918a5199f4b",
+    "truck-shapeops/tests/two_edge_face_trimming.rs": "30099c5983494d79077cd233308069f1c1efd3254564e58ac14b4583b010245c",
+    "truck-shapeops/tests/two_edge_chamfer_caps.rs": "f5e33701244a32aaddb1ec8002afc9ab75169606511e97ad65e6f0d6bed573d3",
+    "truck-shapeops/tests/consumed_chamfer_neighbor.rs": "274906508a1a20c2d23fcc214e980537b9adfed0901b132fe42d2fadf0049627",
+    "truck-shapeops/tests/curved_chamfer_terminals.rs": "7611b9c4e6b9cad376d65690f1fb1bce8d179fe939fa4b0a6b75af1e6fdaacfd",
+    "truck-shapeops/tests/common/blend.rs": "662e292953d1f3f3830dd7da6eefc448ace6635c11533f524f901b0be124a7f9",
+    "truck-shapeops/tests/common/mod.rs": "39bbeb28f4208ccd2df0c716104f11ce3c7176ad082b947ca32738a37f1e3588",
+    "truck-shapeops/tests/fixtures/unequal-radii/model.rs": "29579fbb389bddc6f574a438905f4c542515305318cfe06cc1472835bd61bef9",
+    "truck-shapeops/examples/punched-cube-shapeops.rs": "ff812995873a4e948a7ff8888da781c9b67f76218902406f3e75bee56571c741",
+    "truck-shapeops/examples/audit_fillet.rs": "141a1372d20a6fae62afaf917b079db3680c7927d93c85a37e57fef6a81a9321",
+    "truck-shapeops/examples/audit_chamfer.rs": "78b0a554b4074e731d95be2b8dde87fcae15270ac9aca9a4056345aa2bc41626",
+    "truck-shapeops/examples/replay_occt_blend.rs": "3d39ac8e819522dcd2eb1494b8a9533668650f8a2c329b3f60cb2951fa704c2b"
+  },
+  "core_validation_reused_from": "2026-10-16-curved-chamfer-terminals; production core and integration tests byte-identical",
+  "shapeops_counts": [
+    396,
+    0,
+    1
+  ],
+  "replay_tests": 46,
+  "replay_sha256": "af0ea84f316f84936d0db92decf60c105b9e08073727691171119ee097068e56",
+  "log_sha256": {
+    "parent-failure.txt": "93c4fbe23069577dd8bf39d8ba1392992bb5e97658a8017c33f00753e9e9dd1d",
+    "regressions.txt": "43b6ec0e8725efd32fd40e9a30e9efb4b6ea55df6311eb4c2f7f1dfdc4526da1",
+    "initial-parent-failure.txt": "9f72991f3d2fed0039a7b08ae09eb574be96f6980008c0ced9ea1b1610faff16",
+    "initial-regressions.txt": "27ab8cfc1ffd9e5a5fbd5384402d588d839e3ef5756c1b4f292cb1663c25dbaa",
+    "capture-tests.txt": "cd9510d0243be95d0891415b12f1df5b480c9d1fea79db89fcb2fc9e0f3a9898",
+    "replay-tests.txt": "a10ac9427799b916152e95610ba98fef84118cc2367b0d1a48890aff0659b818",
+    "clippy.txt": "56ee6c38d2da937d913de6c021aef72ceb0b1bf262fc77198ed58c6b13d4e44c",
+    "actions-smoke.txt": "37ace66fa28a6a6f4ca6066759819ec04d799b6bc23a3de3b655b7179e31161c",
+    "replay-build.txt": "136fb1901bdd87988bab869f8d86c616a2c7ca181b49f34fafb78b6d7f678b65"
+  },
+  "native_controls": [
+    {
+      "capture": "001.result",
+      "convex": true,
+      "offset": -2.0,
+      "reference": "plane",
+      "expected_volume": 585.4001198827278,
+      "native_volume": 585.4001197945901,
+      "volume_error": -8.813776730676182e-08,
+      "native_valid": true,
+      "expected_planar": 0.7,
+      "native_planar": 0.6999999999999997,
+      "expected_chord": 0.5494173843776126,
+      "native_chord": 0.5494173843776052,
+      "requested_angle": 30,
+      "measured_angle": 29.99999999999963,
+      "plane_contact": [
+        3.88257569495584,
+        -2,
+        0
+      ],
+      "cylinder_contact": [
+        4.77434482764322,
+        -1.48513685118795,
+        0
+      ],
+      "analytic_bevel_plane": {
+        "normal": [
+          -0.49999999999999845,
+          0.8660254037844396,
+          0
+        ],
+        "origin": [
+          3.8825756949558397,
+          -2.0000000000000004,
+          0
+        ]
+      },
+      "plane_contact_residual": 4.6629367034256575e-15,
+      "analytic_plane_angle": 29.999999999999897,
+      "source_prefix": "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-offset-angle-controls/capture/001",
+      "angle": 30.0,
+      "native_measurement": {
+        "vertices": [
+          [
+            4.77434482764322,
+            -1.48513685118795,
+            0
+          ],
+          [
+            -4.58257569495584,
+            -2,
+            0
+          ],
+          [
+            3.88257569495584,
+            -2,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              -0.49999999999999845,
+              0.8660254037844396,
+              0
+            ],
+            "origin": [
+              3.8825756949558397,
+              -2.0000000000000004,
+              0
+            ]
+          }
+        ],
+        "angle_degrees": 29.999999999999897,
+        "requested_contact_max_error": 7.771561172376096e-15
+      },
+      "truck_measurement": {
+        "vertices": [
+          [
+            4.774344827643182,
+            -1.4851368511880625,
+            0
+          ],
+          [
+            -4.582575694956,
+            -2,
+            0
+          ],
+          [
+            3.8825756949559995,
+            -2,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              0.4999999999999955,
+              -0.8660254037844413,
+              0
+            ],
+            "origin": [
+              4.774344827643182,
+              -1.4851368511880625,
+              10
+            ]
+          }
+        ],
+        "angle_degrees": 29.999999999999705,
+        "requested_contact_max_error": 1.5987211554602254e-13
+      },
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/001",
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 585.2733113338811,
+        "selected_edges": 1,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 585.4001197945911,
+        "truck_volume": 585.4001198826853,
+        "native_to_truck_max_distance": 1.6460320972180606e-13,
+        "native_to_truck_samples": 981,
+        "truck_to_native_max_distance": 1.6076581431691975e-13,
+        "truck_to_native_samples": 981,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/001.input.brep": "e3a32a4ffd4058989ec3749ec660b38d99a22f07441fae13adc2dd9abc358f01",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/001.input.step": "2e8c657edd4a5f613a8c84b5ce7dc6791342a0fdb5e92bf00f5e74dbb45ed3b4",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/001.input.json": "53eaf1bc38b9b03b7ff2180f1c4724566ff17ecb5bd52c8ad7056b30a1d94706"
+      },
+      "native_requested_angle_correct": true,
+      "expected_contacts": [
+        [
+          3.8825756949558397,
+          -2.0,
+          0.0
+        ],
+        [
+          4.77434482764322,
+          -1.4851368511879421,
+          0.0
+        ]
+      ]
+    },
+    {
+      "capture": "003.result",
+      "convex": true,
+      "offset": 0.0,
+      "reference": "plane",
+      "expected_volume": 391.30586027599315,
+      "native_volume": 391.3058602760148,
+      "volume_error": 2.1657342585967854e-11,
+      "native_valid": true,
+      "expected_planar": 0.7,
+      "native_planar": 0.7000000000000002,
+      "expected_chord": 0.39542687090479145,
+      "native_chord": 0.39542687090479456,
+      "requested_angle": 30,
+      "measured_angle": 30.000000000000004,
+      "plane_contact": [
+        4.3,
+        4.28626379701573e-17,
+        0
+      ],
+      "cylinder_contact": [
+        4.98436375897665,
+        0.395117600468793,
+        0
+      ],
+      "analytic_bevel_plane": {
+        "normal": [
+          -0.5000000000000032,
+          0.8660254037844368,
+          0
+        ],
+        "origin": [
+          4.300000000000001,
+          4.286263797015734e-17,
+          0
+        ]
+      },
+      "plane_contact_residual": 2.4980018054066022e-15,
+      "analytic_plane_angle": 30.000000000000213,
+      "source_prefix": "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-offset-angle-controls/capture/003",
+      "angle": 30.0,
+      "native_measurement": {
+        "vertices": [
+          [
+            4.98436375897665,
+            0.395117600468793,
+            0
+          ],
+          [
+            -5,
+            6.12323399573677e-16,
+            0
+          ],
+          [
+            4.3,
+            4.28626379701573e-17,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              -0.5000000000000032,
+              0.8660254037844368,
+              0
+            ],
+            "origin": [
+              4.300000000000001,
+              4.286263797015734e-17,
+              0
+            ]
+          }
+        ],
+        "angle_degrees": 30.000000000000213,
+        "requested_contact_max_error": 6.2842938400131246e-15
+      },
+      "truck_measurement": {
+        "vertices": [
+          [
+            4.984363758976645,
+            0.39511760046879013,
+            0
+          ],
+          [
+            -5,
+            6.1232339957e-16,
+            0
+          ],
+          [
+            4.3,
+            4.286263797e-17,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              0.4999999999999997,
+              -0.8660254037844388,
+              0
+            ],
+            "origin": [
+              4.984363758976645,
+              0.39511760046879013,
+              10
+            ]
+          }
+        ],
+        "angle_degrees": 29.999999999999986,
+        "requested_contact_max_error": 9.930136612989092e-16
+      },
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/002",
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 391.2049429865181,
+        "selected_edges": 1,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 391.30586027601476,
+        "truck_volume": 391.30586027601476,
+        "native_to_truck_max_distance": 1.3322676295505555e-14,
+        "native_to_truck_samples": 975,
+        "truck_to_native_max_distance": 6.060638241914243e-15,
+        "truck_to_native_samples": 975,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/002.input.brep": "dcca2c1c5e32267430e021c4408d5d1042e836bac9742f651d0b8b23b65d532d",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/002.input.step": "7227246c345ec70ad3177d1cae7884c74b028615ba47504e907346df572a0570",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/002.input.json": "15fc0accdafed3b7db40c66230926892d05b09d065ef9548a2d857a42f8bb78a"
+      },
+      "native_requested_angle_correct": true,
+      "expected_contacts": [
+        [
+          4.3,
+          0.0,
+          0.0
+        ],
+        [
+          4.984363758976644,
+          0.3951176004687897,
+          0.0
+        ]
+      ]
+    },
+    {
+      "capture": "005.result",
+      "convex": true,
+      "offset": 2.0,
+      "reference": "plane",
+      "expected_volume": 197.05302488608356,
+      "native_volume": 196.42318970018462,
+      "volume_error": -0.6298351858989406,
+      "native_valid": true,
+      "expected_planar": 0.7,
+      "native_planar": 0.6999999999999997,
+      "expected_chord": 0.3510393532197053,
+      "native_chord": 0.5494173843776101,
+      "requested_angle": 30,
+      "measured_angle": 47.29489832864505,
+      "plane_contact": [
+        3.88257569495584,
+        2,
+        0
+      ],
+      "cylinder_contact": [
+        4.33547480886733,
+        2.49071439183155,
+        0
+      ],
+      "analytic_bevel_plane": {
+        "normal": [
+          -0.7348542082470004,
+          0.6782251046825635,
+          0
+        ],
+        "origin": [
+          3.8825756949558388,
+          2,
+          0
+        ]
+      },
+      "plane_contact_residual": 3.497202527569243e-15,
+      "analytic_plane_angle": 47.294898328645274,
+      "source_prefix": "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-offset-angle-controls/capture/005",
+      "angle": 30.0,
+      "native_measurement": {
+        "vertices": [
+          [
+            4.33547480886733,
+            2.49071439183155,
+            0
+          ],
+          [
+            -4.58257569495584,
+            2,
+            0
+          ],
+          [
+            3.88257569495584,
+            2,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              -0.7348542082470004,
+              0.6782251046825635,
+              0
+            ],
+            "origin": [
+              3.8825756949558388,
+              2,
+              0
+            ]
+          }
+        ],
+        "angle_degrees": 47.294898328645274,
+        "requested_contact_max_error": 0.1985696302408552
+      },
+      "truck_measurement": {
+        "vertices": [
+          [
+            4.430952406266108,
+            2.3166054418922073,
+            0
+          ],
+          [
+            -4.582575694956,
+            2,
+            0
+          ],
+          [
+            3.8825756949559995,
+            2,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              0.4999999999999933,
+              -0.8660254037844426,
+              0
+            ],
+            "origin": [
+              4.430952406266108,
+              2.3166054418922073,
+              10
+            ]
+          }
+        ],
+        "angle_degrees": 29.999999999999552,
+        "requested_contact_max_error": 1.5987211554602254e-13
+      },
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/003",
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 196.98015312023844,
+        "selected_edges": 1,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 196.4231897001845,
+        "truck_volume": 197.05302488608984,
+        "native_to_truck_max_distance": 0.1389651006611918,
+        "native_to_truck_samples": 967,
+        "truck_to_native_max_distance": 0.18824717504059094,
+        "truck_to_native_samples": 965,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/003.input.brep": "01e78ee59e4d0759b3a6072d005db15f84cf411fe3838fd0ee29a3f39fb960e6",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/003.input.step": "0fd1ba2c1f113c07e1f0cc67cbbfa662f184110f63bfd81bd0521a0564a3c118",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/003.input.json": "a44d7f06319f604fb8d70d5206e85fccf1243d4b60eb84126f389f2a4d8bfa65"
+      },
+      "native_requested_angle_correct": false,
+      "expected_contacts": [
+        [
+          3.8825756949558397,
+          2.0,
+          0.0
+        ],
+        [
+          4.430952406266068,
+          2.3166054418922823,
+          0.0
+        ]
+      ]
+    },
+    {
+      "capture": "007.result",
+      "convex": false,
+      "offset": -2.0,
+      "reference": "plane",
+      "expected_volume": 1011.6257101852093,
+      "native_volume": 1011.6257101851487,
+      "volume_error": -6.059508450562134e-11,
+      "native_valid": true,
+      "expected_planar": 0.7,
+      "native_planar": 0.7000000000000002,
+      "expected_chord": 0.35384076716243634,
+      "native_chord": 0.35384076716244206,
+      "requested_angle": 30,
+      "measured_angle": 30.00000000000052,
+      "plane_contact": [
+        5.28257569495584,
+        -2,
+        0
+      ],
+      "cylinder_contact": [
+        4.7125482990776,
+        -1.67089452954423,
+        0
+      ],
+      "analytic_bevel_plane": {
+        "normal": [
+          -0.5000000000000054,
+          -0.8660254037844356,
+          0
+        ],
+        "origin": [
+          5.28257569495584,
+          -2,
+          0
+        ]
+      },
+      "plane_contact_residual": 1.8318679906315083e-15,
+      "analytic_plane_angle": 30.00000000000036,
+      "source_prefix": "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-offset-angle-controls/capture/007",
+      "angle": 30.0,
+      "native_measurement": {
+        "vertices": [
+          [
+            5.28257569495584,
+            -2,
+            0
+          ],
+          [
+            8,
+            -2,
+            0
+          ],
+          [
+            4.7125482990776,
+            -1.67089452954423,
+            0
+          ],
+          [
+            8,
+            8,
+            0
+          ],
+          [
+            5,
+            -1.22464679914735e-15,
+            0
+          ],
+          [
+            -8,
+            8,
+            0
+          ],
+          [
+            -4.58257569495583,
+            -2.00000000000001,
+            0
+          ],
+          [
+            -8,
+            -2,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              -0.5000000000000054,
+              -0.8660254037844356,
+              0
+            ],
+            "origin": [
+              5.28257569495584,
+              -2,
+              0
+            ]
+          }
+        ],
+        "angle_degrees": 30.00000000000036,
+        "requested_contact_max_error": 5.9580819677934555e-15
+      },
+      "truck_measurement": {
+        "vertices": [
+          [
+            -8,
+            8,
+            0
+          ],
+          [
+            -8,
+            -2,
+            0
+          ],
+          [
+            -4.582575694956,
+            -2,
+            0
+          ],
+          [
+            8,
+            8,
+            0
+          ],
+          [
+            8,
+            -2,
+            0
+          ],
+          [
+            5.282575694956,
+            -2,
+            0
+          ],
+          [
+            4.712548299077622,
+            -1.6708945295441633,
+            0
+          ],
+          [
+            5,
+            -1.2246467991e-15,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              -0.49999999999999317,
+              -0.8660254037844426,
+              0
+            ],
+            "origin": [
+              5.282575694956,
+              -2,
+              10
+            ]
+          }
+        ],
+        "angle_degrees": 29.999999999999545,
+        "requested_contact_max_error": 1.5987211554602254e-13
+      },
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/004",
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 1011.7538536625356,
+        "selected_edges": 1,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 1011.6257101851484,
+        "truck_volume": 1011.6257101851476,
+        "native_to_truck_max_distance": 2.007283228522283e-13,
+        "native_to_truck_samples": 2330,
+        "truck_to_native_max_distance": 1.708358723008223e-13,
+        "truck_to_native_samples": 2330,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/004.input.brep": "7985ca1dfa2ca65ee138d705fe701951fa26d71027e62129ea2d1d83f114041b",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/004.input.step": "b0b36836fcb26d1e050db29a0b2fe7384736519c701efdc02a8447163ea62bdf",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/004.input.json": "766cc26138d209b3ac0a39bc9d2c7122b9bb35710663b6be10d8156f18b671c6"
+      },
+      "native_requested_angle_correct": true,
+      "expected_contacts": [
+        [
+          5.28257569495584,
+          -2.0,
+          0.0
+        ],
+        [
+          4.712548299077597,
+          -1.6708945295442352,
+          0.0
+        ]
+      ]
+    },
+    {
+      "capture": "009.result",
+      "convex": false,
+      "offset": 0.0,
+      "reference": "plane",
+      "expected_volume": 885.8635741404257,
+      "native_volume": 885.8635741403592,
+      "volume_error": -6.650680006714538e-11,
+      "native_valid": true,
+      "expected_planar": 0.7,
+      "native_planar": 0.7000000000000002,
+      "expected_chord": 0.41441668561508516,
+      "native_chord": 0.41441668561508493,
+      "requested_angle": 30,
+      "measured_angle": 29.999999999999964,
+      "plane_contact": [
+        5.7,
+        0,
+        0
+      ],
+      "cylinder_contact": [
+        4.98282588106838,
+        0.414060670621003,
+        0
+      ],
+      "analytic_bevel_plane": {
+        "normal": [
+          -0.5000000000000008,
+          -0.8660254037844383,
+          0
+        ],
+        "origin": [
+          5.699999999999999,
+          0,
+          0
+        ]
+      },
+      "plane_contact_residual": 7.216449660063518e-16,
+      "analytic_plane_angle": 30.00000000000005,
+      "source_prefix": "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-offset-angle-controls/capture/009",
+      "angle": 30.0,
+      "native_measurement": {
+        "vertices": [
+          [
+            5.7,
+            0,
+            0
+          ],
+          [
+            8,
+            0,
+            0
+          ],
+          [
+            4.98282588106838,
+            0.414060670621003,
+            0
+          ],
+          [
+            8,
+            8,
+            0
+          ],
+          [
+            -5,
+            -7.85196730485993e-14,
+            0
+          ],
+          [
+            -8,
+            8,
+            0
+          ],
+          [
+            -8,
+            0,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              -0.5000000000000008,
+              -0.8660254037844383,
+              0
+            ],
+            "origin": [
+              5.699999999999999,
+              0,
+              0
+            ]
+          }
+        ],
+        "angle_degrees": 30.00000000000005,
+        "requested_contact_max_error": 9.155133597044475e-16
+      },
+      "truck_measurement": {
+        "vertices": [
+          [
+            -8,
+            8,
+            0
+          ],
+          [
+            -8,
+            0,
+            0
+          ],
+          [
+            -5,
+            -7.8519673049e-14,
+            0
+          ],
+          [
+            8,
+            8,
+            0
+          ],
+          [
+            8,
+            0,
+            0
+          ],
+          [
+            5.7,
+            -1.2246467991e-15,
+            0
+          ],
+          [
+            4.982825881068381,
+            0.41406067062100194,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              -0.5000000000000002,
+              -0.8660254037844386,
+              0
+            ],
+            "origin": [
+              4.982825881068381,
+              0.41406067062100194,
+              0
+            ]
+          }
+        ],
+        "angle_degrees": 30.00000000000001,
+        "requested_contact_max_error": 1.27675647831893e-15
+      },
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/005",
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 885.9641161478711,
+        "selected_edges": 1,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 885.8635741403594,
+        "truck_volume": 885.8635741403582,
+        "native_to_truck_max_distance": 9.467511879332587e-14,
+        "native_to_truck_samples": 2073,
+        "truck_to_native_max_distance": 7.913199644817298e-14,
+        "truck_to_native_samples": 2073,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/005.input.brep": "923dffec7eae5f4b47a9d68a7160504881e23796f119e6016bd8b734511ccf34",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/005.input.step": "73b7c4ccbe1fd4e841d9c991e7167cb1471d673b7e506c0870d52c5936321552",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/005.input.json": "906c6f8b8d0dfe34ed4cb96c141d85460d1c4d5caba1c06241465dbc100fdb06"
+      },
+      "native_requested_angle_correct": true,
+      "expected_contacts": [
+        [
+          5.7,
+          0.0,
+          0.0
+        ],
+        [
+          4.982825881068381,
+          0.4140606706210032,
+          0.0
+        ]
+      ]
+    },
+    {
+      "capture": "011.result",
+      "convex": false,
+      "offset": 2.0,
+      "reference": "plane",
+      "expected_volume": 759.8623389334593,
+      "native_volume": 760.7222179379628,
+      "volume_error": 0.8598790045034548,
+      "native_valid": true,
+      "expected_planar": 0.7,
+      "native_planar": 0.7000000000000002,
+      "expected_chord": 0.647717679348686,
+      "native_chord": 0.35384076716243834,
+      "requested_angle": 30,
+      "measured_angle": 20.511460028020466,
+      "plane_contact": [
+        5.28257569495584,
+        2,
+        0
+      ],
+      "cylinder_contact": [
+        4.42965294896062,
+        2.31908920737528,
+        0
+      ],
+      "analytic_bevel_plane": {
+        "normal": [
+          -0.35039472294824775,
+          -0.9366021237056965,
+          0
+        ],
+        "origin": [
+          5.28257569495584,
+          2,
+          0
+        ]
+      },
+      "plane_contact_residual": 8.881784197001252e-16,
+      "analytic_plane_angle": 20.511460028020405,
+      "source_prefix": "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-offset-angle-controls/capture/011",
+      "angle": 30.0,
+      "native_measurement": {
+        "vertices": [
+          [
+            5.28257569495584,
+            2,
+            0
+          ],
+          [
+            8,
+            2,
+            0
+          ],
+          [
+            4.42965294896062,
+            2.31908920737528,
+            0
+          ],
+          [
+            8,
+            8,
+            0
+          ],
+          [
+            -4.58257569495583,
+            2.00000000000001,
+            0
+          ],
+          [
+            -8,
+            8,
+            0
+          ],
+          [
+            -8,
+            2,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              -0.35039472294824775,
+              -0.9366021237056965,
+              0
+            ],
+            "origin": [
+              5.28257569495584,
+              2,
+              0
+            ]
+          }
+        ],
+        "angle_degrees": 20.511460028020405,
+        "requested_contact_max_error": 0.2942143319903965
+      },
+      "truck_measurement": {
+        "vertices": [
+          [
+            -8,
+            8,
+            0
+          ],
+          [
+            -8,
+            2,
+            0
+          ],
+          [
+            -4.582575694956,
+            2,
+            0
+          ],
+          [
+            8,
+            8,
+            0
+          ],
+          [
+            8,
+            2,
+            0
+          ],
+          [
+            5.282575694956,
+            2,
+            0
+          ],
+          [
+            4.2855813686067705,
+            2.5756149426982518,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              -0.4999999999999965,
+              -0.8660254037844407,
+              0
+            ],
+            "origin": [
+              4.2855813686067705,
+              2.5756149426982518,
+              0
+            ]
+          }
+        ],
+        "angle_degrees": 29.99999999999977,
+        "requested_contact_max_error": 1.5987211554602254e-13
+      },
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/006",
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 759.9345645800992,
+        "selected_edges": 1,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 760.722217937963,
+        "truck_volume": 759.8623389334539,
+        "native_to_truck_max_distance": 0.15012201333725517,
+        "native_to_truck_samples": 2091,
+        "truck_to_native_max_distance": 0.13284643890411804,
+        "truck_to_native_samples": 2091,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/006.input.brep": "8b8a57492242cac66a9986e30b8e0843e29eeef67c9904a429d4dfa56d396424",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/006.input.step": "00e84e33a32c3e3d61b13868c17f6a140e01c483f388f03d41870f632732e1c7",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/006.input.json": "6d7cad7ee3e32bfc4941b21465cfcc5cd1a905e0d800c0caaccf6d30e8dd9196"
+      },
+      "native_requested_angle_correct": false,
+      "expected_contacts": [
+        [
+          5.28257569495584,
+          2.0,
+          0.0
+        ],
+        [
+          4.285581368606851,
+          2.575614942698118,
+          0.0
+        ]
+      ]
+    },
+    {
+      "mode": "angle",
+      "reference": "plane",
+      "convex": true,
+      "offset": 0.0,
+      "angle": 15.0,
+      "planar_inset": 0.7,
+      "cylinder_chord": 0.1866633365136787,
+      "kernel_tangent": 0.18676096093425965,
+      "expected_volume": 392.04478974524045,
+      "native_volume": 392.04478974526756,
+      "source_prefix": "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-extra-angles/capture/001",
+      "native_measurement": {
+        "vertices": [
+          [
+            4.99651567988016,
+            0.186630813939506,
+            0
+          ],
+          [
+            -5,
+            6.12323399573677e-16,
+            0
+          ],
+          [
+            4.3,
+            4.28626379701573e-17,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              -0.2588190451025254,
+              0.9659258262890671,
+              0
+            ],
+            "origin": [
+              4.300000000000001,
+              4.286263797015734e-17,
+              0
+            ]
+          }
+        ],
+        "angle_degrees": 15.000000000000275,
+        "requested_contact_max_error": 3.6528910504821414e-15
+      },
+      "truck_measurement": {
+        "vertices": [
+          [
+            4.996515679880158,
+            0.18663081393950282,
+            0
+          ],
+          [
+            -5,
+            6.1232339957e-16,
+            0
+          ],
+          [
+            4.3,
+            4.286263797e-17,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              0.25881904510252074,
+              -0.9659258262890683,
+              0
+            ],
+            "origin": [
+              4.996515679880158,
+              0.18663081393950282,
+              10
+            ]
+          }
+        ],
+        "angle_degrees": 14.999999999999998,
+        "requested_contact_max_error": 4.286263797e-17
+      },
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/007",
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 391.94236414587846,
+        "selected_edges": 1,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 392.0447897452675,
+        "truck_volume": 392.04478974526756,
+        "native_to_truck_max_distance": 1.3322676295505555e-14,
+        "native_to_truck_samples": 975,
+        "truck_to_native_max_distance": 3.6528910504821414e-15,
+        "truck_to_native_samples": 975,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/007.input.brep": "dcca2c1c5e32267430e021c4408d5d1042e836bac9742f651d0b8b23b65d532d",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/007.input.step": "0b0381b9920fcb3d6ea76caee32c388b86999a8e67c9739be34a9d8c963dc8ef",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/007.input.json": "50e7b2e3daddfdbd552545cd9f7065b6ec0736d2a94207930001d5dace1bc8ec"
+      },
+      "native_requested_angle_correct": true,
+      "expected_contacts": [
+        [
+          4.3,
+          0.0,
+          0.0
+        ],
+        [
+          4.996515679880158,
+          0.18663081393950282,
+          0.0
+        ]
+      ]
+    },
+    {
+      "mode": "angle",
+      "reference": "plane",
+      "convex": true,
+      "offset": 0.0,
+      "angle": 60.0,
+      "planar_inset": 0.7,
+      "cylinder_chord": 1.0331018242637693,
+      "kernel_tangent": 1.0499868973924202,
+      "expected_volume": 388.9182097885997,
+      "native_volume": 388.9182097886102,
+      "source_prefix": "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-extra-angles/capture/002",
+      "native_measurement": {
+        "vertices": [
+          [
+            4.89327006207029,
+            1.02757389011528,
+            0
+          ],
+          [
+            -5,
+            6.12323399573677e-16,
+            0
+          ],
+          [
+            4.3,
+            4.28626379701573e-17,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              -0.8660254037844388,
+              0.4999999999999997,
+              0
+            ],
+            "origin": [
+              4.300000000000001,
+              4.286263797015734e-17,
+              0
+            ]
+          }
+        ],
+        "angle_degrees": 60.00000000000002,
+        "requested_contact_max_error": 2.808666774861361e-15
+      },
+      "truck_measurement": {
+        "vertices": [
+          [
+            4.893270062070288,
+            1.0275738901152793,
+            0
+          ],
+          [
+            -5,
+            6.1232339957e-16,
+            0
+          ],
+          [
+            4.3,
+            4.286263797e-17,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              0.8660254037844385,
+              -0.5000000000000003,
+              0
+            ],
+            "origin": [
+              4.893270062070288,
+              1.0275738901152793,
+              10
+            ]
+          }
+        ],
+        "angle_degrees": 59.999999999999986,
+        "requested_contact_max_error": 9.155133597044475e-16
+      },
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/008",
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 388.82206865666876,
+        "selected_edges": 1,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 388.91820978860994,
+        "truck_volume": 388.91820978861017,
+        "native_to_truck_max_distance": 1.5543122344755868e-14,
+        "native_to_truck_samples": 975,
+        "truck_to_native_max_distance": 4.440892098500626e-15,
+        "truck_to_native_samples": 975,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/008.input.brep": "dcca2c1c5e32267430e021c4408d5d1042e836bac9742f651d0b8b23b65d532d",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/008.input.step": "2843d5993c968a7145eb05e065235b845e579d9f6fc8b86a6c0884954aa3992c",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/008.input.json": "bf095d2dfad2fa2ef66d96677e61deccf0eb7fdfdf38ce3900022730b03c5857"
+      },
+      "native_requested_angle_correct": true,
+      "expected_contacts": [
+        [
+          4.3,
+          0.0,
+          0.0
+        ],
+        [
+          4.893270062070287,
+          1.027573890115279,
+          0.0
+        ]
+      ]
+    },
+    {
+      "mode": "angle",
+      "reference": "plane",
+      "convex": false,
+      "offset": 0.0,
+      "angle": 15.0,
+      "planar_inset": 0.7,
+      "cylinder_chord": 0.18855054823547654,
+      "kernel_tangent": 0.1886511650800205,
+      "expected_volume": 886.6422260215273,
+      "native_volume": 886.6422260214398,
+      "source_prefix": "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-extra-angles/capture/003",
+      "native_measurement": {
+        "vertices": [
+          [
+            5.7,
+            0,
+            0
+          ],
+          [
+            8,
+            0,
+            0
+          ],
+          [
+            4.99644486907601,
+            0.18851702916186,
+            0
+          ],
+          [
+            8,
+            8,
+            0
+          ],
+          [
+            -5,
+            -7.85196730485993e-14,
+            0
+          ],
+          [
+            -8,
+            8,
+            0
+          ],
+          [
+            -8,
+            0,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              -0.25881904510252596,
+              -0.9659258262890669,
+              0
+            ],
+            "origin": [
+              5.699999999999999,
+              0,
+              0
+            ]
+          }
+        ],
+        "angle_degrees": 15.00000000000031,
+        "requested_contact_max_error": 4.0245584642661925e-15
+      },
+      "truck_measurement": {
+        "vertices": [
+          [
+            -8,
+            8,
+            0
+          ],
+          [
+            -8,
+            0,
+            0
+          ],
+          [
+            -5,
+            -7.8519673049e-14,
+            0
+          ],
+          [
+            8,
+            8,
+            0
+          ],
+          [
+            8,
+            0,
+            0
+          ],
+          [
+            5.7,
+            -1.2246467991e-15,
+            0
+          ],
+          [
+            4.996444869076011,
+            0.1885170291618548,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              -0.2588190451025211,
+              -0.9659258262890682,
+              0
+            ],
+            "origin": [
+              4.996444869076011,
+              0.1885170291618548,
+              0
+            ]
+          }
+        ],
+        "angle_degrees": 15.000000000000018,
+        "requested_contact_max_error": 1.4655364458042814e-15
+      },
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/009",
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 886.7446142594762,
+        "selected_edges": 1,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 886.6422260214397,
+        "truck_volume": 886.6422260214389,
+        "native_to_truck_max_distance": 9.467511879332587e-14,
+        "native_to_truck_samples": 2073,
+        "truck_to_native_max_distance": 7.851967305e-14,
+        "truck_to_native_samples": 2073,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/009.input.brep": "923dffec7eae5f4b47a9d68a7160504881e23796f119e6016bd8b734511ccf34",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/009.input.step": "f6b351a46a588bf5f309b3e06480fdd53ccf0f309604891ab06100db10ae88f2",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/009.input.json": "80eda20f87b03f071363658a5897b5d6745689cb2d304300abc31543ea05dcd3"
+      },
+      "native_requested_angle_correct": true,
+      "expected_contacts": [
+        [
+          5.7,
+          0.0,
+          0.0
+        ],
+        [
+          4.99644486907601,
+          0.18851702916185598,
+          0.0
+        ]
+      ]
+    },
+    {
+      "mode": "angle",
+      "reference": "plane",
+      "convex": false,
+      "offset": 0.0,
+      "angle": 60.0,
+      "planar_inset": 0.7,
+      "cylinder_chord": 1.8092834409935012,
+      "kernel_tangent": 1.9040841763013798,
+      "expected_volume": 882.0699204948066,
+      "native_volume": 882.0699204947965,
+      "source_prefix": "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-extra-angles/capture/004",
+      "native_measurement": {
+        "vertices": [
+          [
+            5.7,
+            0,
+            0
+          ],
+          [
+            8,
+            0,
+            0
+          ],
+          [
+            4.67264934301467,
+            1.77942353508785,
+            0
+          ],
+          [
+            8,
+            8,
+            0
+          ],
+          [
+            -5,
+            -7.85196730485993e-14,
+            0
+          ],
+          [
+            -8,
+            8,
+            0
+          ],
+          [
+            -8,
+            0,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              -0.8660254037844387,
+              -0.49999999999999994,
+              0
+            ],
+            "origin": [
+              5.699999999999999,
+              0,
+              0
+            ]
+          }
+        ],
+        "angle_degrees": 60.00000000000001,
+        "requested_contact_max_error": 5.197930934883577e-15
+      },
+      "truck_measurement": {
+        "vertices": [
+          [
+            -8,
+            8,
+            0
+          ],
+          [
+            -8,
+            0,
+            0
+          ],
+          [
+            -5,
+            -7.8519673049e-14,
+            0
+          ],
+          [
+            8,
+            8,
+            0
+          ],
+          [
+            8,
+            0,
+            0
+          ],
+          [
+            5.7,
+            -1.2246467991e-15,
+            0
+          ],
+          [
+            4.6726493430146725,
+            1.7794235350878513,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              -0.8660254037844386,
+              -0.5000000000000002,
+              0
+            ],
+            "origin": [
+              4.6726493430146725,
+              1.7794235350878513,
+              0
+            ]
+          }
+        ],
+        "angle_degrees": 59.99999999999999,
+        "requested_contact_max_error": 3.66205343881779e-15
+      },
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/010",
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 882.1610375233327,
+        "selected_edges": 1,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 882.0699204947966,
+        "truck_volume": 882.0699204947958,
+        "native_to_truck_max_distance": 9.467511879332587e-14,
+        "native_to_truck_samples": 2073,
+        "truck_to_native_max_distance": 7.913199644817298e-14,
+        "truck_to_native_samples": 2073,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/010.input.brep": "923dffec7eae5f4b47a9d68a7160504881e23796f119e6016bd8b734511ccf34",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/010.input.step": "cdb9a685f64d58f9ed78f5a7a2b280a39dc6212beb7e2050d59a54173ac74178",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-plane-angles-final/010.input.json": "b35988268d4ef5d5725289cb1723e91e38cc5a5b0cc8b21f94f4f2c6700f0ab0"
+      },
+      "native_requested_angle_correct": true,
+      "expected_contacts": [
+        [
+          5.7,
+          0.0,
+          0.0
+        ],
+        [
+          4.672649343014672,
+          1.779423535087855,
+          0.0
+        ]
+      ]
+    }
+  ],
+  "native_generator_sha256": "45992dc9ead38c30bad7d6e7984b9008d4a5684c9f491522ac767ea2a9f137c8",
+  "contact_oracle_sha256": "fc895c7377bbb3e1783b59bd9de07578dee2f0574fbc5ac8221c7beb94ca7b15",
+  "plugin_sha256": {
+    "target/occt-cone-reference-plugin/libTKBlendAudit.so": "c0c295c9bb0748cc78526ab0a2eb23114442b715593113d93908a55e8edcd76e",
+    "target/occt-cone-reference-plugin/compare_shapes": "4b98c99d824766c0cd1d4b6f250a9a01a5c23e06896dc7b1100eefddf1af74c2"
+  },
+  "archive_sha256": "d517a1af10ef7026c9c825f46860895001671f9d4e0c32ef745f11ebd45c1ecc",
+  "artifact_sha256": {
+    "native-longitudinal-offset-angle-controls/inputs.log": "3bd01a73bcbc566b307e4b51d5b3444f9ccc4c66d48968efcd713681c5f05e33",
+    "native-longitudinal-offset-angle-controls/input-0.brep": "0aca0334bc3d25fe00b8887dadc5bdc2c2e96b7df0262e0c8e7d4159d8802a09",
+    "native-longitudinal-offset-angle-controls/input-1.brep": "fde9aff479bf10343db598e51f291842e9da9f2201cf2e11be6cef3286592ecb",
+    "native-longitudinal-offset-angle-controls/input-2.brep": "253cc4e613c78fd94065028ddff1b125505c5e287bbdd080b64f3f34d062992e",
+    "native-longitudinal-offset-angle-controls/input-3.brep": "a7d68f78494677b8307689c6e4ea79b79eef1fa8c088058fa013b2efb0522031",
+    "native-longitudinal-offset-angle-controls/input-4.brep": "1d27e344ece9bffe1bafe161b16c93228a38b70b2def9c4d4951b4b7abfaa957",
+    "native-longitudinal-offset-angle-controls/input-5.brep": "166065f3fe57c1d906193347a0ef5b7c34b40b6a43ca634d7375b3b013e05d05",
+    "native-longitudinal-offset-angle-controls/controls.tcl": "7ea939d96a4c48690f1b7e78cf07590255bfa5990d18f5ce3ec76526e24587f3",
+    "native-longitudinal-offset-angle-controls/display.log": "a4f8607d524f5751cb6a1044182f031abb1c2598f362faaaaf98b9d61016be04",
+    "native-longitudinal-offset-angle-controls/before0.result.brep": "e3a32a4ffd4058989ec3749ec660b38d99a22f07441fae13adc2dd9abc358f01",
+    "native-longitudinal-offset-angle-controls/before0.result.step": "7eaf328d2a75426a0aae683f1c9196228860163b931e1d01d433c832bf2ac237",
+    "native-longitudinal-offset-angle-controls/before0.result.json": "dc808fc8256cffedf0fddfdc7036bee744abc26e8301ab79307e7a6c56b4e180",
+    "native-longitudinal-offset-angle-controls/after0.result.brep": "e3a32a4ffd4058989ec3749ec660b38d99a22f07441fae13adc2dd9abc358f01",
+    "native-longitudinal-offset-angle-controls/after0.result.step": "aaec395a0262476c31dabf5f349318a2d551d79c406eb2514c80aebf00cb6841",
+    "native-longitudinal-offset-angle-controls/after0.result.json": "dc808fc8256cffedf0fddfdc7036bee744abc26e8301ab79307e7a6c56b4e180",
+    "native-longitudinal-offset-angle-controls/before1.result.brep": "e3a32a4ffd4058989ec3749ec660b38d99a22f07441fae13adc2dd9abc358f01",
+    "native-longitudinal-offset-angle-controls/before1.result.step": "8406191500137caf96da042d65cf01130918819767ca4aa31dcdb128c6074239",
+    "native-longitudinal-offset-angle-controls/before1.result.json": "dc808fc8256cffedf0fddfdc7036bee744abc26e8301ab79307e7a6c56b4e180",
+    "native-longitudinal-offset-angle-controls/after1.result.brep": "e3a32a4ffd4058989ec3749ec660b38d99a22f07441fae13adc2dd9abc358f01",
+    "native-longitudinal-offset-angle-controls/after1.result.step": "e70e0f8d02e56fd2ee591f7118bc273304c57f5b3a55e814846f4dea5a93eab7",
+    "native-longitudinal-offset-angle-controls/after1.result.json": "dc808fc8256cffedf0fddfdc7036bee744abc26e8301ab79307e7a6c56b4e180",
+    "native-longitudinal-offset-angle-controls/before2.result.brep": "dcca2c1c5e32267430e021c4408d5d1042e836bac9742f651d0b8b23b65d532d",
+    "native-longitudinal-offset-angle-controls/before2.result.step": "4d17791c88e047ec909b2d8ccfb3651b5aa2ae562e8f65c76b0aa9a5871270be",
+    "native-longitudinal-offset-angle-controls/before2.result.json": "951bc33f282ee2302428b390e54e9691055ef8108ddc32ec37cac2c27c5ecb99",
+    "native-longitudinal-offset-angle-controls/after2.result.brep": "dcca2c1c5e32267430e021c4408d5d1042e836bac9742f651d0b8b23b65d532d",
+    "native-longitudinal-offset-angle-controls/after2.result.step": "1b8a46b281be70b90386ff2e1c2a840f5aa0ee6c4f5941e487eccd2657da835c",
+    "native-longitudinal-offset-angle-controls/after2.result.json": "951bc33f282ee2302428b390e54e9691055ef8108ddc32ec37cac2c27c5ecb99",
+    "native-longitudinal-offset-angle-controls/before3.result.brep": "dcca2c1c5e32267430e021c4408d5d1042e836bac9742f651d0b8b23b65d532d",
+    "native-longitudinal-offset-angle-controls/before3.result.step": "ce2842737b50e459df033f2f4c8e2a88a782a559869a624927d4df719dfa9cf0",
+    "native-longitudinal-offset-angle-controls/before3.result.json": "951bc33f282ee2302428b390e54e9691055ef8108ddc32ec37cac2c27c5ecb99",
+    "native-longitudinal-offset-angle-controls/after3.result.brep": "dcca2c1c5e32267430e021c4408d5d1042e836bac9742f651d0b8b23b65d532d",
+    "native-longitudinal-offset-angle-controls/after3.result.step": "01a4e573c25f95bb8101cdccb8a7e7b662c1cfa3405abea28e430ab9a75bee61",
+    "native-longitudinal-offset-angle-controls/after3.result.json": "951bc33f282ee2302428b390e54e9691055ef8108ddc32ec37cac2c27c5ecb99",
+    "native-longitudinal-offset-angle-controls/before4.result.brep": "01e78ee59e4d0759b3a6072d005db15f84cf411fe3838fd0ee29a3f39fb960e6",
+    "native-longitudinal-offset-angle-controls/before4.result.step": "34cebd88c595c6f93e7264d74a5d2126cf51cedae0c161f615d9c0c10b3a8bf5",
+    "native-longitudinal-offset-angle-controls/before4.result.json": "3764ef75b58680cbaec01cd57c42f64f4ccad5169bc9138338bba09393dfd372",
+    "native-longitudinal-offset-angle-controls/after4.result.brep": "01e78ee59e4d0759b3a6072d005db15f84cf411fe3838fd0ee29a3f39fb960e6",
+    "native-longitudinal-offset-angle-controls/after4.result.step": "c195c110ade1c9eb8527364e5d8b2a19c649950d76baa03d4ed9b0a3bd3cb094",
+    "native-longitudinal-offset-angle-controls/after4.result.json": "3764ef75b58680cbaec01cd57c42f64f4ccad5169bc9138338bba09393dfd372",
+    "native-longitudinal-offset-angle-controls/before5.result.brep": "01e78ee59e4d0759b3a6072d005db15f84cf411fe3838fd0ee29a3f39fb960e6",
+    "native-longitudinal-offset-angle-controls/before5.result.step": "96de67baa0364c29d6b54f2deca23b10640bc34d57c2edab7759c3a0ba008e85",
+    "native-longitudinal-offset-angle-controls/before5.result.json": "3764ef75b58680cbaec01cd57c42f64f4ccad5169bc9138338bba09393dfd372",
+    "native-longitudinal-offset-angle-controls/after5.result.brep": "01e78ee59e4d0759b3a6072d005db15f84cf411fe3838fd0ee29a3f39fb960e6",
+    "native-longitudinal-offset-angle-controls/after5.result.step": "95c43262af88414844fedc6c15f55db46722144fca00cafed855f14172ecf0e9",
+    "native-longitudinal-offset-angle-controls/after5.result.json": "3764ef75b58680cbaec01cd57c42f64f4ccad5169bc9138338bba09393dfd372",
+    "native-longitudinal-offset-angle-controls/before6.result.brep": "7985ca1dfa2ca65ee138d705fe701951fa26d71027e62129ea2d1d83f114041b",
+    "native-longitudinal-offset-angle-controls/before6.result.step": "d766fef07cab5b55c277d6b6f016684f124790393164075796091e321356aab2",
+    "native-longitudinal-offset-angle-controls/before6.result.json": "7a81196afc827b46300966ac5eb4772fbae396f6bee5f5fc2e52bcde62d77360",
+    "native-longitudinal-offset-angle-controls/after6.result.brep": "7985ca1dfa2ca65ee138d705fe701951fa26d71027e62129ea2d1d83f114041b",
+    "native-longitudinal-offset-angle-controls/after6.result.step": "86eb1ef8d1fdbccc9595ca0b17c0b21dfe7302d6872e38ca142b18705f500144",
+    "native-longitudinal-offset-angle-controls/after6.result.json": "7a81196afc827b46300966ac5eb4772fbae396f6bee5f5fc2e52bcde62d77360",
+    "native-longitudinal-offset-angle-controls/before7.result.brep": "7985ca1dfa2ca65ee138d705fe701951fa26d71027e62129ea2d1d83f114041b",
+    "native-longitudinal-offset-angle-controls/before7.result.step": "7c8114864375dd1e70e2c8c82ec66ea281e451502f122b623d64b5e9530aa82a",
+    "native-longitudinal-offset-angle-controls/before7.result.json": "7a81196afc827b46300966ac5eb4772fbae396f6bee5f5fc2e52bcde62d77360",
+    "native-longitudinal-offset-angle-controls/after7.result.brep": "7985ca1dfa2ca65ee138d705fe701951fa26d71027e62129ea2d1d83f114041b",
+    "native-longitudinal-offset-angle-controls/after7.result.step": "89c432caff1baa897024e0771262aa1400637bc32e00f5032710057ad8861fa4",
+    "native-longitudinal-offset-angle-controls/after7.result.json": "7a81196afc827b46300966ac5eb4772fbae396f6bee5f5fc2e52bcde62d77360",
+    "native-longitudinal-offset-angle-controls/before8.result.brep": "923dffec7eae5f4b47a9d68a7160504881e23796f119e6016bd8b734511ccf34",
+    "native-longitudinal-offset-angle-controls/before8.result.step": "d338f191e87e05f721c9169ed2fd86e4425a35dd2f7262e84baf0f0611f7e225",
+    "native-longitudinal-offset-angle-controls/before8.result.json": "ed4715ddc78fba0ef0184c95a0a6ef8bda4e9f55a4244a60bf610847e5819c9b",
+    "native-longitudinal-offset-angle-controls/after8.result.brep": "923dffec7eae5f4b47a9d68a7160504881e23796f119e6016bd8b734511ccf34",
+    "native-longitudinal-offset-angle-controls/after8.result.step": "0af77c5b78c887337d064449c4d88850e047fedebb5b5409dfccce13ce9d08c7",
+    "native-longitudinal-offset-angle-controls/after8.result.json": "ed4715ddc78fba0ef0184c95a0a6ef8bda4e9f55a4244a60bf610847e5819c9b",
+    "native-longitudinal-offset-angle-controls/before9.result.brep": "923dffec7eae5f4b47a9d68a7160504881e23796f119e6016bd8b734511ccf34",
+    "native-longitudinal-offset-angle-controls/before9.result.step": "d27150c2309dc77954c05fd837cfa3b0ac59a8e0ece715c2ff149dc75ac33380",
+    "native-longitudinal-offset-angle-controls/before9.result.json": "ed4715ddc78fba0ef0184c95a0a6ef8bda4e9f55a4244a60bf610847e5819c9b",
+    "native-longitudinal-offset-angle-controls/after9.result.brep": "923dffec7eae5f4b47a9d68a7160504881e23796f119e6016bd8b734511ccf34",
+    "native-longitudinal-offset-angle-controls/after9.result.step": "3afe42ebad6f94cdaeb8d8ee8fbbe72aba41bf1fe41a67ebc0aebb7dbd47d2cf",
+    "native-longitudinal-offset-angle-controls/after9.result.json": "ed4715ddc78fba0ef0184c95a0a6ef8bda4e9f55a4244a60bf610847e5819c9b",
+    "native-longitudinal-offset-angle-controls/before10.result.brep": "8b8a57492242cac66a9986e30b8e0843e29eeef67c9904a429d4dfa56d396424",
+    "native-longitudinal-offset-angle-controls/before10.result.step": "6a96a378b80906b17a19546eea43913ecaf7059ed4ecabe716a4f5875397e85c",
+    "native-longitudinal-offset-angle-controls/before10.result.json": "6364d582f7a29be20de87ecbd771bd9004ee04c47633289899f831bd2011d761",
+    "native-longitudinal-offset-angle-controls/after10.result.brep": "8b8a57492242cac66a9986e30b8e0843e29eeef67c9904a429d4dfa56d396424",
+    "native-longitudinal-offset-angle-controls/after10.result.step": "c0b1803450a16eae7fbd129d8c62b6216c8dc8d65a0109fd18b30915311763b8",
+    "native-longitudinal-offset-angle-controls/after10.result.json": "6364d582f7a29be20de87ecbd771bd9004ee04c47633289899f831bd2011d761",
+    "native-longitudinal-offset-angle-controls/before11.result.brep": "8b8a57492242cac66a9986e30b8e0843e29eeef67c9904a429d4dfa56d396424",
+    "native-longitudinal-offset-angle-controls/before11.result.step": "ce90138b977c8a049f0dc7a959adcc5f21f53812d68bd612ce58739006e0e2c8",
+    "native-longitudinal-offset-angle-controls/before11.result.json": "6364d582f7a29be20de87ecbd771bd9004ee04c47633289899f831bd2011d761",
+    "native-longitudinal-offset-angle-controls/after11.result.brep": "8b8a57492242cac66a9986e30b8e0843e29eeef67c9904a429d4dfa56d396424",
+    "native-longitudinal-offset-angle-controls/after11.result.step": "3bc1154b1285c94b8122fcdd2f013f2965bbbbe12fbaf4c7520ab8daf4d66745",
+    "native-longitudinal-offset-angle-controls/after11.result.json": "6364d582f7a29be20de87ecbd771bd9004ee04c47633289899f831bd2011d761",
+    "native-longitudinal-offset-angle-controls/controls.log": "a4641bc19bb83deeec8fe45a02455dce648e8edad834970ad08dbe14771d1c25",
+    "native-longitudinal-offset-angle-controls/analysis.json": "81e4c4638f3d4da7afcf06f40f85a2b4e66ac56b9e741912c5682a647603311f",
+    "native-longitudinal-offset-angle-controls/plane-angle-proof.json": "2d792e7540b6dde2decfe0a5c15b5ad14cc810e09e2c904087c7467d8cdd655d",
+    "native-longitudinal-offset-angle-controls/capture/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native-longitudinal-offset-angle-controls/capture/001.input.brep": "e3a32a4ffd4058989ec3749ec660b38d99a22f07441fae13adc2dd9abc358f01",
+    "native-longitudinal-offset-angle-controls/capture/001.input.step": "2e8c657edd4a5f613a8c84b5ce7dc6791342a0fdb5e92bf00f5e74dbb45ed3b4",
+    "native-longitudinal-offset-angle-controls/capture/001.input.json": "53eaf1bc38b9b03b7ff2180f1c4724566ff17ecb5bd52c8ad7056b30a1d94706",
+    "native-longitudinal-offset-angle-controls/capture/001.result.brep": "a6b7a94017b916c9db044e2b046dcab555948b2f4e658c5af6415120f1fabf80",
+    "native-longitudinal-offset-angle-controls/capture/001.result.step": "337b024f82b1116456dee3edaea71b6093009e337da39aad9e4d5e12934ea592",
+    "native-longitudinal-offset-angle-controls/capture/001.result.json": "d01a0b97a012b8191a33879e144904f8de5e7d4b59ca5163fc955daedc2cd5e6",
+    "native-longitudinal-offset-angle-controls/capture/002.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native-longitudinal-offset-angle-controls/capture/002.input.brep": "e3a32a4ffd4058989ec3749ec660b38d99a22f07441fae13adc2dd9abc358f01",
+    "native-longitudinal-offset-angle-controls/capture/002.input.step": "8f4ec1b77568c4b4d0b34e0a79de1f553a2833c7df0ddb26e3cc0d21ed7922c6",
+    "native-longitudinal-offset-angle-controls/capture/002.input.json": "6e216410e7b9f941937c946b76e87fb222c7549ef45d819908aca122fa7806e3",
+    "native-longitudinal-offset-angle-controls/capture/002.result.brep": "187fe0bfb4c9ddcd48304e6c2874be6cc013cad9ebf71065000a8ddb48d0c1e0",
+    "native-longitudinal-offset-angle-controls/capture/002.result.step": "bd5d86c283a17d61ab0694dbbd3e3395b4c8ba4e673e0f7755bd93d010a2e781",
+    "native-longitudinal-offset-angle-controls/capture/002.result.json": "8c6f525e0958bed69ba4c1fda0fe2a78d6f0e21b136fb3331aca563bc046b030",
+    "native-longitudinal-offset-angle-controls/capture/003.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native-longitudinal-offset-angle-controls/capture/003.input.brep": "dcca2c1c5e32267430e021c4408d5d1042e836bac9742f651d0b8b23b65d532d",
+    "native-longitudinal-offset-angle-controls/capture/003.input.step": "7227246c345ec70ad3177d1cae7884c74b028615ba47504e907346df572a0570",
+    "native-longitudinal-offset-angle-controls/capture/003.input.json": "15fc0accdafed3b7db40c66230926892d05b09d065ef9548a2d857a42f8bb78a",
+    "native-longitudinal-offset-angle-controls/capture/003.result.brep": "094e184c2f8ddb14ec219e172a09e514509ee81347d4e85484d2742c14a19323",
+    "native-longitudinal-offset-angle-controls/capture/003.result.step": "c2bd3af17e7ef24ec512eb7351932ad6b7ab1aae39e62a4e8b0163700d3df730",
+    "native-longitudinal-offset-angle-controls/capture/003.result.json": "2c5d0fee7f25723386d891655a8555fe84a03d9a19b0bae8795514074eff526a",
+    "native-longitudinal-offset-angle-controls/capture/004.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native-longitudinal-offset-angle-controls/capture/004.input.brep": "dcca2c1c5e32267430e021c4408d5d1042e836bac9742f651d0b8b23b65d532d",
+    "native-longitudinal-offset-angle-controls/capture/004.input.step": "e3a71812dfa1e1eb543332248d46d6a0da97d50bdb301c23b04a347569ac6b14",
+    "native-longitudinal-offset-angle-controls/capture/004.input.json": "3d27afdf806e1157197a216eb74626d11da00fb67160960d54b7d4239a406327",
+    "native-longitudinal-offset-angle-controls/capture/004.result.brep": "96077d535d79f66eb491b2ce39b17fafe717a33d4dc3010e1a3f700acc2593bd",
+    "native-longitudinal-offset-angle-controls/capture/004.result.step": "205a708fe5fbc14efae2a86819b59c74c263985dbe6e4ed6a54c4bd1b8eea35c",
+    "native-longitudinal-offset-angle-controls/capture/004.result.json": "34c9ecb28e90e219bbdbaa4dd3588e64d48fe5b98b1160bf67f42a201e4cc2bc",
+    "native-longitudinal-offset-angle-controls/capture/005.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native-longitudinal-offset-angle-controls/capture/005.input.brep": "01e78ee59e4d0759b3a6072d005db15f84cf411fe3838fd0ee29a3f39fb960e6",
+    "native-longitudinal-offset-angle-controls/capture/005.input.step": "0fd1ba2c1f113c07e1f0cc67cbbfa662f184110f63bfd81bd0521a0564a3c118",
+    "native-longitudinal-offset-angle-controls/capture/005.input.json": "a44d7f06319f604fb8d70d5206e85fccf1243d4b60eb84126f389f2a4d8bfa65",
+    "native-longitudinal-offset-angle-controls/capture/005.result.brep": "d93ddcbbe5829e39cbad5bbf270f97e138543a9ac02facb9de5b876c852e3791",
+    "native-longitudinal-offset-angle-controls/capture/005.result.step": "27f2fef8d217290dc364fc88e0af3642c98b75301b3167e655d40c5df6f14233",
+    "native-longitudinal-offset-angle-controls/capture/005.result.json": "d0d0108c596a8ac3a17e87561fb3eac2513ff56012240e5895b27d46f6237aed",
+    "native-longitudinal-offset-angle-controls/capture/006.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native-longitudinal-offset-angle-controls/capture/006.input.brep": "01e78ee59e4d0759b3a6072d005db15f84cf411fe3838fd0ee29a3f39fb960e6",
+    "native-longitudinal-offset-angle-controls/capture/006.input.step": "4eec0d9edeec06a76d14ca1dbee2270a2a29178a63b9821c61f3aa68ef34290b",
+    "native-longitudinal-offset-angle-controls/capture/006.input.json": "9a7a68d7bbf16399a5b0097b61d94ee1c8731539bd3140166ba358a2c00121de",
+    "native-longitudinal-offset-angle-controls/capture/006.result.brep": "688cc95b84c6b3da5ce762c7f95c538c019da6f27d2efb7abe0886ccc7826fd1",
+    "native-longitudinal-offset-angle-controls/capture/006.result.step": "56a54d95eafd9c2c0095473845b7673c699dce9add6dc5aff31ac18983794d84",
+    "native-longitudinal-offset-angle-controls/capture/006.result.json": "12424df1d797db6e3a7a86297cb1c7e39d0fa81d6cc54db012550ec3994c5ee6",
+    "native-longitudinal-offset-angle-controls/capture/007.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native-longitudinal-offset-angle-controls/capture/007.input.brep": "7985ca1dfa2ca65ee138d705fe701951fa26d71027e62129ea2d1d83f114041b",
+    "native-longitudinal-offset-angle-controls/capture/007.input.step": "b0b36836fcb26d1e050db29a0b2fe7384736519c701efdc02a8447163ea62bdf",
+    "native-longitudinal-offset-angle-controls/capture/007.input.json": "766cc26138d209b3ac0a39bc9d2c7122b9bb35710663b6be10d8156f18b671c6",
+    "native-longitudinal-offset-angle-controls/capture/007.result.brep": "5ba1de8b4fc4dbdb560217ba423c7364c118feecc4cc5f94231166d9402c3b38",
+    "native-longitudinal-offset-angle-controls/capture/007.result.step": "b3bf4499c3f8dbeddb84f5130f118fccc58c48b38bdb85352da5a243c79a622d",
+    "native-longitudinal-offset-angle-controls/capture/007.result.json": "a7b7d45b5d519e2b15d1764279d4c57609f2cb2584e610f4a0d9645020461859",
+    "native-longitudinal-offset-angle-controls/capture/008.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native-longitudinal-offset-angle-controls/capture/008.input.brep": "7985ca1dfa2ca65ee138d705fe701951fa26d71027e62129ea2d1d83f114041b",
+    "native-longitudinal-offset-angle-controls/capture/008.input.step": "e8172bf9316f68ec87b501bac6013628af240036c8e2f506eb5fe0b317bedc20",
+    "native-longitudinal-offset-angle-controls/capture/008.input.json": "1cc38fbcf19457ac6796b6ffa58693ad666e3492bb38318cc0157f4ccb596431",
+    "native-longitudinal-offset-angle-controls/capture/008.result.brep": "a9c2dbbdf66063dff3ed9418890b31313a9bd9b3034c084df296e21c9f387fe7",
+    "native-longitudinal-offset-angle-controls/capture/008.result.step": "ecd56e883cba4cadd875d9507e9693000813485819a2f8df1bacbbec71c77eca",
+    "native-longitudinal-offset-angle-controls/capture/008.result.json": "a21764cf8f778df34945decadd279d02bb948a48958fef0966cf1f5905d16fde",
+    "native-longitudinal-offset-angle-controls/capture/009.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native-longitudinal-offset-angle-controls/capture/009.input.brep": "923dffec7eae5f4b47a9d68a7160504881e23796f119e6016bd8b734511ccf34",
+    "native-longitudinal-offset-angle-controls/capture/009.input.step": "73b7c4ccbe1fd4e841d9c991e7167cb1471d673b7e506c0870d52c5936321552",
+    "native-longitudinal-offset-angle-controls/capture/009.input.json": "906c6f8b8d0dfe34ed4cb96c141d85460d1c4d5caba1c06241465dbc100fdb06",
+    "native-longitudinal-offset-angle-controls/capture/009.result.brep": "3dbfd429b5d9ff82129eee69a38c199b4eca634904def27ccdc4c830a4aa52f5",
+    "native-longitudinal-offset-angle-controls/capture/009.result.step": "21cb67f2efb3e82b8bc79c1a5c2449f63ddcfcf2e0fd52155d07c8aa592f3b17",
+    "native-longitudinal-offset-angle-controls/capture/009.result.json": "8d30fb5a1caa68c02f853aa7fc0949f9da3043820024e2edf8d56a01c429950d",
+    "native-longitudinal-offset-angle-controls/capture/010.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native-longitudinal-offset-angle-controls/capture/010.input.brep": "923dffec7eae5f4b47a9d68a7160504881e23796f119e6016bd8b734511ccf34",
+    "native-longitudinal-offset-angle-controls/capture/010.input.step": "57e76f0514d0053741735f86d8921b616f60a918c8bfae1ccb8c9f998728ae88",
+    "native-longitudinal-offset-angle-controls/capture/010.input.json": "ff328ed973b945392f0acad1281e05dc9ade65c1dc2b6e4ae0ac8797fce7c61e",
+    "native-longitudinal-offset-angle-controls/capture/010.result.brep": "3e76dea806491780e07368cc62586bbcc94b22d6d6ea361bae25333145ad1690",
+    "native-longitudinal-offset-angle-controls/capture/010.result.step": "927d9d2f59150f451cb796f6d253dee7c699097630c16a84469a646eac67eafd",
+    "native-longitudinal-offset-angle-controls/capture/010.result.json": "e0b104a305ab3320c017031d26430a95fd87ccee4b6677d5877315edd004f1ef",
+    "native-longitudinal-offset-angle-controls/capture/011.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native-longitudinal-offset-angle-controls/capture/011.input.brep": "8b8a57492242cac66a9986e30b8e0843e29eeef67c9904a429d4dfa56d396424",
+    "native-longitudinal-offset-angle-controls/capture/011.input.step": "00e84e33a32c3e3d61b13868c17f6a140e01c483f388f03d41870f632732e1c7",
+    "native-longitudinal-offset-angle-controls/capture/011.input.json": "6d7cad7ee3e32bfc4941b21465cfcc5cd1a905e0d800c0caaccf6d30e8dd9196",
+    "native-longitudinal-offset-angle-controls/capture/011.result.brep": "a619bfdc35aea4d2b78f6cf43f4523bbb867b14e604497c3e5beb06ee7efbac5",
+    "native-longitudinal-offset-angle-controls/capture/011.result.step": "476deb6cb6eae73e2dcfaf5584610886b0fa456755366c08e22c530fe3076538",
+    "native-longitudinal-offset-angle-controls/capture/011.result.json": "7903d626888c6f14d209bce9b2c4f59bf63553d9ddc830a3b279470cf18d9d73",
+    "native-longitudinal-offset-angle-controls/capture/012.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native-longitudinal-offset-angle-controls/capture/012.input.brep": "8b8a57492242cac66a9986e30b8e0843e29eeef67c9904a429d4dfa56d396424",
+    "native-longitudinal-offset-angle-controls/capture/012.input.step": "9b23260059ee3e02dbf63fe7226d061c850d6071f7309ac4aaabc0a651f1bea8",
+    "native-longitudinal-offset-angle-controls/capture/012.input.json": "8e8d42913d88fa8c422a0489f5b9c4b6f5587e3281d915f5d5077ac9832168f8",
+    "native-longitudinal-offset-angle-controls/capture/012.result.brep": "a402b3ea01824508854581af84ebcbf3a01d9ee07100c1d31f116cf32b873b8c",
+    "native-longitudinal-offset-angle-controls/capture/012.result.step": "a2518ed6f4f244c791175360bbd439c89c5bf8f1b9b9ca9ddbdc7d368a0a4bca",
+    "native-longitudinal-offset-angle-controls/capture/012.result.json": "978ebc03541403abc0b0303a0d4d7d2508e208271d9d42a562834607fd924a9b",
+    "native-longitudinal-plane-extra-angles/inputs.log": "3bd01a73bcbc566b307e4b51d5b3444f9ccc4c66d48968efcd713681c5f05e33",
+    "native-longitudinal-plane-extra-angles/input-0.brep": "0aca0334bc3d25fe00b8887dadc5bdc2c2e96b7df0262e0c8e7d4159d8802a09",
+    "native-longitudinal-plane-extra-angles/input-1.brep": "fde9aff479bf10343db598e51f291842e9da9f2201cf2e11be6cef3286592ecb",
+    "native-longitudinal-plane-extra-angles/input-2.brep": "253cc4e613c78fd94065028ddff1b125505c5e287bbdd080b64f3f34d062992e",
+    "native-longitudinal-plane-extra-angles/input-3.brep": "a7d68f78494677b8307689c6e4ea79b79eef1fa8c088058fa013b2efb0522031",
+    "native-longitudinal-plane-extra-angles/input-4.brep": "1d27e344ece9bffe1bafe161b16c93228a38b70b2def9c4d4951b4b7abfaa957",
+    "native-longitudinal-plane-extra-angles/input-5.brep": "166065f3fe57c1d906193347a0ef5b7c34b40b6a43ca634d7375b3b013e05d05",
+    "native-longitudinal-plane-extra-angles/controls.tcl": "7d9dc6efb77ae690039f18f4f681d56867012a7f36b3efbc5dd2cd36b0693324",
+    "native-longitudinal-plane-extra-angles/display.log": "377520b44ed5fef4359c41084a372608da95e7f6ed6580c72bc308afcc8130d6",
+    "native-longitudinal-plane-extra-angles/before0.result.brep": "dcca2c1c5e32267430e021c4408d5d1042e836bac9742f651d0b8b23b65d532d",
+    "native-longitudinal-plane-extra-angles/before0.result.step": "1e181c59b8585962933fa7d76b157b69fa35f26a0deeda4e76cd89a1e9edfd6e",
+    "native-longitudinal-plane-extra-angles/before0.result.json": "951bc33f282ee2302428b390e54e9691055ef8108ddc32ec37cac2c27c5ecb99",
+    "native-longitudinal-plane-extra-angles/after0.result.brep": "dcca2c1c5e32267430e021c4408d5d1042e836bac9742f651d0b8b23b65d532d",
+    "native-longitudinal-plane-extra-angles/after0.result.step": "fa65511e0a1e9c1ed563ccd6585f697615468fd78cc61ba7a71da7e7a99b5038",
+    "native-longitudinal-plane-extra-angles/after0.result.json": "951bc33f282ee2302428b390e54e9691055ef8108ddc32ec37cac2c27c5ecb99",
+    "native-longitudinal-plane-extra-angles/before1.result.brep": "dcca2c1c5e32267430e021c4408d5d1042e836bac9742f651d0b8b23b65d532d",
+    "native-longitudinal-plane-extra-angles/before1.result.step": "aa8aca020ba14785f59d1d2ea388e279acb19f6ca1cf691b7bce73d1e4d9f357",
+    "native-longitudinal-plane-extra-angles/before1.result.json": "951bc33f282ee2302428b390e54e9691055ef8108ddc32ec37cac2c27c5ecb99",
+    "native-longitudinal-plane-extra-angles/after1.result.brep": "dcca2c1c5e32267430e021c4408d5d1042e836bac9742f651d0b8b23b65d532d",
+    "native-longitudinal-plane-extra-angles/after1.result.step": "2c9cbd3761a205a0a83144d5184ac0d55960667d99baf65807487effb37015d3",
+    "native-longitudinal-plane-extra-angles/after1.result.json": "951bc33f282ee2302428b390e54e9691055ef8108ddc32ec37cac2c27c5ecb99",
+    "native-longitudinal-plane-extra-angles/before2.result.brep": "923dffec7eae5f4b47a9d68a7160504881e23796f119e6016bd8b734511ccf34",
+    "native-longitudinal-plane-extra-angles/before2.result.step": "30b35dac886e464ce2f645e276ec2b688773d6b1e9a0cd4f0e6e7b5158e9f74b",
+    "native-longitudinal-plane-extra-angles/before2.result.json": "ed4715ddc78fba0ef0184c95a0a6ef8bda4e9f55a4244a60bf610847e5819c9b",
+    "native-longitudinal-plane-extra-angles/after2.result.brep": "923dffec7eae5f4b47a9d68a7160504881e23796f119e6016bd8b734511ccf34",
+    "native-longitudinal-plane-extra-angles/after2.result.step": "99cf028cbdb80a32e6e9b93966082e53e0419de194b12964a69c9bd2b73995fb",
+    "native-longitudinal-plane-extra-angles/after2.result.json": "ed4715ddc78fba0ef0184c95a0a6ef8bda4e9f55a4244a60bf610847e5819c9b",
+    "native-longitudinal-plane-extra-angles/before3.result.brep": "923dffec7eae5f4b47a9d68a7160504881e23796f119e6016bd8b734511ccf34",
+    "native-longitudinal-plane-extra-angles/before3.result.step": "c58df165af4b1dd79f49cb5e7c74ee6515af22ec46c70d62a3164ed36f52db3a",
+    "native-longitudinal-plane-extra-angles/before3.result.json": "ed4715ddc78fba0ef0184c95a0a6ef8bda4e9f55a4244a60bf610847e5819c9b",
+    "native-longitudinal-plane-extra-angles/after3.result.brep": "923dffec7eae5f4b47a9d68a7160504881e23796f119e6016bd8b734511ccf34",
+    "native-longitudinal-plane-extra-angles/after3.result.step": "9e4b033f8526e01164e75656036db6dd8299b591d523580d3ae28fcb1d1cd7ab",
+    "native-longitudinal-plane-extra-angles/after3.result.json": "ed4715ddc78fba0ef0184c95a0a6ef8bda4e9f55a4244a60bf610847e5819c9b",
+    "native-longitudinal-plane-extra-angles/controls.log": "1346311b243325a2b1728d37ca04160bfd0517b7270b86676bf2e12d408a799c",
+    "native-longitudinal-plane-extra-angles/summary.json": "d474fd3d8d15949d83eb3a6d6953f93ad991cb9fa11c9f0d6fffae3bd74f1045",
+    "native-longitudinal-plane-extra-angles/capture/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native-longitudinal-plane-extra-angles/capture/001.input.brep": "dcca2c1c5e32267430e021c4408d5d1042e836bac9742f651d0b8b23b65d532d",
+    "native-longitudinal-plane-extra-angles/capture/001.input.step": "0b0381b9920fcb3d6ea76caee32c388b86999a8e67c9739be34a9d8c963dc8ef",
+    "native-longitudinal-plane-extra-angles/capture/001.input.json": "50e7b2e3daddfdbd552545cd9f7065b6ec0736d2a94207930001d5dace1bc8ec",
+    "native-longitudinal-plane-extra-angles/capture/001.result.brep": "86d164fbcb8f48e6597689cc58e2b5cf0401b0fc2da00188031e2558973ff8fa",
+    "native-longitudinal-plane-extra-angles/capture/001.result.step": "d16afb95b8023d1fe144c3b79360dc689f78dcaec294add842a9966dc29d92e3",
+    "native-longitudinal-plane-extra-angles/capture/001.result.json": "be49c0605ff27e85578106069bfc5b1d6d9d9302590751120ebf89de2fa56587",
+    "native-longitudinal-plane-extra-angles/capture/002.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native-longitudinal-plane-extra-angles/capture/002.input.brep": "dcca2c1c5e32267430e021c4408d5d1042e836bac9742f651d0b8b23b65d532d",
+    "native-longitudinal-plane-extra-angles/capture/002.input.step": "2843d5993c968a7145eb05e065235b845e579d9f6fc8b86a6c0884954aa3992c",
+    "native-longitudinal-plane-extra-angles/capture/002.input.json": "bf095d2dfad2fa2ef66d96677e61deccf0eb7fdfdf38ce3900022730b03c5857",
+    "native-longitudinal-plane-extra-angles/capture/002.result.brep": "326c44fa44a13b5b9a362c7c78cd29dc88fc88f4248b34f474c90fa33c1c439a",
+    "native-longitudinal-plane-extra-angles/capture/002.result.step": "d37e3c79ff1509797934909e58e151916204313e1015dd775a7464baa1298063",
+    "native-longitudinal-plane-extra-angles/capture/002.result.json": "a06392a6b9232004a05eb5768e175bb1c53d60e9a2fb6230e832f26ceb507652",
+    "native-longitudinal-plane-extra-angles/capture/003.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native-longitudinal-plane-extra-angles/capture/003.input.brep": "923dffec7eae5f4b47a9d68a7160504881e23796f119e6016bd8b734511ccf34",
+    "native-longitudinal-plane-extra-angles/capture/003.input.step": "f6b351a46a588bf5f309b3e06480fdd53ccf0f309604891ab06100db10ae88f2",
+    "native-longitudinal-plane-extra-angles/capture/003.input.json": "80eda20f87b03f071363658a5897b5d6745689cb2d304300abc31543ea05dcd3",
+    "native-longitudinal-plane-extra-angles/capture/003.result.brep": "7264e1dccada676f5481653884cad2d3ea177dfc2acd4946c39a64f196998d78",
+    "native-longitudinal-plane-extra-angles/capture/003.result.step": "09ef5f11f1e4fc0bb3ed15380e037442d8a9004cdc782b53e856382cb3849303",
+    "native-longitudinal-plane-extra-angles/capture/003.result.json": "72a98ccea34cc18d66c17876c51816c1508e9d5539d082f08b92d424773eb749",
+    "native-longitudinal-plane-extra-angles/capture/004.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native-longitudinal-plane-extra-angles/capture/004.input.brep": "923dffec7eae5f4b47a9d68a7160504881e23796f119e6016bd8b734511ccf34",
+    "native-longitudinal-plane-extra-angles/capture/004.input.step": "cdb9a685f64d58f9ed78f5a7a2b280a39dc6212beb7e2050d59a54173ac74178",
+    "native-longitudinal-plane-extra-angles/capture/004.input.json": "b35988268d4ef5d5725289cb1723e91e38cc5a5b0cc8b21f94f4f2c6700f0ab0",
+    "native-longitudinal-plane-extra-angles/capture/004.result.brep": "62d9867d1ef15225bb96850b6525296fe2fe55cf951014397a3fa24422c0b494",
+    "native-longitudinal-plane-extra-angles/capture/004.result.step": "f149a81219e6e4c116e4808e9cf41cd2d1c478d86fedc3ca11b9bd0a63f94b0c",
+    "native-longitudinal-plane-extra-angles/capture/004.result.json": "c5fe94d79a6b062ed9723074579a9ba97b8ce955cd99556ba6b4a3689b3c3171",
+    "native-longitudinal-plane-angles-final/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native-longitudinal-plane-angles-final/001.input.brep": "e3a32a4ffd4058989ec3749ec660b38d99a22f07441fae13adc2dd9abc358f01",
+    "native-longitudinal-plane-angles-final/001.input.step": "2e8c657edd4a5f613a8c84b5ce7dc6791342a0fdb5e92bf00f5e74dbb45ed3b4",
+    "native-longitudinal-plane-angles-final/001.input.json": "53eaf1bc38b9b03b7ff2180f1c4724566ff17ecb5bd52c8ad7056b30a1d94706",
+    "native-longitudinal-plane-angles-final/001.result.brep": "a6b7a94017b916c9db044e2b046dcab555948b2f4e658c5af6415120f1fabf80",
+    "native-longitudinal-plane-angles-final/001.result.step": "337b024f82b1116456dee3edaea71b6093009e337da39aad9e4d5e12934ea592",
+    "native-longitudinal-plane-angles-final/001.result.json": "d01a0b97a012b8191a33879e144904f8de5e7d4b59ca5163fc955daedc2cd5e6",
+    "native-longitudinal-plane-angles-final/001.truck.log": "6042a5374333f32a1a498706b89acb99452a71ef0b532cf8e47b2cf9b255a7d4",
+    "native-longitudinal-plane-angles-final/001.truck.step": "688d68ff2ce7cec94d68a4bd1cb0bf8d66b5363cd1866598f04fb340cc07b4b2",
+    "native-longitudinal-plane-angles-final/001.truck.json": "32d6f3f749b2b5ffd85419a4449807ee1901cba51fdb56a9b78f361156f5ad6b",
+    "native-longitudinal-plane-angles-final/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-longitudinal-plane-angles-final/001.comparison.json": "3ebab104a13cdc852b31c5d5f2da6be243744d56e3163a38f429f58456f04125",
+    "native-longitudinal-plane-angles-final/002.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native-longitudinal-plane-angles-final/002.input.brep": "dcca2c1c5e32267430e021c4408d5d1042e836bac9742f651d0b8b23b65d532d",
+    "native-longitudinal-plane-angles-final/002.input.step": "7227246c345ec70ad3177d1cae7884c74b028615ba47504e907346df572a0570",
+    "native-longitudinal-plane-angles-final/002.input.json": "15fc0accdafed3b7db40c66230926892d05b09d065ef9548a2d857a42f8bb78a",
+    "native-longitudinal-plane-angles-final/002.result.brep": "094e184c2f8ddb14ec219e172a09e514509ee81347d4e85484d2742c14a19323",
+    "native-longitudinal-plane-angles-final/002.result.step": "c2bd3af17e7ef24ec512eb7351932ad6b7ab1aae39e62a4e8b0163700d3df730",
+    "native-longitudinal-plane-angles-final/002.result.json": "2c5d0fee7f25723386d891655a8555fe84a03d9a19b0bae8795514074eff526a",
+    "native-longitudinal-plane-angles-final/002.truck.log": "a66b976a09e9621da3dab934c65d76546a20dcc15a99286a661be7af30d7d56f",
+    "native-longitudinal-plane-angles-final/002.truck.step": "731a17d1c840178ddf40b71c0bda5f23158c0ae020f61c9fee6add6b26173a11",
+    "native-longitudinal-plane-angles-final/002.truck.json": "c5f762775556c6ad699048cec5622f94f8f009eb31fabed403e1c869b8b10d8c",
+    "native-longitudinal-plane-angles-final/002.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-longitudinal-plane-angles-final/002.comparison.json": "4667fa4f3eda9f4398ef3e9e1d57e3ce4ebbc1ff8c38c81db2bcce654fb203df",
+    "native-longitudinal-plane-angles-final/003.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native-longitudinal-plane-angles-final/003.input.brep": "01e78ee59e4d0759b3a6072d005db15f84cf411fe3838fd0ee29a3f39fb960e6",
+    "native-longitudinal-plane-angles-final/003.input.step": "0fd1ba2c1f113c07e1f0cc67cbbfa662f184110f63bfd81bd0521a0564a3c118",
+    "native-longitudinal-plane-angles-final/003.input.json": "a44d7f06319f604fb8d70d5206e85fccf1243d4b60eb84126f389f2a4d8bfa65",
+    "native-longitudinal-plane-angles-final/003.result.brep": "d93ddcbbe5829e39cbad5bbf270f97e138543a9ac02facb9de5b876c852e3791",
+    "native-longitudinal-plane-angles-final/003.result.step": "27f2fef8d217290dc364fc88e0af3642c98b75301b3167e655d40c5df6f14233",
+    "native-longitudinal-plane-angles-final/003.result.json": "d0d0108c596a8ac3a17e87561fb3eac2513ff56012240e5895b27d46f6237aed",
+    "native-longitudinal-plane-angles-final/003.truck.log": "6bbe957bca208754f431cec2fa519384adbf18511e68adc7106c5c587b807005",
+    "native-longitudinal-plane-angles-final/003.truck.step": "2343015887dfda226acb48d3dfc961c135e5e5afb4acb188c09b2595d0527447",
+    "native-longitudinal-plane-angles-final/003.truck.json": "d75e3329ede813b13f2035d04fe48b2f1d8d2a895e3169f35d3f1071d4f1209f",
+    "native-longitudinal-plane-angles-final/003.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-longitudinal-plane-angles-final/003.comparison.json": "fba00f148f338b38c877c2e0ca52aac186d6601770dd8e5e54dc7025cdf670c7",
+    "native-longitudinal-plane-angles-final/004.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native-longitudinal-plane-angles-final/004.input.brep": "7985ca1dfa2ca65ee138d705fe701951fa26d71027e62129ea2d1d83f114041b",
+    "native-longitudinal-plane-angles-final/004.input.step": "b0b36836fcb26d1e050db29a0b2fe7384736519c701efdc02a8447163ea62bdf",
+    "native-longitudinal-plane-angles-final/004.input.json": "766cc26138d209b3ac0a39bc9d2c7122b9bb35710663b6be10d8156f18b671c6",
+    "native-longitudinal-plane-angles-final/004.result.brep": "5ba1de8b4fc4dbdb560217ba423c7364c118feecc4cc5f94231166d9402c3b38",
+    "native-longitudinal-plane-angles-final/004.result.step": "b3bf4499c3f8dbeddb84f5130f118fccc58c48b38bdb85352da5a243c79a622d",
+    "native-longitudinal-plane-angles-final/004.result.json": "a7b7d45b5d519e2b15d1764279d4c57609f2cb2584e610f4a0d9645020461859",
+    "native-longitudinal-plane-angles-final/004.truck.log": "227d0ab6a307d056efa2e3bece3752aef68b7d03c4862c61b7a451fbcd9e5ede",
+    "native-longitudinal-plane-angles-final/004.truck.step": "3980271eba43d88b1cab92d73cdcab7e39868af671d8c50a790770a15f0d325f",
+    "native-longitudinal-plane-angles-final/004.truck.json": "1abb852d0f730bea11f309e369dcfe05c7299ff845997ae26b20f01a4e2e87dc",
+    "native-longitudinal-plane-angles-final/004.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-longitudinal-plane-angles-final/004.comparison.json": "94c34a2d52842859b97cd558c7e08dd903f23a132058b3005d274b9bb4050dfd",
+    "native-longitudinal-plane-angles-final/005.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native-longitudinal-plane-angles-final/005.input.brep": "923dffec7eae5f4b47a9d68a7160504881e23796f119e6016bd8b734511ccf34",
+    "native-longitudinal-plane-angles-final/005.input.step": "73b7c4ccbe1fd4e841d9c991e7167cb1471d673b7e506c0870d52c5936321552",
+    "native-longitudinal-plane-angles-final/005.input.json": "906c6f8b8d0dfe34ed4cb96c141d85460d1c4d5caba1c06241465dbc100fdb06",
+    "native-longitudinal-plane-angles-final/005.result.brep": "3dbfd429b5d9ff82129eee69a38c199b4eca634904def27ccdc4c830a4aa52f5",
+    "native-longitudinal-plane-angles-final/005.result.step": "21cb67f2efb3e82b8bc79c1a5c2449f63ddcfcf2e0fd52155d07c8aa592f3b17",
+    "native-longitudinal-plane-angles-final/005.result.json": "8d30fb5a1caa68c02f853aa7fc0949f9da3043820024e2edf8d56a01c429950d",
+    "native-longitudinal-plane-angles-final/005.truck.log": "c97d2f9d80045c0867a98830b81b6a72cf445dc58340202260c6bafc9a9826fa",
+    "native-longitudinal-plane-angles-final/005.truck.step": "3bb02757170535a254344d069ca3ec10bfc8ea4dc5f1338407834df47c8bd8bf",
+    "native-longitudinal-plane-angles-final/005.truck.json": "8307795ec8ae73fe549db0325fd024a8777ea323c590445abada06b2fd7de574",
+    "native-longitudinal-plane-angles-final/005.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-longitudinal-plane-angles-final/005.comparison.json": "036506b3b97eb61aaf80421e7b6b8667e14d301d6d8755d2974dcf82352e204b",
+    "native-longitudinal-plane-angles-final/006.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native-longitudinal-plane-angles-final/006.input.brep": "8b8a57492242cac66a9986e30b8e0843e29eeef67c9904a429d4dfa56d396424",
+    "native-longitudinal-plane-angles-final/006.input.step": "00e84e33a32c3e3d61b13868c17f6a140e01c483f388f03d41870f632732e1c7",
+    "native-longitudinal-plane-angles-final/006.input.json": "6d7cad7ee3e32bfc4941b21465cfcc5cd1a905e0d800c0caaccf6d30e8dd9196",
+    "native-longitudinal-plane-angles-final/006.result.brep": "a619bfdc35aea4d2b78f6cf43f4523bbb867b14e604497c3e5beb06ee7efbac5",
+    "native-longitudinal-plane-angles-final/006.result.step": "476deb6cb6eae73e2dcfaf5584610886b0fa456755366c08e22c530fe3076538",
+    "native-longitudinal-plane-angles-final/006.result.json": "7903d626888c6f14d209bce9b2c4f59bf63553d9ddc830a3b279470cf18d9d73",
+    "native-longitudinal-plane-angles-final/006.truck.log": "287e69ec7cae9d4cb2d584af4b0895432624a84e6cd538b57ffd694ebcfe87a6",
+    "native-longitudinal-plane-angles-final/006.truck.step": "a0fb3d6ed529f66530228e063e7c85846391b8c20cb4453f01daeff9274ce291",
+    "native-longitudinal-plane-angles-final/006.truck.json": "cb7fb26a91fd2f81f9bbcd7549c4f563823ff474a3590059e6cd9ca1d955ab77",
+    "native-longitudinal-plane-angles-final/006.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-longitudinal-plane-angles-final/006.comparison.json": "f4be19d4be7d584f62fe0e8e0dda995bcfda77c073cba60492c31eb4e58fe271",
+    "native-longitudinal-plane-angles-final/007.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native-longitudinal-plane-angles-final/007.input.brep": "dcca2c1c5e32267430e021c4408d5d1042e836bac9742f651d0b8b23b65d532d",
+    "native-longitudinal-plane-angles-final/007.input.step": "0b0381b9920fcb3d6ea76caee32c388b86999a8e67c9739be34a9d8c963dc8ef",
+    "native-longitudinal-plane-angles-final/007.input.json": "50e7b2e3daddfdbd552545cd9f7065b6ec0736d2a94207930001d5dace1bc8ec",
+    "native-longitudinal-plane-angles-final/007.result.brep": "86d164fbcb8f48e6597689cc58e2b5cf0401b0fc2da00188031e2558973ff8fa",
+    "native-longitudinal-plane-angles-final/007.result.step": "d16afb95b8023d1fe144c3b79360dc689f78dcaec294add842a9966dc29d92e3",
+    "native-longitudinal-plane-angles-final/007.result.json": "be49c0605ff27e85578106069bfc5b1d6d9d9302590751120ebf89de2fa56587",
+    "native-longitudinal-plane-angles-final/007.truck.log": "50a9f8a4e36d05d82f2eeb7b2af316abde6a9e1400f96692611f13bf466018db",
+    "native-longitudinal-plane-angles-final/007.truck.step": "a19ee54fa88a76aad6f2324b8928cd16feee40fa3ff6fe70616490ac65c7574a",
+    "native-longitudinal-plane-angles-final/007.truck.json": "03c7c81ba31e0be9d885aa9a83282ba12e555ee557fb8a4c2eb9672b9c7cfd96",
+    "native-longitudinal-plane-angles-final/007.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-longitudinal-plane-angles-final/007.comparison.json": "24538d78f459ab8382de1bb26b6d1639f875b225c4454a2f573330581fb6b075",
+    "native-longitudinal-plane-angles-final/008.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native-longitudinal-plane-angles-final/008.input.brep": "dcca2c1c5e32267430e021c4408d5d1042e836bac9742f651d0b8b23b65d532d",
+    "native-longitudinal-plane-angles-final/008.input.step": "2843d5993c968a7145eb05e065235b845e579d9f6fc8b86a6c0884954aa3992c",
+    "native-longitudinal-plane-angles-final/008.input.json": "bf095d2dfad2fa2ef66d96677e61deccf0eb7fdfdf38ce3900022730b03c5857",
+    "native-longitudinal-plane-angles-final/008.result.brep": "326c44fa44a13b5b9a362c7c78cd29dc88fc88f4248b34f474c90fa33c1c439a",
+    "native-longitudinal-plane-angles-final/008.result.step": "d37e3c79ff1509797934909e58e151916204313e1015dd775a7464baa1298063",
+    "native-longitudinal-plane-angles-final/008.result.json": "a06392a6b9232004a05eb5768e175bb1c53d60e9a2fb6230e832f26ceb507652",
+    "native-longitudinal-plane-angles-final/008.truck.log": "9c00a17280ff09717b7be00dc8d8a3a80bfece0b69bdef2fd2d85d8c7ce56871",
+    "native-longitudinal-plane-angles-final/008.truck.step": "d84f77dc7eb808ad34def1df343aba8e5021b9a3f1d20756c3b7666edff2af9c",
+    "native-longitudinal-plane-angles-final/008.truck.json": "6cc8fe4332630883529384655d884e422a1d518e38794c3f83d630f34222bcd3",
+    "native-longitudinal-plane-angles-final/008.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-longitudinal-plane-angles-final/008.comparison.json": "3150dc7b2f2e190aaac81fb09ed4601e9cd01a68ca91262c58220b037cbcfb7d",
+    "native-longitudinal-plane-angles-final/009.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native-longitudinal-plane-angles-final/009.input.brep": "923dffec7eae5f4b47a9d68a7160504881e23796f119e6016bd8b734511ccf34",
+    "native-longitudinal-plane-angles-final/009.input.step": "f6b351a46a588bf5f309b3e06480fdd53ccf0f309604891ab06100db10ae88f2",
+    "native-longitudinal-plane-angles-final/009.input.json": "80eda20f87b03f071363658a5897b5d6745689cb2d304300abc31543ea05dcd3",
+    "native-longitudinal-plane-angles-final/009.result.brep": "7264e1dccada676f5481653884cad2d3ea177dfc2acd4946c39a64f196998d78",
+    "native-longitudinal-plane-angles-final/009.result.step": "09ef5f11f1e4fc0bb3ed15380e037442d8a9004cdc782b53e856382cb3849303",
+    "native-longitudinal-plane-angles-final/009.result.json": "72a98ccea34cc18d66c17876c51816c1508e9d5539d082f08b92d424773eb749",
+    "native-longitudinal-plane-angles-final/009.truck.log": "b4d8181553c12af20a82587edc7b20c3c986f044b1d892b353e2977a4e5f0b67",
+    "native-longitudinal-plane-angles-final/009.truck.step": "d43f0ac19e4d3f8d4e390e95dead9df7afa0821036d122f17e458d4e401af321",
+    "native-longitudinal-plane-angles-final/009.truck.json": "37207c5a6b04e81d4c7021c745337c8f3da527d09f7401e341814f367b01e45b",
+    "native-longitudinal-plane-angles-final/009.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-longitudinal-plane-angles-final/009.comparison.json": "5ee85ad4a1fc8c1194d8ab1bcbd2fffd9e80f07265d5180d540357db353a17ce",
+    "native-longitudinal-plane-angles-final/010.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native-longitudinal-plane-angles-final/010.input.brep": "923dffec7eae5f4b47a9d68a7160504881e23796f119e6016bd8b734511ccf34",
+    "native-longitudinal-plane-angles-final/010.input.step": "cdb9a685f64d58f9ed78f5a7a2b280a39dc6212beb7e2050d59a54173ac74178",
+    "native-longitudinal-plane-angles-final/010.input.json": "b35988268d4ef5d5725289cb1723e91e38cc5a5b0cc8b21f94f4f2c6700f0ab0",
+    "native-longitudinal-plane-angles-final/010.result.brep": "62d9867d1ef15225bb96850b6525296fe2fe55cf951014397a3fa24422c0b494",
+    "native-longitudinal-plane-angles-final/010.result.step": "f149a81219e6e4c116e4808e9cf41cd2d1c478d86fedc3ca11b9bd0a63f94b0c",
+    "native-longitudinal-plane-angles-final/010.result.json": "c5fe94d79a6b062ed9723074579a9ba97b8ce955cd99556ba6b4a3689b3c3171",
+    "native-longitudinal-plane-angles-final/010.truck.log": "fd531ca1d15e78f7d1c46205794b8bb60461b85018118aa629f2ebf1f14bac1b",
+    "native-longitudinal-plane-angles-final/010.truck.step": "ebac5d0b4774f251eb80923f661ef7262309d0d8acc5e35f3a66f3a28bd6019b",
+    "native-longitudinal-plane-angles-final/010.truck.json": "d5b4a3f42c9b08358e7a36b6e587f531eba0c612a3e283f439fe336f0c9ee2d5",
+    "native-longitudinal-plane-angles-final/010.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-longitudinal-plane-angles-final/010.comparison.json": "46616b476daabb27ea0e11068b073cac95f85664463285f13b3397c65aea2d3c",
+    "native-longitudinal-plane-angles-final/validated-summary.json": "a302f520d11c7d624e07ee7d674433dc5dcf1aff3cf0747f54e995c1a9e08773",
+    "tools/longitudinal-offset-inputs.cpp": "d240e9bb9e347215c971167c9bddd976f7cabf9fe207611f1a0d9437998a1a0d",
+    "tools/native-section-vertices.cpp": "2be3729671bc1ec184fbd628134b83e7d8176f9a335757cf49a54c7ee89c8a0a",
+    "tools/native-plane-angle-oracle.cpp": "7d0bbfa354ac5c8351b6759988df393c87701fd3ec22633d3dba55a1cc019b1a",
+    "tools/longitudinal-plane-angle-oracle.cpp": "10b012805ec6182dc51ab5231c9d24a073de5bfeba5d69a192f7466a09e16df6",
+    "tools/validate-longitudinal-offset-angle-controls.py": "a245c011ebfef79cf1ffe6a165554a96ba98a9c4ddc7911a2a82c5a01a396538",
+    "tools/validate-longitudinal-plane-extra-angles.py": "89b457172082eb10fe62d72f9096cbb0f6f85fca548e64ce921a842a1b7cd1f2",
+    "tools/analyze-longitudinal-offset-angles.py": "7b01c0bae6ab3f7feefed54b2e4fc3b93decaa738716ff3af196100f0c33eb46",
+    "tools/check-native-plane-angles.py": "1f86203d793815154ea3506f391f86edbd5626f3ed6726af51890b91ceb9c6bc",
+    "tools/replay-longitudinal-plane-angles.py": "cddecfb32b8a777fa1500fb6ff44001733f210e6b653ea521d261bea55cff5a1",
+    "tools/validate-longitudinal-plane-angles.py": "fcbedc305cab9ab0162f2889244a2b7fa3d1bf7a7fd05dee27087c072ab3a322",
+    "tools/longitudinal-offset-angle-controls.txt": "37103cf4e5a02ee9d79b4edf46b015c7f3cca69e0fe95d2d4014373347c241eb",
+    "tools/longitudinal-plane-extra-angles.txt": "a6a2b9b9b78abd632b34577e260967bad0c4aa0cbb694edb3894038fc262963c",
+    "tools/native-plane-angle-proof.txt": "a076893cddf4c9aa331fd8fe028fc559b30b05e7973f89497f59dce2606e7cd6",
+    "tools/longitudinal-plane-angle-oracle-build.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tools/longitudinal-plane-angles-native.txt": "c4a236a9e55292318a12b4d459c4ab8f9419a666984ca1e1963e9c14e08374a1"
+  },
+  "fixture_sha256": {
+    "truck-shapeops/tests/fixtures/chamfer-longitudinal-angle/001.step": "2e8c657edd4a5f613a8c84b5ce7dc6791342a0fdb5e92bf00f5e74dbb45ed3b4",
+    "truck-shapeops/tests/fixtures/chamfer-longitudinal-angle/001.json": "53eaf1bc38b9b03b7ff2180f1c4724566ff17ecb5bd52c8ad7056b30a1d94706",
+    "truck-shapeops/tests/fixtures/chamfer-longitudinal-angle/003.step": "7227246c345ec70ad3177d1cae7884c74b028615ba47504e907346df572a0570",
+    "truck-shapeops/tests/fixtures/chamfer-longitudinal-angle/003.json": "15fc0accdafed3b7db40c66230926892d05b09d065ef9548a2d857a42f8bb78a",
+    "truck-shapeops/tests/fixtures/chamfer-longitudinal-angle/005.step": "0fd1ba2c1f113c07e1f0cc67cbbfa662f184110f63bfd81bd0521a0564a3c118",
+    "truck-shapeops/tests/fixtures/chamfer-longitudinal-angle/005.json": "a44d7f06319f604fb8d70d5206e85fccf1243d4b60eb84126f389f2a4d8bfa65",
+    "truck-shapeops/tests/fixtures/chamfer-longitudinal-angle/007.step": "b0b36836fcb26d1e050db29a0b2fe7384736519c701efdc02a8447163ea62bdf",
+    "truck-shapeops/tests/fixtures/chamfer-longitudinal-angle/007.json": "766cc26138d209b3ac0a39bc9d2c7122b9bb35710663b6be10d8156f18b671c6",
+    "truck-shapeops/tests/fixtures/chamfer-longitudinal-angle/009.step": "73b7c4ccbe1fd4e841d9c991e7167cb1471d673b7e506c0870d52c5936321552",
+    "truck-shapeops/tests/fixtures/chamfer-longitudinal-angle/009.json": "906c6f8b8d0dfe34ed4cb96c141d85460d1c4d5caba1c06241465dbc100fdb06",
+    "truck-shapeops/tests/fixtures/chamfer-longitudinal-angle/011.step": "00e84e33a32c3e3d61b13868c17f6a140e01c483f388f03d41870f632732e1c7",
+    "truck-shapeops/tests/fixtures/chamfer-longitudinal-angle/011.json": "6d7cad7ee3e32bfc4941b21465cfcc5cd1a905e0d800c0caaccf6d30e8dd9196"
+  }
+}

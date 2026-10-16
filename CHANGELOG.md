@@ -6,6 +6,10 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Replay plane-reference distance-angle chamfers on longitudinal plane/cylinder
+  edges from the requested planar contact and angle. Preserve the local cylinder
+  branch and reject unsupported cylinder-reference angles.
+
 - Let planar chamfers cross curved terminal boundaries using the existing
   curve/surface intersection routine. Intersections must remain within the
   terminal edge’s parameter range; trimming and support-face validation stay in force.

@@ -245,6 +245,64 @@ fn longitudinal_cylinder(input: &Solid, edge: &Edge) -> Option<(usize, f64)> {
         .then_some((side, *radius))
 }
 
+fn longitudinal_plane_angle_chord(
+    plane_face: &Face,
+    cylinder_face: &Face,
+    edge: EdgeID,
+    distance: f64,
+    angle: f64,
+) -> Option<f64> {
+    let (Elementary::Plane(plane), plane_forward) = plane_face.oriented_surface().elementary()?
+    else {
+        return None;
+    };
+    let (
+        Elementary::Cylinder {
+            origin,
+            axis,
+            radius,
+        },
+        cylinder_forward,
+    ) = cylinder_face.oriented_surface().elementary()?
+    else {
+        return None;
+    };
+    let boundary = plane_face.edge_iter().find(|e| e.id() == edge)?;
+    let start = boundary.front().point();
+    let spine = (boundary.back().point() - start).normalize();
+    let normal = plane.normal() * if plane_forward { 1. } else { -1. };
+    let inward = normal.cross(spine).normalize();
+    let p = start + distance * inward;
+    let direction = -inward * angle.cos() - normal * angle.sin();
+    let radial = p - origin - axis * (p - origin).dot(axis);
+    let transverse = direction - axis * direction.dot(axis);
+    let a = transverse.magnitude2();
+    let b = radial.dot(transverse);
+    let c = radial.magnitude2() - radius * radius;
+    let discriminant = b * b - a * c;
+    if a <= 0. || discriminant < 0. || !discriminant.is_finite() {
+        return None;
+    }
+    let root = discriminant.sqrt();
+    let parameter = [(-b - root) / a, (-b + root) / a]
+        .into_iter()
+        .filter(|t| t.is_finite() && *t > 0.)
+        .min_by(f64::total_cmp)?;
+    let contact = p + parameter * direction;
+    let seed_radial = start - origin - axis * (start - origin).dot(axis);
+    let contact_radial = contact - origin - axis * (contact - origin).dot(axis);
+    let cylinder_boundary = cylinder_face.edge_iter().find(|e| e.id() == edge)?;
+    let cylinder_spine =
+        (cylinder_boundary.back().point() - cylinder_boundary.front().point()).normalize();
+    let cylinder_normal = seed_radial.normalize() * if cylinder_forward { 1. } else { -1. };
+    let cylinder_inward = cylinder_normal.cross(cylinder_spine);
+    if contact_radial.dot(seed_radial) <= 0. || contact_radial.dot(cylinder_inward) <= 0. {
+        return None;
+    }
+    let chord = contact.distance(start);
+    (chord.is_finite() && chord > 0.).then_some(chord)
+}
+
 fn chamfer_selection(
     input: &Solid,
     selection: &[Value],
@@ -531,18 +589,34 @@ fn chamfer_selection(
                     _ => return Err(unsupported("Face-dependent chamfers require planar supports, a perpendicular plane/cylinder or plane/cone rim, or a longitudinal plane/cylinder edge")),
                 };
                 if mode == "distance-angle" {
-                    let (cos_beta, sin_beta) = linear_section.ok_or_else(|| {
-                        unsupported("Distance-angle chamfers on longitudinal cylindrical edges require curved-section conversion")
-                    })?;
                     let tangent = requested[1] / requested[0];
-                    // Sine rule in the corner section: d1 = d0 sin(alpha) / sin(beta + alpha).
-                    let denominator = sin_beta + cos_beta * tangent;
-                    if sin_beta <= 1e-12 || denominator <= 1e-12 {
-                        return Err(invalid(
-                            "Chamfer angle has no finite positive setback on these supports",
-                        ));
+                    if let Some((cos_beta, sin_beta)) = linear_section {
+                        // Sine rule in the corner section: d1 = d0 sin(alpha) / sin(beta + alpha).
+                        let denominator = sin_beta + cos_beta * tangent;
+                        if sin_beta <= 1e-12 || denominator <= 1e-12 {
+                            return Err(invalid(
+                                "Chamfer angle has no finite positive setback on these supports",
+                            ));
+                        }
+                        distances[1] = requested[1] / denominator;
+                    } else {
+                        let (cylinder, _) = longitudinal.unwrap();
+                        if *side == cylinder {
+                            return Err(unsupported("Cylinder-reference distance-angle chamfers on longitudinal edges are unsupported"));
+                        }
+                        distances[1] = longitudinal_plane_angle_chord(
+                            adjacent[*side],
+                            adjacent[cylinder],
+                            edge.id(),
+                            requested[0],
+                            tangent.atan(),
+                        )
+                        .ok_or_else(|| {
+                            unsupported(
+                                "Plane-reference angle has no supported local cylinder contact",
+                            )
+                        })?;
                     }
-                    distances[1] = requested[1] / denominator;
                     if !distances[1].is_finite() || distances[1] <= 0. {
                         return Err(invalid("Invalid derived chamfer distance"));
                     }
@@ -2464,6 +2538,259 @@ mod longitudinal_chamfer_distance_tests {
             assert_eq!(error["status"], "unhandled-intent");
         }
         assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
+        std::fs::remove_file(path).unwrap();
+    }
+}
+
+#[cfg(test)]
+mod longitudinal_plane_angle_tests {
+    use super::*;
+
+    fn fixture(index: usize) -> (&'static str, Value) {
+        let (step, task) = match index {
+            0 => (
+                include_str!("../tests/fixtures/chamfer-longitudinal-angle/001.step"),
+                include_str!("../tests/fixtures/chamfer-longitudinal-angle/001.json"),
+            ),
+            1 => (
+                include_str!("../tests/fixtures/chamfer-longitudinal-angle/003.step"),
+                include_str!("../tests/fixtures/chamfer-longitudinal-angle/003.json"),
+            ),
+            2 => (
+                include_str!("../tests/fixtures/chamfer-longitudinal-angle/005.step"),
+                include_str!("../tests/fixtures/chamfer-longitudinal-angle/005.json"),
+            ),
+            3 => (
+                include_str!("../tests/fixtures/chamfer-longitudinal-angle/007.step"),
+                include_str!("../tests/fixtures/chamfer-longitudinal-angle/007.json"),
+            ),
+            4 => (
+                include_str!("../tests/fixtures/chamfer-longitudinal-angle/009.step"),
+                include_str!("../tests/fixtures/chamfer-longitudinal-angle/009.json"),
+            ),
+            5 => (
+                include_str!("../tests/fixtures/chamfer-longitudinal-angle/011.step"),
+                include_str!("../tests/fixtures/chamfer-longitudinal-angle/011.json"),
+            ),
+            _ => unreachable!(),
+        };
+        (step, serde_json::from_str(task).unwrap())
+    }
+
+    fn transform_points(member: &mut Value, transform: Matrix4) {
+        let points = member["points"].as_array_mut().unwrap();
+        for p in points.iter_mut() {
+            let point = transform.transform_point(Point3::from_vec(captured_vector(p).unwrap()));
+            *p = json!([point.x, point.y, point.z]);
+        }
+        points.reverse();
+    }
+
+    fn check(index: usize, moved: bool, degrees: f64) {
+        let convex = index < 3;
+        let h: f64 = [-2., 0., 2.][index % 3];
+        let scale: f64 = if moved { 0.2 } else { 1. };
+        let transform = if moved {
+            Matrix4::from_translation(Vector3::new(13., -7., 23.))
+                * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.73))
+        } else {
+            Matrix4::identity()
+        } * Matrix4::from_scale(scale);
+        let inverse = transform.invert().unwrap();
+        let directory = std::env::temp_dir().join(format!(
+            "truck-longitudinal-plane-angle-{}-{index}-{moved}-{degrees}",
+            std::process::id()
+        ));
+        std::fs::create_dir_all(&directory).unwrap();
+        let prefix = directory.join("001");
+        let prefix = prefix.to_str().unwrap();
+        let (step, task) = fixture(index);
+        std::fs::write(format!("{prefix}.input.step"), step).unwrap();
+        let mut input =
+            builder::transformed(&import(&format!("{prefix}.input.step")).unwrap(), transform);
+        if moved {
+            input = Solid::new(
+                input
+                    .boundaries()
+                    .iter()
+                    .map(|s| s.iter().cloned().rev().collect())
+                    .collect(),
+            );
+        }
+        let x = (25. - h * h).sqrt();
+        let original_area = 25. * (h / 5.).acos() - h * x;
+        let original_volume = (if convex {
+            original_area
+        } else {
+            16. * (8. - h) - original_area
+        }) * 10.;
+        replay_common::assert_solid(&input, original_volume * scale.powi(3), &[0], TOL);
+        let prepared = prepare_for_step(&input.compress(), CHAMFER_STEP_TOL).unwrap();
+        let step = StepDisplay::new(
+            Default::default(),
+            StepDesign::from_model(StepModel::from(&prepared)),
+        )
+        .to_string();
+        std::fs::write(format!("{prefix}.input.step"), &step).unwrap();
+        let mut chosen = task["selection"][0].clone();
+        transform_points(&mut chosen, transform);
+        for member in chosen["contour_edges"].as_array_mut().unwrap() {
+            transform_points(member, transform);
+        }
+        let origin = transform.transform_point(Point3::from_vec(
+            captured_vector(&chosen["reference_plane"]["origin"]).unwrap(),
+        ));
+        let normal = transform
+            .transform_vector(captured_vector(&chosen["reference_plane"]["normal"]).unwrap())
+            .normalize();
+        chosen["reference_plane"] =
+            json!({"origin":[origin.x,origin.y,origin.z],"normal":[normal.x,normal.y,normal.z]});
+        chosen["distance"] = json!(0.7 * scale);
+        chosen["angle_degrees"] = json!(degrees);
+        let sign = if convex { -1. } else { 1. };
+        let alpha = degrees.to_radians();
+        let p = Point3::new(x + sign * 0.7, h, 0.);
+        let u = Vector3::new(-sign * alpha.cos(), alpha.sin(), 0.);
+        let dot = p.to_vec().dot(u);
+        let root = (dot * dot + 25. - p.to_vec().magnitude2()).sqrt();
+        let parameter = [-dot - root, -dot + root]
+            .into_iter()
+            .filter(|t| *t > 0.)
+            .min_by(f64::total_cmp)
+            .unwrap();
+        let q = p + parameter * u;
+        let psi = q.y.atan2(q.x) - (h / 5.).asin();
+        let removed = (x * h - h * p.x + p.x * q.y - h * q.x - 25. * psi).abs() / 2.;
+        let expected = (original_volume - 10. * removed) * scale.powi(3);
+        let before = serde_json::to_string(&input.compress()).unwrap();
+        let selected = chamfer_selection(&input, &[chosen.clone()], true).unwrap();
+        assert_eq!(selected.len(), 1);
+        for (edge, distances) in selected {
+            let adjacent: Vec<_> = input
+                .face_iter()
+                .filter(|f| f.edge_iter().any(|e| e.id() == edge.id()))
+                .collect();
+            for (face, distance) in adjacent.iter().zip(distances) {
+                let expected = match face.oriented_surface().elementary().unwrap().0 {
+                    Elementary::Plane(_) => 0.7 * scale,
+                    Elementary::Cylinder { .. } => 5. * psi.tan() * scale,
+                    _ => panic!("unexpected support"),
+                };
+                assert!((distance - expected).abs() < 1e-11);
+            }
+        }
+        assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
+        let task = json!({"schema_version":2,"operation":"chamfer","selection":[chosen]});
+        std::fs::write(format!("{prefix}.input.json"), task.to_string()).unwrap();
+        let result = replay(prefix, &Cell::new("start")).unwrap();
+        assert_eq!(result["status"], "operation-succeeded", "{result}");
+        assert_eq!(result["selected_edges"], 1);
+        for field in [
+            "input_unchanged",
+            "geometry_consistent",
+            "mesh_closed",
+            "step_prepared",
+        ] {
+            assert_eq!(result[field], true, "{field}: {result}");
+        }
+        assert_eq!(
+            step,
+            std::fs::read_to_string(format!("{prefix}.input.step")).unwrap()
+        );
+        let output = import(&format!("{prefix}.truck.step")).unwrap();
+        replay_common::assert_solid(&output, expected, &[0], TOL);
+        replay_common::blend::assert_step(&output, expected, TOL);
+        for target in [
+            p,
+            q,
+            p + 10. * Vector3::unit_z(),
+            q + 10. * Vector3::unit_z(),
+        ] {
+            assert!(output
+                .vertex_iter()
+                .any(|v| inverse.transform_point(v.point()).distance(target) < 1e-6));
+        }
+        let expected_normal =
+            Vector3::new(u.y, -u.x, 0.).normalize() * if convex { 1. } else { -1. };
+        let bevels: Vec<_> = output
+            .face_iter()
+            .filter(|face| {
+                matches!(
+                    face.oriented_surface().elementary(),
+                    Some((Elementary::Plane(_), _))
+                ) && inverse
+                    .transform_vector(face.oriented_surface().normal(0., 0.))
+                    .normalize()
+                    .dot(expected_normal)
+                    > 1. - 1e-8
+            })
+            .collect();
+        assert_eq!(bevels.len(), 1);
+        for vertex in bevels[0].vertex_iter() {
+            assert!(
+                (inverse.transform_point(vertex.point()) - p)
+                    .dot(expected_normal)
+                    .abs()
+                    < 1e-6
+            );
+        }
+        std::fs::remove_dir_all(directory).unwrap();
+    }
+
+    #[test]
+    fn convex_longitudinal_chamfers_preserve_the_requested_plane_angle() {
+        for index in 0..3 {
+            for moved in [false, true] {
+                check(index, moved, 30.);
+            }
+        }
+    }
+    #[test]
+    fn concave_longitudinal_chamfers_preserve_the_requested_plane_angle() {
+        for index in 3..6 {
+            for moved in [false, true] {
+                check(index, moved, 30.);
+            }
+        }
+    }
+    #[test]
+    fn longitudinal_plane_angles_preserve_shallow_and_steep_requests() {
+        for index in [1, 4] {
+            for degrees in [15., 60.] {
+                for moved in [false, true] {
+                    check(index, moved, degrees);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn longitudinal_angles_reject_unsupported_references_and_contacts() {
+        let path = std::env::temp_dir().join(format!(
+            "truck-longitudinal-angle-guards-{}.step",
+            std::process::id()
+        ));
+        for (index, cylinder_reference, distance, angle) in [
+            (1, true, 1.5, 30.),
+            (1, false, 6., 89.),
+            (4, false, 0.7, 80.),
+        ] {
+            let (step, mut task) = fixture(index);
+            std::fs::write(&path, step).unwrap();
+            let input = import(path.to_str().unwrap()).unwrap();
+            let before = serde_json::to_string(&input.compress()).unwrap();
+            let chosen = &mut task["selection"][0];
+            chosen["distance"] = json!(distance);
+            chosen["angle_degrees"] = json!(angle);
+            if cylinder_reference {
+                chosen["reference_plane"] = Value::Null;
+                chosen["reference_cylinder"] =
+                    json!({"origin":[0.,0.,0.],"axis":[0.,0.,1.],"radius":5.});
+            }
+            let error = chamfer_selection(&input, &[chosen.clone()], true).unwrap_err();
+            assert_eq!(error["status"], "unhandled-intent");
+            assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
+        }
         std::fs::remove_file(path).unwrap();
     }
 }
