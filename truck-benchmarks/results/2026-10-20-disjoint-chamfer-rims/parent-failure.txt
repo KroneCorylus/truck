@@ -1,0 +1,32 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 2.01s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/disjoint_chamfer_rims.rs (target/release/deps/disjoint_chamfer_rims-d76d925b05b4ebef)
+
+running 3 tests
+test full_cylinder_disjoint_rims ... FAILED
+test quarter_cylinder_disjoint_rims ... FAILED
+test overlapping_disjoint_rim_cuts_preserve_input ... ok
+
+failures:
+
+---- full_cylinder_disjoint_rims stdout ----
+
+thread 'full_cylinder_disjoint_rims' (811728) panicked at truck-shapeops/tests/disjoint_chamfer_rims.rs:96:29:
+called `Result::unwrap()` on an `Err` value: Diagnostic { code: UnsupportedGeometry, operation: "blend", stage: "intersect_straight_blends", message: "The geometry is outside the supported scope of this operation.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- quarter_cylinder_disjoint_rims stdout ----
+
+thread 'quarter_cylinder_disjoint_rims' (811730) panicked at truck-shapeops/tests/disjoint_chamfer_rims.rs:96:29:
+called `Result::unwrap()` on an `Err` value: Diagnostic { code: UnsupportedGeometry, operation: "blend", stage: "intersect_straight_blends", message: "The geometry is outside the supported scope of this operation.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+
+
+failures:
+    full_cylinder_disjoint_rims
+    quarter_cylinder_disjoint_rims
+
+test result: FAILED. 1 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-shapeops --test disjoint_chamfer_rims`

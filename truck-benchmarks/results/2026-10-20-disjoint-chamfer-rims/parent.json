@@ -1,0 +1,7 @@
+{
+  "revision": "69518ba1c19747b6752f257026326f9bae14909d",
+  "sha256": {
+    "truck-shapeops/src/fillet/modeling.rs": "d367aa6170c3bd25927f98309bcad8b58403f87f109927f05d37311316d2cfb8",
+    "truck-shapeops/tests/disjoint_chamfer_rims.rs": "6f0fe2e1c503a346ebc5a6f1483214480bf8f41da46d797e1434ee03e88d504a"
+  }
+}

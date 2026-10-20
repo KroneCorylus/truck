@@ -1,0 +1,8 @@
+quarter equal Truck volume error -2.4167349010895123e-08 sampled distance 4.35447744109551e-09 cone error 4.440892098500626e-15
+quarter unequal Truck volume error -2.290369138790993e-08 sampled distance 4.354473980294558e-09 cone error 1.7763568394002505e-15
+quarter angle Truck volume error -2.229805318165745e-08 sampled distance 4.354476538546377e-09 cone error 6.217248937900877e-15
+quarter different Truck volume error -2.2370699070961564e-08 sampled distance 4.354473980294558e-09 cone error 1.7763568394002505e-15
+full equal Truck volume error -1.2016437267448055e-07 sampled distance 8.043927834933129e-08 cone error 2.035414503609445e-09
+full unequal Truck volume error -1.1388328857719898e-07 sampled distance 8.043927834933129e-08 cone error 2.035414503609445e-09
+full angle Truck volume error -1.1087172424595337e-07 sampled distance 8.043927834933129e-08 cone error 2.035414503609445e-09
+full different Truck volume error -1.1123461263196077e-07 sampled distance 8.605132073569166e-08 cone error 2.0354153917878648e-09
