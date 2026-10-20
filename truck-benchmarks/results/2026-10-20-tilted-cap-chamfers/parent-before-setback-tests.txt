@@ -1,0 +1,34 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 8.04s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/tilted_cap_chamfer.rs (target/release/deps/tilted_cap_chamfer-cd8bb9657e461910)
+
+running 4 tests
+test tilted_cap_chamfers_preserve_material_history_and_step ... FAILED
+test tilted_cap_chamfers_survive_similarity_transforms ... FAILED
+test horizontal_cap_retains_its_chamfer_contract ... ok
+test tight_contact_tolerance_and_folded_offsets_remain_rejected ... ok
+
+failures:
+
+---- tilted_cap_chamfers_preserve_material_history_and_step stdout ----
+
+thread 'tilted_cap_chamfers_preserve_material_history_and_step' (2112023) panicked at truck-shapeops/tests/tilted_cap_chamfer.rs:117:25:
+tangent rounded rim under a tilted planar cap: Diagnostic { code: BlendConstructionFailed, operation: "chamfer_solid_along_wire", stage: "trim_faces", message: "Blend construction failed; the numerical or geometric constraint could not be resolved.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- tilted_cap_chamfers_survive_similarity_transforms stdout ----
+
+thread 'tilted_cap_chamfers_survive_similarity_transforms' (2112024) panicked at truck-shapeops/tests/tilted_cap_chamfer.rs:117:25:
+tangent rounded rim under a tilted planar cap: Diagnostic { code: BlendConstructionFailed, operation: "chamfer_solid_along_wire", stage: "trim_faces", message: "Blend construction failed; the numerical or geometric constraint could not be resolved.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+
+
+failures:
+    tilted_cap_chamfers_preserve_material_history_and_step
+    tilted_cap_chamfers_survive_similarity_transforms
+
+test result: FAILED. 2 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.54s
+
+error: test failed, to rerun pass `-p truck-shapeops --test tilted_cap_chamfer`
+exit_code 101

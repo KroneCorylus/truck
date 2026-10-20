@@ -1,0 +1,83 @@
+$ cargo test --release -p truck-shapeops --test tilted_cap_chamfer --test chamfer_general --test disjoint_chamfer_rims --test chamfer_terminal_growth --test conic_section_chamfers --test mixed_chamfer_components --test tangent_chamfer_fit
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 14.45s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/chamfer_general.rs (target/release/deps/chamfer_general-861dcc4b338d5228)
+
+running 15 tests
+test a_flat_face_seam_is_not_a_concave_chamfer ... ok
+test concave_chamfers_reject_collapsed_neighbours ... ok
+test oversized_unequal_distances_preserve_the_input ... ok
+test an_untouched_four_edge_vertex_does_not_block_a_chamfer ... ok
+test three_edge_corners_do_not_require_a_globally_convex_body ... ok
+test asymmetric_three_edge_corner_matches_an_affine_scaled_reference ... ok
+test chamfers_reject_hole_collisions_without_changing_the_body ... ok
+test concave_chamfers_measure_distances_on_oblique_support_faces ... ok
+test isolated_inset_edges_have_valid_planar_terminations ... ok
+test mixed_three_way_chamfer_has_a_transition_face_above_the_inside_bevel ... ok
+test asymmetric_inset_chamfers_keep_their_contact_distances_and_order ... ok
+test mixed_corner_transitions_support_distinct_setbacks_and_both_ends ... ok
+test concave_cavity_edges_and_mixed_disjoint_selections_preserve_volume ... ok
+test concave_chamfers_add_material_and_preserve_distance_sides ... ok
+test holes_elsewhere_do_not_disable_a_planar_chamfer ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/chamfer_terminal_growth.rs (target/release/deps/chamfer_terminal_growth-10efbae6014db305)
+
+running 5 tests
+test oversized_terminal_cuts_preserve_the_input ... ok
+test unequal_chamfer_extends_concave_terminal_lines ... ok
+test equal_chamfer_extends_concave_terminal_lines ... ok
+test angle_chamfer_extends_concave_terminal_lines ... ok
+test convex_terminal_edges_keep_bounded_trims ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/conic_section_chamfers.rs (target/release/deps/conic_section_chamfers-e6a3b9140b75033b)
+
+running 1 test
+test chamfers_cross_the_conic_parameter_seam ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+     Running tests/disjoint_chamfer_rims.rs (target/release/deps/disjoint_chamfer_rims-d76d925b05b4ebef)
+
+running 3 tests
+test overlapping_disjoint_rim_cuts_preserve_input ... ok
+test quarter_cylinder_disjoint_rims ... ok
+test full_cylinder_disjoint_rims ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s
+
+     Running tests/mixed_chamfer_components.rs (target/release/deps/mixed_chamfer_components-6cad066db96ba1bb)
+
+running 4 tests
+test overlapping_mixed_components_preserve_input ... ok
+test equal_mixed_chamfer_components ... ok
+test angle_mixed_chamfer_components ... ok
+test unequal_mixed_chamfer_components ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+
+     Running tests/tangent_chamfer_fit.rs (target/release/deps/tangent_chamfer_fit-5cf333bab899bdaf)
+
+running 3 tests
+test simple_chamfer_keeps_contact_curves_on_its_ruled_surface ... ok
+test shifted_curve_domains_preserve_bevel_orientation_and_material ... ok
+test tangent_chamfers_preserve_material_contacts_and_step_across_scales ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/tilted_cap_chamfer.rs (target/release/deps/tilted_cap_chamfer-cd8bb9657e461910)
+
+running 4 tests
+test horizontal_cap_retains_its_chamfer_contract ... ok
+test tilted_cap_chamfers_survive_similarity_transforms ... ok
+test tilted_cap_chamfers_preserve_material_history_and_step ... ok
+test tight_contact_tolerance_and_folded_offsets_remain_rejected ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.97s
+
+exit_code 0

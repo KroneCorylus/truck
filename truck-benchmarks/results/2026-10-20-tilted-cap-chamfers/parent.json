@@ -1,0 +1,13 @@
+{
+  "revision": "ca175695b5f714e7bb58601641ec65f40ba36e3e",
+  "sha256": {
+    "truck-shapeops/tests/tilted_cap_chamfer.rs": "60e6d3078703ea70ed0887d63fef4e100724cf10992c952fa11bee6b395fcff6",
+    "truck-shapeops/src/fillet/modeling.rs": "f05b57ea3e0134c0253ddb3d1438e03df5120ca3c1df2da77a38c2efddfd7717",
+    "truck-shapeops/src/fillet/along_wire.rs": "e44529af142785553f71b3ba819c8a359f8275a1242ed06595fa37aa81e0b32c",
+    "truck-shapeops/src/fillet/chamfer.rs": "4ab29509ca0ee447557d0f9a2b80e680b3314d542c324eeb8f55a0acd6505ee1"
+  },
+  "tests": {
+    "passed": 2,
+    "failed": 2
+  }
+}

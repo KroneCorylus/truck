@@ -74,6 +74,7 @@ fn fit_contact_curves<C, S>(
     surface1: &S,
     distances: (f64, f64),
     tol: f64,
+    range: Option<(f64, f64)>,
 ) -> Option<(
     Vec<f64>,
     [PCurve<BSplineCurve<Point2>, S>; 2],
@@ -83,7 +84,7 @@ where
     C: FilletedCurve<S> + ParameterDivision1D<Point = Point3>,
     S: FilletedSurface<C> + SearchNearestParameter<D2, Point = Point3>,
 {
-    let (t0, t1) = edge.range_tuple();
+    let (t0, t1) = range.unwrap_or_else(|| edge.range_tuple());
     let mut count = edge
         .parameter_division((t0, t1), tol)
         .0
@@ -134,6 +135,100 @@ where
     }
 }
 
+fn constrain_contact<C, S>(
+    source: &PCurve<BSplineCurve<Point2>, S>,
+    edge: &Edge<Point3, C>,
+    tol: f64,
+) -> Option<C>
+where
+    C: FilletedCurve<S>,
+    S: FilletedSurface<C>,
+    PCurve<BSplineCurve<Point2>, S>: ToSameGeometry<C>,
+{
+    let old = edge.oriented_curve();
+    let (a, b) = old.range_tuple();
+    if old.subs(a).near(&edge.front().point()) && old.subs(b).near(&edge.back().point()) {
+        return Some(old);
+    }
+    // Inversion followed by trimming can shift the parameter interval.
+    let original_curve: C = source.to_same_geometry();
+    let a = original_curve.search_nearest_parameter(old.subs(a), None, 100)?;
+    let b = original_curve.search_nearest_parameter(old.subs(b), None, 100)?;
+    if !a.is_finite() || !b.is_finite() || a >= b {
+        return None;
+    }
+    let (mut curve, surface) = source.clone().decompose();
+    curve = curve.cut(a);
+    curve.cut(b);
+    let original = PCurve::new(curve.clone(), surface.clone());
+    let endpoints = [(a, edge.front().point()), (b, edge.back().point())];
+    let mut shifts = Vec::new();
+    for (t, p) in endpoints {
+        if original.subs(t).distance(p) > tol {
+            return None;
+        }
+        let hint = curve.subs(t);
+        let (mut u, mut v) = surface.search_parameter(p, Some((hint.x, hint.y)), 100)?;
+        if let Some(period) = surface.u_period() {
+            u += ((hint.x - u) / period).round() * period;
+        }
+        if let Some(period) = surface.v_period() {
+            v += ((hint.y - v) / period).round() * period;
+        }
+        shifts.push(Point2::new(u, v) - hint);
+    }
+    // Constrain the endpoint and its tangent on the original support, within caller tolerance.
+    let count = curve.control_points().len();
+    for (i, p) in curve.control_points_mut().enumerate() {
+        if i < 2 {
+            *p += shifts[0];
+        }
+        if i + 2 >= count {
+            *p += shifts[1];
+        }
+    }
+    let corrected = PCurve::new(curve, surface);
+    if (0..=32).any(|i| {
+        let t = a + (b - a) * i as f64 / 32.;
+        corrected.subs(t).distance(original.subs(t)) > tol
+            || corrected.der(t).dot(original.der(t)) <= 0.
+    }) {
+        return None;
+    }
+    Some(corrected.to_same_geometry())
+}
+
+fn fit_trimmed_contacts<C: ParametricCurve3D + BoundedCurve>(
+    curves: &[C; 2],
+    tol: f64,
+) -> Option<[BSplineCurve<Point3>; 2]> {
+    let ranges = curves.each_ref().map(|c| c.range_tuple());
+    let point = |side: usize, t: f64| {
+        let (a, b) = ranges[side];
+        curves[side].subs(a + (b - a) * t)
+    };
+    let mut count = 5;
+    while count <= 257 {
+        let params: Vec<_> = (0..count).map(|i| i as f64 / (count - 1) as f64).collect();
+        let fit: [BSplineCurve<Point3>; 2] = std::array::from_fn(|side| {
+            interpolate(&params, params.iter().map(|&t| point(side, t)))
+        });
+        let good = params.windows(2).all(|w| {
+            (0..=4).all(|i| {
+                let t = w[0] + (w[1] - w[0]) * i as f64 / 4.;
+                (0..2).all(|side| {
+                    point(side, t).distance(fit[side].subs(t)) <= tol.min(TOLERANCE * 0.1)
+                })
+            })
+        });
+        if good {
+            return Some(fit);
+        }
+        count = 2 * count - 1;
+    }
+    None
+}
+
 fn ruling_edge<C, S>(
     (v0, uv0): (&Vertex<Point3>, Point2),
     (v1, uv1): (&Vertex<Point3>, Point2),
@@ -176,7 +271,7 @@ where
     let edge_curve = chamfered_edge.oriented_curve();
 
     let (params, [pcurve0, pcurve1], [curve0, curve1]) =
-        fit_contact_curves(&edge_curve, &surface0, &surface1, (d0, d1), tol)?;
+        fit_contact_curves(&edge_curve, &surface0, &surface1, (d0, d1), tol, None)?;
 
     let (new_face0, chamfer_edge0, _) =
         cut_face_by_curve(face0, pcurve0.to_same_geometry(), chamfered_edge_id)?;
@@ -295,7 +390,15 @@ where
     PCurve<BSplineCurve<Point2>, S>: ToSameGeometry<C>,
     BSplineSurface<Point3>: ToSameGeometry<S>,
 {
-    try_chamfer_along_wire_with_trim(shell, wire, d0, d1, tol, along_wire::trim_contact_edge)
+    try_chamfer_along_wire_with_trim(
+        shell,
+        wire,
+        d0,
+        d1,
+        tol,
+        along_wire::trim_contact_edge,
+        false,
+    )
 }
 
 pub(super) fn try_chamfer_along_wire_with_trim<C, S>(
@@ -305,6 +408,7 @@ pub(super) fn try_chamfer_along_wire_with_trim<C, S>(
     d1: f64,
     tol: f64,
     trim: impl Fn(&mut C, &Edge<Point3, C>, bool) -> Option<along_wire::TrimmedContact<C>>,
+    continue_contacts: bool,
 ) -> Result<Shell<Point3, C, S>, Diagnostic>
 where
     C: FilletedCurve<S> + ParameterDivision1D<Point = Point3>,
@@ -344,13 +448,22 @@ where
         return Err(error);
     }
     let mut contacts = Vec::new();
+    let mut support_contacts = Vec::new();
     let mut surfaces = Vec::new();
     let mut sides = Vec::new();
     for (index, edge) in wire.iter().enumerate() {
         let mut adjacent = [None, None];
+        let mut cap_side = None;
         for face in shell {
             if let Some(found) = face.edge_iter().find(|e| e.id() == edge.id()) {
                 let side = usize::from(found.front() != edge.front());
+                if continue_contacts
+                    && wire
+                        .iter()
+                        .all(|e| face.edge_iter().any(|q| q.id() == e.id()))
+                {
+                    cap_side = Some(side);
+                }
                 if adjacent[side].replace(face.oriented_surface()).is_some() {
                     return Err(Diagnostic::new(
                         Code::UnsupportedTopology,
@@ -368,9 +481,27 @@ where
             );
         };
         let curve = edge.oriented_curve();
-        let (params, pcurves, [c0, c1]) = fit_contact_curves(&curve, &s0, &s1, (d0, d1), tol)
-            .ok_or_else(|| failed().stage("find_contact").selection(index))?;
-        let contact: [C; 2] = pcurves.map(|curve| curve.to_same_geometry());
+        let (a, b) = curve.range_tuple();
+        let range = if continue_contacts {
+            let speeds = [curve.der(a).magnitude(), curve.der(b).magnitude()];
+            if speeds.iter().any(|s| !s.is_finite() || *s <= 0.) {
+                return Err(failed().stage("continue_contacts").selection(index));
+            }
+            let range = (
+                a - 2. * d0.max(d1) / speeds[0],
+                b + 2. * d0.max(d1) / speeds[1],
+            );
+            if !range.0.is_finite() || !range.1.is_finite() || range.0 >= range.1 {
+                return Err(failed().stage("continue_contacts").selection(index));
+            }
+            Some(range)
+        } else {
+            None
+        };
+        let (params, pcurves, [c0, c1]) =
+            fit_contact_curves(&curve, &s0, &s1, (d0, d1), tol, range)
+                .ok_or_else(|| failed().stage("find_contact").selection(index))?;
+        let mut contact: [C; 2] = pcurves.each_ref().map(|curve| curve.to_same_geometry());
         // Reject collapsed/reversed offsets and fits that separate the contact edge from
         // either its supporting face or the ruled chamfer by more than the fitting tolerance.
         for pair in params.windows(2) {
@@ -398,6 +529,14 @@ where
                 }
             }
         }
+        if continue_contacts {
+            let side = cap_side.ok_or_else(failed)?;
+            contact[side] = contact[side].cut(a);
+            contact[side].cut(b);
+        }
+        if continue_contacts {
+            support_contacts.push(pcurves);
+        }
         contacts.push(contact);
         let t = (params[0] + params[params.len() - 1]) / 2.0;
         let p = curve.subs(t);
@@ -415,6 +554,27 @@ where
     }
     let mut trimmed = along_wire::trim_closed_chain(shell, wire, &contacts, trim)
         .ok_or_else(|| failed().stage("trim_faces"))?;
+    if continue_contacts {
+        for k in 0..wire.len() {
+            for (source, edge) in support_contacts[k].iter().zip(&trimmed.contacts[k]) {
+                let curve = constrain_contact(source, edge, tol)
+                    .ok_or_else(|| failed().stage("constrain_contact").selection(k))?;
+                edge.set_curve(if edge.orientation() {
+                    curve
+                } else {
+                    curve.inverse()
+                });
+            }
+            contacts[k] = std::array::from_fn(|side| trimmed.contacts[k][side].oriented_curve());
+            let [c0, c1] = fit_trimmed_contacts(&contacts[k], tol)
+                .ok_or_else(|| failed().stage("fit_trimmed_contacts"))?;
+            surfaces[k] = if sides[k].0 == 0. {
+                BSplineSurface::homotopy(c0, c1)
+            } else {
+                BSplineSurface::homotopy(c1, c0)
+            };
+        }
+    }
     let n = wire.len();
     let nv = if closed { n } else { n + 1 };
     let mut cross = Vec::new();

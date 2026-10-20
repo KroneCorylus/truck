@@ -1,0 +1,9 @@
+angle0 volume difference 7.291212078541776e-11 ppm 9.763399395101793e-05 distance 1.1124653632106652e-08 setback 5.7407820164279144e-09
+angle2 volume difference 9.222484712689827e-06 ppm 12.62608636633241 distance 0.0005065624328762976 setback 3.4740942483901804e-09
+angle-2 volume difference 1.4262255965125092e-07 ppm 0.18688457328791422 distance 9.859176644842356e-06 setback 6.0954429882381644e-05
+angle10 volume difference 4.299933168938619e-05 ppm 64.74042759770498 distance 0.002511258306027193 setback 2.050671341902177e-06
+Traceback (most recent call last):
+  File "/home/krone/Development/Pieza_WS/truck/target/compare-tilted-cap.py", line 16, in <module>
+    Path('target/tilted-cap-comparison-summary.json').write_text(json.dumps(records,indent=2)+'\n');assert not failures,failures
+                                                                                                           ^^^^^^^^^^^^
+AssertionError: [('angle10', 'result', 'distance')]

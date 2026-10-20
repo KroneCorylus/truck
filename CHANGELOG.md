@@ -6,6 +6,13 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Continue tangent chamfer contacts beneath tilted planar caps across parallel
+  convex cylindrical and planar walls when their original intervals stop short
+  of a support seam. Preserve support surfaces, constrain endpoint corrections
+  within caller tolerance, and retain fold and topology checks. Regressions cover
+  contour direction, transforms, setbacks, material, history and STEP; independent
+  native controls retain a documented 10-degree distance discrepancy.
+
 - Replay cylinder-reference distance-angle chamfers on longitudinal plane/cylinder
   edges using the requested chord and the cylinder tangent at the new contact.
   Reject contacts outside the local branch or with no positive planar setback.

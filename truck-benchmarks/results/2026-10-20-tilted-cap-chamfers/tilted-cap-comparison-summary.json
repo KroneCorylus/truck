@@ -1,0 +1,322 @@
+[
+  {
+    "degrees": 0.0,
+    "expected_input_volume": 0.7556701050704796,
+    "generated_faces": 3,
+    "geometry_consistent": true,
+    "input_unchanged": true,
+    "max_setback_error": 5.7407820164279144e-09,
+    "mode": "angle0",
+    "native_reference_volume": 0.7467903118046886,
+    "setback_samples": 198,
+    "input_comparison": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 0.7556701050704788,
+      "truck_volume": 0.7556701050704789,
+      "native_to_truck_max_distance": 1.3877787807814457e-15,
+      "native_to_truck_samples": 1581,
+      "truck_to_native_max_distance": 3.3766115072321297e-16,
+      "truck_to_native_samples": 1581,
+      "native_tolerances": {
+        "face": 1e-07,
+        "edge": 1.5e-07,
+        "vertex": 1.50000000055511e-07
+      },
+      "truck_step_tolerances": {
+        "face": 1e-07,
+        "edge": 1e-07,
+        "vertex": 1e-07
+      }
+    },
+    "result_comparison": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 0.7467903118046888,
+      "truck_volume": 0.7467903117317765,
+      "native_to_truck_max_distance": 1.1124653632106652e-08,
+      "native_to_truck_samples": 2291,
+      "truck_to_native_max_distance": 1.1123182901748347e-08,
+      "truck_to_native_samples": 2277,
+      "native_tolerances": {
+        "face": 1e-07,
+        "edge": 1.5e-07,
+        "vertex": 0.0001
+      },
+      "truck_step_tolerances": {
+        "face": 1e-07,
+        "edge": 1e-07,
+        "vertex": 1e-07
+      }
+    },
+    "volume_difference": 7.291212078541776e-11,
+    "volume_difference_ppm": 9.763399395101793e-05,
+    "native_reference": {
+      "mode": "angle0",
+      "degrees": 0.0,
+      "native_input_unchanged": true,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-tilted-cap/capture/001",
+      "native": {
+        "native_valid": true,
+        "solids": 1,
+        "volume": 0.7467903118046886,
+        "area": 4.806784676778382,
+        "stored_tolerances": {
+          "face": 1e-07,
+          "edge": 1.5e-07,
+          "vertex": 0.0001
+        }
+      },
+      "expected_input_volume": 0.7556701050704796,
+      "input_volume_error": -7.771561172376096e-16
+    }
+  },
+  {
+    "degrees": 2.0,
+    "expected_input_volume": 0.7393016384142941,
+    "generated_faces": 3,
+    "geometry_consistent": true,
+    "input_unchanged": true,
+    "max_setback_error": 3.4740942483901804e-09,
+    "mode": "angle2",
+    "native_reference_volume": 0.7304309859056308,
+    "setback_samples": 198,
+    "input_comparison": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 0.7393016384150412,
+      "truck_volume": 0.7393016384106308,
+      "native_to_truck_max_distance": 1.5553031891404223e-15,
+      "native_to_truck_samples": 1551,
+      "truck_to_native_max_distance": 4.041272810440265e-16,
+      "truck_to_native_samples": 1551,
+      "native_tolerances": {
+        "face": 1e-07,
+        "edge": 1.5e-07,
+        "vertex": 1.50000000124127e-07
+      },
+      "truck_step_tolerances": {
+        "face": 1e-07,
+        "edge": 1e-07,
+        "vertex": 1e-07
+      }
+    },
+    "result_comparison": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 0.7304309859056304,
+      "truck_volume": 0.7304217634209181,
+      "native_to_truck_max_distance": 0.0005065624328762976,
+      "native_to_truck_samples": 2252,
+      "truck_to_native_max_distance": 0.00045575995427247845,
+      "truck_to_native_samples": 2242,
+      "native_tolerances": {
+        "face": 5.23929133679382e-06,
+        "edge": 1.87571045263926e-05,
+        "vertex": 0.0001
+      },
+      "truck_step_tolerances": {
+        "face": 1e-07,
+        "edge": 1e-07,
+        "vertex": 1e-07
+      }
+    },
+    "volume_difference": 9.222484712689827e-06,
+    "volume_difference_ppm": 12.62608636633241,
+    "native_reference": {
+      "mode": "angle2",
+      "degrees": 2.0,
+      "native_input_unchanged": true,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-tilted-cap/capture/002",
+      "native": {
+        "native_valid": true,
+        "solids": 1,
+        "volume": 0.7304309859056308,
+        "area": 4.746283107280259,
+        "stored_tolerances": {
+          "face": 5.239291336793825e-06,
+          "edge": 1.875710452639256e-05,
+          "vertex": 0.0001
+        }
+      },
+      "expected_input_volume": 0.7393016384142941,
+      "input_volume_error": 7.470690732702678e-13
+    }
+  },
+  {
+    "degrees": -2.0,
+    "expected_input_volume": 0.7720385717266651,
+    "generated_faces": 3,
+    "geometry_consistent": true,
+    "input_unchanged": true,
+    "max_setback_error": 6.0954429882381644e-05,
+    "mode": "angle-2",
+    "native_reference_volume": 0.7631585483063213,
+    "setback_samples": 198,
+    "input_comparison": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 0.7720385717259158,
+      "truck_volume": 0.7720385717303272,
+      "native_to_truck_max_distance": 1.3334236103572998e-15,
+      "native_to_truck_samples": 1551,
+      "truck_to_native_max_distance": 4.611102534756203e-16,
+      "truck_to_native_samples": 1551,
+      "native_tolerances": {
+        "face": 1e-07,
+        "edge": 1.5e-07,
+        "vertex": 1.50000000166533e-07
+      },
+      "truck_step_tolerances": {
+        "face": 1e-07,
+        "edge": 1e-07,
+        "vertex": 1e-07
+      }
+    },
+    "result_comparison": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 0.7631585483063213,
+      "truck_volume": 0.763158690928881,
+      "native_to_truck_max_distance": 9.734927741218155e-06,
+      "native_to_truck_samples": 2244,
+      "truck_to_native_max_distance": 9.859176644842356e-06,
+      "truck_to_native_samples": 2241,
+      "native_tolerances": {
+        "face": 4.4202559779714e-06,
+        "edge": 4.4202559779714e-06,
+        "vertex": 0.0001
+      },
+      "truck_step_tolerances": {
+        "face": 1e-07,
+        "edge": 1e-07,
+        "vertex": 1e-07
+      }
+    },
+    "volume_difference": 1.4262255965125092e-07,
+    "volume_difference_ppm": 0.18688457328791422,
+    "native_reference": {
+      "mode": "angle-2",
+      "degrees": -2.0,
+      "native_input_unchanged": true,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-tilted-cap/capture/003",
+      "native": {
+        "native_valid": true,
+        "solids": 1,
+        "volume": 0.7631585483063213,
+        "area": 4.8684269120179335,
+        "stored_tolerances": {
+          "face": 4.420255977971396e-06,
+          "edge": 4.420255977971396e-06,
+          "vertex": 0.0001
+        }
+      },
+      "expected_input_volume": 0.7720385717266651,
+      "input_volume_error": -7.492895193195181e-13
+    }
+  },
+  {
+    "degrees": 10.0,
+    "expected_input_volume": 0.6730200848584555,
+    "generated_faces": 3,
+    "geometry_consistent": true,
+    "input_unchanged": true,
+    "max_setback_error": 2.050671341902177e-06,
+    "mode": "angle10",
+    "native_reference_volume": 0.664180532704892,
+    "setback_samples": 198,
+    "input_comparison": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 0.6730200848622317,
+      "truck_volume": 0.6730200848399611,
+      "native_to_truck_max_distance": 1.5710734600032811e-15,
+      "native_to_truck_samples": 1538,
+      "truck_to_native_max_distance": 3.3766115072321297e-16,
+      "truck_to_native_samples": 1538,
+      "native_tolerances": {
+        "face": 1e-07,
+        "edge": 1.5e-07,
+        "vertex": 1.50000000124127e-07
+      },
+      "truck_step_tolerances": {
+        "face": 1e-07,
+        "edge": 1e-07,
+        "vertex": 1e-07
+      }
+    },
+    "result_comparison": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 0.6641805327048919,
+      "truck_volume": 0.6641375333732026,
+      "native_to_truck_max_distance": 0.002511258306027193,
+      "native_to_truck_samples": 2230,
+      "truck_to_native_max_distance": 0.0022757839437112107,
+      "truck_to_native_samples": 2226,
+      "native_tolerances": {
+        "face": 2.47612636141126e-05,
+        "edge": 8.7976538465854e-05,
+        "vertex": 0.000167574358982658
+      },
+      "truck_step_tolerances": {
+        "face": 1e-07,
+        "edge": 1e-07,
+        "vertex": 1e-07
+      }
+    },
+    "volume_difference": 4.299933168938619e-05,
+    "volume_difference_ppm": 64.74042759770498,
+    "native_reference": {
+      "mode": "angle10",
+      "degrees": 10.0,
+      "native_input_unchanged": true,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-tilted-cap/capture/004",
+      "native": {
+        "native_valid": true,
+        "solids": 1,
+        "volume": 0.664180532704892,
+        "area": 4.512020195642286,
+        "stored_tolerances": {
+          "face": 2.4761263614112614e-05,
+          "edge": 8.797653846585398e-05,
+          "vertex": 0.0001675743589826581
+        }
+      },
+      "expected_input_volume": 0.6730200848584555,
+      "input_volume_error": 3.776201573657545e-12
+    }
+  }
+]

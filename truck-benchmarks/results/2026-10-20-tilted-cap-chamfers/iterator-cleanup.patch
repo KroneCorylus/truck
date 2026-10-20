@@ -1,0 +1,14 @@
+--- truck-shapeops/src/fillet/chamfer.rs (full suite)
++++ truck-shapeops/src/fillet/chamfer.rs (final)
+@@ -556,9 +556,8 @@
+         .ok_or_else(|| failed().stage("trim_faces"))?;
+     if continue_contacts {
+         for k in 0..wire.len() {
+-            for side in 0..2 {
+-                let edge = &trimmed.contacts[k][side];
+-                let curve = constrain_contact(&support_contacts[k][side], edge, tol)
++            for (source, edge) in support_contacts[k].iter().zip(&trimmed.contacts[k]) {
++                let curve = constrain_contact(source, edge, tol)
+                     .ok_or_else(|| failed().stage("constrain_contact").selection(k))?;
+                 edge.set_curve(if edge.orientation() {
+                     curve

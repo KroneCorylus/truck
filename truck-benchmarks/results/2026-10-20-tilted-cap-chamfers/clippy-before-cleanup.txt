@@ -1,0 +1,25 @@
+$ cargo clippy --release -p truck-shapeops -p truck-stepio -p truck-benchmarks --all-targets
+    Checking truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+error: the loop variable `side` is used to index `support_contacts`
+   --> truck-shapeops/src/fillet/chamfer.rs:559:25
+    |
+559 |             for side in 0..2 {
+    |                         ^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#needless_range_loop
+note: the lint level is defined here
+   --> truck-shapeops/src/lib.rs:59:9
+    |
+ 59 | #![deny(clippy::all, rust_2018_idioms)]
+    |         ^^^^^^^^^^^
+    = note: `#[deny(clippy::needless_range_loop)]` implied by `#[deny(clippy::all)]`
+help: consider using an iterator and enumerate()
+    |
+559 -             for side in 0..2 {
+559 +             for (side, <item>) in support_contacts.iter().enumerate().take(2) {
+    |
+
+error: could not compile `truck-shapeops` (lib) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `truck-shapeops` (lib test) due to 1 previous error
+exit_code 101

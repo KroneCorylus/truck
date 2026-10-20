@@ -751,30 +751,91 @@ pub fn try_chamfer_solid_along_wire(
             "validate_input",
         ));
     }
-    let shell = super::chamfer::try_chamfer_along_wire_with_trim(
-        &solid.boundaries()[index],
-        wire,
-        d0,
-        d1,
-        tol,
-        |curve, edge, start| {
-            let open_end = !wire.is_cyclic()
-                && [wire.front_vertex(), wire.back_vertex()]
-                    .into_iter()
-                    .flatten()
-                    .any(|vertex| vertex == edge.front() || vertex == edge.back());
-            if open_end {
-                super::along_wire::trim_extended_contact_edge::<_, Surface>(curve, edge, start)
+    let trim = |curve: &mut truck_modeling::Curve, edge: &truck_modeling::Edge, start| {
+        let open_end = !wire.is_cyclic()
+            && [wire.front_vertex(), wire.back_vertex()]
+                .into_iter()
+                .flatten()
+                .any(|vertex| vertex == edge.front() || vertex == edge.back());
+        if open_end {
+            super::along_wire::trim_extended_contact_edge::<_, Surface>(curve, edge, start)
+        } else {
+            super::along_wire::trim_contact_edge::<_, Surface>(curve, edge, start)
+        }
+    };
+    let build = |continued| {
+        super::chamfer::try_chamfer_along_wire_with_trim(
+            &solid.boundaries()[index],
+            wire,
+            d0,
+            d1,
+            tol,
+            trim,
+            continued,
+        )
+    };
+    let shell = build(false)
+        .or_else(|error| {
+            if error.code == Code::BlendConstructionFailed
+                && error.stage == "trim_faces"
+                && can_continue_chamfer_contacts(&solid.boundaries()[index], wire)
+            {
+                build(true)
             } else {
-                super::along_wire::trim_contact_edge::<_, Surface>(curve, edge, start)
+                Err(error)
             }
-        },
-    )
-    .or_else(|error| {
-        super::chamfer_collapse::chamfer(&solid.boundaries()[index], wire, d0, d1, tol).ok_or(error)
-    })
-    .map_err(|e| e.operation(operation).shell(index))?;
+        })
+        .or_else(|error| {
+            super::chamfer_collapse::chamfer(&solid.boundaries()[index], wire, d0, d1, tol)
+                .ok_or(error)
+        })
+        .map_err(|e| e.operation(operation).shell(index))?;
     finish(solid, index, shell, tol).map_err(|e| e.operation(operation))
+}
+
+fn can_continue_chamfer_contacts(shell: &Shell, wire: &Wire) -> bool {
+    use truck_modeling::*;
+    if !wire.iter().any(|e| matches!(e.curve(), Curve::Conic(_)))
+        || wire
+            .iter()
+            .any(|e| !matches!(e.curve(), Curve::Line(_) | Curve::Conic(_)))
+    {
+        return false;
+    }
+    let Some(cap) = shell.iter().find(|f| {
+        matches!(
+            f.oriented_surface().elementary(),
+            Some((Elementary::Plane(_), _))
+        ) && wire.iter().all(|e| f.edge_iter().any(|q| q.id() == e.id()))
+    }) else {
+        return false;
+    };
+    let walls: Vec<_> = shell
+        .iter()
+        .filter(|f| {
+            f.id() != cap.id() && f.edge_iter().any(|e| wire.iter().any(|q| q.id() == e.id()))
+        })
+        .map(|f| f.oriented_surface().elementary())
+        .collect();
+    let Some(axis) = walls.iter().find_map(|w| match w {
+        Some((Elementary::Cylinder { axis, .. }, true)) => Some(*axis),
+        _ => None,
+    }) else {
+        return false;
+    };
+    let Some((Elementary::Plane(plane), _)) = cap.oriented_surface().elementary() else {
+        return false;
+    };
+    if plane.normal().dot(axis).abs() < 1e-8 {
+        return false;
+    }
+    walls.iter().all(|w| match w {
+        Some((Elementary::Plane(p), _)) => p.normal().dot(axis).abs() < 1e-8,
+        Some((Elementary::Cylinder { axis: other, .. }, true)) => {
+            axis.cross(*other).magnitude() < 1e-8
+        }
+        _ => false,
+    })
 }
 
 /// Chamfers a single edge of a modeling solid, trimming both end faces.

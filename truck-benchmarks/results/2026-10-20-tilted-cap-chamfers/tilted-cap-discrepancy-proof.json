@@ -1,0 +1,26 @@
+{
+  "native_cap_boundary_point": [
+    0.7255312198051134,
+    0.12320413054493012,
+    0.6546088858561607
+  ],
+  "original_guide_witness": [
+    0.7639046665667014,
+    0.03512295183492509,
+    0.6478426118493128
+  ],
+  "witness_parameter": -1.148603555445661,
+  "nearest_guide_distance_upper_bound": 0.09631509706813374,
+  "requested_setback": 0.1,
+  "minimum_setback_shortfall": 0.0036849029318662685,
+  "truck_contact_sample_max_error": 2.050671341902177e-06,
+  "native_to_truck_distance": 0.002511258306027193,
+  "classification": "Unresolved native reference discrepancy; existing distance comparison fails. This witness proves the native cap contact is not a constant 0.1 distance from the original contour. It does not establish the cause or global correctness of Truck surfaces.",
+  "evidence_sha256": {
+    "target/tilted-cap-boundary.txt": "ce274535fa8fa8f36f4036fd111c1531cb6c86d80d600f132f313d47b2a76046",
+    "target/tilted-cap-boundary.cpp": "9e4518d6b86e1eedb03eca0b13e90317317e61e8412abcc3d0421f890b5520c1",
+    "target/compare-tilted-cap.py": "410d6a6dfed578e1b208a4cba4265f4dab7d29d2e8b801eee472946dab3508f5",
+    "target/tilted-cap-native-probe.txt": "526003178c023fd9d4de8d8f03af595ed69c789892ca5c71555f1d87402530f4",
+    "target/tilted-cap-comparison-summary.json": "0d7061c8cf5337dfbe874de4aa8ebe2d11374040916cd8dfe6920fbd1ba4bb90"
+  }
+}
