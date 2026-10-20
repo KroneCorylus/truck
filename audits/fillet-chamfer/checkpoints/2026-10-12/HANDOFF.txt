@@ -1,7 +1,7 @@
 LATEST CHECKPOINT — 2026-10-20
 ACTIVE: Continue work and commit achievements until done or told to stop.
-Read ../2026-10-20-procedural-cylinders/HANDOFF.txt and report.html.
-Implementation 51e609eb recognizes procedural cylinders for sequential rounds.
+Read ../2026-10-20-mixed-collapsed-contacts/HANDOFF.txt and report.html.
+Implementation 3bd4ef6d supports mixed spherical and toroidal rim corners.
 Full capture:443/413;no prior check regressions. Known parent geometry precision failure remains. Full parity unverified.
 
 HISTORICAL HANDOFF FOLLOWS
