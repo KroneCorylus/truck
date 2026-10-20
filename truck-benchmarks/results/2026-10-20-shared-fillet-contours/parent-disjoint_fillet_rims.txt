@@ -1,0 +1,34 @@
+$ cargo test --release -p truck-shapeops --test disjoint_fillet_rims
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 2.10s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/disjoint_fillet_rims.rs (target/release/deps/disjoint_fillet_rims-8d661ca6f4a5335b)
+
+running 3 tests
+test open_fillet_rims_share_the_original_walls ... FAILED
+test closed_fillet_rims_share_the_original_wall ... FAILED
+test overlapping_fillet_rims_preserve_input ... ok
+
+failures:
+
+---- open_fillet_rims_share_the_original_walls stdout ----
+
+thread 'open_fillet_rims_share_the_original_walls' (1512480) panicked at truck-shapeops/tests/disjoint_fillet_rims.rs:76:33:
+called `Result::unwrap()` on an `Err` value: Diagnostic { code: UnsupportedGeometry, operation: "fillet_solid_edges", stage: "validate_input", message: "The geometry is outside the supported scope of this operation.", context: Context { operand: None, shell_index: Some(0), face_index: Some(0), edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- closed_fillet_rims_share_the_original_wall stdout ----
+
+thread 'closed_fillet_rims_share_the_original_wall' (1512479) panicked at truck-shapeops/tests/disjoint_fillet_rims.rs:76:33:
+called `Result::unwrap()` on an `Err` value: Diagnostic { code: UnsupportedGeometry, operation: "fillet_solid_edges", stage: "validate_input", message: "The geometry is outside the supported scope of this operation.", context: Context { operand: None, shell_index: Some(0), face_index: Some(0), edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+
+
+failures:
+    closed_fillet_rims_share_the_original_wall
+    open_fillet_rims_share_the_original_walls
+
+test result: FAILED. 1 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-shapeops --test disjoint_fillet_rims`
+exit_code 101

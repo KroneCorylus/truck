@@ -191,13 +191,105 @@ fn separate_contours_fail_atomically_when_a_later_round_does_not_fit() {
     }
 }
 
+fn removed_top_cone_volume(radius: f64, support_radius: f64, slope: f64) -> f64 {
+    // Revolve the difference between the cone and its tangent circular section.
+    let norm = 1.0_f64.hypot(slope);
+    let center = support_radius - radius * (norm - slope);
+    let contact = center + radius / norm;
+    let height = radius - radius * slope / norm;
+    let primitive = |t: f64| {
+        radius
+            * (center * center * t.sin()
+                + center * radius * (t + (2. * t).sin() / 2.)
+                + radius * radius * (t.sin() - t.sin().powi(3) / 3.))
+    };
+    std::f64::consts::PI
+        * (height
+            * (support_radius * support_radius + support_radius * contact + contact * contact)
+            / 3.
+            - primitive(std::f64::consts::FRAC_PI_2)
+            + primitive(slope.atan()))
+}
 #[test]
-fn contours_sharing_support_faces_remain_unsupported() {
+fn contours_sharing_conical_support_preserve_material_and_step() {
     let solid = input();
     let before = serde_json::to_string(&solid.compress()).unwrap();
     let a = contour(&solid, Matrix4::identity(), 2., 5.);
     let b = contour(&solid, Matrix4::identity(), 1.5, 8.);
     let edges: Vec<_> = a.iter().chain(&b).map(|e| e.id()).collect();
-    assert!(try_fillet_solid_edges(&solid, &edges, 0.3, 1e-6).is_err());
-    assert_eq!(before, serde_json::to_string(&solid.compress()).unwrap());
+    let volume = 56.25 * std::f64::consts::PI + added_volume(0.3, 2., 1. / 6.)
+        - removed_top_cone_volume(0.3, 1.5, 1. / 6.);
+    assert!((volume - 176.76295442022382).abs() < 1e-12);
+    let mut reference = None;
+    for order in [edges.clone(), edges.iter().rev().copied().collect()] {
+        let result = try_fillet_solid_edges(&solid, &order, 0.3, 1e-6).unwrap();
+        assert!(result.solid.is_geometric_consistent());
+        assert_eq!(result.generated_faces.len(), 4);
+        assert_eq!(result.modified_faces.len(), 4);
+        for face in &result.generated_faces {
+            let surface = face.oriented_surface();
+            let (u, v) = surface.try_range_tuple();
+            let ((a, b), (c, d)) = (u.unwrap(), v.unwrap());
+            for i in 0..=8 {
+                for j in 0..=8 {
+                    let (u, v) = (a + (b - a) * i as f64 / 8., c + (d - c) * j as f64 / 8.);
+                    let p = surface.subs(u, v);
+                    let norm = 1.0_f64.hypot(1. / 6.);
+                    let (center, z, sign) = if p.z < 7. {
+                        (2. + 0.3 * (norm - 1. / 6.), 5.3, -1.)
+                    } else {
+                        (1.5 - 0.3 * (norm - 1. / 6.), 7.7, 1.)
+                    };
+                    let rho = p.x.hypot(p.y);
+                    let radial = Vector3::new(
+                        p.x * (1. - center / rho),
+                        p.y * (1. - center / rho),
+                        p.z - z,
+                    );
+                    assert!((radial.magnitude() - 0.3).abs() < 1e-6, "{p:?}");
+                    assert!(
+                        surface.normal(u, v).normalize().dot(radial.normalize()) * sign > 1. - 1e-5
+                    );
+                }
+            }
+        }
+        common::assert_solid(&result.solid, volume, &[0], 0.001);
+        common::blend::assert_step(&result.solid, volume, 0.001);
+        assert_eq!(before, serde_json::to_string(&solid.compress()).unwrap());
+
+        let original: Vec<_> = solid.face_iter().collect();
+        let output: Vec<_> = result.solid.face_iter().collect();
+        let expected: Vec<_> = original
+            .iter()
+            .zip(&output)
+            .filter(|(a, b)| a.id() != b.id())
+            .map(|(a, b)| (a.id(), b.id()))
+            .collect();
+        assert_eq!(
+            result
+                .modified_faces
+                .iter()
+                .map(|(a, b)| (*a, b.id()))
+                .collect::<Vec<_>>(),
+            expected
+        );
+        assert_eq!(
+            result
+                .generated_faces
+                .iter()
+                .map(|f| f.id())
+                .collect::<Vec<_>>(),
+            output
+                .iter()
+                .skip(original.len())
+                .map(|f| f.id())
+                .collect::<Vec<_>>()
+        );
+        let compressed = serde_json::to_string(&result.solid.compress()).unwrap();
+        if let Some(expected) = &reference {
+            assert_eq!(&compressed, expected);
+        } else {
+            reference = Some(compressed);
+        }
+    }
 }

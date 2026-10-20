@@ -1,0 +1,10 @@
+{
+  "revision": "0017e352a38767c5ca0e12b2fc115d37c2a3c41a",
+  "sha256": {
+    "truck-shapeops/src/fillet/modeling.rs": "bc61f4f813ff8210f72bfccf7c7f36f7cc00055a36d8b2387a0acf6be3da5443",
+    "truck-shapeops/tests/disjoint_fillet_rims.rs": "0bb81330160847436b08162808f155536359d34d15082050ffbb2f8cb6babc6b",
+    "truck-shapeops/tests/separate_fillet_contours.rs": "44c19ea0d105ef412d9fe59353b12f780a4abcd9bd8de65ad64b3673702d09e8"
+  },
+  "unchanged_existing_tests_sha256": "32b5a298216c5168a085e3e07be60782f0a429f430bb4ed2f08b6615adef8080",
+  "intended_contract_update": "Shared original supports become supported when component trims preserve earlier generated fillets. The old rejection test is rewritten first with independent material/radius/normals/history/STEP checks, selection-order determinism, and unchanged input preservation. The other two existing tests are unchanged."
+}
