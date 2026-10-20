@@ -198,18 +198,36 @@ pub(super) fn contained(
         && !loops_intersect(points, original, normal, epsilon)
 }
 
+fn outer_loop(loops: &[Vec<Point3>], normal: Vector3) -> Option<usize> {
+    // A valid planar face has one outer loop, larger in projected area than any hole.
+    loops
+        .iter()
+        .map(|points| polygon_area(points).dot(normal).abs())
+        .enumerate()
+        .max_by(|(_, a), (_, b)| a.total_cmp(b))
+        .filter(|(_, area)| area.is_finite() && *area > 0.0)
+        .map(|(i, _)| i)
+}
+
 pub(super) fn contains_patch(face: &Face, points: &[Point3], normal: Vector3, tol: f64) -> bool {
     let loops: Vec<_> = face
         .boundaries()
         .iter()
         .map(|w| sample_wire(w, tol))
         .collect();
-    contained(points, &loops[0], normal, TOLERANCE)
-        && loops[1..].iter().all(|hole| {
-            !loops_touch(points, hole, normal, TOLERANCE)
-                && !inside(hole[0], points, normal, TOLERANCE)
-                && !inside(points[0], hole, normal, TOLERANCE)
-        })
+    let Some(outer) = outer_loop(&loops, normal) else {
+        return false;
+    };
+    contained(points, &loops[outer], normal, TOLERANCE)
+        && loops
+            .iter()
+            .enumerate()
+            .filter(|(i, _)| *i != outer)
+            .all(|(_, hole)| {
+                !loops_touch(points, hole, normal, TOLERANCE)
+                    && !inside(hole[0], points, normal, TOLERANCE)
+                    && !inside(points[0], hole, normal, TOLERANCE)
+            })
 }
 
 pub(super) struct Neighborhood {
@@ -354,26 +372,30 @@ pub(crate) fn valid_boundaries(
 ) -> bool {
     let epsilon = tol.min(TOLERANCE);
     let original = face.boundaries();
+    let original_loops: Vec<_> = original.iter().map(|w| sample_wire(w, tol)).collect();
     let loops: Vec<_> = boundaries.iter().map(|w| sample_wire(w, tol)).collect();
+    let Some(outer) = outer_loop(&original_loops, normal).filter(|&i| i < loops.len()) else {
+        return false;
+    };
     let changed = |i| original.get(i) != boundaries.get(i);
     for (i, points) in loops.iter().enumerate() {
-        let orientation = original
+        let orientation = original_loops
             .get(i)
-            .map_or(if i == 0 { 1. } else { -1. }, |wire| {
-                polygon_area(&sample_wire(wire, tol)).dot(normal).signum()
+            .map_or(if i == outer { 1. } else { -1. }, |points| {
+                polygon_area(points).dot(normal).signum()
             });
         if changed(i) && !valid_polygon(points, normal * orientation, epsilon) {
             return false;
         }
     }
-    for i in 1..loops.len() {
-        if (changed(i) || changed(0))
-            && (!contained(&loops[i], &loops[0], normal, epsilon)
-                || loops_touch(&loops[i], &loops[0], normal, 2.0 * tol))
+    for i in (0..loops.len()).filter(|&i| i != outer) {
+        if (changed(i) || changed(outer))
+            && (!contained(&loops[i], &loops[outer], normal, epsilon)
+                || loops_touch(&loops[i], &loops[outer], normal, 2.0 * tol))
         {
             return false;
         }
-        for j in 1..i {
+        for j in (0..i).filter(|&j| j != outer) {
             if (changed(i) || changed(j))
                 && (loops_touch(&loops[i], &loops[j], normal, 2.0 * tol)
                     || inside(loops[i][0], &loops[j], normal, epsilon)

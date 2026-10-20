@@ -1,0 +1,23 @@
+{
+  "revision": "39b40375f0516f9af4f0de589e5dd195d0f87c7d",
+  "sha256": {
+    "truck-shapeops/src/fillet/extend_intersection_curve.rs": "4af6cfdeba3558e0b455059bdb67500f7cfc12d7c3007246d8f97c5290615169",
+    "truck-shapeops/src/fillet/edges.rs": "45b075cbad5bcd9523a7b17bf33fe282338acb139ee888ae0cdce828a243ec85",
+    "truck-shapeops/src/fillet/convex.rs": "aa56d71fd2fd6b86f11cf4571b7bc8e6cef4da91615c003a8199438022f7276c",
+    "truck-shapeops/src/fillet/chamfer_edges.rs": "9e7085c8f7aa51cb3f4fabf0ce00426681e3917a80fbc30814c94af4af77bb76",
+    "truck-shapeops/src/fillet/chamfer_miter.rs": "7925e25f6aedfe899068e4e55bd4f170f7b99a04b79f67d31dd4968f2f8be47a",
+    "truck-shapeops/src/fillet/planar.rs": "050a124d00899b7e43df36edd9c84cf9ea7fa6305c9a93124df791de791fccd6",
+    "truck-shapeops/src/fillet/projected_section.rs": "d2ff875824b4107c608673e91aca2e0fb3e0f14f2cb66d98195be1fdc79a873b",
+    "truck-shapeops/src/fillet/along_wire.rs": "e44529af142785553f71b3ba819c8a359f8275a1242ed06595fa37aa81e0b32c",
+    "truck-shapeops/src/fillet/chamfer.rs": "4ab29509ca0ee447557d0f9a2b80e680b3314d542c324eeb8f55a0acd6505ee1",
+    "truck-shapeops/src/fillet/mod.rs": "50949a94c4f58cb7c01869d115061c30883efc6099974f09195630b9cecbe940",
+    "truck-shapeops/src/fillet/modeling.rs": "d8f80e999604761ab69dba4f075b46742ec6e651af73b4b54c52baac35764d1e",
+    "truck-shapeops/src/fillet/planar_fillet.rs": "50c6d956f13d879f457a949b16f5dc15100462b4d02489797c6b88980f3356bb",
+    "truck-shapeops/src/fillet/chamfer_collapse.rs": "1edb9a6fd7914848b2ff4d813dff1f48a3fb0f0e59310a0488e3bbe8f67897b8",
+    "truck-shapeops/src/fillet/additive.rs": "5c2413719042277bad2c2ecfb7e46bf2938be888bee87aac40d37d759cb026d2",
+    "truck-shapeops/src/fillet/continued_support.rs": "c344c88d3dc6cb4ad353688c1f2c79cef30fe6cf30cde0e576efd86303173600",
+    "truck-shapeops/src/fillet/planar_edge.rs": "755df6e28bdbd81eda4723f2f71fcccd416a8390f757e6665da4c762ce1d4b6d",
+    "truck-shapeops/src/fillet/planar/tests.rs": "c56180fa15cfaa21fc4949bbee0c55311a4de2184b502298ff4ef573f9d7cd0b",
+    "truck-shapeops/tests/reordered_loop_chamfers.rs": "9a564e9e47d360bd45f2ce02832547303f08493bc7774ab8d1c45567655913a3"
+  }
+}

@@ -1,0 +1,4 @@
+outer equal Truck volume error -5.684341886080802e-14 sampled distance 1.7763568394002505e-15 plane error 6.661338147750939e-16
+outer unequal Truck volume error -1.7053025658242404e-13 sampled distance 1.2212453270876722e-15 plane error 1.6653345369377348e-15
+inner equal Truck volume error 0.0 sampled distance 3.972054645195637e-15 plane error 6.661338147750939e-16
+inner unequal Truck volume error 0.0 sampled distance 4.5288390936029406e-15 plane error 2.220446049250313e-15

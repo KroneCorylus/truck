@@ -265,3 +265,156 @@ mod exhaustive {
         })
     }
 }
+
+fn rectangle(x0: f64, y0: f64, x1: f64, y1: f64) -> Wire {
+    let v = builder::vertices([
+        Point3::new(x0, y0, 0.),
+        Point3::new(x1, y0, 0.),
+        Point3::new(x1, y1, 0.),
+        Point3::new(x0, y1, 0.),
+    ]);
+    (0..4)
+        .map(|i| builder::line(&v[i], &v[(i + 1) % 4]))
+        .collect()
+}
+fn check_loop_order(new_outer: Wire, new_hole: Wire, expected: bool) {
+    let outer = rectangle(0., 0., 10., 10.);
+    let hole = rectangle(2., 2., 4., 4.).inverse();
+    let other = rectangle(6., 6., 8., 8.).inverse();
+    let base = builder::try_attach_plane(&[outer.clone(), hole.clone(), other.clone()]).unwrap();
+    for order in [
+        [0, 1, 2],
+        [0, 2, 1],
+        [1, 0, 2],
+        [1, 2, 0],
+        [2, 0, 1],
+        [2, 1, 0],
+    ] {
+        for matrix in [
+            Matrix4::identity(),
+            Matrix4::from_translation(Vector3::new(4., -3., 7.))
+                * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.7))
+                * Matrix4::from_scale(0.2),
+        ] {
+            let originals = [outer.clone(), hole.clone(), other.clone()];
+            let next = [new_outer.clone(), new_hole.clone(), other.clone()];
+            let face = builder::transformed(
+                &Face::new(
+                    order.map(|i| originals[i].clone()).to_vec(),
+                    base.oriented_surface(),
+                ),
+                matrix,
+            );
+            let boundaries = order
+                .map(|i| builder::transformed(&next[i], matrix))
+                .to_vec();
+            let normal = matrix.transform_vector(Vector3::unit_z()).normalize();
+            assert_eq!(
+                valid_boundaries(&face, &boundaries, normal, 0.001),
+                expected,
+                "order {order:?}"
+            );
+        }
+    }
+}
+#[test]
+fn changing_outer_keeps_two_holes() {
+    check_loop_order(
+        rectangle(0., 0.5, 10., 10.),
+        rectangle(2., 2., 4., 4.).inverse(),
+        true,
+    );
+}
+#[test]
+fn growing_hole_stays_inside_original_outer() {
+    check_loop_order(
+        rectangle(0., 0., 10., 10.),
+        rectangle(2., 1., 4., 4.).inverse(),
+        true,
+    );
+}
+#[test]
+fn reordered_holes_keep_collision_guards() {
+    for hole in [
+        rectangle(-1., 2., 4., 4.),
+        rectangle(0., 2., 4., 4.),
+        rectangle(0.001, 2., 4., 4.),
+        rectangle(2., 2., 7., 7.),
+        rectangle(1., 1., 9., 9.),
+    ] {
+        check_loop_order(rectangle(0., 0., 10., 10.), hole.inverse(), false);
+    }
+}
+fn check_patch(points: &[Point3], expected: bool) {
+    let outer = rectangle(0., 0., 10., 10.);
+    let hole = rectangle(2., 2., 4., 4.).inverse();
+    let other = rectangle(6., 6., 8., 8.).inverse();
+    let base = builder::try_attach_plane(&[outer.clone(), hole.clone(), other.clone()]).unwrap();
+    for order in [
+        [0, 1, 2],
+        [0, 2, 1],
+        [1, 0, 2],
+        [1, 2, 0],
+        [2, 0, 1],
+        [2, 1, 0],
+    ] {
+        for matrix in [
+            Matrix4::identity(),
+            Matrix4::from_translation(Vector3::new(4., -3., 7.))
+                * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.7))
+                * Matrix4::from_scale(0.2),
+        ] {
+            let originals = [outer.clone(), hole.clone(), other.clone()];
+            let face = builder::transformed(
+                &Face::new(
+                    order.map(|i| originals[i].clone()).to_vec(),
+                    base.oriented_surface(),
+                ),
+                matrix,
+            );
+            let points: Vec<_> = points.iter().map(|p| matrix.transform_point(*p)).collect();
+            assert_eq!(
+                contains_patch(
+                    &face,
+                    &points,
+                    matrix.transform_vector(Vector3::unit_z()).normalize(),
+                    0.001
+                ),
+                expected,
+                "order {order:?}"
+            );
+        }
+    }
+}
+#[test]
+fn patches_find_outer_loop_in_any_position() {
+    check_patch(
+        &[
+            Point3::new(0.5, 5., 0.),
+            Point3::new(1.5, 5., 0.),
+            Point3::new(1.5, 5.5, 0.),
+            Point3::new(0.5, 5.5, 0.),
+        ],
+        true,
+    );
+}
+#[test]
+fn reordered_patches_keep_collision_guards() {
+    for (a, b, c, d) in [
+        (1., 1., 5., 5.),
+        (3., 3., 5., 5.),
+        (2.5, 2.5, 3.5, 3.5),
+        (-1., 5., 1., 6.),
+        (1., 2., 2., 4.),
+    ] {
+        check_patch(
+            &[
+                Point3::new(a, b, 0.),
+                Point3::new(c, b, 0.),
+                Point3::new(c, d, 0.),
+                Point3::new(a, d, 0.),
+            ],
+            false,
+        );
+    }
+}
