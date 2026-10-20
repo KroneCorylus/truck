@@ -1,0 +1,11 @@
+{
+  "revision": "3ce555450757b50b247b0cdedb1e1d7fbf1c8293",
+  "test_module_sha256": "bd028cda72b5f284eface2fb62f1bb18c1bf22928df561c776f9509ce3923a88",
+  "fixture_sha256": {
+    "truck-shapeops/tests/fixtures/chamfer-cylindrical-terminal-fan/split.step": "77c2005dca1a798e66cd0874bb8a31bb51cd52108123c540875f9367c9a96f65",
+    "truck-shapeops/tests/fixtures/chamfer-cylindrical-terminal-fan/unsplit.step": "d6b2fea5a8ef30c0656ce8911f2c415a7d7a3fd74f02caa06e0f39314796b363",
+    "truck-shapeops/tests/fixtures/chamfer-cylindrical-terminal-fan/equal.json": "adefc360713c45a8002b9f36ab0fc838559b50a4caf8d7acd1867587fe54a2b8",
+    "truck-shapeops/tests/fixtures/chamfer-cylindrical-terminal-fan/distances.json": "9e78160abdf0532e215a115bab85ab97e2ff7e9b10cfaf36814aeb8f5f5c0f81",
+    "truck-shapeops/tests/fixtures/chamfer-cylindrical-terminal-fan/angle.json": "1ff80e7cec4fe24122f85a20ff485ce4f0424824d2ebd145578cf34942b3773a"
+  }
+}

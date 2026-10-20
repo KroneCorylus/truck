@@ -1,0 +1,13 @@
+fan 1 raw native valid True raw sample 1.9762317796494886 equivalent sample 2.1290590070635924e-09 volume error -7.582912076031789e-11
+fan 2 raw native valid False raw sample 1.9762317796494886 equivalent sample 2.1290590070635924e-09 volume error -7.44648787076585e-11
+fan 3 raw native valid True raw sample 0.20000000000000018 equivalent sample 2.1290590070635924e-09 volume error -7.617018127348274e-11
+fan 4 raw native valid False raw sample 1.965698510858879 equivalent sample 2.1290590070635924e-09 volume error -7.503331289626658e-11
+fan 5 raw native valid True raw sample 0.1616580753730954 equivalent sample 2.1290590070635924e-09 volume error -7.628386811120436e-11
+fan 6 raw native valid False raw sample 1.833624093246021 equivalent sample 2.1290590070635924e-09 volume error -7.526068657170981e-11
+unsplit 1 raw native valid True raw sample 2.1290590070635924e-09 equivalent sample 2.1290590070635924e-09 volume error -7.344169716816396e-11
+unsplit 2 raw native valid True raw sample 2.1290590070635924e-09 equivalent sample 2.1290590070635924e-09 volume error -6.923528417246416e-11
+unsplit 3 raw native valid True raw sample 2.1290590070635924e-09 equivalent sample 2.1290590070635924e-09 volume error -7.389644451905042e-11
+unsplit 4 raw native valid True raw sample 2.1290590070635924e-09 equivalent sample 2.1290590070635924e-09 volume error -7.003109203651547e-11
+unsplit 5 raw native valid True raw sample 2.1290590070635924e-09 equivalent sample 2.1290590070635924e-09 volume error -7.389644451905042e-11
+unsplit 6 raw native valid True raw sample 2.1290590070635924e-09 equivalent sample 2.1290590070635924e-09 volume error -7.037215254968032e-11
+Twelve Truck controls preserve analytic material and contacts and match valid unsplit native controls; six raw subdivided native discrepancies retained.

@@ -1,0 +1,45 @@
+   Compiling truck-meshalgo v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-meshalgo)
+    Finished `release` profile [optimized] target(s) in 3.22s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/cylindrical_terminal_fan.rs (target/release/deps/cylindrical_terminal_fan-fe6e5c4f4190ff2a)
+
+running 4 tests
+test subdivided_terminal_fan_preserves_mesh_material ... FAILED
+test subdivided_terminal_fan_preserves_robust_mesh_material ... FAILED
+test cylindrical_terminal_fan_preserves_robust_mesh_material ... FAILED
+test cylindrical_terminal_fan_preserves_mesh_material ... FAILED
+
+failures:
+
+---- subdivided_terminal_fan_preserves_mesh_material stdout ----
+
+thread 'subdivided_terminal_fan_preserves_mesh_material' (451675) panicked at truck-meshalgo/tests/cylindrical_terminal_fan.rs:52:9:
+robust=false, moved=false: volume 5.500265823245002, expected 5.51422380495957, allowed 0.012566370614359175
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- subdivided_terminal_fan_preserves_robust_mesh_material stdout ----
+
+thread 'subdivided_terminal_fan_preserves_robust_mesh_material' (451676) panicked at truck-meshalgo/tests/cylindrical_terminal_fan.rs:52:9:
+robust=true, moved=false: volume 5.500265823245002, expected 5.51422380495957, allowed 0.012566370614359175
+
+---- cylindrical_terminal_fan_preserves_robust_mesh_material stdout ----
+
+thread 'cylindrical_terminal_fan_preserves_robust_mesh_material' (451674) panicked at truck-meshalgo/tests/cylindrical_terminal_fan.rs:52:9:
+robust=true, moved=false: volume 688.2366578240106, expected 689.2779756199461, allowed 0.3141592653589793
+
+---- cylindrical_terminal_fan_preserves_mesh_material stdout ----
+
+thread 'cylindrical_terminal_fan_preserves_mesh_material' (451673) panicked at truck-meshalgo/tests/cylindrical_terminal_fan.rs:52:9:
+robust=false, moved=false: volume 688.2366578240106, expected 689.2779756199461, allowed 0.3141592653589793
+
+
+failures:
+    cylindrical_terminal_fan_preserves_mesh_material
+    cylindrical_terminal_fan_preserves_robust_mesh_material
+    subdivided_terminal_fan_preserves_mesh_material
+    subdivided_terminal_fan_preserves_robust_mesh_material
+
+test result: FAILED. 0 passed; 4 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.23s
+
+error: test failed, to rerun pass `-p truck-meshalgo --test cylindrical_terminal_fan`

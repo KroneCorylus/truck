@@ -1076,7 +1076,7 @@ fn refine_interior(
     metric: &MeshMetric,
     boundary_map: &HashMap<FixedVertexHandle, Point3>,
 ) {
-    for _ in 0..20 {
+    for _ in 0..64 {
         let mut positions = vec![Point3::origin(); triangulation.num_vertices()];
         for vertex in triangulation.vertices() {
             let uv = vertex.as_ref().uv;

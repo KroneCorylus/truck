@@ -201,28 +201,65 @@ pub(super) fn blend(
         let (paths, walk) = &transitions[end];
         let initial = end_faces[end];
         let cap = shell[initial].oriented_surface();
-        let coplanar_fan = matches!(cap.elementary(), Some((Elementary::Plane(_), _)))
+        let corner = if end == 0 { start } else { finish };
+        let local_normal = |surface: &Surface, point: Point3| {
+            let (elementary, forward) = surface.elementary()?;
+            let normal = match elementary {
+                Elementary::Plane(plane) => plane.normal(),
+                Elementary::Cylinder { origin, axis, .. } => {
+                    let delta = point - origin;
+                    (delta - axis * delta.dot(axis)).normalize()
+                }
+                _ => return None,
+            };
+            Some(normal * if forward { 1. } else { -1. })
+        };
+        let cap_normal = local_normal(&cap, corner.point());
+        let coincident_fan = cap_normal.is_some()
             && walk.iter().all(|(_, _, next)| {
                 let other = shell[*next].oriented_surface();
-                matches!(other.elementary(), Some((Elementary::Plane(_), _)))
-                    && cap
-                        .normal(0., 0.)
-                        .normalize()
-                        .dot(other.normal(0., 0.).normalize())
-                        > 1. - TOLERANCE
-                    && (other.subs(0., 0.) - cap.subs(0., 0.))
-                        .dot(cap.normal(0., 0.).normalize())
-                        .abs()
-                        <= TOLERANCE
+                if local_normal(&other, corner.point())
+                    .zip(cap_normal)
+                    .is_none_or(|(a, b)| a.dot(b) < 1. - TOLERANCE)
+                {
+                    return false;
+                }
+                match (cap.elementary(), other.elementary()) {
+                    (Some((Elementary::Plane(a), _)), Some((Elementary::Plane(b), _))) => {
+                        (a.subs(0., 0.) - b.subs(0., 0.)).dot(a.normal()).abs() <= TOLERANCE
+                    }
+                    (
+                        Some((
+                            Elementary::Cylinder {
+                                origin: a,
+                                axis: u,
+                                radius: r,
+                            },
+                            _,
+                        )),
+                        Some((
+                            Elementary::Cylinder {
+                                origin: b,
+                                axis: v,
+                                radius: s,
+                            },
+                            _,
+                        )),
+                    ) => {
+                        (r - s).abs() <= TOLERANCE
+                            && u.cross(v).magnitude() <= TOLERANCE
+                            && (a - b).cross(u).magnitude() <= TOLERANCE
+                    }
+                    _ => false,
+                }
             });
         if matches!(blend, Blend::Chamfer(_))
             && n.cross(m).dot(axis) < 0.
             && paths.iter().all(Vec::is_empty)
             && !walk.is_empty()
-            && coplanar_fan
+            && coincident_fan
         {
-            // Keep coplanar cap seams at the old corner; the additive bevel gets its own cap.
-            let corner = if end == 0 { start } else { finish };
+            // Keep coincident terminal seams at the old corner; add only the missing patch.
             let mut pieces = Vec::new();
             for (side, point) in [a, b].into_iter().zip(&contact[end]) {
                 let old = shell[side]
@@ -248,17 +285,35 @@ pub(super) fn blend(
                 connectors.insert((piece.back().id(), piece.front().id()), piece.inverse());
                 pieces.push(piece);
             }
-            let edge = builder::line(&contact[end][0], &contact[end][1]);
+            let curve = match (cap.elementary(), surface.elementary()) {
+                (Some((Elementary::Plane(_), _)), _) => {
+                    Curve::Line(Line(contact[end][0].point(), contact[end][1].point()))
+                }
+                (_, Some((Elementary::Plane(plane), _))) => {
+                    super::projected_section::projected_section(
+                        &cap,
+                        plane,
+                        contact[end][0].point(),
+                        contact[end][1].point(),
+                    )
+                    .ok_or_else(|| error(Code::UnsupportedGeometry))?
+                }
+                _ => return Err(error(Code::UnsupportedGeometry)),
+            };
+            let edge = Edge::new(&contact[end][0], &contact[end][1], curve);
             let mut boundary =
                 Wire::from(vec![edge.clone(), pieces[1].inverse(), pieces[0].clone()]);
             if end == 0 {
                 boundary.invert();
             }
-            if !super::planar::valid_polygon(
-                &sample_wire(&boundary, tol),
-                cap.normal(0., 0.).normalize(),
-                tol,
-            ) {
+            // The visible half of a cylinder projects injectively onto its tangent plane.
+            let samples = sample_wire(&boundary, tol);
+            let normal = cap_normal.unwrap();
+            if !samples
+                .iter()
+                .all(|p| local_normal(&cap, *p).is_some_and(|n| n.dot(normal) > TOLERANCE))
+                || !super::planar::valid_polygon(&samples, normal, tol)
+            {
                 return Err(error(Code::OutsideNeighbour));
             }
             cap_patches.push(

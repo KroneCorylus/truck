@@ -3368,3 +3368,210 @@ mod parallel_cylinder_chord_tests {
         std::fs::remove_file(path).unwrap();
     }
 }
+
+#[cfg(test)]
+mod cylindrical_terminal_fan_tests {
+    use super::*;
+
+    fn check(split: bool, mode: usize, count: usize, moved: bool) {
+        let (radius, halfwidth, level, height): (f64, f64, f64, f64) = (5., 2., 5., 10.);
+        let planar: f64 = 0.7;
+        let wall = [0.7, 0.5, 0.7 / 3_f64.sqrt()][mode];
+        let initial = std::f64::consts::PI * radius * radius * height
+            - level
+                * (halfwidth * (radius * radius - halfwidth * halfwidth).sqrt()
+                    + radius * radius * (halfwidth / radius).asin());
+        let primitive = |y: f64| {
+            (y * (radius * radius - y * y).sqrt() + radius * radius * (y / radius).asin()) / 2.
+        };
+        let moment = |y: f64| -(radius * radius - y * y).powf(1.5) / 3.;
+        let lower = halfwidth - planar;
+        let added = wall / planar
+            * (moment(halfwidth)
+                - moment(lower)
+                - lower * (primitive(halfwidth) - primitive(lower)));
+        let scale: f64 = if moved { 0.2 } else { 1. };
+        let expected = (initial + count as f64 * added) * scale.powi(3);
+        let transform = if moved {
+            Matrix4::from_translation(Vector3::new(13., -7., 23.))
+                * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.73))
+        } else {
+            Matrix4::identity()
+        } * Matrix4::from_scale(scale);
+        let inverse = transform.invert().unwrap();
+        let directory = std::env::temp_dir().join(format!(
+            "truck-cylinder-terminal-{}-{split}-{mode}-{count}-{moved}",
+            std::process::id()
+        ));
+        std::fs::create_dir_all(&directory).unwrap();
+        let prefix = directory.join("001");
+        let prefix = prefix.to_str().unwrap();
+        let step = if split {
+            include_str!("../tests/fixtures/chamfer-cylindrical-terminal-fan/split.step")
+        } else {
+            include_str!("../tests/fixtures/chamfer-cylindrical-terminal-fan/unsplit.step")
+        };
+        std::fs::write(format!("{prefix}.input.step"), step).unwrap();
+        let mut input =
+            builder::transformed(&import(&format!("{prefix}.input.step")).unwrap(), transform);
+        if moved {
+            input = Solid::new(
+                input
+                    .boundaries()
+                    .iter()
+                    .map(|s| s.iter().cloned().rev().collect())
+                    .collect(),
+            );
+        }
+        replay_common::assert_solid(&input, initial * scale.powi(3), &[0], TOL);
+        let prepared = prepare_for_step(&input.compress(), CHAMFER_STEP_TOL).unwrap();
+        let step = StepDisplay::new(
+            Default::default(),
+            StepDesign::from_model(StepModel::from(&prepared)),
+        )
+        .to_string();
+        std::fs::write(format!("{prefix}.input.step"), &step).unwrap();
+        let mut task: Value = serde_json::from_str(
+            [
+                include_str!("../tests/fixtures/chamfer-cylindrical-terminal-fan/equal.json"),
+                include_str!("../tests/fixtures/chamfer-cylindrical-terminal-fan/distances.json"),
+                include_str!("../tests/fixtures/chamfer-cylindrical-terminal-fan/angle.json"),
+            ][mode],
+        )
+        .unwrap();
+        task["selection"].as_array_mut().unwrap().truncate(count);
+        for chosen in task["selection"].as_array_mut().unwrap() {
+            let transform_points = |member: &mut Value| {
+                let points = member["points"].as_array_mut().unwrap();
+                for p in points.iter_mut() {
+                    let q =
+                        transform.transform_point(Point3::from_vec(captured_vector(p).unwrap()));
+                    *p = json!([q.x, q.y, q.z]);
+                }
+                if moved {
+                    points.reverse();
+                }
+            };
+            transform_points(chosen);
+            for member in chosen["contour_edges"].as_array_mut().unwrap() {
+                transform_points(member);
+            }
+            if let Some(d) = chosen["distance"].as_f64() {
+                chosen["distance"] = json!(d * scale);
+            }
+            if let Some(distances) = chosen["distances"].as_array_mut() {
+                for d in distances {
+                    *d = json!(d.as_f64().unwrap() * scale);
+                }
+            }
+            if chosen["reference_plane"].is_object() {
+                let reference = &mut chosen["reference_plane"];
+                let origin = transform.transform_point(Point3::from_vec(
+                    captured_vector(&reference["origin"]).unwrap(),
+                ));
+                let normal = transform
+                    .transform_vector(captured_vector(&reference["normal"]).unwrap())
+                    .normalize();
+                reference["origin"] = json!([origin.x, origin.y, origin.z]);
+                reference["normal"] = json!([normal.x, normal.y, normal.z]);
+            }
+        }
+        if moved {
+            task["selection"].as_array_mut().unwrap().reverse();
+        }
+        let before = serde_json::to_string(&input.compress()).unwrap();
+        let selected =
+            chamfer_selection(&input, task["selection"].as_array().unwrap(), true).unwrap();
+        assert_eq!(selected.len(), count);
+        let assignments: Vec<_> = selected.iter().map(|(edge, d)| (edge.id(), *d)).collect();
+        let output = try_chamfer_solid_edges_with_distances(&input, &assignments, TOL).unwrap();
+        assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
+        replay_common::assert_solid(&output.solid, expected, &[0], TOL);
+        replay_common::blend::assert_step(&output.solid, expected, TOL);
+        std::fs::write(format!("{prefix}.input.json"), task.to_string()).unwrap();
+        let result = replay(prefix, &Cell::new("start")).unwrap();
+        assert_eq!(result["status"], "operation-succeeded", "{result}");
+        assert_eq!(result["selected_edges"], count);
+        for field in [
+            "input_unchanged",
+            "geometry_consistent",
+            "mesh_closed",
+            "step_prepared",
+        ] {
+            assert_eq!(result[field], true, "{field}: {result}");
+        }
+        assert_eq!(
+            step,
+            std::fs::read_to_string(format!("{prefix}.input.step")).unwrap()
+        );
+        let output = import(&format!("{prefix}.truck.step")).unwrap();
+        replay_common::assert_solid(&output, expected, &[0], TOL);
+        replay_common::blend::assert_step(&output, expected, TOL);
+        for sign in [1., -1.].into_iter().take(count) {
+            let targets = [
+                Point3::new(0., sign * halfwidth, level - wall),
+                Point3::new(
+                    (radius * radius - halfwidth * halfwidth).sqrt(),
+                    sign * halfwidth,
+                    level - wall,
+                ),
+                Point3::new(0., sign * lower, level),
+                Point3::new(
+                    (radius * radius - lower * lower).sqrt(),
+                    sign * lower,
+                    level,
+                ),
+            ];
+            for target in targets {
+                assert!(output
+                    .vertex_iter()
+                    .any(|v| inverse.transform_point(v.point()).distance(target) < 1e-6));
+            }
+            let normal = Vector3::new(0., -sign * wall / planar, -1.).normalize();
+            let bevels: Vec<_> = output
+                .face_iter()
+                .filter(|f| {
+                    matches!(
+                        f.oriented_surface().elementary(),
+                        Some((Elementary::Plane(_), _))
+                    ) && inverse
+                        .transform_vector(f.oriented_surface().normal(0., 0.))
+                        .normalize()
+                        .dot(normal)
+                        > 1. - 1e-8
+                })
+                .collect();
+            assert_eq!(bevels.len(), 1);
+            for point in bevels[0].vertex_iter() {
+                assert!(
+                    (inverse.transform_point(point.point()) - targets[0])
+                        .dot(normal)
+                        .abs()
+                        < 1e-6
+                );
+            }
+        }
+        std::fs::remove_dir_all(directory).unwrap();
+    }
+
+    #[test]
+    fn split_cylindrical_terminal_fans_preserve_chamfer_material() {
+        for mode in 0..3 {
+            for count in [1, 2] {
+                for moved in [false, true] {
+                    check(true, mode, count, moved);
+                }
+            }
+        }
+    }
+    #[test]
+    fn unsplit_cylindrical_ends_preserve_chamfer_material() {
+        for mode in 0..3 {
+            for count in [1, 2] {
+                for moved in [false, true] {
+                    check(false, mode, count, moved);
+                }
+            }
+        }
+    }
+}

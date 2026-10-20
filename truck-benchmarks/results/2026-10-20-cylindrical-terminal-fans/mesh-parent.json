@@ -1,0 +1,30 @@
+{
+  "revision": "3ce555450757b50b247b0cdedb1e1d7fbf1c8293",
+  "production_sha256": "c9db5eae2fe87596b77ab6b2a84607b771211852efdfd0aa69b5fa32f35a014a",
+  "test_sha256": "5402800031e721a1c33e2248c152491c36c96fb417cae1aa31e40b2b434ecb2f",
+  "fixture_sha256": "1bc9be1208d8b5a7353aaeb016466c15fa6e13abfe8e467812fa43033ec930c4",
+  "exact_step_comparison": {
+    "schema_version": 1,
+    "comparison": "sampled-only",
+    "native_valid": true,
+    "truck_step_valid": true,
+    "native_solids": 1,
+    "truck_solids": 1,
+    "native_volume": 689.277975619922,
+    "truck_volume": 689.2779756198726,
+    "native_to_truck_max_distance": 1.5987226974359048e-13,
+    "native_to_truck_samples": 1737,
+    "truck_to_native_max_distance": 2.1290590070635924e-09,
+    "truck_to_native_samples": 2062,
+    "native_tolerances": {
+      "face": 1e-07,
+      "edge": 1.5e-07,
+      "vertex": 0.0001
+    },
+    "truck_step_tolerances": {
+      "face": 1e-07,
+      "edge": 1e-07,
+      "vertex": 1e-07
+    }
+  }
+}

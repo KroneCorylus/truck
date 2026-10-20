@@ -1,0 +1,25 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 9.85s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running unittests examples/replay_occt_blend.rs (target/release/examples/replay_occt_blend-bd2259d8fa5b09df)
+
+running 2 tests
+test cylindrical_terminal_fan_tests::split_cylindrical_terminal_fans_preserve_chamfer_material ... FAILED
+test cylindrical_terminal_fan_tests::unsplit_cylindrical_ends_preserve_chamfer_material ... ok
+
+failures:
+
+---- cylindrical_terminal_fan_tests::split_cylindrical_terminal_fans_preserve_chamfer_material stdout ----
+
+thread 'cylindrical_terminal_fan_tests::split_cylindrical_terminal_fans_preserve_chamfer_material' (455403) panicked at truck-shapeops/examples/../tests/common/mod.rs:77:5:
+volume 5.500265823244945 differs from expected 5.5142238049595695 by more than 0.011750113072052972
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    cylindrical_terminal_fan_tests::split_cylindrical_terminal_fans_preserve_chamfer_material
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 57 filtered out; finished in 2.97s
+
+error: test failed, to rerun pass `-p truck-shapeops --example replay_occt_blend`

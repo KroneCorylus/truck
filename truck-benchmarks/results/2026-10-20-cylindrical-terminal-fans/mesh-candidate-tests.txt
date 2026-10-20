@@ -1,0 +1,11 @@
+   Compiling truck-meshalgo v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-meshalgo)
+    Finished `release` profile [optimized] target(s) in 3.26s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/cylindrical_terminal_fan.rs (target/release/deps/cylindrical_terminal_fan-fe6e5c4f4190ff2a)
+
+running 2 tests
+test cylindrical_terminal_fan_preserves_mesh_material ... ok
+test cylindrical_terminal_fan_preserves_robust_mesh_material ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
