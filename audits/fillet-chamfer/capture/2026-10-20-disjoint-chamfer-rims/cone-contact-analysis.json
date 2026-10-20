@@ -1,0 +1,970 @@
+[
+  {
+    "case": "B3",
+    "selection": 0,
+    "kind": "native",
+    "input": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/B3/capture/001.input.brep",
+    "result": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/B3/capture/001.result.brep",
+    "points": [
+      [
+        0.5,
+        0,
+        0.5000000000000001
+      ],
+      [
+        -0.49999001091909784,
+        -0.0031605349421287288,
+        0.5000000000000001
+      ],
+      [
+        0.5,
+        -2.4103282011818116e-14,
+        0.5000000000000001
+      ]
+    ],
+    "limit": 0.2,
+    "expected_plane": 0.1,
+    "expected_cone": 0.06,
+    "reference": "plane",
+    "first": 0.1,
+    "second": 0.06,
+    "measurement": {
+      "row": 0,
+      "valid": true,
+      "radius": 0.5,
+      "half_angle": 0.7853981633974483,
+      "volume": 0.9004475124327088,
+      "planar_setbacks": [
+        0.10000000000000009
+      ],
+      "cone_setbacks": [
+        0.060000000000000095
+      ],
+      "planar_spread": 0,
+      "cone_spread": 0,
+      "planar_circles": 1,
+      "cone_circles": 1
+    },
+    "max_setback_error": 9.71445146547012e-17
+  },
+  {
+    "case": "B3",
+    "selection": 0,
+    "kind": "truck",
+    "input": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/B3/capture/001.input.brep",
+    "result": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/B3/capture/001.truck.step",
+    "points": [
+      [
+        0.5,
+        0,
+        0.5000000000000001
+      ],
+      [
+        -0.49999001091909784,
+        -0.0031605349421287288,
+        0.5000000000000001
+      ],
+      [
+        0.5,
+        -2.4103282011818116e-14,
+        0.5000000000000001
+      ]
+    ],
+    "limit": 0.2,
+    "expected_plane": 0.1,
+    "expected_cone": 0.06,
+    "reference": "plane",
+    "first": 0.1,
+    "second": 0.06,
+    "measurement": {
+      "row": 1,
+      "valid": true,
+      "radius": 0.5,
+      "half_angle": 0.7853981633974483,
+      "volume": 0.89719345824466,
+      "planar_setbacks": [
+        0.10000000050746422
+      ],
+      "cone_setbacks": [
+        0.059999999999709945
+      ],
+      "planar_spread": 1.0149285856186907e-09,
+      "cone_spread": 1.570092458683775e-16,
+      "planar_circles": 0,
+      "cone_circles": 0
+    },
+    "max_setback_error": 1.0149285023519639e-09
+  },
+  {
+    "case": "B3",
+    "selection": 1,
+    "kind": "native",
+    "input": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/B3/capture/001.input.brep",
+    "result": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/B3/capture/001.result.brep",
+    "points": [
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        -0.9999900147630092,
+        -0.004468822470922523,
+        0
+      ],
+      [
+        1,
+        -7.041102451613936e-14,
+        0
+      ]
+    ],
+    "limit": 0.2,
+    "expected_plane": 0.1,
+    "expected_cone": 0.06,
+    "reference": "plane",
+    "first": 0.1,
+    "second": 0.06,
+    "measurement": {
+      "row": 2,
+      "valid": true,
+      "radius": 1,
+      "half_angle": 0.7853981633974483,
+      "volume": 0.9004475124327088,
+      "planar_setbacks": [
+        0.07369074008682053
+      ],
+      "cone_setbacks": [
+        0.05999999999999994
+      ],
+      "planar_spread": 2.220446049250313e-16,
+      "cone_spread": 0,
+      "planar_circles": 1,
+      "cone_circles": 1
+    },
+    "max_setback_error": 0.02630925991317959,
+    "native_first_setback_fold": 0.07369074008682053
+  },
+  {
+    "case": "B3",
+    "selection": 1,
+    "kind": "truck",
+    "input": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/B3/capture/001.input.brep",
+    "result": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/B3/capture/001.truck.step",
+    "points": [
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        -0.9999900147630092,
+        -0.004468822470922523,
+        0
+      ],
+      [
+        1,
+        -7.041102451613936e-14,
+        0
+      ]
+    ],
+    "limit": 0.2,
+    "expected_plane": 0.1,
+    "expected_cone": 0.06,
+    "reference": "plane",
+    "first": 0.1,
+    "second": 0.06,
+    "measurement": {
+      "row": 3,
+      "valid": true,
+      "radius": 1,
+      "half_angle": 0.7853981633974483,
+      "volume": 0.89719345824466,
+      "planar_setbacks": [
+        0.1000000042496938
+      ],
+      "cone_setbacks": [
+        0.06000000000002679
+      ],
+      "planar_spread": 8.499387749161258e-09,
+      "cone_spread": 3.14018491736755e-16,
+      "planar_circles": 0,
+      "cone_circles": 0
+    },
+    "max_setback_error": 8.499387665894531e-09
+  },
+  {
+    "case": "B4",
+    "selection": 0,
+    "kind": "native",
+    "input": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/B4/capture/001.input.brep",
+    "result": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/B4/capture/001.result.brep",
+    "points": [
+      [
+        0.5,
+        0,
+        0.5000000000000001
+      ],
+      [
+        -0.49999001091909784,
+        -0.0031605349421287288,
+        0.5000000000000001
+      ],
+      [
+        0.5,
+        -2.4103282011818116e-14,
+        0.5000000000000001
+      ]
+    ],
+    "limit": 0.2,
+    "expected_plane": 0.1,
+    "expected_cone": 0.06,
+    "reference": "plane",
+    "first": 0.1,
+    "second": 0.06,
+    "measurement": {
+      "row": 4,
+      "valid": true,
+      "radius": 0.5,
+      "half_angle": 0.7853981633974483,
+      "volume": 0.9004343839652745,
+      "planar_setbacks": [
+        0.10000000000000009
+      ],
+      "cone_setbacks": [
+        0.060000000000000095
+      ],
+      "planar_spread": 0,
+      "cone_spread": 0,
+      "planar_circles": 1,
+      "cone_circles": 1
+    },
+    "max_setback_error": 9.71445146547012e-17
+  },
+  {
+    "case": "B4",
+    "selection": 0,
+    "kind": "truck",
+    "input": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/B4/capture/001.input.brep",
+    "result": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/B4/capture/001.truck.step",
+    "points": [
+      [
+        0.5,
+        0,
+        0.5000000000000001
+      ],
+      [
+        -0.49999001091909784,
+        -0.0031605349421287288,
+        0.5000000000000001
+      ],
+      [
+        0.5,
+        -2.4103282011818116e-14,
+        0.5000000000000001
+      ]
+    ],
+    "limit": 0.2,
+    "expected_plane": 0.1,
+    "expected_cone": 0.06,
+    "reference": "plane",
+    "first": 0.1,
+    "second": 0.06,
+    "measurement": {
+      "row": 5,
+      "valid": true,
+      "radius": 0.5,
+      "half_angle": 0.7853981633974483,
+      "volume": 0.8971414062913486,
+      "planar_setbacks": [
+        0.10000000050746422
+      ],
+      "cone_setbacks": [
+        0.059999999999709945
+      ],
+      "planar_spread": 1.0149285856186907e-09,
+      "cone_spread": 1.570092458683775e-16,
+      "planar_circles": 0,
+      "cone_circles": 0
+    },
+    "max_setback_error": 1.0149285023519639e-09
+  },
+  {
+    "case": "B4",
+    "selection": 1,
+    "kind": "native",
+    "input": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/B4/capture/001.input.brep",
+    "result": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/B4/capture/001.result.brep",
+    "points": [
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        -0.9999900147630092,
+        -0.004468822470922523,
+        0
+      ],
+      [
+        1,
+        -7.041102451613936e-14,
+        0
+      ]
+    ],
+    "limit": 0.2,
+    "expected_plane": 0.06,
+    "expected_cone": 0.1,
+    "reference": "cone",
+    "first": 0.1,
+    "second": 0.06,
+    "measurement": {
+      "row": 6,
+      "valid": true,
+      "radius": 1,
+      "half_angle": 0.7853981633974483,
+      "volume": 0.9004343839652745,
+      "planar_setbacks": [
+        0.06000000000000005
+      ],
+      "cone_setbacks": [
+        0.07369074008682049
+      ],
+      "planar_spread": 1.1102230246251565e-16,
+      "cone_spread": 0,
+      "planar_circles": 1,
+      "cone_circles": 1
+    },
+    "max_setback_error": 0.02630925991317952,
+    "native_first_setback_fold": 0.07369074008682053
+  },
+  {
+    "case": "B4",
+    "selection": 1,
+    "kind": "truck",
+    "input": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/B4/capture/001.input.brep",
+    "result": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/B4/capture/001.truck.step",
+    "points": [
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        -0.9999900147630092,
+        -0.004468822470922523,
+        0
+      ],
+      [
+        1,
+        -7.041102451613936e-14,
+        0
+      ]
+    ],
+    "limit": 0.2,
+    "expected_plane": 0.06,
+    "expected_cone": 0.1,
+    "reference": "cone",
+    "first": 0.1,
+    "second": 0.06,
+    "measurement": {
+      "row": 7,
+      "valid": true,
+      "radius": 1,
+      "half_angle": 0.7853981633974483,
+      "volume": 0.8971414062913486,
+      "planar_setbacks": [
+        0.06000000443856901
+      ],
+      "cone_setbacks": [
+        0.1000000000000447
+      ],
+      "planar_spread": 8.877138135687801e-09,
+      "cone_spread": 3.14018491736755e-16,
+      "planar_circles": 0,
+      "cone_circles": 0
+    },
+    "max_setback_error": 8.87713808017665e-09
+  },
+  {
+    "case": "C2",
+    "selection": 0,
+    "kind": "native",
+    "input": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/C2/capture/001.input.brep",
+    "result": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/C2/capture/001.result.brep",
+    "points": [
+      [
+        1.25,
+        1,
+        1
+      ],
+      [
+        0.75,
+        0.999999999999997,
+        1
+      ],
+      [
+        1.25,
+        1.0000000000000073,
+        1
+      ]
+    ],
+    "limit": 0.2,
+    "expected_plane": 0.06,
+    "expected_cone": 0.1,
+    "reference": "cone",
+    "first": 0.1,
+    "second": 0.06,
+    "measurement": {
+      "row": 8,
+      "valid": true,
+      "radius": 0.25,
+      "half_angle": 0.7853981633974483,
+      "volume": 3.887184186234915,
+      "planar_setbacks": [
+        0.05999999999999994
+      ],
+      "cone_setbacks": [
+        0.07369074008682049
+      ],
+      "planar_spread": 2.220446049250313e-16,
+      "cone_spread": 0,
+      "planar_circles": 1,
+      "cone_circles": 1
+    },
+    "max_setback_error": 0.02630925991317952,
+    "native_first_setback_fold": 0.07369074008682053
+  },
+  {
+    "case": "C2",
+    "selection": 0,
+    "kind": "truck",
+    "input": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/C2/capture/001.input.brep",
+    "result": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/C2/capture/001.truck.step",
+    "points": [
+      [
+        1.25,
+        1,
+        1
+      ],
+      [
+        0.75,
+        0.999999999999997,
+        1
+      ],
+      [
+        1.25,
+        1.0000000000000073,
+        1
+      ]
+    ],
+    "limit": 0.2,
+    "expected_plane": 0.06,
+    "expected_cone": 0.1,
+    "reference": "cone",
+    "first": 0.1,
+    "second": 0.06,
+    "measurement": {
+      "row": 9,
+      "valid": true,
+      "radius": 0.25,
+      "half_angle": 0.7853981633974483,
+      "volume": 3.8876334659275407,
+      "planar_setbacks": [
+        0.059999998536216514
+      ],
+      "cone_setbacks": [
+        0.09999999999988628
+      ],
+      "planar_spread": 2.9275671331596698e-09,
+      "cone_spread": 3.14018491736755e-16,
+      "planar_circles": 0,
+      "cone_circles": 0
+    },
+    "max_setback_error": 2.927567049892943e-09
+  },
+  {
+    "case": "C2",
+    "selection": 1,
+    "kind": "native",
+    "input": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/C2/capture/001.input.brep",
+    "result": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/C2/capture/001.result.brep",
+    "points": [
+      [
+        1.5,
+        1,
+        0.75
+      ],
+      [
+        0.5000099890809022,
+        0.9968394650578712,
+        0.75
+      ],
+      [
+        1.5,
+        0.9999999999999759,
+        0.75
+      ]
+    ],
+    "limit": 0.2,
+    "expected_plane": 0.06,
+    "expected_cone": 0.1,
+    "reference": "cone",
+    "first": 0.1,
+    "second": 0.06,
+    "measurement": {
+      "row": 10,
+      "valid": true,
+      "radius": 0.5,
+      "half_angle": 0.7853981633974483,
+      "volume": 3.887184186234915,
+      "planar_setbacks": [
+        0.06000000000000005
+      ],
+      "cone_setbacks": [
+        0.07369074008682049
+      ],
+      "planar_spread": 1.6653345369377348e-16,
+      "cone_spread": 0,
+      "planar_circles": 1,
+      "cone_circles": 1
+    },
+    "max_setback_error": 0.02630925991317952,
+    "native_first_setback_fold": 0.07369074008682053
+  },
+  {
+    "case": "C2",
+    "selection": 1,
+    "kind": "truck",
+    "input": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/C2/capture/001.input.brep",
+    "result": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/C2/capture/001.truck.step",
+    "points": [
+      [
+        1.5,
+        1,
+        0.75
+      ],
+      [
+        0.5000099890809022,
+        0.9968394650578712,
+        0.75
+      ],
+      [
+        1.5,
+        0.9999999999999759,
+        0.75
+      ]
+    ],
+    "limit": 0.2,
+    "expected_plane": 0.06,
+    "expected_cone": 0.1,
+    "reference": "cone",
+    "first": 0.1,
+    "second": 0.06,
+    "measurement": {
+      "row": 11,
+      "valid": true,
+      "radius": 0.5,
+      "half_angle": 0.7853981633974483,
+      "volume": 3.8876334659275407,
+      "planar_setbacks": [
+        0.06000000055821059
+      ],
+      "cone_setbacks": [
+        0.10000000000004486
+      ],
+      "planar_spread": 1.1164215107939413e-09,
+      "cone_spread": 3.14018491736755e-16,
+      "planar_circles": 0,
+      "cone_circles": 0
+    },
+    "max_setback_error": 1.1164213442604876e-09
+  },
+  {
+    "case": "C3",
+    "selection": 0,
+    "kind": "native",
+    "input": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/C3/capture/001.input.brep",
+    "result": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/C3/capture/001.result.brep",
+    "points": [
+      [
+        1.25,
+        1,
+        1
+      ],
+      [
+        0.75,
+        0.999999999999997,
+        1
+      ],
+      [
+        1.25,
+        1.0000000000000073,
+        1
+      ]
+    ],
+    "limit": 0.2,
+    "expected_plane": 0.1,
+    "expected_cone": 0.06,
+    "reference": "plane",
+    "first": 0.1,
+    "second": 0.06,
+    "measurement": {
+      "row": 12,
+      "valid": true,
+      "radius": 0.25,
+      "half_angle": 0.7853981633974483,
+      "volume": 3.887157929300046,
+      "planar_setbacks": [
+        0.07369074008682053
+      ],
+      "cone_setbacks": [
+        0.05999999999999994
+      ],
+      "planar_spread": 2.220446049250313e-16,
+      "cone_spread": 0,
+      "planar_circles": 1,
+      "cone_circles": 1
+    },
+    "max_setback_error": 0.02630925991317959,
+    "native_first_setback_fold": 0.07369074008682053
+  },
+  {
+    "case": "C3",
+    "selection": 0,
+    "kind": "truck",
+    "input": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/C3/capture/001.input.brep",
+    "result": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/C3/capture/001.truck.step",
+    "points": [
+      [
+        1.25,
+        1,
+        1
+      ],
+      [
+        0.75,
+        0.999999999999997,
+        1
+      ],
+      [
+        1.25,
+        1.0000000000000073,
+        1
+      ]
+    ],
+    "limit": 0.2,
+    "expected_plane": 0.1,
+    "expected_cone": 0.06,
+    "reference": "plane",
+    "first": 0.1,
+    "second": 0.06,
+    "measurement": {
+      "row": 13,
+      "valid": true,
+      "radius": 0.25,
+      "half_angle": 0.7853981633974483,
+      "volume": 3.8875293626043943,
+      "planar_setbacks": [
+        0.09999999834734141
+      ],
+      "cone_setbacks": [
+        0.05999999999986837
+      ],
+      "planar_spread": 3.30531785275312e-09,
+      "cone_spread": 3.14018491736755e-16,
+      "planar_circles": 0,
+      "cone_circles": 0
+    },
+    "max_setback_error": 3.3053175196862128e-09
+  },
+  {
+    "case": "C3",
+    "selection": 1,
+    "kind": "native",
+    "input": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/C3/capture/001.input.brep",
+    "result": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/C3/capture/001.result.brep",
+    "points": [
+      [
+        1.5,
+        1,
+        0.75
+      ],
+      [
+        0.5000099890809022,
+        0.9968394650578712,
+        0.75
+      ],
+      [
+        1.5,
+        0.9999999999999759,
+        0.75
+      ]
+    ],
+    "limit": 0.2,
+    "expected_plane": 0.1,
+    "expected_cone": 0.06,
+    "reference": "plane",
+    "first": 0.1,
+    "second": 0.06,
+    "measurement": {
+      "row": 14,
+      "valid": true,
+      "radius": 0.5,
+      "half_angle": 0.7853981633974483,
+      "volume": 3.887157929300046,
+      "planar_setbacks": [
+        0.07369074008682053
+      ],
+      "cone_setbacks": [
+        0.05999999999999994
+      ],
+      "planar_spread": 1.6653345369377348e-16,
+      "cone_spread": 0,
+      "planar_circles": 1,
+      "cone_circles": 1
+    },
+    "max_setback_error": 0.02630925991317956,
+    "native_first_setback_fold": 0.07369074008682053
+  },
+  {
+    "case": "C3",
+    "selection": 1,
+    "kind": "truck",
+    "input": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/C3/capture/001.input.brep",
+    "result": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/C3/capture/001.truck.step",
+    "points": [
+      [
+        1.5,
+        1,
+        0.75
+      ],
+      [
+        0.5000099890809022,
+        0.9968394650578712,
+        0.75
+      ],
+      [
+        1.5,
+        0.9999999999999759,
+        0.75
+      ]
+    ],
+    "limit": 0.2,
+    "expected_plane": 0.1,
+    "expected_cone": 0.06,
+    "reference": "plane",
+    "first": 0.1,
+    "second": 0.06,
+    "measurement": {
+      "row": 15,
+      "valid": true,
+      "radius": 0.5,
+      "half_angle": 0.7853981633974483,
+      "volume": 3.8875293626043943,
+      "planar_setbacks": [
+        0.10000000050746416
+      ],
+      "cone_setbacks": [
+        0.060000000000026865
+      ],
+      "planar_spread": 1.0149286966409932e-09,
+      "cone_spread": 4.710277376051325e-16,
+      "planar_circles": 0,
+      "cone_circles": 0
+    },
+    "max_setback_error": 1.0149285023519639e-09
+  },
+  {
+    "case": "C4",
+    "selection": 0,
+    "kind": "native",
+    "input": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/C4/capture/001.input.brep",
+    "result": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/C4/capture/001.result.brep",
+    "points": [
+      [
+        1.25,
+        1,
+        1
+      ],
+      [
+        0.75,
+        0.999999999999997,
+        1
+      ],
+      [
+        1.25,
+        1.0000000000000073,
+        1
+      ]
+    ],
+    "limit": 0.2,
+    "expected_plane": 0.05,
+    "expected_cone": 0.1,
+    "reference": "cone",
+    "first": 0.1,
+    "second": 0.05,
+    "measurement": {
+      "row": 16,
+      "valid": true,
+      "radius": 0.25,
+      "half_angle": 0.7853981633974483,
+      "volume": 3.8866223414864605,
+      "planar_setbacks": [
+        0.04999999999999999
+      ],
+      "cone_setbacks": [
+        0.05469181606780274
+      ],
+      "planar_spread": 1.1102230246251565e-16,
+      "cone_spread": 0,
+      "planar_circles": 1,
+      "cone_circles": 1
+    },
+    "max_setback_error": 0.045308183932197266,
+    "native_first_setback_fold": 0.05469181606780271
+  },
+  {
+    "case": "C4",
+    "selection": 0,
+    "kind": "truck",
+    "input": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/C4/capture/001.input.brep",
+    "result": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/C4/capture/001.truck.step",
+    "points": [
+      [
+        1.25,
+        1,
+        1
+      ],
+      [
+        0.75,
+        0.999999999999997,
+        1
+      ],
+      [
+        1.25,
+        1.0000000000000073,
+        1
+      ]
+    ],
+    "limit": 0.2,
+    "expected_plane": 0.05,
+    "expected_cone": 0.1,
+    "reference": "cone",
+    "first": 0.1,
+    "second": 0.05,
+    "measurement": {
+      "row": 17,
+      "valid": true,
+      "radius": 0.25,
+      "half_angle": 0.7853981633974483,
+      "volume": 3.8873457310203285,
+      "planar_setbacks": [
+        0.0499999985834354
+      ],
+      "cone_setbacks": [
+        0.09999999999988628
+      ],
+      "planar_spread": 2.8331293422390047e-09,
+      "cone_spread": 3.14018491736755e-16,
+      "planar_circles": 0,
+      "cone_circles": 0
+    },
+    "max_setback_error": 2.8331292728500657e-09
+  },
+  {
+    "case": "C4",
+    "selection": 1,
+    "kind": "native",
+    "input": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/C4/capture/001.input.brep",
+    "result": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/C4/capture/001.result.brep",
+    "points": [
+      [
+        1.5,
+        1,
+        0.75
+      ],
+      [
+        0.5000099890809022,
+        0.9968394650578712,
+        0.75
+      ],
+      [
+        1.5,
+        0.9999999999999759,
+        0.75
+      ]
+    ],
+    "limit": 0.2,
+    "expected_plane": 0.05,
+    "expected_cone": 0.1,
+    "reference": "cone",
+    "first": 0.1,
+    "second": 0.05,
+    "measurement": {
+      "row": 18,
+      "valid": true,
+      "radius": 0.5,
+      "half_angle": 0.7853981633974483,
+      "volume": 3.8866223414864605,
+      "planar_setbacks": [
+        0.050000000000000044
+      ],
+      "cone_setbacks": [
+        0.05469181606780274
+      ],
+      "planar_spread": 1.6653345369377348e-16,
+      "cone_spread": 0,
+      "planar_circles": 1,
+      "cone_circles": 1
+    },
+    "max_setback_error": 0.045308183932197266,
+    "native_first_setback_fold": 0.05469181606780271
+  },
+  {
+    "case": "C4",
+    "selection": 1,
+    "kind": "truck",
+    "input": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/C4/capture/001.input.brep",
+    "result": "target/occt-capture-disjoint-chamfer-rims/chamfer/dist_dist/C4/capture/001.truck.step",
+    "points": [
+      [
+        1.5,
+        1,
+        0.75
+      ],
+      [
+        0.5000099890809022,
+        0.9968394650578712,
+        0.75
+      ],
+      [
+        1.5,
+        0.9999999999999759,
+        0.75
+      ]
+    ],
+    "limit": 0.2,
+    "expected_plane": 0.05,
+    "expected_cone": 0.1,
+    "reference": "cone",
+    "first": 0.1,
+    "second": 0.05,
+    "measurement": {
+      "row": 19,
+      "valid": true,
+      "radius": 0.5,
+      "half_angle": 0.7853981633974483,
+      "volume": 3.8873457310203285,
+      "planar_setbacks": [
+        0.05000000057089721
+      ],
+      "cone_setbacks": [
+        0.10000000000004486
+      ],
+      "planar_spread": 1.141794658821027e-09,
+      "cone_spread": 3.14018491736755e-16,
+      "planar_circles": 0,
+      "cone_circles": 0
+    },
+    "max_setback_error": 1.1417945339209368e-09
+  }
+]

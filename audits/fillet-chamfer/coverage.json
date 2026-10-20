@@ -3,7 +3,7 @@
     "title": "Fillet and chamfer feature parity audit",
     "baseline": "OCCT V7_9_3 source inventory plus the recorded Truck/Pieza revisions. Includes 3D, 2D, related workflows and all textual candidates under the discovery rules.",
     "meaning_of_all": "Every dedicated test-grid entry, matching registered test/helper, discovered blend command and retained reference in this pinned checkout. This is not a claim about all mathematical configurations or current/future OCCT releases.",
-    "execution": "All1,026 inventoried entries have native attempts. Latest clean capture at070d1985:396 native passes,648 operations,487 complete chamfer and161 complete fillet scopes;372 constructions/347 limited sampled passes at0.001. All371 prior constructions retain checks;371 prior result/comparison records exact,0 numerical changes. Native discrepancies retained;full parity remains unverified.",
+    "execution": "All 1,026 inventoried entries have native attempts. Latest clean capture at edcc9bf9:396 native passes,648 operations,487 complete chamfer and161 complete fillet scopes;417 constructions/387 limited sampled passes at0.001. All372 prior constructions retain checks;372 prior result/comparison records exact,0 numerical changes. Native discrepancies retained;full parity remains unverified.",
     "mapping": "Capability assessments describe observable outcomes supported or restricted by reviewed source evidence. Per-case tags and links are automated hints; they do not prove Truck handles that fixture.",
     "objective": "Achieve at least OCCT-level fillet/chamfer capabilities and robustness for equivalent modeling tasks in Truck/Pieza.",
     "equivalence": "Judge the requested geometry, dimensions, validity, editing behavior and practical performance. Different APIs, algorithms, languages, surface representations and internal operation sequences are acceptable. Missing a corresponding OCCT method is not evidence of a feature gap."
@@ -625,6 +625,12 @@
           "path": "truck-benchmarks/results/2026-10-20-convex-corner-clipping/REPORT.md",
           "find": "# Convex chamfer corner clipping",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-20-disjoint-chamfer-rims/REPORT.md",
+          "find": "# Disjoint chamfer rims",
+          "role": "test"
         }
       ],
       "required_outcome": "Bevel with independently specified setbacks on the intended two support faces; orientation or storage order must not silently exchange them.",
@@ -645,7 +651,8 @@
         "At 35c11b96, planar chamfer contacts extend exact conics and their extruded cylinder generators;mesh interior ruling fixes material loss. Three parent failures,eight variants,oversized guards,six native controls. Full shapeops 400 and meshalgo 98 pass,46 replay tests,Clippy/smoke. Clean capture:359 constructions/340 limited passes;no prior successful check regressed. No parity upgrade.",
         "At 7ab0f68f, parallel cylinder chords preserve both supports and concave chamfers retain subdivided cap seams. Three parent failures,18replay variants,9native controls;400shapeops/98meshalgo/54replay/13capture tests,Clippy/smoke pass. Native tolerance mutation in3controls retained. Clean capture:364constructions/341limited passes;no prior check regressions. No parity upgrade.",
         "At ea20f7d9, concave chamfers preserve coincident cylindrical terminal seams with exact end patches. Two construction/four mesh parent failures;24construction variants,12controls. Final mesh change only increases existing refinement cap20\u219264. Full400shapeops/102meshalgo/59replay/13capture tests,Clippy/smoke pass. Six raw subdivided native discrepancies retained separately from equivalent valid controls. Clean capture:371constructions/347limited passes;no prior check regression. No parity upgrade.",
-        "At070d1985,convex miter corners escaping one original support plane are clipped to it. Four parent failures plus one balanced guard;five tests with transforms/reordering,independent halfspace material/vertices and shared solid/STEP checks. Five native controls retain raw corner-policy discrepancies.405shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:372/347,no prior check regression. No parity upgrade."
+        "At070d1985,convex miter corners escaping one original support plane are clipped to it. Four parent failures plus one balanced guard;five tests with transforms/reordering,independent halfspace material/vertices and shared solid/STEP checks. Five native controls retain raw corner-policy discrepancies.405shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:372/347,no prior check regression. No parity upgrade.",
+        "At edcc9bf9, selected-edge chamfers support disjoint tangent wires with constant oriented distances, shared original supports and guards against modifying earlier generated bevels. Two parent failures plus overlap guard;16 positive/4 negative variants,8 native controls,independent cone material/contacts and complete face correspondence.408shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:417/387,no prior check regression. No parity upgrade."
       ]
     },
     {
@@ -755,6 +762,12 @@
           "path": "truck-benchmarks/results/2026-10-20-convex-corner-clipping/REPORT.md",
           "find": "# Convex chamfer corner clipping",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-20-disjoint-chamfer-rims/REPORT.md",
+          "find": "# Disjoint chamfer rims",
+          "role": "test"
         }
       ],
       "required_outcome": "Produce a chamfer with the requested setback and angle, including non-right-angle supports, using any equivalent parameterization.",
@@ -771,7 +784,8 @@
         "At 7ab0f68f, parallel cylinder chords preserve both supports and concave chamfers retain subdivided cap seams. Three parent failures,18replay variants,9native controls;400shapeops/98meshalgo/54replay/13capture tests,Clippy/smoke pass. Native tolerance mutation in3controls retained. Clean capture:364constructions/341limited passes;no prior check regressions. No parity upgrade.",
         "At 68b6a642, parallel cylinder contact-angle requests preserve reference chord and the angle at the new contact. Two parent failures,20variants,12native controls (10valid/2impossible);57replay/13capture tests,Clippy/smoke pass. Core400shapeops/98meshalgo validation reused with hashes. Raw native failures/mutations retained. Clean capture:365constructions/341limited passes;no prior check regression. No parity upgrade.",
         "At ea20f7d9, concave chamfers preserve coincident cylindrical terminal seams with exact end patches. Two construction/four mesh parent failures;24construction variants,12controls. Final mesh change only increases existing refinement cap20\u219264. Full400shapeops/102meshalgo/59replay/13capture tests,Clippy/smoke pass. Six raw subdivided native discrepancies retained separately from equivalent valid controls. Clean capture:371constructions/347limited passes;no prior check regression. No parity upgrade.",
-        "At070d1985,convex miter corners escaping one original support plane are clipped to it. Four parent failures plus one balanced guard;five tests with transforms/reordering,independent halfspace material/vertices and shared solid/STEP checks. Five native controls retain raw corner-policy discrepancies.405shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:372/347,no prior check regression. No parity upgrade."
+        "At070d1985,convex miter corners escaping one original support plane are clipped to it. Four parent failures plus one balanced guard;five tests with transforms/reordering,independent halfspace material/vertices and shared solid/STEP checks. Five native controls retain raw corner-policy discrepancies.405shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:372/347,no prior check regression. No parity upgrade.",
+        "At edcc9bf9, selected-edge chamfers support disjoint tangent wires with constant oriented distances, shared original supports and guards against modifying earlier generated bevels. Two parent failures plus overlap guard;16 positive/4 negative variants,8 native controls,independent cone material/contacts and complete face correspondence.408shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:417/387,no prior check regression. No parity upgrade."
       ]
     },
     {
@@ -883,6 +897,12 @@
           "path": "truck-benchmarks/results/2026-10-20-convex-corner-clipping/REPORT.md",
           "find": "# Convex chamfer corner clipping",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-20-disjoint-chamfer-rims/REPORT.md",
+          "find": "# Disjoint chamfer rims",
+          "role": "test"
         }
       ],
       "required_outcome": "Produce the intended measurable setbacks on curved supports after explicitly translating dimension conventions between kernels.",
@@ -890,7 +910,8 @@
         "At 460ac6fd, cylinder-reference longitudinal requests preserve captured chord and angle at the new cylinder contact. Three parent failures,20 variants,10 native controls;49 replay tests,13 capture tests,Clippy/smoke pass. Six native controls differ from this geometric contract;source model and raw verdicts retained. Clean capture:363 constructions/340 limited passes;no prior check regressed. No parity upgrade.",
         "At 68b6a642, parallel cylinder contact-angle requests preserve reference chord and the angle at the new contact. Two parent failures,20variants,12native controls (10valid/2impossible);57replay/13capture tests,Clippy/smoke pass. Core400shapeops/98meshalgo validation reused with hashes. Raw native failures/mutations retained. Clean capture:365constructions/341limited passes;no prior check regression. No parity upgrade.",
         "At ea20f7d9, concave chamfers preserve coincident cylindrical terminal seams with exact end patches. Two construction/four mesh parent failures;24construction variants,12controls. Final mesh change only increases existing refinement cap20\u219264. Full400shapeops/102meshalgo/59replay/13capture tests,Clippy/smoke pass. Six raw subdivided native discrepancies retained separately from equivalent valid controls. Clean capture:371constructions/347limited passes;no prior check regression. No parity upgrade.",
-        "At070d1985,convex miter corners escaping one original support plane are clipped to it. Four parent failures plus one balanced guard;five tests with transforms/reordering,independent halfspace material/vertices and shared solid/STEP checks. Five native controls retain raw corner-policy discrepancies.405shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:372/347,no prior check regression. No parity upgrade."
+        "At070d1985,convex miter corners escaping one original support plane are clipped to it. Four parent failures plus one balanced guard;five tests with transforms/reordering,independent halfspace material/vertices and shared solid/STEP checks. Five native controls retain raw corner-policy discrepancies.405shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:372/347,no prior check regression. No parity upgrade.",
+        "At edcc9bf9, selected-edge chamfers support disjoint tangent wires with constant oriented distances, shared original supports and guards against modifying earlier generated bevels. Two parent failures plus overlap guard;16 positive/4 negative variants,8 native controls,independent cone material/contacts and complete face correspondence.408shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:417/387,no prior check regression. No parity upgrade."
       ]
     },
     {

@@ -1,0 +1,18 @@
+{
+  "chamfer/dist_dist/B3/capture/001.input.brep": "cbfdff0197b8ed789e88c2d371cc54c89552ff8cd68075a4a2767a08ee531aa8",
+  "chamfer/dist_dist/B3/capture/001.result.brep": "aa0976e3019d69505ce1172d5bc0680c6f50d80fdc9c8fd3b0935f764d28882d",
+  "chamfer/dist_dist/B3/capture/001.truck.step": "512115d452ff41433eb034a2d07aa0f3737cf193f688a717a45be87f9a65adf4",
+  "chamfer/dist_dist/B4/capture/001.input.brep": "cbfdff0197b8ed789e88c2d371cc54c89552ff8cd68075a4a2767a08ee531aa8",
+  "chamfer/dist_dist/B4/capture/001.result.brep": "70aaa3c0a041af034764d6ef15a8bf6e31c1b4eb4e970bbd5318bcb4ae24c401",
+  "chamfer/dist_dist/B4/capture/001.truck.step": "6937ba51063b293834532cda37b4f4ac715ce858dabdf3cacd5819612aeeab6b",
+  "chamfer/dist_dist/C2/capture/001.input.brep": "0a54e8426c754f9800b92ae4fe613ae921b5dce70cf20bef574549ecbe89dbd8",
+  "chamfer/dist_dist/C2/capture/001.result.brep": "75dc84df97e566ab16b1e4f2515417c657815c27ecf5470a74273f64adf953bf",
+  "chamfer/dist_dist/C2/capture/001.truck.step": "db7029d668aacf035a6884c2713a26cf1ececca3dbed2c740f763b1d33cd7c80",
+  "chamfer/dist_dist/C3/capture/001.input.brep": "0a54e8426c754f9800b92ae4fe613ae921b5dce70cf20bef574549ecbe89dbd8",
+  "chamfer/dist_dist/C3/capture/001.result.brep": "bde5c087f9e0fb32c336344ed682e07a66cd9ab9df2a3bc9735bf5d8cd9833a2",
+  "chamfer/dist_dist/C3/capture/001.truck.step": "8acf6dfea49828fc8228448f95cebf4cd40ec9f61d001227deaefef1323582a0",
+  "chamfer/dist_dist/C4/capture/001.input.brep": "0a54e8426c754f9800b92ae4fe613ae921b5dce70cf20bef574549ecbe89dbd8",
+  "chamfer/dist_dist/C4/capture/001.result.brep": "62c45a2b87d80398ddd512d256e6a0f52ddce38ca08c9feda02e951149991b94",
+  "chamfer/dist_dist/C4/capture/001.truck.step": "e7de3184e0a8d1dd4164e770f2446388b95a073a71cb545557aea101e158371e",
+  "truck-benchmarks/results/2026-10-16-cone-contact-oracle/oracle.cpp": "c373809c4fdcbafc48a33648153cde79728091ddf3a5e53e4f2177fd83a2cc90"
+}

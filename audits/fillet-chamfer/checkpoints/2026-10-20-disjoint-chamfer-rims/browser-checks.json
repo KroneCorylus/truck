@@ -1,0 +1,43 @@
+{
+  "title": "Disjoint chamfer rims — progress and remaining work",
+  "width": 1280,
+  "scrollWidth": 1280,
+  "links": [
+    {
+      "href": "#done",
+      "ok": true
+    },
+    {
+      "href": "#results",
+      "ok": true
+    },
+    {
+      "href": "#remaining",
+      "ok": true
+    },
+    {
+      "href": "#evidence",
+      "ok": true
+    },
+    {
+      "href": "../../../../truck-benchmarks/results/2026-10-20-disjoint-chamfer-rims/REPORT.md",
+      "ok": true
+    },
+    {
+      "href": "../../capture/2026-10-20-disjoint-chamfer-rims/REPORT.md",
+      "ok": true
+    },
+    {
+      "href": "../../capture/2026-10-20-disjoint-chamfer-rims/comparison-summary.json",
+      "ok": true
+    },
+    {
+      "href": "../../capture/2026-10-20-disjoint-chamfer-rims/artifacts.zip",
+      "ok": true
+    },
+    {
+      "href": "HANDOFF.txt",
+      "ok": true
+    }
+  ]
+}
