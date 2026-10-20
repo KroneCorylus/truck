@@ -1,0 +1,40 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 4.12s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running unittests examples/replay_occt_blend.rs (target/release/examples/replay_occt_blend-bd2259d8fa5b09df)
+
+running 5 tests
+test parallel_cylinder_chord_tests::parallel_cylinder_angles_remain_explicitly_unsupported ... ok
+test parallel_cylinder_chord_tests::parallel_cylinder_chords_reject_either_oversized_side ... ok
+test parallel_cylinder_chord_tests::concave_parallel_cylinder_chamfer_preserves_subdivided_caps ... FAILED
+test parallel_cylinder_chord_tests::unequal_parallel_cylinder_chamfers_preserve_reference_sides ... FAILED
+test parallel_cylinder_chord_tests::equal_parallel_cylinder_chamfers_preserve_both_chords ... FAILED
+
+failures:
+
+---- parallel_cylinder_chord_tests::concave_parallel_cylinder_chamfer_preserves_subdivided_caps stdout ----
+
+thread 'parallel_cylinder_chord_tests::concave_parallel_cylinder_chamfer_preserves_subdivided_caps' (179838) panicked at truck-shapeops/examples/replay_occt_blend.rs:3118:18:
+called `Result::unwrap()` on an `Err` value: Diagnostic { code: OutsideNeighbour, operation: "chamfer_solid_edge", stage: "intersect_end_faces", message: "The moved boundary leaves its neighbouring face.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- parallel_cylinder_chord_tests::unequal_parallel_cylinder_chamfers_preserve_reference_sides stdout ----
+
+thread 'parallel_cylinder_chord_tests::unequal_parallel_cylinder_chamfers_preserve_reference_sides' (179842) panicked at truck-shapeops/examples/replay_occt_blend.rs:3028:75:
+called `Result::unwrap()` on an `Err` value: Object {"reason": String("Face-dependent chamfers require planar supports, a perpendicular plane/cylinder or plane/cone rim, or a longitudinal plane/cylinder edge"), "status": String("unhandled-intent")}
+
+---- parallel_cylinder_chord_tests::equal_parallel_cylinder_chamfers_preserve_both_chords stdout ----
+
+thread 'parallel_cylinder_chord_tests::equal_parallel_cylinder_chamfers_preserve_both_chords' (179839) panicked at truck-shapeops/examples/replay_occt_blend.rs:3043:17:
+0.7 != 0.7051937931347594
+
+
+failures:
+    parallel_cylinder_chord_tests::concave_parallel_cylinder_chamfer_preserves_subdivided_caps
+    parallel_cylinder_chord_tests::equal_parallel_cylinder_chamfers_preserve_both_chords
+    parallel_cylinder_chord_tests::unequal_parallel_cylinder_chamfers_preserve_reference_sides
+
+test result: FAILED. 2 passed; 3 failed; 0 ignored; 0 measured; 49 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p truck-shapeops --example replay_occt_blend`

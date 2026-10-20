@@ -1,0 +1,10 @@
+001 sample 1.6999744233919093e-13 volume error 8.355982572538778e-12 contact error 6.280369834735101e-16 native input unchanged True
+002 sample 1.6999744233919093e-13 volume error 1.2846612662542611e-11 contact error 4.440892098500626e-16 native input unchanged True
+003 sample 1.6999744233919093e-13 volume error 1.2846612662542611e-11 contact error 4.440892098500626e-16 native input unchanged True
+004 sample 2.6201263381153694e-13 volume error 1.2875034371973015e-11 contact error 2.207261867256572e-13 native input unchanged True
+005 sample 2.6201263381153694e-13 volume error 1.7962520360015333e-11 contact error 2.2397950889897277e-13 native input unchanged True
+006 sample 2.6201263381153694e-13 volume error 1.7962520360015333e-11 contact error 2.2397950889897277e-13 native input unchanged True
+007 sample 1.6999744233919093e-13 volume error -2.7853275241795927e-10 contact error 1.6011864169946884e-15 native input unchanged False
+008 sample 1.6999744233919093e-13 volume error -2.7557689463719726e-10 contact error 1.2560739669470201e-15 native input unchanged False
+009 sample 1.6999744233919093e-13 volume error -2.7557689463719726e-10 contact error 1.2560739669470201e-15 native input unchanged False
+Nine valid Truck single solids match independent contacts/material and native sampled geometry; three native inputs changed vertex tolerances.

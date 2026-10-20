@@ -195,10 +195,82 @@ pub(super) fn blend(
     ];
     let mut cross = Vec::new();
     let mut connectors = HashMap::default();
+    let mut cap_patches = Vec::new();
     for end in 0..2 {
         let mut points = vec![contact[end][0].clone()];
         let (paths, walk) = &transitions[end];
         let initial = end_faces[end];
+        let cap = shell[initial].oriented_surface();
+        let coplanar_fan = matches!(cap.elementary(), Some((Elementary::Plane(_), _)))
+            && walk.iter().all(|(_, _, next)| {
+                let other = shell[*next].oriented_surface();
+                matches!(other.elementary(), Some((Elementary::Plane(_), _)))
+                    && cap
+                        .normal(0., 0.)
+                        .normalize()
+                        .dot(other.normal(0., 0.).normalize())
+                        > 1. - TOLERANCE
+                    && (other.subs(0., 0.) - cap.subs(0., 0.))
+                        .dot(cap.normal(0., 0.).normalize())
+                        .abs()
+                        <= TOLERANCE
+            });
+        if matches!(blend, Blend::Chamfer(_))
+            && n.cross(m).dot(axis) < 0.
+            && paths.iter().all(Vec::is_empty)
+            && !walk.is_empty()
+            && coplanar_fan
+        {
+            // Keep coplanar cap seams at the old corner; the additive bevel gets its own cap.
+            let corner = if end == 0 { start } else { finish };
+            let mut pieces = Vec::new();
+            for (side, point) in [a, b].into_iter().zip(&contact[end]) {
+                let old = shell[side]
+                    .edge_iter()
+                    .find(|edge| {
+                        edge.id() != id
+                            && replacements.contains_key(&edge.id())
+                            && (edge.front() == corner || edge.back() == corner)
+                    })
+                    .ok_or_else(|| error(Code::UnsupportedTopology))?;
+                let absolute = old.absolute_clone();
+                let curve = absolute.curve();
+                let front = absolute.front() == corner;
+                let (t0, t1) = curve.range_tuple();
+                let parameter = curve
+                    .search_parameter(point.point(), if front { t0 } else { t1 }, 100)
+                    .ok_or_else(|| error(Code::OutsideNeighbour))?;
+                let (left, right) = absolute
+                    .cut_with_parameter(point, parameter)
+                    .ok_or_else(|| error(Code::OutsideNeighbour))?;
+                let piece = if front { left } else { right.inverse() };
+                connectors.insert((piece.front().id(), piece.back().id()), piece.clone());
+                connectors.insert((piece.back().id(), piece.front().id()), piece.inverse());
+                pieces.push(piece);
+            }
+            let edge = builder::line(&contact[end][0], &contact[end][1]);
+            let mut boundary =
+                Wire::from(vec![edge.clone(), pieces[1].inverse(), pieces[0].clone()]);
+            if end == 0 {
+                boundary.invert();
+            }
+            if !super::planar::valid_polygon(
+                &sample_wire(&boundary, tol),
+                cap.normal(0., 0.).normalize(),
+                tol,
+            ) {
+                return Err(error(Code::OutsideNeighbour));
+            }
+            cap_patches.push(
+                Face::try_new(
+                    vec![boundary.clone()],
+                    extend_surface(cap, &[boundary], tol),
+                )
+                .map_err(|e| error(Code::InvalidOutputTopology).with_coded_source(e))?,
+            );
+            cross.push(Wire::from(vec![edge]));
+            continue;
+        }
         let mut walls = Vec::new();
         let mut current = paths[0]
             .last()
@@ -433,6 +505,7 @@ pub(super) fn blend(
         )
         .map_err(|e| error(Code::InvalidOutputTopology).with_coded_source(e))?,
     );
+    result.extend(cap_patches);
     if result.shell_condition() != ShellCondition::Closed {
         return Err(error(Code::InvalidOutputTopology));
     }
