@@ -6,6 +6,10 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Replay cylinder-reference distance-angle chamfers on longitudinal plane/cylinder
+  edges using the requested chord and the cylinder tangent at the new contact.
+  Reject contacts outside the local branch or with no positive planar setback.
+
 - Extend exact conic contact boundaries when a straight-edge chamfer reaches past
   their old endpoint. Preserve the periodic branch and extend an extruded
   cylindrical support’s generator with its new boundary. Seed an interior mesh

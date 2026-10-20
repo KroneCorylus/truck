@@ -1,0 +1,5 @@
+{
+  "revision": "fd791dea687a56947e8343e8e489de8478fd7e82",
+  "test_module_sha256": "ea16d2bada3f97e49f9059a004e24c6b2c72eeb0661e578001e42b2a0c4d0f3b",
+  "contract_change": "Previously unsupported valid cylinder-reference request now has positive contact-angle/material coverage; rejection guard uses oversized chord 8 on radius 5 instead of valid chord 1.5. Other existing checks unchanged."
+}

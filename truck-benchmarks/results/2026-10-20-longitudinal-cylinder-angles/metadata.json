@@ -1,0 +1,2129 @@
+{
+  "parent_revision": "fd791dea687a56947e8343e8e489de8478fd7e82",
+  "source_sha256": {
+    "truck-shapeops/src/thread.rs": "dde916eefe7df28638b1855f616c915be37065efb06834a0dd38142db209f6ee",
+    "truck-shapeops/src/alternative.rs": "820392cdac5c56f81ccb0388c5d4a95d84994196e724896186a3a6f9a5806697",
+    "truck-shapeops/src/lib.rs": "f5930f4813660153a11f5ea6c5dd7e2b72381119b0a007d9a2936af4f490eee8",
+    "truck-shapeops/src/profile.rs": "f93d5790e8e9e4de18920137b203c073a4c4a46427e914967d6bd6dfe770f444",
+    "truck-shapeops/src/sewing.rs": "a931f29e18a2552f053fb0d7b934752b9182492f2a817d701b16daec4b61e94c",
+    "truck-shapeops/src/fillet/extend_intersection_curve.rs": "4af6cfdeba3558e0b455059bdb67500f7cfc12d7c3007246d8f97c5290615169",
+    "truck-shapeops/src/fillet/edges.rs": "45b075cbad5bcd9523a7b17bf33fe282338acb139ee888ae0cdce828a243ec85",
+    "truck-shapeops/src/fillet/convex.rs": "aa56d71fd2fd6b86f11cf4571b7bc8e6cef4da91615c003a8199438022f7276c",
+    "truck-shapeops/src/fillet/chamfer_edges.rs": "9e7085c8f7aa51cb3f4fabf0ce00426681e3917a80fbc30814c94af4af77bb76",
+    "truck-shapeops/src/fillet/chamfer_miter.rs": "e07d2a3c0b608bf320382ec82d31a3b7808c9638c9021ea993fc1cc267ae7ca3",
+    "truck-shapeops/src/fillet/planar.rs": "050a124d00899b7e43df36edd9c84cf9ea7fa6305c9a93124df791de791fccd6",
+    "truck-shapeops/src/fillet/planar_edge.rs": "35b1777083b3c9dad7e43e9b4ce3eb79adcd575533ccd24e588a6008d5d178c8",
+    "truck-shapeops/src/fillet/projected_section.rs": "d2ff875824b4107c608673e91aca2e0fb3e0f14f2cb66d98195be1fdc79a873b",
+    "truck-shapeops/src/fillet/along_wire.rs": "6adc3d65f752ab82c97bced17d6d203ee5547a8db6d8154f6a24babf7e780982",
+    "truck-shapeops/src/fillet/chamfer.rs": "00b31ade28d4602448bdbd6ab64006bc15838b826894ff525a3f8c4b78957204",
+    "truck-shapeops/src/fillet/mod.rs": "50949a94c4f58cb7c01869d115061c30883efc6099974f09195630b9cecbe940",
+    "truck-shapeops/src/fillet/modeling.rs": "d367aa6170c3bd25927f98309bcad8b58403f87f109927f05d37311316d2cfb8",
+    "truck-shapeops/src/fillet/planar_fillet.rs": "50c6d956f13d879f457a949b16f5dc15100462b4d02489797c6b88980f3356bb",
+    "truck-shapeops/src/fillet/chamfer_collapse.rs": "1edb9a6fd7914848b2ff4d813dff1f48a3fb0f0e59310a0488e3bbe8f67897b8",
+    "truck-shapeops/src/fillet/additive.rs": "5c2413719042277bad2c2ecfb7e46bf2938be888bee87aac40d37d759cb026d2",
+    "truck-shapeops/src/fillet/continued_support.rs": "c344c88d3dc6cb4ad353688c1f2c79cef30fe6cf30cde0e576efd86303173600",
+    "truck-shapeops/src/healing/mod.rs": "393e50d89792274cf2fdd4f670a418ebf9ce1f4fb93272f1e98cdf5a9c37b7a7",
+    "truck-shapeops/src/healing/split_closed_edges.rs": "0965d54985cc032d9eeca3a60c5a3d7fd1805203254cd208bb63d7d0a686e00a",
+    "truck-shapeops/src/healing/tests.rs": "65945e23e01e22149c3d19f7b853295157ca7b6e0c262c366df7200004d0f587",
+    "truck-shapeops/src/healing/split_closed_faces.rs": "2c46b9aa8fd8f9aaba42afb118c6898f6c2e1c0d2767869570d2206297c86794",
+    "truck-shapeops/src/transversal/mod.rs": "46f5b365049c8b2d1942cac1dab7f766c95fa5707dbda1337fce22d15b70f20e",
+    "truck-shapeops/src/local/delete.rs": "f147dbad6c4df1badeeceba0e486366ed70967dfda293275cf5f82bebb664b69",
+    "truck-shapeops/src/local/replace.rs": "97d8fad850f0326ed1d663d2a31251a683334f2017d82c7f2e7cb42d7fa73c2b",
+    "truck-shapeops/src/local/draft.rs": "8433022ce784efd2477ba72e78fbe02471e7d5a212a4f01a70702556ec6611e5",
+    "truck-shapeops/src/local/intersect.rs": "b31d4c28a3821862a9ca2c53a2505e4030f0cf95eca91fee4d2c2b26a0d7e10b",
+    "truck-shapeops/src/local/shell.rs": "8c77ca5a07b7fb4a5c1703353f6eb81780d02c52891d27a3c3a879559378d780",
+    "truck-shapeops/src/local/mod.rs": "c92d4ea8eae61ef0357665453ddaa577316a67c170ef6ccaca7519c6cd879cdb",
+    "truck-shapeops/src/transversal/divide_face/mod.rs": "7f72278afec62eb7f0571a878a7cbdad01ac6ee8d1cb91f0b089a72ec2e626f6",
+    "truck-shapeops/src/transversal/divide_face/tests.rs": "a27779e32349f02e280e604f968c4087bad4e492da27fb3089ec36f3f853f828",
+    "truck-shapeops/src/transversal/faces_classification/tests.rs": "2ec9dfbeb5c16aaac1a868f16eb7b62d88c025bfcbde870274848e00ca5fb4a5",
+    "truck-shapeops/src/transversal/faces_classification/mod.rs": "645eacc40f9f432322a285f6587baedb1db0df15da67838a1c11642bf526eb4b",
+    "truck-shapeops/src/transversal/integrate/components.rs": "75f27bed964ec69cfaea01f5328d94fa65785cac62acaac87e1dab1540de6719",
+    "truck-shapeops/src/transversal/integrate/mod.rs": "3e3afa51ea2de9b7e30b108ee9b129924b2e37d4d618888344d8e4bfd56620a3",
+    "truck-shapeops/src/transversal/integrate/through_hole.rs": "489e6ffae8d675d54aa8ae5ec13b505fdb8f4cc1426e67e0ed69b33dacfabdef",
+    "truck-shapeops/src/transversal/intersection_curve/tests.rs": "ea8f45c565673bedbe99d4825d330b477cd52133d779719815b3a6bb3c2429c1",
+    "truck-shapeops/src/transversal/intersection_curve/mod.rs": "633109076822fc95c6662c35c66bd7b9b50dc4c07dbde1a4151f2ec570aaf0a4",
+    "truck-shapeops/src/transversal/loops_store/tests.rs": "b1414648e95a02d7db9cd637c0c5cf0b33750b86cc14e41ff7762c135cfba3b2",
+    "truck-shapeops/src/transversal/loops_store/coincident.rs": "441a2173efdb8e0d18209086e79c7663e9c7be13cb3dc726ddfcb26f70617411",
+    "truck-shapeops/src/transversal/loops_store/mod.rs": "2a0b314581374fd846d97402db4cc3d76801ba33df2d8bc6977510b485f503bd",
+    "truck-shapeops/src/transversal/polyline_construction/tests.rs": "cca3f345512a6ebe384e8be792acb8e6a11fae746a73885719aa49f3caefc29e",
+    "truck-shapeops/src/transversal/polyline_construction/mod.rs": "a245bfc2ae1a124d8570695341a90ff30e25a1b4a55d345ca4fd8102b45c2780",
+    "truck-shapeops/src/fillet/planar/tests.rs": "21448b125bfe843008d846765db414bafa184fcc86320220cc9346ae0fc13914",
+    "truck-shapeops/tests/fillet.rs": "1eb84900c7d05ed5ea445557fbd9e1c6528637039c351db0ec229f96ae23c87c",
+    "truck-shapeops/tests/chamfer.rs": "1cae7b366991ce3af1a6ef3d346cdf07396431b5c0a2232e5ae81e1e011b0dff",
+    "truck-shapeops/tests/bench_plate.rs": "c48afe12dfcaf9c938cd8e1582a1c5f3bbaf053b067776e4d8f6a6d89b2656e4",
+    "truck-shapeops/tests/fillet_chain.rs": "ff34e11bc4c36aa08ffb5aa6fa14c5cf0d5f1f8e4f7e7da25ce1440f3a9dfce8",
+    "truck-shapeops/tests/loft.rs": "9775fe82ffd1723c97c41e75c12be46bdac758d78590026ad247603247ea84c6",
+    "truck-shapeops/tests/intersect.rs": "fca2b5b2e30ea0ca030698fa26d90c5a214404cc170941822c452984dcc0be81",
+    "truck-shapeops/tests/fillet_edges.rs": "d6168e153d230ecc33993bcf89fe85bb1854c53e3bbea7fbdfa6df5a1ed1f6a0",
+    "truck-shapeops/tests/boolean_cache.rs": "3d8a788224d0de932b4b1afb3aecafa6469a5e7a5673b576f6fee0b488e3b397",
+    "truck-shapeops/tests/r5_chamfer_after_fillet.rs": "d4f7d8ab5157b983ea64d6fd23333fd86152ccb496702728d5289647ef464ce1",
+    "truck-shapeops/tests/R7-R8-extrude-remove.rs": "41fdfc75aa81af2067856475df388ee123df1d651b4c15e677836c4a72bd6f84",
+    "truck-shapeops/tests/diagnostics.rs": "91fdd16e84de69e878f0e9351bb40602f0e9262b0085a2e078f03e73d1d24737",
+    "truck-shapeops/tests/fixed_sweep.rs": "7184cd04573259166ba0abb987135a2361b4cb6d8945dc32cd7cfed396e4270b",
+    "truck-shapeops/tests/sewing.rs": "055706addb62733bb62e7c46c98bffe05916c59273372b281b1adac3656e6e90",
+    "truck-shapeops/tests/corner_hole.rs": "293e43f038018d82d152d82fba64134ee6bdee3446fa7e6b97ea75b93169130e",
+    "truck-shapeops/tests/app_sphere_bore.rs": "c80a6172fc46bf1d819fa8bb6bfa6371562da90e8363e6b3a8b6407256c52922",
+    "truck-shapeops/tests/nonconvex_chamfer.rs": "5318d002b84aa01542e60f8c77ff76532201249580c98621f952b48b72bd14e5",
+    "truck-shapeops/tests/chamfer_general.rs": "a8bce4f8826b650bed8724f5fd928350edc515c08583b2a3757f8cbec625f599",
+    "truck-shapeops/tests/oblique_fillet_ends.rs": "adc2d9e52694e75a1c473b9749ae0cc7bd0adc65a9bb9c27862a59bf6fe62858",
+    "truck-shapeops/tests/boolean_hole_fillet.rs": "c468243f521ae18e39c9c0bd5f8c00c17bf45545f04c240694d8bb1ee722bd22",
+    "truck-shapeops/tests/drafted_annulus.rs": "9fa3d06cf975e6221949c1537d773541ba6807c1a58f48ad3f2073256234d6e5",
+    "truck-shapeops/tests/nonconvex_shell.rs": "ecd98e6500e98dca3c5aaf0b456088f534604e6ca58e21539ab3722b41a93906",
+    "truck-shapeops/tests/mixed_chamfer_pair.rs": "be139a9426e5b9061da26ce864a06232ba0890467c59a9093c9f3d6ab7dbc1a8",
+    "truck-shapeops/tests/annular_booleans.rs": "a9623c6615f29ce6aeb8103b70dddd95c3ae95ca0d25e946cabbbc55f56814a8",
+    "truck-shapeops/tests/mixed_pair_fillet.rs": "8c168868cc6f3a4d8b93123443db63f2bea8797afc5867c43f27091e75e6e46e",
+    "truck-shapeops/tests/rounded_local_ops.rs": "026b4d5045085a57c7b84ebbfc59a02c64fa9d627d549c944fa9c10514f4cb88",
+    "truck-shapeops/tests/channel_boundary.rs": "ab6b76cc111d9051b48829ed2a926a91ea6dae7a564bc39fd3e366f20a7e311b",
+    "truck-shapeops/tests/channel_rim_blends.rs": "d407ed0a1e00fdd1fa9d5ea9fd8eb3c52e4c0b53e26f68db815d1f8d7370c231",
+    "truck-shapeops/tests/blend_limits.rs": "7673507f658b0162fe579dcefbcc1e02bb396c2663e55b0155e857a76c051094",
+    "truck-shapeops/tests/modeled_thread.rs": "beeee305f86588f60a519695a46292de61adafe682a15b2d7de1683289a986f4",
+    "truck-shapeops/tests/cut_plate_workflows.rs": "cfe882f66f2106f67d12d8f89f41cf46d5753920881d79d4f81fda8ae42336b2",
+    "truck-shapeops/tests/nonconvex_fillet.rs": "1e0b93f69f598e41c89b83e43d594e6cd73b026c000b667e79e8d5d744775188",
+    "truck-shapeops/tests/R10-sequential-fillet.rs": "002a2ea026b04280f5ffafb6c7daae0625cad7e8c3473a814e30ddd641b2d95b",
+    "truck-shapeops/tests/R12-face-extrude-round.rs": "dc031e1a5e7a8990696133ef3791593ef5bc6ce7029b1c516140d1d64702087e",
+    "truck-shapeops/tests/boolean.rs": "3ce9454f59660565e5740d24dc5f84cb528de0972c73b6644e95b32bfbd44624",
+    "truck-shapeops/tests/curved_blend_ends.rs": "647fafe503de641b0de287c5a3b98926b91f34195c4f06e5f918d04c00263574",
+    "truck-shapeops/tests/local_ops.rs": "9ec6390e03fecdfcf3e3a39168d3afaeb4e992c03fdaff3ebb0a34a949fdca55",
+    "truck-shapeops/tests/modeling_blends.rs": "140cc531f4571c75d3c2986c2e5e5da4194aead8d9f04d1cd413392248cf1526",
+    "truck-shapeops/tests/plane_cylinder_lips.rs": "ade151ade0f7e9dfa2db6188e03a83c3dfc0239959f4e23bae31a07782b9bb59",
+    "truck-shapeops/tests/r11_corners.rs": "34d94e2d272fbc361212a3a46e2f09bbb0a8e3a0b699890a22ac4e6d3f24151e",
+    "truck-shapeops/tests/r4_boolean.rs": "70ef7d5e72891eb62d6ffc73d215739b3c6a6285d7796517cdc904b779a6237c",
+    "truck-shapeops/tests/subtract_effect.rs": "08bac89f6ffabcc1b35dab47d97682b46031cd8dfd0607f1bf00f77ca651f31a",
+    "truck-shapeops/tests/sweep.rs": "017a5b672ba433259de5f9ce50d0a6fd7fd9e7dea522889c61360f8c99040b4d",
+    "truck-shapeops/tests/sequential_blends.rs": "1e5801504f1195d5433f6777a515c69228e0fc6264b63eef2514cbb5e34681bb",
+    "truck-shapeops/tests/rib_fillet.rs": "768574e95f0729f39d0b397613113b5bd03ea09b460fccf455a24f5c508f9cc6",
+    "truck-shapeops/tests/collapsed_trim.rs": "570c981da5f2290a32a21b32997a36a7d8d1f6f83f77d113fa1ec1bbf445c6b1",
+    "truck-shapeops/tests/analytic_holes.rs": "ef8ad9867b50537f8a839018a63149c555bb44709ee679c28d4b0bd4b592a3fa",
+    "truck-shapeops/tests/drafted_fillet_miters.rs": "9b4dbe179040ebdf582eb97353566b7dc98d29a5e6b98119085fd47ea59ff1bc",
+    "truck-shapeops/tests/fillet_wire_representation.rs": "301a869be38a3ead0eb7ad646838fbf7df0ecad12a799c366fe0e302b3bedea5",
+    "truck-shapeops/tests/curved_blend_representation.rs": "3c922556f51ba63e8d3bd3cea56206b992b4b96d4a0270c71730c9715de13657",
+    "truck-shapeops/tests/high_valence_fillets.rs": "c46b58b52c1606a0d98b3e235eb243c86280bdb8a67a633427f39fb19e67ea26",
+    "truck-shapeops/tests/conical_blends.rs": "fc63ebf15788202173d0e88d4c0e086a79f5dec2c69ca82648cdf53dd84337f5",
+    "truck-shapeops/tests/spherical_rim_blends.rs": "9e6e27d2db3ee402de52a1dda89832e5af0b6400df964859f24251f9cf8ac367",
+    "truck-shapeops/tests/short_spine_fillets.rs": "2edea33908df728e5e1d8b69da15e04add64706956efc7cb08970618bf8daba6",
+    "truck-shapeops/tests/curved_fillet_step_domain.rs": "10efd3f94d12cba9bf3fb968bd1e7dccbb830328b29f44f7648e85c8042a140f",
+    "truck-shapeops/tests/imported_conic_prisms.rs": "e3550b9ab0be1e187f2b256f094290dbcda9d3eb29ef699e86dc4749a7dbed6b",
+    "truck-shapeops/tests/imported_support_domains.rs": "9c083e59bba26bd8057cb0641650c6d8359d9352af2923cc53f7f20abd83b2e7",
+    "truck-shapeops/tests/tangent_closed_face_split.rs": "9f5a9dc89635d10d489077088633f984f96221f6681cf9a65d888918d9396b22",
+    "truck-shapeops/tests/imported_spherical_mesh.rs": "12bf866cf6a255d4cbcb49ed7416ac30bb99e8c89164bb7ecc006ab0e9a60256",
+    "truck-shapeops/tests/spherical_meridian_step.rs": "fe48737926a6ebfef2e6b4ded76fed0f6cd25d3a7d385265c851c8aeb95ee526",
+    "truck-shapeops/tests/rounded_roof_post.rs": "a00dac3593a6e117cd020e1d467726b9808685355a5eb7ae797ec04bb067cef2",
+    "truck-shapeops/tests/two_edge_blend_caps.rs": "7c9363e1ddf5a064ded8fb0c92e5b1a29e365a486dbbb2d4643fc02e30506d47",
+    "truck-shapeops/tests/imported_spline_pipe.rs": "e55af5a53c4da7b4d950c0f6995ab64d6c0c9da447aaf9d98ad4915434c36ded",
+    "truck-shapeops/tests/parameter_scaled_fillet_mesh.rs": "e30c325c69fd57ff8527eb15c7fde0ed6a911197b1af068912c4d36786a4d63c",
+    "truck-shapeops/tests/spline_pipe_blend.rs": "f0bb9cfd22a630b1e8bc0d7f4b500689420ba7816317851830fedf4f54cc926a",
+    "truck-shapeops/tests/spherical_pole_blend.rs": "613e9ab2ecc85bc61065694d01f009f50a6e01704d794304a3c15afab6977284",
+    "truck-shapeops/tests/imported_toroidal_sectors.rs": "bd48bacaa48e85cefb7c38d54ea9b23e2e78d12043103f7a62864133e87d902e",
+    "truck-shapeops/tests/imported_ellipsoid_sectors.rs": "adfc182af54d7ca0e437bbd08651d1415eab25d71302cefc6d56d59b55f14cbb",
+    "truck-shapeops/tests/imported_spline_prisms.rs": "81971728b32f3fe218cf8875342c95d92a9a55ac37531c14901a859fd207899b",
+    "truck-shapeops/tests/imported_conical_sectors.rs": "473d63b78bec4aeb28a6c3aa6b3cc4dbdd79ce08ef95505355e483b652af6e52",
+    "truck-shapeops/tests/imported_oblique_extrusions.rs": "2c741ae74e67d6b46bef6f7d3d9856263119d7780ea0ecd726c6f5b8fa189c51",
+    "truck-shapeops/tests/imported_polar_excursions.rs": "5c69d44a0d14fe86ec109bd99b31c5af7bd7bc5ac46f5d0f25160a4c215a4504",
+    "truck-shapeops/tests/imported_closed_bezier_prisms.rs": "981066b33e8ae8e3d75c55093dfadb5b4b89125a8322f84936f2936d575e7d9f",
+    "truck-shapeops/tests/separate_fillet_contours.rs": "e4e26279e3329932a15e27f7913554b31b776c22f5ada3dce143ee319360784a",
+    "truck-shapeops/tests/unequal_fillet_radii.rs": "2fce9b2ff6d60311e49348d13b0fa0ef6dd719704c303d5acb0e4da05e034a81",
+    "truck-shapeops/tests/imported_spherical_pcurves.rs": "71410dfa77c788a72fb636faa5a87129577e11d1e099ca7295529e9545e7a83c",
+    "truck-shapeops/tests/imported_bounded_edges.rs": "43f69bb1bb53ec55384a7ea5f369fb1d6d9492ef106422b8dba5ad07913188ff",
+    "truck-shapeops/tests/tangent_chamfer_fit.rs": "07a3b6f66ec1a903db00bcba8eaddd5d981352d693859f9d36f00918a5199f4b",
+    "truck-shapeops/tests/two_edge_face_trimming.rs": "30099c5983494d79077cd233308069f1c1efd3254564e58ac14b4583b010245c",
+    "truck-shapeops/tests/two_edge_chamfer_caps.rs": "f5e33701244a32aaddb1ec8002afc9ab75169606511e97ad65e6f0d6bed573d3",
+    "truck-shapeops/tests/consumed_chamfer_neighbor.rs": "274906508a1a20c2d23fcc214e980537b9adfed0901b132fe42d2fadf0049627",
+    "truck-shapeops/tests/curved_chamfer_terminals.rs": "7611b9c4e6b9cad376d65690f1fb1bce8d179fe939fa4b0a6b75af1e6fdaacfd",
+    "truck-shapeops/tests/conic_contact_extension.rs": "5513c1b8d3e7072cf6069af328c372618724a68d64606e1631c76e5dfbd06291",
+    "truck-shapeops/tests/common/blend.rs": "662e292953d1f3f3830dd7da6eefc448ace6635c11533f524f901b0be124a7f9",
+    "truck-shapeops/tests/common/mod.rs": "39bbeb28f4208ccd2df0c716104f11ce3c7176ad082b947ca32738a37f1e3588",
+    "truck-shapeops/tests/fixtures/unequal-radii/model.rs": "29579fbb389bddc6f574a438905f4c542515305318cfe06cc1472835bd61bef9",
+    "truck-shapeops/examples/punched-cube-shapeops.rs": "ff812995873a4e948a7ff8888da781c9b67f76218902406f3e75bee56571c741",
+    "truck-shapeops/examples/audit_fillet.rs": "141a1372d20a6fae62afaf917b079db3680c7927d93c85a37e57fef6a81a9321",
+    "truck-shapeops/examples/audit_chamfer.rs": "78b0a554b4074e731d95be2b8dde87fcae15270ac9aca9a4056345aa2bc41626",
+    "truck-shapeops/examples/replay_occt_blend.rs": "c029dcd6d97a38642db2884351a360824990ce2183bc5fcc85bd918d3a0d981f",
+    "truck-meshalgo/src/lib.rs": "c0954111ee88985fb5f7ba5b2960ff24ad04ff855ae0ac5a32e12fe3edd80b90",
+    "truck-meshalgo/src/vtk.rs": "2f2dbf755b0af54f5354bdd208e0a81f0e934464ff079535d17cd42606cb98b7",
+    "truck-meshalgo/src/analyzers/mod.rs": "10c9b376740e870774d3505758afff88cd3095f37d3ac5892f702e483479375b",
+    "truck-meshalgo/src/analyzers/splitting.rs": "00d117d5e313e99420e4b32dd2abb15644d58587bbfda2a5337e6fbf39378abf",
+    "truck-meshalgo/src/analyzers/volume.rs": "e8eff8747f34e7f90e60fe8b208213473b0ee803f484aab40855a79e4333c705",
+    "truck-meshalgo/src/analyzers/in_out_judge.rs": "9426398d80299054bba15d42ec462b4b2f8a943c5a0a4c49623422d3ad3a04ab",
+    "truck-meshalgo/src/analyzers/topology.rs": "d1d74e07457285121c9e0f110571f5bf746cc964c87e1c962367ad16c7d3c655",
+    "truck-meshalgo/src/analyzers/collision.rs": "7415301cc28445efca6a85b5f587ca680b4b388fd76a1e15d733a013261391ff",
+    "truck-meshalgo/src/common/adjacency.rs": "07870726891fcfe6fe78c70b525ff5a57d44dd4a783282256c78126de8773d02",
+    "truck-meshalgo/src/common/face_normal.rs": "bb4e6b51d6b5d906d7d6c433c149776aad5570123e3879eb77c339f79912e997",
+    "truck-meshalgo/src/common/mod.rs": "1136dd21c0998bc8e8130468f8e8f1b9949cda4662493b18241698ed5b13a98f",
+    "truck-meshalgo/src/common/triangulate.rs": "de3e40f5f0d4627cd91a2ddc89c2891d5b35d47768cf2976c64279b24e9e36b5",
+    "truck-meshalgo/src/filters/mod.rs": "a76cafe38d8b3b3e41265f7c4bffc88f888007b1197cd7aad02f524453dbdb28",
+    "truck-meshalgo/src/filters/normal_filters.rs": "00b3bb84fcda36dc75696153c62485c0c6b43ce8a2cc819d3c9dc590ea8c5a7f",
+    "truck-meshalgo/src/filters/structuring.rs": "0b224b1191a8e785c41d3ace06778692d744b5471a3802efcbaf75dc0c41d302",
+    "truck-meshalgo/src/filters/optimizing.rs": "52b1972855b9ac8a66be1bcfd1e9d832c440df8934e668b5a51b60fb172228a8",
+    "truck-meshalgo/src/filters/subdivision.rs": "388583cd2e25b5eb8e036094b2a70c3bd2294b787464ef76c5875561c44bab3a",
+    "truck-meshalgo/src/tessellation/diagnostics.rs": "0ae333234e69fddae98d731cc1485cb30e55605a48b45ef827fe2d6e3b28df62",
+    "truck-meshalgo/src/tessellation/mod.rs": "f5935d325ab0661b4430ccc53f8ccb43b54daf9526c0789d384b014d4d0b7aa9",
+    "truck-meshalgo/src/tessellation/triangulation.rs": "c9db5eae2fe87596b77ab6b2a84607b771211852efdfd0aa69b5fa32f35a014a",
+    "truck-meshalgo/src/tessellation/triangulation/tests.rs": "a97288070dc05d5bc5eedefeaa1c5b687f9a2e566bd88c863684a4d0f88fcf4d",
+    "truck-meshalgo/src/analyzers/point_cloud/mod.rs": "4cde8e744664fbb410fcea247e296b798518e9a5b84c7269a30b14ef172e77f1",
+    "truck-meshalgo/src/analyzers/point_cloud/hashed_point_cloud.rs": "4fcda4a521a1e0ebb768f057e662d337579517437daf7a9e772fefcae3afe65f",
+    "truck-meshalgo/src/analyzers/point_cloud/sort_end_points.rs": "ae274dec30e500592b685c4d79e6c7e8b576450d7bf9ec91d07efe1e9444c4ac",
+    "truck-meshalgo/tests/vtk.rs": "9f995b67f6db16b04932850cbbd0670a2a645636d85afbeea5d2adf95e77852c",
+    "truck-meshalgo/tests/R9-revolve-fine-tessellation.rs": "978f110fc0e2c6e66fb2f4791ab61c6e1a61d52c87aae9dd8efddab768bef496",
+    "truck-meshalgo/tests/loft_winding.rs": "c9603c998ea29a448ef8a7360c52bb6aa7c9007472306a5a16225ba105432daf",
+    "truck-meshalgo/tests/cone_apex.rs": "a9fc5bd54117b86c50772ffc1938d6f8f559ea536c1b8932a8104c67cdb5fb63",
+    "truck-meshalgo/tests/pole_winding.rs": "cc707c2752122615895acb7916ef815b3b02f5193455e7d86348d5a7bf991fe0",
+    "truck-meshalgo/tests/collapsed_trim.rs": "325d25f9af3160ef8f22ec297621c5b9f55d06eed1e4000b5503bc0c236dd8f3",
+    "truck-meshalgo/tests/analyzers/collision.rs": "46c92a519e4c7369150cbdc903f0d2368c42efcdccfad0ae8184f90f707927a0",
+    "truck-meshalgo/tests/analyzers/main.rs": "64e2dfd64c5f023ffdcfbccd912f0505dfbfdaa2c78d46ac3d063d012b22c7ca",
+    "truck-meshalgo/tests/analyzers/point_cloud.rs": "dd03c73f21685ea591ef45268e3ce9f9bd9caf8ce972c8b2176468f903c12631",
+    "truck-meshalgo/tests/analyzers/splitting.rs": "d9f2f21882b451239082c555c550b767ef2da9a829e270e1569f57e85c22b6ad",
+    "truck-meshalgo/tests/analyzers/topology.rs": "0aa9a2b00d1c2e6cbc0043d24346fb55b96368a86970ae09e709c625aba7fa95",
+    "truck-meshalgo/tests/analyzers/volume.rs": "553cecaba351d3ae2f4a0f82d0547e43ed7dcab239d9a2df1778d126aabfaf27",
+    "truck-meshalgo/tests/common/mod.rs": "1235451838818b87255fb88c4170f3e0bfa18d996c3e8cc718aa5eed8504f65b",
+    "truck-meshalgo/tests/common/shapes.rs": "56fb0f05547c4e47bf438b47bd2ab7d7bf30ca957ff9ee3bcb42ed8858fba8b6",
+    "truck-meshalgo/tests/filters/main.rs": "0c745a1fabf0f0ef7b1e3a7ae8f7a839bf20c5a051ee19a76fd22b4b076b4567",
+    "truck-meshalgo/tests/filters/normal_filter.rs": "0cf7fd55662a6994eb800981e2cc58a50d26c637815c3731e230e42a48a435ad",
+    "truck-meshalgo/tests/filters/optimizing.rs": "3367be14586ef2f4363359db26a16fa916f1b9cb49cbc82a63bc8251b9bca47f",
+    "truck-meshalgo/tests/filters/structuring.rs": "1e22a110096dfb281cfa83828cd307a9b72e5162806c661804f4efc225238051",
+    "truck-meshalgo/tests/filters/subdivision.rs": "d003805d3eb0abe2c99f5dbebc57a06de58c7fa76c61f6d887c6f75a393baeb8",
+    "truck-meshalgo/tests/tessellation/main.rs": "4883904f985f62f179cf5dce00ed35a6bc2a408003b33de5c9effa2620821eec",
+    "truck-meshalgo/tests/tessellation/triangulation.rs": "553a423b5e5de4d4986940cf47be99ee2b4dbee240d3b2a1d1ffe006f7cfe24a"
+  },
+  "meshalgo_counts": [
+    98,
+    0,
+    1
+  ],
+  "core_validation_reused_from": "2026-10-16-conic-contact-extension; production core and integration tests byte-identical",
+  "shapeops_counts": [
+    400,
+    0,
+    1
+  ],
+  "replay_tests": 49,
+  "replay_sha256": "d0f5f4ed15556ef2029e529e8727502b184848d012336cbbfdd0cf11af426e53",
+  "log_sha256": {
+    "parent-failure.txt": "1e52f31530bc6d7b4a9ed5f44791dc3e68d9d03fdf2f8736168dfc8b76be88a3",
+    "replay-tests.txt": "26163c0ce473ab39b3346aacd85db5158b94f95c7e260a84a57052032f45b867",
+    "capture-tests.txt": "6252e5085bcb1bee560f100e486424e9ccdacb555c6b0131b8c6470ae7df859b",
+    "clippy.txt": "f1f9581b380f7b2a9e7854660667054c22cf13cb77722c999794341514f8e877",
+    "actions-smoke.txt": "37ace66fa28a6a6f4ca6066759819ec04d799b6bc23a3de3b655b7179e31161c",
+    "replay-build.txt": "01a142b17e764e42e89a32ba3041c52584102a2963f2f6bae0633d256d12d0b7"
+  },
+  "native_source": {
+    "path": "../investigations/sequential-holes-2026-10-10/occt/src/ChFiKPart/ChFiKPart_ComputeData_ChAsymPlnCyl.cxx",
+    "sha256": "edba252ee3b728fa0f183c06581a289e2494c1dfb08a1d07605fbd8434b52167",
+    "function": "ChFiKPart_MakeChAsym overload with gp_Lin spine",
+    "lines": "475\u2013501"
+  },
+  "native_controls": [
+    {
+      "convex": true,
+      "offset": -2.0,
+      "angle": 30.0,
+      "chord": 1.5,
+      "radius": 5.0,
+      "height": 10.0,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/001",
+      "native": {
+        "native_valid": true,
+        "solids": 1,
+        "volume": 575.2355790877424,
+        "area": 398.5109229717643,
+        "stored_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        }
+      },
+      "native_measurement": {
+        "vertices": [
+          [
+            4.96957138668138,
+            -0.550781474522954,
+            0
+          ],
+          [
+            -4.58257569495584,
+            -2,
+            0
+          ],
+          [
+            3.00546576520419,
+            -2,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              0.5937253933193762,
+              -0.8046677310093602,
+              0
+            ],
+            "origin": [
+              3.005465765204187,
+              -2.0000000000000004,
+              0
+            ]
+          }
+        ],
+        "contact_angle_degrees": 47.253853117357345,
+        "chord": 1.4999999999999978,
+        "requested_contact_max_error": 0.8986012064899196
+      },
+      "native_source_model": {
+        "planar_setback": 1.577109929751649,
+        "contact_error": 8.881784197001252e-16
+      },
+      "truck_measurement": {
+        "vertices": [
+          [
+            4.969571386681386,
+            -0.5507814745229299,
+            0
+          ],
+          [
+            -4.582575694956,
+            -2,
+            0
+          ],
+          [
+            3.9040669716942755,
+            -2,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              0.8056768659050202,
+              -0.592355288442219,
+              0
+            ],
+            "origin": [
+              4.969571386681386,
+              -0.5507814745229299,
+              10
+            ]
+          }
+        ],
+        "contact_angle_degrees": 29.999999999995616,
+        "chord": 1.5000000000000222,
+        "requested_contact_max_error": 1.6608936448392342e-13
+      },
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 581.6259132901572,
+        "selected_edges": 1,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 575.2355790877422,
+        "truck_volume": 581.7469267381798,
+        "native_to_truck_max_distance": 0.43476555764311375,
+        "native_to_truck_samples": 979,
+        "truck_to_native_max_distance": 0.533522354760594,
+        "truck_to_native_samples": 981,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/001.input.brep": "e3a32a4ffd4058989ec3749ec660b38d99a22f07441fae13adc2dd9abc358f01",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/001.input.step": "4199b491fd6914f2fdcd1fc1ab560be11d117189f43ab5209d754300e0f033b0",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/001.input.json": "6e216410e7b9f941937c946b76e87fb222c7549ef45d819908aca122fa7806e3"
+      },
+      "native_requested_contact_angle_correct": false,
+      "expected_contacts": [
+        [
+          3.9040669716941094,
+          -2.0,
+          0.0
+        ],
+        [
+          4.969571386681383,
+          -0.5507814745229525,
+          0.0
+        ]
+      ],
+      "expected_volume": 581.7469267382078
+    },
+    {
+      "convex": true,
+      "offset": 0.0,
+      "angle": 30.0,
+      "chord": 1.5,
+      "radius": 5.0,
+      "height": 10.0,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/002",
+      "native": {
+        "native_valid": true,
+        "solids": 1,
+        "volume": 384.1152820186023,
+        "area": 325.15813370031225,
+        "stored_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        }
+      },
+      "native_measurement": {
+        "vertices": [
+          [
+            4.775,
+            1.48302899499639,
+            0
+          ],
+          [
+            -5,
+            6.12323399573677e-16,
+            0
+          ],
+          [
+            3.91877281052282,
+            6.62060708372162e-17,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              0.866025403784439,
+              -0.4999999999999993,
+              0
+            ],
+            "origin": [
+              3.9187728105228157,
+              6.620607083721617e-17,
+              0
+            ]
+          }
+        ],
+        "contact_angle_degrees": 47.253853117357224,
+        "chord": 1.5000000000000007,
+        "requested_contact_max_error": 0.5207568264125078
+      },
+      "native_source_model": {
+        "planar_setback": 1.0812271894771852,
+        "contact_error": 5.329070518200751e-15
+      },
+      "truck_measurement": {
+        "vertices": [
+          [
+            4.775,
+            1.483028994996389,
+            0
+          ],
+          [
+            -5,
+            6.1232339957e-16,
+            0
+          ],
+          [
+            4.439529636935328,
+            3.4318911807e-17,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              0.9753571601137777,
+              -0.2206318431568451,
+              0
+            ],
+            "origin": [
+              4.775,
+              1.483028994996389,
+              10
+            ]
+          }
+        ],
+        "contact_angle_degrees": 30.00000000000003,
+        "chord": 1.4999999999999998,
+        "requested_contact_max_error": 8.881784197001252e-16
+      },
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 387.8846768918085,
+        "selected_edges": 1,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 384.11528201860216,
+        "truck_volume": 387.97676938316306,
+        "native_to_truck_max_distance": 0.3555467295237001,
+        "native_to_truck_samples": 975,
+        "truck_to_native_max_distance": 0.4509886408673995,
+        "truck_to_native_samples": 975,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/002.input.brep": "dcca2c1c5e32267430e021c4408d5d1042e836bac9742f651d0b8b23b65d532d",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/002.input.step": "92ed66c385ca37a1af9d490b076e505bd31f3fd3290e573591cca96b852fabb1",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/002.input.json": "3d27afdf806e1157197a216eb74626d11da00fb67160960d54b7d4239a406327"
+      },
+      "native_requested_contact_angle_correct": false,
+      "expected_contacts": [
+        [
+          4.439529636935328,
+          0.0,
+          0.0
+        ],
+        [
+          4.7749999999999995,
+          1.483028994996389,
+          0.0
+        ]
+      ],
+      "expected_volume": 387.97676938315703
+    },
+    {
+      "convex": true,
+      "offset": 2.0,
+      "angle": 30.0,
+      "chord": 1.5,
+      "radius": 5.0,
+      "height": 10.0,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/003",
+      "native": {
+        "native_valid": true,
+        "solids": 1,
+        "volume": 187.59352726570114,
+        "area": 229.15548730499347,
+        "stored_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        }
+      },
+      "native_measurement": {
+        "vertices": [
+          [
+            3.78314819068427,
+            3.26921852547705,
+            0
+          ],
+          [
+            -4.58257569495584,
+            2,
+            0
+          ],
+          [
+            3.00546576520419,
+            2,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              0.8526688014865229,
+              -0.5224518302882445,
+              0
+            ],
+            "origin": [
+              3.0054657652041925,
+              2,
+              0
+            ]
+          }
+        ],
+        "contact_angle_degrees": 72.32889118462084,
+        "chord": 1.5000000000000024,
+        "requested_contact_max_error": 1.0205342725196953
+      },
+      "native_source_model": {
+        "planar_setback": 1.577109929751649,
+        "contact_error": 8.881784197001252e-16
+      },
+      "truck_measurement": {
+        "vertices": [
+          [
+            3.78314819068434,
+            3.269218525476968,
+            0
+          ],
+          [
+            -4.582575694956,
+            2,
+            0
+          ],
+          [
+            4.026000037724046,
+            2,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              0.9821823404304324,
+              0.18793043964881845,
+              0
+            ],
+            "origin": [
+              3.78314819068434,
+              3.269218525476968,
+              10
+            ]
+          }
+        ],
+        "contact_angle_degrees": 29.999999999994127,
+        "chord": 1.499999999999896,
+        "requested_contact_max_error": 1.6076029396572267e-13
+      },
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 194.00417029687708,
+        "selected_edges": 1,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 187.59352726570106,
+        "truck_volume": 194.0699322885358,
+        "native_to_truck_max_distance": 0.5076874101908193,
+        "native_to_truck_samples": 969,
+        "truck_to_native_max_distance": 0.8701777350254533,
+        "truck_to_native_samples": 973,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/003.input.brep": "01e78ee59e4d0759b3a6072d005db15f84cf411fe3838fd0ee29a3f39fb960e6",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/003.input.step": "117c9d95f6cec141e941851463d732457eab375f9b477600ca8cb6ae6e2e445b",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/003.input.json": "9a7a68d7bbf16399a5b0097b61d94ee1c8731539bd3140166ba358a2c00121de"
+      },
+      "native_requested_contact_angle_correct": false,
+      "expected_contacts": [
+        [
+          4.026000037723885,
+          2.0,
+          0.0
+        ],
+        [
+          3.783148190684271,
+          3.2692185254770485,
+          0.0
+        ]
+      ],
+      "expected_volume": 194.06993228853173
+    },
+    {
+      "convex": false,
+      "offset": -2.0,
+      "angle": 30.0,
+      "chord": 1.5,
+      "radius": 5.0,
+      "height": 10.0,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/004",
+      "native": {
+        "native_valid": true,
+        "solids": 1,
+        "volume": 1005.9279539541302,
+        "area": 818.3083675416456,
+        "stored_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        }
+      },
+      "native_measurement": {
+        "vertices": [
+          [
+            5.60500014235407,
+            -2,
+            0
+          ],
+          [
+            8,
+            -2,
+            0
+          ],
+          [
+            4.96957138668138,
+            -0.550781474522953,
+            0
+          ],
+          [
+            8,
+            8,
+            0
+          ],
+          [
+            5,
+            -1.22464679914735e-15,
+            0
+          ],
+          [
+            -8,
+            8,
+            0
+          ],
+          [
+            -4.58257569495583,
+            -2.00000000000001,
+            0
+          ],
+          [
+            -8,
+            -2,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              0.9158331608095627,
+              0.4015589888939929,
+              0
+            ],
+            "origin": [
+              5.605000142354072,
+              -2,
+              0
+            ]
+          }
+        ],
+        "contact_angle_degrees": 30.000000000000053,
+        "chord": 1.4999999999999984,
+        "requested_contact_max_error": 2.7217452008024307e-15
+      },
+      "native_source_model": {
+        "planar_setback": 1.0224244473982318,
+        "contact_error": 1.3322676295501878e-15
+      },
+      "truck_measurement": {
+        "vertices": [
+          [
+            -8,
+            8,
+            0
+          ],
+          [
+            -8,
+            -2,
+            0
+          ],
+          [
+            -4.582575694956,
+            -2,
+            0
+          ],
+          [
+            8,
+            8,
+            0
+          ],
+          [
+            8,
+            -2,
+            0
+          ],
+          [
+            5.605000142354237,
+            -2,
+            0
+          ],
+          [
+            4.969571386681385,
+            -0.5507814745229301,
+            0
+          ],
+          [
+            5,
+            -1.2246467991e-15,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              -0.915833160809527,
+              -0.40155898889407404,
+              0
+            ],
+            "origin": [
+              5.605000142354237,
+              -2,
+              10
+            ]
+          }
+        ],
+        "contact_angle_degrees": 30.00000000000484,
+        "chord": 1.500000000000022,
+        "requested_contact_max_error": 1.652011860642233e-13
+      },
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 1006.0490363764125,
+        "selected_edges": 1,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 1005.9279539541297,
+        "truck_volume": 1005.927953954128,
+        "native_to_truck_max_distance": 1.6964207816272392e-13,
+        "native_to_truck_samples": 2330,
+        "truck_to_native_max_distance": 1.708358723008223e-13,
+        "truck_to_native_samples": 2330,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/004.input.brep": "7985ca1dfa2ca65ee138d705fe701951fa26d71027e62129ea2d1d83f114041b",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/004.input.step": "9a6f6feb9865f46adb3e45ab86c12ff488696c8dfcc9126490e72dac0a75daf5",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/004.input.json": "1cc38fbcf19457ac6796b6ffa58693ad666e3492bb38318cc0157f4ccb596431"
+      },
+      "native_requested_contact_angle_correct": true,
+      "expected_contacts": [
+        [
+          5.605000142354072,
+          -2.0,
+          0.0
+        ],
+        [
+          4.969571386681383,
+          -0.5507814745229525,
+          0.0
+        ]
+      ],
+      "expected_volume": 1005.9279539541981
+    },
+    {
+      "convex": false,
+      "offset": 0.0,
+      "angle": 30.0,
+      "chord": 1.5,
+      "radius": 5.0,
+      "height": 10.0,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/005",
+      "native": {
+        "native_valid": true,
+        "solids": 1,
+        "volume": 877.6377117735171,
+        "area": 705.604236307839,
+        "stored_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        }
+      },
+      "native_measurement": {
+        "vertices": [
+          [
+            6.37954819245178,
+            0,
+            0
+          ],
+          [
+            8,
+            0,
+            0
+          ],
+          [
+            4.775,
+            1.48302899499639,
+            0
+          ],
+          [
+            8,
+            8,
+            0
+          ],
+          [
+            -5,
+            -7.85196730485993e-14,
+            0
+          ],
+          [
+            -8,
+            8,
+            0
+          ],
+          [
+            -8,
+            0,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              0.6787513611145004,
+              0.7343681568431554,
+              0
+            ],
+            "origin": [
+              6.379548192451777,
+              0,
+              0
+            ]
+          }
+        ],
+        "contact_angle_degrees": 29.999999999999954,
+        "chord": 1.5000000000000007,
+        "requested_contact_max_error": 1.2560739669470201e-15
+      },
+      "native_source_model": {
+        "planar_setback": 1.3795481924517787,
+        "contact_error": 8.881784197001252e-16
+      },
+      "truck_measurement": {
+        "vertices": [
+          [
+            -8,
+            8,
+            0
+          ],
+          [
+            -8,
+            0,
+            0
+          ],
+          [
+            -5,
+            -7.8519673049e-14,
+            0
+          ],
+          [
+            8,
+            8,
+            0
+          ],
+          [
+            8,
+            0,
+            0
+          ],
+          [
+            6.379548192451779,
+            -1.2246467991e-15,
+            0
+          ],
+          [
+            4.775,
+            1.4830289949963875,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              -0.6787513611145001,
+              -0.7343681568431556,
+              0
+            ],
+            "origin": [
+              4.775,
+              1.4830289949963875,
+              0
+            ]
+          }
+        ],
+        "contact_angle_degrees": 30.000000000000004,
+        "chord": 1.4999999999999984,
+        "requested_contact_max_error": 1.790180836524724e-15
+      },
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 877.729804264883,
+        "selected_edges": 1,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 877.6377117735169,
+        "truck_volume": 877.6377117735161,
+        "native_to_truck_max_distance": 9.467511879332587e-14,
+        "native_to_truck_samples": 2073,
+        "truck_to_native_max_distance": 7.851967305e-14,
+        "truck_to_native_samples": 2073,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/005.input.brep": "923dffec7eae5f4b47a9d68a7160504881e23796f119e6016bd8b734511ccf34",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/005.input.step": "b484f4e1ab333e1f5d80beb4c6ebe2d30af172ccf1673409d7bb8b5b35a888dd",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/005.input.json": "ff328ed973b945392f0acad1281e05dc9ade65c1dc2b6e4ae0ac8797fce7c61e"
+      },
+      "native_requested_contact_angle_correct": true,
+      "expected_contacts": [
+        [
+          6.379548192451779,
+          0.0,
+          0.0
+        ],
+        [
+          4.7749999999999995,
+          1.483028994996389,
+          0.0
+        ]
+      ],
+      "expected_volume": 877.6377117735333
+    },
+    {
+      "convex": false,
+      "offset": 2.0,
+      "angle": 30.0,
+      "chord": 1.5,
+      "radius": 5.0,
+      "height": 10.0,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/006",
+      "native": {
+        "native_valid": true,
+        "solids": 1,
+        "volume": 755.9095867888332,
+        "area": 612.38101865232,
+        "stored_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        }
+      },
+      "native_measurement": {
+        "vertices": [
+          [
+            5.60500014235407,
+            2,
+            0
+          ],
+          [
+            8,
+            2,
+            0
+          ],
+          [
+            3.78314819068427,
+            3.26921852547705,
+            0
+          ],
+          [
+            8,
+            8,
+            0
+          ],
+          [
+            -4.58257569495583,
+            2.00000000000001,
+            0
+          ],
+          [
+            -8,
+            8,
+            0
+          ],
+          [
+            -8,
+            2,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              0.5716237849673339,
+              0.8205158429059243,
+              0
+            ],
+            "origin": [
+              5.60500014235407,
+              2,
+              0
+            ]
+          }
+        ],
+        "contact_angle_degrees": 14.30443339364026,
+        "chord": 1.5000000000000024,
+        "requested_contact_max_error": 0.5655813825863207
+      },
+      "native_source_model": {
+        "planar_setback": 1.0224244473982318,
+        "contact_error": 1.3322676295501878e-15
+      },
+      "truck_measurement": {
+        "vertices": [
+          [
+            -8,
+            8,
+            0
+          ],
+          [
+            -8,
+            2,
+            0
+          ],
+          [
+            -4.582575694956,
+            2,
+            0
+          ],
+          [
+            8,
+            8,
+            0
+          ],
+          [
+            8,
+            2,
+            0
+          ],
+          [
+            7.434418617413728,
+            2,
+            0
+          ],
+          [
+            3.7831481906843405,
+            3.269218525476968,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              -0.3283386353350212,
+              -0.9445600777855986,
+              0
+            ],
+            "origin": [
+              3.7831481906843405,
+              3.269218525476968,
+              0
+            ]
+          }
+        ],
+        "contact_angle_degrees": 30.00000000000223,
+        "chord": 1.4999999999998959,
+        "requested_contact_max_error": 1.0611502144536855e-13
+      },
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 744.3656896835128,
+        "selected_edges": 1,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 755.9095867888329,
+        "truck_volume": 744.2999276918545,
+        "native_to_truck_max_distance": 0.6006687655577636,
+        "native_to_truck_samples": 2091,
+        "truck_to_native_max_distance": 0.5228695565013717,
+        "truck_to_native_samples": 2087,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/006.input.brep": "8b8a57492242cac66a9986e30b8e0843e29eeef67c9904a429d4dfa56d396424",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/006.input.step": "b50668d25c0876ea1238f108aaa426b9e9eabb83b26c857453016537b583d4f0",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/006.input.json": "8e8d42913d88fa8c422a0489f5b9c4b6f5587e3281d915f5d5077ac9832168f8"
+      },
+      "native_requested_contact_angle_correct": false,
+      "expected_contacts": [
+        [
+          7.434418617413679,
+          2.0,
+          0.0
+        ],
+        [
+          3.783148190684271,
+          3.2692185254770485,
+          0.0
+        ]
+      ],
+      "expected_volume": 744.2999276918558
+    },
+    {
+      "convex": true,
+      "offset": 0.0,
+      "angle": 15.0,
+      "chord": 1.5,
+      "radius": 5.0,
+      "height": 10.0,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/007",
+      "native": {
+        "native_valid": true,
+        "solids": 1,
+        "volume": 387.5177269845814,
+        "area": 328.65603251689663,
+        "stored_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        }
+      },
+      "native_measurement": {
+        "vertices": [
+          [
+            4.775,
+            1.48302899499639,
+            0
+          ],
+          [
+            -5,
+            6.12323399573677e-16,
+            0
+          ],
+          [
+            4.37762357843878,
+            3.81095646264866e-17,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              0.9659258262890685,
+              -0.25881904510251963,
+              0
+            ],
+            "origin": [
+              4.377623578438779,
+              3.810956462648661e-17,
+              0
+            ]
+          }
+        ],
+        "contact_angle_degrees": 32.2538531173572,
+        "chord": 1.5000000000000007,
+        "requested_contact_max_error": 0.4557446767768827
+      },
+      "native_source_model": {
+        "planar_setback": 0.6223764215612217,
+        "contact_error": 1.9984014443252818e-15
+      },
+      "truck_measurement": {
+        "vertices": [
+          [
+            4.775,
+            1.483028994996389,
+            0
+          ],
+          [
+            -5,
+            6.1232339957e-16,
+            0
+          ],
+          [
+            4.833368255215663,
+            1.0203251644e-17,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              0.9992263937749236,
+              0.039327013407598886,
+              0
+            ],
+            "origin": [
+              4.775,
+              1.483028994996389,
+              10
+            ]
+          }
+        ],
+        "contact_angle_degrees": 14.999999999999996,
+        "chord": 1.4999999999999998,
+        "requested_contact_max_error": 8.881784197001252e-16
+      },
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 390.80504734310375,
+        "selected_edges": 1,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 387.51772698458143,
+        "truck_volume": 390.8971398344586,
+        "native_to_truck_max_distance": 0.3187744769005186,
+        "native_to_truck_samples": 975,
+        "truck_to_native_max_distance": 0.4402155534925571,
+        "truck_to_native_samples": 977,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/007.input.brep": "dcca2c1c5e32267430e021c4408d5d1042e836bac9742f651d0b8b23b65d532d",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/007.input.step": "be89fc47d62eb4af76bf93d8cc1d13af422a1907d51f40bc6ff555879fa4fc58",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/007.input.json": "74077dcaf679a7b9803169ffec14b706d1860b6abb07e3686ba6cc628a708b8a"
+      },
+      "native_requested_contact_angle_correct": false,
+      "expected_contacts": [
+        [
+          4.833368255215663,
+          0.0,
+          0.0
+        ],
+        [
+          4.7749999999999995,
+          1.483028994996389,
+          0.0
+        ]
+      ],
+      "expected_volume": 390.89713983445233
+    },
+    {
+      "convex": true,
+      "offset": 0.0,
+      "angle": 45.0,
+      "chord": 1.5,
+      "radius": 5.0,
+      "height": 10.0,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/008",
+      "native": {
+        "native_valid": true,
+        "solids": 1,
+        "volume": 379.46745576009647,
+        "area": 321.80920378503987,
+        "stored_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        }
+      },
+      "native_measurement": {
+        "vertices": [
+          [
+            4.775,
+            1.48302899499639,
+            0
+          ],
+          [
+            -5,
+            6.12323399573677e-16,
+            0
+          ],
+          [
+            3.29197100500361,
+            1.0458661207866e-16,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              0.7071067811865483,
+              -0.7071067811865468,
+              0
+            ],
+            "origin": [
+              3.2919710050036137,
+              1.0458661207865973e-16,
+              0
+            ]
+          }
+        ],
+        "contact_angle_degrees": 62.25385311735723,
+        "chord": 1.5000000000000007,
+        "requested_contact_max_error": 0.7028970309209219
+      },
+      "native_source_model": {
+        "planar_setback": 1.7080289949963887,
+        "contact_error": 1.1102230246251565e-15
+      },
+      "truck_measurement": {
+        "vertices": [
+          [
+            4.775,
+            1.483028994996389,
+            0
+          ],
+          [
+            -5,
+            6.1232339957e-16,
+            0
+          ],
+          [
+            3.994868035924532,
+            6.1546582126e-17,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              0.8850189478447963,
+              -0.46555500422150975,
+              0
+            ],
+            "origin": [
+              4.775,
+              1.483028994996389,
+              10
+            ]
+          }
+        ],
+        "contact_angle_degrees": 45.0,
+        "chord": 1.4999999999999998,
+        "requested_contact_max_error": 8.881784197001252e-16
+      },
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 384.5874466555058,
+        "selected_edges": 1,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 379.46745576009647,
+        "truck_volume": 384.67953914686007,
+        "native_to_truck_max_distance": 0.435454033524204,
+        "native_to_truck_samples": 971,
+        "truck_to_native_max_distance": 0.49702325704007305,
+        "truck_to_native_samples": 975,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/008.input.brep": "dcca2c1c5e32267430e021c4408d5d1042e836bac9742f651d0b8b23b65d532d",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/008.input.step": "0fdc699c36fe8dc213663be0af1858aa58439f4333e2aea1227ac492597c7257",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/008.input.json": "51da67ac1b9dd39a95bfd997c7b3194729d9d8acbe40dd32f50bb5f79e6559d8"
+      },
+      "native_requested_contact_angle_correct": false,
+      "expected_contacts": [
+        [
+          3.994868035924532,
+          0.0,
+          0.0
+        ],
+        [
+          4.7749999999999995,
+          1.483028994996389,
+          0.0
+        ]
+      ],
+      "expected_volume": 384.67953914685444
+    },
+    {
+      "convex": false,
+      "offset": 0.0,
+      "angle": 15.0,
+      "chord": 1.5,
+      "radius": 5.0,
+      "height": 10.0,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/009",
+      "native": {
+        "native_valid": true,
+        "solids": 1,
+        "volume": 882.5961238534264,
+        "area": 708.9696989231155,
+        "stored_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        }
+      },
+      "native_measurement": {
+        "vertices": [
+          [
+            5.71086105327401,
+            0,
+            0
+          ],
+          [
+            8,
+            0,
+            0
+          ],
+          [
+            4.775,
+            1.48302899499639,
+            0
+          ],
+          [
+            8,
+            8,
+            0
+          ],
+          [
+            -5,
+            -7.85196730485993e-14,
+            0
+          ],
+          [
+            -8,
+            8,
+            0
+          ],
+          [
+            -8,
+            0,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              0.8456919344371969,
+              0.5336713895534142,
+              0
+            ],
+            "origin": [
+              5.710861053274005,
+              0,
+              0
+            ]
+          }
+        ],
+        "contact_angle_degrees": 14.99999999999997,
+        "chord": 1.5000000000000007,
+        "requested_contact_max_error": 5.329070518200751e-15
+      },
+      "native_source_model": {
+        "planar_setback": 0.7108610532740051,
+        "contact_error": 4.551914400963142e-15
+      },
+      "truck_measurement": {
+        "vertices": [
+          [
+            -8,
+            8,
+            0
+          ],
+          [
+            -8,
+            0,
+            0
+          ],
+          [
+            -5,
+            -7.8519673049e-14,
+            0
+          ],
+          [
+            8,
+            8,
+            0
+          ],
+          [
+            8,
+            0,
+            0
+          ],
+          [
+            5.710861053274005,
+            -1.2246467991e-15,
+            0
+          ],
+          [
+            4.775,
+            1.4830289949963875,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              -0.845691934437197,
+              -0.533671389553414,
+              0
+            ],
+            "origin": [
+              4.775,
+              1.4830289949963875,
+              0
+            ]
+          }
+        ],
+        "contact_angle_degrees": 14.999999999999996,
+        "chord": 1.4999999999999984,
+        "requested_contact_max_error": 1.790180836524724e-15
+      },
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 882.6882163447921,
+        "selected_edges": 1,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 882.5961238534267,
+        "truck_volume": 882.5961238534256,
+        "native_to_truck_max_distance": 9.467511879332587e-14,
+        "native_to_truck_samples": 2073,
+        "truck_to_native_max_distance": 7.851967305e-14,
+        "truck_to_native_samples": 2073,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/009.input.brep": "923dffec7eae5f4b47a9d68a7160504881e23796f119e6016bd8b734511ccf34",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/009.input.step": "10e45ff61c1ab87c70716289bd7c3b4360406aee9f9654fe64b704de819a958d",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/009.input.json": "2936912d5692e2417228446451159fe1c462f716f0f2261e5556026034ec8913"
+      },
+      "native_requested_contact_angle_correct": true,
+      "expected_contacts": [
+        [
+          5.710861053274004,
+          0.0,
+          0.0
+        ],
+        [
+          4.7749999999999995,
+          1.483028994996389,
+          0.0
+        ]
+      ],
+      "expected_volume": 882.5961238534424
+    },
+    {
+      "convex": false,
+      "offset": 0.0,
+      "angle": 45.0,
+      "chord": 1.5,
+      "radius": 5.0,
+      "height": 10.0,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/010",
+      "native": {
+        "native_valid": true,
+        "solids": 1,
+        "volume": 868.6306362065661,
+        "area": 701.6616627754557,
+        "stored_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        }
+      },
+      "native_measurement": {
+        "vertices": [
+          [
+            7.59423456707285,
+            0,
+            0
+          ],
+          [
+            8,
+            0,
+            0
+          ],
+          [
+            4.775,
+            1.48302899499639,
+            0
+          ],
+          [
+            8,
+            8,
+            0
+          ],
+          [
+            -5,
+            -7.85196730485993e-14,
+            0
+          ],
+          [
+            -8,
+            8,
+            0
+          ],
+          [
+            -8,
+            0,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              0.4655550042215098,
+              0.8850189478447962,
+              0
+            ],
+            "origin": [
+              7.594234567072855,
+              0,
+              0
+            ]
+          }
+        ],
+        "contact_angle_degrees": 44.99999999999996,
+        "chord": 1.5000000000000007,
+        "requested_contact_max_error": 7.105427357601002e-15
+      },
+      "native_source_model": {
+        "planar_setback": 2.594234567072858,
+        "contact_error": 7.993605777301127e-15
+      },
+      "truck_measurement": {
+        "vertices": [
+          [
+            -8,
+            8,
+            0
+          ],
+          [
+            -8,
+            0,
+            0
+          ],
+          [
+            -5,
+            -7.8519673049e-14,
+            0
+          ],
+          [
+            8,
+            8,
+            0
+          ],
+          [
+            8,
+            0,
+            0
+          ],
+          [
+            7.594234567072856,
+            -1.2246467991e-15,
+            0
+          ],
+          [
+            4.775,
+            1.4830289949963875,
+            0
+          ]
+        ],
+        "bevel_planes": [
+          {
+            "normal": [
+              -0.46555500422150975,
+              -0.8850189478447963,
+              0
+            ],
+            "origin": [
+              4.775,
+              1.4830289949963875,
+              0
+            ]
+          }
+        ],
+        "contact_angle_degrees": 45.0,
+        "chord": 1.4999999999999984,
+        "requested_contact_max_error": 1.790180836524724e-15
+      },
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 868.7227286979324,
+        "selected_edges": 1,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 868.6306362065657,
+        "truck_volume": 868.630636206565,
+        "native_to_truck_max_distance": 9.467511879332587e-14,
+        "native_to_truck_samples": 2071,
+        "truck_to_native_max_distance": 7.851967305e-14,
+        "truck_to_native_samples": 2071,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/010.input.brep": "923dffec7eae5f4b47a9d68a7160504881e23796f119e6016bd8b734511ccf34",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/010.input.step": "e9d26414ac13cc21bd5876de3051da368c3f4eca06de3239561846e8cd2acc12",
+        "/home/krone/Development/Pieza_WS/truck/target/native-longitudinal-cylinder-angles/capture/010.input.json": "9c830f0ba59b0eadae4c9cc6acb1081de399304b306b4dc0f5b17c9fe0b87b84"
+      },
+      "native_requested_contact_angle_correct": true,
+      "expected_contacts": [
+        [
+          7.594234567072857,
+          0.0,
+          0.0
+        ],
+        [
+          4.7749999999999995,
+          1.483028994996389,
+          0.0
+        ]
+      ],
+      "expected_volume": 868.6306362065828
+    }
+  ],
+  "archive_sha256": "a5532e851f793389098a6c76cb5bfbf83d79a926b841e83ebfb92b54182744c1",
+  "artifact_sha256": {
+    "native/inputs.log": "3bd01a73bcbc566b307e4b51d5b3444f9ccc4c66d48968efcd713681c5f05e33",
+    "native/input-0.brep": "0aca0334bc3d25fe00b8887dadc5bdc2c2e96b7df0262e0c8e7d4159d8802a09",
+    "native/input-1.brep": "fde9aff479bf10343db598e51f291842e9da9f2201cf2e11be6cef3286592ecb",
+    "native/input-2.brep": "253cc4e613c78fd94065028ddff1b125505c5e287bbdd080b64f3f34d062992e",
+    "native/input-3.brep": "a7d68f78494677b8307689c6e4ea79b79eef1fa8c088058fa013b2efb0522031",
+    "native/input-4.brep": "1d27e344ece9bffe1bafe161b16c93228a38b70b2def9c4d4951b4b7abfaa957",
+    "native/input-5.brep": "166065f3fe57c1d906193347a0ef5b7c34b40b6a43ca634d7375b3b013e05d05",
+    "native/controls.tcl": "c3083be718b8faae5184da9c34f1df99d9978e016ec5ba324fdb5c98db0d1284",
+    "native/display.log": "ba58cccd1d6fcb1fe7b41389025cc348d73cc85df0c37e14666ef1f8b5fe214d",
+    "native/before0.result.brep": "e3a32a4ffd4058989ec3749ec660b38d99a22f07441fae13adc2dd9abc358f01",
+    "native/before0.result.step": "3ab1598d186a54f68a260759d33419ad0a52ccc1ace812c8c13a426654e20144",
+    "native/before0.result.json": "dc808fc8256cffedf0fddfdc7036bee744abc26e8301ab79307e7a6c56b4e180",
+    "native/after0.result.brep": "e3a32a4ffd4058989ec3749ec660b38d99a22f07441fae13adc2dd9abc358f01",
+    "native/after0.result.step": "5dd507e66c955bf6dc586c400d8e17fb80b954b39e875a776b3fa8ef6065daf6",
+    "native/after0.result.json": "dc808fc8256cffedf0fddfdc7036bee744abc26e8301ab79307e7a6c56b4e180",
+    "native/before1.result.brep": "dcca2c1c5e32267430e021c4408d5d1042e836bac9742f651d0b8b23b65d532d",
+    "native/before1.result.step": "390d9097b1a76792ab749f53d7b051a6e7a986ebce460ec29ff15ca495959000",
+    "native/before1.result.json": "951bc33f282ee2302428b390e54e9691055ef8108ddc32ec37cac2c27c5ecb99",
+    "native/after1.result.brep": "dcca2c1c5e32267430e021c4408d5d1042e836bac9742f651d0b8b23b65d532d",
+    "native/after1.result.step": "125fe3e3422bd9ded83d98e7b400e4b1a139290319aa254eb465e0ce5ca19125",
+    "native/after1.result.json": "951bc33f282ee2302428b390e54e9691055ef8108ddc32ec37cac2c27c5ecb99",
+    "native/before2.result.brep": "01e78ee59e4d0759b3a6072d005db15f84cf411fe3838fd0ee29a3f39fb960e6",
+    "native/before2.result.step": "a08d30827553cca1aaa77d0271c2a84b69c767064091659a8a193d878748137f",
+    "native/before2.result.json": "3764ef75b58680cbaec01cd57c42f64f4ccad5169bc9138338bba09393dfd372",
+    "native/after2.result.brep": "01e78ee59e4d0759b3a6072d005db15f84cf411fe3838fd0ee29a3f39fb960e6",
+    "native/after2.result.step": "9e034d56f5853151401d259d3a931c89ec13f0a707f258b328192637126011e2",
+    "native/after2.result.json": "3764ef75b58680cbaec01cd57c42f64f4ccad5169bc9138338bba09393dfd372",
+    "native/before3.result.brep": "7985ca1dfa2ca65ee138d705fe701951fa26d71027e62129ea2d1d83f114041b",
+    "native/before3.result.step": "015a4ea11d86d99ceef6fd793b84706b808108febf6eeb7abd706104669032cf",
+    "native/before3.result.json": "7a81196afc827b46300966ac5eb4772fbae396f6bee5f5fc2e52bcde62d77360",
+    "native/after3.result.brep": "7985ca1dfa2ca65ee138d705fe701951fa26d71027e62129ea2d1d83f114041b",
+    "native/after3.result.step": "716729a15e50e6aa692642261f69aefa0aacc4d2b5fa4119c86301933c54ccaf",
+    "native/after3.result.json": "7a81196afc827b46300966ac5eb4772fbae396f6bee5f5fc2e52bcde62d77360",
+    "native/before4.result.brep": "923dffec7eae5f4b47a9d68a7160504881e23796f119e6016bd8b734511ccf34",
+    "native/before4.result.step": "811e1220153c4f62fa74400bc558c2ccf938ceb9b405b390576c285e6da808b4",
+    "native/before4.result.json": "ed4715ddc78fba0ef0184c95a0a6ef8bda4e9f55a4244a60bf610847e5819c9b",
+    "native/after4.result.brep": "923dffec7eae5f4b47a9d68a7160504881e23796f119e6016bd8b734511ccf34",
+    "native/after4.result.step": "30f2081297b3c7ae1473ca2767a2f1caeed26147d06c608d34249556e08450c0",
+    "native/after4.result.json": "ed4715ddc78fba0ef0184c95a0a6ef8bda4e9f55a4244a60bf610847e5819c9b",
+    "native/before5.result.brep": "8b8a57492242cac66a9986e30b8e0843e29eeef67c9904a429d4dfa56d396424",
+    "native/before5.result.step": "6cd38868b6aed783aec95533cf8defeea688486e92840dfcf97372b689040af1",
+    "native/before5.result.json": "6364d582f7a29be20de87ecbd771bd9004ee04c47633289899f831bd2011d761",
+    "native/after5.result.brep": "8b8a57492242cac66a9986e30b8e0843e29eeef67c9904a429d4dfa56d396424",
+    "native/after5.result.step": "47188c8d0b78887a31d762f957416ad05781a8ccf6639b8e9ecbfee36ca3753a",
+    "native/after5.result.json": "6364d582f7a29be20de87ecbd771bd9004ee04c47633289899f831bd2011d761",
+    "native/before6.result.brep": "dcca2c1c5e32267430e021c4408d5d1042e836bac9742f651d0b8b23b65d532d",
+    "native/before6.result.step": "cbe94490b5e4365ce1de0937b4b0e36871e221099a2dddc42d9776a0a1ad0907",
+    "native/before6.result.json": "951bc33f282ee2302428b390e54e9691055ef8108ddc32ec37cac2c27c5ecb99",
+    "native/after6.result.brep": "dcca2c1c5e32267430e021c4408d5d1042e836bac9742f651d0b8b23b65d532d",
+    "native/after6.result.step": "ad0b40c06586df4347c4ec3d0f753da95e11d06602e150ff7e0e463c344d7d9e",
+    "native/after6.result.json": "951bc33f282ee2302428b390e54e9691055ef8108ddc32ec37cac2c27c5ecb99",
+    "native/before7.result.brep": "dcca2c1c5e32267430e021c4408d5d1042e836bac9742f651d0b8b23b65d532d",
+    "native/before7.result.step": "06c3a585f631d91af20a05272d79d7335ffafb24158f482514c9d7cd9db9f099",
+    "native/before7.result.json": "951bc33f282ee2302428b390e54e9691055ef8108ddc32ec37cac2c27c5ecb99",
+    "native/after7.result.brep": "dcca2c1c5e32267430e021c4408d5d1042e836bac9742f651d0b8b23b65d532d",
+    "native/after7.result.step": "0bda883d96e39a12df44815bf981ab1fa97b9345ac9281957bd2b6eb4fb1803d",
+    "native/after7.result.json": "951bc33f282ee2302428b390e54e9691055ef8108ddc32ec37cac2c27c5ecb99",
+    "native/before8.result.brep": "923dffec7eae5f4b47a9d68a7160504881e23796f119e6016bd8b734511ccf34",
+    "native/before8.result.step": "086a6a543b8874fa6e4bff24dbe7caa6ea63de57957d5e5236accc02f0089219",
+    "native/before8.result.json": "ed4715ddc78fba0ef0184c95a0a6ef8bda4e9f55a4244a60bf610847e5819c9b",
+    "native/after8.result.brep": "923dffec7eae5f4b47a9d68a7160504881e23796f119e6016bd8b734511ccf34",
+    "native/after8.result.step": "f83ce7c5ae6e10456d6d8df47c2d31c6f27f7c41a8310056f795fb8ee6c80c67",
+    "native/after8.result.json": "ed4715ddc78fba0ef0184c95a0a6ef8bda4e9f55a4244a60bf610847e5819c9b",
+    "native/before9.result.brep": "923dffec7eae5f4b47a9d68a7160504881e23796f119e6016bd8b734511ccf34",
+    "native/before9.result.step": "af5cecbde1d2fbc86d7e387954a7a76bd6b29ba3181f3369f1db4591c25f4686",
+    "native/before9.result.json": "ed4715ddc78fba0ef0184c95a0a6ef8bda4e9f55a4244a60bf610847e5819c9b",
+    "native/after9.result.brep": "923dffec7eae5f4b47a9d68a7160504881e23796f119e6016bd8b734511ccf34",
+    "native/after9.result.step": "bfbf7005051f135694155099c9c2973620bd4e1239079dfb9794b30cd88c71e8",
+    "native/after9.result.json": "ed4715ddc78fba0ef0184c95a0a6ef8bda4e9f55a4244a60bf610847e5819c9b",
+    "native/controls.log": "9e4abc01b70550677a9fef72d0c3c79618228bb375b2701dee89c5ee74f7352a",
+    "native/summary.json": "857bff4239a9842e0b3d30935432fa056b6095879eecd446519e47e47eaec952",
+    "native/validated-summary.json": "6e730067c34a501ccea94f94bcc9ec31bfe689a6287eccdb1a2c180422bce309",
+    "native/capture/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native/capture/001.input.brep": "e3a32a4ffd4058989ec3749ec660b38d99a22f07441fae13adc2dd9abc358f01",
+    "native/capture/001.input.step": "4199b491fd6914f2fdcd1fc1ab560be11d117189f43ab5209d754300e0f033b0",
+    "native/capture/001.input.json": "6e216410e7b9f941937c946b76e87fb222c7549ef45d819908aca122fa7806e3",
+    "native/capture/001.result.brep": "187fe0bfb4c9ddcd48304e6c2874be6cc013cad9ebf71065000a8ddb48d0c1e0",
+    "native/capture/001.result.step": "415771fcfb6dd8c6491b711a557756e8229b129789b41222147fd41f330be18d",
+    "native/capture/001.result.json": "8c6f525e0958bed69ba4c1fda0fe2a78d6f0e21b136fb3331aca563bc046b030",
+    "native/capture/002.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native/capture/002.input.brep": "dcca2c1c5e32267430e021c4408d5d1042e836bac9742f651d0b8b23b65d532d",
+    "native/capture/002.input.step": "92ed66c385ca37a1af9d490b076e505bd31f3fd3290e573591cca96b852fabb1",
+    "native/capture/002.input.json": "3d27afdf806e1157197a216eb74626d11da00fb67160960d54b7d4239a406327",
+    "native/capture/002.result.brep": "96077d535d79f66eb491b2ce39b17fafe717a33d4dc3010e1a3f700acc2593bd",
+    "native/capture/002.result.step": "015c1c3c4886d7a51728ee82f09a77c80499dab1850c88cb0934b0bd6d90b20a",
+    "native/capture/002.result.json": "34c9ecb28e90e219bbdbaa4dd3588e64d48fe5b98b1160bf67f42a201e4cc2bc",
+    "native/capture/003.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native/capture/003.input.brep": "01e78ee59e4d0759b3a6072d005db15f84cf411fe3838fd0ee29a3f39fb960e6",
+    "native/capture/003.input.step": "117c9d95f6cec141e941851463d732457eab375f9b477600ca8cb6ae6e2e445b",
+    "native/capture/003.input.json": "9a7a68d7bbf16399a5b0097b61d94ee1c8731539bd3140166ba358a2c00121de",
+    "native/capture/003.result.brep": "688cc95b84c6b3da5ce762c7f95c538c019da6f27d2efb7abe0886ccc7826fd1",
+    "native/capture/003.result.step": "adfe1b2b4d3e796f70f0ad84966c2460de19b9ed93c5bc89a08c135c790fa340",
+    "native/capture/003.result.json": "12424df1d797db6e3a7a86297cb1c7e39d0fa81d6cc54db012550ec3994c5ee6",
+    "native/capture/004.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native/capture/004.input.brep": "7985ca1dfa2ca65ee138d705fe701951fa26d71027e62129ea2d1d83f114041b",
+    "native/capture/004.input.step": "9a6f6feb9865f46adb3e45ab86c12ff488696c8dfcc9126490e72dac0a75daf5",
+    "native/capture/004.input.json": "1cc38fbcf19457ac6796b6ffa58693ad666e3492bb38318cc0157f4ccb596431",
+    "native/capture/004.result.brep": "a9c2dbbdf66063dff3ed9418890b31313a9bd9b3034c084df296e21c9f387fe7",
+    "native/capture/004.result.step": "d38f27b6c6235b7422548d288e04fffdbc9c997abc2c49f8f5b2c392ecbdcb0d",
+    "native/capture/004.result.json": "a21764cf8f778df34945decadd279d02bb948a48958fef0966cf1f5905d16fde",
+    "native/capture/005.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native/capture/005.input.brep": "923dffec7eae5f4b47a9d68a7160504881e23796f119e6016bd8b734511ccf34",
+    "native/capture/005.input.step": "b484f4e1ab333e1f5d80beb4c6ebe2d30af172ccf1673409d7bb8b5b35a888dd",
+    "native/capture/005.input.json": "ff328ed973b945392f0acad1281e05dc9ade65c1dc2b6e4ae0ac8797fce7c61e",
+    "native/capture/005.result.brep": "3e76dea806491780e07368cc62586bbcc94b22d6d6ea361bae25333145ad1690",
+    "native/capture/005.result.step": "2b3efccccb467c906a48151fba3ae396c5eeae66ba3b124b42ee07d5174bd1a5",
+    "native/capture/005.result.json": "e0b104a305ab3320c017031d26430a95fd87ccee4b6677d5877315edd004f1ef",
+    "native/capture/006.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native/capture/006.input.brep": "8b8a57492242cac66a9986e30b8e0843e29eeef67c9904a429d4dfa56d396424",
+    "native/capture/006.input.step": "b50668d25c0876ea1238f108aaa426b9e9eabb83b26c857453016537b583d4f0",
+    "native/capture/006.input.json": "8e8d42913d88fa8c422a0489f5b9c4b6f5587e3281d915f5d5077ac9832168f8",
+    "native/capture/006.result.brep": "a402b3ea01824508854581af84ebcbf3a01d9ee07100c1d31f116cf32b873b8c",
+    "native/capture/006.result.step": "5bd09c2e9270a8ad4391804df81d0c269b59c4cefe111422c5747c3e7e22e7ba",
+    "native/capture/006.result.json": "978ebc03541403abc0b0303a0d4d7d2508e208271d9d42a562834607fd924a9b",
+    "native/capture/007.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native/capture/007.input.brep": "dcca2c1c5e32267430e021c4408d5d1042e836bac9742f651d0b8b23b65d532d",
+    "native/capture/007.input.step": "be89fc47d62eb4af76bf93d8cc1d13af422a1907d51f40bc6ff555879fa4fc58",
+    "native/capture/007.input.json": "74077dcaf679a7b9803169ffec14b706d1860b6abb07e3686ba6cc628a708b8a",
+    "native/capture/007.result.brep": "77fd57940aab2520e330e2b9adcbe9d93096a1cd60dda5fe52a63440de057bc8",
+    "native/capture/007.result.step": "199422831f2a02adaebf70c15c5a80e90ed2a65fe3a4d1b7799d0cd62c933752",
+    "native/capture/007.result.json": "ac5a8c673f8aebeb11bc77bb8223932e897a4ede3490c817ea26bf5dceca9b37",
+    "native/capture/008.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native/capture/008.input.brep": "dcca2c1c5e32267430e021c4408d5d1042e836bac9742f651d0b8b23b65d532d",
+    "native/capture/008.input.step": "0fdc699c36fe8dc213663be0af1858aa58439f4333e2aea1227ac492597c7257",
+    "native/capture/008.input.json": "51da67ac1b9dd39a95bfd997c7b3194729d9d8acbe40dd32f50bb5f79e6559d8",
+    "native/capture/008.result.brep": "5acf46b46319018de80e90356b76c002b168945e063e2932e55fc9c1636381d6",
+    "native/capture/008.result.step": "e2a954b3ca4d769c307b743db747df0d7a9a82b8ae89636b6580c0480b0a0c32",
+    "native/capture/008.result.json": "324d37e16d5d4d4f32b71565946e918d3ccf51f5af267a21c3923d3a837308f2",
+    "native/capture/009.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native/capture/009.input.brep": "923dffec7eae5f4b47a9d68a7160504881e23796f119e6016bd8b734511ccf34",
+    "native/capture/009.input.step": "10e45ff61c1ab87c70716289bd7c3b4360406aee9f9654fe64b704de819a958d",
+    "native/capture/009.input.json": "2936912d5692e2417228446451159fe1c462f716f0f2261e5556026034ec8913",
+    "native/capture/009.result.brep": "8726ede28fa1a3b7de809faa3e1413e44cc9fb995a12d4b41ae014aeaf391c40",
+    "native/capture/009.result.step": "796541e9c449af654a9c78769d055cd3a983bfc66883f9e6b91bb021cd811a72",
+    "native/capture/009.result.json": "89b60a50c447dce74dcf8645b8c03b8094c189a72b13d1af86a8b3b9ac66b5f6",
+    "native/capture/010.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native/capture/010.input.brep": "923dffec7eae5f4b47a9d68a7160504881e23796f119e6016bd8b734511ccf34",
+    "native/capture/010.input.step": "e9d26414ac13cc21bd5876de3051da368c3f4eca06de3239561846e8cd2acc12",
+    "native/capture/010.input.json": "9c830f0ba59b0eadae4c9cc6acb1081de399304b306b4dc0f5b17c9fe0b87b84",
+    "native/capture/010.result.brep": "248548e0c756e8f25fbcf9cede08b4851f39e1a26392d64d5a9607693f1f7970",
+    "native/capture/010.result.step": "df1d5d316457ab79a46e931e02c799622e8bc763c653b9230506aac7c8c59ec6",
+    "native/capture/010.result.json": "0ded2e6e71109e400c1cab6dca8b7463e99d792aa353387efe4a907de6542e5f",
+    "native/capture/001.truck.log": "11a3e42c23c77c543a04918b5414bdc0161edd355c7a760cc0c4c16c2d38d678",
+    "native/capture/001.truck.step": "e66d17c4759b91ca2b1ef3717b679a520839b3b6b1f554fce794418c7d46499e",
+    "native/capture/001.truck.json": "938a7d8ad0ff18f354b4f1125c2b049fc8984a70c37e34204e1d7aa865d85570",
+    "native/capture/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native/capture/001.comparison.json": "300b1339f3a1ed14aca4fc22563d0412fe7663bbe9ef2f051f78657190d9492a",
+    "native/capture/002.truck.log": "7d6385f3ed61d37ffbca02439f85bd08dfd33512b9530138e6c20853d00d1435",
+    "native/capture/002.truck.step": "2f12864f5dccc8b916302898a65aeff9b2c289148ad5eed3a50c24f6ec8221e8",
+    "native/capture/002.truck.json": "d6a2c2b12346e70a64882ec8f094de4efbe44538545135487b7ba6ce12075c12",
+    "native/capture/002.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native/capture/002.comparison.json": "4d7f15b8c13eae667831c367bf287d34036ecc82581203ef8510c8c9ef3ca5ea",
+    "native/capture/003.truck.log": "2c80162521afb2ad613aea5f20151a974e326bde0018e93d1d12cd29b078078f",
+    "native/capture/003.truck.step": "5a47cf2b883c3a67b2eb4e7996a112c37677e917430579cff60f9d37ce444c18",
+    "native/capture/003.truck.json": "babe1a4e2b439c01471ada657b3eaff59f7c7f4d82c8b190e667a94ef820340f",
+    "native/capture/003.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native/capture/003.comparison.json": "85c927b5f7f7d780c2ff7163467013637a4f80397ef931f556497d42d0629361",
+    "native/capture/004.truck.log": "e52f2c249fafd6aa333f4b277988ab8ba31de36e7a8e9bd3c5ccbf9622f5b0dd",
+    "native/capture/004.truck.step": "a0ad1bee528f52c2d5b4a47f1026d8f1ab7807cf44d0a023a62b89acea7c4c48",
+    "native/capture/004.truck.json": "08dca51727bd5ec0cdeda9c0ae688ce731b3a7c92f2adce7631f7c3306b75a63",
+    "native/capture/004.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native/capture/004.comparison.json": "7126af9840a19f727a160637c3ea208a4bf0d942599b4cc7ce913847b2b41619",
+    "native/capture/005.truck.log": "cdee5158e0ae5f5e68949a99ba8668a161298c91429c59a9aa9b7b333b202997",
+    "native/capture/005.truck.step": "98ac623fb764e9f0307e85b938da5be26b055f1d631e34c01e6beb0a97659d3c",
+    "native/capture/005.truck.json": "8c27cf7e3a631cdc876e12ae1f742fbfae3d1a5082b43a7ca37837f2164f333b",
+    "native/capture/005.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native/capture/005.comparison.json": "f20203708707a0c2bd7b241c4349b8267e51be92cd8a4528e1effca4823a56fe",
+    "native/capture/006.truck.log": "c132dfd7b54e8bf30d92e516fa1dd7db81b033dca3c7b631040a01f35048af50",
+    "native/capture/006.truck.step": "431d53cda6ba359e1cdf0cf67ef0e8b2ab91ae9a4cadd4470c1c02daa587c100",
+    "native/capture/006.truck.json": "e748b4202d95db70caa1dd92a3fb79627271955c803259b64b0371684e7782ed",
+    "native/capture/006.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native/capture/006.comparison.json": "d1e780d14d7f0a37b1f634ecc700384ece6c8a022263a53082c9de69fcc380a5",
+    "native/capture/007.truck.log": "26df7e00af218d5870c72e71944c75d41ef472c1b7258edbe8ecb6d897211b06",
+    "native/capture/007.truck.step": "28f6e5b39811d2b0e9434e60575dc2c085a4a836fe27c2b7ddc455ddc203efd8",
+    "native/capture/007.truck.json": "f7c54f82f6102e7c7d0e6a569879a23ce7fab5530b46a655d9664097b84e325c",
+    "native/capture/007.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native/capture/007.comparison.json": "e4a68cb504835bb35cf6848ad68bc2d79108cd516f7b64702e977749fc17169a",
+    "native/capture/008.truck.log": "ce42459b1bd575e95687de2e771f251fae268e1e243eb91632908e696105e277",
+    "native/capture/008.truck.step": "92457f727723c492840c5afa4d4c8cf0ddafb894d1360458a132676d230d434c",
+    "native/capture/008.truck.json": "847a9ada8cddf449de3b107dabf339455659d8b7fdf441a582c0996d896b8ec3",
+    "native/capture/008.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native/capture/008.comparison.json": "a104b25947e87c25c18f67927fbe832ad60b4629785e27922986eadcce3b0a2f",
+    "native/capture/009.truck.log": "b06cbdd0e649034a1964c8a7bb9addc8c596cec62e13d2d980aa1d83027abb28",
+    "native/capture/009.truck.step": "94b6016cca89e40844855781247c84a63db86d2a8bf892af6cf14c667a61bc32",
+    "native/capture/009.truck.json": "51cf13e8aac22e9ab0a053a8191f6b716224951673daab77f1b13e26f81bad37",
+    "native/capture/009.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native/capture/009.comparison.json": "7c74ad343ac2985d025468b186a40649858135f18d42504ccdbf7be887d9af2b",
+    "native/capture/010.truck.log": "f5c8951ba7c4f3e7a68856e4c1fa294bf76ac21dda3d733d0caa1a05551e9c5e",
+    "native/capture/010.truck.step": "aad88273f84f356d075a6b994fdfeab54f788fe5e25a8c4e47d96c286020e669",
+    "native/capture/010.truck.json": "9dcb1af3d0a3db46c3d178141cc1cfed932c8b6712cbd7392f65d3110d8d3aa1",
+    "native/capture/010.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native/capture/010.comparison.json": "9bb46c90f82a4ae1d7852287ad96ebb4ccf28a0cacbe37c398c1689fd7fdefb1",
+    "tools/capture-longitudinal-cylinder-angles.py": "0644fc63ba6bdca374d496ea0b2bd42b2feaba51e73ae38b8ca1a3260db6110c",
+    "tools/replay-longitudinal-cylinder-angles.py": "6ade0b49caa35f7d588198a2b22de8c396352449bd6b500168e83b0b24b6e09a",
+    "tools/validate-longitudinal-cylinder-angles.py": "b4393846727f40aa83e953b554ae9718701f5a8151e0cb66edfdb8b96ed92c60",
+    "tools/longitudinal-offset-inputs.cpp": "d240e9bb9e347215c971167c9bddd976f7cabf9fe207611f1a0d9437998a1a0d",
+    "tools/longitudinal-plane-angle-oracle.cpp": "10b012805ec6182dc51ab5231c9d24a073de5bfeba5d69a192f7466a09e16df6",
+    "tools/cylinder-angle-native-capture.txt": "81e4b9a1ff4931f9d9bd98006b8d7c35882dc965a761a884959c437a0408236d",
+    "tools/cylinder-angle-native-replay.txt": "d9c237d86d54abd058fa47a6028fac73868932d8e50bc39450ac9be0a4f5649d"
+  },
+  "native_generator_sha256": "45992dc9ead38c30bad7d6e7984b9008d4a5684c9f491522ac767ea2a9f137c8",
+  "contact_oracle_sha256": "fc895c7377bbb3e1783b59bd9de07578dee2f0574fbc5ac8221c7beb94ca7b15"
+}

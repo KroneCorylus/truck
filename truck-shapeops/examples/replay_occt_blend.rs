@@ -245,6 +245,57 @@ fn longitudinal_cylinder(input: &Solid, edge: &Edge) -> Option<(usize, f64)> {
         .then_some((side, *radius))
 }
 
+fn longitudinal_cylinder_angle_setback(
+    plane_face: &Face,
+    cylinder_face: &Face,
+    edge: EdgeID,
+    chord: f64,
+    angle: f64,
+) -> Option<f64> {
+    let (Elementary::Plane(plane), plane_forward) = plane_face.oriented_surface().elementary()?
+    else {
+        return None;
+    };
+    let (
+        Elementary::Cylinder {
+            origin,
+            axis,
+            radius,
+        },
+        cylinder_forward,
+    ) = cylinder_face.oriented_surface().elementary()?
+    else {
+        return None;
+    };
+    let ratio = chord / (2. * radius);
+    if !(ratio > 0. && ratio < std::f64::consts::FRAC_1_SQRT_2) {
+        return None;
+    }
+    let psi = 2. * ratio.asin();
+    let boundary = cylinder_face.edge_iter().find(|e| e.id() == edge)?;
+    let start = boundary.front().point();
+    let spine = (boundary.back().point() - start).normalize();
+    let radial = (start - origin - axis * (start - origin).dot(axis)).normalize();
+    let orientation = if cylinder_forward { 1. } else { -1. };
+    let inward = (radial * orientation).cross(spine).normalize();
+    let contact_radial = radial * psi.cos() + inward * psi.sin();
+    let contact = start + radius * (contact_radial - radial);
+    let normal = contact_radial * orientation;
+    let tangent = normal.cross(spine).normalize();
+    // The angle belongs to the cylinder tangent at the new contact.
+    let direction = -tangent * angle.cos() - normal * angle.sin();
+    let plane_normal = plane.normal() * if plane_forward { 1. } else { -1. };
+    let parameter = (start - contact).dot(plane_normal) / direction.dot(plane_normal);
+    if !parameter.is_finite() || parameter <= 0. {
+        return None;
+    }
+    let plane_boundary = plane_face.edge_iter().find(|e| e.id() == edge)?;
+    let plane_spine = (plane_boundary.back().point() - plane_boundary.front().point()).normalize();
+    let plane_inward = plane_normal.cross(plane_spine).normalize();
+    let setback = (contact + parameter * direction - start).dot(plane_inward);
+    (setback.is_finite() && setback > 0.).then_some(setback)
+}
+
 fn longitudinal_plane_angle_chord(
     plane_face: &Face,
     cylinder_face: &Face,
@@ -601,20 +652,25 @@ fn chamfer_selection(
                         distances[1] = requested[1] / denominator;
                     } else {
                         let (cylinder, _) = longitudinal.unwrap();
-                        if *side == cylinder {
-                            return Err(unsupported("Cylinder-reference distance-angle chamfers on longitudinal edges are unsupported"));
-                        }
-                        distances[1] = longitudinal_plane_angle_chord(
-                            adjacent[*side],
-                            adjacent[cylinder],
-                            edge.id(),
-                            requested[0],
-                            tangent.atan(),
-                        )
-                        .ok_or_else(|| {
-                            unsupported(
-                                "Plane-reference angle has no supported local cylinder contact",
+                        distances[1] = if *side == cylinder {
+                            longitudinal_cylinder_angle_setback(
+                                adjacent[1 - cylinder],
+                                adjacent[cylinder],
+                                edge.id(),
+                                requested[0],
+                                tangent.atan(),
                             )
+                        } else {
+                            longitudinal_plane_angle_chord(
+                                adjacent[*side],
+                                adjacent[cylinder],
+                                edge.id(),
+                                requested[0],
+                                tangent.atan(),
+                            )
+                        }
+                        .ok_or_else(|| {
+                            unsupported("Longitudinal angle has no supported local contact")
                         })?;
                     }
                     if !distances[1].is_finite() || distances[1] <= 0. {
@@ -2587,6 +2643,10 @@ mod longitudinal_plane_angle_tests {
     }
 
     fn check(index: usize, moved: bool, degrees: f64) {
+        check_reference(index, moved, degrees, false);
+    }
+
+    fn check_reference(index: usize, moved: bool, degrees: f64, cylinder_reference: bool) {
         let convex = index < 3;
         let h: f64 = [-2., 0., 2.][index % 3];
         let scale: f64 = if moved { 0.2 } else { 1. };
@@ -2598,7 +2658,7 @@ mod longitudinal_plane_angle_tests {
         } * Matrix4::from_scale(scale);
         let inverse = transform.invert().unwrap();
         let directory = std::env::temp_dir().join(format!(
-            "truck-longitudinal-plane-angle-{}-{index}-{moved}-{degrees}",
+            "truck-longitudinal-angle-{}-{index}-{moved}-{degrees}-{cylinder_reference}",
             std::process::id()
         ));
         std::fs::create_dir_all(&directory).unwrap();
@@ -2649,16 +2709,36 @@ mod longitudinal_plane_angle_tests {
         chosen["angle_degrees"] = json!(degrees);
         let sign = if convex { -1. } else { 1. };
         let alpha = degrees.to_radians();
-        let p = Point3::new(x + sign * 0.7, h, 0.);
-        let u = Vector3::new(-sign * alpha.cos(), alpha.sin(), 0.);
-        let dot = p.to_vec().dot(u);
-        let root = (dot * dot + 25. - p.to_vec().magnitude2()).sqrt();
-        let parameter = [-dot - root, -dot + root]
-            .into_iter()
-            .filter(|t| *t > 0.)
-            .min_by(f64::total_cmp)
-            .unwrap();
-        let q = p + parameter * u;
+        let (p, q, u) = if cylinder_reference {
+            chosen["reference_plane"] = Value::Null;
+            let origin = transform.transform_point(Point3::origin());
+            let axis = transform.transform_vector(Vector3::unit_z()).normalize();
+            chosen["reference_cylinder"] = json!({
+                "origin": [origin.x, origin.y, origin.z],
+                "axis": [axis.x, axis.y, axis.z], "radius": 5. * scale
+            });
+            chosen["distance"] = json!(1.5 * scale);
+            let phi = (h / 5.).asin() + 2. * (1.5_f64 / 10.).asin();
+            let q = Point3::new(5. * phi.cos(), 5. * phi.sin(), 0.);
+            let radial = q.to_vec() / 5.;
+            let tangent = Vector3::new(-radial.y, radial.x, 0.);
+            let direction = -tangent * alpha.cos() + sign * radial * alpha.sin();
+            let p = q + ((h - q.y) / direction.y) * direction;
+            assert!((p.x - x) * sign > 0.);
+            (p, q, -direction)
+        } else {
+            let p = Point3::new(x + sign * 0.7, h, 0.);
+            let u = Vector3::new(-sign * alpha.cos(), alpha.sin(), 0.);
+            let dot = p.to_vec().dot(u);
+            let root = (dot * dot + 25. - p.to_vec().magnitude2()).sqrt();
+            let parameter = [-dot - root, -dot + root]
+                .into_iter()
+                .filter(|t| *t > 0.)
+                .min_by(f64::total_cmp)
+                .unwrap();
+            let q = p + parameter * u;
+            (p, q, u)
+        };
         let psi = q.y.atan2(q.x) - (h / 5.).asin();
         let removed = (x * h - h * p.x + p.x * q.y - h * q.x - 25. * psi).abs() / 2.;
         let expected = (original_volume - 10. * removed) * scale.powi(3);
@@ -2672,7 +2752,7 @@ mod longitudinal_plane_angle_tests {
                 .collect();
             for (face, distance) in adjacent.iter().zip(distances) {
                 let expected = match face.oriented_surface().elementary().unwrap().0 {
-                    Elementary::Plane(_) => 0.7 * scale,
+                    Elementary::Plane(_) => (p.x - x).abs() * scale,
                     Elementary::Cylinder { .. } => 5. * psi.tan() * scale,
                     _ => panic!("unexpected support"),
                 };
@@ -2710,6 +2790,12 @@ mod longitudinal_plane_angle_tests {
                 .vertex_iter()
                 .any(|v| inverse.transform_point(v.point()).distance(target) < 1e-6));
         }
+        let reference_tangent = if cylinder_reference {
+            Vector3::new(-q.y, q.x, 0.).normalize()
+        } else {
+            Vector3::unit_x()
+        };
+        assert!((u.normalize().dot(reference_tangent).abs().acos() - alpha).abs() < 1e-10);
         let expected_normal =
             Vector3::new(u.y, -u.x, 0.).normalize() * if convex { 1. } else { -1. };
         let bevels: Vec<_> = output
@@ -2765,13 +2851,40 @@ mod longitudinal_plane_angle_tests {
     }
 
     #[test]
+    fn convex_longitudinal_chamfers_preserve_the_cylinder_contact_angle() {
+        for index in 0..3 {
+            for moved in [false, true] {
+                check_reference(index, moved, 30., true);
+            }
+        }
+    }
+    #[test]
+    fn concave_longitudinal_chamfers_preserve_the_cylinder_contact_angle() {
+        for index in 3..6 {
+            for moved in [false, true] {
+                check_reference(index, moved, 30., true);
+            }
+        }
+    }
+    #[test]
+    fn longitudinal_cylinder_angles_preserve_shallow_and_steep_requests() {
+        for index in [1, 4] {
+            for degrees in [15., 45.] {
+                for moved in [false, true] {
+                    check_reference(index, moved, degrees, true);
+                }
+            }
+        }
+    }
+
+    #[test]
     fn longitudinal_angles_reject_unsupported_references_and_contacts() {
         let path = std::env::temp_dir().join(format!(
             "truck-longitudinal-angle-guards-{}.step",
             std::process::id()
         ));
         for (index, cylinder_reference, distance, angle) in [
-            (1, true, 1.5, 30.),
+            (1, true, 8., 30.),
             (1, false, 6., 89.),
             (4, false, 0.7, 80.),
         ] {
