@@ -1,0 +1,7 @@
+{
+  "revision": "8941173b5533b4e36dcdd1c945b9b0a3ebf5bee5",
+  "sha256": {
+    "truck-shapeops/src/fillet/projected_section.rs": "593c02d1145a2d72659fb53a0d14df3e9af6b18b0a7d1a87f6b5eb361237ed1f",
+    "truck-shapeops/tests/conic_section_chamfers.rs": "f782acb202ac5fd11a5c9f9990e39f4c296a54f672b3b09689e8f9ec33a596dc"
+  }
+}
