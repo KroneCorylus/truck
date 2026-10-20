@@ -1,0 +1,9 @@
+{
+  "inputs": {
+    "target/occt-capture-parallel-cylinder-angles/chamfer/dist_angle/A2/capture/001.input.json": "953eaa06cb0b8f4b9991b9804ab2198ab60257c1508d89896eb9092ba92393cc",
+    "target/occt-capture-parallel-cylinder-angles/chamfer/dist_angle/A2/capture/001.result.brep": "7e46a8b3d9b82bea4622d84a7a6a9757890651cf373204f18c1d481a7e8176bb",
+    "target/occt-capture-parallel-cylinder-angles/chamfer/dist_angle/A2/capture/001.truck.step": "4c075485d500b0e85d96201b2b298a08b2716e5000be25a34ab043cd0c74257d"
+  },
+  "oracle_source_sha256": "5184551cf7dcab70afdedd2578734e2c3794c07c5e9134b0c3dee480749b0929",
+  "oracle_executable_sha256": "c4b8ab01fd679ba4abf2222c73aac23706e8db9af5c692a530cd2fdd9919901e"
+}

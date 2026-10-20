@@ -1,0 +1,41 @@
+PARALLEL CYLINDER CONTACT ANGLES — 2026-10-20
+ACTIVE: Continue work and commit achievements until done or told to stop.
+
+# Parallel cylinder contact angles: clean full capture
+
+Runtime 68b6a6425d9e352631b1e5bbfddb9080684dd7a3. All396 native entries pass, yielding648 operation records with unchanged requests, complete selection scopes and native result properties. All364 previous constructions retain successful checks; 364 complete result/comparison records are exactly unchanged, with 0 numerical changes.
+
+365 constructions (+1); 341 limited sampled passes (+0) at0.001. 24 constructed discrepancies remain. Every construction preserves input, consistent geometry, a closed mesh, STEP preparation and valid single-solid native/Truck comparison shapes.
+The new dist_angle/A2 construction preserves the requested chord and 30-degree contact angle at all six selected edges. Independent measurements of native output give 41.4783409545, 30, 46.7813237992, 30, 30 and 44.8956155730 degrees in selection order. The two cylinder/cylinder contacts agree; three plane/cylinder contacts explain the new raw discrepancy. See contact-angle-checks.json and the retained surface oracle. No comparison verdict is overridden.
+
+Statuses: {"input-import-failed": 96, "operation-succeeded": 365, "operation-failed": 172, "unhandled-intent": 6, "input-inconsistent": 9}.
+Status changes:
+- chamfer/dist_angle/A2/001: unhandled-intent → operation-succeeded
+
+Replay now resolves cylinder/cylinder distance-angle requests from the reference chord and angle at the new contact. It intersects the resulting ray with the other cylinder, selects the first forward intersection, and rejects missing/out-of-branch contacts. Core geometry and existing plane/cylinder interpretation are unchanged.
+
+Two new tests fail on parent9b69102c; six tests pass. The former blanket rejection was rewritten on that parent into an impossible-union guard, preserving input checks. Twenty positive variants cover equal/unequal radii, both references, feasible30/45-degree requests, transforms and reversals. All57 release replay tests,13capture tests, Clippy and benchmark smoke pass; replay built last. Core sources/tests exactly match the prior400shapeops/98meshalgo validation (one existing ignore each); results are reused with hashes, not claimed rerun.
+
+Twelve native controls: ten valid constructions agree with the independent two-circle contact/material oracle and Truck samples; two union45-degree requests fail natively and are rejected by Truck. Their negative quadratic discriminants independently demonstrate no intersection. Native spline-backed bevels are checked against the expected plane at81 surface points. Eight successful native inputs stay unchanged; two union inputs mutate endpoint tolerances. Raw failures and mutations remain visible; Truck inputs stay unchanged.
+
+Proof: truck-benchmarks/results/2026-10-20-parallel-cylinder-angles/REPORT.md.
+Archive: 8146 byte-verified members; SHA256 59b1bc4431dec81a4894f86b628ac8cb84878d265eadce97a06806568836fa60.
+Finite samples do not establish global boundary error or full parity. No consumer change, push, PR or performance claim.
+
+NEXT INVESTIGATION
+C4 chamfer complex equal/two-distance/angle failures meet a terminal fan of two coincident cylindrical faces. Current planar_edge line315 rejects an internal circular seam intersection outside its old range. This resembles the planar coplanar cap fan fixed at7ab0f68f, but needs a cylindrical patch bounded by exact projected section, not a straight cap. Preserve seams instead of blindly extending them. target/c4-probe.txt and target/c4-probe-source.json capture matching-source diagnostics. Scratch probe copied current core; native/general probe helper source is in target/build-longitudinal-failure-probe.py.
+Fresh target/cylindrical-terminal-fan-input.cpp builds a cylinder R5 H10 with lower half-notch x>=0,|y|<2,z<5, fused to the upper half without unifying cylindrical faces. Initial exact volume688.13280068945392. target/native-cylindrical-terminal-fan has6native controls (one/two edges, equal/two-distance/angle). Raw native results are problematic: single-edge results report valid but have stored tolerances around5 and wrong material; two-edge results report invalid. Initial capture assertion failure preserved. Parent currently fails same terminal-walk line on the first control. Need an unsplit-cylinder equivalent native control and independent section-integral material before treating this as proof. No parent tests or production changes for this candidate yet.
+Section oracle for that notch: initial=pi*R²*H-L*(h*sqrt(R²-h²)+R²*asin(h/R)). For each selected edge, y in[h-Dy,h], added volume Dz/Dy*integral((y-(h-Dy))*sqrt(R²-y²)dy). Primitive of y*sqrt is -(R²-y²)^(3/2)/3; primitive of sqrt is (y*sqrt+R²asin(y/R))/2. Both edges double the addition. Do not call native discrepancies matching.
+
+PREVIOUS
+7ab0f68f/9b69102c parallel chords and planar subdivided concave caps:364constructions/341limited passes;dist_dist/A2 gained, equal_dist/A2 sample error improved0.000621→<4.6e-13. Full400shapeops/98meshalgo. 460ac6fd/0847f7b7 cylinder-reference plane/cylinder angles:363/340;native wrong-contact-angle evidence retained.
+
+METHOD
+Read AGENTS.md. Parent-failing tests; no weakened assertions; shared solid/STEP checks.
+CARGO_BUILD_JOBS=12;rustfmt +nightly --config skip_children=true;no cargo fmt.
+Freeze production during builds/tests/captures;release tests,Clippy,actions smoke;build replay LAST.
+Commit implementation/proof before clean capture, then HTML/catalog/handoff. Force-add JSON/ZIP/STEP;diff check excludes *.step.
+No consumer/pin changes,push,PR,subagents or unsupported speed/parity claims.
+Plugin target/occt-cone-reference-plugin;SDK target/occt-sdk/usr/lib64;OCCT ../investigations/sequential-holes-2026-10-10/occt;publicdata target/occt-public-chamfer-data.
+Capture workers4,timeout120,fresh output. Raw target/occt-capture-parallel-cylinder-angles and target/native-parallel-cylinder-angles-complete; initial failed native capture also retained.
+Helpers target/validate-parallel-cylinder-angles.py,replay-parallel-cylinder-angles.py,package-parallel-cylinder-angle-proof.py,package-parallel-cylinder-angle-full.py,write-parallel-cylinder-angle-checkpoint.py. Packaging is not idempotent.

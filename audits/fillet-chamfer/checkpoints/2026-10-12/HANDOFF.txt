@@ -1,8 +1,8 @@
 LATEST CHECKPOINT — 2026-10-20
 ACTIVE: Continue work and commit achievements until done or told to stop.
-Read ../2026-10-20-parallel-cylinder-chords/HANDOFF.txt and report.html.
-Implementation 7ab0f68f supports parallel cylinder chords and subdivided concave caps.
-Full capture:364constructions/341limited passes;no prior check regressions. Full parity remains unverified.
+Read ../2026-10-20-parallel-cylinder-angles/HANDOFF.txt and report.html.
+Implementation 68b6a642 supports parallel cylinder contact angles.
+Full capture:365constructions/341limited passes;no prior check regressions. Full parity remains unverified.
 
 HISTORICAL HANDOFF FOLLOWS
 
