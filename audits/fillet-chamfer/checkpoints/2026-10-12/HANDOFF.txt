@@ -1,8 +1,8 @@
 LATEST CHECKPOINT — 2026-10-20
 ACTIVE: Continue work and commit achievements until done or told to stop.
-Read ../2026-10-20-collapsed-fillet-contacts/HANDOFF.txt and report.html.
-Implementation 0258681b handles collapsed analytic fillet contacts.
-Full capture:443 constructions/413 limited passes;no prior check regressions. Full parity remains unverified.
+Read ../2026-10-20-procedural-cylinders/HANDOFF.txt and report.html.
+Implementation 51e609eb recognizes procedural cylinders for sequential rounds.
+Full capture:443/413;no prior check regressions. Known parent geometry precision failure remains. Full parity unverified.
 
 HISTORICAL HANDOFF FOLLOWS
 

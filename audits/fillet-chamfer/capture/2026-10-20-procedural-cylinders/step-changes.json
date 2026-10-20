@@ -1,0 +1,28 @@
+[
+  {
+    "case": "blend/simple/C7",
+    "capture": "001",
+    "collapsed-fillet-contacts": {
+      "CIRCLE": 1,
+      "B_SPLINE_CURVE_WITH_KNOTS": 4
+    },
+    "procedural-cylinders": {
+      "CIRCLE": 2,
+      "B_SPLINE_CURVE_WITH_KNOTS": 3
+    },
+    "truck_result_unchanged": true
+  },
+  {
+    "case": "blend/simple/H4",
+    "capture": "001",
+    "collapsed-fillet-contacts": {
+      "CIRCLE": 2,
+      "B_SPLINE_CURVE_WITH_KNOTS": 4
+    },
+    "procedural-cylinders": {
+      "CIRCLE": 3,
+      "B_SPLINE_CURVE_WITH_KNOTS": 3
+    },
+    "truck_result_unchanged": true
+  }
+]

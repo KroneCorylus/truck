@@ -3,7 +3,7 @@
     "title": "Fillet and chamfer feature parity audit",
     "baseline": "OCCT V7_9_3 source inventory plus the recorded Truck/Pieza revisions. Includes 3D, 2D, related workflows and all textual candidates under the discovery rules.",
     "meaning_of_all": "Every dedicated test-grid entry, matching registered test/helper, discovered blend command and retained reference in this pinned checkout. This is not a claim about all mathematical configurations or current/future OCCT releases.",
-    "execution": "All 1,026 inventoried entries have native attempts. Latest clean capture at 0258681b:396 native passes,648 operations,487 complete chamfer and161 complete fillet scopes;443 constructions/413 limited sampled passes at 0.001. All 442 prior constructions retain checks;442 prior result/comparison records exact,0 numerical changes. Native discrepancies retained;full parity remains unverified.",
+    "execution": "All 1,026 inventoried entries have native attempts. Latest clean capture at 51e609eb:396 native passes,648 operations,487 complete chamfer and161 complete fillet scopes;443 constructions/413 limited sampled passes at 0.001. All443 prior constructions retain checks;441 complete prior records exact,2 numerical changes. Native discrepancies retained;full parity remains unverified.",
     "mapping": "Capability assessments describe observable outcomes supported or restricted by reviewed source evidence. Per-case tags and links are automated hints; they do not prove Truck handles that fixture.",
     "objective": "Achieve at least OCCT-level fillet/chamfer capabilities and robustness for equivalent modeling tasks in Truck/Pieza.",
     "equivalence": "Judge the requested geometry, dimensions, validity, editing behavior and practical performance. Different APIs, algorithms, languages, surface representations and internal operation sequences are acceptable. Missing a corresponding OCCT method is not evidence of a feature gap."
@@ -1014,7 +1014,7 @@
         "cylinder"
       ],
       "occt_scope": "Analytic line/circle special cases plus generic walking.",
-      "truck_scope": "Straight axial lips, circular rims, holes and channels have tests; this does not cover all oblique intersections. Separate axial lips can use different radii in one atomic solid operation; the semiannulus regression checks independent circular-area material and rolling-cylinder normals.",
+      "truck_scope": "Straight axial lips, circular rims, holes and channels have tests; this does not cover all oblique intersections. Separate axial lips can use different radii in one atomic solid operation; the semiannulus regression checks independent circular-area material and rolling-cylinder normals. Plane-supported procedural cylinders now have representation-based recognition and original R10 sequential-round controls; this does not establish general procedural-surface equivalence.",
       "next_case": "Compare convex/concave lips, hole/boss rims, and a tilted plane cutting a cylinder.",
       "evidence": [
         {
@@ -1082,6 +1082,12 @@
           "path": "truck-benchmarks/results/2026-10-20-collapsed-fillet-contacts/REPORT.md",
           "find": "# Collapsed analytic fillet contacts",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-20-procedural-cylinders/REPORT.md",
+          "find": "# Recognizing translated procedural cylinders",
+          "role": "test"
         }
       ],
       "required_outcome": "Blend lips and rims formed by planes and cylinders, for holes, bosses and channels in either material sense.",
@@ -1089,7 +1095,8 @@
         "At 4a3e11d4, imported cylinders and conic extrusions receive finite support domains bounded by their complete rational boundary control hulls. Affine conic inclusion/search preserves elliptical, sheared and oblique sweeps; cylinder conversion retains the fitted height and STEP export measures perpendicular radius. Native F8, eight cylinder variants, curved extrema and bounded/off-surface checks pass. Full release modeling/shapeops/STEP: 488 passed, 0 failed, 3 existing ignored; Clippy and action smoke pass. This resolves the previously recorded finite extrusion domain failures; unsupported boundary representations and other import failures remain open.",
         "At 35c6e2cf, draft/angle/C4 rounds the two opposite cylindrical lips of a height-20 semiannulus (radii 2 and 10) with radii 2 and 1. Independent Green-integral volume is 2988.725888734009; native integration of Truck STEP differs by 5.912e-12. Both sampled distance directions are below 3.109e-14. These are sampled checks, not certified global bounds.",
         "At c26b6780, simple chamfer and fillet face patches trim a shared arc/chord neighbor sequentially instead of panicking. Parent-failing tests verify analytic contacts and retained chord, orientation, representations and immutable input. Face-patch scope only; full capture 222 constructions/208 limited comparisons with no prior successful check regressions. No parity upgrade.",
-        "At 0258681b, exact equal-radius analytic cylindrical rim contacts collapse to shared vertices and spherical patches. Three parent failures, four parent controls and seven focused tests;36positive/4negative new-scope variants. Four native controls with independent material/contact/radius/STEP checks.434shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:443/413;all442prior checks retained. Original procedural R10 and near-equal bug828 remain outside this scope. No parity upgrade."
+        "At 0258681b, exact equal-radius analytic cylindrical rim contacts collapse to shared vertices and spherical patches. Three parent failures, four parent controls and seven focused tests;36positive/4negative new-scope variants. Four native controls with independent material/contact/radius/STEP checks.434shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:443/413;all442prior checks retained. Original procedural R10 and near-equal bug828 remain outside this scope. No parity upgrade.",
+        "At 51e609eb, representation-proven plane-supported procedural cylinders enable the original R10 and six new sequential continuations. Three parent failures;four independent native controls. Release suites:1032passing,one reproduced parent geometry precision failure,five existing ignores;59replay/13capture,Clippy/smoke pass. Clean capture:443/413;all443prior checks retained. No parity upgrade."
       ]
     },
     {
@@ -1397,7 +1404,7 @@
         "freeform"
       ],
       "occt_scope": "Tests explicitly convert shapes to NURBS before chamfering.",
-      "truck_scope": "Fixed planar spline support recognition, straight spline edge grouping in Pieza and bounded contact trimming in the generic kernel path. Planar rim fillets, asymmetric chamfers and sequential single-edge miter fillets have representation regressions. Circular rim blends also have analytic/exact-NURBS controls, including elevated degrees and shifted parameter domains. Broader invariance for curved support pairs and split faces remains open. STEP export also covers short, long and shifted longitudinal fillet domains. Conical rims now cover equivalent analytic and exact NURBS supports with reversed wires and rigid transforms.",
+      "truck_scope": "Fixed planar spline support recognition, straight spline edge grouping in Pieza and bounded contact trimming in the generic kernel path. Planar rim fillets, asymmetric chamfers and sequential single-edge miter fillets have representation regressions. Circular rim blends also have analytic/exact-NURBS controls, including elevated degrees and shifted parameter domains. Broader invariance for curved support pairs and split faces remains open. STEP export also covers short, long and shifted longitudinal fillet domains. Conical rims now cover equivalent analytic and exact NURBS supports with reversed wires and rigid transforms. Plane-supported procedural cylinders now have representation-based recognition and original R10 sequential-round controls; this does not establish general procedural-surface equivalence.",
       "next_case": "Compare non-cylindrical curved support pairs and split faces across analytic/NURBS/STEP representations, including smooth rolling continuations around existing rounds. Passing cylindrical rims and sequential single-edge miters does not establish general junction or freeform parity. Fillet surface parameter scaling is covered during STEP preparation; extend equivalent checks to support and boundary-curve parameters.",
       "evidence": [
         {
@@ -1609,6 +1616,12 @@
           "path": "audits/fillet-chamfer/capture/2026-10-12-spline-rim/REPORT.md",
           "find": "# Captured replay after closed spline-rim continuation",
           "role": "verification"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-20-procedural-cylinders/REPORT.md",
+          "find": "# Recognizing translated procedural cylinders",
+          "role": "test"
         }
       ],
       "required_outcome": "Handle equivalent physical geometry consistently when represented analytically, as exact NURBS, with split faces, or after STEP import.",
@@ -1640,7 +1653,8 @@
         "At 41e25f28, finite nonelliptic STEP conics convert to exact normalized polynomial/rational curves. The edge parser preserves parabola identity and nonperiodic hyperbola trims. Transformed/reversed arc, 2D/3D STEP edge and prism/STEP regressions pass; full release STEP/shapeops: 397 passed, 0 failed, 1 existing ignored, with Clippy/action smoke. Captured F8/F9/G1/G2 progress to input-consistency failure, with extrusion support domains still unresolved; no blend success or full parity is claimed. See capture/2026-10-11-conic-import/REPORT.md.",
         "At 4a3e11d4, imported cylinders and conic extrusions receive finite support domains bounded by their complete rational boundary control hulls. Affine conic inclusion/search preserves elliptical, sheared and oblique sweeps; cylinder conversion retains the fitted height and STEP export measures perpendicular radius. Native F8, eight cylinder variants, curved extrema and bounded/off-surface checks pass. Full release modeling/shapeops/STEP: 488 passed, 0 failed, 3 existing ignored; Clippy and action smoke pass. This resolves the previously recorded finite extrusion domain failures; unsupported boundary representations and other import failures remain open.",
         "Closed spline-pipe rim regressions now cover displaced longitudinal contact seams, two constant radii, rigid transformation, scale 0.01, reversed wire and unequal rim parameter spans. Contact fitting follows one UV branch across closed NURBS seams without treating support parameter bounds as face trims. Both end-to-end tests fail on parent 4a156c4f; they check radius/normals, independent volume, topology/mesh closure, STEP and immutable input. This is targeted capability evidence, supplemented by the subsequent clean 99c9d487 native capture. See truck-benchmarks/results/2026-10-12-spline-rim-continuation/REPORT.md.",
-        "Clean full capture at 99c9d487 (kernel f7f8f4f5) passes all 156 native entries. J9 is the sole construction-status change: it now succeeds, with maximum sampled distances 9.41989e-5/1.09879e-4. All 73 constructed outputs preserve input and geometry, close their meshes and yield native-valid single-solid STEP; 71 meet the combined limited comparisons. The 31 construction failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents, one incomplete capture, G1 and tolerance-grid A1 discrepancies remain. No panic, timeout or full-parity verdict. See capture/2026-10-12-spline-rim/REPORT.md."
+        "Clean full capture at 99c9d487 (kernel f7f8f4f5) passes all 156 native entries. J9 is the sole construction-status change: it now succeeds, with maximum sampled distances 9.41989e-5/1.09879e-4. All 73 constructed outputs preserve input and geometry, close their meshes and yield native-valid single-solid STEP; 71 meet the combined limited comparisons. The 31 construction failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents, one incomplete capture, G1 and tolerance-grid A1 discrepancies remain. No panic, timeout or full-parity verdict. See capture/2026-10-12-spline-rim/REPORT.md.",
+        "At 51e609eb, representation-proven plane-supported procedural cylinders enable the original R10 and six new sequential continuations. Three parent failures;four independent native controls. Release suites:1032passing,one reproduced parent geometry precision failure,five existing ignores;59replay/13capture,Clippy/smoke pass. Clean capture:443/413;all443prior checks retained. No parity upgrade."
       ]
     },
     {
@@ -2392,8 +2406,8 @@
         "degenerate"
       ],
       "occt_scope": "Singular corners and degenerate boundaries are explicitly represented.",
-      "truck_scope": "Equal-radius sequential rims on perpendicular planar and analytic cylindrical walls support collapsed contacts through spherical patches, including closed contours. Original procedural fillets, full cap consumption and folded offsets remain unsupported. Specific collapsed chamfers are supported.",
-      "next_case": "Prove equivalent procedural-cylinder representations, then investigate near-equal and mixed collapsing/noncollapsing rim sections without loosening fold or trim guards.",
+      "truck_scope": "Equal-radius sequential rims on perpendicular planar and analytic cylindrical walls support collapsed spherical contacts, including representation-proven procedural cylinders and closed contours. Full cap consumption, folded offsets and mixed collapsing/regular cylindrical corners remain limited.",
+      "next_case": "Prove mixed collapsing and regular cylindrical rim corners without weakening fold or trim guards; investigate near-equal inputs separately.",
       "evidence": [
         {
           "repo": "occt",
@@ -2418,11 +2432,18 @@
           "path": "truck-benchmarks/results/2026-10-20-collapsed-fillet-contacts/REPORT.md",
           "find": "# Collapsed analytic fillet contacts",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-20-procedural-cylinders/REPORT.md",
+          "find": "# Recognizing translated procedural cylinders",
+          "role": "test"
         }
       ],
       "required_outcome": "Handle valid limiting cases where contact curves collapse or tips become singular, with controlled rejection of impossible configurations.",
       "verification": [
-        "At 0258681b, exact equal-radius analytic cylindrical rim contacts collapse to shared vertices and spherical patches. Three parent failures, four parent controls and seven focused tests;36positive/4negative new-scope variants. Four native controls with independent material/contact/radius/STEP checks.434shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:443/413;all442prior checks retained. Original procedural R10 and near-equal bug828 remain outside this scope. No parity upgrade."
+        "At 0258681b, exact equal-radius analytic cylindrical rim contacts collapse to shared vertices and spherical patches. Three parent failures, four parent controls and seven focused tests;36positive/4negative new-scope variants. Four native controls with independent material/contact/radius/STEP checks.434shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:443/413;all442prior checks retained. Original procedural R10 and near-equal bug828 remain outside this scope. No parity upgrade.",
+        "At 51e609eb, representation-proven plane-supported procedural cylinders enable the original R10 and six new sequential continuations. Three parent failures;four independent native controls. Release suites:1032passing,one reproduced parent geometry precision failure,five existing ignores;59replay/13capture,Clippy/smoke pass. Clean capture:443/413;all443prior checks retained. No parity upgrade."
       ]
     },
     {
@@ -3381,7 +3402,7 @@
         "sequential"
       ],
       "occt_scope": "Dedicated sequential chamfer grids and composition regressions.",
-      "truck_scope": "Many feature orders are tested. Sequential single-edge rounds form equal-radius miters for analytic, B-spline and weighted NURBS edges. Equal-radius rolling continuations around analytic cylindrical rounds support spherical collapsed-contact corners on open and closed rims. The older procedural R10 representation and general topology transitions remain limited.",
+      "truck_scope": "Many feature orders are tested. Equal-radius miters support analytic, B-spline and weighted NURBS edges. Rolling continuations around cylindrical rounds support spherical collapsed contacts, including the original procedural R10 representation when coefficient data proves a cylinder. General topology transitions remain limited.",
       "next_case": "Fillet\u2192fillet, fillet\u2192chamfer, chamfer\u2192fillet and chamfer\u2192chamfer with nearby and intersecting selections.",
       "evidence": [
         {
@@ -3413,11 +3434,18 @@
           "path": "truck-benchmarks/results/2026-10-20-collapsed-fillet-contacts/REPORT.md",
           "find": "# Collapsed analytic fillet contacts",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-20-procedural-cylinders/REPORT.md",
+          "find": "# Recognizing translated procedural cylinders",
+          "role": "test"
         }
       ],
       "required_outcome": "Apply successive rounds and bevels to earlier feature results with correct dimensions, valid topology and stable selections.",
       "verification": [
-        "At 0258681b, exact equal-radius analytic cylindrical rim contacts collapse to shared vertices and spherical patches. Three parent failures, four parent controls and seven focused tests;36positive/4negative new-scope variants. Four native controls with independent material/contact/radius/STEP checks.434shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:443/413;all442prior checks retained. Original procedural R10 and near-equal bug828 remain outside this scope. No parity upgrade."
+        "At 0258681b, exact equal-radius analytic cylindrical rim contacts collapse to shared vertices and spherical patches. Three parent failures, four parent controls and seven focused tests;36positive/4negative new-scope variants. Four native controls with independent material/contact/radius/STEP checks.434shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:443/413;all442prior checks retained. Original procedural R10 and near-equal bug828 remain outside this scope. No parity upgrade.",
+        "At 51e609eb, representation-proven plane-supported procedural cylinders enable the original R10 and six new sequential continuations. Three parent failures;four independent native controls. Release suites:1032passing,one reproduced parent geometry precision failure,five existing ignores;59replay/13capture,Clippy/smoke pass. Clean capture:443/413;all443prior checks retained. No parity upgrade."
       ]
     },
     {
