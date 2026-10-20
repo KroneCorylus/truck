@@ -3,7 +3,7 @@
     "title": "Fillet and chamfer feature parity audit",
     "baseline": "OCCT V7_9_3 source inventory plus the recorded Truck/Pieza revisions. Includes 3D, 2D, related workflows and all textual candidates under the discovery rules.",
     "meaning_of_all": "Every dedicated test-grid entry, matching registered test/helper, discovered blend command and retained reference in this pinned checkout. This is not a claim about all mathematical configurations or current/future OCCT releases.",
-    "execution": "All 1,026 inventoried entries have native attempts. Latest clean capture at 35c11b96:396 native passes,648 operations,487 complete chamfer and161 complete fillet scopes;359 constructions/340 limited sampled passes at0.001. All356 prior constructions retain checks;220 complete prior results/comparisons exact,136 numerical changes recorded. No prior successful check regressed. Independent native-error proofs retain raw verdicts. Full parity remains unverified;stopped at user-requested checkpoint.",
+    "execution": "All 1,026 inventoried entries have native attempts. Latest clean capture at 460ac6fd:396 native passes,648 operations,487 complete chamfer and161 complete fillet scopes;363 constructions/340 limited sampled passes at0.001. All359 prior constructions retain checks;359 complete prior results/comparisons exact,0 numerical changes. Cylinder contact-angle control discrepancies retain raw native verdicts. Full parity remains unverified.",
     "mapping": "Capability assessments describe observable outcomes supported or restricted by reviewed source evidence. Per-case tags and links are automated hints; they do not prove Truck handles that fixture.",
     "objective": "Achieve at least OCCT-level fillet/chamfer capabilities and robustness for equivalent modeling tasks in Truck/Pieza.",
     "equivalence": "Judge the requested geometry, dimensions, validity, editing behavior and practical performance. Different APIs, algorithms, languages, surface representations and internal operation sequences are acceptable. Missing a corresponding OCCT method is not evidence of a feature gap."
@@ -704,6 +704,12 @@
           "path": "truck-benchmarks/results/2026-10-16-longitudinal-plane-angles/REPORT.md",
           "find": "# Plane-reference angles",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-20-longitudinal-cylinder-angles/REPORT.md",
+          "find": "# Longitudinal cylinder-reference",
+          "role": "test"
         }
       ],
       "required_outcome": "Produce a chamfer with the requested setback and angle, including non-right-angle supports, using any equivalent parameterization.",
@@ -715,7 +721,8 @@
         "At c4706b38, refined contact fits and normalized ruled-surface orientation preserve small/shifted tangent chamfers with parent-failing material/mesh/STEP regressions. Explicit native A4 three-edge contour proof is valid with sampled maximum difference6.18e-06. Automatic capture remains seed-only; full capture222 constructions/208 limited comparisons, no prior successful check regressions. No parity upgrade.",
         "At 099ccb7e following 2346b975, native chamfer schema2 captures complete contours and first-assignment/ignored semantics. Parent-failing replay validation prevents seed fallback. Automatic A4 applies3edges with valid STEP and sampled maximum2.23e-8. Fillets remainseed-only and retain5e-5exportfits; chamfersuse1e-7. Fullcapture221 constructions/210 limitedcomparisons; 58 corrected-intentrecords, no prior successful checkregressions forunchangedintent. No parityupgrade.",
         "At 48a1032f, replay propagates planar seed reference sides across complete oriented chamfer contours, including perpendicular plane/cylinder rims. Two parent-failing native regressions verify both directions and normal signs, exact setbacks and solid/STEP checks. Full capture: 231 constructions, 220 limited comparisons; all648 intents unchanged and no successful check regressions. Fillets remain seed-only. No parity upgrade.",
-        "At 05901a28, plane-reference longitudinal cylinder angles preserve requested angle/contact/material:three parent failures,20 variants,guards,ten native controls;two native plane-angle discrepancies retained.46 replay tests,Clippy/smoke. Clean capture:356 constructions/337 limited passes;no prior successful check regressed. Cylinder-reference angles remain unsupported."
+        "At 05901a28, plane-reference longitudinal cylinder angles preserve requested angle/contact/material:three parent failures,20 variants,guards,ten native controls;two native plane-angle discrepancies retained.46 replay tests,Clippy/smoke. Clean capture:356 constructions/337 limited passes;no prior successful check regressed. Cylinder-reference angles remain unsupported.",
+        "At 460ac6fd, cylinder-reference longitudinal requests preserve captured chord and angle at the new cylinder contact. Three parent failures,20 variants,10 native controls;49 replay tests,13 capture tests,Clippy/smoke pass. Six native controls differ from this geometric contract;source model and raw verdicts retained. Clean capture:363 constructions/340 limited passes;no prior check regressed. No parity upgrade."
       ]
     },
     {
@@ -803,9 +810,18 @@
           "path": "truck-shapeops/tests/channel_rim_blends.rs",
           "find": "fn chamfer_section",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-20-longitudinal-cylinder-angles/REPORT.md",
+          "find": "# Longitudinal cylinder-reference",
+          "role": "test"
         }
       ],
-      "required_outcome": "Produce the intended measurable setbacks on curved supports after explicitly translating dimension conventions between kernels."
+      "required_outcome": "Produce the intended measurable setbacks on curved supports after explicitly translating dimension conventions between kernels.",
+      "verification": [
+        "At 460ac6fd, cylinder-reference longitudinal requests preserve captured chord and angle at the new cylinder contact. Three parent failures,20 variants,10 native controls;49 replay tests,13 capture tests,Clippy/smoke pass. Six native controls differ from this geometric contract;source model and raw verdicts retained. Clean capture:363 constructions/340 limited passes;no prior check regressed. No parity upgrade."
+      ]
     },
     {
       "id": "G01",

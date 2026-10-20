@@ -1,8 +1,9 @@
-LATEST CHECKPOINT — 2026-10-16
-STOPPED at user's request. Read ../2026-10-16-conic-contact-extension/HANDOFF.txt and report.html.
-Implementation 35c11b96 supports exact conic chamfer contacts and correct mesh material.
-Full capture:359 constructions/340 limited passes;no prior check regressions.
-Do not resume until instructed. Full parity remains unverified.
+LATEST CHECKPOINT — 2026-10-20
+ACTIVE: Continue work and commit achievements until done or told to stop.
+Read ../2026-10-20-longitudinal-cylinder-angles/HANDOFF.txt and report.html.
+Implementation 460ac6fd supports cylinder-reference longitudinal contact angles.
+Full capture:363 constructions/340 limited passes;no prior check regressions.
+Full parity remains unverified. Next candidate: parallel cylinder/cylinder chord handling.
 
 HISTORICAL HANDOFF FOLLOWS
 

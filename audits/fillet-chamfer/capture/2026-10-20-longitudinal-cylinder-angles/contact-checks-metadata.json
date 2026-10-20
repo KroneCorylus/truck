@@ -1,0 +1,8 @@
+{
+  "oracle_source_sha256": "a15418ed64a6298977d7b3cab40b8e489037bca869a190a2d28fbe96f7d37501",
+  "oracle_executable_sha256": "ee19b5f1814a6a82876761da9a151c6c5273a6cd667bfd6ea25a3245a5a7fa19",
+  "script_sha256": "9b5989a0f7efa2520dc788f0149b67e2b6c64dc357d2cf68163a5a6789f4ba1c",
+  "measurements_sha256": "90e94236f373deb34243f8788efca88d050e0073226efa62447e06297eb6b41d",
+  "method": "Analytic native/Truck STEP bevel planes and cylinder contacts; all four retain requested chord; normal angle measured at actual contact",
+  "build": "g++ -std=c++17 -O2 -isystem target/occt-sdk/usr/include/opencascade target/solid-contact-oracle.cpp -Ltarget/occt-sdk/usr/lib64 -lTKDESTEP -lTKXSBase -lTKShHealing -lTKTopAlgo -lTKGeomAlgo -lTKBRep -lTKGeomBase -lTKG3d -lTKG2d -lTKMath -lTKernel -o target/solid-contact-oracle"
+}
