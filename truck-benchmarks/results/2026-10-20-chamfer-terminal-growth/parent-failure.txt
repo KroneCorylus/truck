@@ -1,0 +1,40 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 1.97s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/chamfer_terminal_growth.rs (target/release/deps/chamfer_terminal_growth-10efbae6014db305)
+
+running 5 tests
+test angle_chamfer_extends_concave_terminal_lines ... FAILED
+test unequal_chamfer_extends_concave_terminal_lines ... FAILED
+test equal_chamfer_extends_concave_terminal_lines ... FAILED
+test oversized_terminal_cuts_preserve_the_input ... ok
+test convex_terminal_edges_keep_bounded_trims ... ok
+
+failures:
+
+---- angle_chamfer_extends_concave_terminal_lines stdout ----
+
+thread 'angle_chamfer_extends_concave_terminal_lines' (990882) panicked at truck-shapeops/tests/chamfer_terminal_growth.rs:102:29:
+called `Result::unwrap()` on an `Err` value: Diagnostic { code: BlendConstructionFailed, operation: "chamfer_solid_along_wire", stage: "trim_faces", message: "Blend construction failed; the numerical or geometric constraint could not be resolved.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- unequal_chamfer_extends_concave_terminal_lines stdout ----
+
+thread 'unequal_chamfer_extends_concave_terminal_lines' (990886) panicked at truck-shapeops/tests/chamfer_terminal_growth.rs:102:29:
+called `Result::unwrap()` on an `Err` value: Diagnostic { code: BlendConstructionFailed, operation: "chamfer_solid_along_wire", stage: "trim_faces", message: "Blend construction failed; the numerical or geometric constraint could not be resolved.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+
+---- equal_chamfer_extends_concave_terminal_lines stdout ----
+
+thread 'equal_chamfer_extends_concave_terminal_lines' (990884) panicked at truck-shapeops/tests/chamfer_terminal_growth.rs:102:29:
+called `Result::unwrap()` on an `Err` value: Diagnostic { code: BlendConstructionFailed, operation: "chamfer_solid_along_wire", stage: "trim_faces", message: "Blend construction failed; the numerical or geometric constraint could not be resolved.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+
+
+failures:
+    angle_chamfer_extends_concave_terminal_lines
+    equal_chamfer_extends_concave_terminal_lines
+    unequal_chamfer_extends_concave_terminal_lines
+
+test result: FAILED. 2 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+error: test failed, to rerun pass `-p truck-shapeops --test chamfer_terminal_growth`

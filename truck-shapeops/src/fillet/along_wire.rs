@@ -851,6 +851,7 @@ pub(super) fn trim_closed_chain<C, S>(
     shell: &Shell<Point3, C, S>,
     wire: &Wire<Point3, C>,
     contact_curves: &[[C; 2]],
+    trim: impl Fn(&mut C, &Edge<Point3, C>, bool) -> Option<TrimmedContact<C>>,
 ) -> Option<TrimmedChain<C, S>>
 where
     C: FilletedCurve<S>,
@@ -865,7 +866,7 @@ where
         .into_iter()
         .flatten()
         .collect::<Vec<_>>();
-    let trimmed = trim_runs(shell, wire, &runs, contact_curves, trim_contact_edge)?;
+    let trimmed = trim_runs(shell, wire, &runs, contact_curves, trim)?;
     trimmed
         .cuts
         .pieces
@@ -1157,7 +1158,7 @@ where
     })
 }
 
-type TrimmedContact<C> = (Option<Edge<Point3, C>>, Vertex<Point3>);
+pub(super) type TrimmedContact<C> = (Option<Edge<Point3, C>>, Vertex<Point3>);
 
 fn intersect_rolling_fillet<C, S, R, E>(
     surface: &RbfSurface<C, S, S, R>,
@@ -1190,7 +1191,7 @@ where
     None
 }
 
-fn trim_extended_contact_edge<C, S>(
+pub(super) fn trim_extended_contact_edge<C, S>(
     curve: &mut C,
     edge: &Edge<Point3, C>,
     at_start: bool,
@@ -1272,7 +1273,7 @@ where
     ))
 }
 
-fn trim_contact_edge<C: FilletedCurve<S>, S>(
+pub(super) fn trim_contact_edge<C: FilletedCurve<S>, S>(
     curve: &mut C,
     edge: &Edge<Point3, C>,
     at_start: bool,

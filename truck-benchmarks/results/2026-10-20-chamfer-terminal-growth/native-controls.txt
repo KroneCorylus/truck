@@ -1,0 +1,6 @@
+convex equal Truck volume error -1.1466809723970073e-08 sampled distance 4.840299058559973e-09 cone error 8.881784197001252e-16
+convex unequal Truck volume error -9.937650702340761e-09 sampled distance 4.8402990585599645e-09 cone error 8.881784197001252e-16
+convex angle Truck volume error -1.0174204589930014e-08 sampled distance 4.840299058559966e-09 cone error 1.3322676295501878e-15
+stepped equal Truck volume error -1.2005216376564931e-08 sampled distance 4.8402987962140505e-09 cone error 1.7763568394002505e-15
+stepped unequal Truck volume error -1.053206233336823e-08 sampled distance 4.8402987962140414e-09 cone error 1.1102230246251565e-15
+stepped angle Truck volume error -1.0759777069324628e-08 sampled distance 4.84029879621406e-09 cone error 1.3322676295501878e-15

@@ -673,6 +673,8 @@ fn separate_chamfer_wires(
 /// consume circular contacts. These corners end in exact conical tips; adjacent planar
 /// chamfers share a ridge beyond each tip. Consumed arcs must be bounded by straight edges.
 /// Open chains must terminate on straight edges and the cuts must retain the support faces.
+/// At an open end, a straight terminal edge may extend toward the new contact, allowing
+/// chamfers at concave radial steps. Interior and closed-chain edges remain bounded.
 pub fn chamfer_solid_along_wire(
     solid: &Solid,
     wire: &Wire,
@@ -709,12 +711,29 @@ pub fn try_chamfer_solid_along_wire(
             "validate_input",
         ));
     }
-    let shell = super::try_chamfer_along_wire(&solid.boundaries()[index], wire, d0, d1, tol)
-        .or_else(|error| {
-            super::chamfer_collapse::chamfer(&solid.boundaries()[index], wire, d0, d1, tol)
-                .ok_or(error)
-        })
-        .map_err(|e| e.operation(operation).shell(index))?;
+    let shell = super::chamfer::try_chamfer_along_wire_with_trim(
+        &solid.boundaries()[index],
+        wire,
+        d0,
+        d1,
+        tol,
+        |curve, edge, start| {
+            let open_end = !wire.is_cyclic()
+                && [wire.front_vertex(), wire.back_vertex()]
+                    .into_iter()
+                    .flatten()
+                    .any(|vertex| vertex == edge.front() || vertex == edge.back());
+            if open_end {
+                super::along_wire::trim_extended_contact_edge::<_, Surface>(curve, edge, start)
+            } else {
+                super::along_wire::trim_contact_edge::<_, Surface>(curve, edge, start)
+            }
+        },
+    )
+    .or_else(|error| {
+        super::chamfer_collapse::chamfer(&solid.boundaries()[index], wire, d0, d1, tol).ok_or(error)
+    })
+    .map_err(|e| e.operation(operation).shell(index))?;
     finish(solid, index, shell, tol).map_err(|e| e.operation(operation))
 }
 

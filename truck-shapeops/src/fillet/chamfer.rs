@@ -295,6 +295,23 @@ where
     PCurve<BSplineCurve<Point2>, S>: ToSameGeometry<C>,
     BSplineSurface<Point3>: ToSameGeometry<S>,
 {
+    try_chamfer_along_wire_with_trim(shell, wire, d0, d1, tol, along_wire::trim_contact_edge)
+}
+
+pub(super) fn try_chamfer_along_wire_with_trim<C, S>(
+    shell: &Shell<Point3, C, S>,
+    wire: &Wire<Point3, C>,
+    d0: f64,
+    d1: f64,
+    tol: f64,
+    trim: impl Fn(&mut C, &Edge<Point3, C>, bool) -> Option<along_wire::TrimmedContact<C>>,
+) -> Result<Shell<Point3, C, S>, Diagnostic>
+where
+    C: FilletedCurve<S> + ParameterDivision1D<Point = Point3>,
+    S: FilletedSurface<C> + SearchNearestParameter<D2, Point = Point3>,
+    PCurve<BSplineCurve<Point2>, S>: ToSameGeometry<C>,
+    BSplineSurface<Point3>: ToSameGeometry<S>,
+{
     let operation = "chamfer_along_wire";
     validate_tolerance(tol, operation)?;
     let failed = || Diagnostic::new(Code::BlendConstructionFailed, operation, "construct_blend");
@@ -396,7 +413,7 @@ where
         sides.push(if swap { (1.0, 0.0) } else { (0.0, 1.0) });
         surfaces.push(surface);
     }
-    let mut trimmed = along_wire::trim_closed_chain(shell, wire, &contacts)
+    let mut trimmed = along_wire::trim_closed_chain(shell, wire, &contacts, trim)
         .ok_or_else(|| failed().stage("trim_faces"))?;
     let n = wire.len();
     let nv = if closed { n } else { n + 1 };

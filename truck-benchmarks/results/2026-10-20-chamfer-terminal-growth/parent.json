@@ -1,0 +1,22 @@
+{
+  "revision": "d515003dd7735ad94aa94e9753f7fc0db0618232",
+  "sha256": {
+    "truck-shapeops/src/fillet/extend_intersection_curve.rs": "4af6cfdeba3558e0b455059bdb67500f7cfc12d7c3007246d8f97c5290615169",
+    "truck-shapeops/src/fillet/edges.rs": "45b075cbad5bcd9523a7b17bf33fe282338acb139ee888ae0cdce828a243ec85",
+    "truck-shapeops/src/fillet/convex.rs": "aa56d71fd2fd6b86f11cf4571b7bc8e6cef4da91615c003a8199438022f7276c",
+    "truck-shapeops/src/fillet/chamfer_edges.rs": "9e7085c8f7aa51cb3f4fabf0ce00426681e3917a80fbc30814c94af4af77bb76",
+    "truck-shapeops/src/fillet/chamfer_miter.rs": "7925e25f6aedfe899068e4e55bd4f170f7b99a04b79f67d31dd4968f2f8be47a",
+    "truck-shapeops/src/fillet/planar.rs": "050a124d00899b7e43df36edd9c84cf9ea7fa6305c9a93124df791de791fccd6",
+    "truck-shapeops/src/fillet/projected_section.rs": "d2ff875824b4107c608673e91aca2e0fb3e0f14f2cb66d98195be1fdc79a873b",
+    "truck-shapeops/src/fillet/along_wire.rs": "6adc3d65f752ab82c97bced17d6d203ee5547a8db6d8154f6a24babf7e780982",
+    "truck-shapeops/src/fillet/chamfer.rs": "00b31ade28d4602448bdbd6ab64006bc15838b826894ff525a3f8c4b78957204",
+    "truck-shapeops/src/fillet/mod.rs": "50949a94c4f58cb7c01869d115061c30883efc6099974f09195630b9cecbe940",
+    "truck-shapeops/src/fillet/modeling.rs": "cefbc3ca54f041a1fe40c44f2491802fa3cdbfbf0a13acabb3418d9caacfd6a0",
+    "truck-shapeops/src/fillet/planar_fillet.rs": "50c6d956f13d879f457a949b16f5dc15100462b4d02489797c6b88980f3356bb",
+    "truck-shapeops/src/fillet/chamfer_collapse.rs": "1edb9a6fd7914848b2ff4d813dff1f48a3fb0f0e59310a0488e3bbe8f67897b8",
+    "truck-shapeops/src/fillet/additive.rs": "5c2413719042277bad2c2ecfb7e46bf2938be888bee87aac40d37d759cb026d2",
+    "truck-shapeops/src/fillet/continued_support.rs": "c344c88d3dc6cb4ad353688c1f2c79cef30fe6cf30cde0e576efd86303173600",
+    "truck-shapeops/src/fillet/planar_edge.rs": "755df6e28bdbd81eda4723f2f71fcccd416a8390f757e6665da4c762ce1d4b6d",
+    "truck-shapeops/tests/chamfer_terminal_growth.rs": "d12a8ea264049f3ad596c9c9761b0276388311ebd2956ba138113efb0092f9d8"
+  }
+}
