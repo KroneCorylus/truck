@@ -1,0 +1,42 @@
+[
+  {
+    "mode": "size12-radius0.5",
+    "size": 12.0,
+    "radius": 0.5,
+    "native_input_unchanged": true,
+    "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-mixed-collapsed-rims/capture/001",
+    "native": {
+      "native_valid": true,
+      "solids": 1,
+      "volume": 926.9585793141185,
+      "area": 547.98847454896,
+      "stored_tolerances": {
+        "face": 1e-07,
+        "edge": 1e-07,
+        "vertex": 1.0000000000000002e-07
+      }
+    },
+    "expected_volume": 926.958579314127,
+    "native_volume_error": -8.412825991399586e-12
+  },
+  {
+    "mode": "size12-radius1",
+    "size": 12.0,
+    "radius": 1.0,
+    "native_input_unchanged": true,
+    "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-mixed-collapsed-rims/capture/002",
+    "native": {
+      "native_valid": true,
+      "solids": 1,
+      "volume": 920.6929034465202,
+      "area": 538.9492370805788,
+      "stored_tolerances": {
+        "face": 1e-07,
+        "edge": 1e-07,
+        "vertex": 1.0000000000000002e-07
+      }
+    },
+    "expected_volume": 920.6929034465295,
+    "native_volume_error": -9.322320693172514e-12
+  }
+]

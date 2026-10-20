@@ -93,7 +93,8 @@ fn finish(solid: &Solid, index: usize, shell: Shell, tol: f64) -> Result<BlendRe
 /// a reentrant contact; curved end boundaries retain their existing trimmed domains.
 /// A constant-radius rim on perpendicular planar and analytic cylindrical walls may collapse
 /// a convex cylindrical contact to one vertex when both radii are equal. The corner becomes
-/// spherical; straight rim sections remain cylindrical. The cap must retain a nonzero boundary,
+/// spherical; larger convex cylindrical corners retain circular contacts and toroidal patches,
+/// while straight rim sections remain cylindrical. The cap must retain a nonzero boundary,
 /// and open ends require straight transverse boundaries. Analytic recognition includes
 /// procedural cylinders with proven translated circular sections. Folded offsets (larger
 /// radii) remain unsupported by this collapsed-contact construction.

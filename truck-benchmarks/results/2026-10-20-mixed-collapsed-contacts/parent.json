@@ -1,0 +1,11 @@
+{
+  "revision": "8778f76fb59a3167bf6426d37b772c97fabc191a",
+  "sha256": {
+    "truck-shapeops/src/fillet/collapsed_contacts.rs": "fbec43b24ceebea43a7caa7ba6248aa66e97d6ce438f2966ebbfbee8f47e764e",
+    "truck-shapeops/tests/mixed_collapsed_contacts.rs": "1c73d074e65cd6f277338e5746ce4cece302c1a4e01d45aae6bb90be91b4a301"
+  },
+  "tests": {
+    "passed": 1,
+    "failed": 2
+  }
+}

@@ -47,6 +47,7 @@ pub(super) fn fillet<R: ScalarFunctionD1>(shell: &Shell, selected: &Wire, law: R
     let points: Vec<_> = vertices.iter().map(Vertex::point).collect();
     let mut cap_points: Vec<Option<Point3>> = vec![None; nv];
     let mut collapsed = vec![false; n];
+    let mut cylinders = vec![None; n];
     let mut walls = Vec::new();
     for (k, e) in wire.iter().enumerate() {
         let wall = shell.iter().enumerate().find_map(|(i, f)| {
@@ -72,15 +73,16 @@ pub(super) fn fillet<R: ScalarFunctionD1>(shell: &Shell, selected: &Wire, law: R
                 }
             }
             Elementary::Cylinder {
-                axis, radius: r, ..
+                origin,
+                axis,
+                radius: r,
             } => {
-                if !sense
-                    || (r - radius).abs() > radius * 1e-10
-                    || axis.cross(normal).magnitude() > 1e-8
-                {
+                if !sense || r < radius - radius * 1e-10 || axis.cross(normal).magnitude() > 1e-8 {
                     return None;
                 }
-                collapsed[k] = true;
+                collapsed[k] = (r - radius).abs() <= radius * 1e-10;
+                let center = origin + axis * (e.front().point() - origin).dot(axis);
+                cylinders[k] = Some((center, r));
             }
             _ => return None,
         };
@@ -168,7 +170,19 @@ pub(super) fn fillet<R: ScalarFunctionD1>(shell: &Shell, selected: &Wire, law: R
         let cap_edge = if collapsed[k] {
             None
         } else {
-            let edge = builder::line(&cap_vertices[k], &cap_vertices[j]);
+            let edge = match cylinders[k] {
+                Some((center, r)) => {
+                    let transform = Matrix4::from_translation(center.to_vec())
+                        * Matrix4::from_scale((r - radius) / r)
+                        * Matrix4::from_translation(-center.to_vec());
+                    Edge::new(
+                        &cap_vertices[k],
+                        &cap_vertices[j],
+                        e.oriented_curve().transformed(transform),
+                    )
+                }
+                None => builder::line(&cap_vertices[k], &cap_vertices[j]),
+            };
             if (edge.back().point() - edge.front().point())
                 .dot(e.back().point() - e.front().point())
                 <= 0.
@@ -198,6 +212,13 @@ pub(super) fn fillet<R: ScalarFunctionD1>(shell: &Shell, selected: &Wire, law: R
             Processor::new(Sphere::new(Point3::origin(), radius))
                 .transformed(transform)
                 .into()
+        } else if let Some((center, _)) = cylinders[k] {
+            Processor::new(RevolutedCurve::by_revolution(
+                sections[k].oriented_curve(),
+                center,
+                normal,
+            ))
+            .into()
         } else {
             ExtrudedCurve::by_extrusion(sections[k].oriented_curve(), points[j] - points[k]).into()
         };
