@@ -708,6 +708,9 @@ fn chamfer_selection(
                     (Some((Elementary::Plane(p), _)), Some((Elementary::Cylinder { axis, .. }, _)))
                     | (Some((Elementary::Cylinder { axis, .. }, _)), Some((Elementary::Plane(p), _)))
                         if p.normal().cross(*axis).magnitude() < 1e-8 => Some((0., 1.)),
+                    (Some((Elementary::Plane(p), _)), Some((Elementary::Cylinder { axis, .. }, _)))
+                    | (Some((Elementary::Cylinder { axis, .. }, _)), Some((Elementary::Plane(p), _)))
+                        if mode == "two-distances" && p.normal().dot(*axis).abs() > 1e-8 => None,
                     (Some((Elementary::Plane(p), plane_forward)), Some((Elementary::Cone { axis, half_angle, .. }, cone_forward)))
                     | (Some((Elementary::Cone { axis, half_angle, .. }, cone_forward)), Some((Elementary::Plane(p), plane_forward)))
                         if p.normal().cross(*axis).magnitude() < 1e-8 => {
@@ -3572,6 +3575,275 @@ mod cylindrical_terminal_fan_tests {
                     check(false, mode, count, moved);
                 }
             }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tilted_cap_distance_tests {
+    use super::*;
+
+    fn fixture(degrees: i32) -> (&'static str, Value) {
+        let (step, task) = match degrees {
+            0 => (
+                include_str!("../tests/fixtures/tilted-cap-chamfers/angle0.step"),
+                include_str!("../tests/fixtures/tilted-cap-chamfers/angle0.json"),
+            ),
+            2 => (
+                include_str!("../tests/fixtures/tilted-cap-chamfers/angle2.step"),
+                include_str!("../tests/fixtures/tilted-cap-chamfers/angle2.json"),
+            ),
+            -2 => (
+                include_str!("../tests/fixtures/tilted-cap-chamfers/angle-2.step"),
+                include_str!("../tests/fixtures/tilted-cap-chamfers/angle-2.json"),
+            ),
+            10 => (
+                include_str!("../tests/fixtures/tilted-cap-chamfers/angle10.step"),
+                include_str!("../tests/fixtures/tilted-cap-chamfers/angle10.json"),
+            ),
+            _ => unreachable!(),
+        };
+        (step, serde_json::from_str(task).unwrap())
+    }
+
+    fn same_support(a: &Elementary, b: &Elementary) -> bool {
+        match (a, b) {
+            (Elementary::Plane(a), Elementary::Plane(b)) => {
+                a.normal().cross(b.normal()).magnitude() < 1e-8
+                    && (a.origin() - b.origin()).dot(a.normal()).abs() < 1e-8
+            }
+            (
+                Elementary::Cylinder {
+                    origin: a,
+                    axis: u,
+                    radius: r,
+                },
+                Elementary::Cylinder {
+                    origin: b,
+                    axis: v,
+                    radius: s,
+                },
+            ) => {
+                u.cross(*v).magnitude() < 1e-8
+                    && (a - b).cross(*u).magnitude() < 1e-8
+                    && (r - s).abs() < 1e-8
+            }
+            _ => false,
+        }
+    }
+
+    fn assert_contacts(
+        input: &Solid,
+        output: &Solid,
+        selected: &[(Edge, [f64; 2])],
+        cap: f64,
+        wall: f64,
+    ) {
+        let originals: Vec<_> = input
+            .face_iter()
+            .filter_map(|f| f.oriented_surface().elementary())
+            .collect();
+        let selected_supports: Vec<_> = input
+            .face_iter()
+            .filter(|f| {
+                f.edge_iter()
+                    .any(|e| selected.iter().any(|(q, _)| q.id() == e.id()))
+            })
+            .filter_map(|f| f.oriented_surface().elementary())
+            .collect();
+        let supports: Vec<_> = output
+            .face_iter()
+            .filter_map(|f| {
+                let (surface, _) = f.oriented_surface().elementary()?;
+                originals
+                    .iter()
+                    .any(|(s, _)| same_support(&surface, s))
+                    .then_some((f.id(), surface))
+            })
+            .collect();
+        let mut seen = HashSet::new();
+        let mut samples = [0; 2];
+        for edge in output.edge_iter().filter(|e| seen.insert(e.id())) {
+            let adjacent: Vec<_> = output
+                .face_iter()
+                .filter(|f| f.edge_iter().any(|e| e.id() == edge.id()))
+                .collect();
+            let retained: Vec<_> = adjacent
+                .iter()
+                .filter_map(|f| supports.iter().find(|(id, _)| *id == f.id()))
+                .collect();
+            if retained.len() != 1 {
+                continue;
+            }
+            if !selected_supports
+                .iter()
+                .any(|(s, _)| same_support(s, &retained[0].1))
+            {
+                continue;
+            }
+            let cap_side =
+                matches!(&retained[0].1, Elementary::Plane(p) if p.normal().z.abs() > 0.9);
+            let expected = if cap_side { cap } else { wall };
+            let curve = edge.oriented_curve();
+            let (a, b) = curve.range_tuple();
+            for i in 0..=32 {
+                let point = curve.subs(a + (b - a) * i as f64 / 32.);
+                let distance = selected
+                    .iter()
+                    .map(|(e, _)| {
+                        let c = e.oriented_curve();
+                        let (a, b) = c.range_tuple();
+                        let t = c
+                            .search_nearest_parameter(point, None, 100)
+                            .unwrap()
+                            .clamp(a, b);
+                        point.distance(c.subs(t))
+                    })
+                    .fold(f64::INFINITY, f64::min);
+                assert!(
+                    (distance - expected).abs() < TOL,
+                    "contact setback {distance}, expected {expected}, support {:?}, point {point:?}", retained[0].1
+                );
+                samples[usize::from(cap_side)] += 1;
+            }
+        }
+        assert_eq!(samples, [99, 99]);
+    }
+
+    fn check(degrees: i32, cap: f64, wall: f64, expected: f64, tolerance: f64) {
+        let (step, task) = fixture(degrees);
+        for cylinder_reference in [false, true] {
+            for reverse in [false, true] {
+                let directory = std::env::temp_dir().join(format!(
+                    "truck-tilted-two-distance-{}-{degrees}-{cap}-{wall}-{cylinder_reference}-{reverse}",
+                    std::process::id()
+                ));
+                std::fs::create_dir_all(&directory).unwrap();
+                let prefix = directory.join("001");
+                let prefix = prefix.to_str().unwrap();
+                std::fs::write(format!("{prefix}.input.step"), step).unwrap();
+                let mut task = task.clone();
+                let chosen = &mut task["selection"][0];
+                chosen["distances"] = json!([cap, wall]);
+                if cylinder_reference {
+                    chosen.as_object_mut().unwrap().remove("reference_plane");
+                    chosen["reference_cylinder"] = json!({
+                        "origin":[0.6,0.4,0.], "axis":[0.,0.,1.], "radius":0.4
+                    });
+                    chosen["distances"] = json!([wall, cap]);
+                }
+                if reverse {
+                    chosen["points"].as_array_mut().unwrap().reverse();
+                    for edge in chosen["contour_edges"].as_array_mut().unwrap() {
+                        edge["points"].as_array_mut().unwrap().reverse();
+                    }
+                    chosen["contour_edges"].as_array_mut().unwrap().reverse();
+                }
+                let input = import(&format!("{prefix}.input.step")).unwrap();
+                let before = serde_json::to_string(&input.compress()).unwrap();
+                let selected =
+                    chamfer_selection(&input, task["selection"].as_array().unwrap(), true).expect(
+                        "tilted two-distance requests have explicit reference-side assignments",
+                    );
+                assert_eq!(selected.len(), 3);
+                for (edge, distances) in &selected {
+                    let cap_face = input
+                        .face_iter()
+                        .find(|f| {
+                            f.edge_iter().any(|e| e.id() == edge.id())
+                                && matches!(f.oriented_surface().elementary(),
+                                    Some((Elementary::Plane(p), _)) if p.normal().z.abs() > 0.9)
+                        })
+                        .unwrap();
+                    let boundary = cap_face.edge_iter().find(|e| e.id() == edge.id()).unwrap();
+                    let side = usize::from(boundary.front() != edge.front());
+                    assert_eq!(distances[side], cap);
+                    assert_eq!(distances[1 - side], wall);
+                }
+                assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
+                std::fs::write(format!("{prefix}.input.json"), task.to_string()).unwrap();
+                let result = replay(prefix, &Cell::new("start")).unwrap();
+                assert_eq!(result["status"], "operation-succeeded", "{result}");
+                assert_eq!(result["selected_edges"], 3);
+                for field in [
+                    "input_unchanged",
+                    "geometry_consistent",
+                    "mesh_closed",
+                    "step_prepared",
+                ] {
+                    assert_eq!(result[field], true, "{field}: {result}");
+                }
+                let output = import(&format!("{prefix}.truck.step")).unwrap();
+                assert_contacts(&input, &output, &selected, cap, wall);
+                let volume = if degrees == 0 {
+                    let baseline = if cap == 0.1 {
+                        0.7377444872248238
+                    } else {
+                        0.7382592258875428
+                    };
+                    assert!((result["mesh_volume"].as_f64().unwrap() - baseline).abs() < 1e-12);
+                    output.triangulation(tolerance).to_polygon().volume()
+                } else {
+                    result["mesh_volume"].as_f64().unwrap()
+                };
+                assert!((volume - expected).abs() < expected * tolerance);
+                replay_common::assert_solid(&output, expected, &[0], tolerance);
+                replay_common::blend::assert_step(&output, expected, tolerance);
+                assert_eq!(
+                    std::fs::read_to_string(format!("{prefix}.input.step")).unwrap(),
+                    step
+                );
+                std::fs::remove_dir_all(directory).unwrap();
+            }
+        }
+    }
+
+    #[test]
+    fn tilted_two_distance_requests_preserve_reference_sides_and_material() {
+        for (degrees, first, second) in [
+            (2, 0.7215788135717496, 0.7220729149682258),
+            (-2, 0.7542779686410115, 0.7548021492349541),
+            (10, 0.6554324578649225, 0.655806718429273),
+        ] {
+            check(degrees, 0.1, 0.2, first, 0.001);
+            check(degrees, 0.2, 0.1, second, 0.001);
+        }
+    }
+
+    #[test]
+    fn horizontal_two_distance_requests_preserve_independent_material() {
+        let radius = 0.4;
+        let input = 0.782539615254126 * (1. - radius * radius * (1. - std::f64::consts::PI / 4.));
+        for (cap, wall) in [(0.1, 0.2), (0.2, 0.1)] {
+            let removed = cap * wall / 2. * (1.2 + std::f64::consts::PI / 2. * (radius - cap / 3.));
+            check(0, cap, wall, input - removed, 1e-6);
+        }
+    }
+
+    #[test]
+    fn tilted_distance_angle_requests_remain_unhandled() {
+        for degrees in [-2, 2, 10] {
+            let (step, mut task) = fixture(degrees);
+            let directory = std::env::temp_dir().join(format!(
+                "truck-tilted-angle-{}-{degrees}",
+                std::process::id()
+            ));
+            std::fs::create_dir_all(&directory).unwrap();
+            let path = directory.join("input.step");
+            std::fs::write(&path, step).unwrap();
+            let solid = import(path.to_str().unwrap()).unwrap();
+            let before = serde_json::to_string(&solid.compress()).unwrap();
+            let chosen = &mut task["selection"][0];
+            chosen["mode"] = json!("distance-angle");
+            chosen["distance"] = json!(0.1);
+            chosen["angle_degrees"] = json!(60.);
+            chosen.as_object_mut().unwrap().remove("distances");
+            let error =
+                chamfer_selection(&solid, task["selection"].as_array().unwrap(), true).unwrap_err();
+            assert_eq!(error["status"], "unhandled-intent");
+            assert_eq!(before, serde_json::to_string(&solid.compress()).unwrap());
+            assert_eq!(std::fs::read_to_string(path).unwrap(), step);
+            std::fs::remove_dir_all(directory).unwrap();
         }
     }
 }

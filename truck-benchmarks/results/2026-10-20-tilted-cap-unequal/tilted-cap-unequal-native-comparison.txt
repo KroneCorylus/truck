@@ -1,0 +1,13 @@
+angle0-cap0.1-wall0.2 distance 5.573524498060878e-09 volume difference 4.3754555534292194e-11 ppm 5.929520508926819e-05
+angle0-cap0.2-wall0.1 distance 5.573524498060878e-09 volume difference 2.761502138071137e-11 ppm 3.7396730098468945e-05
+angle2-cap0.1-wall0.2 distance 0.0012919429431995275 volume difference 3.6933472958300406e-05 ppm 51.18425356127502
+angle2-cap0.2-wall0.1 distance 0.0003210418854274069 volume difference 7.582905735215029e-06 ppm 10.501578965261023
+angle-2-cap0.1-wall0.2 distance 2.7946166980233375e-05 volume difference 8.197633143414151e-07 ppm 1.0868185846901892
+angle-2-cap0.2-wall0.1 distance 5.793068265556096e-06 volume difference 1.0538826156203385e-07 ppm 0.13962369035230274
+angle10-cap0.1-wall0.2 distance 0.006631789418503017 volume difference 0.00017660136414032745 ppm 269.44250627380916
+angle10-cap0.2-wall0.1 distance 0.0015993416038762942 volume difference 3.1995309858090515e-05 ppm 48.787712841251
+Traceback (most recent call last):
+  File "/home/krone/Development/Pieza_WS/truck/target/replay-tilted-cap-unequal.py", line 26, in <module>
+    assert not failures,failures
+           ^^^^^^^^^^^^
+AssertionError: [{'mode': 'angle2-cap0.1-wall0.2', 'check': 'distance', 'value': 0.0012919429431995275, 'threshold': 0.001}, {'mode': 'angle10-cap0.1-wall0.2', 'check': 'distance', 'value': 0.006631789418503017, 'threshold': 0.001}, {'mode': 'angle10-cap0.2-wall0.1', 'check': 'distance', 'value': 0.0015993416038762942, 'threshold': 0.001}]

@@ -1,0 +1,630 @@
+{
+  "controls": [
+    {
+      "native": {
+        "mode": "angle0-cap0.1-wall0.2",
+        "degrees": 0.0,
+        "cap_distance": 0.1,
+        "wall_distance": 0.2,
+        "native_input_unchanged": true,
+        "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-tilted-cap-unequal/capture/001",
+        "native": {
+          "native_valid": true,
+          "solids": 1,
+          "volume": 0.737910518538898,
+          "area": 4.75775915989723,
+          "stored_tolerances": {
+            "face": 1e-07,
+            "edge": 1.5e-07,
+            "vertex": 0.0001
+          }
+        },
+        "expected_input_volume": 0.7556701050704796,
+        "input_volume_error": -7.771561172376096e-16
+      },
+      "result": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 0.7377444872248238,
+        "selected_edges": 3,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 0.737910518538898,
+        "truck_volume": 0.7379105184951434,
+        "native_to_truck_max_distance": 5.573524498060878e-09,
+        "native_to_truck_samples": 2289,
+        "truck_to_native_max_distance": 4.778332497673651e-09,
+        "truck_to_native_samples": 2277,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1.5e-07,
+          "vertex": 0.0001
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "volume_difference": 4.3754555534292194e-11,
+      "volume_difference_ppm": 5.929520508926819e-05,
+      "limited_distance_pass": true
+    },
+    {
+      "native": {
+        "mode": "angle0-cap0.2-wall0.1",
+        "degrees": 0.0,
+        "cap_distance": 0.2,
+        "wall_distance": 0.1,
+        "native_input_unchanged": true,
+        "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-tilted-cap-unequal/capture/002",
+        "native": {
+          "native_valid": true,
+          "solids": 1,
+          "volume": 0.7384341173144962,
+          "area": 4.763759067971551,
+          "stored_tolerances": {
+            "face": 1e-07,
+            "edge": 1.5e-07,
+            "vertex": 0.0001
+          }
+        },
+        "expected_input_volume": 0.7556701050704796,
+        "input_volume_error": -7.771561172376096e-16
+      },
+      "result": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 0.7382592258875428,
+        "selected_edges": 3,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 0.7384341173144963,
+        "truck_volume": 0.7384341172868812,
+        "native_to_truck_max_distance": 5.573524498060878e-09,
+        "native_to_truck_samples": 2291,
+        "truck_to_native_max_distance": 4.778332497673651e-09,
+        "truck_to_native_samples": 2277,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1.5e-07,
+          "vertex": 0.0001
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "volume_difference": 2.761502138071137e-11,
+      "volume_difference_ppm": 3.7396730098468945e-05,
+      "limited_distance_pass": true
+    },
+    {
+      "native": {
+        "mode": "angle2-cap0.1-wall0.2",
+        "degrees": 2.0,
+        "cap_distance": 0.1,
+        "wall_distance": 0.2,
+        "native_input_unchanged": true,
+        "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-tilted-cap-unequal/capture/003",
+        "native": {
+          "native_valid": true,
+          "solids": 1,
+          "volume": 0.7215788135717496,
+          "area": 4.698082391138991,
+          "stored_tolerances": {
+            "face": 9.91228237949835e-06,
+            "edge": 3.709734052038419e-05,
+            "vertex": 0.0001
+          }
+        },
+        "expected_input_volume": 0.7393016384142941,
+        "input_volume_error": 7.470690732702678e-13
+      },
+      "result": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 0.7214103773253222,
+        "selected_edges": 3,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 0.7215788135717491,
+        "truck_volume": 0.7215418800987908,
+        "native_to_truck_max_distance": 0.0012919429431995275,
+        "native_to_truck_samples": 2249,
+        "truck_to_native_max_distance": 0.0011614301259177465,
+        "truck_to_native_samples": 2239,
+        "native_tolerances": {
+          "face": 9.91228237949835e-06,
+          "edge": 3.70973405203842e-05,
+          "vertex": 0.0001
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "volume_difference": 3.6933472958300406e-05,
+      "volume_difference_ppm": 51.18425356127502,
+      "limited_distance_pass": false
+    },
+    {
+      "native": {
+        "mode": "angle2-cap0.2-wall0.1",
+        "degrees": 2.0,
+        "cap_distance": 0.2,
+        "wall_distance": 0.1,
+        "native_input_unchanged": true,
+        "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-tilted-cap-unequal/capture/004",
+        "native": {
+          "native_valid": true,
+          "solids": 1,
+          "volume": 0.7220729149682258,
+          "area": 4.7036716871963025,
+          "stored_tolerances": {
+            "face": 5.239291336793825e-06,
+            "edge": 3.751420905314276e-05,
+            "vertex": 0.0001
+          }
+        },
+        "expected_input_volume": 0.7393016384142941,
+        "input_volume_error": 7.470690732702678e-13
+      },
+      "result": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 0.7219295517704326,
+        "selected_edges": 3,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 0.7220729149682256,
+        "truck_volume": 0.7220653320624904,
+        "native_to_truck_max_distance": 0.0003210418854274069,
+        "native_to_truck_samples": 2252,
+        "truck_to_native_max_distance": 0.0002882938217376799,
+        "truck_to_native_samples": 2242,
+        "native_tolerances": {
+          "face": 5.23929133679382e-06,
+          "edge": 3.75142090531428e-05,
+          "vertex": 0.0001
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "volume_difference": 7.582905735215029e-06,
+      "volume_difference_ppm": 10.501578965261023,
+      "limited_distance_pass": true
+    },
+    {
+      "native": {
+        "mode": "angle-2-cap0.1-wall0.2",
+        "degrees": -2.0,
+        "cap_distance": 0.1,
+        "wall_distance": 0.2,
+        "native_input_unchanged": true,
+        "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-tilted-cap-unequal/capture/005",
+        "native": {
+          "native_valid": true,
+          "solids": 1,
+          "volume": 0.7542779686410115,
+          "area": 4.818766896861616,
+          "stored_tolerances": {
+            "face": 8.792000946803782e-06,
+            "edge": 8.792000946803782e-06,
+            "vertex": 0.0001
+          }
+        },
+        "expected_input_volume": 0.7720385717266651,
+        "input_volume_error": -7.492895193195181e-13
+      },
+      "result": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 0.7541366745734964,
+        "selected_edges": 3,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 0.7542779686410115,
+        "truck_volume": 0.7542787884043258,
+        "native_to_truck_max_distance": 2.7787469689002186e-05,
+        "native_to_truck_samples": 2242,
+        "truck_to_native_max_distance": 2.7946166980233375e-05,
+        "truck_to_native_samples": 2239,
+        "native_tolerances": {
+          "face": 8.79200094680378e-06,
+          "edge": 8.79200094680378e-06,
+          "vertex": 0.0001
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "volume_difference": 8.197633143414151e-07,
+      "volume_difference_ppm": 1.0868185846901892,
+      "limited_distance_pass": true
+    },
+    {
+      "native": {
+        "mode": "angle-2-cap0.2-wall0.1",
+        "degrees": -2.0,
+        "cap_distance": 0.2,
+        "wall_distance": 0.1,
+        "native_input_unchanged": true,
+        "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-tilted-cap-unequal/capture/006",
+        "native": {
+          "native_valid": true,
+          "solids": 1,
+          "volume": 0.7548021492349541,
+          "area": 4.82492765885668,
+          "stored_tolerances": {
+            "face": 8.840479563500749e-06,
+            "edge": 8.840479563500749e-06,
+            "vertex": 0.0001
+          }
+        },
+        "expected_input_volume": 0.7720385717266651,
+        "input_volume_error": -7.492895193195181e-13
+      },
+      "result": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 0.7546557537978198,
+        "selected_edges": 3,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 0.7548021492349543,
+        "truck_volume": 0.7548022546232158,
+        "native_to_truck_max_distance": 5.738543796047016e-06,
+        "native_to_truck_samples": 2244,
+        "truck_to_native_max_distance": 5.793068265556096e-06,
+        "truck_to_native_samples": 2242,
+        "native_tolerances": {
+          "face": 8.84047956350075e-06,
+          "edge": 8.84047956350075e-06,
+          "vertex": 0.0001
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "volume_difference": 1.0538826156203385e-07,
+      "volume_difference_ppm": 0.13962369035230274,
+      "limited_distance_pass": true
+    },
+    {
+      "native": {
+        "mode": "angle10-cap0.1-wall0.2",
+        "degrees": 10.0,
+        "cap_distance": 0.1,
+        "wall_distance": 0.2,
+        "native_input_unchanged": true,
+        "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-tilted-cap-unequal/capture/007",
+        "native": {
+          "native_valid": true,
+          "solids": 1,
+          "volume": 0.6554324578649225,
+          "area": 4.4668578609030565,
+          "stored_tolerances": {
+            "face": 9.745199268101625e-06,
+            "edge": 0.00016647554675238782,
+            "vertex": 0.00016647554675238788
+          }
+        },
+        "expected_input_volume": 0.6730200848584555,
+        "input_volume_error": 3.776201573657545e-12
+      },
+      "result": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 0.6551363897967192,
+        "selected_edges": 3,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 0.6554324578649221,
+        "truck_volume": 0.6552558565007818,
+        "native_to_truck_max_distance": 0.006631789418503017,
+        "native_to_truck_samples": 2224,
+        "truck_to_native_max_distance": 0.005970360647972626,
+        "truck_to_native_samples": 2241,
+        "native_tolerances": {
+          "face": 9.74519926810163e-06,
+          "edge": 0.000166475546752388,
+          "vertex": 0.000166475546752388
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "volume_difference": 0.00017660136414032745,
+      "volume_difference_ppm": 269.44250627380916,
+      "limited_distance_pass": false
+    },
+    {
+      "native": {
+        "mode": "angle10-cap0.2-wall0.1",
+        "degrees": 10.0,
+        "cap_distance": 0.2,
+        "wall_distance": 0.1,
+        "native_input_unchanged": true,
+        "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-tilted-cap-unequal/capture/008",
+        "native": {
+          "native_valid": true,
+          "solids": 1,
+          "volume": 0.655806718429273,
+          "area": 4.470844381380387,
+          "stored_tolerances": {
+            "face": 4.010206080715461e-06,
+            "edge": 0.00017595307693194512,
+            "vertex": 0.00017595307693194518
+          }
+        },
+        "expected_input_volume": 0.6730200848584555,
+        "input_volume_error": 3.776201573657545e-12
+      },
+      "result": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 0.6556518856017669,
+        "selected_edges": 3,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 0.6558067184292729,
+        "truck_volume": 0.6557747231194148,
+        "native_to_truck_max_distance": 0.0015993416038762942,
+        "native_to_truck_samples": 2230,
+        "truck_to_native_max_distance": 0.0014345802918252011,
+        "truck_to_native_samples": 2209,
+        "native_tolerances": {
+          "face": 4.01020608071546e-06,
+          "edge": 0.000175953076931945,
+          "vertex": 0.000175953076931945
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 9.496975707879064e-07,
+          "vertex": 9.496975707879064e-07
+        }
+      },
+      "volume_difference": 3.1995309858090515e-05,
+      "volume_difference_ppm": 48.787712841251,
+      "limited_distance_pass": false
+    }
+  ],
+  "failures": [
+    {
+      "mode": "angle2-cap0.1-wall0.2",
+      "check": "distance",
+      "value": 0.0012919429431995275,
+      "threshold": 0.001
+    },
+    {
+      "mode": "angle10-cap0.1-wall0.2",
+      "check": "distance",
+      "value": 0.006631789418503017,
+      "threshold": 0.001
+    },
+    {
+      "mode": "angle10-cap0.2-wall0.1",
+      "check": "distance",
+      "value": 0.0015993416038762942,
+      "threshold": 0.001
+    }
+  ],
+  "native_reference_sha256": {
+    "target/native-tilted-cap-unequal/angle0-cap0.1-wall0.2.brep": "cd945d551899295ca78d391824b9182c214483fd7c88d5e7c005ec52fa08888c",
+    "target/native-tilted-cap-unequal/angle0-cap0.2-wall0.1.brep": "cd945d551899295ca78d391824b9182c214483fd7c88d5e7c005ec52fa08888c",
+    "target/native-tilted-cap-unequal/angle2-cap0.1-wall0.2.brep": "615a8382a62e5183f8197ee6003eb366cff68b642e257329fa3082f588563f8e",
+    "target/native-tilted-cap-unequal/angle2-cap0.2-wall0.1.brep": "615a8382a62e5183f8197ee6003eb366cff68b642e257329fa3082f588563f8e",
+    "target/native-tilted-cap-unequal/angle-2-cap0.1-wall0.2.brep": "41a38152dce74806f053da7cd62c99743d39be698f2d70738471592ed2e4291a",
+    "target/native-tilted-cap-unequal/angle-2-cap0.2-wall0.1.brep": "41a38152dce74806f053da7cd62c99743d39be698f2d70738471592ed2e4291a",
+    "target/native-tilted-cap-unequal/angle10-cap0.1-wall0.2.brep": "065344974b48597a46b7bc1d70d615997097da52a2aa2c59adf8184eade53ffe",
+    "target/native-tilted-cap-unequal/angle10-cap0.2-wall0.1.brep": "065344974b48597a46b7bc1d70d615997097da52a2aa2c59adf8184eade53ffe",
+    "target/native-tilted-cap-unequal/controls.tcl": "ea2588b4af6d4943ca0ae02991274e47a9262c45f4d1a7d5bf9218d50eb4400e",
+    "target/native-tilted-cap-unequal/display.log": "35879d7f0013b8b2309ee082f6fc61464ca16594c87d79c353ffb107568388dc",
+    "target/native-tilted-cap-unequal/before0.result.brep": "2b13e3940cfec80127b2491e06922356c86b4958d0b29e27003282d238b658d7",
+    "target/native-tilted-cap-unequal/before0.result.step": "44433576b0f0ffdc697e0c562983939c0f5beb23c64339121625ff7fd1c9df24",
+    "target/native-tilted-cap-unequal/before0.result.json": "fafb9fdf3c7d881ecae066a542c2b24b9a5d85f2d7decbfc1c4436ec18fb7631",
+    "target/native-tilted-cap-unequal/after0.result.brep": "2b13e3940cfec80127b2491e06922356c86b4958d0b29e27003282d238b658d7",
+    "target/native-tilted-cap-unequal/after0.result.step": "b29803ab032bd28ae8dba9b2ac704b397f7634c78acdcacb55a53b3241ac721f",
+    "target/native-tilted-cap-unequal/after0.result.json": "fafb9fdf3c7d881ecae066a542c2b24b9a5d85f2d7decbfc1c4436ec18fb7631",
+    "target/native-tilted-cap-unequal/before1.result.brep": "2b13e3940cfec80127b2491e06922356c86b4958d0b29e27003282d238b658d7",
+    "target/native-tilted-cap-unequal/before1.result.step": "819aca44b7f45545ec823c892e0171c4000b1f61eaef57392420b5fb57e8264c",
+    "target/native-tilted-cap-unequal/before1.result.json": "fafb9fdf3c7d881ecae066a542c2b24b9a5d85f2d7decbfc1c4436ec18fb7631",
+    "target/native-tilted-cap-unequal/after1.result.brep": "2b13e3940cfec80127b2491e06922356c86b4958d0b29e27003282d238b658d7",
+    "target/native-tilted-cap-unequal/after1.result.step": "73ca9c200f86a8c3fae0e7dc9a09543f2a59069940b75ac2ca96a0feb890f9f7",
+    "target/native-tilted-cap-unequal/after1.result.json": "fafb9fdf3c7d881ecae066a542c2b24b9a5d85f2d7decbfc1c4436ec18fb7631",
+    "target/native-tilted-cap-unequal/before2.result.brep": "1e0aacdf270eb285ae10ffc3c6263d79b4607452181d7a2f8af4db6dd184b6ca",
+    "target/native-tilted-cap-unequal/before2.result.step": "b613af7dd9ff52326c7ca99441589ee5d443a955dccccf65306025fb3c5d972c",
+    "target/native-tilted-cap-unequal/before2.result.json": "5ee0fc741989d03d874e30d97959f056b78cd7ee23e2e33e215ef9ecb7887dab",
+    "target/native-tilted-cap-unequal/after2.result.brep": "1e0aacdf270eb285ae10ffc3c6263d79b4607452181d7a2f8af4db6dd184b6ca",
+    "target/native-tilted-cap-unequal/after2.result.step": "dc7acff091f4775b1d202d4c0abfde6352f1af79c8e0fd4026073bb0ab845197",
+    "target/native-tilted-cap-unequal/after2.result.json": "5ee0fc741989d03d874e30d97959f056b78cd7ee23e2e33e215ef9ecb7887dab",
+    "target/native-tilted-cap-unequal/before3.result.brep": "1e0aacdf270eb285ae10ffc3c6263d79b4607452181d7a2f8af4db6dd184b6ca",
+    "target/native-tilted-cap-unequal/before3.result.step": "35a7c42dca73331fde6c468c3dc6d0503b3af15cd37d59b33b89013f76aafe53",
+    "target/native-tilted-cap-unequal/before3.result.json": "5ee0fc741989d03d874e30d97959f056b78cd7ee23e2e33e215ef9ecb7887dab",
+    "target/native-tilted-cap-unequal/after3.result.brep": "1e0aacdf270eb285ae10ffc3c6263d79b4607452181d7a2f8af4db6dd184b6ca",
+    "target/native-tilted-cap-unequal/after3.result.step": "ebbc9687a993a362b7928cd7a89a041170b558dfc67aa75ce041afb4ebf33cb7",
+    "target/native-tilted-cap-unequal/after3.result.json": "5ee0fc741989d03d874e30d97959f056b78cd7ee23e2e33e215ef9ecb7887dab",
+    "target/native-tilted-cap-unequal/before4.result.brep": "79201c227766615a35755c9b5cfa90564a8f1aa28c522e511fc9f1b2e666924c",
+    "target/native-tilted-cap-unequal/before4.result.step": "c38ac8e22cfe9c8729b39d72fca29da8ca5d7199d750a56fadf91ed064c524ad",
+    "target/native-tilted-cap-unequal/before4.result.json": "050e4896bf955e5ea00e83ad6cee9ef8cc23a205b48e1c63dd3299ac1a0c27aa",
+    "target/native-tilted-cap-unequal/after4.result.brep": "79201c227766615a35755c9b5cfa90564a8f1aa28c522e511fc9f1b2e666924c",
+    "target/native-tilted-cap-unequal/after4.result.step": "4e22ed19a7b7100a11352c0e2666481093932add6d2fc159792f83e053ea7e08",
+    "target/native-tilted-cap-unequal/after4.result.json": "050e4896bf955e5ea00e83ad6cee9ef8cc23a205b48e1c63dd3299ac1a0c27aa",
+    "target/native-tilted-cap-unequal/before5.result.brep": "79201c227766615a35755c9b5cfa90564a8f1aa28c522e511fc9f1b2e666924c",
+    "target/native-tilted-cap-unequal/before5.result.step": "626abe3e6533267eaf2ba3dec7f97432c4790d030fc73319a7ee101b481596c8",
+    "target/native-tilted-cap-unequal/before5.result.json": "050e4896bf955e5ea00e83ad6cee9ef8cc23a205b48e1c63dd3299ac1a0c27aa",
+    "target/native-tilted-cap-unequal/after5.result.brep": "79201c227766615a35755c9b5cfa90564a8f1aa28c522e511fc9f1b2e666924c",
+    "target/native-tilted-cap-unequal/after5.result.step": "9f377d91f255fa758f05f2ab76a7c863681ee2f5ee9b401bdfb3ebb1b635fce6",
+    "target/native-tilted-cap-unequal/after5.result.json": "050e4896bf955e5ea00e83ad6cee9ef8cc23a205b48e1c63dd3299ac1a0c27aa",
+    "target/native-tilted-cap-unequal/before6.result.brep": "dd67a49d7d5d59a1a09c7092a56fbeafc5c93f94b64059e7239a34b20e6e82d6",
+    "target/native-tilted-cap-unequal/before6.result.step": "ab7271826103cb72e3b20d2c383255495265b127ad8e361ee87741d4c9037a1d",
+    "target/native-tilted-cap-unequal/before6.result.json": "719e8dd05729666c0b8fbc5440e1266d495e14f9dbd1c7677bfd435ecacef0e2",
+    "target/native-tilted-cap-unequal/after6.result.brep": "dd67a49d7d5d59a1a09c7092a56fbeafc5c93f94b64059e7239a34b20e6e82d6",
+    "target/native-tilted-cap-unequal/after6.result.step": "43dfe71e9eabd3401d00919004ffc6cfcba8baf3d12b1a068a09230d5a5c88ba",
+    "target/native-tilted-cap-unequal/after6.result.json": "719e8dd05729666c0b8fbc5440e1266d495e14f9dbd1c7677bfd435ecacef0e2",
+    "target/native-tilted-cap-unequal/before7.result.brep": "dd67a49d7d5d59a1a09c7092a56fbeafc5c93f94b64059e7239a34b20e6e82d6",
+    "target/native-tilted-cap-unequal/before7.result.step": "6c5cb7d8dfb1a6d10b08539b799f7e02e83f509f0dc696f7b903b7cc9d177d64",
+    "target/native-tilted-cap-unequal/before7.result.json": "719e8dd05729666c0b8fbc5440e1266d495e14f9dbd1c7677bfd435ecacef0e2",
+    "target/native-tilted-cap-unequal/after7.result.brep": "dd67a49d7d5d59a1a09c7092a56fbeafc5c93f94b64059e7239a34b20e6e82d6",
+    "target/native-tilted-cap-unequal/after7.result.step": "c5b9cf802a1de2ce923573d9b80b292dc41e24afbff12aa81305705d23073dba",
+    "target/native-tilted-cap-unequal/after7.result.json": "719e8dd05729666c0b8fbc5440e1266d495e14f9dbd1c7677bfd435ecacef0e2",
+    "target/native-tilted-cap-unequal/controls.log": "f0a0560e99accc57001c3bbcf8767868a2c8f0864a7cdf2834464c45a8222d3d",
+    "target/native-tilted-cap-unequal/summary.json": "383c1e99d6263e3e9ff03aaef3354583fc6cfe50499429cd261b0fa8f42c5d17",
+    "target/native-tilted-cap-unequal/capture/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "target/native-tilted-cap-unequal/capture/001.input.brep": "2b13e3940cfec80127b2491e06922356c86b4958d0b29e27003282d238b658d7",
+    "target/native-tilted-cap-unequal/capture/001.input.step": "2aa3ed6b4120248ae2bd0cbb6762d618bef2f002f8b56a90bbaf445c615812a6",
+    "target/native-tilted-cap-unequal/capture/001.input.json": "840d2e69ac2f32f8394fff4ecd49304b91e4641922e5089ce39c8e39fd21040e",
+    "target/native-tilted-cap-unequal/capture/001.result.brep": "b6c6d3ea0a7f52e57f0c00029cfe66e58cbc407d658a199cb32e385fb4ef0b01",
+    "target/native-tilted-cap-unequal/capture/001.result.step": "d1ac863037c98be8b55bc5713fb93cbe7e683274beb533bd0234dfd2bc290239",
+    "target/native-tilted-cap-unequal/capture/001.result.json": "8791cda5b115c0476d9873d04c9ee186559bdfcb97bb46dc46e042acded648ad",
+    "target/native-tilted-cap-unequal/capture/002.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "target/native-tilted-cap-unequal/capture/002.input.brep": "2b13e3940cfec80127b2491e06922356c86b4958d0b29e27003282d238b658d7",
+    "target/native-tilted-cap-unequal/capture/002.input.step": "31bf392c4be5c4847e48826210e6b2f7daf7fc8d764bea7f8934325f8dbf70c9",
+    "target/native-tilted-cap-unequal/capture/002.input.json": "c0518f099b44fc1cf71e03086878d89c0367196278bbf230aa8787351134902c",
+    "target/native-tilted-cap-unequal/capture/002.result.brep": "cdbfd7b69f6fd1b64eff95b26def4b9e0ab17219506b9edb2fff38eadae2dcdc",
+    "target/native-tilted-cap-unequal/capture/002.result.step": "2a49c5ff7ee5840491c2bd1b37533a557a37f4503fb23f9ef26444208be7c86e",
+    "target/native-tilted-cap-unequal/capture/002.result.json": "9358092ff02da12f38493b9e32500b20537ddebca10155279bc98e0f3f952bfc",
+    "target/native-tilted-cap-unequal/capture/003.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "target/native-tilted-cap-unequal/capture/003.input.brep": "1e0aacdf270eb285ae10ffc3c6263d79b4607452181d7a2f8af4db6dd184b6ca",
+    "target/native-tilted-cap-unequal/capture/003.input.step": "0da008759612b92bc4095760537335c1d8ed5ded677243266b32a6cb5ce91ee6",
+    "target/native-tilted-cap-unequal/capture/003.input.json": "eda735f3c23aeca3ec5d7e01b1f2477724f7d5fc89b8feea192a0565b139b854",
+    "target/native-tilted-cap-unequal/capture/003.result.brep": "a4e0bbce9055811af425b57c05fbdf49a4ce850213c3d888230c6314644ae8ea",
+    "target/native-tilted-cap-unequal/capture/003.result.step": "979206f0d36588feba311b65eb9c1b68dc66dba14d818351462cc2743ceed56f",
+    "target/native-tilted-cap-unequal/capture/003.result.json": "11c67786f85b1aea017dc3f2308e58d836ded6307d56c366bfaa91020c60ddbd",
+    "target/native-tilted-cap-unequal/capture/004.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "target/native-tilted-cap-unequal/capture/004.input.brep": "1e0aacdf270eb285ae10ffc3c6263d79b4607452181d7a2f8af4db6dd184b6ca",
+    "target/native-tilted-cap-unequal/capture/004.input.step": "5078076761302f9baa8da422b72198313a3a627fdc5369e6264244ab16b24c1e",
+    "target/native-tilted-cap-unequal/capture/004.input.json": "9ab13029a1a2f8d420c7f1dc0452a89e8cf3e66f3665d67814c1dac9ef54cd7f",
+    "target/native-tilted-cap-unequal/capture/004.result.brep": "51fba55471d827f595c866274cf831453eb1aed762d6478d005d4c93d7cc95bf",
+    "target/native-tilted-cap-unequal/capture/004.result.step": "50ae9e9e5dc53af52d2c5831d5d28eebc3b0074505ebb44a18996bf4b74c2e19",
+    "target/native-tilted-cap-unequal/capture/004.result.json": "c64b9d519da98332b926835520bb6452db73b81d93fcbcfa3b9e14748e3fd93e",
+    "target/native-tilted-cap-unequal/capture/005.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "target/native-tilted-cap-unequal/capture/005.input.brep": "79201c227766615a35755c9b5cfa90564a8f1aa28c522e511fc9f1b2e666924c",
+    "target/native-tilted-cap-unequal/capture/005.input.step": "b89ed8e6df2f43324db063dc6018b50372cd590dca7ff23277300b3b6d36bc11",
+    "target/native-tilted-cap-unequal/capture/005.input.json": "7010c431ec43c427e0f9c23a435326411d96c950ef403a9f22a040a4e3d01f4a",
+    "target/native-tilted-cap-unequal/capture/005.result.brep": "b4b024fa09a4391bc5daebba5d68ceccb6ab2489f3f704e32cfb389af6b6d283",
+    "target/native-tilted-cap-unequal/capture/005.result.step": "b9c8fefeb15c3ebb53d18ace46f9c5106c96b9b17e71e755a080248d0275090b",
+    "target/native-tilted-cap-unequal/capture/005.result.json": "1ea443dd0a10571086fb36ff5da29382efb59d69e471a29a2ba39042fca64e4d",
+    "target/native-tilted-cap-unequal/capture/006.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "target/native-tilted-cap-unequal/capture/006.input.brep": "79201c227766615a35755c9b5cfa90564a8f1aa28c522e511fc9f1b2e666924c",
+    "target/native-tilted-cap-unequal/capture/006.input.step": "2a5d15fb6a0eb2bf61ae6312cdb0df9fa4f64103202efb8909ea1486c41c2a7e",
+    "target/native-tilted-cap-unequal/capture/006.input.json": "776c7d8c37b92b3a5c75019e08beabe193b1bf9f99bbcb32b3b5a91d436c1da8",
+    "target/native-tilted-cap-unequal/capture/006.result.brep": "92c865a4165f16880196ad4141a734a32c801fe369e4103bdacfe58f5420c430",
+    "target/native-tilted-cap-unequal/capture/006.result.step": "3f0bb5f452e32d392115620d844f9f09fecc4c4a0e2582c7df155d4d8f0d7cef",
+    "target/native-tilted-cap-unequal/capture/006.result.json": "6eacf69c82ac3b2a119e0fd08143f4c5ab6925e854a907bc2af3670448eecb4c",
+    "target/native-tilted-cap-unequal/capture/007.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "target/native-tilted-cap-unequal/capture/007.input.brep": "dd67a49d7d5d59a1a09c7092a56fbeafc5c93f94b64059e7239a34b20e6e82d6",
+    "target/native-tilted-cap-unequal/capture/007.input.step": "dafd301803c61b47e17c465deee5e42f7e277d5604bce47acf5e1c721610f58b",
+    "target/native-tilted-cap-unequal/capture/007.input.json": "b3a81c64f775441450cc79c44017ba3b6df6f067af6c78501609d98dda4d5229",
+    "target/native-tilted-cap-unequal/capture/007.result.brep": "3ecb31fb10a5a366d179a9db8bc7c727d33c748320d60b5ec8dc21cf950db1dc",
+    "target/native-tilted-cap-unequal/capture/007.result.step": "fb0636e0decf0dc1120402b7313024d5cffa519a58c9e470c6ef4e42482e8d14",
+    "target/native-tilted-cap-unequal/capture/007.result.json": "2a5a5583283c23904d13bdfb337225ddd837e2927304d0ff8c38591ce1820303",
+    "target/native-tilted-cap-unequal/capture/008.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "target/native-tilted-cap-unequal/capture/008.input.brep": "dd67a49d7d5d59a1a09c7092a56fbeafc5c93f94b64059e7239a34b20e6e82d6",
+    "target/native-tilted-cap-unequal/capture/008.input.step": "63048e608ba1caa7414cf9704649bfadde093ad7828a2ec936fe9d0c105a2379",
+    "target/native-tilted-cap-unequal/capture/008.input.json": "82629b18ee583bd4ba4d753a1d26d2110f16c8d48f3e72c2033262cae8f4d373",
+    "target/native-tilted-cap-unequal/capture/008.result.brep": "231bafa6cfcc2aab64efa2e6b3b120f54c49a80d21872abbf7c82f1d6e4f9c2f",
+    "target/native-tilted-cap-unequal/capture/008.result.step": "945a921fb56bacbefbbecbf059d309f758fe5cc541a7b7338af6f1f6486273f7",
+    "target/native-tilted-cap-unequal/capture/008.result.json": "76d9a5d73c09f7a44fa202756d7ebb75af8ac6010e54f3cf7130e5f31d1d5eff"
+  }
+}

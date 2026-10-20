@@ -6,6 +6,11 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Replay unequal-distance chamfers on tilted plane/cylinder rims using the
+  captured reference side. Keep tilted distance-angle requests unsupported;
+  they require a varying local angle construction. Verify both reference faces,
+  reversed contours, independent horizontal material and exported setbacks.
+
 - Continue tangent chamfer contacts beneath tilted planar caps across parallel
   convex cylindrical and planar walls when their original intervals stop short
   of a support seam. Preserve support surfaces, constrain endpoint corrections

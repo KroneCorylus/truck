@@ -1,0 +1,8 @@
+angle0-cap0.1-wall0.2 input error -7.771561172376096e-16 result volume 0.737910518538898 contour lengths [3]
+angle0-cap0.2-wall0.1 input error -7.771561172376096e-16 result volume 0.7384341173144962 contour lengths [3]
+angle2-cap0.1-wall0.2 input error 7.470690732702678e-13 result volume 0.7215788135717496 contour lengths [3]
+angle2-cap0.2-wall0.1 input error 7.470690732702678e-13 result volume 0.7220729149682258 contour lengths [3]
+angle-2-cap0.1-wall0.2 input error -7.492895193195181e-13 result volume 0.7542779686410115 contour lengths [3]
+angle-2-cap0.2-wall0.1 input error -7.492895193195181e-13 result volume 0.7548021492349541 contour lengths [3]
+angle10-cap0.1-wall0.2 input error 3.776201573657545e-12 result volume 0.6554324578649225 contour lengths [3]
+angle10-cap0.2-wall0.1 input error 3.776201573657545e-12 result volume 0.655806718429273 contour lengths [3]

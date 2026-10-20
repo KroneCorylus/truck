@@ -1,0 +1,66 @@
+{
+  "classification": "Three retained native distance-comparison failures. Explicit witnesses on the original guide prove native cap-contact shortfalls larger than0.001. This is not a global Truck accuracy proof; native smoothing is a possible but unproven cause.",
+  "proofs": [
+    {
+      "mode": "angle2-cap0.1-wall0.2",
+      "native_cap_boundary_point": [
+        0.7361713255816773,
+        0.131040759167066,
+        0.7568319460870536
+      ],
+      "original_guide_witness": [
+        0.7806216403577354,
+        0.04310250346285577,
+        0.7552797068909235
+      ],
+      "witness_parameter": -1.102289964257813,
+      "requested_cap_setback": 0.1,
+      "nearest_guide_distance_upper_bound": 0.09854631777246534,
+      "minimum_setback_shortfall": 0.0014536822275346695,
+      "sampled_distance_failure": 0.0012919429431995275,
+      "extraction_log": "target/tilted-cap-unequal-discrepancies/angle2-cap0.1-wall0.2.txt",
+      "extraction_log_sha256": "45a7cad065643a5a85cf62eddd5f9e44071ac4547698c086af9d7a5a8be09ba9"
+    },
+    {
+      "mode": "angle10-cap0.1-wall0.2",
+      "native_cap_boundary_point": [
+        0.7349198513200959,
+        0.12320983574455666,
+        0.6529534168081399
+      ],
+      "original_guide_witness": [
+        0.7739865609524723,
+        0.03982132682801487,
+        0.6460649018524482
+      ],
+      "witness_parameter": -1.1207953625293108,
+      "requested_cap_setback": 0.1,
+      "nearest_guide_distance_upper_bound": 0.09234339640233823,
+      "minimum_setback_shortfall": 0.007656603597661779,
+      "sampled_distance_failure": 0.006631789418503017,
+      "extraction_log": "target/tilted-cap-unequal-discrepancies/angle10-cap0.1-wall0.2.txt",
+      "extraction_log_sha256": "dac269d9a505acbf721c0d592a8a07d265daeb391723d80c23f852ac3eec82f3"
+    },
+    {
+      "mode": "angle10-cap0.2-wall0.1",
+      "native_cap_boundary_point": [
+        0.6860376410953191,
+        0.21481007313979528,
+        0.6615726693474313
+      ],
+      "original_guide_witness": [
+        0.7645721403361109,
+        0.03542351882603367,
+        0.6477249182148508
+      ],
+      "witness_parameter": -1.1467734907293363,
+      "requested_cap_setback": 0.2,
+      "nearest_guide_distance_upper_bound": 0.19631343217160652,
+      "minimum_setback_shortfall": 0.0036865678283934944,
+      "sampled_distance_failure": 0.0015993416038762942,
+      "extraction_log": "target/tilted-cap-unequal-discrepancies/angle10-cap0.2-wall0.1.txt",
+      "extraction_log_sha256": "ea25a78a338d061cb65cad643af22e79625fc0fd7ed33330f73dc1ca4ace805a"
+    }
+  ],
+  "comparison_sha256": "82fd11c9d3d6be9559f8c6c662fbd22915a7acd029e958730a70098b2bb3afd7"
+}

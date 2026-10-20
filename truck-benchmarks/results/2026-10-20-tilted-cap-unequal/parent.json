@@ -1,0 +1,20 @@
+{
+  "revision": "ca6322948677cce16362e25da9310d736ea79c3b",
+  "tests": {
+    "passed": 2,
+    "failed": 1
+  },
+  "source_sha256": {
+    "truck-shapeops/examples/replay_occt_blend.rs": "143911f1d8df37b0d8fbf7c3aeceb94ea645ff2477b81b3ef9acfb49c1dd565f",
+    "truck-shapeops/tests/fixtures/tilted-cap-chamfers/angle0.step": "2aa3ed6b4120248ae2bd0cbb6762d618bef2f002f8b56a90bbaf445c615812a6",
+    "truck-shapeops/tests/fixtures/tilted-cap-chamfers/angle0.json": "19ae1c97cd7ed98d95d6650f545da4c79d8b6e8215d7079825f8a47d523ec398",
+    "truck-shapeops/tests/fixtures/tilted-cap-chamfers/angle2.step": "0da008759612b92bc4095760537335c1d8ed5ded677243266b32a6cb5ce91ee6",
+    "truck-shapeops/tests/fixtures/tilted-cap-chamfers/angle2.json": "dacd86c809242b00345cd9217aa928e1ad1586688d343a279508a3a5d3f39b8e",
+    "truck-shapeops/tests/fixtures/tilted-cap-chamfers/angle-2.step": "b89ed8e6df2f43324db063dc6018b50372cd590dca7ff23277300b3b6d36bc11",
+    "truck-shapeops/tests/fixtures/tilted-cap-chamfers/angle-2.json": "534b7dc35195a278f30cbef77bca9dd6e187331587210e94d43c669e91fe5e9b",
+    "truck-shapeops/tests/fixtures/tilted-cap-chamfers/angle10.step": "dafd301803c61b47e17c465deee5e42f7e277d5604bce47acf5e1c721610f58b",
+    "truck-shapeops/tests/fixtures/tilted-cap-chamfers/angle10.json": "7fccbfd8bb2d5454a92288c803b8db9570d0fdd7a235a69678e713918bbaf382"
+  },
+  "test_design": "Before implementation, corrected the new flat control to test refined material under the original one-ppm bound and preserve the reported coarse mesh volume against parent values within1e-12. Initial draft incorrectly applied the refined bound to replay fixed0.001 tessellation. No existing test changed. Final flat/reference-order controls and tilted angle rejection pass on parent.",
+  "test_module_sha256": "a740a4daa5ba62c4effa499245ded231a95c61956fca65ccfc533dd511cde338"
+}
