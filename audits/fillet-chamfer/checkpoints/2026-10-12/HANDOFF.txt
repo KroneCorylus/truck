@@ -1,7 +1,7 @@
 LATEST CHECKPOINT — 2026-10-20
 ACTIVE: Continue work and commit achievements until done or told to stop.
-Read ../2026-10-20-planar-loop-order/HANDOFF.txt and report.html.
-Implementation d198a51c handles reordered planar loops.
+Read ../2026-10-20-conic-section-seams/HANDOFF.txt and report.html.
+Implementation 2ea838f2 corrects projected conic section seams.
 Full capture:438constructions/408limited passes;no prior check regressions. Full parity remains unverified.
 
 HISTORICAL HANDOFF FOLLOWS

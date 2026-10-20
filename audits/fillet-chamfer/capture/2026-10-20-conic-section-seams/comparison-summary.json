@@ -1,0 +1,574 @@
+{
+  "kernel_revision": "2ea838f2b4f81549e028082275c31dc127e2865f",
+  "native": {
+    "passed": 396
+  },
+  "captures": 648,
+  "before_statuses": {
+    "input-import-failed": 96,
+    "operation-succeeded": 438,
+    "operation-failed": 99,
+    "unhandled-intent": 6,
+    "input-inconsistent": 9
+  },
+  "after_statuses": {
+    "input-import-failed": 96,
+    "operation-succeeded": 438,
+    "operation-failed": 99,
+    "unhandled-intent": 6,
+    "input-inconsistent": 9
+  },
+  "capture_scopes": {
+    "fillet-native-contours": 161,
+    "chamfer-native-contours": 487
+  },
+  "unchanged_intent_records": 648,
+  "successful_checks": {
+    "constructed": 438,
+    "input_unchanged": 438,
+    "geometry_consistent": 438,
+    "mesh_closed": 438,
+    "step_prepared": 438,
+    "native_valid": 438,
+    "truck_step_valid": 438,
+    "single_solid": 438,
+    "sampled_distance": 408
+  },
+  "limited_comparison_passes": 408,
+  "status_changes": [],
+  "scope_changes": [],
+  "changed_scope_check_losses": [],
+  "unchanged_intent_regressions": [],
+  "numeric_changes": [
+    {
+      "case": "blend/tolblend_simple/D4",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 29111.311992511357,
+          "after": 29111.312097601443
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_complex/C4",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 14671436.379191615,
+          "after": 14671436.37919161
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/C2",
+      "capture": "002",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 141.39982820107136,
+          "after": 141.39982820107147
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/C2",
+      "capture": "007",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 139.90670511649162,
+          "after": 139.90670511649157
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/C4",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 14669185.723627582,
+          "after": 14669185.72362758
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_complex/C4",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 14674457.816274978,
+          "after": 14674457.816274973
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/C2",
+      "capture": "002",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 141.5138269400252,
+          "after": 141.51382694002515
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/C4",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 14670729.523745557,
+          "after": 14670729.523745561
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_complex/C4",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 14674457.816274978,
+          "after": 14674457.816274973
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/C2",
+      "capture": "002",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 141.5779996375276,
+          "after": 141.57799963752777
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/C2",
+      "capture": "007",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 139.7787337432915,
+          "after": 139.77873374329144
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/C4",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "mesh_volume": {
+          "before": 14670729.523745557,
+          "after": 14670729.523745561
+        }
+      }
+    }
+  ],
+  "exact_successful_results": 426,
+  "seed_capture_changes": [],
+  "native_reference_changes": [],
+  "stored_tolerances": {
+    "threshold": 0.001,
+    "inputs": [
+      {
+        "case": "chamfer/dist_angle_sequence/B5",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.01538612357827674,
+          "vertex": 0.015386123578276744
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle_sequence/B7",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.015385866787860681,
+          "vertex": 0.015385866787860684
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle_sequence/B8",
+        "capture": "003",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.09823449952410898,
+          "vertex": 0.11256746834283206
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_dist_sequence/B5",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.015385866784913394,
+          "vertex": 0.015385866784913398
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_dist_sequence/B6",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.015386123576832314,
+          "vertex": 0.015386123576832318
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/equal_dist_sequence/B6",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.015385866785128127,
+          "vertex": 0.01538586678512813
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/equal_dist_sequence/B8",
+        "capture": "003",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.06347812877808842,
+          "vertex": 0.06923484078027042
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      }
+    ],
+    "native_results": [
+      {
+        "case": "blend/simple/D1",
+        "capture": "001",
+        "tolerances": {
+          "face": 0.0001,
+          "edge": 0.8964317893944277,
+          "vertex": 1.2642307919977536
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/simple/F5",
+        "capture": "001",
+        "tolerances": {
+          "face": 0.02190790727118659,
+          "edge": 0.02190790727118659,
+          "vertex": 0.021907907271186598
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/simple/F7",
+        "capture": "001",
+        "tolerances": {
+          "face": 1e-06,
+          "edge": 1.000000006123234e-06,
+          "vertex": 0.04540290569850494
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/simple/F9",
+        "capture": "001",
+        "tolerances": {
+          "face": 1e-06,
+          "edge": 0.005381662689997078,
+          "vertex": 0.008350113249638094
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/simple/G2",
+        "capture": "001",
+        "tolerances": {
+          "face": 0.0001,
+          "edge": 0.058118986044292886,
+          "vertex": 0.08523407424694941
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/simple/H4",
+        "capture": "001",
+        "tolerances": {
+          "face": 1e-06,
+          "edge": 22.974106952046146,
+          "vertex": 22.974106952046153
+        },
+        "status": "operation-succeeded",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/tolblend_simple/A1",
+        "capture": "001",
+        "tolerances": {
+          "face": 0.002351089158340483,
+          "edge": 0.002351089158340483,
+          "vertex": 0.0023510891583404837
+        },
+        "status": "operation-succeeded",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/tolblend_simple/A2",
+        "capture": "001",
+        "tolerances": {
+          "face": 0.01616354954173985,
+          "edge": 0.01616354954173985,
+          "vertex": 0.016163549541739857
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/tolblend_simple/D3",
+        "capture": "001",
+        "tolerances": {
+          "face": 0.07389052197953262,
+          "edge": 0.08021622051706867,
+          "vertex": 0.16809285098977023
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/tolblend_simple/D5",
+        "capture": "001",
+        "tolerances": {
+          "face": 0.008070814689590054,
+          "edge": 0.008070814689590054,
+          "vertex": 0.008070814689590058
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle/F1",
+        "capture": "001",
+        "tolerances": {
+          "face": 0.0001,
+          "edge": 0.0692833518221263,
+          "vertex": 0.06928335182212686
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle_sequence/B5",
+        "capture": "001",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.01538612357827674,
+          "vertex": 0.015386123578276744
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle_sequence/B5",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.01538612357827674,
+          "vertex": 0.015696123578276745
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle_sequence/B7",
+        "capture": "001",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.015385866787860681,
+          "vertex": 0.015385866787860684
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle_sequence/B7",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 5e-05,
+          "vertex": 0.016005866787860687
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle_sequence/B8",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.09823449952410898,
+          "vertex": 0.11256746834283206
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle_sequence/B8",
+        "capture": "003",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.09823449952410898,
+          "vertex": 0.11256746834283206
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_dist_complex/B5",
+        "capture": "001",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.00036173254411125385,
+          "vertex": 0.0010531067408991698
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_dist_sequence/B5",
+        "capture": "001",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.015385866784913394,
+          "vertex": 0.015385866784913398
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_dist_sequence/B5",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 5e-05,
+          "vertex": 0.0160058667849134
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_dist_sequence/B6",
+        "capture": "001",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.015386123576832314,
+          "vertex": 0.015386123576832318
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_dist_sequence/B6",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 5e-05,
+          "vertex": 0.01600612357683232
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/equal_dist_complex/B6",
+        "capture": "001",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.00044441723946461964,
+          "vertex": 0.0012931407907644137
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/equal_dist_complex/C1",
+        "capture": "001",
+        "tolerances": {
+          "face": 3.050212492887909e-06,
+          "edge": 0.0011785994935571728,
+          "vertex": 0.0020450305471271255
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/equal_dist_sequence/B6",
+        "capture": "001",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.015385866785128127,
+          "vertex": 0.01538586678512813
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/equal_dist_sequence/B6",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 5e-05,
+          "vertex": 0.016005866785128133
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/equal_dist_sequence/B8",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.06347812877808842,
+          "vertex": 0.06923484078027042
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/equal_dist_sequence/B8",
+        "capture": "003",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.06347812877808842,
+          "vertex": 0.06923484078027042
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      }
+    ],
+    "truck_step": [],
+    "native_result_count": 647,
+    "truck_step_count": 438
+  }
+}
