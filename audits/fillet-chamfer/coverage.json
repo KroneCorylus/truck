@@ -3,7 +3,7 @@
     "title": "Fillet and chamfer feature parity audit",
     "baseline": "OCCT V7_9_3 source inventory plus the recorded Truck/Pieza revisions. Includes 3D, 2D, related workflows and all textual candidates under the discovery rules.",
     "meaning_of_all": "Every dedicated test-grid entry, matching registered test/helper, discovered blend command and retained reference in this pinned checkout. This is not a claim about all mathematical configurations or current/future OCCT releases.",
-    "execution": "All 1,026 inventoried entries have native attempts. Latest clean capture at 460ac6fd:396 native passes,648 operations,487 complete chamfer and161 complete fillet scopes;363 constructions/340 limited sampled passes at0.001. All359 prior constructions retain checks;359 complete prior results/comparisons exact,0 numerical changes. Cylinder contact-angle control discrepancies retain raw native verdicts. Full parity remains unverified.",
+    "execution": "All 1,026 inventoried entries have native attempts. Latest clean capture at 7ab0f68f:396 native passes,648 operations,487 complete chamfer and161 complete fillet scopes;364 constructions/341 limited sampled passes at0.001. All363 prior constructions retain checks;362 complete prior results/comparisons exact,1 numerical changes. Raw native discrepancies retained. Full parity remains unverified.",
     "mapping": "Capability assessments describe observable outcomes supported or restricted by reviewed source evidence. Per-case tags and links are automated hints; they do not prove Truck handles that fixture.",
     "objective": "Achieve at least OCCT-level fillet/chamfer capabilities and robustness for equivalent modeling tasks in Truck/Pieza.",
     "equivalence": "Judge the requested geometry, dimensions, validity, editing behavior and practical performance. Different APIs, algorithms, languages, surface representations and internal operation sequences are acceptable. Missing a corresponding OCCT method is not evidence of a feature gap."
@@ -607,6 +607,12 @@
           "path": "truck-benchmarks/results/2026-10-16-conic-contact-extension/REPORT.md",
           "find": "# Exact conic contact",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-20-parallel-cylinder-chords/REPORT.md",
+          "find": "# Parallel cylinder chamfer",
+          "role": "test"
         }
       ],
       "required_outcome": "Bevel with independently specified setbacks on the intended two support faces; orientation or storage order must not silently exchange them.",
@@ -624,7 +630,8 @@
         "At4211cfe0, isolated equal/unequal chamfers retry theexistingstraight-edge solver after a miter rejects consumedneighbors.2parent-failingtests/6variants,3nativecontrols,fullshapeops393pass,39replay,Clippy/smoke. Fullcapture312construct/292limitedpasses;no priorcheckregressions. Existing oversized/collision guards unchanged. No parityupgrade.",
         "At b5c98d1a, replay converts native equal/unequal cylindrical chord distances on longitudinal plane/cylinder edges while preserving reference sides. Three parent-failing tests, six constructed variants, 21 native controls with independent material/contact checks;42 replay tests,13 capture tests,Clippy/smoke pass. Full capture:312 constructions/293 limited passes;no prior successful check regressed. Kernel distance contract unchanged;distance-angle remains unsupported here. No parity upgrade.",
         "At ac5b8fa3, planar chamfers cross curved terminal boundaries using existing intersection and bounded trimming. Two parent-failing tests/four constructed variants,oversized guards,six independent native controls. Full shapeops 396 pass,42 replay tests,Clippy/smoke. Clean capture:352 constructions/333 limited passes;no prior successful check regressed. No parity upgrade.",
-        "At 35c11b96, planar chamfer contacts extend exact conics and their extruded cylinder generators;mesh interior ruling fixes material loss. Three parent failures,eight variants,oversized guards,six native controls. Full shapeops 400 and meshalgo 98 pass,46 replay tests,Clippy/smoke. Clean capture:359 constructions/340 limited passes;no prior successful check regressed. No parity upgrade."
+        "At 35c11b96, planar chamfer contacts extend exact conics and their extruded cylinder generators;mesh interior ruling fixes material loss. Three parent failures,eight variants,oversized guards,six native controls. Full shapeops 400 and meshalgo 98 pass,46 replay tests,Clippy/smoke. Clean capture:359 constructions/340 limited passes;no prior successful check regressed. No parity upgrade.",
+        "At 7ab0f68f, parallel cylinder chords preserve both supports and concave chamfers retain subdivided cap seams. Three parent failures,18replay variants,9native controls;400shapeops/98meshalgo/54replay/13capture tests,Clippy/smoke pass. Native tolerance mutation in3controls retained. Clean capture:364constructions/341limited passes;no prior check regressions. No parity upgrade."
       ]
     },
     {
@@ -710,6 +717,12 @@
           "path": "truck-benchmarks/results/2026-10-20-longitudinal-cylinder-angles/REPORT.md",
           "find": "# Longitudinal cylinder-reference",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-20-parallel-cylinder-chords/REPORT.md",
+          "find": "# Parallel cylinder chamfer",
+          "role": "test"
         }
       ],
       "required_outcome": "Produce a chamfer with the requested setback and angle, including non-right-angle supports, using any equivalent parameterization.",
@@ -722,7 +735,8 @@
         "At 099ccb7e following 2346b975, native chamfer schema2 captures complete contours and first-assignment/ignored semantics. Parent-failing replay validation prevents seed fallback. Automatic A4 applies3edges with valid STEP and sampled maximum2.23e-8. Fillets remainseed-only and retain5e-5exportfits; chamfersuse1e-7. Fullcapture221 constructions/210 limitedcomparisons; 58 corrected-intentrecords, no prior successful checkregressions forunchangedintent. No parityupgrade.",
         "At 48a1032f, replay propagates planar seed reference sides across complete oriented chamfer contours, including perpendicular plane/cylinder rims. Two parent-failing native regressions verify both directions and normal signs, exact setbacks and solid/STEP checks. Full capture: 231 constructions, 220 limited comparisons; all648 intents unchanged and no successful check regressions. Fillets remain seed-only. No parity upgrade.",
         "At 05901a28, plane-reference longitudinal cylinder angles preserve requested angle/contact/material:three parent failures,20 variants,guards,ten native controls;two native plane-angle discrepancies retained.46 replay tests,Clippy/smoke. Clean capture:356 constructions/337 limited passes;no prior successful check regressed. Cylinder-reference angles remain unsupported.",
-        "At 460ac6fd, cylinder-reference longitudinal requests preserve captured chord and angle at the new cylinder contact. Three parent failures,20 variants,10 native controls;49 replay tests,13 capture tests,Clippy/smoke pass. Six native controls differ from this geometric contract;source model and raw verdicts retained. Clean capture:363 constructions/340 limited passes;no prior check regressed. No parity upgrade."
+        "At 460ac6fd, cylinder-reference longitudinal requests preserve captured chord and angle at the new cylinder contact. Three parent failures,20 variants,10 native controls;49 replay tests,13 capture tests,Clippy/smoke pass. Six native controls differ from this geometric contract;source model and raw verdicts retained. Clean capture:363 constructions/340 limited passes;no prior check regressed. No parity upgrade.",
+        "At 7ab0f68f, parallel cylinder chords preserve both supports and concave chamfers retain subdivided cap seams. Three parent failures,18replay variants,9native controls;400shapeops/98meshalgo/54replay/13capture tests,Clippy/smoke pass. Native tolerance mutation in3controls retained. Clean capture:364constructions/341limited passes;no prior check regressions. No parity upgrade."
       ]
     },
     {

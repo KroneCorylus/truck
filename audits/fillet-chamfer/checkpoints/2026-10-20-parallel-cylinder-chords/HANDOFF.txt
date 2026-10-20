@@ -1,0 +1,42 @@
+PARALLEL CYLINDER CHORDS — 2026-10-20
+ACTIVE: Continue work and commit achievements until done or told to stop.
+
+# Parallel cylinder chords: clean full capture
+
+Runtime 7ab0f68f4641832a590fb25abb1c419f1669955b. All 396 native entries pass, yielding 648 operations with unchanged requests, complete selection scopes and native result properties. All 363 previous constructions retain their successful checks; 362 complete result/comparison records are exactly unchanged; 1 numerical changes are recorded.
+
+364 constructions (+1); 341 limited sampled passes (+1) at 0.001. 23 constructed discrepancies remain. Every construction preserves its input, consistent geometry, a closed mesh, STEP preparation and valid single-solid native/Truck comparison shapes.
+
+The prior equal_dist/A2 result also improves: correcting both cylinder chords reduces the bidirectional sampled discrepancy from about 0.00062106 to below 4.6e-13. Its material values change accordingly; all prior successful checks remain satisfied.
+
+Statuses: {"input-import-failed": 96, "operation-succeeded": 364, "operation-failed": 172, "unhandled-intent": 7, "input-inconsistent": 9}.
+Status changes:
+- chamfer/dist_dist/A2/001: unhandled-intent → operation-succeeded
+
+Replay converts the chord on each parallel cylindrical support to its core tangent setback, preserving equal/unequal distances and reference assignment. The core now constructs the extra planar cap region for concave chamfers across coplanar subdivided end caps while preserving existing internal seams. No selected edge is dropped. Two-cylinder distance-angle remains explicitly unsupported.
+
+Three parent failures and two passing rejection guards precede implementation. All five tests now pass, including 18 replay variants with transforms, reversed references and face/sample order, exact contact/material and shared solid/STEP checks. Full release validation passes 400 shapeops tests, 98 meshalgo tests (one existing ignore each), 54 replay tests and 13 capture tests. Clippy and benchmark smoke pass; replay built last.
+
+Nine independent native/Truck controls match exact contact and material oracles and sampled geometry. Truck inputs remain unchanged. Native changes endpoint tolerances in three union controls; the original failed capture assertion and raw before/after BREPs remain in the evidence. This is not claimed as native input immutability.
+
+Proof: truck-benchmarks/results/2026-10-20-parallel-cylinder-chords/REPORT.md.
+Archive: 8143 byte-verified members; SHA256 a5de09d82068bcee7ac0f9e60e66b7f819b69913823ce7e64e6f0007c1350423.
+Finite samples do not prove global boundary error or full parity. No consumer change, push, PR or performance claim.
+
+NEXT
+Inspect remaining mixed selections using complete native scopes. Two-cylinder distance-angle needs an independent local-contact derivation and parent-failing controls; do not treat it as a planar section. Missing nonanalytic reference descriptors remain separate.
+Scratch target/native-parallel-cylinder-angles-complete contains12native controls:10valid30/45deg results and2union45deg failures. Initial target/native-parallel-cylinder-angles stopped at the first native failure; preserve it. target/analyze-parallel-cylinder-angles.py measures contact angles from actual contact chord lines; native bevel supports are BSpline, not tagged planes. target/model-parallel-cylinder-angles.py independently solves ray/circle intersection:10contacts agree within6e-15;2union45deg discriminants negative. For union30deg two local roots exist; choose the first forward intersection. Native union inputs mutate tolerances. These are preliminary, not yet implementation proof. No new parent tests or angle production edits yet.
+
+PREVIOUS
+460ac6fd/0847f7b7 cylinder-reference longitudinal angles:363 constructions/340 limited passes. Ten controls:4native agree,6differ; four corpus outputs have correct Truck30deg versus native41.4783409545deg. Raw verdicts and independent measurements retained.
+35c11b96/fd791dea conic contacts:359/340;full400shapeops/98meshalgo. Earlier cone/native discrepancies are documented; do not rediscover or override.
+
+METHOD
+Read AGENTS.md. Parent-failing tests; no weakened assertions; shared solid/STEP checks.
+CARGO_BUILD_JOBS=12;rustfmt +nightly --config skip_children=true;no cargo fmt.
+Freeze production during builds/tests/captures;release tests,Clippy,actions smoke;build replay LAST.
+Commit implementation/proof before clean capture, then HTML/catalog/handoff. Force-add JSON/ZIP/STEP;diff check excludes *.step.
+No consumer/pin changes,push,PR,subagents or unsupported speed/parity claims.
+Plugin target/occt-cone-reference-plugin;SDK target/occt-sdk/usr/lib64;OCCT ../investigations/sequential-holes-2026-10-10/occt;publicdata target/occt-public-chamfer-data.
+Capture workers4,timeout120,fresh output. Raw target/occt-capture-parallel-cylinder-chords and target/native-parallel-cylinder-controls.
+Helpers target/validate-parallel-cylinder-chords.py,replay-parallel-cylinder-controls.py,package-parallel-cylinder-proof.py,package-parallel-cylinder-full.py,write-parallel-cylinder-checkpoint.py. Packaging is not idempotent.

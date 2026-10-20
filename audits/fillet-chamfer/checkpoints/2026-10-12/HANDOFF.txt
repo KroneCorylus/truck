@@ -1,9 +1,8 @@
 LATEST CHECKPOINT — 2026-10-20
 ACTIVE: Continue work and commit achievements until done or told to stop.
-Read ../2026-10-20-longitudinal-cylinder-angles/HANDOFF.txt and report.html.
-Implementation 460ac6fd supports cylinder-reference longitudinal contact angles.
-Full capture:363 constructions/340 limited passes;no prior check regressions.
-Full parity remains unverified. Next candidate: parallel cylinder/cylinder chord handling.
+Read ../2026-10-20-parallel-cylinder-chords/HANDOFF.txt and report.html.
+Implementation 7ab0f68f supports parallel cylinder chords and subdivided concave caps.
+Full capture:364constructions/341limited passes;no prior check regressions. Full parity remains unverified.
 
 HISTORICAL HANDOFF FOLLOWS
 
