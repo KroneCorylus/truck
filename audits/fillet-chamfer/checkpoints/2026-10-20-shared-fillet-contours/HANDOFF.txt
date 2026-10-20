@@ -1,0 +1,37 @@
+SHARED FILLET CONTOURS — 2026-10-20
+ACTIVE: Continue work and commit achievements until done or told to stop.
+
+# Shared and open fillet contours: clean full capture
+
+Runtime f474ab2639adf1418b6faab53efb8c176c333d2f. All 396 native entries pass, yielding 648 operations with unchanged requests, scopes and native result properties. All 441 prior constructions retain checks; 441 complete result/comparison records are exactly unchanged. Numerical changes: 0.
+
+442 constructions (+1); 412 limited sampled passes (+1) at 0.001. 30 constructed discrepancies remain. Every construction preserves input, consistent geometry, closed mesh, STEP preparation and valid single-solid native/Truck comparison shapes.
+Statuses: {"input-import-failed": 96, "operation-succeeded": 442, "operation-failed": 95, "unhandled-intent": 6, "input-inconsistent": 9}.
+Status changes:
+- blend/simple/I6/001: operation-failed → operation-succeeded
+
+Separate fillet contours can now be open or closed and share original support faces. Each tangent component uses the existing wire constructor. Remaining selected edges must survive, and a later component cannot modify an earlier generated fillet. Failure preserves the input, and final face correspondence refers to the original solid.
+
+Two new rim tests and the deliberately rewritten shared-cone success test fail on the parent. All six focused tests pass after implementation, including the two unchanged existing contour tests and the new overlap guard. Eight positive and eight overlapping-rim variants cover subdivisions, transforms and reversed ordering. Three fresh native controls verify independent material, contact positions and rolling radius; 810 sampled surface points and valid single-solid STEP checks are retained. Native I6 also passes the targeted comparison.
+
+431 shapeops tests (one existing ignore), 59 replay tests, 13 capture tests, all-target release Clippy and single-thread actions smoke pass. Replay built last. Unchanged mesher 102-test evidence is verified by source hashes.
+
+Proof: truck-benchmarks/results/2026-10-20-shared-fillet-contours/REPORT.md.
+Archive: 8377 byte-verified members; SHA256 372c490c73f87321b402ede3d12c75f356809ee9394ab55b92fb8f5dbc8243f8.
+Finite samples do not establish a global error bound or full parity. No consumer, dependency or tolerance change, push, PR or performance claim.
+
+NEXT
+Investigate exact equal-radius collapsed contacts. See target/collapsed-contact-next.txt. No production implementation yet. Scratch analytic plane/cylinder helper and stronger primitive matrix pass16equal-radius variants. Existing R10-sequential-fillet.rs explicitly rejects ratio1 and1.2. Rewrite generated-matrix ratio1 first with stronger success/material/history/STEP/input checks; retain ratio1.2 rejection and the original procedural-fixture rejection, whose Surface::Fillet is not analytically classified. Fresh native controls target/native-collapsed-contacts match independent material and preserve input. Generic ApproxFilletSurface cannot represent zero-derivative contact curves; do not merely relax regular_contact. A concrete cap/wall constructor with cylindrical straight patches and spherical collapsed corner patches may be appropriate. Begin exact primitive cases; native bug828 radii differ from10 by up to8e-7, so do not assume snapping is valid. I8 needs a different non-tangent junction construction.
+
+PREVIOUS
+Mixed chamfer components eea16d36/0017e352:441/411,all438prior complete records exact. Conic seams2ea838f2/21bf2c9a:438/408,12mesh-volume changes,all438prior STEP comparisons exact. Loop order d198a51c/8941173b:438/408,18gains,all420prior records exact. Earlier independent discrepancy proofs remain authoritative.
+
+METHOD
+Read AGENTS.md. Parent-failing tests;no weakened assertions;shared solid/STEP checks.
+CARGO_BUILD_JOBS=12;rustfmt +nightly --config skip_children=true;no cargo fmt.
+Freeze production during builds/tests/captures;release tests,Clippy,actions smoke;build replay LAST.
+Commit implementation/proof before clean capture,then HTML/catalog/handoff. Force-add JSON/ZIP/STEP;diff check excludes *.step.
+No consumer/pin changes,push,PR,subagents or unsupported speed/parity claims.
+Plugin target/occt-cone-reference-plugin;SDK target/occt-sdk/usr/lib64;OCCT ../investigations/sequential-holes-2026-10-10/occt;publicdata target/occt-public-chamfer-data.
+Capture workers4,timeout120,freshoutput. Raw target/occt-capture-shared-fillet-contours;controls target/native-disjoint-fillet-rims and target/native-shared-cone-fillet.
+Helpers target/validate-shared-fillets.py,replay-shared-fillets.py,package-shared-fillets-proof.py,package-shared-fillets-full.py,write-shared-fillets-checkpoint.py. Packaging is not idempotent.

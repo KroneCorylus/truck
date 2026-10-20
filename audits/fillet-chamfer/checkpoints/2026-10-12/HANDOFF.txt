@@ -1,8 +1,8 @@
 LATEST CHECKPOINT — 2026-10-20
 ACTIVE: Continue work and commit achievements until done or told to stop.
-Read ../2026-10-20-mixed-chamfer-components/HANDOFF.txt and report.html.
-Implementation eea16d36 handles mixed disjoint chamfer components.
-Full capture:441constructions/411limited passes;no prior check regressions. Full parity remains unverified.
+Read ../2026-10-20-shared-fillet-contours/HANDOFF.txt and report.html.
+Implementation f474ab26 handles shared and open fillet contours.
+Full capture:442 constructions/412 limited passes;no prior check regressions. Full parity remains unverified.
 
 HISTORICAL HANDOFF FOLLOWS
 

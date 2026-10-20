@@ -3,7 +3,7 @@
     "title": "Fillet and chamfer feature parity audit",
     "baseline": "OCCT V7_9_3 source inventory plus the recorded Truck/Pieza revisions. Includes 3D, 2D, related workflows and all textual candidates under the discovery rules.",
     "meaning_of_all": "Every dedicated test-grid entry, matching registered test/helper, discovered blend command and retained reference in this pinned checkout. This is not a claim about all mathematical configurations or current/future OCCT releases.",
-    "execution": "All1,026 inventoried entries have native attempts. Latest clean capture ateea16d36:396 native passes,648 operations,487 complete chamfer and161 complete fillet scopes;441 constructions/411 limited sampled passes at 0.001. All 438 prior constructions retain checks;438 prior result/comparison records exact,0 numerical changes. Native discrepancies retained;full parity remains unverified.",
+    "execution": "All 1,026 inventoried entries have native attempts. Latest clean capture at f474ab26:396 native passes,648 operations,487 complete chamfer and161 complete fillet scopes;442 constructions/412 limited sampled passes at 0.001. All 441 prior constructions retain checks;441 prior result/comparison records exact,0 numerical changes. Native discrepancies retained;full parity remains unverified.",
     "mapping": "Capability assessments describe observable outcomes supported or restricted by reviewed source evidence. Per-case tags and links are automated hints; they do not prove Truck handles that fixture.",
     "objective": "Achieve at least OCCT-level fillet/chamfer capabilities and robustness for equivalent modeling tasks in Truck/Pieza.",
     "equivalence": "Judge the requested geometry, dimensions, validity, editing behavior and practical performance. Different APIs, algorithms, languages, surface representations and internal operation sequences are acceptable. Missing a corresponding OCCT method is not evidence of a feature gap."
@@ -144,13 +144,20 @@
           "path": "audits/fillet-chamfer/capture/2026-10-15-native-fillet-contours/REPORT.md",
           "find": "# Final native",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-20-shared-fillet-contours/REPORT.md",
+          "find": "# Separate open fillet contours and shared supports",
+          "role": "test"
         }
       ],
       "required_outcome": "Round selected planar-solid edges to the requested constant radius, for convex and concave material, while preserving a valid solid.",
       "verification": [
         "At d1b2bade, planar-ended fillets can be wider than their spine when the trimmed positive-weight rational patch fits every original convex half-space. The parent fails the length-0.2/radius-0.5 case. Thirty-six operations cover lengths 0.2/1/10, radii 0.5/10, perpendicular and oblique caps, and rigid transforms, with independent radius/normal/end-bound/volume checks, topology, closed meshes, history, immutable inputs and STEP. Full shapeops: 310 passed, 0 failed, 1 existing ignored; Clippy and action benchmark smoke pass. Evidence: truck-benchmarks/results/2026-10-11-short-spine-fillets/REPORT.md.",
         "At 35c6e2cf, per-edge constant radii recover draft/angle/A2 (box) and B5 (acute wedge). Three placements/scales and both selection orders check independently derived material, rolling radii/normals, complete history, unchanged input, closed meshes and STEP. Equal-radius all-edge cube and empty selections retain existing behavior. No lower-level geometric construction algorithm changed.",
-        "At e3fab5a6, fillet schema3 captures final whole contours/radius laws after all seed assignments and exact observed native settings. Parent-failing tests preserve repeated-radius replacement, complete scope and explicit unsupported laws/representations. Full capture: 231 constructions/220 limited comparisons, 4 corrected-scope records, no successful check regression for unchanged intent. 0 losses under corrected intent remain explicit. No parity upgrade."
+        "At e3fab5a6, fillet schema3 captures final whole contours/radius laws after all seed assignments and exact observed native settings. Parent-failing tests preserve repeated-radius replacement, complete scope and explicit unsupported laws/representations. Full capture: 231 constructions/220 limited comparisons, 4 corrected-scope records, no successful check regression for unchanged intent. 0 losses under corrected intent remain explicit. No parity upgrade.",
+        "At f474ab26, separate open/closed tangent fillet contours may share original supports while retaining selected-edge and earlier-fillet guards. Three parent failures including an intentional old-scope contract rewrite; eight positive/eight overlap rim variants and three fresh native controls.431 shapeops/59 replay/13 capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:442/412;all441prior checks retained. No parity upgrade."
       ]
     },
     {
@@ -1802,6 +1809,12 @@
           "path": "audits/fillet-chamfer/capture/2026-10-15-native-fillet-contours/REPORT.md",
           "find": "# Final native",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-20-shared-fillet-contours/REPORT.md",
+          "find": "# Separate open fillet contours and shared supports",
+          "role": "test"
         }
       ],
       "required_outcome": "Round or bevel a tangent chain continuously across edge splits and changes of support face.",
@@ -1811,7 +1824,8 @@
         "The clean a83a0f5c full capture confirms Q4 operation 2 is the sole change in limited pass/fail outcomes: it now has a closed mesh, one native-valid STEP solid and sampled distances below 0.00033. All 70 constructed results now have closed meshes and native-valid single-solid STEP; 69 pass combined limited comparisons. The 161 capture statuses remain 70 constructed, 32 construction failures, 25 import failures, 23 inconsistent inputs, eight unhandled, two timeouts and one incomplete, with zero panics. Tolerance-grid A1 still differs; G1 trim failure and I3/J9 timeouts remain. Evidence: audits/fillet-chamfer/capture/2026-10-12-roof-continuation/REPORT.md. No full parity verdict is assigned.",
         "At 099ccb7e following 2346b975, native chamfer schema2 captures complete contours and first-assignment/ignored semantics. Parent-failing replay validation prevents seed fallback. Automatic A4 applies3edges with valid STEP and sampled maximum2.23e-8. Fillets remainseed-only and retain5e-5exportfits; chamfersuse1e-7. Fullcapture221 constructions/210 limitedcomparisons; 58 corrected-intentrecords, no prior successful checkregressions forunchangedintent. No parityupgrade.",
         "At 48a1032f, replay propagates planar seed reference sides across complete oriented chamfer contours, including perpendicular plane/cylinder rims. Two parent-failing native regressions verify both directions and normal signs, exact setbacks and solid/STEP checks. Full capture: 231 constructions, 220 limited comparisons; all648 intents unchanged and no successful check regressions. Fillets remain seed-only. No parity upgrade.",
-        "At e3fab5a6, fillet schema3 captures final whole contours/radius laws after all seed assignments and exact observed native settings. Parent-failing tests preserve repeated-radius replacement, complete scope and explicit unsupported laws/representations. Full capture: 231 constructions/220 limited comparisons, 4 corrected-scope records, no successful check regression for unchanged intent. 0 losses under corrected intent remain explicit. No parity upgrade."
+        "At e3fab5a6, fillet schema3 captures final whole contours/radius laws after all seed assignments and exact observed native settings. Parent-failing tests preserve repeated-radius replacement, complete scope and explicit unsupported laws/representations. Full capture: 231 constructions/220 limited comparisons, 4 corrected-scope records, no successful check regression for unchanged intent. 0 losses under corrected intent remain explicit. No parity upgrade.",
+        "At f474ab26, separate open/closed tangent fillet contours may share original supports while retaining selected-edge and earlier-fillet guards. Three parent failures including an intentional old-scope contract rewrite; eight positive/eight overlap rim variants and three fresh native controls.431 shapeops/59 replay/13 capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:442/412;all441prior checks retained. No parity upgrade."
       ]
     },
     {
@@ -1823,7 +1837,7 @@
         "periodic-seam"
       ],
       "occt_scope": "Closed/tangent states, periodic surface handling and seam-related regressions, including expected failures.",
-      "truck_scope": "Cylinder rims and displaced longitudinal seams on a closed spline pipe have solid and STEP regressions. The spline case preserves a consistent contact parameter branch without requiring declared surface periodicity, including reversal and independent edge reparameterization. Broader torus and seam/termination interactions remain unverified. Separate closed tangent contours with distinct support faces can be rounded atomically in one equal-radius selection; shared changed trim faces are rejected.",
+      "truck_scope": "Cylinder rims and displaced longitudinal seams on a closed spline pipe have solid and STEP regressions. The spline case preserves a consistent contact parameter branch without requiring declared surface periodicity, including reversal and independent edge reparameterization. Broader torus and seam/termination interactions remain unverified. Separate open or closed tangent contours can be rounded atomically in one equal-radius selection, including shared original supports; later components may not change earlier generated fillets.",
       "next_case": "Move toroidal seams through terminations and exercise closed single-edge spline contours with curvature and radius-law variation.",
       "evidence": [
         {
@@ -1879,13 +1893,20 @@
           "path": "audits/fillet-chamfer/capture/2026-10-14-separate-contours/REPORT.md",
           "find": "# Full capture after atomic",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-20-shared-fillet-contours/REPORT.md",
+          "find": "# Separate open fillet contours and shared supports",
+          "role": "test"
         }
       ],
       "required_outcome": "Complete a closed blend without gaps or invalid topology, regardless of where periodic seams lie.",
       "verification": [
         "Closed spline-pipe rim regressions now cover displaced longitudinal contact seams, two constant radii, rigid transformation, scale 0.01, reversed wire and unequal rim parameter spans. Contact fitting follows one UV branch across closed NURBS seams without treating support parameter bounds as face trims. Both end-to-end tests fail on parent 4a156c4f; they check radius/normals, independent volume, topology/mesh closure, STEP and immutable input. This is targeted capability evidence, supplemented by the subsequent clean 99c9d487 native capture. See truck-benchmarks/results/2026-10-12-spline-rim-continuation/REPORT.md.",
         "Clean full capture at 99c9d487 (kernel f7f8f4f5) passes all 156 native entries. J9 is the sole construction-status change: it now succeeds, with maximum sampled distances 9.41989e-5/1.09879e-4. All 73 constructed outputs preserve input and geometry, close their meshes and yield native-valid single-solid STEP; 71 meet the combined limited comparisons. The 31 construction failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents, one incomplete capture, G1 and tolerance-grid A1 discrepancies remain. No panic, timeout or full-parity verdict. See capture/2026-10-12-spline-rim/REPORT.md.",
-        "At 35d73044, separate cylinder/cone-stack rims pass dimension-derived material, rolling radius/normals, transformed/scaled input, selection permutation, face-history, mesh and STEP regressions. Native feat/featrf/A4,A5,A6,B4 repeat this one geometry and now pass the limited comparison. All 97 preceding successful records are exactly unchanged in the clean full capture (101 constructions, 92 limited passes). Shared supports, intersecting distant faces and general corners remain outside this added scope."
+        "At 35d73044, separate cylinder/cone-stack rims pass dimension-derived material, rolling radius/normals, transformed/scaled input, selection permutation, face-history, mesh and STEP regressions. Native feat/featrf/A4,A5,A6,B4 repeat this one geometry and now pass the limited comparison. All 97 preceding successful records are exactly unchanged in the clean full capture (101 constructions, 92 limited passes). Shared supports, intersecting distant faces and general corners remain outside this added scope.",
+        "At f474ab26, separate open/closed tangent fillet contours may share original supports while retaining selected-edge and earlier-fillet guards. Three parent failures including an intentional old-scope contract rewrite; eight positive/eight overlap rim variants and three fresh native controls.431 shapeops/59 replay/13 capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:442/412;all441prior checks retained. No parity upgrade."
       ]
     },
     {
@@ -4213,7 +4234,7 @@
       "verification": [
         "At 9285a3a0, exact coincident adjacent wire ends are connected, tangent face loops are split, generated plane/cylinder-generator pcurves become spatial lines, and complete affine-circle bounds fit cylinder supports. Native Z1 preprocessing passes both modes and rigid transforms with geometry consistency, independent volume, closed meshes and STEP round trips. Invalid crossing counts and failed conversions preserve the polyline cache; unrelated coincident vertices and nonzero gaps are retained. Full release shapeops/STEP: 408 passed, 0 failed, 1 existing ignored; Clippy and action smoke pass. Subsequent native Z1 fillet replay remains to be measured; preprocessing success alone is not blend parity.",
         "At clean HEAD 6351c68b, the full tangent-input replay passes all 156 native entries and constructs 70 of 161 captured Truck tasks. All 70 preserve input and geometry consistency; 69 have closed Truck meshes, 69 prepare STEP, 68 yield native-valid single-solid STEP and 67 meet the combined limited checks including bidirectional sampled distance <=0.001. Z1 now succeeds, with maximum sampled distances about 3.48e-5. Newly reachable Q4 capture 2 has an open mesh, exports two solids and differs by 1.20840; D4 export, tolerance A1 and I3/J9 timeouts remain. Zero panics; no full parity verdict.",
-        "Separate-contour failure is atomic: a selection containing a valid individual round and an oversized round fails without changing the input in either selection order. Shared-support contours remain rejected.",
+        "Separate-contour failure is atomic: a selection containing a valid individual round and an oversized round fails without changing the input in either selection order. That checkpoint rejected shared supports; the later shared-fillet-contours checkpoint replaces this scope limit with stronger successful-solid checks and retains atomic oversized/overlap rejection.",
         "At 35c6e2cf, regressions reject invalid/nonfinite per-edge radii, duplicate/unknown edges, oversized rounds, connected unequal-radius selections, overlapping parallel rounds and conflicting captured assignments. Valid nonoverlapping unequal rounds sharing a planar support pass material and STEP checks. Input preservation is asserted for success and failure.",
         "At c26b6780, simple chamfer and fillet face patches trim a shared arc/chord neighbor sequentially instead of panicking. Parent-failing tests verify analytic contacts and retained chord, orientation, representations and immutable input. Face-patch scope only; full capture 222 constructions/208 limited comparisons with no prior successful check regressions. No parity upgrade.",
         "At 099ccb7e following 2346b975, native chamfer schema2 captures complete contours and first-assignment/ignored semantics. Parent-failing replay validation prevents seed fallback. Automatic A4 applies3edges with valid STEP and sampled maximum2.23e-8. Fillets remainseed-only and retain5e-5exportfits; chamfersuse1e-7. Fullcapture221 constructions/210 limitedcomparisons; 58 corrected-intentrecords, no prior successful checkregressions forunchangedintent. No parityupgrade.",
