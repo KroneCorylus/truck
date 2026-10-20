@@ -1,0 +1,10 @@
+{
+  "revision": "b5d23f828de2d53149ce28917a95bbe820b2eecf",
+  "sha256": {
+    "truck-shapeops/src/fillet/modeling.rs": "ead8d4f2f8b86be223d0f97c0b12bbafa1235d7c4d42f2ba4038bdd30221d01b",
+    "truck-shapeops/src/fillet/mod.rs": "50949a94c4f58cb7c01869d115061c30883efc6099974f09195630b9cecbe940",
+    "truck-shapeops/tests/R10-sequential-fillet.rs": "2b450d9f2d2306ca40a37022fa59a092f033deb46ed46be56c4dd6cc52b51e1e"
+  },
+  "intended_contract_update": "Only the generated analytic-cylinder matrix changes equal-radius rejection into spherical-corner success, retaining material/history/input checks and adding STEP and spherical-radius checks. The original procedural fixture rejection and ratio1.2 rejection remain unchanged. A new transform regression also fails on the parent.",
+  "unchanged_original_tests_sha256": "db13b39f163581be75fc260232fe32044912c2fbf90a964cc8ae3b6ccd14cc3f"
+}

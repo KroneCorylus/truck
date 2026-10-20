@@ -91,9 +91,11 @@ fn finish(solid: &Solid, index: usize, shell: Shell, tol: f64) -> Result<BlendRe
 /// invalid parameters, failed construction, or non-closed output. The input is never modified.
 /// Exact straight boundaries at open ends may extend toward the selected endpoint to meet
 /// a reentrant contact; curved end boundaries retain their existing trimmed domains.
-/// Rounding the rim where an existing convex cylindrical fillet meets a perpendicular plane
-/// requires a smaller radius; collapsed contact curves (equal radii) and folded offsets
-/// (larger radii) are unsupported.
+/// A constant-radius rim on perpendicular planar and analytic cylindrical walls may collapse
+/// a convex cylindrical contact to one vertex when both radii are equal. The corner becomes
+/// spherical; straight rim sections remain cylindrical. The cap must retain a nonzero boundary,
+/// and open ends require straight transverse boundaries. Procedural cylindrical supports and
+/// folded offsets (larger radii) remain unsupported by this collapsed-contact construction.
 pub fn fillet_solid_along_wire<R: ScalarFunctionD1>(
     solid: &Solid,
     wire: &Wire,
@@ -127,6 +129,13 @@ pub fn try_fillet_solid_along_wire<R: ScalarFunctionD1>(
         ));
     }
     let shell = super::try_fillet_along_wire(&solid.boundaries()[index], wire, radius.clone(), tol)
+        .or_else(|error| {
+            if error.code != Code::BlendConstructionFailed {
+                return Err(error);
+            }
+            super::collapsed_contacts::fillet(&solid.boundaries()[index], wire, radius.clone())
+                .ok_or(error)
+        })
         .map_err(|e| e.operation(operation).shell(index))?;
     finish(solid, index, shell, tol)
         .or_else(|error| {

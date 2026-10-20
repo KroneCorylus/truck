@@ -492,6 +492,7 @@ where
 }
 
 mod along_wire;
+mod collapsed_contacts;
 mod continued_support;
 pub use along_wire::{fillet_along_wire, try_fillet_along_wire};
 mod chamfer;

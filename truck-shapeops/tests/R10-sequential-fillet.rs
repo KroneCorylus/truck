@@ -199,8 +199,9 @@ fn sequential_radii_sizes_and_edge_orders() {
                     let radius = ratio * first_radius;
                     for wire in [wire.clone(), wire.inverse()] {
                         let result = fillet_solid_along_wire(&solid, &wire, radius, 0.001);
-                        if ratio < 1.0 {
-                            let result = result.expect("regular smaller-radius second fillet");
+                        if ratio <= 1.0 {
+                            let result =
+                                result.expect("regular or collapsed-contact second fillet");
                             assert_history(&solid, &result, 3);
                             common::assert_solid(
                                 &result.solid,
@@ -208,6 +209,14 @@ fn sequential_radii_sizes_and_edge_orders() {
                                 &[0],
                                 0.001,
                             );
+                            if ratio == 1.0 {
+                                common::blend::assert_step(
+                                    &result.solid,
+                                    expected_volume(size, first_radius, radius),
+                                    0.001,
+                                );
+                                assert_spherical_corner(&result, radius);
+                            }
                         } else {
                             assert!(result.is_none(), "size={size}, first={first_radius}, second={radius}, swapped={swapped}");
                         }
@@ -215,6 +224,168 @@ fn sequential_radii_sizes_and_edge_orders() {
                     }
                 }
             }
+        }
+    }
+}
+
+fn assert_spherical_corner(result: &BlendResult, radius: f64) {
+    let spheres: Vec<_> = result
+        .generated_faces
+        .iter()
+        .filter_map(|face| match face.oriented_surface().elementary() {
+            Some((
+                Elementary::Sphere {
+                    center,
+                    radius: actual,
+                },
+                true,
+            )) => Some((face, center, actual)),
+            _ => None,
+        })
+        .collect();
+    assert_eq!(spheres.len(), 1);
+    for (face, center, actual) in spheres {
+        assert!((actual - radius).abs() < 1e-8);
+        for edge in face.edge_iter() {
+            let curve = edge.oriented_curve();
+            let (a, b) = curve.range_tuple();
+            for i in 0..=16 {
+                assert!(
+                    ((curve.subs(a + (b - a) * i as f64 / 16.) - center).magnitude() - radius)
+                        .abs()
+                        < 1e-7
+                );
+            }
+        }
+    }
+}
+
+#[test]
+fn collapsed_corner_survives_similarity_transforms() {
+    let cube = primitive::cuboid(BoundingBox::from_iter([
+        Point3::origin(),
+        Point3::new(10., 10., 10.),
+    ]));
+    let edge = cube
+        .edge_iter()
+        .find(|e| {
+            [e.front().point(), e.back().point()]
+                .iter()
+                .all(|p| p.x.abs() < 1e-8 && p.y.abs() < 1e-8)
+        })
+        .unwrap();
+    let solid = fillet_solid_edges(&cube, &[edge.id()], 1., 0.001)
+        .unwrap()
+        .solid;
+    let wire = second_wire_at(&solid, 10., false);
+    for scale in [0.2, 7.] {
+        let matrix = Matrix4::from_translation(Vector3::new(7., -11., 17.))
+            * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.73))
+            * Matrix4::from_scale(scale);
+        let input = builder::transformed(&solid, matrix);
+        let transformed: Wire = wire
+            .iter()
+            .map(|edge| {
+                let a = matrix.transform_point(edge.front().point());
+                let b = matrix.transform_point(edge.back().point());
+                input
+                    .edge_iter()
+                    .find_map(|e| {
+                        if (e.front().point() - a).magnitude() < 1e-7
+                            && (e.back().point() - b).magnitude() < 1e-7
+                        {
+                            Some(e.clone())
+                        } else if (e.front().point() - b).magnitude() < 1e-7
+                            && (e.back().point() - a).magnitude() < 1e-7
+                        {
+                            Some(e.inverse())
+                        } else {
+                            None
+                        }
+                    })
+                    .unwrap()
+            })
+            .collect();
+        let before = serde_json::to_string(&input.compress()).unwrap();
+        for selection in [transformed.clone(), transformed.inverse()] {
+            let result = fillet_solid_along_wire(&input, &selection, scale, 0.001).unwrap();
+            assert_history(&input, &result, 3);
+            assert_spherical_corner(&result, scale);
+            let expected = expected_volume(10., 1., 1.) * scale.powi(3);
+            common::assert_solid(&result.solid, expected, &[0], 0.001);
+            common::blend::assert_step(&result.solid, expected, 0.001);
+            assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
+        }
+    }
+}
+
+fn rounded_rectangle(height: f64) -> Solid {
+    let cube = primitive::cuboid(BoundingBox::from_iter([
+        Point3::origin(),
+        Point3::new(10., 8., height),
+    ]));
+    let mut seen = HashSet::new();
+    let edges: Vec<_> = cube
+        .edge_iter()
+        .filter(|e| {
+            let v = e.back().point() - e.front().point();
+            v.x.abs() < 1e-8 && v.y.abs() < 1e-8 && seen.insert(e.id())
+        })
+        .map(|e| e.id())
+        .collect();
+    fillet_solid_edges(&cube, &edges, 1., 0.001).unwrap().solid
+}
+fn top_boundary(solid: &Solid, height: f64) -> Wire {
+    solid
+        .face_iter()
+        .find(|f| f.vertex_iter().all(|v| (v.point().z - height).abs() < 1e-8))
+        .unwrap()
+        .boundaries()[0]
+        .clone()
+}
+#[test]
+fn closed_collapsed_corners_merge_contacts_across_the_wire_seam() {
+    let solid = rounded_rectangle(6.);
+    let wire = top_boundary(&solid, 6.);
+    assert_eq!(wire.len(), 8);
+    let before = serde_json::to_string(&solid.compress()).unwrap();
+    let pi = std::f64::consts::PI;
+    let area = 1. - pi / 4.;
+    let centroid = (10. - 3. * pi) / (12. - 3. * pi);
+    let expected = (80. - 4. * area) * 6. - area * (28. + 2. * pi * (1. - centroid));
+    for offset in 0..wire.len() {
+        let selected: Wire = (0..wire.len())
+            .map(|i| wire[(i + offset) % wire.len()].clone())
+            .collect();
+        for selected in [selected.clone(), selected.inverse()] {
+            let result = fillet_solid_along_wire(&solid, &selected, 1., 0.001).unwrap();
+            assert_history(&solid, &result, 8);
+            assert_eq!(
+                result
+                    .generated_faces
+                    .iter()
+                    .filter(|f| matches!(
+                        f.oriented_surface().elementary(),
+                        Some((Elementary::Sphere { .. }, true))
+                    ))
+                    .count(),
+                4
+            );
+            common::assert_solid(&result.solid, expected, &[0], 0.001);
+            common::blend::assert_step(&result.solid, expected, 0.001);
+            assert_eq!(before, serde_json::to_string(&solid.compress()).unwrap());
+        }
+    }
+}
+#[test]
+fn collapsed_contacts_reject_cap_consumption_and_short_walls() {
+    let cylinder = common::modeling::cylinder(Point3::origin(), Vector3::unit_z(), 1., 5.);
+    for (solid, height) in [(cylinder, 5.), (rounded_rectangle(0.5), 0.5)] {
+        let wire = top_boundary(&solid, height);
+        let before = serde_json::to_string(&solid.compress()).unwrap();
+        for selected in [wire.clone(), wire.inverse()] {
+            assert!(fillet_solid_along_wire(&solid, &selected, 1., 0.001).is_none());
+            assert_eq!(before, serde_json::to_string(&solid.compress()).unwrap());
         }
     }
 }

@@ -1,0 +1,44 @@
+$ cargo test --release -p truck-shapeops --test R10-sequential-fillet
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 8.85s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/R10-sequential-fillet.rs (target/release/deps/R10_sequential_fillet-fb6bd51e7e27b261)
+
+running 7 tests
+test first_fillet_input_and_second_wire_control ... ok
+test collapsed_corner_survives_similarity_transforms ... FAILED
+test closed_collapsed_corners_merge_contacts_across_the_wire_seam ... FAILED
+test adjacent_second_fillet_must_not_panic_or_mutate_input ... ok
+test collapsed_contacts_reject_cap_consumption_and_short_walls ... ok
+test sequential_radii_sizes_and_edge_orders ... FAILED
+test smaller_second_radius_on_original_fixture_preserves_geometry_and_history ... ok
+
+failures:
+
+---- collapsed_corner_survives_similarity_transforms stdout ----
+
+thread 'collapsed_corner_survives_similarity_transforms' (1693029) panicked at truck-shapeops/tests/R10-sequential-fillet.rs:311:84:
+called `Option::unwrap()` on a `None` value
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- closed_collapsed_corners_merge_contacts_across_the_wire_seam stdout ----
+
+thread 'closed_collapsed_corners_merge_contacts_across_the_wire_seam' (1693027) panicked at truck-shapeops/tests/R10-sequential-fillet.rs:361:80:
+called `Option::unwrap()` on a `None` value
+
+---- sequential_radii_sizes_and_edge_orders stdout ----
+
+thread 'sequential_radii_sizes_and_edge_orders' (1693031) panicked at truck-shapeops/tests/R10-sequential-fillet.rs:204:40:
+regular or collapsed-contact second fillet
+
+
+failures:
+    closed_collapsed_corners_merge_contacts_across_the_wire_seam
+    collapsed_corner_survives_similarity_transforms
+    sequential_radii_sizes_and_edge_orders
+
+test result: FAILED. 4 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.33s
+
+error: test failed, to rerun pass `-p truck-shapeops --test R10-sequential-fillet`
+exit_code 101
