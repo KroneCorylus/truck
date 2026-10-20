@@ -3,7 +3,7 @@
     "title": "Fillet and chamfer feature parity audit",
     "baseline": "OCCT V7_9_3 source inventory plus the recorded Truck/Pieza revisions. Includes 3D, 2D, related workflows and all textual candidates under the discovery rules.",
     "meaning_of_all": "Every dedicated test-grid entry, matching registered test/helper, discovered blend command and retained reference in this pinned checkout. This is not a claim about all mathematical configurations or current/future OCCT releases.",
-    "execution": "All1,026 inventoried entries have native attempts. Latest clean capture at5eed074b:396 native passes,648 operations,487 complete chamfer and161 complete fillet scopes;420 constructions/390 limited sampled passes at 0.001. All 417 prior constructions retain checks;417 prior result/comparison records exact,0 numerical changes. Native discrepancies retained;full parity remains unverified.",
+    "execution": "All1,026 inventoried entries have native attempts. Latest clean capture atd198a51c:396 native passes,648 operations,487 complete chamfer and161 complete fillet scopes;438 constructions/408 limited sampled passes at 0.001. All 420 prior constructions retain checks;420 prior result/comparison records exact,0 numerical changes. Native discrepancies retained;full parity remains unverified.",
     "mapping": "Capability assessments describe observable outcomes supported or restricted by reviewed source evidence. Per-case tags and links are automated hints; they do not prove Truck handles that fixture.",
     "objective": "Achieve at least OCCT-level fillet/chamfer capabilities and robustness for equivalent modeling tasks in Truck/Pieza.",
     "equivalence": "Judge the requested geometry, dimensions, validity, editing behavior and practical performance. Different APIs, algorithms, languages, surface representations and internal operation sequences are acceptable. Missing a corresponding OCCT method is not evidence of a feature gap."
@@ -637,6 +637,12 @@
           "path": "truck-benchmarks/results/2026-10-20-chamfer-terminal-growth/REPORT.md",
           "find": "# Chamfer terminal growth",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-20-planar-loop-order/REPORT.md",
+          "find": "# Planar boundary loop order",
+          "role": "test"
         }
       ],
       "required_outcome": "Bevel with independently specified setbacks on the intended two support faces; orientation or storage order must not silently exchange them.",
@@ -659,7 +665,8 @@
         "At ea20f7d9, concave chamfers preserve coincident cylindrical terminal seams with exact end patches. Two construction/four mesh parent failures;24construction variants,12controls. Final mesh change only increases existing refinement cap20\u219264. Full400shapeops/102meshalgo/59replay/13capture tests,Clippy/smoke pass. Six raw subdivided native discrepancies retained separately from equivalent valid controls. Clean capture:371constructions/347limited passes;no prior check regression. No parity upgrade.",
         "At070d1985,convex miter corners escaping one original support plane are clipped to it. Four parent failures plus one balanced guard;five tests with transforms/reordering,independent halfspace material/vertices and shared solid/STEP checks. Five native controls retain raw corner-policy discrepancies.405shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:372/347,no prior check regression. No parity upgrade.",
         "At edcc9bf9, selected-edge chamfers support disjoint tangent wires with constant oriented distances, shared original supports and guards against modifying earlier generated bevels. Two parent failures plus overlap guard;16 positive/4 negative variants,8 native controls,independent cone material/contacts and complete face correspondence.408shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:417/387,no prior check regression. No parity upgrade.",
-        "At5eed074b, modeling chamfers extend exact straight terminal edges only at open wire ends, retaining closed/interior bounds and final checks. Three parent failures plus two guards;12positive/8negative variants,6native controls,independent material/contact/STEP/history checks. Three stepped native input-tolerance mutations retained.413shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:420/390,no prior check regression. No parity upgrade."
+        "At5eed074b, modeling chamfers extend exact straight terminal edges only at open wire ends, retaining closed/interior bounds and final checks. Three parent failures plus two guards;12positive/8negative variants,6native controls,independent material/contact/STEP/history checks. Three stepped native input-tolerance mutations retained.413shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:420/390,no prior check regression. No parity upgrade.",
+        "Atd198a51c, planar boundary and patch checks identify the outer loop geometrically and retain its original identity. Five parent failures plus two guards;all six loop orders and transforms,16solid variants,4native controls,independent material/contact/STEP/history checks. Both native inner-rim input mutations retained.420shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:438/408,no prior check regression. No parity upgrade."
       ]
     },
     {
@@ -781,6 +788,12 @@
           "path": "truck-benchmarks/results/2026-10-20-chamfer-terminal-growth/REPORT.md",
           "find": "# Chamfer terminal growth",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-20-planar-loop-order/REPORT.md",
+          "find": "# Planar boundary loop order",
+          "role": "test"
         }
       ],
       "required_outcome": "Produce a chamfer with the requested setback and angle, including non-right-angle supports, using any equivalent parameterization.",
@@ -799,7 +812,8 @@
         "At ea20f7d9, concave chamfers preserve coincident cylindrical terminal seams with exact end patches. Two construction/four mesh parent failures;24construction variants,12controls. Final mesh change only increases existing refinement cap20\u219264. Full400shapeops/102meshalgo/59replay/13capture tests,Clippy/smoke pass. Six raw subdivided native discrepancies retained separately from equivalent valid controls. Clean capture:371constructions/347limited passes;no prior check regression. No parity upgrade.",
         "At070d1985,convex miter corners escaping one original support plane are clipped to it. Four parent failures plus one balanced guard;five tests with transforms/reordering,independent halfspace material/vertices and shared solid/STEP checks. Five native controls retain raw corner-policy discrepancies.405shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:372/347,no prior check regression. No parity upgrade.",
         "At edcc9bf9, selected-edge chamfers support disjoint tangent wires with constant oriented distances, shared original supports and guards against modifying earlier generated bevels. Two parent failures plus overlap guard;16 positive/4 negative variants,8 native controls,independent cone material/contacts and complete face correspondence.408shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:417/387,no prior check regression. No parity upgrade.",
-        "At5eed074b, modeling chamfers extend exact straight terminal edges only at open wire ends, retaining closed/interior bounds and final checks. Three parent failures plus two guards;12positive/8negative variants,6native controls,independent material/contact/STEP/history checks. Three stepped native input-tolerance mutations retained.413shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:420/390,no prior check regression. No parity upgrade."
+        "At5eed074b, modeling chamfers extend exact straight terminal edges only at open wire ends, retaining closed/interior bounds and final checks. Three parent failures plus two guards;12positive/8negative variants,6native controls,independent material/contact/STEP/history checks. Three stepped native input-tolerance mutations retained.413shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:420/390,no prior check regression. No parity upgrade.",
+        "Atd198a51c, planar boundary and patch checks identify the outer loop geometrically and retain its original identity. Five parent failures plus two guards;all six loop orders and transforms,16solid variants,4native controls,independent material/contact/STEP/history checks. Both native inner-rim input mutations retained.420shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:438/408,no prior check regression. No parity upgrade."
       ]
     },
     {
@@ -923,6 +937,12 @@
           "path": "truck-benchmarks/results/2026-10-20-chamfer-terminal-growth/REPORT.md",
           "find": "# Chamfer terminal growth",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-20-planar-loop-order/REPORT.md",
+          "find": "# Planar boundary loop order",
+          "role": "test"
         }
       ],
       "required_outcome": "Produce the intended measurable setbacks on curved supports after explicitly translating dimension conventions between kernels.",
@@ -932,7 +952,8 @@
         "At ea20f7d9, concave chamfers preserve coincident cylindrical terminal seams with exact end patches. Two construction/four mesh parent failures;24construction variants,12controls. Final mesh change only increases existing refinement cap20\u219264. Full400shapeops/102meshalgo/59replay/13capture tests,Clippy/smoke pass. Six raw subdivided native discrepancies retained separately from equivalent valid controls. Clean capture:371constructions/347limited passes;no prior check regression. No parity upgrade.",
         "At070d1985,convex miter corners escaping one original support plane are clipped to it. Four parent failures plus one balanced guard;five tests with transforms/reordering,independent halfspace material/vertices and shared solid/STEP checks. Five native controls retain raw corner-policy discrepancies.405shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:372/347,no prior check regression. No parity upgrade.",
         "At edcc9bf9, selected-edge chamfers support disjoint tangent wires with constant oriented distances, shared original supports and guards against modifying earlier generated bevels. Two parent failures plus overlap guard;16 positive/4 negative variants,8 native controls,independent cone material/contacts and complete face correspondence.408shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:417/387,no prior check regression. No parity upgrade.",
-        "At5eed074b, modeling chamfers extend exact straight terminal edges only at open wire ends, retaining closed/interior bounds and final checks. Three parent failures plus two guards;12positive/8negative variants,6native controls,independent material/contact/STEP/history checks. Three stepped native input-tolerance mutations retained.413shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:420/390,no prior check regression. No parity upgrade."
+        "At5eed074b, modeling chamfers extend exact straight terminal edges only at open wire ends, retaining closed/interior bounds and final checks. Three parent failures plus two guards;12positive/8negative variants,6native controls,independent material/contact/STEP/history checks. Three stepped native input-tolerance mutations retained.413shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:420/390,no prior check regression. No parity upgrade.",
+        "Atd198a51c, planar boundary and patch checks identify the outer loop geometrically and retain its original identity. Five parent failures plus two guards;all six loop orders and transforms,16solid variants,4native controls,independent material/contact/STEP/history checks. Both native inner-rim input mutations retained.420shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:438/408,no prior check regression. No parity upgrade."
       ]
     },
     {

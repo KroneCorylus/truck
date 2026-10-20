@@ -1,8 +1,8 @@
 LATEST CHECKPOINT — 2026-10-20
 ACTIVE: Continue work and commit achievements until done or told to stop.
-Read ../2026-10-20-chamfer-terminal-growth/HANDOFF.txt and report.html.
-Implementation 5eed074b supports chamfer terminal growth.
-Full capture:420constructions/390limited passes;no prior check regressions. Full parity remains unverified.
+Read ../2026-10-20-planar-loop-order/HANDOFF.txt and report.html.
+Implementation d198a51c handles reordered planar loops.
+Full capture:438constructions/408limited passes;no prior check regressions. Full parity remains unverified.
 
 HISTORICAL HANDOFF FOLLOWS
 

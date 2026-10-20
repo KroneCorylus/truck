@@ -1,0 +1,54 @@
+PLANAR LOOP ORDER — 2026-10-20
+ACTIVE: Continue work and commit achievements until done or told to stop.
+
+# Planar loop order: clean full capture
+
+Runtime d198a51cc1d1d4c7d7df2a92a4520e2673368800. All 396 native entries pass, yielding 648 operations with unchanged requests, scopes and native result properties. All 420 prior constructions retain checks; 420 complete result/comparison records are exactly unchanged. Numerical changes: 0.
+
+438 constructions (+18); 408 limited sampled passes (+18) at 0.001. 30 constructed discrepancies remain. Every construction preserves input, consistent geometry, closed mesh, STEP preparation and valid single-solid native/Truck comparison shapes.
+Statuses: {"input-import-failed": 96, "operation-succeeded": 438, "operation-failed": 99, "unhandled-intent": 6, "input-inconsistent": 9}.
+Status changes:
+- chamfer/dist_angle_sequence/A1/006: operation-failed → operation-succeeded
+- chamfer/dist_angle_sequence/A1/008: operation-failed → operation-succeeded
+- chamfer/dist_angle_sequence/A1/011: operation-failed → operation-succeeded
+- chamfer/dist_angle_sequence/A1/013: operation-failed → operation-succeeded
+- chamfer/dist_angle_sequence/A1/014: operation-failed → operation-succeeded
+- chamfer/dist_angle_sequence/A4/002: operation-failed → operation-succeeded
+- chamfer/dist_dist_sequence/A1/006: operation-failed → operation-succeeded
+- chamfer/dist_dist_sequence/A1/008: operation-failed → operation-succeeded
+- chamfer/dist_dist_sequence/A1/011: operation-failed → operation-succeeded
+- chamfer/dist_dist_sequence/A1/013: operation-failed → operation-succeeded
+- chamfer/dist_dist_sequence/A1/014: operation-failed → operation-succeeded
+- chamfer/dist_dist_sequence/A4/002: operation-failed → operation-succeeded
+- chamfer/equal_dist_sequence/A1/006: operation-failed → operation-succeeded
+- chamfer/equal_dist_sequence/A1/008: operation-failed → operation-succeeded
+- chamfer/equal_dist_sequence/A1/011: operation-failed → operation-succeeded
+- chamfer/equal_dist_sequence/A1/013: operation-failed → operation-succeeded
+- chamfer/equal_dist_sequence/A1/014: operation-failed → operation-succeeded
+- chamfer/equal_dist_sequence/A4/002: operation-failed → operation-succeeded
+
+Planar blend checks now locate the outer loop by projected area, allowing imported faces to list holes first. Trim validation keeps the original outer-loop identity. Polygon orientation, intersections, hole containment and spacing checks remain unchanged; no tolerance is relaxed.
+
+Five regressions fail on the parent: three boundary/patch tests and two solid tests. Two new collision guards and three existing planar tests pass there. All seven new tests now pass. Boundary tests cover all six loop orders with transforms; sixteen solid variants check outer and inner chamfers, independent material, genus 2, closed meshes, STEP, input preservation and face correspondence. Four native controls match independent material and contact geometry. Both native inner-rim operations mutate input; that evidence is retained.
+
+420 shapeops tests (one existing ignore), 59 replay tests, 13 capture tests, all-target release Clippy and single-thread actions smoke pass. Replay built last. Unchanged mesher 102-test evidence is verified by source hashes.
+
+Proof:truck-benchmarks/results/2026-10-20-planar-loop-order/REPORT.md.
+Archive: 8365 byte-verified members;SHA256 d16e6760497f0fc309ce1fdf28f99df686b6de48dfc5d9c865a82f806b8f1fdb.
+Finite samples do not establish a global error bound or full parity. No consumer, dependency or tolerance change, push, PR or performance claim.
+
+NEXT
+Read target/conic-section-next.txt and target/mixed-disjoint-next.txt, especially the native counterexample and successful conic prototype. Mixed-component fallback passes primitive tests and A3 all3modes, but native quarter-cylinder equal control creates a major conic arc on the second cut and invalid STEP. Do not promote dispatch yet. Input cylinder is an Extruded full-period Conic even though the face covers only a quarter. projected_section uses independent nearest parameters and min/max, allowing near2pi versus near0 to select the major arc. Investigate bounded/source-aware seam handling; preserve long bounded sections. Raw failure and intermediate stages in target/mixed-component-controls/debug*.step/debug.log. Current loop-order implementation is unrelated and validated. Scratch conic tests now give two parent failures and one bounded-long-arc guard; candidate all pass. The candidate also restores valid STEP and native agreement for all three fresh controls. Normal Cargo parent proof, solid-level standalone section regression and production implementation remain.
+
+PREVIOUS
+Terminal growth5eed074b/39b40375:420 constructions/390 limited passes;all3F4 modes gained,all417prior records exact. Disjoint rims edcc9bf9/d515003d:417/387,45newconstructions/40newpasses;all372prior records exact. Five new unequal cone discrepancies independently explained by native first-setback fold; Truck preserves both setbacks within8.88e-9. Rawdiscrepancies retained;earlier independent discrepancy proofs remain authoritative.
+
+METHOD
+Read AGENTS.md. Parent-failing tests;no weakened assertions;shared solid/STEP checks.
+CARGO_BUILD_JOBS=12;rustfmt +nightly --config skip_children=true;no cargo fmt.
+Freeze production during builds/tests/captures;release tests,Clippy,actions smoke;build replay LAST.
+Commit implementation/proof before clean capture,then HTML/catalog/handoff. Force-add JSON/ZIP/STEP;diff check excludes *.step.
+No consumer/pin changes,push,PR,subagents or unsupported speed/parity claims.
+Plugin target/occt-cone-reference-plugin;SDK target/occt-sdk/usr/lib64;OCCT ../investigations/sequential-holes-2026-10-10/occt;publicdata target/occt-public-chamfer-data.
+Capture workers4,timeout120,freshoutput. Raw target/occt-capture-planar-loop-order;controls target/native-reordered-loops.
+Helpers target/validate-planar-loop-order.py,replay-planar-loop-order.py,package-planar-loop-order-proof.py,package-planar-loop-order-full.py,write-planar-loop-order-checkpoint.py. Packaging is not idempotent.
