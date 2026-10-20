@@ -80,7 +80,7 @@ fn finish(solid: &Solid, index: usize, shell: Shell, tol: f64) -> Result<BlendRe
 
 /// Fillets a tangent-continuous wire belonging to one boundary of a modeling solid.
 ///
-/// The scope and radius parameterization are those of [`super::fillet_along_wire`]. In
+/// The base construction and radius parameterization are those of [`super::fillet_along_wire`]. In
 /// particular, the radius covers `[0, wire.len()]`, with one unit per edge, and must supply
 /// derivatives up to second order and extend beyond the endpoints. Radius positivity and finite
 /// derivatives are checked at sampled stations. Closed-wire contacts can continue across a
@@ -94,8 +94,9 @@ fn finish(solid: &Solid, index: usize, shell: Shell, tol: f64) -> Result<BlendRe
 /// A constant-radius rim on perpendicular planar and analytic cylindrical walls may collapse
 /// a convex cylindrical contact to one vertex when both radii are equal. The corner becomes
 /// spherical; straight rim sections remain cylindrical. The cap must retain a nonzero boundary,
-/// and open ends require straight transverse boundaries. Procedural cylindrical supports and
-/// folded offsets (larger radii) remain unsupported by this collapsed-contact construction.
+/// and open ends require straight transverse boundaries. Analytic recognition includes
+/// procedural cylinders with proven translated circular sections. Folded offsets (larger
+/// radii) remain unsupported by this collapsed-contact construction.
 pub fn fillet_solid_along_wire<R: ScalarFunctionD1>(
     solid: &Solid,
     wire: &Wire,

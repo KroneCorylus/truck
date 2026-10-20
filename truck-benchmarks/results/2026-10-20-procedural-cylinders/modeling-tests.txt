@@ -1,0 +1,195 @@
+$ cargo test --release -p truck-modeling
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-modeling)
+    Finished `release` profile [optimized] target(s) in 6.99s
+     Running unittests src/lib.rs (target/release/deps/truck_modeling-cd403b47d5ae25bb)
+
+running 13 tests
+****** test of the expressions of error messages ******
+
+Two same vertices cannot construct an edge.
+
+cannot attach a plane to a wire that is not on one plane.
+
+*******************************************************
+test errors::print_messages ... ok
+test geom_impls::test_geom_impl::circum_center_is_stable_for_a_station_near_an_arc_endpoint ... ok
+test geom_impls::test_geom_impl::test_take_one_axis_by_normal ... ok
+test geometry::inclusion_tests::sampled_inclusion_reuses_searches_without_dropping_samples ... ok
+test geom_impls::test_geom_impl::test_circum_center ... ok
+test geom_impls::test_geom_impl::test_circle_arc_tangent0 ... ok
+test geom_impls::test_geom_impl::test_circle_arc_three_point ... ok
+test geom_impls::test_geom_impl::test_circle_arc ... ok
+test geom_impls::test_geom_impl::test_attach_plane_with_multiple_boundary ... ok
+test builder::partial_torus::partial_torus ... ok
+test geometry::inclusion_tests::inclusion_preserves_periodic_seams_poles_and_transformed_curves ... ok
+test geom_impls::test_geom_impl::test_attach_plane_with_single_boundary ... ok
+test geometry::inclusion_tests::bad_seeded_results_fall_back_and_off_surface_curves_stay_rejected ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/conic.rs (target/release/deps/conic-ae3c4d2c5e881889)
+
+running 3 tests
+test circle_arc_by_tangent_is_conic ... ok
+test circle_arc_by_transit_is_conic ... ok
+test inverted_conic_reverses_and_stays_exact ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/conic_extrusion_inclusion.rs (target/release/deps/conic_extrusion_inclusion-1668ecc15252172b)
+
+running 1 test
+test exact_cylinder_boundaries_include_at_small_and_large_scales ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/cylinder_search.rs (target/release/deps/cylinder_search-022974795a0739fa)
+
+running 3 tests
+test unsupported_cylinder_seeds_fall_back ... ok
+test explicit_hints_and_other_extrusions_keep_general_search ... ok
+test round_cylinders_match_general_projection ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/elementary.rs (target/release/deps/elementary-2794d9ce091021b9)
+
+running 9 tests
+test extruded_disk_gives_cylinder ... ok
+test horn_torus_orientation_is_classified_away_from_its_singular_midpoint ... ok
+test other_surfaces_are_not_elementary ... ok
+test planar_splines_keep_their_plane_under_weights_transforms_and_orientation ... ok
+test transformed_and_inverted_surface_keeps_its_kind ... ok
+test warped_degenerate_and_singular_splines_are_not_planes ... ok
+test revolved_profile_gives_planes_cylinder_and_cone ... ok
+test revolved_disk_gives_torus ... ok
+test revolved_half_circle_gives_sphere ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/extruded.rs (target/release/deps/extruded-d3176334023547dc)
+
+running 1 test
+test tsweep_of_disk_keeps_extruded_conic ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/loft_alignment.rs (target/release/deps/loft_alignment-97e95f9989e5987c)
+
+running 1 test
+test translated_closed_sections_preserve_correspondence_and_winding ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/nurbs_cylinder.rs (target/release/deps/nurbs_cylinder-b3c42fc2f714a93f)
+
+running 4 tests
+test non_bezier_knot_spans_are_not_assumed_to_be_circular ... ok
+test elliptic_or_nonruled_rational_surfaces_are_not_cylinders ... ok
+test reversed_native_cylinder_offsets_preserve_orientation ... ok
+test rational_ruled_cylinders_have_exact_typed_offsets ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/oblique_conic_extrusion_inclusion.rs (target/release/deps/oblique_conic_extrusion_inclusion-b5223540e6c204a5)
+
+running 1 test
+test affine_conic_extrusions_preserve_exact_inclusion_and_bounded_trims ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/offset.rs (target/release/deps/offset-ee7cf8991da58f5a)
+
+running 6 tests
+test extruded_circle_changes_radius ... ok
+test plane_moves_along_its_normal ... ok
+test inverted_revolution_offsets_along_the_inverted_normal ... ok
+test splines_have_no_typed_offset ... ok
+test revolved_line_moves_a_cylinder_and_a_cone ... ok
+test revolved_circles_give_a_sphere_and_a_torus ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/procedural_cylinder.rs (target/release/deps/procedural_cylinder-9716363bb1883a58)
+
+running 2 tests
+test varying_or_non_circular_procedural_sections_are_not_classified ... ok
+test translated_procedural_circle_is_an_analytic_cylinder ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/revolved_search.rs (target/release/deps/revolved_search-29bf688e6ab8539f)
+
+running 2 tests
+test revolved_cylinder_inverse_preserves_membership_and_orientation ... ok
+test native_revolved_nearest_matches_grid_search_under_similarity_transforms ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+
+     Running tests/revolved_surface_inclusion.rs (target/release/deps/revolved_surface_inclusion-31190f847131ee3e)
+
+running 3 tests
+test singular_revolved_transform_rejects_inclusion_without_panicking ... ok
+test spherical_meridians_remain_included_across_the_periodic_seam ... ok
+test transformed_revolved_boundaries_use_the_surface_coordinate_system ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/topo_traits.rs (target/release/deps/topo_traits-b1cdadba4c8b7eb1)
+
+running 15 tests
+test edge_multi_sweep ... ok
+test edge_closed_sweep ... ok
+test edge_sweep ... ok
+test face_sweep ... ok
+test face_multi_sweep ... ok
+test face_closed_sweep ... ok
+test shell_sweep ... ok
+test shell_multi_sweep ... ok
+test shell_closed_sweep ... ok
+test vertex_closed_sweep ... ok
+test vertex_multi_sweep ... ok
+test vertex_sweep ... ok
+test wire_closed_sweep ... ok
+test wire_multi_sweep ... ok
+test wire_sweep ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests truck_modeling
+
+running 29 tests
+test truck-modeling/src/builder.rs - builder::rsweep (line 594) ... ignored
+test truck-modeling/src/builder.rs - builder::tsweep (line 482) ... ignored
+test truck-modeling/src/builder.rs - builder::vertex (line 20) ... ok
+test truck-modeling/src/sweep.rs - sweep::Vertex<P>::sweep (line 14) ... ok
+test truck-modeling/src/builder.rs - builder::clone (line 405) ... ok
+test truck-modeling/src/builder.rs - builder::vertices (line 32) ... ok
+test truck-modeling/src/primitive.rs - primitive::rect (line 8) ... ok
+test truck-modeling/src/builder.rs - builder::circle_arc (line 89) ... ok
+test truck-modeling/src/builder.rs - builder::bezier (line 148) ... ok
+test truck-modeling/src/builder.rs - builder::circle_arc (line 108) ... ok
+test truck-modeling/src/builder.rs - builder::line (line 55) ... ok
+test truck-modeling/src/primitive.rs - primitive::circle (line 64) ... ok
+test truck-modeling/src/primitive.rs - primitive::rect (line 26) ... ok
+test truck-modeling/src/builder.rs - builder::homotopy (line 178) ... ok
+test truck-modeling/src/sweep.rs - sweep::Edge<P,C>::sweep (line 45) ... ok
+test truck-modeling/src/builder.rs - builder::try_wire_homotopy (line 274) ... ok
+test truck-modeling/src/builder.rs - builder::try_attach_plane (line 343) ... ok
+test truck-modeling/src/sweep.rs - sweep::Wire<P,C>::sweep (line 108) ... ok
+test truck-modeling/src/builder.rs - builder::sweep_along_wire (line 1475) ... ok
+test truck-modeling/src/sweep.rs - sweep::Face<P,C,S>::sweep (line 183) ... ok
+test truck-modeling/src/builder.rs - builder::try_wire_homotopy (line 244) ... ok
+test truck-modeling/src/builder.rs - builder::try_wire_homotopy (line 219) ... ok
+test truck-modeling/src/primitive.rs - primitive::cuboid (line 121) ... ok
+test truck-modeling/src/builder.rs - builder::try_attach_plane (line 330) ... ok
+test truck-modeling/src/builder.rs - builder::cone (line 674) ... ok
+test truck-modeling/src/builder.rs - builder::try_loft_shell (line 794) ... ok
+test truck-modeling/src/builder.rs - builder::tsweep (line 444) ... ok
+test truck-modeling/src/builder.rs - builder::rsweep (line 504) ... ok
+test truck-modeling/src/builder.rs - builder::rsweep (line 533) ... ok
+
+test result: ok. 27 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.45s
+
+exit_code 0

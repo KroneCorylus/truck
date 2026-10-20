@@ -102,10 +102,12 @@ fn adjacent_second_fillet_must_not_panic_or_mutate_input() {
     }));
     assert_eq!(before, serde_json::to_string(&solid.compress()).unwrap());
     let result = result.expect("second fillet panicked in the kernel");
-    assert!(
-        result.is_none(),
-        "equal radii require a collapsed contact curve"
-    );
+    let result = result.expect("equal-radius procedural contact becomes a spherical corner");
+    assert_history(&solid, &result, 3);
+    common::assert_solid(&result.solid, expected_volume(70., 1., 1.), &[0], 0.001);
+    common::blend::assert_step(&result.solid, expected_volume(70., 1., 1.), 0.001);
+    assert_spherical_corner(&result, 1.);
+    assert_eq!(before, serde_json::to_string(&solid.compress()).unwrap());
 }
 
 fn assert_history(input: &Solid, result: &BlendResult, generated: usize) {
@@ -385,6 +387,55 @@ fn collapsed_contacts_reject_cap_consumption_and_short_walls() {
         let before = serde_json::to_string(&solid.compress()).unwrap();
         for selected in [wire.clone(), wire.inverse()] {
             assert!(fillet_solid_along_wire(&solid, &selected, 1., 0.001).is_none());
+            assert_eq!(before, serde_json::to_string(&solid.compress()).unwrap());
+        }
+    }
+}
+
+#[test]
+fn procedural_first_round_supports_equal_radius_continuation() {
+    for radius in [0.5, 1., 2.] {
+        let cube = primitive::cuboid(BoundingBox::from_iter([
+            Point3::origin(),
+            Point3::new(12., 12., 12.),
+        ]));
+        let edge = cube
+            .edge_iter()
+            .find(|e| {
+                [e.front().point(), e.back().point()]
+                    .iter()
+                    .all(|p| p.x.abs() < 1e-8 && p.y.abs() < 1e-8)
+            })
+            .unwrap();
+        let before = serde_json::to_string(&cube.compress()).unwrap();
+        let first =
+            fillet_solid_along_wire(&cube, &vec![edge.clone()].into(), radius, 0.001).unwrap();
+        assert_history(&cube, &first, 1);
+        assert!(matches!(
+            first.generated_faces[0].surface(),
+            Surface::Fillet(_)
+        ));
+        common::assert_solid(
+            &first.solid,
+            12_f64.powi(3) - radius * radius * (1. - std::f64::consts::PI / 4.) * 12.,
+            &[0],
+            0.001,
+        );
+        assert_eq!(before, serde_json::to_string(&cube.compress()).unwrap());
+        let solid = first.solid;
+        let wire = second_wire_at(&solid, 12., false);
+        let before = serde_json::to_string(&solid.compress()).unwrap();
+        for selected in [wire.clone(), wire.inverse()] {
+            let result = fillet_solid_along_wire(&solid, &selected, radius, 0.001).unwrap();
+            assert_history(&solid, &result, 3);
+            assert_spherical_corner(&result, radius);
+            common::assert_solid(
+                &result.solid,
+                expected_volume(12., radius, radius),
+                &[0],
+                0.001,
+            );
+            common::blend::assert_step(&result.solid, expected_volume(12., radius, radius), 0.001);
             assert_eq!(before, serde_json::to_string(&solid.compress()).unwrap());
         }
     }

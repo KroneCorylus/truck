@@ -1,0 +1,13 @@
+{
+  "revision": "160891893b6f4882be0dc745c6886ecc6cc1240e",
+  "sha256": {
+    "truck-geometry/src/decorators/af_surface.rs": "b7000bb75958bb519c20413dba31c22cb9f15faec8915867bf8a8bd229528596",
+    "truck-modeling/src/geometry.rs": "49bed173ee736e7c4f8426cc818ab52cf66dfec9bf3b9d8f6600a27a5a0ebfd5",
+    "truck-modeling/tests/procedural_cylinder.rs": "a04dda4522597e56e4c77ba3bf9c0e1338780040421b4807fc34c2c288476815",
+    "truck-shapeops/src/fillet/modeling.rs": "d8215c7f589145417724d5dc7fab59b512e7db6185143e74d07f575fd30de99f",
+    "truck-shapeops/tests/R10-sequential-fillet.rs": "9013c8ad60d286063c8dc99328033267b4d333fe24bf23c64e12c17527fcd168",
+    "truck-shapeops/tests/R10-first-fillet-solid.json": "05f83e4d83cf48a08100d1c97ad289089b50cc8cc2b5040f54b3b9eafbb98c58"
+  },
+  "unchanged_existing_r10_tests_sha256": "fd929dfa2e96b8e82dc3ab86198540ab0c4883dcd158fc6d87e6f4e9b4c206fe",
+  "intended_contract_update": "The original procedural R10 equal-radius rejection is rewritten before implementation into successful spherical continuation, retaining catch_unwind and input preservation and adding complete history, analytic material, STEP and radius checks. All existing analytic-continuation and fold/cap/short-wall guards remain unchanged. A new procedural-first-round regression and coefficient-based modeling classification tests fail on the parent."
+}

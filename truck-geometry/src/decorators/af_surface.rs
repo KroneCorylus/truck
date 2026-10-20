@@ -7,6 +7,10 @@ impl<S0, S1> ApproxFilletSurface<S0, S1> {
     pub const fn surface1(&self) -> &S1 { &self.surface1 }
     /// Returns the knot vector for the parameter `v`.
     pub const fn vknot_vec(&self) -> &KnotVec { &self.knot_vec }
+    /// Returns the tangent-vector control arrays and the section-weight control array.
+    pub fn section_coefficients(&self) -> (&[Vector2], &[Vector2], &[f64]) {
+        (&self.tangent_vecs0, &self.tangent_vecs1, &self.weights)
+    }
     /// Normalizes the longitudinal parameter to `[0, 1]`, preserving the geometry.
     ///
     /// Returns `None` without mutation for non-finite, unordered or zero-range knots.

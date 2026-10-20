@@ -1,0 +1,26 @@
+   Compiling truck-geotrait v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-geotrait)
+   Compiling truck-topology v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-topology)
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-modeling)
+    Finished `release` profile [optimized] target(s) in 3.24s
+     Running tests/procedural_cylinder.rs (target/release/deps/procedural_cylinder-9716363bb1883a58)
+
+running 2 tests
+test translated_procedural_circle_is_an_analytic_cylinder ... FAILED
+test varying_or_non_circular_procedural_sections_are_not_classified ... ok
+
+failures:
+
+---- translated_procedural_circle_is_an_analytic_cylinder stdout ----
+
+thread 'translated_procedural_circle_is_an_analytic_cylinder' (1806576) panicked at truck-modeling/tests/procedural_cylinder.rs:38:21:
+translated circular section must be recognized
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    translated_procedural_circle_is_an_analytic_cylinder
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-modeling --test procedural_cylinder`

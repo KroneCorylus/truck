@@ -648,7 +648,9 @@ impl Surface {
     /// parallel to the axis (cylinder), perpendicular to it (plane) or meeting it (cone); a
     /// revolved round circle in a plane through the axis, centred on the axis (sphere) or off
     /// it (torus); a clamped rational quadratic patch ruled along a circular section;
-    /// and regular planar B-spline or positive-weight NURBS patches.
+    /// regular planar B-spline or positive-weight NURBS patches; and plane-supported procedural
+    /// fillets whose clamped parallel contact polygons and constant section coefficients prove
+    /// a translated circular section.
     pub fn elementary(&self) -> Option<(Elementary, bool)> {
         let elementary = match self {
             Surface::Plane(plane) => return Some((Elementary::Plane(*plane), true)),
@@ -658,6 +660,9 @@ impl Surface {
             }
             .transformed(*surface.transform())?,
             Surface::Extruded(surface) => extruded_elementary(surface)?,
+            Surface::Fillet(surface) => {
+                fillet_cylinder(surface.entity())?.transformed(*surface.transform())?
+            }
             Surface::BSplineSurface(surface) => {
                 spline_plane(self, surface.control_points().iter().flatten().copied())?
             }
@@ -681,7 +686,6 @@ impl Surface {
             Surface::RevolutedCurve(surface) => {
                 revolved_elementary(surface.entity())?.transformed(*surface.transform())?
             }
-            _ => return None,
         };
         let (urange, vrange) = self.try_range_tuple();
         let sample = |range: Option<(f64, f64)>, t| range.map_or(t, |(a, b)| a + (b - a) * t);
@@ -967,6 +971,111 @@ impl Surface {
     }
 }
 
+fn fillet_cylinder(
+    surface: &ApproxFilletSurface<Box<Surface>, Box<Surface>>,
+) -> Option<Elementary> {
+    let (Surface::Plane(plane0), Surface::Plane(plane1)) =
+        (surface.surface0().as_ref(), surface.surface1().as_ref())
+    else {
+        return None;
+    };
+    let (tangent0, tangent1, weights) = surface.section_coefficients();
+    let n = weights.len();
+    let knots = surface.vknot_vec();
+    let degree = knots.len().checked_sub(n + 1)?;
+    if n < 2 || degree == 0 || degree >= n || tangent0.len() != n || tangent1.len() != n {
+        return None;
+    }
+    let (a, b) = (knots[0], knots[knots.len() - 1]);
+    if !a.is_finite()
+        || !b.is_finite()
+        || a >= b
+        || knots.iter().any(|t| !t.is_finite())
+        || knots.windows(2).any(|w| w[0] > w[1])
+        || knots.iter().take(degree + 1).any(|&t| t != a)
+        || knots.iter().rev().take(degree + 1).any(|&t| t != b)
+    {
+        return None;
+    }
+    let close = |a: f64, b: f64| {
+        a.is_finite()
+            && b.is_finite()
+            && (a - b).abs() <= 256. * f64::EPSILON * (1. + a.abs().max(b.abs()))
+    };
+    if weights[0] <= 0.
+        || weights.iter().any(|&w| !close(w, weights[0]))
+        || [tangent0, tangent1]
+            .iter()
+            .any(|t| t.iter().any(|v| !close(v.x, t[0].x) || !close(v.y, t[0].y)))
+    {
+        return None;
+    }
+    let side0 = surface.side_pcurve0();
+    let side1 = surface.side_pcurve1();
+    let points: [Vec<_>; 2] =
+        [(plane0, side0.curve()), (plane1, side1.curve())].map(|(plane, curve)| {
+            curve
+                .control_points()
+                .iter()
+                .map(|p| plane.subs(p.x, p.y))
+                .collect()
+        });
+    if points.iter().any(|p| p.len() != n) {
+        return None;
+    }
+    let direction = points[0][n - 1] - points[0][0];
+    let length = direction.magnitude();
+    let displacement = points[1][0] - points[0][0];
+    if !length.is_finite() || length <= 0. || !displacement.magnitude().is_finite() {
+        return None;
+    }
+    let axis = direction / length;
+    let epsilon = 256. * f64::EPSILON * (1. + length.max(displacement.magnitude()));
+    for side in &points {
+        for p in side {
+            let residual = (*p - side[0]).cross(axis).magnitude();
+            if !residual.is_finite() || residual > epsilon {
+                return None;
+            }
+        }
+        for pair in side.windows(2) {
+            let progress = (pair[1] - pair[0]).dot(axis);
+            if !progress.is_finite() || progress <= 0. {
+                return None;
+            }
+        }
+    }
+    for (p, q) in points[0].iter().zip(&points[1]) {
+        let residual = (q - p - displacement).magnitude();
+        if !residual.is_finite() || residual > epsilon {
+            return None;
+        }
+    }
+    // Parallel contact polygons and constant coefficients make every section a translation.
+    let section = surface.fillet_bezier(a);
+    let [p, q, r, s] = *section.control_points().as_slice() else {
+        return None;
+    };
+    if [p, q, r, s]
+        .iter()
+        .any(|p| (0..4).any(|i| !p[i].is_finite()))
+    {
+        return None;
+    }
+    let middle = (3. * q - p) / 2.;
+    let other = (3. * r - s) / 2.;
+    // A degree-elevated rational quadratic has the same recovered middle control from both ends.
+    if (0..4).any(|i| !close(middle[i], other[i])) {
+        return None;
+    }
+    let (origin, radius) = circular_section([p, middle, s], axis)?;
+    Some(Elementary::Cylinder {
+        origin,
+        axis,
+        radius,
+    })
+}
+
 fn nurbs_cylinder(surface: &NurbsSurface<Vector4>) -> Option<Elementary> {
     let transpose = match surface.degrees() {
         (2, 1) => false,
@@ -1016,6 +1125,16 @@ fn nurbs_cylinder(surface: &NurbsSurface<Vector4>) -> Option<Elementary> {
             return None;
         }
     }
+    let (origin, radius) = circular_section(row, axis)?;
+    Some(Elementary::Cylinder {
+        origin,
+        axis,
+        radius,
+    })
+}
+
+fn circular_section(row: [Vector4; 3], axis: Vector3) -> Option<(Point3, f64)> {
+    let start = row[0].to_point();
     let [p, q, r] = row.map(|p| p.to_point() - axis * (p.to_point() - start).dot(axis));
     let chord = r - p;
     let normal = axis.cross(q - p);
@@ -1036,11 +1155,7 @@ fn nurbs_cylinder(surface: &NurbsSurface<Vector4>) -> Option<Elementary> {
     if !(row[1].w / row[0].w).near(&weight) || !middle.near(&q) {
         return None;
     }
-    Some(Elementary::Cylinder {
-        origin: center,
-        axis,
-        radius,
-    })
+    Some((center, radius))
 }
 
 /// The component of `p - origin` perpendicular to the unit vector `axis`.
