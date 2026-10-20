@@ -3,7 +3,7 @@
     "title": "Fillet and chamfer feature parity audit",
     "baseline": "OCCT V7_9_3 source inventory plus the recorded Truck/Pieza revisions. Includes 3D, 2D, related workflows and all textual candidates under the discovery rules.",
     "meaning_of_all": "Every dedicated test-grid entry, matching registered test/helper, discovered blend command and retained reference in this pinned checkout. This is not a claim about all mathematical configurations or current/future OCCT releases.",
-    "execution": "All 1,026 inventoried entries have native attempts. Latest clean capture at 3bd4ef6d:396 native passes,648 operations,487 complete chamfer and161 complete fillet scopes;443 constructions/413 limited sampled passes at 0.001. All443 prior constructions retain checks;443 complete prior records exact,0 numerical changes. Native discrepancies retained;full parity remains unverified.",
+    "execution": "All 1,026 inventoried entries have native attempts. Latest clean capture at fdc8092c:396 native passes,648 operations,487 complete chamfer and161 complete fillet scopes;444 constructions/414 limited sampled passes at0.001. All443 prior constructions retain checks;443 complete prior records exact,0 numerical changes. Native discrepancies retained;full parity remains unverified.",
     "mapping": "Capability assessments describe observable outcomes supported or restricted by reviewed source evidence. Per-case tags and links are automated hints; they do not prove Truck handles that fixture.",
     "objective": "Achieve at least OCCT-level fillet/chamfer capabilities and robustness for equivalent modeling tasks in Truck/Pieza.",
     "equivalence": "Judge the requested geometry, dimensions, validity, editing behavior and practical performance. Different APIs, algorithms, languages, surface representations and internal operation sequences are acceptable. Missing a corresponding OCCT method is not evidence of a feature gap."
@@ -371,7 +371,7 @@
         "chamfer"
       ],
       "occt_scope": "Symmetric chamfers propagated along contours.",
-      "truck_scope": "Planar neighborhoods, nonconvex corners and selected cylinder lips are covered.",
+      "truck_scope": "Planar neighborhoods, nonconvex corners and selected cylinder lips are covered. Tilted planar-cap tangent chamfer contacts can continue to original seams on parallel convex cylindrical/planar walls; four independent native controls retain one distance discrepancy.",
       "next_case": "Pair simple OCCT fixtures with planar convex and concave solids.",
       "evidence": [
         {
@@ -487,6 +487,12 @@
           "path": "truck-benchmarks/results/2026-10-20-mixed-chamfer-components/REPORT.md",
           "find": "# Mixed disjoint chamfer components",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-20-tilted-cap-chamfers/REPORT.md",
+          "find": "# Tilted-cap chamfer contact continuation",
+          "role": "test"
         }
       ],
       "required_outcome": "Bevel selected edges by equal specified setbacks on both supports, including convex and concave material.",
@@ -506,7 +512,8 @@
         "At ac5b8fa3, planar chamfers cross curved terminal boundaries using existing intersection and bounded trimming. Two parent-failing tests/four constructed variants,oversized guards,six independent native controls. Full shapeops 396 pass,42 replay tests,Clippy/smoke. Clean capture:352 constructions/333 limited passes;no prior successful check regressed. No parity upgrade.",
         "At 35c11b96, planar chamfer contacts extend exact conics and their extruded cylinder generators;mesh interior ruling fixes material loss. Three parent failures,eight variants,oversized guards,six native controls. Full shapeops 400 and meshalgo 98 pass,46 replay tests,Clippy/smoke. Clean capture:359 constructions/340 limited passes;no prior successful check regressed. No parity upgrade.",
         "At2ea838f2, projected conic sections unwrap periodic endpoints locally and preserve explicit bounded long arcs and reversal. Three parent failures plus long-arc guard;three scales,two solid variants,three native controls with independent material/contact/STEP/history/input checks.424shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:438/408,no prior check regression. No parity upgrade.",
-        "Ateea16d36, mixed disjoint chamfer components use the existing single-edge constructor when needed, preserving side orientation, remaining selections and earlier bevels. Three parent failures plus overlap guard;18positive/6negative variants,3native controls with independent material/contact/STEP/history/input checks.428shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:441/411,all438prior records exact. No parity upgrade."
+        "Ateea16d36, mixed disjoint chamfer components use the existing single-edge constructor when needed, preserving side orientation, remaining selections and earlier bevels. Three parent failures plus overlap guard;18positive/6negative variants,3native controls with independent material/contact/STEP/history/input checks.428shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:441/411,all438prior records exact. No parity upgrade.",
+        "At fdc8092c, tilted planar-cap chamfer contacts continue over parallel convex cylindrical and planar supports. Two parent failures;four independent native controls,three distance passes and one explicitly retained10-degree discrepancy.442shapeops/115stepio/59replay/13capture,Clippy/smoke pass;baseline geometry precision failure retained. Clean capture:444/414;all443prior checks retained. No parity upgrade."
       ]
     },
     {
@@ -930,7 +937,7 @@
         "freeform"
       ],
       "occt_scope": "Classic numerical chamfer contacts satisfy a normal-section plane and a guide-to-contact chord distance.",
-      "truck_scope": "Generic Truck contacts use nearest projections of tangent offsets; the same numeric parameter generally gives a different physical setback from OCCT. This is a dimension-convention difference until equivalent inputs or alternate constructions have been tested.",
+      "truck_scope": "Generic Truck contacts use nearest projections of tangent offsets; the same numeric parameter generally gives a different physical setback from OCCT. This is a dimension-convention difference until equivalent inputs or alternate constructions have been tested. Tilted planar-cap tangent chamfer contacts can continue to original seams on parallel convex cylindrical/planar walls; four independent native controls retain one distance discrepancy.",
       "next_case": "On a radius-2 cylinder, request a physical chord setback of 1. Translate each parameter convention and measure the result; then check varying curvature where a single converted value may be insufficient.",
       "evidence": [
         {
@@ -992,6 +999,12 @@
           "path": "truck-benchmarks/results/2026-10-20-planar-loop-order/REPORT.md",
           "find": "# Planar boundary loop order",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-20-tilted-cap-chamfers/REPORT.md",
+          "find": "# Tilted-cap chamfer contact continuation",
+          "role": "test"
         }
       ],
       "required_outcome": "Produce the intended measurable setbacks on curved supports after explicitly translating dimension conventions between kernels.",
@@ -1002,7 +1015,8 @@
         "At070d1985,convex miter corners escaping one original support plane are clipped to it. Four parent failures plus one balanced guard;five tests with transforms/reordering,independent halfspace material/vertices and shared solid/STEP checks. Five native controls retain raw corner-policy discrepancies.405shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:372/347,no prior check regression. No parity upgrade.",
         "At edcc9bf9, selected-edge chamfers support disjoint tangent wires with constant oriented distances, shared original supports and guards against modifying earlier generated bevels. Two parent failures plus overlap guard;16 positive/4 negative variants,8 native controls,independent cone material/contacts and complete face correspondence.408shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:417/387,no prior check regression. No parity upgrade.",
         "At5eed074b, modeling chamfers extend exact straight terminal edges only at open wire ends, retaining closed/interior bounds and final checks. Three parent failures plus two guards;12positive/8negative variants,6native controls,independent material/contact/STEP/history checks. Three stepped native input-tolerance mutations retained.413shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:420/390,no prior check regression. No parity upgrade.",
-        "Atd198a51c, planar boundary and patch checks identify the outer loop geometrically and retain its original identity. Five parent failures plus two guards;all six loop orders and transforms,16solid variants,4native controls,independent material/contact/STEP/history checks. Both native inner-rim input mutations retained.420shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:438/408,no prior check regression. No parity upgrade."
+        "Atd198a51c, planar boundary and patch checks identify the outer loop geometrically and retain its original identity. Five parent failures plus two guards;all six loop orders and transforms,16solid variants,4native controls,independent material/contact/STEP/history checks. Both native inner-rim input mutations retained.420shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:438/408,no prior check regression. No parity upgrade.",
+        "At fdc8092c, tilted planar-cap chamfer contacts continue over parallel convex cylindrical and planar supports. Two parent failures;four independent native controls,three distance passes and one explicitly retained10-degree discrepancy.442shapeops/115stepio/59replay/13capture,Clippy/smoke pass;baseline geometry precision failure retained. Clean capture:444/414;all443prior checks retained. No parity upgrade."
       ]
     },
     {
@@ -1014,7 +1028,7 @@
         "cylinder"
       ],
       "occt_scope": "Analytic line/circle special cases plus generic walking.",
-      "truck_scope": "Straight axial lips, circular rims, holes and channels have tests; this does not cover all oblique intersections. Separate axial lips can use different radii in one atomic solid operation; the semiannulus regression checks independent circular-area material and rolling-cylinder normals. Plane-supported procedural cylinders now have representation-based recognition and original R10 sequential-round controls; this does not establish general procedural-surface equivalence. Mixed collapsing and regular convex cylindrical rim corners now have spherical/torus patch and independent radius/normal/material controls; general junction parity remains unverified.",
+      "truck_scope": "Straight axial lips, circular rims, holes and channels have tests; this does not cover all oblique intersections. Separate axial lips can use different radii in one atomic solid operation; the semiannulus regression checks independent circular-area material and rolling-cylinder normals. Plane-supported procedural cylinders now have representation-based recognition and original R10 sequential-round controls; this does not establish general procedural-surface equivalence. Mixed collapsing and regular convex cylindrical rim corners now have spherical/torus patch and independent radius/normal/material controls; general junction parity remains unverified. Tilted planar-cap tangent chamfer contacts can continue to original seams on parallel convex cylindrical/planar walls; four independent native controls retain one distance discrepancy.",
       "next_case": "Compare convex/concave lips, hole/boss rims, and a tilted plane cutting a cylinder.",
       "evidence": [
         {
@@ -1094,6 +1108,12 @@
           "path": "truck-benchmarks/results/2026-10-20-mixed-collapsed-contacts/REPORT.md",
           "find": "# Mixed collapsing and regular cylindrical rim corners",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-20-tilted-cap-chamfers/REPORT.md",
+          "find": "# Tilted-cap chamfer contact continuation",
+          "role": "test"
         }
       ],
       "required_outcome": "Blend lips and rims formed by planes and cylinders, for holes, bosses and channels in either material sense.",
@@ -1103,7 +1123,8 @@
         "At c26b6780, simple chamfer and fillet face patches trim a shared arc/chord neighbor sequentially instead of panicking. Parent-failing tests verify analytic contacts and retained chord, orientation, representations and immutable input. Face-patch scope only; full capture 222 constructions/208 limited comparisons with no prior successful check regressions. No parity upgrade.",
         "At 0258681b, exact equal-radius analytic cylindrical rim contacts collapse to shared vertices and spherical patches. Three parent failures, four parent controls and seven focused tests;36positive/4negative new-scope variants. Four native controls with independent material/contact/radius/STEP checks.434shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:443/413;all442prior checks retained. Original procedural R10 and near-equal bug828 remain outside this scope. No parity upgrade.",
         "At 51e609eb, representation-proven plane-supported procedural cylinders enable the original R10 and six new sequential continuations. Three parent failures;four independent native controls. Release suites:1032passing,one reproduced parent geometry precision failure,five existing ignores;59replay/13capture,Clippy/smoke pass. Clean capture:443/413;all443prior checks retained. No parity upgrade.",
-        "At 3bd4ef6d, mixed collapsing and regular convex cylindrical rim corners use spherical and toroidal patches. Two parent failures;two independent native controls;20new-scope variants.438shapeops/115stepio/59replay/13capture,Clippy/smoke pass;unchanged geometry/modeling/meshalgo evidence retained,including the baseline precision failure. Clean capture:443/413;all443prior checks retained. No parity upgrade."
+        "At 3bd4ef6d, mixed collapsing and regular convex cylindrical rim corners use spherical and toroidal patches. Two parent failures;two independent native controls;20new-scope variants.438shapeops/115stepio/59replay/13capture,Clippy/smoke pass;unchanged geometry/modeling/meshalgo evidence retained,including the baseline precision failure. Clean capture:443/413;all443prior checks retained. No parity upgrade.",
+        "At fdc8092c, tilted planar-cap chamfer contacts continue over parallel convex cylindrical and planar supports. Two parent failures;four independent native controls,three distance passes and one explicitly retained10-degree discrepancy.442shapeops/115stepio/59replay/13capture,Clippy/smoke pass;baseline geometry precision failure retained. Clean capture:444/414;all443prior checks retained. No parity upgrade."
       ]
     },
     {
@@ -1769,7 +1790,7 @@
         "tangent"
       ],
       "occt_scope": "Contours propagate along tangent edges and tangent support series.",
-      "truck_scope": "Application propagation checks edge tangents and both face normals; the kernel accepts explicitly supplied chains. Closed-wire contacts can now leave a planar outer boundary and continue onto one tangent adjacent support per original edge and side, with Q4 post/rounded-roof solid and STEP regression coverage. General open-wire and multi-neighbor support propagation remains incomplete. Mixed collapsing and regular convex cylindrical rim corners now have spherical/torus patch and independent radius/normal/material controls; general junction parity remains unverified.",
+      "truck_scope": "Application propagation checks edge tangents and both face normals; the kernel accepts explicitly supplied chains. Closed-wire contacts can now leave a planar outer boundary and continue onto one tangent adjacent support per original edge and side, with Q4 post/rounded-roof solid and STEP regression coverage. General open-wire and multi-neighbor support propagation remains incomplete. Mixed collapsing and regular convex cylindrical rim corners now have spherical/torus patch and independent radius/normal/material controls; general junction parity remains unverified. Tilted planar-cap tangent chamfer contacts can continue to original seams on parallel convex cylindrical/planar walls; four independent native controls retain one distance discrepancy.",
       "next_case": "Extend support continuation to open contours and multiple neighboring supports within one original edge; vary tangent continuity and contact clearance around the threshold.",
       "evidence": [
         {
@@ -1855,6 +1876,12 @@
           "path": "truck-benchmarks/results/2026-10-20-mixed-collapsed-contacts/REPORT.md",
           "find": "# Mixed collapsing and regular cylindrical rim corners",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-20-tilted-cap-chamfers/REPORT.md",
+          "find": "# Tilted-cap chamfer contact continuation",
+          "role": "test"
         }
       ],
       "required_outcome": "Round or bevel a tangent chain continuously across edge splits and changes of support face.",
@@ -1867,7 +1894,8 @@
         "At e3fab5a6, fillet schema3 captures final whole contours/radius laws after all seed assignments and exact observed native settings. Parent-failing tests preserve repeated-radius replacement, complete scope and explicit unsupported laws/representations. Full capture: 231 constructions/220 limited comparisons, 4 corrected-scope records, no successful check regression for unchanged intent. 0 losses under corrected intent remain explicit. No parity upgrade.",
         "At f474ab26, separate open/closed tangent fillet contours may share original supports while retaining selected-edge and earlier-fillet guards. Three parent failures including an intentional old-scope contract rewrite; eight positive/eight overlap rim variants and three fresh native controls.431 shapeops/59 replay/13 capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:442/412;all441prior checks retained. No parity upgrade.",
         "At 0258681b, exact equal-radius analytic cylindrical rim contacts collapse to shared vertices and spherical patches. Three parent failures, four parent controls and seven focused tests;36positive/4negative new-scope variants. Four native controls with independent material/contact/radius/STEP checks.434shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:443/413;all442prior checks retained. Original procedural R10 and near-equal bug828 remain outside this scope. No parity upgrade.",
-        "At 3bd4ef6d, mixed collapsing and regular convex cylindrical rim corners use spherical and toroidal patches. Two parent failures;two independent native controls;20new-scope variants.438shapeops/115stepio/59replay/13capture,Clippy/smoke pass;unchanged geometry/modeling/meshalgo evidence retained,including the baseline precision failure. Clean capture:443/413;all443prior checks retained. No parity upgrade."
+        "At 3bd4ef6d, mixed collapsing and regular convex cylindrical rim corners use spherical and toroidal patches. Two parent failures;two independent native controls;20new-scope variants.438shapeops/115stepio/59replay/13capture,Clippy/smoke pass;unchanged geometry/modeling/meshalgo evidence retained,including the baseline precision failure. Clean capture:443/413;all443prior checks retained. No parity upgrade.",
+        "At fdc8092c, tilted planar-cap chamfer contacts continue over parallel convex cylindrical and planar supports. Two parent failures;four independent native controls,three distance passes and one explicitly retained10-degree discrepancy.442shapeops/115stepio/59replay/13capture,Clippy/smoke pass;baseline geometry precision failure retained. Clean capture:444/414;all443prior checks retained. No parity upgrade."
       ]
     },
     {
