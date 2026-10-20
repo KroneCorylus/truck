@@ -1,0 +1,13 @@
+001 sample 1.6999744233919093e-13 volume error 1.3244516594568267e-11 contact error 6.280369834735101e-16
+002 sample 1.6999744233919093e-13 volume error 8.554934538551606e-12 contact error 6.280369834735101e-16
+003 sample 1.6999744233919093e-13 volume error 8.270717444247566e-12 contact error 8.881784197001252e-16
+004 sample 1.6999744233919093e-13 volume error 8.469669410260394e-12 contact error 9.930136612989092e-16
+005 sample 2.621631293057448e-13 volume error 1.963940121640917e-11 contact error 2.591232950238514e-13
+006 sample 2.8020445577424726e-13 volume error 1.2988721209694631e-11 contact error 2.7642511140767213e-13
+007 sample 3.1527738059793424e-13 volume error 1.4864554032101296e-11 contact error 3.126643504364304e-13
+008 sample 3.1782891094952486e-13 volume error 1.3216094885137863e-11 contact error 3.158632698906554e-13
+009 sample 1.6999744233919093e-13 volume error -2.7989699447061867e-10 contact error 9.930136612989092e-16
+010 sample 1.6999744233919093e-13 volume error -2.7853275241795927e-10 contact error 5.617333549722722e-15
+011 native failed; Truck rejects missing circle intersection
+012 native failed; Truck rejects missing circle intersection
+Ten valid single solids preserve contacts, contact angle and independent material; two impossible union requests rejected. Raw native failures/mutations retained.

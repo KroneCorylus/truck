@@ -250,6 +250,79 @@ fn longitudinal_cylinders(input: &Solid, edge: &Edge) -> Option<[Option<f64>; 2]
     radii.iter().any(Option::is_some).then_some(radii)
 }
 
+fn parallel_cylinder_angle_chord(
+    reference: &Face,
+    other: &Face,
+    edge: EdgeID,
+    chord: f64,
+    angle: f64,
+) -> Option<f64> {
+    let cylinder = |face: &Face| {
+        let (
+            Elementary::Cylinder {
+                origin,
+                axis,
+                radius,
+            },
+            forward,
+        ) = face.oriented_surface().elementary()?
+        else {
+            return None;
+        };
+        Some((origin, axis, radius, if forward { 1. } else { -1. }))
+    };
+    let (origin, axis, radius, orientation) = cylinder(reference)?;
+    let (other_origin, other_axis, other_radius, other_orientation) = cylinder(other)?;
+    let ratio = chord / (2. * radius);
+    if !(ratio > 0. && ratio < std::f64::consts::FRAC_1_SQRT_2) {
+        return None;
+    }
+    let boundary = reference.edge_iter().find(|e| e.id() == edge)?;
+    let start = boundary.front().point();
+    let spine = (boundary.back().point() - start).normalize();
+    let radial = (start - origin - axis * (start - origin).dot(axis)).normalize();
+    let other_radial =
+        (start - other_origin - other_axis * (start - other_origin).dot(other_axis)).normalize();
+    let normal = radial * orientation;
+    let other_normal = other_radial * other_orientation;
+    let sense = normal.cross(other_normal).dot(spine).signum();
+    let inward = normal.cross(spine).normalize();
+    let psi = 2. * ratio.asin();
+    let contact_radial = radial * psi.cos() + inward * psi.sin();
+    let contact = start + radius * (contact_radial - radial);
+    let contact_normal = contact_radial * orientation;
+    let direction = -contact_normal.cross(spine).normalize() * angle.cos()
+        - sense * contact_normal * angle.sin();
+    let offset = contact - other_origin - other_axis * (contact - other_origin).dot(other_axis);
+    let direction = direction - other_axis * direction.dot(other_axis);
+    let a = direction.magnitude2();
+    let b = offset.dot(direction);
+    let c = offset.magnitude2() - other_radius * other_radius;
+    let discriminant = b * b - a * c;
+    if !discriminant.is_finite() || discriminant <= 0. || a <= 0. {
+        return None;
+    }
+    // The first forward intersection stays on the local bevel branch when both roots are positive.
+    let parameter = [
+        (-b - discriminant.sqrt()) / a,
+        (-b + discriminant.sqrt()) / a,
+    ]
+    .into_iter()
+    .filter(|t| t.is_finite() && *t > 0.)
+    .min_by(f64::total_cmp)?;
+    let point = contact + parameter * direction;
+    let other_boundary = other.edge_iter().find(|e| e.id() == edge)?;
+    let other_spine = (other_boundary.back().point() - other_boundary.front().point()).normalize();
+    let inset = (point - start).dot(other_normal.cross(other_spine).normalize());
+    let radial_projection = (point - other_origin).dot(other_radial);
+    let distance = point.distance(start);
+    (inset > 0.
+        && radial_projection > 0.
+        && distance.is_finite()
+        && distance < std::f64::consts::SQRT_2 * other_radius)
+        .then_some(distance)
+}
+
 fn longitudinal_cylinder_angle_setback(
     plane_face: &Face,
     cylinder_face: &Face,
@@ -657,28 +730,33 @@ fn chamfer_selection(
                         distances[1] = requested[1] / denominator;
                     } else {
                         let radii = longitudinal.unwrap();
-                        if radii.iter().all(Option::is_some) {
-                            return Err(unsupported(
-                                "Distance-angle chamfers between two cylinders are unsupported",
-                            ));
-                        }
-                        let cylinder = usize::from(radii[0].is_none());
-                        distances[1] = if *side == cylinder {
-                            longitudinal_cylinder_angle_setback(
-                                adjacent[1 - cylinder],
-                                adjacent[cylinder],
+                        distances[1] = if radii.iter().all(Option::is_some) {
+                            parallel_cylinder_angle_chord(
+                                adjacent[*side],
+                                adjacent[1 - *side],
                                 edge.id(),
                                 requested[0],
                                 tangent.atan(),
                             )
                         } else {
-                            longitudinal_plane_angle_chord(
-                                adjacent[*side],
-                                adjacent[cylinder],
-                                edge.id(),
-                                requested[0],
-                                tangent.atan(),
-                            )
+                            let cylinder = usize::from(radii[0].is_none());
+                            if *side == cylinder {
+                                longitudinal_cylinder_angle_setback(
+                                    adjacent[1 - cylinder],
+                                    adjacent[cylinder],
+                                    edge.id(),
+                                    requested[0],
+                                    tangent.atan(),
+                                )
+                            } else {
+                                longitudinal_plane_angle_chord(
+                                    adjacent[*side],
+                                    adjacent[cylinder],
+                                    edge.id(),
+                                    requested[0],
+                                    tangent.atan(),
+                                )
+                            }
                         }
                         .ok_or_else(|| {
                             unsupported("Longitudinal angle has no supported local contact")
@@ -2944,7 +3022,7 @@ mod parallel_cylinder_chord_tests {
         (step, serde_json::from_str(task).unwrap())
     }
 
-    fn check(index: usize, reference: Option<usize>, moved: bool) {
+    fn check(index: usize, reference: Option<usize>, moved: bool, angle: Option<f64>) {
         let (r1, r2, d, height): (f64, f64, f64, f64) =
             (5., if index == 1 { 4. } else { 5. }, 6., 10.);
         let joined = index == 2;
@@ -2957,11 +3035,37 @@ mod parallel_cylinder_chord_tests {
         } else {
             initial_area
         } * height;
-        let chords: [f64; 2] = if reference.is_some() {
+        let mut chords: [f64; 2] = if reference.is_some() {
             [0.8, 0.4]
         } else {
             [0.7, 0.7]
         };
+        if let Some(angle) = angle {
+            let side = reference.unwrap();
+            let other = 1 - side;
+            let radii = [r1, r2];
+            let centers = [0., d];
+            let rotation = sigma * if side == 0 { 1. } else { -1. };
+            let phi =
+                y.atan2(x - centers[side]) + rotation * 2. * (0.7 / (2. * radii[side])).asin();
+            let radial = Vector3::new(phi.cos(), phi.sin(), 0.);
+            let contact = Point3::new(centers[side], 0., 0.) + radii[side] * radial;
+            let tangent = rotation * Vector3::new(-radial.y, radial.x, 0.);
+            let alpha = angle.to_radians();
+            let direction = -tangent * alpha.cos() + sigma * radial * alpha.sin();
+            let offset = contact - Point3::new(centers[other], 0., 0.);
+            let linear = offset.dot(direction);
+            let discriminant = linear * linear - offset.magnitude2() + radii[other].powi(2);
+            assert!(discriminant > 0.);
+            let parameter = [-linear - discriminant.sqrt(), -linear + discriminant.sqrt()]
+                .into_iter()
+                .filter(|t| *t > 0.)
+                .min_by(f64::total_cmp)
+                .unwrap();
+            let second = contact + parameter * direction;
+            chords[side] = 0.7;
+            chords[other] = second.distance(Point3::new(x, y, 0.));
+        }
         let a = 2. * (chords[0] / (2. * r1)).asin();
         let b = 2. * (chords[1] / (2. * r2)).asin();
         let phi1 = y.atan2(x) + sigma * a;
@@ -2983,7 +3087,7 @@ mod parallel_cylinder_chord_tests {
         } * Matrix4::from_scale(scale);
         let inverse = transform.invert().unwrap();
         let directory = std::env::temp_dir().join(format!(
-            "truck-parallel-cylinders-{}-{index}-{reference:?}-{moved}",
+            "truck-parallel-cylinders-{}-{index}-{reference:?}-{moved}-{angle:?}",
             std::process::id()
         ));
         std::fs::create_dir_all(&directory).unwrap();
@@ -3026,8 +3130,15 @@ mod parallel_cylinder_chord_tests {
             transform_points(member);
         }
         if let Some(side) = reference {
-            chosen["mode"] = json!("two-distances");
-            chosen["distance"] = Value::Null;
+            chosen["mode"] = json!(if angle.is_some() {
+                "distance-angle"
+            } else {
+                "two-distances"
+            });
+            chosen["distance"] = angle.map_or(Value::Null, |_| json!(chords[side] * scale));
+            if let Some(angle) = angle {
+                chosen["angle_degrees"] = json!(angle);
+            }
             chosen["distances"] = json!([chords[side] * scale, chords[1 - side] * scale]);
             let origin =
                 transform.transform_point(Point3::new(if side == 0 { 0. } else { d }, 0., 0.));
@@ -3106,6 +3217,24 @@ mod parallel_cylinder_chord_tests {
             })
             .collect();
         assert_eq!(bevels.len(), 1);
+        if let Some(angle) = angle {
+            let side = reference.unwrap();
+            let radial = if side == 0 {
+                qa.to_vec() / r1
+            } else {
+                (qb - Point3::new(d, 0., 0.)) / r2
+            };
+            let actual_normal = inverse
+                .transform_vector(bevels[0].oriented_surface().normal(0., 0.))
+                .normalize();
+            let actual = actual_normal
+                .dot(radial)
+                .abs()
+                .clamp(0., 1.)
+                .acos()
+                .to_degrees();
+            assert!((actual - angle).abs() < 1e-8, "{actual} != {angle}");
+        }
         for v in bevels[0].vertex_iter() {
             assert!((inverse.transform_point(v.point()) - qa).dot(normal).abs() < 1e-6);
         }
@@ -3143,7 +3272,7 @@ mod parallel_cylinder_chord_tests {
     fn equal_parallel_cylinder_chamfers_preserve_both_chords() {
         for index in 0..3 {
             for moved in [false, true] {
-                check(index, None, moved);
+                check(index, None, moved, None);
             }
         }
     }
@@ -3152,14 +3281,54 @@ mod parallel_cylinder_chord_tests {
         for index in 0..3 {
             for reference in [0, 1] {
                 for moved in [false, true] {
-                    check(index, Some(reference), moved);
+                    check(index, Some(reference), moved, None);
                 }
             }
         }
     }
     #[test]
-    fn parallel_cylinder_angles_remain_explicitly_unsupported() {
+    fn convex_parallel_cylinder_angles_preserve_reference_contacts() {
+        for index in 0..2 {
+            for reference in [0, 1] {
+                for angle in [30., 45.] {
+                    for moved in [false, true] {
+                        check(index, Some(reference), moved, Some(angle));
+                    }
+                }
+            }
+        }
+    }
+    #[test]
+    fn concave_parallel_cylinder_angles_preserve_reference_contacts() {
+        for reference in [0, 1] {
+            for moved in [false, true] {
+                check(2, Some(reference), moved, Some(30.));
+            }
+        }
+    }
+    #[test]
+    fn parallel_cylinder_angles_reject_oversized_chord() {
         let (step, mut task) = fixture(0);
+        let path = std::env::temp_dir().join(format!(
+            "truck-parallel-cylinder-angle-size-{}.step",
+            std::process::id()
+        ));
+        std::fs::write(&path, step).unwrap();
+        let input = import(path.to_str().unwrap()).unwrap();
+        let before = serde_json::to_string(&input.compress()).unwrap();
+        let chosen = &mut task["selection"][0];
+        chosen["mode"] = json!("distance-angle");
+        chosen["distance"] = json!(8.);
+        chosen["angle_degrees"] = json!(30.);
+        chosen["reference_cylinder"] = json!({"origin":[0.,0.,0.],"axis":[0.,0.,1.],"radius":5.});
+        let error = chamfer_selection(&input, &[chosen.clone()], true).unwrap_err();
+        assert_eq!(error["status"], "unhandled-intent");
+        assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
+        std::fs::remove_file(path).unwrap();
+    }
+    #[test]
+    fn parallel_cylinder_angles_reject_missing_intersection() {
+        let (step, mut task) = fixture(2);
         let path = std::env::temp_dir().join(format!(
             "truck-parallel-cylinder-angle-{}.step",
             std::process::id()
@@ -3169,7 +3338,7 @@ mod parallel_cylinder_chord_tests {
         let before = serde_json::to_string(&input.compress()).unwrap();
         let chosen = &mut task["selection"][0];
         chosen["mode"] = json!("distance-angle");
-        chosen["angle_degrees"] = json!(30.);
+        chosen["angle_degrees"] = json!(45.);
         chosen["reference_cylinder"] = json!({"origin":[0.,0.,0.],"axis":[0.,0.,1.],"radius":5.});
         let error = chamfer_selection(&input, &[chosen.clone()], true).unwrap_err();
         assert_eq!(error["status"], "unhandled-intent");

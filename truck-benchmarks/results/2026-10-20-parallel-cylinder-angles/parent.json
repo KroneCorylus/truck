@@ -1,0 +1,12 @@
+{
+  "revision": "9b69102cc2a497bced013b3121010a46beb2a5ad",
+  "test_module_sha256": "25ea20d3f2f359e737ec2ad37c278d4e27bec6a056726c15378237134d0d6347",
+  "fixture_sha256": {
+    "truck-shapeops/tests/fixtures/chamfer-parallel-cylinders/001.step": "834f850762717f36d48b796a1024557e2bf492573ae7cfd9fc9be05826901639",
+    "truck-shapeops/tests/fixtures/chamfer-parallel-cylinders/001.json": "2ddc9009babc07242b70b251e7606f35e786f2deeb253f5e1e7de7f989f4eafe",
+    "truck-shapeops/tests/fixtures/chamfer-parallel-cylinders/004.step": "9c7769f794797a8c32765b547ae662f39c316799e388a0160f65f0077ada1e38",
+    "truck-shapeops/tests/fixtures/chamfer-parallel-cylinders/004.json": "5a519efb4fdc0bae3db29efd155b2479bd8e0943d758004ed3b727afb03da10b",
+    "truck-shapeops/tests/fixtures/chamfer-parallel-cylinders/007.step": "c0cfbf5dc3246b6db8291c6fab06a0929c3fe4da512bf74a2259c237df2a2879",
+    "truck-shapeops/tests/fixtures/chamfer-parallel-cylinders/007.json": "5879442a8e8db12addd0deea49d6b6484d1da3f8705406546f713082705ef838"
+  }
+}
