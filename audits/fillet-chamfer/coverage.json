@@ -3,7 +3,7 @@
     "title": "Fillet and chamfer feature parity audit",
     "baseline": "OCCT V7_9_3 source inventory plus the recorded Truck/Pieza revisions. Includes 3D, 2D, related workflows and all textual candidates under the discovery rules.",
     "meaning_of_all": "Every dedicated test-grid entry, matching registered test/helper, discovered blend command and retained reference in this pinned checkout. This is not a claim about all mathematical configurations or current/future OCCT releases.",
-    "execution": "All 1,026 inventoried entries have native attempts. Latest clean capture at 68b6a642:396 native passes,648 operations,487 complete chamfer and161 complete fillet scopes;365 constructions/341 limited sampled passes at0.001. All364 prior constructions retain checks;364 complete prior results/comparisons exact,0 numerical changes. Raw native discrepancies retained. Full parity remains unverified.",
+    "execution": "All 1,026 inventoried entries have native attempts. Latest clean capture at ea20f7d9:396 native passes,648 operations,487 complete chamfer and161 complete fillet scopes;371 constructions/347 limited sampled passes at0.001. All365 prior constructions retain checks;351 complete prior results/comparisons exact,14 numerical changes (0 affect STEP comparison). Raw native discrepancies retained. Full parity remains unverified.",
     "mapping": "Capability assessments describe observable outcomes supported or restricted by reviewed source evidence. Per-case tags and links are automated hints; they do not prove Truck handles that fixture.",
     "objective": "Achieve at least OCCT-level fillet/chamfer capabilities and robustness for equivalent modeling tasks in Truck/Pieza.",
     "equivalence": "Judge the requested geometry, dimensions, validity, editing behavior and practical performance. Different APIs, algorithms, languages, surface representations and internal operation sequences are acceptable. Missing a corresponding OCCT method is not evidence of a feature gap."
@@ -613,6 +613,12 @@
           "path": "truck-benchmarks/results/2026-10-20-parallel-cylinder-chords/REPORT.md",
           "find": "# Parallel cylinder chamfer",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-20-cylindrical-terminal-fans/REPORT.md",
+          "find": "# Coincident cylindrical terminal",
+          "role": "test"
         }
       ],
       "required_outcome": "Bevel with independently specified setbacks on the intended two support faces; orientation or storage order must not silently exchange them.",
@@ -631,7 +637,8 @@
         "At b5c98d1a, replay converts native equal/unequal cylindrical chord distances on longitudinal plane/cylinder edges while preserving reference sides. Three parent-failing tests, six constructed variants, 21 native controls with independent material/contact checks;42 replay tests,13 capture tests,Clippy/smoke pass. Full capture:312 constructions/293 limited passes;no prior successful check regressed. Kernel distance contract unchanged;distance-angle remains unsupported here. No parity upgrade.",
         "At ac5b8fa3, planar chamfers cross curved terminal boundaries using existing intersection and bounded trimming. Two parent-failing tests/four constructed variants,oversized guards,six independent native controls. Full shapeops 396 pass,42 replay tests,Clippy/smoke. Clean capture:352 constructions/333 limited passes;no prior successful check regressed. No parity upgrade.",
         "At 35c11b96, planar chamfer contacts extend exact conics and their extruded cylinder generators;mesh interior ruling fixes material loss. Three parent failures,eight variants,oversized guards,six native controls. Full shapeops 400 and meshalgo 98 pass,46 replay tests,Clippy/smoke. Clean capture:359 constructions/340 limited passes;no prior successful check regressed. No parity upgrade.",
-        "At 7ab0f68f, parallel cylinder chords preserve both supports and concave chamfers retain subdivided cap seams. Three parent failures,18replay variants,9native controls;400shapeops/98meshalgo/54replay/13capture tests,Clippy/smoke pass. Native tolerance mutation in3controls retained. Clean capture:364constructions/341limited passes;no prior check regressions. No parity upgrade."
+        "At 7ab0f68f, parallel cylinder chords preserve both supports and concave chamfers retain subdivided cap seams. Three parent failures,18replay variants,9native controls;400shapeops/98meshalgo/54replay/13capture tests,Clippy/smoke pass. Native tolerance mutation in3controls retained. Clean capture:364constructions/341limited passes;no prior check regressions. No parity upgrade.",
+        "At ea20f7d9, concave chamfers preserve coincident cylindrical terminal seams with exact end patches. Two construction/four mesh parent failures;24construction variants,12controls. Final mesh change only increases existing refinement cap20\u219264. Full400shapeops/102meshalgo/59replay/13capture tests,Clippy/smoke pass. Six raw subdivided native discrepancies retained separately from equivalent valid controls. Clean capture:371constructions/347limited passes;no prior check regression. No parity upgrade."
       ]
     },
     {
@@ -729,6 +736,12 @@
           "path": "truck-benchmarks/results/2026-10-20-parallel-cylinder-angles/REPORT.md",
           "find": "# Parallel cylinder contact-angle",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-20-cylindrical-terminal-fans/REPORT.md",
+          "find": "# Coincident cylindrical terminal",
+          "role": "test"
         }
       ],
       "required_outcome": "Produce a chamfer with the requested setback and angle, including non-right-angle supports, using any equivalent parameterization.",
@@ -743,7 +756,8 @@
         "At 05901a28, plane-reference longitudinal cylinder angles preserve requested angle/contact/material:three parent failures,20 variants,guards,ten native controls;two native plane-angle discrepancies retained.46 replay tests,Clippy/smoke. Clean capture:356 constructions/337 limited passes;no prior successful check regressed. Cylinder-reference angles remain unsupported.",
         "At 460ac6fd, cylinder-reference longitudinal requests preserve captured chord and angle at the new cylinder contact. Three parent failures,20 variants,10 native controls;49 replay tests,13 capture tests,Clippy/smoke pass. Six native controls differ from this geometric contract;source model and raw verdicts retained. Clean capture:363 constructions/340 limited passes;no prior check regressed. No parity upgrade.",
         "At 7ab0f68f, parallel cylinder chords preserve both supports and concave chamfers retain subdivided cap seams. Three parent failures,18replay variants,9native controls;400shapeops/98meshalgo/54replay/13capture tests,Clippy/smoke pass. Native tolerance mutation in3controls retained. Clean capture:364constructions/341limited passes;no prior check regressions. No parity upgrade.",
-        "At 68b6a642, parallel cylinder contact-angle requests preserve reference chord and the angle at the new contact. Two parent failures,20variants,12native controls (10valid/2impossible);57replay/13capture tests,Clippy/smoke pass. Core400shapeops/98meshalgo validation reused with hashes. Raw native failures/mutations retained. Clean capture:365constructions/341limited passes;no prior check regression. No parity upgrade."
+        "At 68b6a642, parallel cylinder contact-angle requests preserve reference chord and the angle at the new contact. Two parent failures,20variants,12native controls (10valid/2impossible);57replay/13capture tests,Clippy/smoke pass. Core400shapeops/98meshalgo validation reused with hashes. Raw native failures/mutations retained. Clean capture:365constructions/341limited passes;no prior check regression. No parity upgrade.",
+        "At ea20f7d9, concave chamfers preserve coincident cylindrical terminal seams with exact end patches. Two construction/four mesh parent failures;24construction variants,12controls. Final mesh change only increases existing refinement cap20\u219264. Full400shapeops/102meshalgo/59replay/13capture tests,Clippy/smoke pass. Six raw subdivided native discrepancies retained separately from equivalent valid controls. Clean capture:371constructions/347limited passes;no prior check regression. No parity upgrade."
       ]
     },
     {
@@ -843,12 +857,19 @@
           "path": "truck-benchmarks/results/2026-10-20-parallel-cylinder-angles/REPORT.md",
           "find": "# Parallel cylinder contact-angle",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-20-cylindrical-terminal-fans/REPORT.md",
+          "find": "# Coincident cylindrical terminal",
+          "role": "test"
         }
       ],
       "required_outcome": "Produce the intended measurable setbacks on curved supports after explicitly translating dimension conventions between kernels.",
       "verification": [
         "At 460ac6fd, cylinder-reference longitudinal requests preserve captured chord and angle at the new cylinder contact. Three parent failures,20 variants,10 native controls;49 replay tests,13 capture tests,Clippy/smoke pass. Six native controls differ from this geometric contract;source model and raw verdicts retained. Clean capture:363 constructions/340 limited passes;no prior check regressed. No parity upgrade.",
-        "At 68b6a642, parallel cylinder contact-angle requests preserve reference chord and the angle at the new contact. Two parent failures,20variants,12native controls (10valid/2impossible);57replay/13capture tests,Clippy/smoke pass. Core400shapeops/98meshalgo validation reused with hashes. Raw native failures/mutations retained. Clean capture:365constructions/341limited passes;no prior check regression. No parity upgrade."
+        "At 68b6a642, parallel cylinder contact-angle requests preserve reference chord and the angle at the new contact. Two parent failures,20variants,12native controls (10valid/2impossible);57replay/13capture tests,Clippy/smoke pass. Core400shapeops/98meshalgo validation reused with hashes. Raw native failures/mutations retained. Clean capture:365constructions/341limited passes;no prior check regression. No parity upgrade.",
+        "At ea20f7d9, concave chamfers preserve coincident cylindrical terminal seams with exact end patches. Two construction/four mesh parent failures;24construction variants,12controls. Final mesh change only increases existing refinement cap20\u219264. Full400shapeops/102meshalgo/59replay/13capture tests,Clippy/smoke pass. Six raw subdivided native discrepancies retained separately from equivalent valid controls. Clean capture:371constructions/347limited passes;no prior check regression. No parity upgrade."
       ]
     },
     {
