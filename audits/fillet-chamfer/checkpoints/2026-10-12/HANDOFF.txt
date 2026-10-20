@@ -1,8 +1,8 @@
 LATEST CHECKPOINT — 2026-10-20
 ACTIVE: Continue work and commit achievements until done or told to stop.
-Read ../2026-10-20-shared-fillet-contours/HANDOFF.txt and report.html.
-Implementation f474ab26 handles shared and open fillet contours.
-Full capture:442 constructions/412 limited passes;no prior check regressions. Full parity remains unverified.
+Read ../2026-10-20-collapsed-fillet-contacts/HANDOFF.txt and report.html.
+Implementation 0258681b handles collapsed analytic fillet contacts.
+Full capture:443 constructions/413 limited passes;no prior check regressions. Full parity remains unverified.
 
 HISTORICAL HANDOFF FOLLOWS
 

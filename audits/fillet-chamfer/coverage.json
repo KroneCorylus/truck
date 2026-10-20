@@ -3,7 +3,7 @@
     "title": "Fillet and chamfer feature parity audit",
     "baseline": "OCCT V7_9_3 source inventory plus the recorded Truck/Pieza revisions. Includes 3D, 2D, related workflows and all textual candidates under the discovery rules.",
     "meaning_of_all": "Every dedicated test-grid entry, matching registered test/helper, discovered blend command and retained reference in this pinned checkout. This is not a claim about all mathematical configurations or current/future OCCT releases.",
-    "execution": "All 1,026 inventoried entries have native attempts. Latest clean capture at f474ab26:396 native passes,648 operations,487 complete chamfer and161 complete fillet scopes;442 constructions/412 limited sampled passes at 0.001. All 441 prior constructions retain checks;441 prior result/comparison records exact,0 numerical changes. Native discrepancies retained;full parity remains unverified.",
+    "execution": "All 1,026 inventoried entries have native attempts. Latest clean capture at 0258681b:396 native passes,648 operations,487 complete chamfer and161 complete fillet scopes;443 constructions/413 limited sampled passes at 0.001. All 442 prior constructions retain checks;442 prior result/comparison records exact,0 numerical changes. Native discrepancies retained;full parity remains unverified.",
     "mapping": "Capability assessments describe observable outcomes supported or restricted by reviewed source evidence. Per-case tags and links are automated hints; they do not prove Truck handles that fixture.",
     "objective": "Achieve at least OCCT-level fillet/chamfer capabilities and robustness for equivalent modeling tasks in Truck/Pieza.",
     "equivalence": "Judge the requested geometry, dimensions, validity, editing behavior and practical performance. Different APIs, algorithms, languages, surface representations and internal operation sequences are acceptable. Missing a corresponding OCCT method is not evidence of a feature gap."
@@ -1076,13 +1076,20 @@
           "path": "truck-benchmarks/results/2026-10-15-two-edge-face-trimming/REPORT.md",
           "find": "# Shared-neighbor",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-20-collapsed-fillet-contacts/REPORT.md",
+          "find": "# Collapsed analytic fillet contacts",
+          "role": "test"
         }
       ],
       "required_outcome": "Blend lips and rims formed by planes and cylinders, for holes, bosses and channels in either material sense.",
       "verification": [
         "At 4a3e11d4, imported cylinders and conic extrusions receive finite support domains bounded by their complete rational boundary control hulls. Affine conic inclusion/search preserves elliptical, sheared and oblique sweeps; cylinder conversion retains the fitted height and STEP export measures perpendicular radius. Native F8, eight cylinder variants, curved extrema and bounded/off-surface checks pass. Full release modeling/shapeops/STEP: 488 passed, 0 failed, 3 existing ignored; Clippy and action smoke pass. This resolves the previously recorded finite extrusion domain failures; unsupported boundary representations and other import failures remain open.",
         "At 35c6e2cf, draft/angle/C4 rounds the two opposite cylindrical lips of a height-20 semiannulus (radii 2 and 10) with radii 2 and 1. Independent Green-integral volume is 2988.725888734009; native integration of Truck STEP differs by 5.912e-12. Both sampled distance directions are below 3.109e-14. These are sampled checks, not certified global bounds.",
-        "At c26b6780, simple chamfer and fillet face patches trim a shared arc/chord neighbor sequentially instead of panicking. Parent-failing tests verify analytic contacts and retained chord, orientation, representations and immutable input. Face-patch scope only; full capture 222 constructions/208 limited comparisons with no prior successful check regressions. No parity upgrade."
+        "At c26b6780, simple chamfer and fillet face patches trim a shared arc/chord neighbor sequentially instead of panicking. Parent-failing tests verify analytic contacts and retained chord, orientation, representations and immutable input. Face-patch scope only; full capture 222 constructions/208 limited comparisons with no prior successful check regressions. No parity upgrade.",
+        "At 0258681b, exact equal-radius analytic cylindrical rim contacts collapse to shared vertices and spherical patches. Three parent failures, four parent controls and seven focused tests;36positive/4negative new-scope variants. Four native controls with independent material/contact/radius/STEP checks.434shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:443/413;all442prior checks retained. Original procedural R10 and near-equal bug828 remain outside this scope. No parity upgrade."
       ]
     },
     {
@@ -1815,6 +1822,12 @@
           "path": "truck-benchmarks/results/2026-10-20-shared-fillet-contours/REPORT.md",
           "find": "# Separate open fillet contours and shared supports",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-20-collapsed-fillet-contacts/REPORT.md",
+          "find": "# Collapsed analytic fillet contacts",
+          "role": "test"
         }
       ],
       "required_outcome": "Round or bevel a tangent chain continuously across edge splits and changes of support face.",
@@ -1825,7 +1838,8 @@
         "At 099ccb7e following 2346b975, native chamfer schema2 captures complete contours and first-assignment/ignored semantics. Parent-failing replay validation prevents seed fallback. Automatic A4 applies3edges with valid STEP and sampled maximum2.23e-8. Fillets remainseed-only and retain5e-5exportfits; chamfersuse1e-7. Fullcapture221 constructions/210 limitedcomparisons; 58 corrected-intentrecords, no prior successful checkregressions forunchangedintent. No parityupgrade.",
         "At 48a1032f, replay propagates planar seed reference sides across complete oriented chamfer contours, including perpendicular plane/cylinder rims. Two parent-failing native regressions verify both directions and normal signs, exact setbacks and solid/STEP checks. Full capture: 231 constructions, 220 limited comparisons; all648 intents unchanged and no successful check regressions. Fillets remain seed-only. No parity upgrade.",
         "At e3fab5a6, fillet schema3 captures final whole contours/radius laws after all seed assignments and exact observed native settings. Parent-failing tests preserve repeated-radius replacement, complete scope and explicit unsupported laws/representations. Full capture: 231 constructions/220 limited comparisons, 4 corrected-scope records, no successful check regression for unchanged intent. 0 losses under corrected intent remain explicit. No parity upgrade.",
-        "At f474ab26, separate open/closed tangent fillet contours may share original supports while retaining selected-edge and earlier-fillet guards. Three parent failures including an intentional old-scope contract rewrite; eight positive/eight overlap rim variants and three fresh native controls.431 shapeops/59 replay/13 capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:442/412;all441prior checks retained. No parity upgrade."
+        "At f474ab26, separate open/closed tangent fillet contours may share original supports while retaining selected-edge and earlier-fillet guards. Three parent failures including an intentional old-scope contract rewrite; eight positive/eight overlap rim variants and three fresh native controls.431 shapeops/59 replay/13 capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:442/412;all441prior checks retained. No parity upgrade.",
+        "At 0258681b, exact equal-radius analytic cylindrical rim contacts collapse to shared vertices and spherical patches. Three parent failures, four parent controls and seven focused tests;36positive/4negative new-scope variants. Four native controls with independent material/contact/radius/STEP checks.434shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:443/413;all442prior checks retained. Original procedural R10 and near-equal bug828 remain outside this scope. No parity upgrade."
       ]
     },
     {
@@ -2378,8 +2392,8 @@
         "degenerate"
       ],
       "occt_scope": "Singular corners and degenerate boundaries are explicitly represented.",
-      "truck_scope": "Equal-radius sequential rim fillets fail by contract. Specific collapsed chamfers are supported.",
-      "next_case": "Sweep second-radius/first-radius through 0.99, 1 and 1.01; compare fillet and chamfer behavior.",
+      "truck_scope": "Equal-radius sequential rims on perpendicular planar and analytic cylindrical walls support collapsed contacts through spherical patches, including closed contours. Original procedural fillets, full cap consumption and folded offsets remain unsupported. Specific collapsed chamfers are supported.",
+      "next_case": "Prove equivalent procedural-cylinder representations, then investigate near-equal and mixed collapsing/noncollapsing rim sections without loosening fold or trim guards.",
       "evidence": [
         {
           "repo": "occt",
@@ -2398,9 +2412,18 @@
           "path": "truck-shapeops/tests/sequential_blends.rs",
           "find": "fn chamfer_consumes_a_smaller_corner_fillet",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-20-collapsed-fillet-contacts/REPORT.md",
+          "find": "# Collapsed analytic fillet contacts",
+          "role": "test"
         }
       ],
-      "required_outcome": "Handle valid limiting cases where contact curves collapse or tips become singular, with controlled rejection of impossible configurations."
+      "required_outcome": "Handle valid limiting cases where contact curves collapse or tips become singular, with controlled rejection of impossible configurations.",
+      "verification": [
+        "At 0258681b, exact equal-radius analytic cylindrical rim contacts collapse to shared vertices and spherical patches. Three parent failures, four parent controls and seven focused tests;36positive/4negative new-scope variants. Four native controls with independent material/contact/radius/STEP checks.434shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:443/413;all442prior checks retained. Original procedural R10 and near-equal bug828 remain outside this scope. No parity upgrade."
+      ]
     },
     {
       "id": "D02",
@@ -3358,7 +3381,7 @@
         "sequential"
       ],
       "occt_scope": "Dedicated sequential chamfer grids and composition regressions.",
-      "truck_scope": "Many feature orders are tested. Sequential single-edge rounds now form equal-radius miters for analytic, B-spline and weighted NURBS edges. Equal-radius rolling continuations around an earlier round still collapse a contact and need a different corner construction; general topology transitions remain limited.",
+      "truck_scope": "Many feature orders are tested. Sequential single-edge rounds form equal-radius miters for analytic, B-spline and weighted NURBS edges. Equal-radius rolling continuations around analytic cylindrical rounds support spherical collapsed-contact corners on open and closed rims. The older procedural R10 representation and general topology transitions remain limited.",
       "next_case": "Fillet\u2192fillet, fillet\u2192chamfer, chamfer\u2192fillet and chamfer\u2192chamfer with nearby and intersecting selections.",
       "evidence": [
         {
@@ -3384,9 +3407,18 @@
           "path": "truck-shapeops/tests/fillet_wire_representation.rs",
           "find": "fn adjacent_analytic_fillets_meet_at_a_valid_miter",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-20-collapsed-fillet-contacts/REPORT.md",
+          "find": "# Collapsed analytic fillet contacts",
+          "role": "test"
         }
       ],
-      "required_outcome": "Apply successive rounds and bevels to earlier feature results with correct dimensions, valid topology and stable selections."
+      "required_outcome": "Apply successive rounds and bevels to earlier feature results with correct dimensions, valid topology and stable selections.",
+      "verification": [
+        "At 0258681b, exact equal-radius analytic cylindrical rim contacts collapse to shared vertices and spherical patches. Three parent failures, four parent controls and seven focused tests;36positive/4negative new-scope variants. Four native controls with independent material/contact/radius/STEP checks.434shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:443/413;all442prior checks retained. Original procedural R10 and near-equal bug828 remain outside this scope. No parity upgrade."
+      ]
     },
     {
       "id": "W02",
