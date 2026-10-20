@@ -650,7 +650,31 @@ fn separate_chamfer_wires(
         {
             return None;
         }
-        let next = try_chamfer_solid_along_wire(&current, &wire, d[0], d[1], tol).ok()?;
+        let next = try_chamfer_solid_along_wire(&current, &wire, d[0], d[1], tol)
+            .or_else(|error| {
+                if wire.len() != 1
+                    || !matches!(
+                        error.code,
+                        Code::BlendConstructionFailed
+                            | Code::UnsupportedGeometry
+                            | Code::UnsupportedTopology
+                            | Code::NonPlanarFace
+                    )
+                {
+                    return Err(error);
+                }
+                let edge = &wire[0];
+                let Some(original) = current.edge_iter().find(|e| e.id() == edge.id()) else {
+                    return Err(error);
+                };
+                let d = if original.orientation() == edge.orientation() {
+                    d
+                } else {
+                    [d[1], d[0]]
+                };
+                try_chamfer_solid_edge(&current, edge.id(), d[0], d[1], tol)
+            })
+            .ok()?;
         if next
             .modified_faces
             .iter()

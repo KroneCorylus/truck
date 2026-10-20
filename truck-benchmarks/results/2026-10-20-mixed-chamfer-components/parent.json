@@ -1,0 +1,7 @@
+{
+  "revision": "21bf2c9abd4926b9c4c69fd6deafdbeb9f51514c",
+  "sha256": {
+    "truck-shapeops/src/fillet/modeling.rs": "d8f80e999604761ab69dba4f075b46742ec6e651af73b4b54c52baac35764d1e",
+    "truck-shapeops/tests/mixed_chamfer_components.rs": "1c8668a90993a4943c2d818eb7ad09144dfc6594d1e0ddf9ab936d2cd9506ff0"
+  }
+}

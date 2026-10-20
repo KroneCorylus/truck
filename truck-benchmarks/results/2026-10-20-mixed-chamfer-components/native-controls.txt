@@ -1,0 +1,3 @@
+equal Truck volume error -1.1678110922730411e-08 sampled distance 4.354477433160448e-09 surface error 2.6645352591003757e-15
+unequal Truck volume error -1.0963191243718029e-08 sampled distance 4.354473980294557e-09 surface error 4.440892098500626e-15
+angle Truck volume error -1.0914391168626025e-08 sampled distance 4.354474959875078e-09 surface error 6.217248937900877e-15

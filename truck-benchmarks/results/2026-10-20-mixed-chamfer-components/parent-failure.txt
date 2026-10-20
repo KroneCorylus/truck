@@ -1,0 +1,39 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 1.97s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/mixed_chamfer_components.rs (target/release/deps/mixed_chamfer_components-6cad066db96ba1bb)
+
+running 4 tests
+test unequal_mixed_chamfer_components ... FAILED
+test equal_mixed_chamfer_components ... FAILED
+test angle_mixed_chamfer_components ... FAILED
+test overlapping_mixed_components_preserve_input ... ok
+
+failures:
+
+---- unequal_mixed_chamfer_components stdout ----
+
+thread 'unequal_mixed_chamfer_components' (1370526) panicked at truck-shapeops/tests/mixed_chamfer_components.rs:91:33:
+called `Result::unwrap()` on an `Err` value: Diagnostic { code: UnsupportedGeometry, operation: "blend", stage: "intersect_straight_blends", message: "The geometry is outside the supported scope of this operation.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+
+---- equal_mixed_chamfer_components stdout ----
+
+thread 'equal_mixed_chamfer_components' (1370524) panicked at truck-shapeops/tests/mixed_chamfer_components.rs:91:33:
+called `Result::unwrap()` on an `Err` value: Diagnostic { code: UnsupportedGeometry, operation: "blend", stage: "intersect_straight_blends", message: "The geometry is outside the supported scope of this operation.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+
+---- angle_mixed_chamfer_components stdout ----
+
+thread 'angle_mixed_chamfer_components' (1370523) panicked at truck-shapeops/tests/mixed_chamfer_components.rs:91:33:
+called `Result::unwrap()` on an `Err` value: Diagnostic { code: UnsupportedGeometry, operation: "blend", stage: "intersect_straight_blends", message: "The geometry is outside the supported scope of this operation.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    angle_mixed_chamfer_components
+    equal_mixed_chamfer_components
+    unequal_mixed_chamfer_components
+
+test result: FAILED. 1 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-shapeops --test mixed_chamfer_components`

@@ -1,0 +1,71 @@
+$ cargo test --release -p truck-shapeops --example replay_occt_blend
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 3.93s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running unittests examples/replay_occt_blend.rs (target/release/examples/replay_occt_blend-bd2259d8fa5b09df)
+
+running 59 tests
+test curved_selection_tests::matching_endpoints_and_midpoint_do_not_establish_physical_coverage ... ok
+test longitudinal_chamfer_distance_tests::longitudinal_chord_conversion_rejects_nonlocal_contacts ... ok
+test chamfer_replay_tests::impossible_distance_angle_chamfers_do_not_construct ... ok
+test longitudinal_plane_angle_tests::longitudinal_angles_reject_unsupported_references_and_contacts ... ok
+test chamfer_replay_tests::invalid_ambiguous_and_unsupported_chamfer_intents_do_not_construct ... ok
+test curved_selection_tests::curved_selection_excludes_the_straight_chord_between_its_endpoints ... ok
+test fillet_contour_tests::variable_native_fillet_contours_never_replay_only_their_seeds ... ok
+test chamfer_replay_tests::equal_distance_chamfers_use_physical_edges ... ok
+test fillet_contour_tests::nonrational_native_fillet_representations_are_explicitly_unhandled ... ok
+test native_contour_tests::legacy_native_seeds_are_explicitly_labeled ... ok
+test fillet_contour_tests::unsupported_native_fillet_continuity_is_explicit ... ok
+test chamfer_replay_tests::unequal_chamfer_distances_preserve_the_reference_face ... ok
+test native_contour_tests::native_contour_scope_requires_seed_membership ... ok
+test native_contour_tests::unknown_capture_schemas_do_not_replay ... ok
+test native_contour_tests::ignored_native_assignments_require_consistent_scope ... ok
+test native_contour_tests::native_contour_scope_cannot_fall_back_to_a_seed ... ok
+test native_contour_tests::native_contour_scope_expands_the_seed_to_all_three_edges ... ok
+test native_contour_tests::explicit_complete_contour_preserves_the_step_round_trip ... ok
+test native_contour_tests::native_contour_assignments_deduplicate_and_reject_conflicts ... ok
+test parallel_cylinder_chord_tests::parallel_cylinder_angles_reject_missing_intersection ... ok
+test parallel_cylinder_chord_tests::parallel_cylinder_angles_reject_oversized_chord ... ok
+test longitudinal_chamfer_distance_tests::unequal_longitudinal_chamfers_preserve_both_reference_sides ... ok
+test parallel_cylinder_chord_tests::parallel_cylinder_chords_reject_either_oversized_side ... ok
+test tests::physical_selection_rejects_incomplete_and_ambiguous_matches ... ok
+test tests::wire_route_rejects_branches_and_disconnected_selection ... ok
+test chamfer_replay_tests::acute_distance_angle_chamfers_preserve_the_angle ... ok
+test native_contour_tests::native_first_assignment_ignores_later_contour_parameters ... ok
+test tests::physical_selection_accepts_split_edges_and_ignores_order ... ok
+test fillet_contour_tests::incomplete_native_fillet_scope_cannot_fall_back_to_seeds ... ok
+test cylindrical_reference_tests::cylindrical_reference_rejects_wrong_and_invalid_descriptors ... ok
+test unequal_radius_tests::unequal_wedge_radii_reach_the_solid_solver ... ok
+test unequal_radius_tests::unequal_box_radii_reach_the_solid_solver ... ok
+test parallel_cylinder_chord_tests::concave_parallel_cylinder_chamfer_preserves_subdivided_caps ... ok
+test chamfer_replay_tests::obtuse_distance_angle_chamfers_preserve_the_angle ... ok
+test unequal_radius_tests::unequal_cylindrical_lip_radii_reach_the_solid_solver ... ok
+test longitudinal_chamfer_distance_tests::equal_chamfer_uses_native_cylinder_chord_distance ... ok
+test longitudinal_plane_angle_tests::convex_longitudinal_chamfers_preserve_the_cylinder_contact_angle ... ok
+test longitudinal_plane_angle_tests::convex_longitudinal_chamfers_preserve_the_requested_plane_angle ... ok
+test native_contour_tests::angle_contour_propagates_the_seed_reference_side ... ok
+test longitudinal_plane_angle_tests::concave_longitudinal_chamfers_preserve_the_requested_plane_angle ... ok
+test longitudinal_plane_angle_tests::concave_longitudinal_chamfers_preserve_the_cylinder_contact_angle ... ok
+test longitudinal_plane_angle_tests::longitudinal_cylinder_angles_preserve_shallow_and_steep_requests ... ok
+test longitudinal_plane_angle_tests::longitudinal_plane_angles_preserve_shallow_and_steep_requests ... ok
+test chamfer_replay_tests::perpendicular_distance_angle_chamfers_preserve_the_angle ... ok
+test native_contour_tests::unequal_contour_propagates_the_seed_reference_side ... ok
+test parallel_cylinder_chord_tests::equal_parallel_cylinder_chamfers_preserve_both_chords ... ok
+test parallel_cylinder_chord_tests::concave_parallel_cylinder_angles_preserve_reference_contacts ... ok
+test parallel_cylinder_chord_tests::convex_parallel_cylinder_angles_preserve_reference_contacts ... ok
+test parallel_cylinder_chord_tests::unequal_parallel_cylinder_chamfers_preserve_reference_sides ... ok
+test cylindrical_reference_tests::cylindrical_reference_preserves_unequal_sides ... ok
+test cylindrical_reference_tests::cylindrical_reference_preserves_distance_angle ... ok
+test conical_reference_tests::conical_reference_rejects_wrong_and_invalid_descriptors ... ok
+test fillet_contour_tests::native_fillet_contour_reaches_the_solver_in_full ... ok
+test conical_reference_tests::conical_reference_preserves_distance_angle ... ok
+test conical_reference_tests::conical_reference_preserves_unequal_sides ... ok
+test fillet_contour_tests::final_native_radius_replaces_earlier_seed_assignments ... ok
+test cylindrical_terminal_fan_tests::split_cylindrical_terminal_fans_preserve_chamfer_material ... ok
+test cylindrical_terminal_fan_tests::unsplit_cylindrical_ends_preserve_chamfer_material ... ok
+test fillet_step_tolerance_tests::fillet_replay_preserves_its_supported_step_fitting_budget ... ok
+
+test result: ok. 59 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 21.61s
+
+exit_code 0
