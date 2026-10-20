@@ -1,0 +1,2634 @@
+{
+  "parent_revision": "002c17ac1c4c2a95d858b951243787da86fbd86b",
+  "source_sha256": {
+    "truck-shapeops/src/thread.rs": "dde916eefe7df28638b1855f616c915be37065efb06834a0dd38142db209f6ee",
+    "truck-shapeops/src/alternative.rs": "820392cdac5c56f81ccb0388c5d4a95d84994196e724896186a3a6f9a5806697",
+    "truck-shapeops/src/lib.rs": "f5930f4813660153a11f5ea6c5dd7e2b72381119b0a007d9a2936af4f490eee8",
+    "truck-shapeops/src/profile.rs": "f93d5790e8e9e4de18920137b203c073a4c4a46427e914967d6bd6dfe770f444",
+    "truck-shapeops/src/sewing.rs": "a931f29e18a2552f053fb0d7b934752b9182492f2a817d701b16daec4b61e94c",
+    "truck-shapeops/src/fillet/extend_intersection_curve.rs": "4af6cfdeba3558e0b455059bdb67500f7cfc12d7c3007246d8f97c5290615169",
+    "truck-shapeops/src/fillet/edges.rs": "45b075cbad5bcd9523a7b17bf33fe282338acb139ee888ae0cdce828a243ec85",
+    "truck-shapeops/src/fillet/convex.rs": "aa56d71fd2fd6b86f11cf4571b7bc8e6cef4da91615c003a8199438022f7276c",
+    "truck-shapeops/src/fillet/chamfer_edges.rs": "9e7085c8f7aa51cb3f4fabf0ce00426681e3917a80fbc30814c94af4af77bb76",
+    "truck-shapeops/src/fillet/chamfer_miter.rs": "7925e25f6aedfe899068e4e55bd4f170f7b99a04b79f67d31dd4968f2f8be47a",
+    "truck-shapeops/src/fillet/planar.rs": "050a124d00899b7e43df36edd9c84cf9ea7fa6305c9a93124df791de791fccd6",
+    "truck-shapeops/src/fillet/projected_section.rs": "d2ff875824b4107c608673e91aca2e0fb3e0f14f2cb66d98195be1fdc79a873b",
+    "truck-shapeops/src/fillet/along_wire.rs": "6adc3d65f752ab82c97bced17d6d203ee5547a8db6d8154f6a24babf7e780982",
+    "truck-shapeops/src/fillet/chamfer.rs": "00b31ade28d4602448bdbd6ab64006bc15838b826894ff525a3f8c4b78957204",
+    "truck-shapeops/src/fillet/mod.rs": "50949a94c4f58cb7c01869d115061c30883efc6099974f09195630b9cecbe940",
+    "truck-shapeops/src/fillet/modeling.rs": "d367aa6170c3bd25927f98309bcad8b58403f87f109927f05d37311316d2cfb8",
+    "truck-shapeops/src/fillet/planar_fillet.rs": "50c6d956f13d879f457a949b16f5dc15100462b4d02489797c6b88980f3356bb",
+    "truck-shapeops/src/fillet/chamfer_collapse.rs": "1edb9a6fd7914848b2ff4d813dff1f48a3fb0f0e59310a0488e3bbe8f67897b8",
+    "truck-shapeops/src/fillet/additive.rs": "5c2413719042277bad2c2ecfb7e46bf2938be888bee87aac40d37d759cb026d2",
+    "truck-shapeops/src/fillet/continued_support.rs": "c344c88d3dc6cb4ad353688c1f2c79cef30fe6cf30cde0e576efd86303173600",
+    "truck-shapeops/src/fillet/planar_edge.rs": "755df6e28bdbd81eda4723f2f71fcccd416a8390f757e6665da4c762ce1d4b6d",
+    "truck-shapeops/src/healing/mod.rs": "393e50d89792274cf2fdd4f670a418ebf9ce1f4fb93272f1e98cdf5a9c37b7a7",
+    "truck-shapeops/src/healing/split_closed_edges.rs": "0965d54985cc032d9eeca3a60c5a3d7fd1805203254cd208bb63d7d0a686e00a",
+    "truck-shapeops/src/healing/tests.rs": "65945e23e01e22149c3d19f7b853295157ca7b6e0c262c366df7200004d0f587",
+    "truck-shapeops/src/healing/split_closed_faces.rs": "2c46b9aa8fd8f9aaba42afb118c6898f6c2e1c0d2767869570d2206297c86794",
+    "truck-shapeops/src/transversal/mod.rs": "46f5b365049c8b2d1942cac1dab7f766c95fa5707dbda1337fce22d15b70f20e",
+    "truck-shapeops/src/local/delete.rs": "f147dbad6c4df1badeeceba0e486366ed70967dfda293275cf5f82bebb664b69",
+    "truck-shapeops/src/local/replace.rs": "97d8fad850f0326ed1d663d2a31251a683334f2017d82c7f2e7cb42d7fa73c2b",
+    "truck-shapeops/src/local/draft.rs": "8433022ce784efd2477ba72e78fbe02471e7d5a212a4f01a70702556ec6611e5",
+    "truck-shapeops/src/local/intersect.rs": "b31d4c28a3821862a9ca2c53a2505e4030f0cf95eca91fee4d2c2b26a0d7e10b",
+    "truck-shapeops/src/local/shell.rs": "8c77ca5a07b7fb4a5c1703353f6eb81780d02c52891d27a3c3a879559378d780",
+    "truck-shapeops/src/local/mod.rs": "c92d4ea8eae61ef0357665453ddaa577316a67c170ef6ccaca7519c6cd879cdb",
+    "truck-shapeops/src/transversal/divide_face/mod.rs": "7f72278afec62eb7f0571a878a7cbdad01ac6ee8d1cb91f0b089a72ec2e626f6",
+    "truck-shapeops/src/transversal/divide_face/tests.rs": "a27779e32349f02e280e604f968c4087bad4e492da27fb3089ec36f3f853f828",
+    "truck-shapeops/src/transversal/faces_classification/tests.rs": "2ec9dfbeb5c16aaac1a868f16eb7b62d88c025bfcbde870274848e00ca5fb4a5",
+    "truck-shapeops/src/transversal/faces_classification/mod.rs": "645eacc40f9f432322a285f6587baedb1db0df15da67838a1c11642bf526eb4b",
+    "truck-shapeops/src/transversal/integrate/components.rs": "75f27bed964ec69cfaea01f5328d94fa65785cac62acaac87e1dab1540de6719",
+    "truck-shapeops/src/transversal/integrate/mod.rs": "3e3afa51ea2de9b7e30b108ee9b129924b2e37d4d618888344d8e4bfd56620a3",
+    "truck-shapeops/src/transversal/integrate/through_hole.rs": "489e6ffae8d675d54aa8ae5ec13b505fdb8f4cc1426e67e0ed69b33dacfabdef",
+    "truck-shapeops/src/transversal/intersection_curve/tests.rs": "ea8f45c565673bedbe99d4825d330b477cd52133d779719815b3a6bb3c2429c1",
+    "truck-shapeops/src/transversal/intersection_curve/mod.rs": "633109076822fc95c6662c35c66bd7b9b50dc4c07dbde1a4151f2ec570aaf0a4",
+    "truck-shapeops/src/transversal/loops_store/tests.rs": "b1414648e95a02d7db9cd637c0c5cf0b33750b86cc14e41ff7762c135cfba3b2",
+    "truck-shapeops/src/transversal/loops_store/coincident.rs": "441a2173efdb8e0d18209086e79c7663e9c7be13cb3dc726ddfcb26f70617411",
+    "truck-shapeops/src/transversal/loops_store/mod.rs": "2a0b314581374fd846d97402db4cc3d76801ba33df2d8bc6977510b485f503bd",
+    "truck-shapeops/src/transversal/polyline_construction/tests.rs": "cca3f345512a6ebe384e8be792acb8e6a11fae746a73885719aa49f3caefc29e",
+    "truck-shapeops/src/transversal/polyline_construction/mod.rs": "a245bfc2ae1a124d8570695341a90ff30e25a1b4a55d345ca4fd8102b45c2780",
+    "truck-shapeops/src/fillet/planar/tests.rs": "21448b125bfe843008d846765db414bafa184fcc86320220cc9346ae0fc13914",
+    "truck-shapeops/tests/fillet.rs": "1eb84900c7d05ed5ea445557fbd9e1c6528637039c351db0ec229f96ae23c87c",
+    "truck-shapeops/tests/chamfer.rs": "1cae7b366991ce3af1a6ef3d346cdf07396431b5c0a2232e5ae81e1e011b0dff",
+    "truck-shapeops/tests/bench_plate.rs": "c48afe12dfcaf9c938cd8e1582a1c5f3bbaf053b067776e4d8f6a6d89b2656e4",
+    "truck-shapeops/tests/fillet_chain.rs": "ff34e11bc4c36aa08ffb5aa6fa14c5cf0d5f1f8e4f7e7da25ce1440f3a9dfce8",
+    "truck-shapeops/tests/loft.rs": "9775fe82ffd1723c97c41e75c12be46bdac758d78590026ad247603247ea84c6",
+    "truck-shapeops/tests/intersect.rs": "fca2b5b2e30ea0ca030698fa26d90c5a214404cc170941822c452984dcc0be81",
+    "truck-shapeops/tests/fillet_edges.rs": "d6168e153d230ecc33993bcf89fe85bb1854c53e3bbea7fbdfa6df5a1ed1f6a0",
+    "truck-shapeops/tests/boolean_cache.rs": "3d8a788224d0de932b4b1afb3aecafa6469a5e7a5673b576f6fee0b488e3b397",
+    "truck-shapeops/tests/r5_chamfer_after_fillet.rs": "d4f7d8ab5157b983ea64d6fd23333fd86152ccb496702728d5289647ef464ce1",
+    "truck-shapeops/tests/R7-R8-extrude-remove.rs": "41fdfc75aa81af2067856475df388ee123df1d651b4c15e677836c4a72bd6f84",
+    "truck-shapeops/tests/diagnostics.rs": "91fdd16e84de69e878f0e9351bb40602f0e9262b0085a2e078f03e73d1d24737",
+    "truck-shapeops/tests/fixed_sweep.rs": "7184cd04573259166ba0abb987135a2361b4cb6d8945dc32cd7cfed396e4270b",
+    "truck-shapeops/tests/sewing.rs": "055706addb62733bb62e7c46c98bffe05916c59273372b281b1adac3656e6e90",
+    "truck-shapeops/tests/corner_hole.rs": "293e43f038018d82d152d82fba64134ee6bdee3446fa7e6b97ea75b93169130e",
+    "truck-shapeops/tests/app_sphere_bore.rs": "c80a6172fc46bf1d819fa8bb6bfa6371562da90e8363e6b3a8b6407256c52922",
+    "truck-shapeops/tests/nonconvex_chamfer.rs": "5318d002b84aa01542e60f8c77ff76532201249580c98621f952b48b72bd14e5",
+    "truck-shapeops/tests/chamfer_general.rs": "a8bce4f8826b650bed8724f5fd928350edc515c08583b2a3757f8cbec625f599",
+    "truck-shapeops/tests/oblique_fillet_ends.rs": "adc2d9e52694e75a1c473b9749ae0cc7bd0adc65a9bb9c27862a59bf6fe62858",
+    "truck-shapeops/tests/boolean_hole_fillet.rs": "c468243f521ae18e39c9c0bd5f8c00c17bf45545f04c240694d8bb1ee722bd22",
+    "truck-shapeops/tests/drafted_annulus.rs": "9fa3d06cf975e6221949c1537d773541ba6807c1a58f48ad3f2073256234d6e5",
+    "truck-shapeops/tests/nonconvex_shell.rs": "ecd98e6500e98dca3c5aaf0b456088f534604e6ca58e21539ab3722b41a93906",
+    "truck-shapeops/tests/mixed_chamfer_pair.rs": "be139a9426e5b9061da26ce864a06232ba0890467c59a9093c9f3d6ab7dbc1a8",
+    "truck-shapeops/tests/annular_booleans.rs": "a9623c6615f29ce6aeb8103b70dddd95c3ae95ca0d25e946cabbbc55f56814a8",
+    "truck-shapeops/tests/mixed_pair_fillet.rs": "8c168868cc6f3a4d8b93123443db63f2bea8797afc5867c43f27091e75e6e46e",
+    "truck-shapeops/tests/rounded_local_ops.rs": "026b4d5045085a57c7b84ebbfc59a02c64fa9d627d549c944fa9c10514f4cb88",
+    "truck-shapeops/tests/channel_boundary.rs": "ab6b76cc111d9051b48829ed2a926a91ea6dae7a564bc39fd3e366f20a7e311b",
+    "truck-shapeops/tests/channel_rim_blends.rs": "d407ed0a1e00fdd1fa9d5ea9fd8eb3c52e4c0b53e26f68db815d1f8d7370c231",
+    "truck-shapeops/tests/blend_limits.rs": "7673507f658b0162fe579dcefbcc1e02bb396c2663e55b0155e857a76c051094",
+    "truck-shapeops/tests/modeled_thread.rs": "beeee305f86588f60a519695a46292de61adafe682a15b2d7de1683289a986f4",
+    "truck-shapeops/tests/cut_plate_workflows.rs": "cfe882f66f2106f67d12d8f89f41cf46d5753920881d79d4f81fda8ae42336b2",
+    "truck-shapeops/tests/nonconvex_fillet.rs": "1e0b93f69f598e41c89b83e43d594e6cd73b026c000b667e79e8d5d744775188",
+    "truck-shapeops/tests/R10-sequential-fillet.rs": "002a2ea026b04280f5ffafb6c7daae0625cad7e8c3473a814e30ddd641b2d95b",
+    "truck-shapeops/tests/R12-face-extrude-round.rs": "dc031e1a5e7a8990696133ef3791593ef5bc6ce7029b1c516140d1d64702087e",
+    "truck-shapeops/tests/boolean.rs": "3ce9454f59660565e5740d24dc5f84cb528de0972c73b6644e95b32bfbd44624",
+    "truck-shapeops/tests/curved_blend_ends.rs": "647fafe503de641b0de287c5a3b98926b91f34195c4f06e5f918d04c00263574",
+    "truck-shapeops/tests/local_ops.rs": "9ec6390e03fecdfcf3e3a39168d3afaeb4e992c03fdaff3ebb0a34a949fdca55",
+    "truck-shapeops/tests/modeling_blends.rs": "140cc531f4571c75d3c2986c2e5e5da4194aead8d9f04d1cd413392248cf1526",
+    "truck-shapeops/tests/plane_cylinder_lips.rs": "ade151ade0f7e9dfa2db6188e03a83c3dfc0239959f4e23bae31a07782b9bb59",
+    "truck-shapeops/tests/r11_corners.rs": "34d94e2d272fbc361212a3a46e2f09bbb0a8e3a0b699890a22ac4e6d3f24151e",
+    "truck-shapeops/tests/r4_boolean.rs": "70ef7d5e72891eb62d6ffc73d215739b3c6a6285d7796517cdc904b779a6237c",
+    "truck-shapeops/tests/subtract_effect.rs": "08bac89f6ffabcc1b35dab47d97682b46031cd8dfd0607f1bf00f77ca651f31a",
+    "truck-shapeops/tests/sweep.rs": "017a5b672ba433259de5f9ce50d0a6fd7fd9e7dea522889c61360f8c99040b4d",
+    "truck-shapeops/tests/sequential_blends.rs": "1e5801504f1195d5433f6777a515c69228e0fc6264b63eef2514cbb5e34681bb",
+    "truck-shapeops/tests/rib_fillet.rs": "768574e95f0729f39d0b397613113b5bd03ea09b460fccf455a24f5c508f9cc6",
+    "truck-shapeops/tests/collapsed_trim.rs": "570c981da5f2290a32a21b32997a36a7d8d1f6f83f77d113fa1ec1bbf445c6b1",
+    "truck-shapeops/tests/analytic_holes.rs": "ef8ad9867b50537f8a839018a63149c555bb44709ee679c28d4b0bd4b592a3fa",
+    "truck-shapeops/tests/drafted_fillet_miters.rs": "9b4dbe179040ebdf582eb97353566b7dc98d29a5e6b98119085fd47ea59ff1bc",
+    "truck-shapeops/tests/fillet_wire_representation.rs": "301a869be38a3ead0eb7ad646838fbf7df0ecad12a799c366fe0e302b3bedea5",
+    "truck-shapeops/tests/curved_blend_representation.rs": "3c922556f51ba63e8d3bd3cea56206b992b4b96d4a0270c71730c9715de13657",
+    "truck-shapeops/tests/high_valence_fillets.rs": "c46b58b52c1606a0d98b3e235eb243c86280bdb8a67a633427f39fb19e67ea26",
+    "truck-shapeops/tests/conical_blends.rs": "fc63ebf15788202173d0e88d4c0e086a79f5dec2c69ca82648cdf53dd84337f5",
+    "truck-shapeops/tests/spherical_rim_blends.rs": "9e6e27d2db3ee402de52a1dda89832e5af0b6400df964859f24251f9cf8ac367",
+    "truck-shapeops/tests/short_spine_fillets.rs": "2edea33908df728e5e1d8b69da15e04add64706956efc7cb08970618bf8daba6",
+    "truck-shapeops/tests/curved_fillet_step_domain.rs": "10efd3f94d12cba9bf3fb968bd1e7dccbb830328b29f44f7648e85c8042a140f",
+    "truck-shapeops/tests/imported_conic_prisms.rs": "e3550b9ab0be1e187f2b256f094290dbcda9d3eb29ef699e86dc4749a7dbed6b",
+    "truck-shapeops/tests/imported_support_domains.rs": "9c083e59bba26bd8057cb0641650c6d8359d9352af2923cc53f7f20abd83b2e7",
+    "truck-shapeops/tests/tangent_closed_face_split.rs": "9f5a9dc89635d10d489077088633f984f96221f6681cf9a65d888918d9396b22",
+    "truck-shapeops/tests/imported_spherical_mesh.rs": "12bf866cf6a255d4cbcb49ed7416ac30bb99e8c89164bb7ecc006ab0e9a60256",
+    "truck-shapeops/tests/spherical_meridian_step.rs": "fe48737926a6ebfef2e6b4ded76fed0f6cd25d3a7d385265c851c8aeb95ee526",
+    "truck-shapeops/tests/rounded_roof_post.rs": "a00dac3593a6e117cd020e1d467726b9808685355a5eb7ae797ec04bb067cef2",
+    "truck-shapeops/tests/two_edge_blend_caps.rs": "7c9363e1ddf5a064ded8fb0c92e5b1a29e365a486dbbb2d4643fc02e30506d47",
+    "truck-shapeops/tests/imported_spline_pipe.rs": "e55af5a53c4da7b4d950c0f6995ab64d6c0c9da447aaf9d98ad4915434c36ded",
+    "truck-shapeops/tests/parameter_scaled_fillet_mesh.rs": "e30c325c69fd57ff8527eb15c7fde0ed6a911197b1af068912c4d36786a4d63c",
+    "truck-shapeops/tests/spline_pipe_blend.rs": "f0bb9cfd22a630b1e8bc0d7f4b500689420ba7816317851830fedf4f54cc926a",
+    "truck-shapeops/tests/spherical_pole_blend.rs": "613e9ab2ecc85bc61065694d01f009f50a6e01704d794304a3c15afab6977284",
+    "truck-shapeops/tests/imported_toroidal_sectors.rs": "bd48bacaa48e85cefb7c38d54ea9b23e2e78d12043103f7a62864133e87d902e",
+    "truck-shapeops/tests/imported_ellipsoid_sectors.rs": "adfc182af54d7ca0e437bbd08651d1415eab25d71302cefc6d56d59b55f14cbb",
+    "truck-shapeops/tests/imported_spline_prisms.rs": "81971728b32f3fe218cf8875342c95d92a9a55ac37531c14901a859fd207899b",
+    "truck-shapeops/tests/imported_conical_sectors.rs": "473d63b78bec4aeb28a6c3aa6b3cc4dbdd79ce08ef95505355e483b652af6e52",
+    "truck-shapeops/tests/imported_oblique_extrusions.rs": "2c741ae74e67d6b46bef6f7d3d9856263119d7780ea0ecd726c6f5b8fa189c51",
+    "truck-shapeops/tests/imported_polar_excursions.rs": "5c69d44a0d14fe86ec109bd99b31c5af7bd7bc5ac46f5d0f25160a4c215a4504",
+    "truck-shapeops/tests/imported_closed_bezier_prisms.rs": "981066b33e8ae8e3d75c55093dfadb5b4b89125a8322f84936f2936d575e7d9f",
+    "truck-shapeops/tests/separate_fillet_contours.rs": "e4e26279e3329932a15e27f7913554b31b776c22f5ada3dce143ee319360784a",
+    "truck-shapeops/tests/unequal_fillet_radii.rs": "2fce9b2ff6d60311e49348d13b0fa0ef6dd719704c303d5acb0e4da05e034a81",
+    "truck-shapeops/tests/imported_spherical_pcurves.rs": "71410dfa77c788a72fb636faa5a87129577e11d1e099ca7295529e9545e7a83c",
+    "truck-shapeops/tests/imported_bounded_edges.rs": "43f69bb1bb53ec55384a7ea5f369fb1d6d9492ef106422b8dba5ad07913188ff",
+    "truck-shapeops/tests/tangent_chamfer_fit.rs": "07a3b6f66ec1a903db00bcba8eaddd5d981352d693859f9d36f00918a5199f4b",
+    "truck-shapeops/tests/two_edge_face_trimming.rs": "30099c5983494d79077cd233308069f1c1efd3254564e58ac14b4583b010245c",
+    "truck-shapeops/tests/two_edge_chamfer_caps.rs": "f5e33701244a32aaddb1ec8002afc9ab75169606511e97ad65e6f0d6bed573d3",
+    "truck-shapeops/tests/consumed_chamfer_neighbor.rs": "274906508a1a20c2d23fcc214e980537b9adfed0901b132fe42d2fadf0049627",
+    "truck-shapeops/tests/curved_chamfer_terminals.rs": "7611b9c4e6b9cad376d65690f1fb1bce8d179fe939fa4b0a6b75af1e6fdaacfd",
+    "truck-shapeops/tests/conic_contact_extension.rs": "5513c1b8d3e7072cf6069af328c372618724a68d64606e1631c76e5dfbd06291",
+    "truck-shapeops/tests/convex_corner_clipping.rs": "afa08dd14da1f2e2a45139f6da92943d0d259aa9cb5dee2e68ff3f610d0eebef",
+    "truck-shapeops/tests/common/blend.rs": "662e292953d1f3f3830dd7da6eefc448ace6635c11533f524f901b0be124a7f9",
+    "truck-shapeops/tests/common/mod.rs": "39bbeb28f4208ccd2df0c716104f11ce3c7176ad082b947ca32738a37f1e3588",
+    "truck-shapeops/tests/fixtures/unequal-radii/model.rs": "29579fbb389bddc6f574a438905f4c542515305318cfe06cc1472835bd61bef9",
+    "truck-shapeops/examples/punched-cube-shapeops.rs": "ff812995873a4e948a7ff8888da781c9b67f76218902406f3e75bee56571c741",
+    "truck-shapeops/examples/audit_fillet.rs": "141a1372d20a6fae62afaf917b079db3680c7927d93c85a37e57fef6a81a9321",
+    "truck-shapeops/examples/audit_chamfer.rs": "78b0a554b4074e731d95be2b8dde87fcae15270ac9aca9a4056345aa2bc41626",
+    "truck-shapeops/examples/replay_occt_blend.rs": "17d66b78680edda2bad6dc6da2c29779fb47fdba0f465451b9cfda71a4c7d954",
+    "truck-meshalgo/src/lib.rs": "c0954111ee88985fb5f7ba5b2960ff24ad04ff855ae0ac5a32e12fe3edd80b90",
+    "truck-meshalgo/src/vtk.rs": "2f2dbf755b0af54f5354bdd208e0a81f0e934464ff079535d17cd42606cb98b7",
+    "truck-meshalgo/src/analyzers/mod.rs": "10c9b376740e870774d3505758afff88cd3095f37d3ac5892f702e483479375b",
+    "truck-meshalgo/src/analyzers/splitting.rs": "00d117d5e313e99420e4b32dd2abb15644d58587bbfda2a5337e6fbf39378abf",
+    "truck-meshalgo/src/analyzers/volume.rs": "e8eff8747f34e7f90e60fe8b208213473b0ee803f484aab40855a79e4333c705",
+    "truck-meshalgo/src/analyzers/in_out_judge.rs": "9426398d80299054bba15d42ec462b4b2f8a943c5a0a4c49623422d3ad3a04ab",
+    "truck-meshalgo/src/analyzers/topology.rs": "d1d74e07457285121c9e0f110571f5bf746cc964c87e1c962367ad16c7d3c655",
+    "truck-meshalgo/src/analyzers/collision.rs": "7415301cc28445efca6a85b5f587ca680b4b388fd76a1e15d733a013261391ff",
+    "truck-meshalgo/src/common/adjacency.rs": "07870726891fcfe6fe78c70b525ff5a57d44dd4a783282256c78126de8773d02",
+    "truck-meshalgo/src/common/face_normal.rs": "bb4e6b51d6b5d906d7d6c433c149776aad5570123e3879eb77c339f79912e997",
+    "truck-meshalgo/src/common/mod.rs": "1136dd21c0998bc8e8130468f8e8f1b9949cda4662493b18241698ed5b13a98f",
+    "truck-meshalgo/src/common/triangulate.rs": "de3e40f5f0d4627cd91a2ddc89c2891d5b35d47768cf2976c64279b24e9e36b5",
+    "truck-meshalgo/src/filters/mod.rs": "a76cafe38d8b3b3e41265f7c4bffc88f888007b1197cd7aad02f524453dbdb28",
+    "truck-meshalgo/src/filters/normal_filters.rs": "00b3bb84fcda36dc75696153c62485c0c6b43ce8a2cc819d3c9dc590ea8c5a7f",
+    "truck-meshalgo/src/filters/structuring.rs": "0b224b1191a8e785c41d3ace06778692d744b5471a3802efcbaf75dc0c41d302",
+    "truck-meshalgo/src/filters/optimizing.rs": "52b1972855b9ac8a66be1bcfd1e9d832c440df8934e668b5a51b60fb172228a8",
+    "truck-meshalgo/src/filters/subdivision.rs": "388583cd2e25b5eb8e036094b2a70c3bd2294b787464ef76c5875561c44bab3a",
+    "truck-meshalgo/src/tessellation/diagnostics.rs": "0ae333234e69fddae98d731cc1485cb30e55605a48b45ef827fe2d6e3b28df62",
+    "truck-meshalgo/src/tessellation/mod.rs": "f5935d325ab0661b4430ccc53f8ccb43b54daf9526c0789d384b014d4d0b7aa9",
+    "truck-meshalgo/src/tessellation/triangulation.rs": "16ad469091c17cc454a4bbbd04626022e3e643198401b0dab80539311761fef8",
+    "truck-meshalgo/src/tessellation/triangulation/tests.rs": "a97288070dc05d5bc5eedefeaa1c5b687f9a2e566bd88c863684a4d0f88fcf4d",
+    "truck-meshalgo/src/analyzers/point_cloud/mod.rs": "4cde8e744664fbb410fcea247e296b798518e9a5b84c7269a30b14ef172e77f1",
+    "truck-meshalgo/src/analyzers/point_cloud/hashed_point_cloud.rs": "4fcda4a521a1e0ebb768f057e662d337579517437daf7a9e772fefcae3afe65f",
+    "truck-meshalgo/src/analyzers/point_cloud/sort_end_points.rs": "ae274dec30e500592b685c4d79e6c7e8b576450d7bf9ec91d07efe1e9444c4ac",
+    "truck-meshalgo/tests/vtk.rs": "9f995b67f6db16b04932850cbbd0670a2a645636d85afbeea5d2adf95e77852c",
+    "truck-meshalgo/tests/R9-revolve-fine-tessellation.rs": "978f110fc0e2c6e66fb2f4791ab61c6e1a61d52c87aae9dd8efddab768bef496",
+    "truck-meshalgo/tests/loft_winding.rs": "c9603c998ea29a448ef8a7360c52bb6aa7c9007472306a5a16225ba105432daf",
+    "truck-meshalgo/tests/cone_apex.rs": "a9fc5bd54117b86c50772ffc1938d6f8f559ea536c1b8932a8104c67cdb5fb63",
+    "truck-meshalgo/tests/pole_winding.rs": "cc707c2752122615895acb7916ef815b3b02f5193455e7d86348d5a7bf991fe0",
+    "truck-meshalgo/tests/collapsed_trim.rs": "325d25f9af3160ef8f22ec297621c5b9f55d06eed1e4000b5503bc0c236dd8f3",
+    "truck-meshalgo/tests/cylindrical_terminal_fan.rs": "efcc670a87d45a99a43c885c1d3f9fa7e458edc085d0757d476f941a7c7752c9",
+    "truck-meshalgo/tests/analyzers/collision.rs": "46c92a519e4c7369150cbdc903f0d2368c42efcdccfad0ae8184f90f707927a0",
+    "truck-meshalgo/tests/analyzers/main.rs": "64e2dfd64c5f023ffdcfbccd912f0505dfbfdaa2c78d46ac3d063d012b22c7ca",
+    "truck-meshalgo/tests/analyzers/point_cloud.rs": "dd03c73f21685ea591ef45268e3ce9f9bd9caf8ce972c8b2176468f903c12631",
+    "truck-meshalgo/tests/analyzers/splitting.rs": "d9f2f21882b451239082c555c550b767ef2da9a829e270e1569f57e85c22b6ad",
+    "truck-meshalgo/tests/analyzers/topology.rs": "0aa9a2b00d1c2e6cbc0043d24346fb55b96368a86970ae09e709c625aba7fa95",
+    "truck-meshalgo/tests/analyzers/volume.rs": "553cecaba351d3ae2f4a0f82d0547e43ed7dcab239d9a2df1778d126aabfaf27",
+    "truck-meshalgo/tests/common/mod.rs": "1235451838818b87255fb88c4170f3e0bfa18d996c3e8cc718aa5eed8504f65b",
+    "truck-meshalgo/tests/common/shapes.rs": "56fb0f05547c4e47bf438b47bd2ab7d7bf30ca957ff9ee3bcb42ed8858fba8b6",
+    "truck-meshalgo/tests/filters/main.rs": "0c745a1fabf0f0ef7b1e3a7ae8f7a839bf20c5a051ee19a76fd22b4b076b4567",
+    "truck-meshalgo/tests/filters/normal_filter.rs": "0cf7fd55662a6994eb800981e2cc58a50d26c637815c3731e230e42a48a435ad",
+    "truck-meshalgo/tests/filters/optimizing.rs": "3367be14586ef2f4363359db26a16fa916f1b9cb49cbc82a63bc8251b9bca47f",
+    "truck-meshalgo/tests/filters/structuring.rs": "1e22a110096dfb281cfa83828cd307a9b72e5162806c661804f4efc225238051",
+    "truck-meshalgo/tests/filters/subdivision.rs": "d003805d3eb0abe2c99f5dbebc57a06de58c7fa76c61f6d887c6f75a393baeb8",
+    "truck-meshalgo/tests/tessellation/main.rs": "4883904f985f62f179cf5dce00ed35a6bc2a408003b33de5c9effa2620821eec",
+    "truck-meshalgo/tests/tessellation/triangulation.rs": "553a423b5e5de4d4986940cf47be99ee2b4dbee240d3b2a1d1ffe006f7cfe24a"
+  },
+  "shapeops_counts": [
+    405,
+    0,
+    1
+  ],
+  "reused_meshalgo_evidence": "truck-benchmarks/results/2026-10-20-cylindrical-terminal-fans/validation.json",
+  "replay_tests": 59,
+  "replay_sha256": "f1a7edb69dea40d089a1d4c9a0351993154df27484257b1570447b0849aae553",
+  "log_sha256": {
+    "parent-failure.txt": "8479702b80dfb81371acecfca4b82f6fea9a4f026e4e59adf52f1af320d5bee6",
+    "candidate-tests.txt": "7eb2eaa2ad81199c6d379b49ca66bf9932a2cae40ed5f14315aaa8640b10e937",
+    "shapeops-tests.txt": "24a298dde2794737695377a92685a33cddd9e64513c561d4fe3cfa4efdc1e039",
+    "replay-tests.txt": "392dc97c52046a97d47e85907b3fb4c60cb0f05f9861a077ff5d4283905d3f4b",
+    "capture-tests.txt": "2e30758de9a1bee8ba0fbeae32674d891bc5fac5c6e8cc8b840287040d6725e3",
+    "clippy.txt": "1c23ab9fd093ca46eaabb1f3699d55ddfe05aec572ee035ace14bfb952a9b8b8",
+    "actions-smoke.txt": "6a78da27882c89b434beef0ef4a611c60c05b20dbf6937c9855a864e42e27e5a",
+    "replay-build.txt": "045db669c34e6726df3935c0328996c732108d8cdc773aa8e4aabc7e2dd5b2ce"
+  },
+  "native_controls": [
+    {
+      "distances": [
+        0.08,
+        0.08,
+        0.08
+      ],
+      "angles": null,
+      "native_input_unchanged": true,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-convex-corner-clip/capture/001",
+      "native": {
+        "native_valid": true,
+        "solids": 1,
+        "volume": 0.9907413333333333,
+        "area": 5.847400917156199,
+        "stored_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        }
+      },
+      "expected_volume": 0.9907839999999999,
+      "halfspace_vertices": [
+        [
+          -0.0,
+          -0.0,
+          -0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.9200000000000002
+        ],
+        [
+          -0.0,
+          0.9200000000000002,
+          -0.0
+        ],
+        [
+          0.0,
+          0.9200000000000002,
+          0.9200000000000002
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          -0.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          -0.0
+        ],
+        [
+          1.0,
+          1.0,
+          0.9199999999999999
+        ],
+        [
+          1.0,
+          0.9199999999999999,
+          1.0
+        ],
+        [
+          0.07999999999999988,
+          0.0,
+          1.0
+        ],
+        [
+          0.07999999999999988,
+          1.0,
+          0.0
+        ],
+        [
+          0.07999999999999986,
+          1.0,
+          0.9200000000000002
+        ],
+        [
+          0.07999999999999986,
+          0.9200000000000002,
+          1.0
+        ],
+        [
+          0.03999999999999987,
+          0.96,
+          0.96
+        ]
+      ],
+      "halfspace_faces": [
+        {
+          "normal": [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          "offset": 0.0,
+          "vertices": [
+            [
+              -0.0,
+              0.9200000000000002,
+              -0.0
+            ],
+            [
+              -0.0,
+              -0.0,
+              -0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.9200000000000002
+            ],
+            [
+              0.0,
+              0.9200000000000002,
+              0.9200000000000002
+            ]
+          ],
+          "area": 0.8464000000000003
+        },
+        {
+          "normal": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "offset": 1.0,
+          "vertices": [
+            [
+              1.0,
+              0.9199999999999999,
+              1.0
+            ],
+            [
+              1.0,
+              -0.0,
+              1.0
+            ],
+            [
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              1.0,
+              1.0,
+              -0.0
+            ],
+            [
+              1.0,
+              1.0,
+              0.9199999999999999
+            ]
+          ],
+          "area": 0.9968
+        },
+        {
+          "normal": [
+            0.0,
+            -1.0,
+            0.0
+          ],
+          "offset": 0.0,
+          "vertices": [
+            [
+              0.07999999999999988,
+              0.0,
+              1.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.9200000000000002
+            ],
+            [
+              -0.0,
+              -0.0,
+              -0.0
+            ],
+            [
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              1.0,
+              -0.0,
+              1.0
+            ]
+          ],
+          "area": 0.9968
+        },
+        {
+          "normal": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "offset": 1.0,
+          "vertices": [
+            [
+              0.07999999999999986,
+              1.0,
+              0.9200000000000002
+            ],
+            [
+              1.0,
+              1.0,
+              0.9199999999999999
+            ],
+            [
+              1.0,
+              1.0,
+              -0.0
+            ],
+            [
+              0.07999999999999988,
+              1.0,
+              0.0
+            ]
+          ],
+          "area": 0.8464000000000002
+        },
+        {
+          "normal": [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          "offset": 0.0,
+          "vertices": [
+            [
+              1.0,
+              1.0,
+              -0.0
+            ],
+            [
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              -0.0,
+              -0.0,
+              -0.0
+            ],
+            [
+              -0.0,
+              0.9200000000000002,
+              -0.0
+            ],
+            [
+              0.07999999999999988,
+              1.0,
+              0.0
+            ]
+          ],
+          "area": 0.9968
+        },
+        {
+          "normal": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "offset": 1.0,
+          "vertices": [
+            [
+              0.07999999999999988,
+              0.0,
+              1.0
+            ],
+            [
+              1.0,
+              -0.0,
+              1.0
+            ],
+            [
+              1.0,
+              0.9199999999999999,
+              1.0
+            ],
+            [
+              0.07999999999999986,
+              0.9200000000000002,
+              1.0
+            ]
+          ],
+          "area": 0.8464000000000002
+        },
+        {
+          "normal": [
+            -0.7071067811865475,
+            0.0,
+            0.7071067811865475
+          ],
+          "offset": 0.6505382386916237,
+          "vertices": [
+            [
+              0.03999999999999987,
+              0.96,
+              0.96
+            ],
+            [
+              0.0,
+              0.9200000000000002,
+              0.9200000000000002
+            ],
+            [
+              0.0,
+              0.0,
+              0.9200000000000002
+            ],
+            [
+              0.07999999999999988,
+              0.0,
+              1.0
+            ],
+            [
+              0.07999999999999986,
+              0.9200000000000002,
+              1.0
+            ]
+          ],
+          "area": 0.10634885989045656
+        },
+        {
+          "normal": [
+            -0.7071067811865475,
+            0.7071067811865475,
+            0.0
+          ],
+          "offset": 0.6505382386916237,
+          "vertices": [
+            [
+              0.07999999999999986,
+              1.0,
+              0.9200000000000002
+            ],
+            [
+              0.07999999999999988,
+              1.0,
+              0.0
+            ],
+            [
+              -0.0,
+              0.9200000000000002,
+              -0.0
+            ],
+            [
+              0.0,
+              0.9200000000000002,
+              0.9200000000000002
+            ],
+            [
+              0.03999999999999987,
+              0.96,
+              0.96
+            ]
+          ],
+          "area": 0.10634885989045656
+        },
+        {
+          "normal": [
+            0.0,
+            0.7071067811865475,
+            0.7071067811865475
+          ],
+          "offset": 1.357645019878171,
+          "vertices": [
+            [
+              0.07999999999999986,
+              0.9200000000000002,
+              1.0
+            ],
+            [
+              1.0,
+              0.9199999999999999,
+              1.0
+            ],
+            [
+              1.0,
+              1.0,
+              0.9199999999999999
+            ],
+            [
+              0.07999999999999986,
+              1.0,
+              0.9200000000000002
+            ],
+            [
+              0.03999999999999987,
+              0.96,
+              0.96
+            ]
+          ],
+          "area": 0.10634885989045671
+        }
+      ],
+      "native_volume_error": -4.266666666663532e-05,
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 0.990784,
+        "selected_edges": 3,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 0.9907413333333334,
+        "truck_volume": 0.9907840000000002,
+        "native_to_truck_max_distance": 0.01697056274847714,
+        "native_to_truck_samples": 2197,
+        "truck_to_native_max_distance": 0.023094010767584987,
+        "truck_to_native_samples": 1920,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "vertex_errors": [
+        3.1401849173675503e-16,
+        3.1401849173675503e-16
+      ],
+      "plane_sample_errors": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        2.220446049250313e-16,
+        2.220446049250313e-16,
+        2.220446049250313e-16
+      ],
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-convex-corner-clip/capture/001.input.brep": "3d9b8b41bab3b48dac7a68b873ae0a1a101b90f567587e4b41475b3bcd759d57",
+        "/home/krone/Development/Pieza_WS/truck/target/native-convex-corner-clip/capture/001.input.step": "19f13410d45589671b393774c83a5b76d525a3907631e7bd56e9a76ecf92728e",
+        "/home/krone/Development/Pieza_WS/truck/target/native-convex-corner-clip/capture/001.input.json": "f1279317f691fae4e1e697066beb7c4a386ba146617e1987860fd6e67ab9f52e"
+      }
+    },
+    {
+      "distances": [
+        0.3,
+        0.08,
+        0.08
+      ],
+      "angles": null,
+      "native_input_unchanged": true,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-convex-corner-clip/capture/002",
+      "native": {
+        "native_valid": true,
+        "solids": 1,
+        "volume": 0.9496453333333331,
+        "area": 5.643541518998194,
+        "stored_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        }
+      },
+      "expected_volume": 0.9503493333333334,
+      "halfspace_vertices": [
+        [
+          -0.0,
+          -0.0,
+          -0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.7
+        ],
+        [
+          -0.0,
+          0.9200000000000002,
+          -0.0
+        ],
+        [
+          0.0,
+          0.9200000000000002,
+          0.7
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          -0.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          -0.0
+        ],
+        [
+          1.0,
+          1.0,
+          0.9199999999999999
+        ],
+        [
+          1.0,
+          0.9199999999999999,
+          1.0
+        ],
+        [
+          0.3,
+          0.0,
+          1.0
+        ],
+        [
+          0.07999999999999988,
+          1.0,
+          0.0
+        ],
+        [
+          0.07999999999999985,
+          1.0,
+          0.7799999999999998
+        ],
+        [
+          0.21999999999999997,
+          1.0,
+          0.9199999999999999
+        ],
+        [
+          0.30000000000000004,
+          0.9199999999999999,
+          1.0
+        ]
+      ],
+      "halfspace_faces": [
+        {
+          "normal": [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          "offset": 0.0,
+          "vertices": [
+            [
+              -0.0,
+              0.9200000000000002,
+              -0.0
+            ],
+            [
+              -0.0,
+              -0.0,
+              -0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.7
+            ],
+            [
+              0.0,
+              0.9200000000000002,
+              0.7
+            ]
+          ],
+          "area": 0.644
+        },
+        {
+          "normal": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "offset": 1.0,
+          "vertices": [
+            [
+              1.0,
+              0.9199999999999999,
+              1.0
+            ],
+            [
+              1.0,
+              -0.0,
+              1.0
+            ],
+            [
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              1.0,
+              1.0,
+              -0.0
+            ],
+            [
+              1.0,
+              1.0,
+              0.9199999999999999
+            ]
+          ],
+          "area": 0.9968
+        },
+        {
+          "normal": [
+            0.0,
+            -1.0,
+            0.0
+          ],
+          "offset": 0.0,
+          "vertices": [
+            [
+              0.3,
+              0.0,
+              1.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.7
+            ],
+            [
+              -0.0,
+              -0.0,
+              -0.0
+            ],
+            [
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              1.0,
+              -0.0,
+              1.0
+            ]
+          ],
+          "area": 0.955
+        },
+        {
+          "normal": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "offset": 1.0,
+          "vertices": [
+            [
+              0.21999999999999997,
+              1.0,
+              0.9199999999999999
+            ],
+            [
+              1.0,
+              1.0,
+              0.9199999999999999
+            ],
+            [
+              1.0,
+              1.0,
+              -0.0
+            ],
+            [
+              0.07999999999999988,
+              1.0,
+              0.0
+            ],
+            [
+              0.07999999999999985,
+              1.0,
+              0.7799999999999998
+            ]
+          ],
+          "area": 0.8366000000000001
+        },
+        {
+          "normal": [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          "offset": 0.0,
+          "vertices": [
+            [
+              1.0,
+              1.0,
+              -0.0
+            ],
+            [
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              -0.0,
+              -0.0,
+              -0.0
+            ],
+            [
+              -0.0,
+              0.9200000000000002,
+              -0.0
+            ],
+            [
+              0.07999999999999988,
+              1.0,
+              0.0
+            ]
+          ],
+          "area": 0.9968
+        },
+        {
+          "normal": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "offset": 1.0,
+          "vertices": [
+            [
+              0.3,
+              0.0,
+              1.0
+            ],
+            [
+              1.0,
+              -0.0,
+              1.0
+            ],
+            [
+              1.0,
+              0.9199999999999999,
+              1.0
+            ],
+            [
+              0.30000000000000004,
+              0.9199999999999999,
+              1.0
+            ]
+          ],
+          "area": 0.6439999999999999
+        },
+        {
+          "normal": [
+            -0.7071067811865476,
+            0.0,
+            0.7071067811865476
+          ],
+          "offset": 0.4949747468305833,
+          "vertices": [
+            [
+              0.21999999999999997,
+              1.0,
+              0.9199999999999999
+            ],
+            [
+              0.07999999999999985,
+              1.0,
+              0.7799999999999998
+            ],
+            [
+              0.0,
+              0.9200000000000002,
+              0.7
+            ],
+            [
+              0.0,
+              0.0,
+              0.7
+            ],
+            [
+              0.3,
+              0.0,
+              1.0
+            ],
+            [
+              0.30000000000000004,
+              0.9199999999999999,
+              1.0
+            ]
+          ],
+          "area": 0.4152131019127408
+        },
+        {
+          "normal": [
+            -0.7071067811865475,
+            0.7071067811865475,
+            0.0
+          ],
+          "offset": 0.6505382386916237,
+          "vertices": [
+            [
+              0.07999999999999988,
+              1.0,
+              0.0
+            ],
+            [
+              -0.0,
+              0.9200000000000002,
+              -0.0
+            ],
+            [
+              0.0,
+              0.9200000000000002,
+              0.7
+            ],
+            [
+              0.07999999999999985,
+              1.0,
+              0.7799999999999998
+            ]
+          ],
+          "area": 0.08372144289248705
+        },
+        {
+          "normal": [
+            0.0,
+            0.7071067811865475,
+            0.7071067811865475
+          ],
+          "offset": 1.357645019878171,
+          "vertices": [
+            [
+              0.30000000000000004,
+              0.9199999999999999,
+              1.0
+            ],
+            [
+              1.0,
+              0.9199999999999999,
+              1.0
+            ],
+            [
+              1.0,
+              1.0,
+              0.9199999999999999
+            ],
+            [
+              0.21999999999999997,
+              1.0,
+              0.9199999999999999
+            ]
+          ],
+          "area": 0.08372144289248726
+        }
+      ],
+      "native_volume_error": -0.00070400000000026,
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 0.9503493333333334,
+        "selected_edges": 3,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 0.9496453333333333,
+        "truck_volume": 0.9503493333333333,
+        "native_to_truck_max_distance": 0.03200000000000003,
+        "native_to_truck_samples": 2270,
+        "truck_to_native_max_distance": 0.046188021535170154,
+        "truck_to_native_samples": 2100,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "vertex_errors": [
+        2.482534153247273e-16,
+        2.482534153247273e-16
+      ],
+      "plane_sample_errors": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.1102230246251565e-16,
+        2.220446049250313e-16,
+        2.220446049250313e-16
+      ],
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-convex-corner-clip/capture/002.input.brep": "3d9b8b41bab3b48dac7a68b873ae0a1a101b90f567587e4b41475b3bcd759d57",
+        "/home/krone/Development/Pieza_WS/truck/target/native-convex-corner-clip/capture/002.input.step": "dfd8a679a6f7dd750fa689f32759023909fdfffcf6a6c0ff02b7578afd148561",
+        "/home/krone/Development/Pieza_WS/truck/target/native-convex-corner-clip/capture/002.input.json": "09f18d0ec0ba2c03d762c8642fbc569ec8dc9bbbd6ddae9ef6335d52051d1b38"
+      }
+    },
+    {
+      "distances": [
+        0.08,
+        0.3,
+        0.08
+      ],
+      "angles": null,
+      "native_input_unchanged": true,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-convex-corner-clip/capture/003",
+      "native": {
+        "native_valid": true,
+        "solids": 1,
+        "volume": 0.9496453333333331,
+        "area": 5.643541518998194,
+        "stored_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        }
+      },
+      "expected_volume": 0.9503493333333334,
+      "halfspace_vertices": [
+        [
+          -0.0,
+          -0.0,
+          -0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.9200000000000002
+        ],
+        [
+          -0.0,
+          0.7,
+          -0.0
+        ],
+        [
+          0.0,
+          0.7,
+          0.9200000000000002
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          -0.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          -0.0
+        ],
+        [
+          1.0,
+          1.0,
+          0.9199999999999999
+        ],
+        [
+          1.0,
+          0.9199999999999999,
+          1.0
+        ],
+        [
+          0.07999999999999988,
+          0.0,
+          1.0
+        ],
+        [
+          0.3,
+          1.0,
+          0.0
+        ],
+        [
+          0.30000000000000004,
+          1.0,
+          0.9199999999999999
+        ],
+        [
+          0.07999999999999985,
+          0.7799999999999998,
+          1.0
+        ],
+        [
+          0.21999999999999997,
+          0.9199999999999999,
+          1.0
+        ]
+      ],
+      "halfspace_faces": [
+        {
+          "normal": [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          "offset": 0.0,
+          "vertices": [
+            [
+              -0.0,
+              0.7,
+              -0.0
+            ],
+            [
+              -0.0,
+              -0.0,
+              -0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.9200000000000002
+            ],
+            [
+              0.0,
+              0.7,
+              0.9200000000000002
+            ]
+          ],
+          "area": 0.644
+        },
+        {
+          "normal": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "offset": 1.0,
+          "vertices": [
+            [
+              1.0,
+              0.9199999999999999,
+              1.0
+            ],
+            [
+              1.0,
+              -0.0,
+              1.0
+            ],
+            [
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              1.0,
+              1.0,
+              -0.0
+            ],
+            [
+              1.0,
+              1.0,
+              0.9199999999999999
+            ]
+          ],
+          "area": 0.9968
+        },
+        {
+          "normal": [
+            0.0,
+            -1.0,
+            0.0
+          ],
+          "offset": 0.0,
+          "vertices": [
+            [
+              0.07999999999999988,
+              0.0,
+              1.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.9200000000000002
+            ],
+            [
+              -0.0,
+              -0.0,
+              -0.0
+            ],
+            [
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              1.0,
+              -0.0,
+              1.0
+            ]
+          ],
+          "area": 0.9968
+        },
+        {
+          "normal": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "offset": 1.0,
+          "vertices": [
+            [
+              1.0,
+              1.0,
+              0.9199999999999999
+            ],
+            [
+              1.0,
+              1.0,
+              -0.0
+            ],
+            [
+              0.3,
+              1.0,
+              0.0
+            ],
+            [
+              0.30000000000000004,
+              1.0,
+              0.9199999999999999
+            ]
+          ],
+          "area": 0.6439999999999999
+        },
+        {
+          "normal": [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          "offset": 0.0,
+          "vertices": [
+            [
+              1.0,
+              1.0,
+              -0.0
+            ],
+            [
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              -0.0,
+              -0.0,
+              -0.0
+            ],
+            [
+              -0.0,
+              0.7,
+              -0.0
+            ],
+            [
+              0.3,
+              1.0,
+              0.0
+            ]
+          ],
+          "area": 0.955
+        },
+        {
+          "normal": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "offset": 1.0,
+          "vertices": [
+            [
+              0.07999999999999985,
+              0.7799999999999998,
+              1.0
+            ],
+            [
+              0.07999999999999988,
+              0.0,
+              1.0
+            ],
+            [
+              1.0,
+              -0.0,
+              1.0
+            ],
+            [
+              1.0,
+              0.9199999999999999,
+              1.0
+            ],
+            [
+              0.21999999999999997,
+              0.9199999999999999,
+              1.0
+            ]
+          ],
+          "area": 0.8366000000000001
+        },
+        {
+          "normal": [
+            -0.7071067811865475,
+            0.0,
+            0.7071067811865475
+          ],
+          "offset": 0.6505382386916237,
+          "vertices": [
+            [
+              0.07999999999999985,
+              0.7799999999999998,
+              1.0
+            ],
+            [
+              0.0,
+              0.7,
+              0.9200000000000002
+            ],
+            [
+              0.0,
+              0.0,
+              0.9200000000000002
+            ],
+            [
+              0.07999999999999988,
+              0.0,
+              1.0
+            ]
+          ],
+          "area": 0.08372144289248705
+        },
+        {
+          "normal": [
+            -0.7071067811865476,
+            0.7071067811865476,
+            0.0
+          ],
+          "offset": 0.4949747468305833,
+          "vertices": [
+            [
+              0.30000000000000004,
+              1.0,
+              0.9199999999999999
+            ],
+            [
+              0.3,
+              1.0,
+              0.0
+            ],
+            [
+              -0.0,
+              0.7,
+              -0.0
+            ],
+            [
+              0.0,
+              0.7,
+              0.9200000000000002
+            ],
+            [
+              0.07999999999999985,
+              0.7799999999999998,
+              1.0
+            ],
+            [
+              0.21999999999999997,
+              0.9199999999999999,
+              1.0
+            ]
+          ],
+          "area": 0.4152131019127408
+        },
+        {
+          "normal": [
+            0.0,
+            0.7071067811865475,
+            0.7071067811865475
+          ],
+          "offset": 1.357645019878171,
+          "vertices": [
+            [
+              1.0,
+              0.9199999999999999,
+              1.0
+            ],
+            [
+              1.0,
+              1.0,
+              0.9199999999999999
+            ],
+            [
+              0.30000000000000004,
+              1.0,
+              0.9199999999999999
+            ],
+            [
+              0.21999999999999997,
+              0.9199999999999999,
+              1.0
+            ]
+          ],
+          "area": 0.08372144289248726
+        }
+      ],
+      "native_volume_error": -0.00070400000000026,
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 0.9503493333333334,
+        "selected_edges": 3,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 0.9496453333333335,
+        "truck_volume": 0.9503493333333333,
+        "native_to_truck_max_distance": 0.03200000000000014,
+        "native_to_truck_samples": 2270,
+        "truck_to_native_max_distance": 0.04618802153517001,
+        "truck_to_native_samples": 2100,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "vertex_errors": [
+        2.482534153247273e-16,
+        2.482534153247273e-16
+      ],
+      "plane_sample_errors": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        2.220446049250313e-16,
+        1.1102230246251565e-16,
+        2.220446049250313e-16
+      ],
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-convex-corner-clip/capture/003.input.brep": "3d9b8b41bab3b48dac7a68b873ae0a1a101b90f567587e4b41475b3bcd759d57",
+        "/home/krone/Development/Pieza_WS/truck/target/native-convex-corner-clip/capture/003.input.step": "f9cf4581548314711c30dba2a7a1506902bb08acef28c8d68b81e2399620cc49",
+        "/home/krone/Development/Pieza_WS/truck/target/native-convex-corner-clip/capture/003.input.json": "f87281cc70e2a2c18c2524ca47bfb96961f9433155df0f71c600a934b0e6d4ca"
+      }
+    },
+    {
+      "distances": [
+        0.08,
+        0.08,
+        0.3
+      ],
+      "angles": null,
+      "native_input_unchanged": true,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-convex-corner-clip/capture/004",
+      "native": {
+        "native_valid": true,
+        "solids": 1,
+        "volume": 0.9496453333333332,
+        "area": 5.643541518998194,
+        "stored_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        }
+      },
+      "expected_volume": 0.9503493333333333,
+      "halfspace_vertices": [
+        [
+          -0.0,
+          -0.0,
+          -0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.9200000000000002
+        ],
+        [
+          -0.0,
+          0.9200000000000002,
+          -0.0
+        ],
+        [
+          0.0,
+          0.7799999999999998,
+          0.9200000000000002
+        ],
+        [
+          -0.0,
+          0.9200000000000002,
+          0.7799999999999998
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          -0.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          -0.0
+        ],
+        [
+          1.0,
+          1.0,
+          0.7
+        ],
+        [
+          1.0,
+          0.7,
+          1.0
+        ],
+        [
+          0.07999999999999988,
+          0.0,
+          1.0
+        ],
+        [
+          0.07999999999999988,
+          1.0,
+          0.0
+        ],
+        [
+          0.07999999999999985,
+          1.0,
+          0.7
+        ],
+        [
+          0.07999999999999985,
+          0.7,
+          1.0
+        ]
+      ],
+      "halfspace_faces": [
+        {
+          "normal": [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          "offset": 0.0,
+          "vertices": [
+            [
+              -0.0,
+              0.9200000000000002,
+              0.7799999999999998
+            ],
+            [
+              -0.0,
+              0.9200000000000002,
+              -0.0
+            ],
+            [
+              -0.0,
+              -0.0,
+              -0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.9200000000000002
+            ],
+            [
+              0.0,
+              0.7799999999999998,
+              0.9200000000000002
+            ]
+          ],
+          "area": 0.8366000000000002
+        },
+        {
+          "normal": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "offset": 1.0,
+          "vertices": [
+            [
+              1.0,
+              0.7,
+              1.0
+            ],
+            [
+              1.0,
+              -0.0,
+              1.0
+            ],
+            [
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              1.0,
+              1.0,
+              -0.0
+            ],
+            [
+              1.0,
+              1.0,
+              0.7
+            ]
+          ],
+          "area": 0.955
+        },
+        {
+          "normal": [
+            0.0,
+            -1.0,
+            0.0
+          ],
+          "offset": 0.0,
+          "vertices": [
+            [
+              0.07999999999999988,
+              0.0,
+              1.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.9200000000000002
+            ],
+            [
+              -0.0,
+              -0.0,
+              -0.0
+            ],
+            [
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              1.0,
+              -0.0,
+              1.0
+            ]
+          ],
+          "area": 0.9968
+        },
+        {
+          "normal": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "offset": 1.0,
+          "vertices": [
+            [
+              1.0,
+              1.0,
+              0.7
+            ],
+            [
+              1.0,
+              1.0,
+              -0.0
+            ],
+            [
+              0.07999999999999988,
+              1.0,
+              0.0
+            ],
+            [
+              0.07999999999999985,
+              1.0,
+              0.7
+            ]
+          ],
+          "area": 0.644
+        },
+        {
+          "normal": [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          "offset": 0.0,
+          "vertices": [
+            [
+              1.0,
+              1.0,
+              -0.0
+            ],
+            [
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              -0.0,
+              -0.0,
+              -0.0
+            ],
+            [
+              -0.0,
+              0.9200000000000002,
+              -0.0
+            ],
+            [
+              0.07999999999999988,
+              1.0,
+              0.0
+            ]
+          ],
+          "area": 0.9968
+        },
+        {
+          "normal": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "offset": 1.0,
+          "vertices": [
+            [
+              0.07999999999999988,
+              0.0,
+              1.0
+            ],
+            [
+              1.0,
+              -0.0,
+              1.0
+            ],
+            [
+              1.0,
+              0.7,
+              1.0
+            ],
+            [
+              0.07999999999999985,
+              0.7,
+              1.0
+            ]
+          ],
+          "area": 0.644
+        },
+        {
+          "normal": [
+            -0.7071067811865475,
+            0.0,
+            0.7071067811865475
+          ],
+          "offset": 0.6505382386916237,
+          "vertices": [
+            [
+              0.0,
+              0.7799999999999998,
+              0.9200000000000002
+            ],
+            [
+              0.0,
+              0.0,
+              0.9200000000000002
+            ],
+            [
+              0.07999999999999988,
+              0.0,
+              1.0
+            ],
+            [
+              0.07999999999999985,
+              0.7,
+              1.0
+            ]
+          ],
+          "area": 0.08372144289248712
+        },
+        {
+          "normal": [
+            -0.7071067811865475,
+            0.7071067811865475,
+            0.0
+          ],
+          "offset": 0.6505382386916237,
+          "vertices": [
+            [
+              0.07999999999999985,
+              1.0,
+              0.7
+            ],
+            [
+              0.07999999999999988,
+              1.0,
+              0.0
+            ],
+            [
+              -0.0,
+              0.9200000000000002,
+              -0.0
+            ],
+            [
+              -0.0,
+              0.9200000000000002,
+              0.7799999999999998
+            ]
+          ],
+          "area": 0.08372144289248712
+        },
+        {
+          "normal": [
+            0.0,
+            0.7071067811865476,
+            0.7071067811865476
+          ],
+          "offset": 1.2020815280171309,
+          "vertices": [
+            [
+              1.0,
+              1.0,
+              0.7
+            ],
+            [
+              0.07999999999999985,
+              1.0,
+              0.7
+            ],
+            [
+              -0.0,
+              0.9200000000000002,
+              0.7799999999999998
+            ],
+            [
+              0.0,
+              0.7799999999999998,
+              0.9200000000000002
+            ],
+            [
+              0.07999999999999985,
+              0.7,
+              1.0
+            ],
+            [
+              1.0,
+              0.7,
+              1.0
+            ]
+          ],
+          "area": 0.41521310191274086
+        }
+      ],
+      "native_volume_error": -0.0007040000000000379,
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 0.9503493333333334,
+        "selected_edges": 3,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 0.9496453333333332,
+        "truck_volume": 0.9503493333333334,
+        "native_to_truck_max_distance": 0.03200000000000012,
+        "native_to_truck_samples": 2270,
+        "truck_to_native_max_distance": 0.04618802153517017,
+        "truck_to_native_samples": 2100,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 0.0001
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "vertex_errors": [
+        2.220446049250313e-16,
+        2.220446049250313e-16
+      ],
+      "plane_sample_errors": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        2.220446049250313e-16,
+        2.220446049250313e-16,
+        2.220446049250313e-16
+      ],
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-convex-corner-clip/capture/004.input.brep": "3d9b8b41bab3b48dac7a68b873ae0a1a101b90f567587e4b41475b3bcd759d57",
+        "/home/krone/Development/Pieza_WS/truck/target/native-convex-corner-clip/capture/004.input.step": "b1b3913f5b36c975290e8eab813e6e9cd9c0f1b7e82d18758964eba156664f61",
+        "/home/krone/Development/Pieza_WS/truck/target/native-convex-corner-clip/capture/004.input.json": "8ef41390b6a1de54f8b5e898a64c5d17606a754ff9e0317fba3330ec6f368a7d"
+      }
+    },
+    {
+      "distances": [
+        0.08,
+        0.2,
+        0.1
+      ],
+      "angles": [
+        40.0,
+        30.0,
+        30.0
+      ],
+      "native_input_unchanged": true,
+      "prefix": "/home/krone/Development/Pieza_WS/truck/target/native-convex-corner-clip/capture/005",
+      "native": {
+        "native_valid": true,
+        "solids": 1,
+        "volume": 0.9833631726478343,
+        "area": 5.8053301219872155,
+        "stored_tolerances": {
+          "face": 0.0001,
+          "edge": 0.0001,
+          "vertex": 0.00010000000000000003
+        }
+      },
+      "expected_volume": 0.9836153411231264,
+      "halfspace_vertices": [
+        [
+          -0.0,
+          -0.0,
+          -0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.92
+        ],
+        [
+          -0.0,
+          0.8,
+          -0.0
+        ],
+        [
+          0.0,
+          0.8,
+          0.92
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          -0.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          -0.0
+        ],
+        [
+          1.0,
+          1.0,
+          0.9000000000000001
+        ],
+        [
+          1.0,
+          0.9422649730810375,
+          1.0
+        ],
+        [
+          0.06712797049418237,
+          0.0,
+          1.0
+        ],
+        [
+          0.11547005383792512,
+          1.0,
+          0.0
+        ],
+        [
+          0.11547005383792512,
+          1.0,
+          0.8999999999999999
+        ],
+        [
+          0.06712797049418237,
+          0.9162690555049084,
+          1.0
+        ],
+        [
+          0.08213672050459174,
+          0.9422649730810373,
+          1.0
+        ]
+      ],
+      "halfspace_faces": [
+        {
+          "normal": [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          "offset": 0.0,
+          "vertices": [
+            [
+              -0.0,
+              0.8,
+              -0.0
+            ],
+            [
+              -0.0,
+              -0.0,
+              -0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.92
+            ],
+            [
+              0.0,
+              0.8,
+              0.92
+            ]
+          ],
+          "area": 0.7360000000000001
+        },
+        {
+          "normal": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "offset": 1.0,
+          "vertices": [
+            [
+              1.0,
+              0.9422649730810375,
+              1.0
+            ],
+            [
+              1.0,
+              -0.0,
+              1.0
+            ],
+            [
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              1.0,
+              1.0,
+              -0.0
+            ],
+            [
+              1.0,
+              1.0,
+              0.9000000000000001
+            ]
+          ],
+          "area": 0.9971132486540519
+        },
+        {
+          "normal": [
+            0.0,
+            -1.0,
+            0.0
+          ],
+          "offset": 0.0,
+          "vertices": [
+            [
+              0.06712797049418237,
+              0.0,
+              1.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.92
+            ],
+            [
+              -0.0,
+              -0.0,
+              -0.0
+            ],
+            [
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              1.0,
+              -0.0,
+              1.0
+            ]
+          ],
+          "area": 0.9973148811802327
+        },
+        {
+          "normal": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "offset": 1.0,
+          "vertices": [
+            [
+              1.0,
+              1.0,
+              0.9000000000000001
+            ],
+            [
+              1.0,
+              1.0,
+              -0.0
+            ],
+            [
+              0.11547005383792512,
+              1.0,
+              0.0
+            ],
+            [
+              0.11547005383792512,
+              1.0,
+              0.8999999999999999
+            ]
+          ],
+          "area": 0.7960769515458674
+        },
+        {
+          "normal": [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          "offset": 0.0,
+          "vertices": [
+            [
+              1.0,
+              1.0,
+              -0.0
+            ],
+            [
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              -0.0,
+              -0.0,
+              -0.0
+            ],
+            [
+              -0.0,
+              0.8,
+              -0.0
+            ],
+            [
+              0.11547005383792512,
+              1.0,
+              0.0
+            ]
+          ],
+          "area": 0.9884529946162075
+        },
+        {
+          "normal": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "offset": 1.0,
+          "vertices": [
+            [
+              0.06712797049418237,
+              0.9162690555049084,
+              1.0
+            ],
+            [
+              0.06712797049418237,
+              0.0,
+              1.0
+            ],
+            [
+              1.0,
+              -0.0,
+              1.0
+            ],
+            [
+              1.0,
+              0.9422649730810375,
+              1.0
+            ],
+            [
+              0.08213672050459174,
+              0.9422649730810373,
+              1.0
+            ]
+          ],
+          "area": 0.8788175546562563
+        },
+        {
+          "normal": [
+            -0.766044443118978,
+            0.0,
+            0.6427876096865393
+          ],
+          "offset": 0.5913646009116161,
+          "vertices": [
+            [
+              0.06712797049418237,
+              0.9162690555049084,
+              1.0
+            ],
+            [
+              0.0,
+              0.8,
+              0.92
+            ],
+            [
+              0.0,
+              0.0,
+              0.92
+            ],
+            [
+              0.06712797049418237,
+              0.0,
+              1.0
+            ]
+          ],
+          "area": 0.08961720542046127
+        },
+        {
+          "normal": [
+            -0.8660254037844387,
+            0.5,
+            0.0
+          ],
+          "offset": 0.4,
+          "vertices": [
+            [
+              0.11547005383792512,
+              1.0,
+              0.8999999999999999
+            ],
+            [
+              0.11547005383792512,
+              1.0,
+              0.0
+            ],
+            [
+              -0.0,
+              0.8,
+              -0.0
+            ],
+            [
+              0.0,
+              0.8,
+              0.92
+            ],
+            [
+              0.06712797049418237,
+              0.9162690555049084,
+              1.0
+            ],
+            [
+              0.08213672050459174,
+              0.9422649730810373,
+              1.0
+            ]
+          ],
+          "area": 0.22223653670298235
+        },
+        {
+          "normal": [
+            0.0,
+            0.8660254037844387,
+            0.5
+          ],
+          "offset": 1.3160254037844388,
+          "vertices": [
+            [
+              1.0,
+              0.9422649730810375,
+              1.0
+            ],
+            [
+              1.0,
+              1.0,
+              0.9000000000000001
+            ],
+            [
+              0.11547005383792512,
+              1.0,
+              0.8999999999999999
+            ],
+            [
+              0.08213672050459174,
+              0.9422649730810373,
+              1.0
+            ]
+          ],
+          "area": 0.10406122140189059
+        }
+      ],
+      "native_volume_error": -0.00025216847529208053,
+      "truck": {
+        "geometry_consistent": true,
+        "input_unchanged": true,
+        "mesh_closed": true,
+        "mesh_volume": 0.9836153411231261,
+        "selected_edges": 3,
+        "selection_scope": "native-contours",
+        "status": "operation-succeeded",
+        "step_fitting_tolerance": 1e-07,
+        "step_prepared": true
+      },
+      "comparison": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 0.9833631726478341,
+        "truck_volume": 0.9836153411231261,
+        "native_to_truck_max_distance": 0.027600000000001068,
+        "native_to_truck_samples": 2293,
+        "truck_to_native_max_distance": 0.03541520378059561,
+        "truck_to_native_samples": 2101,
+        "native_tolerances": {
+          "face": 0.0001,
+          "edge": 0.0001,
+          "vertex": 0.0001
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "vertex_errors": [
+        6.6973807122470445e-16,
+        6.6973807122470445e-16
+      ],
+      "plane_sample_errors": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.1102230246251565e-16,
+        1.1102230246251565e-16,
+        2.220446049250313e-16
+      ],
+      "input_sha256": {
+        "/home/krone/Development/Pieza_WS/truck/target/native-convex-corner-clip/capture/005.input.brep": "3d9b8b41bab3b48dac7a68b873ae0a1a101b90f567587e4b41475b3bcd759d57",
+        "/home/krone/Development/Pieza_WS/truck/target/native-convex-corner-clip/capture/005.input.step": "f1a638df57abc69b16f182397f973683e4a983adc6cd278d1de6b55a25df6545",
+        "/home/krone/Development/Pieza_WS/truck/target/native-convex-corner-clip/capture/005.input.json": "81d659a2474ef519351b4854892592e3831e47b8bb836c942bd6ff75a45733d3"
+      }
+    }
+  ],
+  "archive_sha256": "e62bd7d7e3759d0410e98ff509e986a74b8379da39f9f0a7c690559b19f1287b",
+  "artifact_sha256": {
+    "native/input.brep": "20cd0f3a6d324916a07374425acefd07f0286a9fdd26155a9a2a69bca55be793",
+    "native/controls.tcl": "d2fb78abc4159286b8ba2954052a47ac7899e5b5f3223e7eaeec6fe9d15a06c7",
+    "native/display.log": "387d9ed5b3521de8c7f42351f9d54e45ef21013c7c4a718c09060cc84608444a",
+    "native/before0.result.brep": "3d9b8b41bab3b48dac7a68b873ae0a1a101b90f567587e4b41475b3bcd759d57",
+    "native/before0.result.step": "ec2a5f7e7b85d219272f20eeb6b1b2e3e7ff48ae3b8155a31a92308485446358",
+    "native/before0.result.json": "8e2d11caa27f3756860983594b3cf2d1dca78d39f75442ec6966a746454a9d9c",
+    "native/after0.result.brep": "3d9b8b41bab3b48dac7a68b873ae0a1a101b90f567587e4b41475b3bcd759d57",
+    "native/after0.result.step": "20720ecc525d58dfd2a6d5f1e79ff5ffa859cfa5a0f88c23fb60b233b8b94324",
+    "native/after0.result.json": "8e2d11caa27f3756860983594b3cf2d1dca78d39f75442ec6966a746454a9d9c",
+    "native/before1.result.brep": "3d9b8b41bab3b48dac7a68b873ae0a1a101b90f567587e4b41475b3bcd759d57",
+    "native/before1.result.step": "4d5321eabe76d1476f5f2a788d8e96437f0ef79be5cab92cc5c448fe349ba9f9",
+    "native/before1.result.json": "8e2d11caa27f3756860983594b3cf2d1dca78d39f75442ec6966a746454a9d9c",
+    "native/after1.result.brep": "3d9b8b41bab3b48dac7a68b873ae0a1a101b90f567587e4b41475b3bcd759d57",
+    "native/after1.result.step": "226c7565f7bf779e2c4a6b589e5e78f5431c82cc74f27c008470779f3c133f0f",
+    "native/after1.result.json": "8e2d11caa27f3756860983594b3cf2d1dca78d39f75442ec6966a746454a9d9c",
+    "native/before2.result.brep": "3d9b8b41bab3b48dac7a68b873ae0a1a101b90f567587e4b41475b3bcd759d57",
+    "native/before2.result.step": "d30eb1d1fd7933a07a072ce6b276db166db527729be35dcd4e1b1c8bc4d9b1c2",
+    "native/before2.result.json": "8e2d11caa27f3756860983594b3cf2d1dca78d39f75442ec6966a746454a9d9c",
+    "native/after2.result.brep": "3d9b8b41bab3b48dac7a68b873ae0a1a101b90f567587e4b41475b3bcd759d57",
+    "native/after2.result.step": "6baab46cb3c364eed9024db7f321d3205bc5bf580d814b3c536bf6a6c214d2a5",
+    "native/after2.result.json": "8e2d11caa27f3756860983594b3cf2d1dca78d39f75442ec6966a746454a9d9c",
+    "native/before3.result.brep": "3d9b8b41bab3b48dac7a68b873ae0a1a101b90f567587e4b41475b3bcd759d57",
+    "native/before3.result.step": "e32763b906a0dfd8dd005f6ed3c39f945f9ff0561cc96611cf91076c91d0c2ce",
+    "native/before3.result.json": "8e2d11caa27f3756860983594b3cf2d1dca78d39f75442ec6966a746454a9d9c",
+    "native/after3.result.brep": "3d9b8b41bab3b48dac7a68b873ae0a1a101b90f567587e4b41475b3bcd759d57",
+    "native/after3.result.step": "758b736d35af4386fd7020d349289a875056cceb8d9702d86636ab8ce30a7347",
+    "native/after3.result.json": "8e2d11caa27f3756860983594b3cf2d1dca78d39f75442ec6966a746454a9d9c",
+    "native/before4.result.brep": "3d9b8b41bab3b48dac7a68b873ae0a1a101b90f567587e4b41475b3bcd759d57",
+    "native/before4.result.step": "ff41fcb0b0442893106e4f46ed789f5151e022e0bac18346575602b48a8d0796",
+    "native/before4.result.json": "8e2d11caa27f3756860983594b3cf2d1dca78d39f75442ec6966a746454a9d9c",
+    "native/after4.result.brep": "3d9b8b41bab3b48dac7a68b873ae0a1a101b90f567587e4b41475b3bcd759d57",
+    "native/after4.result.step": "516eae2ea15b2783bdec8d0e0e014903a2fae266cf141b61f3c1e29bd2638a78",
+    "native/after4.result.json": "8e2d11caa27f3756860983594b3cf2d1dca78d39f75442ec6966a746454a9d9c",
+    "native/controls.log": "33e8482f8dcfa2fd3bbf3eac16eb7d384c64c5162088b8f645debe6fbd8c16ac",
+    "native/summary.json": "ed766936bf79ba1c9d2dd1b8fbb6cc4ddd6765ea66c4cd9b2c89cb30eb8fb267",
+    "native/analysis.json": "4c04b45e0ccfb35dfe6b5b3c08bb81dbe788a3ec40096af38fd3fa5cc39d7fb5",
+    "native/capture/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native/capture/001.input.brep": "3d9b8b41bab3b48dac7a68b873ae0a1a101b90f567587e4b41475b3bcd759d57",
+    "native/capture/001.input.step": "19f13410d45589671b393774c83a5b76d525a3907631e7bd56e9a76ecf92728e",
+    "native/capture/001.input.json": "f1279317f691fae4e1e697066beb7c4a386ba146617e1987860fd6e67ab9f52e",
+    "native/capture/001.result.brep": "ad589c5c800ed7ef09e0d79f43a6f0f5b3f7f16b2e7a82dbecc81c7b74e106c3",
+    "native/capture/001.result.step": "a7fac478914fc64b6e01bad255f28ad556cb91db650657bb0287cfbcacdff1eb",
+    "native/capture/001.result.json": "254fede3322c0d6023b8a39a728858476221262a37fa08f7dfb28251b7a98670",
+    "native/capture/002.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native/capture/002.input.brep": "3d9b8b41bab3b48dac7a68b873ae0a1a101b90f567587e4b41475b3bcd759d57",
+    "native/capture/002.input.step": "dfd8a679a6f7dd750fa689f32759023909fdfffcf6a6c0ff02b7578afd148561",
+    "native/capture/002.input.json": "09f18d0ec0ba2c03d762c8642fbc569ec8dc9bbbd6ddae9ef6335d52051d1b38",
+    "native/capture/002.result.brep": "203513dfbeb87a74c957b0125e24c62b99b00522c25aef1e1305da0a2b76877d",
+    "native/capture/002.result.step": "690374947755902781b4f82f46380e6cf21614839e66e665b7ed87aa29e84b04",
+    "native/capture/002.result.json": "2157b1738b091019aa07aaf3549e1329b0efd3b8b280c5a466c64416519ece77",
+    "native/capture/003.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native/capture/003.input.brep": "3d9b8b41bab3b48dac7a68b873ae0a1a101b90f567587e4b41475b3bcd759d57",
+    "native/capture/003.input.step": "f9cf4581548314711c30dba2a7a1506902bb08acef28c8d68b81e2399620cc49",
+    "native/capture/003.input.json": "f87281cc70e2a2c18c2524ca47bfb96961f9433155df0f71c600a934b0e6d4ca",
+    "native/capture/003.result.brep": "65eb0628012c73098fa19f0d7b7ca67aef681a09b1d362ba6b0cb5e87f434ec6",
+    "native/capture/003.result.step": "68bc9eeb86112355af291396db807ea31145950e346fe25ea79c153677a11631",
+    "native/capture/003.result.json": "2157b1738b091019aa07aaf3549e1329b0efd3b8b280c5a466c64416519ece77",
+    "native/capture/004.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native/capture/004.input.brep": "3d9b8b41bab3b48dac7a68b873ae0a1a101b90f567587e4b41475b3bcd759d57",
+    "native/capture/004.input.step": "b1b3913f5b36c975290e8eab813e6e9cd9c0f1b7e82d18758964eba156664f61",
+    "native/capture/004.input.json": "8ef41390b6a1de54f8b5e898a64c5d17606a754ff9e0317fba3330ec6f368a7d",
+    "native/capture/004.result.brep": "bea177ddf36aa0fccfc76ee8bd4b7b531979b2ffec9dea37e709dbaa14a4ff76",
+    "native/capture/004.result.step": "5c5366442df8249ea0f6defc0cef2091aa6a2e6448c367db7cff0c977ec045c1",
+    "native/capture/004.result.json": "cc3dec1dbe957cb2e3e17a5bf3ad40b8e8609da69d6d07730676e564d236d5b9",
+    "native/capture/005.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "native/capture/005.input.brep": "3d9b8b41bab3b48dac7a68b873ae0a1a101b90f567587e4b41475b3bcd759d57",
+    "native/capture/005.input.step": "f1a638df57abc69b16f182397f973683e4a983adc6cd278d1de6b55a25df6545",
+    "native/capture/005.input.json": "81d659a2474ef519351b4854892592e3831e47b8bb836c942bd6ff75a45733d3",
+    "native/capture/005.result.brep": "9eb80d27dd04e9bba42a632e2e53a072b148827ee684dc0842f9b3aa6dae595f",
+    "native/capture/005.result.step": "244b5932db1c71ff93b7d7d105408650e66839b274c78744e80f384210da28cc",
+    "native/capture/005.result.json": "a0bb042e36ec1b9967a93aae343f146535003eaeb218c390cd6a3190c4bb12e1",
+    "native/capture/001.truck.log": "7bda8fde60cf4bea9d5eaa5570886227355d4af9f322f50699bc0097b3fe16a0",
+    "native/capture/001.truck.step": "e49237ea4ac62a2c59fac8695a032fbefc818be585958446b96a5bf5723b8132",
+    "native/capture/001.truck.json": "09dcd8c5dcda0a2214263f617d5c186599a7fe06d3b4daa453b4a2c837f047cf",
+    "native/capture/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native/capture/001.comparison.json": "b30276af6b7078cebb9278052afbb0fbc905149236e8de8f39e164258b3ddc1a",
+    "native/capture/001.native-surfaces.json": "26cbb1f4c81d3e2978ce56d1683217aef9644c528d55ec1062e15e92a3957cca",
+    "native/capture/001.truck-surfaces.json": "4740398a3a229841d68258282303660ac9b5570045f4316784cac2095a105383",
+    "native/capture/002.truck.log": "2510f27df489b504d809dad4e3d8122404c002d8d729923efc5c6cfce4cd1a44",
+    "native/capture/002.truck.step": "256ccd2d393f0387dd8baaddc099fddc902e5ff0f0bf5d65ec8160575c48e5a7",
+    "native/capture/002.truck.json": "6eb8acb7fe5848ec966cad0a4c6eb4e0264fffd5c8a42101f2e6153ff1f01bae",
+    "native/capture/002.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native/capture/002.comparison.json": "5dc9e0c2213e8c496223abebc00966219c4ee84313d5595a49cb869e6f9b5ffe",
+    "native/capture/002.native-surfaces.json": "e9331c4cbf26d08351d4464bd187e1744164738d39806c19c78799f604af3f1c",
+    "native/capture/002.truck-surfaces.json": "cfae26dc3900052e490124bda38027afd9490f5884aaf762081d133dc4123d28",
+    "native/capture/003.truck.log": "2510f27df489b504d809dad4e3d8122404c002d8d729923efc5c6cfce4cd1a44",
+    "native/capture/003.truck.step": "c98ad68955ad8bc61cdee1724f7b3201fc58db0b008ddf9f858a706197fa4d85",
+    "native/capture/003.truck.json": "6eb8acb7fe5848ec966cad0a4c6eb4e0264fffd5c8a42101f2e6153ff1f01bae",
+    "native/capture/003.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native/capture/003.comparison.json": "40a703cdba3f6594c4dc51b48820064e58c811f8fb466c7ac7d574daa13bc8aa",
+    "native/capture/003.native-surfaces.json": "e51952547ea20cb9a2c6cce9ad9533135fc8947041be6845c71b98a3725eba15",
+    "native/capture/003.truck-surfaces.json": "688ea3553eed58ec1068522a776c8d6ee911f9987722ed949968cca18d40dd2b",
+    "native/capture/004.truck.log": "2510f27df489b504d809dad4e3d8122404c002d8d729923efc5c6cfce4cd1a44",
+    "native/capture/004.truck.step": "16652d4509354484118f749ed8b3e189882723ab2a37dbe65813b130c154c618",
+    "native/capture/004.truck.json": "6eb8acb7fe5848ec966cad0a4c6eb4e0264fffd5c8a42101f2e6153ff1f01bae",
+    "native/capture/004.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native/capture/004.comparison.json": "ae20bfc8a9da106040da36f36cf970d7f5389ee9c79cb917dbbc62bb975403ca",
+    "native/capture/004.native-surfaces.json": "989effb9b70ae6460f5836acf3459368081a1e5e2309ee98a8d005a6211f78f3",
+    "native/capture/004.truck-surfaces.json": "49fea5145cfa8a40127a2d323fa1812789d72d002c8642ed2d1bac58707c4b6e",
+    "native/capture/005.truck.log": "2eb4d5ffd027f51fa6a429060e32e7085f74c62f3447b921c0c6849fc7cc7b1c",
+    "native/capture/005.truck.step": "a80029b1e63685e507076b23d2edf8fc05a6fa4bd2c75280d69ba9d5cab0abbb",
+    "native/capture/005.truck.json": "ced42acc7c742f60fd662e58afa28ca36349508b90dd7206a2faac389748d84a",
+    "native/capture/005.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native/capture/005.comparison.json": "9b1be577c23cb68df0e62ae215b3b49ce4913f226cf4276207117e00821699ac",
+    "native/capture/005.native-surfaces.json": "ae203c3836a83a61c11542cbd8aa72a97d3fc43aa10680357fc4884e35a2599d",
+    "native/capture/005.truck-surfaces.json": "c750521467c7666a03586518b27f6709a6b6281ed06c8a28f0e4e89402b88373",
+    "tools/convex-corner-clip-input.cpp": "6d4018b7846b79236817c0131dad4df1b1ff8e13e282a21561923390915af607",
+    "tools/capture-convex-corner-clip.py": "290b64f4eb0cecb85f95fafd800bfdbf056d815d4955a5d7112fc35b1a21d5ad",
+    "tools/analyze-convex-corner-clip.py": "3d3821d2352d039cb83995ddf0f54f0a6e1b7b77b5de006c68e452017b0eabea",
+    "tools/replay-convex-corner-clipping.py": "4588c7c4e4b0ebd320e3efb088489a832f49989917991960d1df8ead973cd6b9",
+    "tools/validate-convex-corner-clipping.py": "d5c45d63022d0a1f983ce81c11d375a6f77d594ac28147fe55c7e1e9395673fe",
+    "tools/cylinder-angle-surface-oracle.cpp": "5184551cf7dcab70afdedd2578734e2c3794c07c5e9134b0c3dee480749b0929",
+    "tools/convex-corner-clip-capture.txt": "ed766936bf79ba1c9d2dd1b8fbb6cc4ddd6765ea66c4cd9b2c89cb30eb8fb267",
+    "tools/convex-corner-native-replay.txt": "7df34a7cf868fb8ad573d52be1abaeb41bb1e85dd5a524b62dd9acc8afef6f35"
+  }
+}

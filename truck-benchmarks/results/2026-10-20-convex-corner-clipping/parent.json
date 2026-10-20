@@ -1,0 +1,8 @@
+{
+  "revision": "002c17ac1c4c2a95d858b951243787da86fbd86b",
+  "sha256": {
+    "truck-shapeops/src/fillet/chamfer_miter.rs": "e07d2a3c0b608bf320382ec82d31a3b7808c9638c9021ea993fc1cc267ae7ca3",
+    "truck-shapeops/tests/convex_corner_clipping.rs": "afa08dd14da1f2e2a45139f6da92943d0d259aa9cb5dee2e68ff3f610d0eebef",
+    "truck-shapeops/tests/convex-corner-clipping.json": "dc3ed1f68d9337e1668e8a500fe2723cb9d319adce37859b2a9307071e00dcda"
+  }
+}

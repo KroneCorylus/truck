@@ -60,7 +60,8 @@ pub(super) fn chamfer(
             inverse * Vector3::new(d, e, f),
         )))
     };
-    let mut corners: Vec<[Option<Vertex>; 2]> = vec![[None, None]; data.original_edges.len()];
+    let mut corners: Vec<[Vec<Vertex>; 2]> =
+        vec![[Vec::new(), Vec::new()]; data.original_edges.len()];
     let mut transitions = Vec::new();
     for (v, incident) in data.incident.iter().enumerate() {
         let chosen: Vec<_> = incident
@@ -233,9 +234,29 @@ pub(super) fn chamfer(
                 }
             }
             let corner = intersection([0, 1, 2].map(|i| bevels[chosen[i]].unwrap()))?;
+            let mut clipped_faces = Vec::new();
+            if concave.is_empty() {
+                for &k in &chosen {
+                    for f in data.sides[k] {
+                        let (n, d) = data.planes[f].unwrap();
+                        if n.dot(corner.point().to_vec()) > d + epsilon
+                            && !clipped_faces.contains(&f)
+                        {
+                            clipped_faces.push(f);
+                        }
+                    }
+                }
+            }
+            if clipped_faces.len() > 1 {
+                return Err(error(Code::OutsideNeighbour));
+            }
             for &k in &chosen {
                 let end = usize::from(data.original_edges[k].front() != &data.vertices[v]);
-                corners[k][end] = Some(corner.clone());
+                corners[k][end] = if clipped_faces.is_empty() {
+                    vec![corner.clone()]
+                } else {
+                    Vec::new()
+                };
                 for &other in chosen.iter().filter(|&&j| j != k) {
                     let common = *data.sides[k]
                         .iter()
@@ -251,6 +272,44 @@ pub(super) fn chamfer(
                         set_contact(other, common, &point);
                     }
                 }
+            }
+            if let Some(&face) = clipped_faces.first() {
+                // Clip the dominant bevel to the original face instead of extending
+                // the three-plane miter outside the solid.
+                let dominant = *chosen
+                    .iter()
+                    .find(|&&k| !data.sides[k].contains(&face))
+                    .ok_or_else(|| error(Code::UnsupportedTopology))?;
+                let mut tips = Vec::new();
+                for side in data.sides[dominant] {
+                    let k = *chosen
+                        .iter()
+                        .find(|&&k| k != dominant && data.sides[k].contains(&side))
+                        .ok_or_else(|| error(Code::UnsupportedTopology))?;
+                    let tip = intersection([
+                        data.planes[face].unwrap(),
+                        bevels[dominant].unwrap(),
+                        bevels[k].unwrap(),
+                    ])?;
+                    for &edge in &chosen {
+                        for plane in [
+                            bevels[edge].unwrap(),
+                            data.planes[data.sides[edge][0]].unwrap(),
+                            data.planes[data.sides[edge][1]].unwrap(),
+                        ] {
+                            if plane.0.dot(tip.point().to_vec()) > plane.1 + epsilon {
+                                return Err(error(Code::OutsideNeighbour));
+                            }
+                        }
+                    }
+                    set_contact(k, face, &tip);
+                    tips.push(tip);
+                }
+                let end = usize::from(data.original_edges[dominant].front() != &data.vertices[v]);
+                if end == 1 {
+                    tips.reverse();
+                }
+                corners[dominant][end] = tips;
             }
         }
     }

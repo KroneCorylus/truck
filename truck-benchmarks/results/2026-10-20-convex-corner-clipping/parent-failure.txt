@@ -1,0 +1,46 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 2.07s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/convex_corner_clipping.rs (target/release/deps/convex_corner_clipping-5bbb71f51ee94cd9)
+
+running 5 tests
+test dominant_xz_bevel_clips_to_original_face ... FAILED
+test dominant_xy_bevel_clips_to_original_face ... FAILED
+test dominant_yz_bevel_clips_to_original_face ... FAILED
+test unequal_angle_corner_clips_to_original_face ... FAILED
+test balanced_convex_corner_retains_three_plane_miter ... ok
+
+failures:
+
+---- dominant_xz_bevel_clips_to_original_face stdout ----
+
+thread 'dominant_xz_bevel_clips_to_original_face' (651300) panicked at truck-shapeops/tests/convex_corner_clipping.rs:75:85:
+called `Result::unwrap()` on an `Err` value: Diagnostic { code: OutsideNeighbour, operation: "chamfer_solid_edges", stage: "construct_miter", message: "The moved boundary leaves its neighbouring face.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: Some("distance"), value: Some("0.3"), station: None }, cause: None, source: None }
+
+---- dominant_xy_bevel_clips_to_original_face stdout ----
+
+thread 'dominant_xy_bevel_clips_to_original_face' (651299) panicked at truck-shapeops/tests/convex_corner_clipping.rs:75:85:
+called `Result::unwrap()` on an `Err` value: Diagnostic { code: OutsideNeighbour, operation: "chamfer_solid_edges", stage: "construct_miter", message: "The moved boundary leaves its neighbouring face.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: Some("distance"), value: Some("0.3"), station: None }, cause: None, source: None }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- dominant_yz_bevel_clips_to_original_face stdout ----
+
+thread 'dominant_yz_bevel_clips_to_original_face' (651301) panicked at truck-shapeops/tests/convex_corner_clipping.rs:75:85:
+called `Result::unwrap()` on an `Err` value: Diagnostic { code: OutsideNeighbour, operation: "chamfer_solid_edges", stage: "construct_miter", message: "The moved boundary leaves its neighbouring face.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: Some("distance"), value: Some("0.3"), station: None }, cause: None, source: None }
+
+---- unequal_angle_corner_clips_to_original_face stdout ----
+
+thread 'unequal_angle_corner_clips_to_original_face' (651302) panicked at truck-shapeops/tests/convex_corner_clipping.rs:75:85:
+called `Result::unwrap()` on an `Err` value: Diagnostic { code: OutsideNeighbour, operation: "chamfer_solid_edges", stage: "construct_miter", message: "The moved boundary leaves its neighbouring face.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: Some("distance"), value: Some("0.2"), station: None }, cause: None, source: None }
+
+
+failures:
+    dominant_xy_bevel_clips_to_original_face
+    dominant_xz_bevel_clips_to_original_face
+    dominant_yz_bevel_clips_to_original_face
+    unequal_angle_corner_clips_to_original_face
+
+test result: FAILED. 1 passed; 4 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p truck-shapeops --test convex_corner_clipping`

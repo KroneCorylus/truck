@@ -1,0 +1,13 @@
+# Convex chamfer corner clipping
+
+Three selected convex edges can produce a triple-bevel intersection outside an original support face. Previously this produced a self-intersecting bevel polygon and OutsideNeighbour. The miter now clips that corner to the support face: the dominant bevel has two shared end vertices, its neighbors end at those vertices, and the original face joins them. New tips must satisfy every local original and bevel halfspace. More than one violated original face is rejected. Concave junction branches retain their existing behavior. No polygon validation or tolerance was relaxed.
+
+Four clipped cases fail on parent 002c17ac1c4c2a95d858b951243787da86fbd86b; the balanced-corner guard passes there. All five tests pass with the fix. Each tests identity and a scaled, rotated, translated solid with reversed face/selection order. Three dominant-bevel orientations and an unequal angle-derived assignment are checked. Shared solid and STEP checks, exact expected vertices in both directions, geometric consistency, three generated bevel faces and input immutability are required. No assertion was weakened.
+
+The independent oracle intersects nine halfspaces (six unit-cube faces plus three requested bevel planes), enumerates valid triple intersections and integrates face area times plane offset / 3. This global convex calculation is independent of the local miter construction. Its vertices and volume are frozen in the fixture; the script, original parameters and native captures are archived.
+
+All five replay controls construct valid single-solid STEP results with expected material and contacts. Maximum independent STEP volume error 3.3306690738754696e-16. Every expected planar face is checked at 81 native surface samples. Native controls are valid and preserve their inputs, but have different corner transitions: their material differs from the planar-halfspace oracle. These raw native discrepancies remain visible in the comparison metadata; the native transition policy is not claimed equivalent to Truck's planar miters.
+
+Validation: 405 shapeops tests (one existing ignore), 59 replay tests and 13 capture tests; all-target release Clippy for shapeops, stepio and benchmarks; single-thread actions smoke; replay built last. The unchanged mesher's 102-test evidence is reused after source hashes are checked. Implementation and evidence are committed before the next clean full corpus capture. No consumer, API, dependency or tolerance change; no push, PR, performance claim or full parity claim.
+
+Archive: 114 byte-verified members; SHA256 e62bd7d7e3759d0410e98ff509e986a74b8379da39f9f0a7c690559b19f1287b.
