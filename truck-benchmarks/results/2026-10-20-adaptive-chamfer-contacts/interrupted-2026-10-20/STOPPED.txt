@@ -1,0 +1,11 @@
+STOPPED immediately at user request, 2026-10-20.
+Changes are UNCOMMITTED. No completed validation.json or clean full capture exists for this checkpoint.
+Parent proof: two new tests fail, existing interpolation test passes.
+Focused candidate contact tests and early replay tests passed; release Clippy passed.
+Full shapeops validation was interrupted; preserve partial logs and rerun before claiming full validation.
+Current change: bounded local chamfer contact refinement within unchanged tolerance/sample budget.
+Downstream curved-cap solids still fail trim_faces. Do not claim complete support.
+Prepared helpers in target: validate-adaptive-chamfer.py, package-adaptive-chamfer-proof.py, package-adaptive-chamfer-full.py, write-adaptive-chamfer-checkpoint.py.
+Proof/report helpers contain anticipated validation counts: execute only after validation completes and inspect actual results.
+Next: rerun validation, review changes, package proof, commit implementation, clean full capture, publish local HTML checkpoint and commit docs. Resume only when asked.
+Previous committed checkpoint: 9687e33d; corpus 445 constructions / 415 limited passes. Known pcurve_derivation baseline precision failure remains.

@@ -6,6 +6,10 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Refine failed chamfer contact intervals locally within the existing sample
+  budget and tolerance, with bounded retries. Curved-cap regressions cover
+  both directions and unequal setbacks; downstream face trimming remains open.
+
 - Replay unequal-distance chamfers on tilted plane/cylinder rims using the
   captured reference side. Keep tilted distance-angle requests unsupported;
   they require a varying local angle construction. Verify both reference faces,

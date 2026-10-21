@@ -85,17 +85,21 @@ where
     S: FilletedSurface<C> + SearchNearestParameter<D2, Point = Point3>,
 {
     let (t0, t1) = range.unwrap_or_else(|| edge.range_tuple());
-    let mut count = edge
+    let count = edge
         .parameter_division((t0, t1), tol)
         .0
         .len()
         .max(MIN_SAMPLES);
     let budget = count.max(257);
     let fit_tolerance2 = tol.min(TOLERANCE * 0.1).powi(2);
-    loop {
-        let params: Vec<_> = (0..count)
+    let uniform = |count: usize| {
+        (0..count)
             .map(|i| t0 + (t1 - t0) * i as f64 / (count - 1) as f64)
-            .collect();
+            .collect::<Vec<_>>()
+    };
+    let mut params = uniform(count);
+    let mut local_refinements = 0;
+    loop {
         let samples = sample_contact_points(edge, surface0, surface1, distances, &params)?;
         let pcurves = std::array::from_fn(|i| {
             PCurve::new(
@@ -109,7 +113,7 @@ where
         });
         let curves = std::array::from_fn(|i| interpolate(&params, samples[i].iter().map(|s| s.1)));
         // The ruled surface must contain its support pcurves at kernel consistency tolerance.
-        let fits = params.windows(2).all(|pair| {
+        let fits = |pair: &[f64]| {
             (0..=4).all(|i| {
                 let t = pair[0] + (pair[1] - pair[0]) * i as f64 / 4.;
                 (0..2).all(|side| {
@@ -124,13 +128,32 @@ where
                             })
                 })
             })
-        });
-        if fits {
+        };
+        if params.windows(2).all(fits) {
             return Some((params, pcurves, curves));
         }
-        count = count.checked_mul(2)?.checked_sub(1)?;
-        if count > budget {
-            return None;
+        let count = params.len().checked_mul(2)?.checked_sub(1)?;
+        if count <= budget {
+            params = uniform(count);
+        } else {
+            if local_refinements == 8 {
+                return None;
+            }
+            local_refinements += 1;
+            let refinement: Option<Vec<_>> = params
+                .windows(2)
+                .filter(|pair| !fits(pair))
+                .map(|pair| {
+                    let midpoint = pair[0] + (pair[1] - pair[0]) / 2.;
+                    (pair[0] < midpoint && midpoint < pair[1]).then_some(midpoint)
+                })
+                .collect();
+            let refinement = refinement?;
+            if refinement.is_empty() || params.len() + refinement.len() > budget {
+                return None;
+            }
+            params.extend(refinement);
+            params.sort_by(f64::total_cmp);
         }
     }
 }
@@ -693,6 +716,108 @@ where
 #[cfg(test)]
 mod contact_interpolation_tests {
     use super::*;
+
+    #[cfg(feature = "step-test")]
+    fn check_curved_cap_contacts(step: &str, task: &str) {
+        use crate::SplitClosedEdgesAndFaces;
+        use std::collections::HashSet;
+        use truck_modeling as model;
+        use truck_stepio::r#in::Table;
+
+        let table = Table::from_step(step).unwrap();
+        assert_eq!(table.manifold_solid_brep.len(), 1);
+        let entity = table.manifold_solid_brep.values().next().unwrap();
+        let (mut compressed, skipped) = table.to_compressed_solid(entity).unwrap();
+        assert!(skipped.is_empty());
+        compressed.split_closed_edges_and_faces(1e-5);
+        let compressed = compressed
+            .try_mapped(
+                |p| Some(*p),
+                |c| model::Curve::try_from(c).ok(),
+                |s| model::Surface::try_from(s).ok(),
+            )
+            .unwrap();
+        let solid = model::Solid::extract(compressed).unwrap();
+        assert!(solid.is_geometric_consistent());
+        let before = serde_json::to_string(&solid.compress()).unwrap();
+        let task: serde_json::Value = serde_json::from_str(task).unwrap();
+        let points = task["selection"][0]["points"].as_array().unwrap();
+        let point = |p: &serde_json::Value| {
+            Point3::new(
+                p[0].as_f64().unwrap(),
+                p[1].as_f64().unwrap(),
+                p[2].as_f64().unwrap(),
+            )
+        };
+        let (a, b) = (point(&points[0]), point(points.last().unwrap()));
+        let mut seen = HashSet::new();
+        let selected: Vec<_> = solid
+            .edge_iter()
+            .filter(|e| seen.insert(e.id()))
+            .filter_map(|e| {
+                if e.front().point().near(&a) && e.back().point().near(&b) {
+                    Some(e.clone())
+                } else if e.front().point().near(&b) && e.back().point().near(&a) {
+                    Some(e.inverse())
+                } else {
+                    None
+                }
+            })
+            .collect();
+        assert_eq!(selected.len(), 1);
+        for edge in [selected[0].clone(), selected[0].inverse()] {
+            let mut supports = [None, None];
+            for face in solid.face_iter() {
+                if let Some(found) = face.edge_iter().find(|e| e.id() == edge.id()) {
+                    let side = usize::from(found.front() != edge.front());
+                    assert!(supports[side].replace(face.oriented_surface()).is_none());
+                }
+            }
+            let [surface0, surface1] = supports.map(Option::unwrap);
+            let curve = edge.oriented_curve();
+            let range = curve.range_tuple();
+            let budget = curve.parameter_division(range, 0.001).0.len().max(257);
+            for distances in [(0.01, 0.01), (0.01, 0.006), (0.006, 0.01)] {
+                let (params, contacts, fits) =
+                    fit_contact_curves(&curve, &surface0, &surface1, distances, 0.001, None)
+                        .expect("localized contact error fits within the existing sample budget");
+                assert!(params.len() <= budget);
+                assert_eq!((params[0], *params.last().unwrap()), range);
+                assert!(params.windows(2).all(|w| w[0] < w[1]));
+                for i in 0..=4096 {
+                    let t = range.0 + (range.1 - range.0) * i as f64 / 4096.;
+                    for side in 0..2 {
+                        let point = contacts[side].subs(t);
+                        let u = fits[side]
+                            .search_nearest_parameter(point, Some(t), 100)
+                            .unwrap()
+                            .clamp(range.0, range.1);
+                        assert!(point.distance(fits[side].subs(u)) < TOLERANCE);
+                        assert!(contacts[side].der(t).dot(curve.der(t)) > 0.);
+                    }
+                }
+                assert_eq!(before, serde_json::to_string(&solid.compress()).unwrap());
+            }
+        }
+    }
+
+    #[cfg(feature = "step-test")]
+    #[test]
+    fn curved_cap_contacts_fit_within_the_existing_sample_budget() {
+        check_curved_cap_contacts(
+            include_str!("../../tests/fixtures/adaptive-chamfer-contacts/001.input.step"),
+            include_str!("../../tests/fixtures/adaptive-chamfer-contacts/001.input.json"),
+        );
+    }
+
+    #[cfg(feature = "step-test")]
+    #[test]
+    fn previously_trimmed_cap_contacts_fit_within_the_existing_sample_budget() {
+        check_curved_cap_contacts(
+            include_str!("../../tests/fixtures/adaptive-chamfer-contacts/003.input.step"),
+            include_str!("../../tests/fixtures/adaptive-chamfer-contacts/003.input.json"),
+        );
+    }
 
     #[test]
     fn dense_affine_contact_samples_preserve_points_and_derivatives() {

@@ -1,0 +1,7 @@
+$ python3 -m unittest discover -s audits/fillet-chamfer/capture -p test_*.py
+.............
+----------------------------------------------------------------------
+Ran 13 tests in 0.033s
+
+OK
+exit_code 0

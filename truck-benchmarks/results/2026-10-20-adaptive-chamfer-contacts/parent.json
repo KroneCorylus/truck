@@ -1,0 +1,15 @@
+{
+  "revision": "9687e33d9ab6e70d6594be541204737b8bc11892",
+  "tests": {
+    "passed": 1,
+    "failed": 2
+  },
+  "source_sha256": {
+    "truck-shapeops/src/fillet/chamfer.rs": "2f4cca3e0718a71cb60fee3493778d82ed33ae75b71774b8e48ad58bb0cfad92",
+    "truck-shapeops/tests/fixtures/adaptive-chamfer-contacts/001.input.step": "b082d7c15b922b1087ef1aa2458c475a002139af8bc613b169829bdb35600ab5",
+    "truck-shapeops/tests/fixtures/adaptive-chamfer-contacts/001.input.json": "5b46b7e5294c8fbad8f82f43cac4e4c9c054e702da14d60ac0aad953811270e4",
+    "truck-shapeops/tests/fixtures/adaptive-chamfer-contacts/003.input.step": "db2bb2550489f1545bf2c4d00130f5214d31fd2edc52fa84e35537d3fe46e9b1",
+    "truck-shapeops/tests/fixtures/adaptive-chamfer-contacts/003.input.json": "3c41252c58b35c9180e52382111b591ae0df5bf0a1d35f2e1052a0c3adbc3386"
+  },
+  "test_module_sha256": "56b951fe864bd9dae5294795418aa2bf05126a0481b011c97451f0de116f1f7a"
+}
