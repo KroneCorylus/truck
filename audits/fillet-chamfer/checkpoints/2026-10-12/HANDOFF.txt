@@ -1,8 +1,7 @@
 LATEST CHECKPOINT — 2026-10-20
-ACTIVE: Continue work and commit achievements until done or told to stop.
-Read ../2026-10-20-tilted-cap-unequal/HANDOFF.txt and report.html.
-Implementation 51e2c1ec replays unequal setbacks on tilted plane/cylinder rims.
-Full capture:445/415;no prior check regressions. Known parent geometry precision failure and native-control discrepancies remain. Full parity unverified.
+CHECKPOINT COMPLETE. Read the remaining work before continuing.
+Read ../2026-10-20-adaptive-chamfer-contacts/HANDOFF.txt and report.html.
+Implementation 81755598; 445 constructions/415 limited passes. Curved-cap face trimming and baseline precision failure remain unresolved.
 
 HISTORICAL HANDOFF FOLLOWS
 

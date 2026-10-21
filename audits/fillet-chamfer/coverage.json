@@ -3,7 +3,7 @@
     "title": "Fillet and chamfer feature parity audit",
     "baseline": "OCCT V7_9_3 source inventory plus the recorded Truck/Pieza revisions. Includes 3D, 2D, related workflows and all textual candidates under the discovery rules.",
     "meaning_of_all": "Every dedicated test-grid entry, matching registered test/helper, discovered blend command and retained reference in this pinned checkout. This is not a claim about all mathematical configurations or current/future OCCT releases.",
-    "execution": "All 1,026 inventoried entries have native attempts. Latest clean capture at 51e2c1ec:396 native passes,648 operations,487 complete chamfer and161 complete fillet scopes;445 constructions/415 limited sampled passes at0.001. All444 prior constructions retain checks;444 complete prior records exact,0 numerical changes. Native discrepancies retained;full parity remains unverified.",
+    "execution": "Clean capture: 396 native entries pass; 648 operations. 445 constructions and 415 limited sampled comparison passes at the unchanged 0.001 threshold. 445 prior successful records are exactly unchanged; 2 unchanged-status failure diagnostics changed. No prior successful check regressed and no native reference property changed. Finite samples do not establish full parity or a global bound.",
     "mapping": "Capability assessments describe observable outcomes supported or restricted by reviewed source evidence. Per-case tags and links are automated hints; they do not prove Truck handles that fixture.",
     "objective": "Achieve at least OCCT-level fillet/chamfer capabilities and robustness for equivalent modeling tasks in Truck/Pieza.",
     "equivalence": "Judge the requested geometry, dimensions, validity, editing behavior and practical performance. Different APIs, algorithms, languages, surface representations and internal operation sequences are acceptable. Missing a corresponding OCCT method is not evidence of a feature gap."
@@ -1018,6 +1018,12 @@
           "path": "truck-benchmarks/results/2026-10-20-tilted-cap-unequal/REPORT.md",
           "find": "# Unequal-distance chamfers beneath tilted caps",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-20-adaptive-chamfer-contacts/REPORT.md",
+          "find": "# Adaptive chamfer contact fitting",
+          "role": "test"
         }
       ],
       "required_outcome": "Produce the intended measurable setbacks on curved supports after explicitly translating dimension conventions between kernels.",
@@ -1030,7 +1036,8 @@
         "At5eed074b, modeling chamfers extend exact straight terminal edges only at open wire ends, retaining closed/interior bounds and final checks. Three parent failures plus two guards;12positive/8negative variants,6native controls,independent material/contact/STEP/history checks. Three stepped native input-tolerance mutations retained.413shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:420/390,no prior check regression. No parity upgrade.",
         "Atd198a51c, planar boundary and patch checks identify the outer loop geometrically and retain its original identity. Five parent failures plus two guards;all six loop orders and transforms,16solid variants,4native controls,independent material/contact/STEP/history checks. Both native inner-rim input mutations retained.420shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:438/408,no prior check regression. No parity upgrade.",
         "At fdc8092c, tilted planar-cap chamfer contacts continue over parallel convex cylindrical and planar supports. Two parent failures;four independent native controls,three distance passes and one explicitly retained10-degree discrepancy.442shapeops/115stepio/59replay/13capture,Clippy/smoke pass;baseline geometry precision failure retained. Clean capture:444/414;all443prior checks retained. No parity upgrade.",
-        "At 51e2c1ec, unequal tilted-cap replay preserves reference-side assignments. One parent failure;32 reference/order variants and6336 contact samples;eight independent controls,five distance passes and three retained discrepancies.62replay/13capture,Clippy/smoke pass;unchanged core evidence and baseline geometry precision failure retained. Clean capture:445/415;all444prior checks retained. No parity upgrade."
+        "At 51e2c1ec, unequal tilted-cap replay preserves reference-side assignments. One parent failure;32 reference/order variants and6336 contact samples;eight independent controls,five distance passes and three retained discrepancies.62replay/13capture,Clippy/smoke pass;unchanged core evidence and baseline geometry precision failure retained. Clean capture:445/415;all444prior checks retained. No parity upgrade.",
+        "At 81755598, bounded local chamfer contact fitting passes two parent-failing curved-cap regressions, twelve fits and98328 dense checks within unchanged sample budget/tolerance. Downstream face trimming remains unsupported. 445/415 clean corpus; no parity upgrade."
       ]
     },
     {
@@ -3064,6 +3071,12 @@
           "path": "truck-benchmarks/results/2026-10-12-periodic-tori/REPORT.md",
           "find": "# Periodic torus projection, circular trims and material-preserving splits",
           "role": "executed-probe"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-20-adaptive-chamfer-contacts/REPORT.md",
+          "find": "# Adaptive chamfer contact fitting",
+          "role": "test"
         }
       ],
       "required_outcome": "Maintain requested geometric accuracy through rapidly changing curvature and unequal feature scales without missed contact failures.",
@@ -3077,7 +3090,8 @@
         "Fresh full capture at clean f6871a18 passes all 156 native entries. All 72 constructed outputs preserve input/geometry, have closed Truck meshes and native-valid single-solid STEP; 70 meet the combined limited checks including bidirectional sampled distance <=0.001. I3 now succeeds with distances 1.13905e-5/8.42998e-6, and all 21 native STEP read regressions from the initial conical-mesh capture are recovered. No timeouts or panics remain in this captured subset. The 32 construction failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents, one incomplete capture, G1 and tolerance-grid A1 shape discrepancies remain. J9 still fails at trim_faces. No full-parity verdict is assigned. See capture/2026-10-12-exact-joins/REPORT.md.",
         "At 6db16d09, spherical-meridian fillets with open polar guide endpoints seed regular offset contacts and continue one parameter branch. Singular projected-revolution seeds are replaced by regular samples, restoring the original input mesh. STEP fitting refines local source spans at the unchanged tolerance and 193-control budget. Three parent-failing solid regressions cover scales 0.02/0.04/1, rigid motion, reversed selection, radius/normals, independent volume, closed meshes, STEP and immutable inputs; separate regressions cover signed contacts, near-pole projection and concentrated export error. Five-crate release: 879 passed, one unchanged PCurve property failure, five existing ignored; final affected shapeops rerun: 338 passed, one existing ignored. Clippy/action smoke pass. Successful E3 construction medians are 87.590/88.837 ms and STEP 126.797/126.638 ms at one/four workers; cylinder and spline controls retain their geometry and prior timing range. These regressions do not establish general polar or feature parity; the clean full replay is recorded below.",
         "Clean full replay at 3f16afc9 (kernel 6db16d09) passes all 156 native entries and constructs 74 of 161 Truck captures, with no timeouts or panics. E3 is the sole construction-status improvement. All 74 outputs preserve input/geometry consistency, close their Truck meshes, prepare STEP and produce native-valid single solids; 72 meet combined limited checks including bidirectional distances <=0.001. E3 distances are 0.0001213415/0.0000218593, STEP volume 3479486.1878489405 versus independent 3479486.1779266507. G1 and tolerance A1 differences remain. Other outcomes are 30 operation failures, 25 import failures, 23 inconsistent inputs, eight unhandled intents and one incomplete capture. All full-parity verdicts remain unverified.",
-        "At 16958067, signed-angle torus inversion preserves near-axis/seam accuracy and the torus normal derivative is corrected. Isoparametric toroidal pcurves become exact conics with bounded world-space seam-roundoff error. Closed UV boundary charts now determine splitter branches, preserving J3's 270-degree sector instead of choosing its complementary arc. Eight parent-failing regressions cover numerical inversion/derivatives, transformed/reversed pcurves and J3/J4/J5 imported solids with independent volumes, closed meshes and STEP; all seven torus input regressions pass. Five-crate release: 893 passed, one unchanged PCurve precision failure, five existing ignored tests; final targeted checks, all-target Clippy and action smoke pass. Repaired imports cost 12-17 ms. E5/E9 controls retain identical volume but cost 0.4-0.7 ms more because the parent rejected valid boundary samples early (144/6541 and 387/9370); the repair rejects zero and completes validation. Clean native blend replay follows separately. See truck-benchmarks/results/2026-10-12-periodic-tori/REPORT.md."
+        "At 16958067, signed-angle torus inversion preserves near-axis/seam accuracy and the torus normal derivative is corrected. Isoparametric toroidal pcurves become exact conics with bounded world-space seam-roundoff error. Closed UV boundary charts now determine splitter branches, preserving J3's 270-degree sector instead of choosing its complementary arc. Eight parent-failing regressions cover numerical inversion/derivatives, transformed/reversed pcurves and J3/J4/J5 imported solids with independent volumes, closed meshes and STEP; all seven torus input regressions pass. Five-crate release: 893 passed, one unchanged PCurve precision failure, five existing ignored tests; final targeted checks, all-target Clippy and action smoke pass. Repaired imports cost 12-17 ms. E5/E9 controls retain identical volume but cost 0.4-0.7 ms more because the parent rejected valid boundary samples early (144/6541 and 387/9370); the repair rejects zero and completes validation. Clean native blend replay follows separately. See truck-benchmarks/results/2026-10-12-periodic-tori/REPORT.md.",
+        "At 81755598, bounded local chamfer contact fitting passes two parent-failing curved-cap regressions, twelve fits and98328 dense checks within unchanged sample budget/tolerance. Downstream face trimming remains unsupported. 445/415 clean corpus; no parity upgrade."
       ]
     },
     {

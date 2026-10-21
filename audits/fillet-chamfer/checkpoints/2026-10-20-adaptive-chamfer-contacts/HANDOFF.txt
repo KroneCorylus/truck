@@ -1,0 +1,38 @@
+ADAPTIVE CHAMFER CONTACTS — 2026-10-20
+CHECKPOINT COMPLETE: contact fitting validated; curved-cap face trimming remains open.
+
+# Adaptive chamfer contact fitting: clean capture
+
+Implementation 81755598263323a478ac460c65684e10c96b5708.
+
+Chamfer contact fitting now refines failing intervals after uniform sampling reaches its budget. The existing tolerance and sample budget are unchanged; local refinement is limited to eight rounds. Two parent-failing regressions cover twelve fits and 98,328 dense contact checks. Curved-cap C1 operations still fail downstream face trimming; this is a completed fitting improvement, not completed curved-cap solid support.
+
+444 release shapeops checks, 115 stepio checks, 62 replay tests, 13 capture tests, all-target release Clippy and single-thread actions smoke pass. One existing shapeops ignore remains. Replay was built last. Unchanged core hashes retain prior validation, including the explicitly unresolved parent pcurve_derivation precision failure. No existing test was weakened or skipped.
+
+Clean capture: 396 native entries pass; 648 operations. 445 constructions and 415 limited sampled comparison passes at the unchanged 0.001 threshold. 445 prior successful records are exactly unchanged; 2 unchanged-status failure diagnostics changed. No prior successful check regressed and no native reference property changed. Finite samples do not establish full parity or a global bound.
+
+Statuses: {"input-import-failed": 96, "operation-succeeded": 445, "operation-failed": 93, "unhandled-intent": 5, "input-inconsistent": 9}.
+
+Status changes: [].
+
+Archive SHA256: 2c788594b90c0a7dd4ef04de394dffc58bd138437a05d086bc18be07f9e1336d.
+
+Checkpoint complete. No consumer change, tolerance relaxation, parity claim or performance claim.
+
+NEXT
+C1 contacts fit, but complete operations still fail trim_faces. Preserve the failure and diagnose trimming next session. See target/curved-cap-pipeline-probe.rs/.txt. Current helpers: target/validate-adaptive-chamfer.py, package-adaptive-chamfer-proof.py, package-adaptive-chamfer-full.py, write-adaptive-chamfer-checkpoint.py. Raw target/occt-capture-adaptive-chamfer-contacts. Previous checkpoint 51e2c1ec/9687e33d.
+
+METHOD
+Read AGENTS.md. Parent-failing tests;no weakened assertions;shared solid/STEP checks.
+CARGO_BUILD_JOBS=12;rustfmt +nightly --config skip_children=true;no cargo fmt.
+Freeze production during builds/tests/captures;release tests,Clippy,actions smoke;build replay LAST.
+Commit implementation/proof before clean capture,then HTML/catalog/handoff. Force-add JSON/ZIP/STEP;diff check excludes *.step.
+No consumer/pin changes,push,PR,subagents or unsupported speed/parity claims.
+Plugin target/occt-cone-reference-plugin;SDK target/occt-sdk/usr/lib64;OCCT ../investigations/sequential-holes-2026-10-10/occt;publicdata target/occt-public-chamfer-data.
+Capture workers4,timeout120,freshoutput. Raw target/occt-capture-collapsed-fillet-contacts;controls target/native-collapsed-contacts and target/native-collapsed-contacts-closed.
+Helpers target/validate-collapsed-contacts.py,replay-collapsed-contacts.py,package-collapsed-contacts-proof.py,package-collapsed-contacts-full.py,write-collapsed-contacts-checkpoint.py. Packaging is not idempotent.
+
+CURRENT HELPERS
+Raw target/occt-capture-tilted-cap-unequal; controls target/native-tilted-cap-unequal and target/tilted-cap-unequal-controls. Helpers target/validate-tilted-cap-unequal.py,replay-tilted-cap-unequal.py,package-tilted-cap-unequal-proof.py,package-tilted-cap-unequal-full.py,write-tilted-cap-unequal-checkpoint.py. The native comparison script intentionally retains three distance failures; do not treat its exit1 as a new regression or relax its threshold.
+READ-ONLY FOLLOW-UP
+All257 projection samples succeed on both C1 supports, but the copied unchanged fitter exhausts its uniform ladder. For capture003 it tries10,19,37,73,145 samples, then rejects289 against the257 budget without trying257. target/curved-cap-fit-probe.txt records the trace; target/curved-cap-direct-probe.rs includes the diagnostic copy. This is a candidate, not a proven fix. Do not loosen fitting tolerance or infer that successful contact fitting guarantees a valid solid; capture002 already fails later in trimming.
