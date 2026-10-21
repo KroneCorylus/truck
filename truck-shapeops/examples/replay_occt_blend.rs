@@ -510,6 +510,7 @@ fn chamfer_selection(
             Plane(Point3, Vector3),
             Cylinder(Point3, Vector3, f64),
             Cone(Point3, Vector3, f64),
+            Sample(Point3, Vector3),
         }
         let reference = if mode == "equal-distance" {
             None
@@ -517,7 +518,8 @@ fn chamfer_selection(
             let plane = &chosen["reference_plane"];
             let cylinder = &chosen["reference_cylinder"];
             let cone = &chosen["reference_cone"];
-            if [plane, cylinder, cone]
+            let sample = &chosen["reference_sample"];
+            if [plane, cylinder, cone, sample]
                 .iter()
                 .filter(|value| !value.is_null())
                 .count()
@@ -525,7 +527,21 @@ fn chamfer_selection(
             {
                 return Err(invalid("Ambiguous captured reference surface"));
             }
-            if !cone.is_null() {
+            if !sample.is_null() {
+                let (Some(point), Some(normal)) = (
+                    captured_vector(&sample["point"]),
+                    captured_vector(&sample["normal"]),
+                ) else {
+                    return Err(invalid("Invalid reference surface sample"));
+                };
+                if !normal.magnitude2().is_finite() || normal.magnitude2() < TOLERANCE * TOLERANCE {
+                    return Err(invalid("Invalid reference surface normal"));
+                }
+                Some(Reference::Sample(
+                    Point3::from_vec(point),
+                    normal.normalize(),
+                ))
+            } else if !cone.is_null() {
                 let apex = captured_vector(&cone["apex"]);
                 let axis = captured_vector(&cone["axis"]);
                 let angle = cone["half_angle_radians"]
@@ -611,37 +627,47 @@ fn chamfer_selection(
                     .face_iter()
                     .filter_map(|face| {
                         let boundary = face.edge_iter().find(|e| e.id() == edge.id())?;
-                        let (surface, _) = face.oriented_surface().elementary()?;
-                        let matches = match (&reference, surface) {
-                            (Reference::Plane(origin, normal), Elementary::Plane(plane)) => {
-                                plane.normal().cross(*normal).magnitude() < 1e-8
-                                    && (plane.origin() - origin).dot(*normal).abs() < TOL / 10.
+                        let surface = face.oriented_surface();
+                        let matches = if let Reference::Sample(point, normal) = &reference {
+                            surface
+                                .search_parameter(*point, None, 100)
+                                .is_some_and(|(u, v)| {
+                                    surface.normal(u, v).cross(*normal).magnitude() < 1e-6
+                                })
+                        } else {
+                            let (surface, _) = surface.elementary()?;
+                            match (&reference, surface) {
+                                (Reference::Plane(origin, normal), Elementary::Plane(plane)) => {
+                                    plane.normal().cross(*normal).magnitude() < 1e-8
+                                        && (plane.origin() - origin).dot(*normal).abs() < TOL / 10.
+                                }
+                                (
+                                    Reference::Cylinder(origin, axis, radius),
+                                    Elementary::Cylinder {
+                                        origin: actual_origin,
+                                        axis: actual_axis,
+                                        radius: actual_radius,
+                                    },
+                                ) => {
+                                    actual_axis.cross(*axis).magnitude() < 1e-8
+                                        && (actual_origin - origin).cross(*axis).magnitude()
+                                            < TOL / 10.
+                                        && (actual_radius - radius).abs() < TOL / 10.
+                                }
+                                (
+                                    Reference::Cone(apex, axis, angle),
+                                    Elementary::Cone {
+                                        apex: actual_apex,
+                                        axis: actual_axis,
+                                        half_angle,
+                                    },
+                                ) => {
+                                    (actual_axis - axis).magnitude() < 1e-8
+                                        && actual_apex.distance(*apex) < TOL / 10.
+                                        && (half_angle.0 - angle).abs() < 1e-8
+                                }
+                                _ => false,
                             }
-                            (
-                                Reference::Cylinder(origin, axis, radius),
-                                Elementary::Cylinder {
-                                    origin: actual_origin,
-                                    axis: actual_axis,
-                                    radius: actual_radius,
-                                },
-                            ) => {
-                                actual_axis.cross(*axis).magnitude() < 1e-8
-                                    && (actual_origin - origin).cross(*axis).magnitude() < TOL / 10.
-                                    && (actual_radius - radius).abs() < TOL / 10.
-                            }
-                            (
-                                Reference::Cone(apex, axis, angle),
-                                Elementary::Cone {
-                                    apex: actual_apex,
-                                    axis: actual_axis,
-                                    half_angle,
-                                },
-                            ) => {
-                                (actual_axis - axis).magnitude() < 1e-8
-                                    && actual_apex.distance(*apex) < TOL / 10.
-                                    && (half_angle.0 - angle).abs() < 1e-8
-                            }
-                            _ => false,
                         };
                         matches.then_some(boundary.front() != edge.front())
                     })
@@ -717,7 +743,7 @@ fn chamfer_selection(
                             let sign = if plane_forward == cone_forward { 1. } else { -1. };
                             Some((sign * p.normal().dot(*axis) * half_angle.0.sin(), half_angle.0.cos()))
                         }
-                    _ if longitudinal.is_some() => None,
+                    _ if longitudinal.is_some() || mode == "two-distances" => None,
                     _ => return Err(unsupported("Face-dependent chamfers require planar supports, a perpendicular plane/cylinder or plane/cone rim, or a longitudinal plane/cylinder edge")),
                 };
                 if mode == "distance-angle" {
@@ -998,34 +1024,54 @@ fn replay_task(
         let edges: Vec<_> = selected.into_iter().map(|(e, _)| e).collect();
         let ids: Vec<_> = edges.iter().map(|e| e.id()).collect();
         stage.set("blend");
-        let result =
-            try_chamfer_solid_edges_with_distances(&input, &assignments, TOL).or_else(|error| {
-                if let Some(wire) = as_wire(&edges) {
-                    let ordered: Option<Vec<_>> = wire
-                        .iter()
-                        .map(|edge| {
-                            let mut distances =
-                                assignments.iter().find(|(id, _)| *id == edge.id())?.1;
-                            let boundary = input
-                                .face_iter()
-                                .find_map(|face| face.edge_iter().find(|e| e.id() == edge.id()))?;
-                            if boundary.front() != edge.front() {
-                                distances.swap(0, 1);
-                            }
-                            Some(distances)
-                        })
-                        .collect();
-                    if let Some(ordered) = ordered {
-                        let [d0, d1] = ordered[0];
-                        if ordered.iter().all(|d| {
-                            (d[0] - d0).abs() <= 1e-12 * d0 && (d[1] - d1).abs() <= 1e-12 * d1
-                        }) {
-                            return try_chamfer_solid_along_wire(&input, &wire, d0, d1, TOL);
+        let normal_section = selection.iter().all(|s| s["mode"] == "two-distances")
+            && edges.iter().all(|edge| {
+                longitudinal_cylinders(&input, edge).is_none()
+                    && input.face_iter().any(|face| {
+                        face.edge_iter().any(|e| e.id() == edge.id())
+                            && face.oriented_surface().elementary().is_none()
+                    })
+            });
+        let result = (if normal_section {
+            Err(truck_base::diagnostics::Diagnostic::new(
+                truck_base::diagnostics::Code::UnsupportedTopology,
+                "chamfer_solid_along_wire",
+                "validate_wire",
+            ))
+        } else {
+            try_chamfer_solid_edges_with_distances(&input, &assignments, TOL)
+        })
+        .or_else(|error| {
+            if let Some(wire) = as_wire(&edges) {
+                let ordered: Option<Vec<_>> = wire
+                    .iter()
+                    .map(|edge| {
+                        let mut distances = assignments.iter().find(|(id, _)| *id == edge.id())?.1;
+                        let boundary = input
+                            .face_iter()
+                            .find_map(|face| face.edge_iter().find(|e| e.id() == edge.id()))?;
+                        if boundary.front() != edge.front() {
+                            distances.swap(0, 1);
                         }
+                        Some(distances)
+                    })
+                    .collect();
+                if let Some(ordered) = ordered {
+                    let [d0, d1] = ordered[0];
+                    if ordered
+                        .iter()
+                        .all(|d| (d[0] - d0).abs() <= 1e-12 * d0 && (d[1] - d1).abs() <= 1e-12 * d1)
+                    {
+                        return if normal_section {
+                            try_chamfer_solid_along_wire_chord(&input, &wire, d0, d1, TOL)
+                        } else {
+                            try_chamfer_solid_along_wire(&input, &wire, d0, d1, TOL)
+                        };
                     }
                 }
-                Err(error)
-            });
+            }
+            Err(error)
+        });
         (ids, result)
     } else {
         stage.set("physical-selection");
@@ -3845,5 +3891,179 @@ mod tilted_cap_distance_tests {
             assert_eq!(std::fs::read_to_string(path).unwrap(), step);
             std::fs::remove_dir_all(directory).unwrap();
         }
+    }
+}
+
+#[cfg(test)]
+mod normal_section_reference_tests {
+    use super::*;
+    fn fixture(index: usize) -> (&'static str, Value) {
+        let (step, task) = match index {
+            0 => (
+                include_str!("../tests/fixtures/normal-section-chamfer/0.input.step"),
+                include_str!("../tests/fixtures/normal-section-chamfer/0.input.json"),
+            ),
+            1 => (
+                include_str!("../tests/fixtures/normal-section-chamfer/1.input.step"),
+                include_str!("../tests/fixtures/normal-section-chamfer/1.input.json"),
+            ),
+            2 => (
+                include_str!("../tests/fixtures/normal-section-chamfer/2.input.step"),
+                include_str!("../tests/fixtures/normal-section-chamfer/2.input.json"),
+            ),
+            3 => (
+                include_str!("../tests/fixtures/normal-section-chamfer/3.input.step"),
+                include_str!("../tests/fixtures/normal-section-chamfer/3.input.json"),
+            ),
+            _ => unreachable!(),
+        };
+        (step, serde_json::from_str(task).unwrap())
+    }
+    #[test]
+    fn sampled_references_preserve_normal_section_distances_and_material() {
+        for index in 0..4 {
+            let (step, task) = fixture(index);
+            let matrix = if index % 2 == 0 {
+                Matrix4::identity()
+            } else {
+                Matrix4::from_translation(Vector3::new(0.3, -0.2, 0.1))
+                    * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.7))
+            };
+            let inverse = matrix.invert().unwrap();
+            let curvature: f64 = if index < 2 { 0.8 } else { -0.4 };
+            for wall_reference in [false, true] {
+                for reverse in [false, true] {
+                    for (cap, wall) in [(0.3_f64, 0.2), (0.2, 0.3), (0.2, 0.2)] {
+                        let dir=std::env::temp_dir().join(format!("truck-normal-section-{}-{index}-{wall_reference}-{reverse}-{cap}-{wall}",std::process::id()));
+                        std::fs::create_dir_all(&dir).unwrap();
+                        let prefix = dir.join("001");
+                        let prefix = prefix.to_str().unwrap();
+                        std::fs::write(format!("{prefix}.input.step"), step).unwrap();
+                        let mut task = task.clone();
+                        let chosen = &mut task["selection"][0];
+                        chosen["distances"] = json!([cap, wall]);
+                        if wall_reference {
+                            chosen.as_object_mut().unwrap().remove("reference_sample");
+                            let p = matrix.transform_point(Point3::origin());
+                            let n = matrix.transform_vector(Vector3::unit_x());
+                            chosen["reference_plane"] =
+                                json!({"origin":[p.x,p.y,p.z],"normal":[n.x,n.y,n.z]});
+                            chosen["distances"] = json!([wall, cap]);
+                        }
+                        if reverse {
+                            chosen["points"].as_array_mut().unwrap().reverse();
+                            for edge in chosen["contour_edges"].as_array_mut().unwrap() {
+                                edge["points"].as_array_mut().unwrap().reverse();
+                            }
+                            if !chosen["reference_sample"].is_null() {
+                                for q in
+                                    chosen["reference_sample"]["normal"].as_array_mut().unwrap()
+                                {
+                                    *q = json!(-q.as_f64().unwrap());
+                                }
+                            }
+                        }
+                        std::fs::write(format!("{prefix}.input.json"), task.to_string()).unwrap();
+                        let result = replay(prefix, &Cell::new("start")).unwrap();
+                        assert_eq!(result["status"], "operation-succeeded", "{result}");
+                        assert_eq!(result["selected_edges"], 1);
+                        for field in [
+                            "input_unchanged",
+                            "geometry_consistent",
+                            "mesh_closed",
+                            "step_prepared",
+                        ] {
+                            assert_eq!(result[field], true, "{field}: {result}");
+                        }
+                        let output = import(&format!("{prefix}.truck.step")).unwrap();
+                        let x = cap
+                            * (2. / (1. + (1. + 4. * curvature * curvature * cap * cap).sqrt()))
+                                .sqrt();
+                        let expected =
+                            1. + curvature / 3. - wall * x / 2. + curvature * x.powi(3) / 6.;
+                        replay_common::assert_solid(&output, expected, &[0], 1e-6);
+                        replay_common::blend::assert_step(&output, expected, 2e-6);
+                        let mut seen = HashSet::new();
+                        let mut counts = [0; 2];
+                        for edge in output.edge_iter().filter(|e| seen.insert(e.id())) {
+                            let c = edge.oriented_curve();
+                            let (a, b) = c.range_tuple();
+                            let mid = inverse.transform_point(c.subs((a + b) / 2.));
+                            let side = if mid.x.abs() < 1e-6 && (mid.z - (1. - wall)).abs() < 1e-6 {
+                                0
+                            } else if (mid.x - x).abs() < 1e-6
+                                && (mid.z - (1. + curvature * x * x)).abs() < 1e-6
+                            {
+                                1
+                            } else {
+                                continue;
+                            };
+                            for i in 0..=32 {
+                                let p =
+                                    inverse.transform_point(c.subs(a + (b - a) * i as f64 / 32.));
+                                let distance = p.distance(Point3::new(0., p.y, 1.));
+                                assert!(
+                                    (distance - if side == 0 { wall } else { cap }).abs() < 1e-6
+                                );
+                                counts[side] += 1;
+                            }
+                        }
+                        assert_eq!(counts, [33, 33]);
+                        assert_eq!(
+                            std::fs::read_to_string(format!("{prefix}.input.step")).unwrap(),
+                            step
+                        );
+                        std::fs::remove_dir_all(dir).unwrap();
+                    }
+                }
+            }
+        }
+    }
+    #[test]
+    fn sampled_references_reject_missing_ambiguous_and_invalid_witnesses() {
+        let (step, task) = fixture(0);
+        let dir = std::env::temp_dir().join(format!(
+            "truck-normal-section-guards-{}",
+            std::process::id()
+        ));
+        std::fs::create_dir_all(&dir).unwrap();
+        let path = dir.join("input.step");
+        std::fs::write(&path, step).unwrap();
+        let input = import(path.to_str().unwrap()).unwrap();
+        let before = serde_json::to_string(&input.compress()).unwrap();
+        for kind in ["missing", "zero-normal", "other-face", "ambiguous", "angle"] {
+            let mut task = task.clone();
+            let q = &mut task["selection"][0];
+            let expected = match kind {
+                "missing" => {
+                    q.as_object_mut().unwrap().remove("reference_sample");
+                    "unhandled-intent"
+                }
+                "zero-normal" => {
+                    q["reference_sample"]["normal"] = json!([0., 0., 0.]);
+                    "harness-error"
+                }
+                "other-face" => {
+                    q["reference_sample"]["point"] = json!([5., 5., 5.]);
+                    "selection-unmatched"
+                }
+                "ambiguous" => {
+                    q["reference_plane"] = json!({"origin":[0.,0.,0.],"normal":[1.,0.,0.]});
+                    "harness-error"
+                }
+                "angle" => {
+                    q["mode"] = json!("distance-angle");
+                    q["distance"] = json!(0.3);
+                    q["angle_degrees"] = json!(30.);
+                    "unhandled-intent"
+                }
+                _ => unreachable!(),
+            };
+            let result =
+                chamfer_selection(&input, task["selection"].as_array().unwrap(), true).unwrap_err();
+            assert_eq!(result["status"], expected, "{kind}: {result}");
+            assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
+        }
+        std::fs::remove_dir_all(dir).unwrap();
     }
 }

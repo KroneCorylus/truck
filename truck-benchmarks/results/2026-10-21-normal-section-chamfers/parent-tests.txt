@@ -1,0 +1,104 @@
+$ cargo test --release -p truck-shapeops --test normal_section_chamfer
+    Updating crates.io index
+     Locking 479 packages to latest compatible versions
+      Adding parking_lot v0.12.5 (available: v0.13.0)
+      Adding proc-macro-crate v3.3.0 (available: v3.5.0)
+ Downloading crates ...
+  Downloaded equivalent v1.0.3
+  Downloaded syn v3.0.9
+  Downloaded libc v0.2.191
+   Compiling unicode-ident v1.0.27
+   Compiling libc v0.2.191
+   Compiling branches v0.5.1
+   Compiling equivalent v1.0.3
+   Compiling bit-vec v0.10.1
+   Compiling serde_json v1.0.154
+   Compiling rand_xorshift v0.5.0
+   Compiling core_detect v1.0.0
+   Compiling indexmap v2.14.2
+   Compiling proc-macro2 v1.0.107
+   Compiling hashbrown v0.16.1
+   Compiling rclite v0.4.2
+   Compiling bit-set v0.11.1
+   Compiling quote v1.0.47
+   Compiling syn v3.0.9
+   Compiling syn v2.0.119
+   Compiling syn v1.0.109
+   Compiling proc-macro-error-attr v1.0.4
+   Compiling toml_edit v0.19.15
+   Compiling spade v2.15.1
+   Compiling getrandom v0.4.3
+   Compiling parking_lot_core v0.9.12
+   Compiling memchr v1.0.2
+   Compiling wait-timeout v0.2.1
+   Compiling rand v0.10.3
+   Compiling parking_lot v0.12.5
+   Compiling nom v3.2.1
+   Compiling tempfile v3.27.0
+   Compiling rusty-fork v0.3.1
+   Compiling proc-macro-error v1.0.4
+   Compiling proc-macro-crate v1.3.1
+   Compiling num-derive v0.3.3
+   Compiling derive-new v0.5.9
+   Compiling serde_derive v1.0.229
+   Compiling thiserror-impl v2.0.21
+   Compiling truck-derivers v0.1.0 (/home/krone/Development/Pieza_WS/truck/target/normal-section-parent-source/truck-derivers)
+   Compiling bytemuck_derive v1.12.1
+   Compiling proptest-macro v0.6.0
+   Compiling proptest v1.12.0
+   Compiling katexit v0.1.5
+   Compiling derive_more-impl v2.1.1
+   Compiling thiserror-impl v1.0.69
+   Compiling ruststep-derive v0.4.0
+   Compiling derive_more v0.99.20
+   Compiling bytemuck v1.25.2
+   Compiling thiserror v2.0.21
+   Compiling thiserror v1.0.69
+   Compiling serde v1.0.229
+   Compiling cgmath v0.18.0
+   Compiling quick-xml v0.22.0
+   Compiling ruststep v0.4.0
+   Compiling vtkio v0.6.3
+   Compiling derive_more v2.1.1
+   Compiling matext4cgmath v0.1.0
+   Compiling truck-base v0.5.0 (/home/krone/Development/Pieza_WS/truck/target/normal-section-parent-source/truck-base)
+   Compiling truck-geotrait v0.4.0 (/home/krone/Development/Pieza_WS/truck/target/normal-section-parent-source/truck-geotrait)
+   Compiling truck-assembly v0.1.0 (/home/krone/Development/Pieza_WS/truck/target/normal-section-parent-source/truck-assembly)
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/target/normal-section-parent-source/truck-geometry)
+   Compiling truck-topology v0.6.0 (/home/krone/Development/Pieza_WS/truck/target/normal-section-parent-source/truck-topology)
+   Compiling truck-polymesh v0.6.0 (/home/krone/Development/Pieza_WS/truck/target/normal-section-parent-source/truck-polymesh)
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/Pieza_WS/truck/target/normal-section-parent-source/truck-modeling)
+   Compiling truck-meshalgo v0.4.0 (/home/krone/Development/Pieza_WS/truck/target/normal-section-parent-source/truck-meshalgo)
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/target/normal-section-parent-source/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/target/normal-section-parent-source/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 21.84s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/normal_section_chamfer.rs (/home/krone/Development/Pieza_WS/truck/target/release/deps/normal_section_chamfer-dadb94269dc06f5d)
+
+running 2 tests
+test transformed_normal_section_chamfers_preserve_chords_and_material ... FAILED
+test normal_section_chamfers_preserve_chords_and_material ... FAILED
+
+failures:
+
+---- transformed_normal_section_chamfers_preserve_chords_and_material stdout ----
+
+thread 'transformed_normal_section_chamfers_preserve_chords_and_material' (1312837) panicked at truck-shapeops/tests/normal_section_chamfer.rs:107:29:
+normal-section chord is 0.28023059384355076, expected 0.3
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- normal_section_chamfers_preserve_chords_and_material stdout ----
+
+thread 'normal_section_chamfers_preserve_chords_and_material' (1312836) panicked at truck-shapeops/tests/normal_section_chamfer.rs:107:29:
+normal-section chord is 0.28023059384355037, expected 0.3
+
+
+failures:
+    normal_section_chamfers_preserve_chords_and_material
+    transformed_normal_section_chamfers_preserve_chords_and_material
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+error: test failed, to rerun pass `-p truck-shapeops --test normal_section_chamfer`
+exit_code 101

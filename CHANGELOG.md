@@ -6,6 +6,16 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Add `try_chamfer_solid_along_wire_chord` for straight-line setbacks measured
+  in the guide's normal section. A bounded local solve shares the existing
+  contact fitting, trimming and solid validation; tangent-projection APIs retain
+  their behavior. Convex and concave parabolic controls verify both distances,
+  material, reversed edges, transforms, input preservation and STEP.
+- Capture a point and normal for non-elementary chamfer reference surfaces.
+  Replay requires a unique adjacent-face match and uses chord distances for
+  connected unequal-distance contours with non-elementary supports. Missing,
+  conflicting and invalid reference samples and unsupported angles remain explicit.
+
 - Breaking: generic `chamfer_along_wire` and `try_chamfer_along_wire` now require
   `IntersectionCurve<C, S, S>: ToSameGeometry<C>` to retain clipped contacts and
   intersect curved end boundaries. Add that bound to generic callers or use the

@@ -204,6 +204,20 @@ void reference_geometry(std::ostream& out, const TopoDS_Face& face) {
           << "],\"axis\":[" << sign * axis.X() << ',' << sign * axis.Y() << ',' << sign * axis.Z()
           << "],\"half_angle_radians\":" << std::abs(cone.SemiAngle()) << '}';
     }
+    if (surface.GetType() != GeomAbs_Cylinder && surface.GetType() != GeomAbs_Cone) {
+      double u0, u1, v0, v1;
+      BRepTools::UVBounds(face, u0, u1, v0, v1);
+      if (!std::isfinite(u0) || !std::isfinite(u1) || !std::isfinite(v0) || !std::isfinite(v1))
+        throw std::runtime_error("unbounded reference surface");
+      gp_Pnt p; gp_Vec du, dv;
+      surface.D1(u0 + (u1-u0)/2., v0 + (v1-v0)/2., p, du, dv);
+      auto n = du.Crossed(dv);
+      if (!std::isfinite(n.SquareMagnitude()) || n.SquareMagnitude() <= 1e-30)
+        throw std::runtime_error("singular reference surface sample");
+      n.Normalize();
+      out << ",\"reference_sample\":{\"point\":[" << p.X() << ',' << p.Y() << ',' << p.Z()
+          << "],\"normal\":[" << n.X() << ',' << n.Y() << ',' << n.Z() << "]}";
+    }
 
     return;
   }

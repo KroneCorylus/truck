@@ -6,12 +6,76 @@ use truck_base::diagnostics::{validate_tolerance, Code, Diagnostic};
 /// Number of samples along the edge is at least this, so a cubic interpolation is always possible.
 const MIN_SAMPLES: usize = 4;
 
-/// Samples the contact curves of a chamfer along `edge`.
-///
-/// At each sample the in-face direction on `surface_i` is the surface tangent perpendicular to the
-/// edge, pointing into the face. The contact point is the point of `surface_i` nearest to the point
-/// at distance `d_i` along that direction. Returns, for each surface, the samples in parameter
-/// space and in space at the supplied parameters.
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub(super) enum DistanceMode {
+    TangentProjection,
+    NormalSection,
+}
+
+fn contact_parameter<S>(
+    surface: &S,
+    point: Point3,
+    tangent: Vector3,
+    distance: f64,
+    sign: f64,
+    hint: Option<(f64, f64)>,
+    mode: DistanceMode,
+) -> Option<(f64, f64)>
+where
+    S: ParametricSurface3D
+        + SearchParameter<D2, Point = Point3>
+        + SearchNearestParameter<D2, Point = Point3>,
+{
+    let origin = surface.search_parameter(point, hint, 100)?;
+    let normal = surface.normal(origin.0, origin.1);
+    let inward = normal.cross(tangent) * sign;
+    let mut uv = surface.search_nearest_parameter(point + inward * distance, Some(origin), 100)?;
+    if mode == DistanceMode::TangentProjection {
+        return Some(uv);
+    }
+    // Intersect the support with the edge's normal plane and the requested distance sphere.
+    let residual = |uv: (f64, f64)| {
+        let delta = surface.subs(uv.0, uv.1) - point;
+        Vector2::new(
+            delta.dot(tangent),
+            (delta.magnitude2() - distance * distance) / (2. * distance),
+        )
+    };
+    let tolerance = (distance * 1e-10).max(1e-12);
+    for _ in 0..32 {
+        let delta = surface.subs(uv.0, uv.1) - point;
+        let value = residual(uv);
+        if !value.x.is_finite() || !value.y.is_finite() || delta.dot(inward) <= 0. {
+            return None;
+        }
+        if value.magnitude2() <= tolerance * tolerance {
+            return (surface.normal(uv.0, uv.1).dot(normal) > 0.).then_some(uv);
+        }
+        let du = surface.uder(uv.0, uv.1);
+        let dv = surface.vder(uv.0, uv.1);
+        let a = Vector2::new(du.dot(tangent), du.dot(delta) / distance);
+        let b = Vector2::new(dv.dot(tangent), dv.dot(delta) / distance);
+        let det = a.x * b.y - b.x * a.y;
+        if !det.is_finite() || det.abs() <= 1e-12 * a.magnitude() * b.magnitude() {
+            return None;
+        }
+        let step = Vector2::new(
+            (b.y * value.x - b.x * value.y) / det,
+            (a.x * value.y - a.y * value.x) / det,
+        );
+        uv = (0..8).find_map(|i| {
+            let step = step / 2_f64.powi(i);
+            let next = (uv.0 - step.x, uv.1 - step.y);
+            (next.0.is_finite()
+                && next.1.is_finite()
+                && residual(next).magnitude2() < value.magnitude2())
+            .then_some(next)
+        })?;
+    }
+    None
+}
+
+/// Samples the contact curves of a chamfer along `edge` using the requested distance metric.
 #[allow(clippy::type_complexity)]
 fn sample_contact_points<C, S>(
     edge: &C,
@@ -19,6 +83,7 @@ fn sample_contact_points<C, S>(
     surface1: &S,
     (d0, d1): (f64, f64),
     params: &[f64],
+    mode: DistanceMode,
 ) -> Option<[Vec<(Point2, Point3)>; 2]>
 where
     C: FilletedCurve<S> + ParameterDivision1D<Point = Point3>,
@@ -29,9 +94,7 @@ where
         for &t in params {
             let p = edge.subs(t);
             let e = edge.der(t).normalize();
-            let uv = surface.search_parameter(p, *hint, 100)?;
-            let w = surface.normal(uv.0, uv.1).cross(e) * sign;
-            let mut uv = surface.search_nearest_parameter(p + w * distance, Some(uv), 100)?;
+            let mut uv = contact_parameter(surface, p, e, distance, sign, *hint, mode)?;
             if let Some((u, v)) = *hint {
                 if let Some(period) = surface.u_period() {
                     uv.0 += ((u - uv.0) / period).round() * period;
@@ -75,6 +138,7 @@ fn fit_contact_curves<C, S>(
     distances: (f64, f64),
     tol: f64,
     range: Option<(f64, f64)>,
+    mode: DistanceMode,
 ) -> Option<(
     Vec<f64>,
     [PCurve<BSplineCurve<Point2>, S>; 2],
@@ -100,7 +164,7 @@ where
     let mut params = uniform(count);
     let mut local_refinements = 0;
     loop {
-        let samples = sample_contact_points(edge, surface0, surface1, distances, &params)?;
+        let samples = sample_contact_points(edge, surface0, surface1, distances, &params, mode)?;
         let pcurves = std::array::from_fn(|i| {
             PCurve::new(
                 interpolate(&params, samples[i].iter().map(|s| s.0)),
@@ -293,8 +357,15 @@ where
     let surface1 = face1.oriented_surface();
     let edge_curve = chamfered_edge.oriented_curve();
 
-    let (params, [pcurve0, pcurve1], [curve0, curve1]) =
-        fit_contact_curves(&edge_curve, &surface0, &surface1, (d0, d1), tol, None)?;
+    let (params, [pcurve0, pcurve1], [curve0, curve1]) = fit_contact_curves(
+        &edge_curve,
+        &surface0,
+        &surface1,
+        (d0, d1),
+        tol,
+        None,
+        DistanceMode::TangentProjection,
+    )?;
 
     let (new_face0, chamfer_edge0, _) =
         cut_face_by_curve(face0, pcurve0.to_same_geometry(), chamfered_edge_id)?;
@@ -419,22 +490,22 @@ where
     try_chamfer_along_wire_with_trim(
         shell,
         wire,
-        d0,
-        d1,
+        (d0, d1),
         tol,
         along_wire::trim_contact_edge,
         false,
+        DistanceMode::TangentProjection,
     )
 }
 
 pub(super) fn try_chamfer_along_wire_with_trim<C, S>(
     shell: &Shell<Point3, C, S>,
     wire: &Wire<Point3, C>,
-    d0: f64,
-    d1: f64,
+    (d0, d1): (f64, f64),
     tol: f64,
     trim: impl Fn(&mut C, &Edge<Point3, C>, bool) -> Option<along_wire::TrimmedContact<C>>,
     continue_contacts: bool,
+    mode: DistanceMode,
 ) -> Result<Shell<Point3, C, S>, Diagnostic>
 where
     C: FilletedCurve<S> + ParameterDivision1D<Point = Point3>,
@@ -526,7 +597,7 @@ where
             None
         };
         let (params, pcurves, [c0, c1]) =
-            fit_contact_curves(&curve, &s0, &s1, (d0, d1), tol, range)
+            fit_contact_curves(&curve, &s0, &s1, (d0, d1), tol, range, mode)
                 .ok_or_else(|| failed().stage("find_contact").selection(index))?;
         let mut contact: [C; 2] = pcurves.each_ref().map(|curve| curve.to_same_geometry());
         // Reject collapsed/reversed offsets and fits that separate the contact edge from
@@ -539,10 +610,7 @@ where
                 for (side, support, spline, distance, sign) in
                     [(0, &s0, &c0, d0, 1.0), (1, &s1, &c1, d1, -1.0)]
                 {
-                    let uv = support.search_parameter(p, None, 100).ok_or_else(failed)?;
-                    let target = p + support.normal(uv.0, uv.1).cross(tangent) * (distance * sign);
-                    let uv = support
-                        .search_nearest_parameter(target, Some(uv), 100)
+                    let uv = contact_parameter(support, p, tangent, distance, sign, None, mode)
                         .ok_or_else(failed)?;
                     let q = contact[side].subs(t);
                     let advance = contact[side].der(t).dot(tangent);
@@ -848,9 +916,16 @@ mod contact_interpolation_tests {
             let range = curve.range_tuple();
             let budget = curve.parameter_division(range, 0.001).0.len().max(257);
             for distances in [(0.01, 0.01), (0.01, 0.006), (0.006, 0.01)] {
-                let (params, contacts, fits) =
-                    fit_contact_curves(&curve, &surface0, &surface1, distances, 0.001, None)
-                        .expect("localized contact error fits within the existing sample budget");
+                let (params, contacts, fits) = fit_contact_curves(
+                    &curve,
+                    &surface0,
+                    &surface1,
+                    distances,
+                    0.001,
+                    None,
+                    DistanceMode::TangentProjection,
+                )
+                .expect("localized contact error fits within the existing sample budget");
                 assert!(params.len() <= budget);
                 assert_eq!((params[0], *params.last().unwrap()), range);
                 assert!(params.windows(2).all(|w| w[0] < w[1]));

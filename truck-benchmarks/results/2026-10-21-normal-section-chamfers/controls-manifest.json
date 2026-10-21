@@ -1,0 +1,472 @@
+{
+  "archive_sha256": "4cc197dfc38119364b966a66013e567fbfcedbe811676f5c616954b42cd2b91b",
+  "members": {
+    "native-normal-section/summary.json": "d58569735208c615740ef90d1649f6f67c624995ad4912509ad033c9d6808d85",
+    "native-normal-section/0.input.brep": "c0a6305da7aba6f659d4bc83c5aa16da0fbbcf591749d3e993b273b7d951cc4c",
+    "native-normal-section/0.input.step": "54e09f3ddb8f7e0e212afa00991023da223c30d1316b66bfe4751ca9097ed1e4",
+    "native-normal-section/0.result.brep": "4b193c8252765a0f0eef72b9feb6415a2048b1d927410bd3f76d105237cd5a40",
+    "native-normal-section/0.result.step": "1c4c71015c21471bef0be9084235186c373a8e8150f1bd47c8d66e33709fdd67",
+    "native-normal-section/1.input.brep": "c0a6305da7aba6f659d4bc83c5aa16da0fbbcf591749d3e993b273b7d951cc4c",
+    "native-normal-section/1.input.step": "c3f26c114fb8c7620c868feff1dd3692319ed98bd4e3d2502c5d4e42f28c00e9",
+    "native-normal-section/1.result.brep": "555c43b4a5145d56315ecec53d11ea41e25cbfb5fa912794bf377d43919ace91",
+    "native-normal-section/1.result.step": "afedb1be5e3b865b49a932042c706cc2ee16e3799bdd1b860e5f0bd1527feeee",
+    "native-normal-section/2.input.brep": "c0a6305da7aba6f659d4bc83c5aa16da0fbbcf591749d3e993b273b7d951cc4c",
+    "native-normal-section/2.input.step": "8b525c9ed992c690da44dcc3bc00e6d82606401cf4ad5c87ed6f7dfb7e1dea6e",
+    "native-normal-section/2.result.brep": "e595ed98f642606c0518368ac1eaa7d40868ab0faf8d0d67ecf9e55d1f2e8cba",
+    "native-normal-section/2.result.step": "a095869edeeb41c2fea4ae274cb3ebde53d4b8b7cd23596abfc67cf938403188",
+    "native-normal-section/3.input.brep": "3d9d3d950be810b0fb6e40453577fd0f32bae97b357e7095d01bf0e525e996f1",
+    "native-normal-section/3.input.step": "c4a4c4f28acc0841336597efaccebb432bd11df46680485ac835fadc6e34240d",
+    "native-normal-section/3.result.brep": "484310784ccfe8f0775f424e5ab4d940bc0718556d63de4ac0e8835775ca0808",
+    "native-normal-section/3.result.step": "13f6a272b4601a03214237f1a608ff17a32daaaf1a8301a11df59851aab4060a",
+    "native-normal-section/4.input.brep": "3d9d3d950be810b0fb6e40453577fd0f32bae97b357e7095d01bf0e525e996f1",
+    "native-normal-section/4.input.step": "d6fb26d9994b5221f80ebef38142b9f29d6bba0e8cbd3e38bc938ede7493ad86",
+    "native-normal-section/4.result.brep": "637947cea36165412cc4be80711950e6a0f51bf197e698e9ec997a79d0fb1d09",
+    "native-normal-section/4.result.step": "a2335c22936d9fbf07eed67ea0fa7b9bf4c0228e7a05c450d74bcaad623b96a3",
+    "native-normal-section/5.input.brep": "3d9d3d950be810b0fb6e40453577fd0f32bae97b357e7095d01bf0e525e996f1",
+    "native-normal-section/5.input.step": "7ec011134079278cf199b56b2af100428ed7895d08b0370522bb43cddbec4475",
+    "native-normal-section/5.result.brep": "91f5e8ceee80435672b180cbe642c7420e507b13fc89bf539f775a7ef423c9c1",
+    "native-normal-section/5.result.step": "25a14eb50a2380852ed4568a5f14ebc8cd553caebde3a9f5700eba37c4b6e94b",
+    "truck-normal-section/0.input.step": "f88d8f8d999baa26757da421ddb811f842f99f2febb3937298718ba6683ba8e8",
+    "truck-normal-section/0.result.step": "f4644cd21712771aa6f3c1d56c2bfff5d88b91719efe48889a70662da4816411",
+    "truck-normal-section/1.input.step": "a475f50723c24fb0b33dde98244f3c5c83a8bf145227436cfa297a3ac658c0b6",
+    "truck-normal-section/1.result.step": "4c7d99cb4530bb7393924081a8573a6d824c392f49adf267ef9ba270c1308085",
+    "truck-normal-section/2.input.step": "ed94a6d81d4fa2983cb932f380f698ef32eaf1b401c81462b4428ae7a493ad03",
+    "truck-normal-section/2.result.step": "c4e4758938107069410b969014f2848ea5b2037031c07461e96300a63ce2a29b",
+    "truck-normal-section/3.input.step": "28fb88dee90ef6c2ac4b466c1b7d1466be1d16ce9f1bf22bbbb22506fcb027a3",
+    "truck-normal-section/3.result.step": "304da277692daf3dcc37c5ee33669c5173a014fb9763969685603da9b89599ad",
+    "truck-normal-section/4.input.step": "82c24c82ac590546aa671136a447cf5115a0217e3180bf44617e630f74918676",
+    "truck-normal-section/4.result.step": "dff048e066d957709255c68971e95315a93af22bbeba5e6343e39bdd64c5247c",
+    "truck-normal-section/5.input.step": "c18c49cee3918ac0b13efec58ea47e850ced0d29359f07ab386a68a368716a08",
+    "truck-normal-section/5.result.step": "75d5f67eb508ec8a63cb890eddebbeee1a088d12bb74aef70db2fe230fd2fa5b",
+    "truck-normal-section/0.input.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "truck-normal-section/0.input.comparison.json": "a4d3008f83d7919803b514b4557d19e07ad57fd7671913560dac1b72efdbd151",
+    "truck-normal-section/0.result.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "truck-normal-section/0.result.comparison.json": "460ca737f2afb742d8d2fe5fedb0036aa8748336b4a85f27370caa8a5b050338",
+    "truck-normal-section/1.input.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "truck-normal-section/1.input.comparison.json": "a4d3008f83d7919803b514b4557d19e07ad57fd7671913560dac1b72efdbd151",
+    "truck-normal-section/1.result.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "truck-normal-section/1.result.comparison.json": "48cbdc8230fdf050b5c4ec8697bdfd9291e3b33584b9727e59bd900104aa5c85",
+    "truck-normal-section/2.input.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "truck-normal-section/2.input.comparison.json": "a4d3008f83d7919803b514b4557d19e07ad57fd7671913560dac1b72efdbd151",
+    "truck-normal-section/2.result.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "truck-normal-section/2.result.comparison.json": "72574130ccecf22f4b32b1e36b650fc274a721f3792ce405f70d524f5a4a1bf9",
+    "truck-normal-section/3.input.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "truck-normal-section/3.input.comparison.json": "ffb44d987130523c4a95bd3fdffd6e55d6fc76921c472c05fb4d0be0938d1506",
+    "truck-normal-section/3.result.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "truck-normal-section/3.result.comparison.json": "e5494703570e53e6215726223d52e08118485397cc65e8d378e35be877041616",
+    "truck-normal-section/4.input.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "truck-normal-section/4.input.comparison.json": "ffb44d987130523c4a95bd3fdffd6e55d6fc76921c472c05fb4d0be0938d1506",
+    "truck-normal-section/4.result.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "truck-normal-section/4.result.comparison.json": "a2a81f99d1650aab75db43032c1cc9e1436b0be5c20817051d3d9de9f715c8b4",
+    "truck-normal-section/5.input.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "truck-normal-section/5.input.comparison.json": "ffb44d987130523c4a95bd3fdffd6e55d6fc76921c472c05fb4d0be0938d1506",
+    "truck-normal-section/5.result.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "truck-normal-section/5.result.comparison.json": "ca4e8db74cb53f8d3f9fa109293f0111c189494bb44e5573d4e63bfe4070ec97",
+    "proof/normal-section-native.cpp": "66dc1edb02f2ac21312ad67c4bbb08d8485bd81bc0974b2a03941cbfb14e94d4",
+    "proof/normal-section-native-command.json": "7a25500908774165f6ac43679eb02d883c9672954724f4cc2b0349b9d4f41a2e",
+    "proof/normal-section-native-build.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "proof/normal-section-native.txt": "58d8fd010dc28877a582e45eeebcf1413794764807a9255122bce60db2fb85c3",
+    "proof/normal-section-export.rs": "57d092e1da8707223cec5b5c27cbe40d29ca65fae78f4c1d1f1ca9d136ac9592",
+    "proof/normal-section-export-command.json": "6b1d644ba7c244c467110cabc88530f80932581f1bd51e6d70d6e5e67fb5c195",
+    "proof/normal-section-export-build.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "proof/normal-section-export.txt": "b29f83c69ea76f99bc9046044af643f1b7c2c147bcbe7839063131ab99618aaf",
+    "proof/normal-section-comparisons.json": "e4281dedccf7fb12aa6386a3df3bb00fe7b1b181a9c4a962abf2afd58cce7dba",
+    "proof/normal-section-comparisons.txt": "c44c3caf18b8a284248c11f36259bc87f8ccbf52443eb85978cfe4e83d9e44ad",
+    "proof/build-normal-section-native.py": "cde10b4fe47d9055c674d926988b9e6f5600f32f655114b3e4daec5535af8d20",
+    "proof/export-normal-section.py": "ce551c016c72770097035fbb5c84bd7183685b28d65c2dd7dce3e1e6c6567ca2",
+    "proof/normal-section-parent-test.rs": "a6aaa8f1473d956bae1242e1e83f7721130b2e35b4a4ddbad4118acadf67627c",
+    "proof/normal-section-c1.rs": "c63817e0c3147cbdc63ab43af25326f3ad97b1dc0c90a393a58106f6ff52db8f",
+    "proof/normal-section-c1-build.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "proof/normal-section-c1.txt": "a40b44cb2abd3cb57d3d6967552f02556d849ba0315512bfbaac31321bdfcd0f",
+    "proof/normal-section-c1.step": "1fa84c554d5cf75c6eb99755499537301320d8be96d2acb2a81a5585ee38ace4",
+    "proof/normal-section-c1.comparison.json": "cfb1af659ce7edb52f87ed624765e64cc43cdf526fd6acde36983cb1dd9c3e57",
+    "proof/normal-section-c1.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "proof/normal-section-c1-input.comparison.json": "02532f56ab6f5f90428781b372d5941cdc34a0c4ef9273dc53aff19c775a43e2",
+    "proof/normal-section-c1-input.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "proof/normal-section-faces.cpp": "70219c8cfcc980ce7e416b6df6817d862682e911294bdb9333b0845b3b611178",
+    "proof/normal-section-faces-build.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "proof/normal-section-faces.txt": "1f24fdc8fc5fb63f31d3d883db0db0f5884668a12622d9692488c9fdad8af7f0",
+    "proof/normal-section-faces.json": "cfb1af659ce7edb52f87ed624765e64cc43cdf526fd6acde36983cb1dd9c3e57",
+    "proof/normal-section-mesh.cpp": "aad87e5142ad93d278f9c6be85fe13ce3a9d0708e56505b7f6728c05a5148dd1",
+    "proof/normal-section-mesh-build.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "proof/normal-section-mesh.txt": "4e44d91dcbb73ebd117b9cc50949d502b524cef3385a74f08252f0bf08f4271d",
+    "proof/normal-section-mesh.json": "a7003b03300813e53616223f3436e2d7c07f7e8e27af7f23b66bcbde666945cf",
+    "proof/probe-normal-section.py": "5286ac773b7f54709d1646eee2b3e389f8d951f6f0718ec83a5e8124deffd316",
+    "proof/probe-chamfer-faces.py": "60fdb5bcfdbb00decdac074ad93659883be3bb41ee0da8f01d9781d28f765ba5",
+    "proof/mesh-chamfer-comparison.py": "9d2590b513391861deb3a352652d6f4e186511279ddbd7e83a500af37648df0b"
+  },
+  "comparisons": [
+    {
+      "index": 0,
+      "native": {
+        "index": 0,
+        "curvature": 0.8,
+        "cap": 0.3,
+        "wall": 0.2,
+        "expected": 1.2407778153246019,
+        "input_volume": 1.2666666666666664,
+        "volume": 1.2407778153246016,
+        "valid": true,
+        "input_unchanged": true
+      },
+      "input": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 1.2666666666666664,
+        "truck_volume": 1.2666666666666664,
+        "native_to_truck_max_distance": 2.482534153247273e-16,
+        "native_to_truck_samples": 1252,
+        "truck_to_native_max_distance": 3.1401849173675503e-16,
+        "truck_to_native_samples": 1252,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "result": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 1.2407778153246016,
+        "truck_volume": 1.2407778153244389,
+        "native_to_truck_max_distance": 2.726025292361362e-12,
+        "native_to_truck_samples": 1519,
+        "truck_to_native_max_distance": 2.727110798359669e-12,
+        "truck_to_native_samples": 1519,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      }
+    },
+    {
+      "index": 1,
+      "native": {
+        "index": 1,
+        "curvature": 0.8,
+        "cap": 0.2,
+        "wall": 0.3,
+        "expected": 1.2380623516195224,
+        "input_volume": 1.2666666666666664,
+        "volume": 1.2380623516195224,
+        "valid": true,
+        "input_unchanged": true
+      },
+      "input": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 1.2666666666666664,
+        "truck_volume": 1.2666666666666664,
+        "native_to_truck_max_distance": 2.482534153247273e-16,
+        "native_to_truck_samples": 1252,
+        "truck_to_native_max_distance": 3.1401849173675503e-16,
+        "truck_to_native_samples": 1252,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "result": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 1.2380623516195222,
+        "truck_volume": 1.2380623516195217,
+        "native_to_truck_max_distance": 5.542295721902694e-15,
+        "native_to_truck_samples": 1517,
+        "truck_to_native_max_distance": 7.527443105585587e-15,
+        "truck_to_native_samples": 1517,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      }
+    },
+    {
+      "index": 2,
+      "native": {
+        "index": 2,
+        "curvature": 0.8,
+        "cap": 0.2,
+        "wall": 0.2,
+        "expected": 1.247939762309503,
+        "input_volume": 1.2666666666666664,
+        "volume": 1.2479397623095032,
+        "valid": true,
+        "input_unchanged": true
+      },
+      "input": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 1.2666666666666664,
+        "truck_volume": 1.2666666666666664,
+        "native_to_truck_max_distance": 2.482534153247273e-16,
+        "native_to_truck_samples": 1252,
+        "truck_to_native_max_distance": 3.1401849173675503e-16,
+        "truck_to_native_samples": 1252,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "result": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 1.247939762309503,
+        "truck_volume": 1.2479397623095025,
+        "native_to_truck_max_distance": 5.542295721902694e-15,
+        "native_to_truck_samples": 1521,
+        "truck_to_native_max_distance": 7.544259545409964e-15,
+        "truck_to_native_samples": 1521,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      }
+    },
+    {
+      "index": 3,
+      "native": {
+        "index": 3,
+        "curvature": -0.4,
+        "cap": 0.3,
+        "wall": 0.2,
+        "expected": 0.8351150677158309,
+        "input_volume": 0.8666666666666665,
+        "volume": 0.8351150677158307,
+        "valid": true,
+        "input_unchanged": true
+      },
+      "input": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 0.8666666666666665,
+        "truck_volume": 0.8666666666666664,
+        "native_to_truck_max_distance": 1.5700924586837752e-16,
+        "native_to_truck_samples": 1286,
+        "truck_to_native_max_distance": 1.2412670766236366e-16,
+        "truck_to_native_samples": 1286,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "result": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 0.8351150677158303,
+        "truck_volume": 0.8351150677158306,
+        "native_to_truck_max_distance": 2.9624445261614194e-15,
+        "native_to_truck_samples": 1553,
+        "truck_to_native_max_distance": 2.0740677722252305e-15,
+        "truck_to_native_samples": 1553,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      }
+    },
+    {
+      "index": 4,
+      "native": {
+        "index": 4,
+        "curvature": -0.4,
+        "cap": 0.2,
+        "wall": 0.3,
+        "expected": 0.8362333215763506,
+        "input_volume": 0.8666666666666665,
+        "volume": 0.8362333215763501,
+        "valid": true,
+        "input_unchanged": true
+      },
+      "input": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 0.8666666666666665,
+        "truck_volume": 0.8666666666666664,
+        "native_to_truck_max_distance": 1.5700924586837752e-16,
+        "native_to_truck_samples": 1286,
+        "truck_to_native_max_distance": 1.2412670766236366e-16,
+        "truck_to_native_samples": 1286,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "result": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 0.8362333215763499,
+        "truck_volume": 0.8362333215763502,
+        "native_to_truck_max_distance": 2.9394713984828794e-15,
+        "native_to_truck_samples": 1549,
+        "truck_to_native_max_distance": 2.1130726402723043e-15,
+        "truck_to_native_samples": 1549,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      }
+    },
+    {
+      "index": 5,
+      "native": {
+        "index": 5,
+        "curvature": -0.4,
+        "cap": 0.2,
+        "wall": 0.2,
+        "expected": 0.84620167466162,
+        "input_volume": 0.8666666666666665,
+        "volume": 0.8462016746616197,
+        "valid": true,
+        "input_unchanged": true
+      },
+      "input": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 0.8666666666666665,
+        "truck_volume": 0.8666666666666664,
+        "native_to_truck_max_distance": 1.5700924586837752e-16,
+        "native_to_truck_samples": 1286,
+        "truck_to_native_max_distance": 1.2412670766236366e-16,
+        "truck_to_native_samples": 1286,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "result": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 0.8462016746616196,
+        "truck_volume": 0.8462016746616197,
+        "native_to_truck_max_distance": 2.9624445261614194e-15,
+        "native_to_truck_samples": 1553,
+        "truck_to_native_max_distance": 2.1130726402723043e-15,
+        "truck_to_native_samples": 1553,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      }
+    }
+  ]
+}

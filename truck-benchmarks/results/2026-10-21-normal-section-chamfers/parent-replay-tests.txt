@@ -1,0 +1,37 @@
+$ cargo test --release -p truck-shapeops --example replay_occt_blend normal_section_reference_tests
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/target/normal-section-parent-source/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 4.14s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running unittests examples/replay_occt_blend.rs (/home/krone/Development/Pieza_WS/truck/target/release/examples/replay_occt_blend-c98035ef48e57904)
+
+running 2 tests
+test normal_section_reference_tests::sampled_references_reject_missing_ambiguous_and_invalid_witnesses ... FAILED
+test normal_section_reference_tests::sampled_references_preserve_normal_section_distances_and_material ... FAILED
+
+failures:
+
+---- normal_section_reference_tests::sampled_references_reject_missing_ambiguous_and_invalid_witnesses stdout ----
+
+thread 'normal_section_reference_tests::sampled_references_reject_missing_ambiguous_and_invalid_witnesses' (1313283) panicked at truck-shapeops/examples/replay_occt_blend.rs:4018:13:
+assertion `left == right` failed: zero-normal: {"reason":"Face-dependent chamfers require a captured reference plane, cylinder or cone","status":"unhandled-intent"}
+  left: String("unhandled-intent")
+ right: "harness-error"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- normal_section_reference_tests::sampled_references_preserve_normal_section_distances_and_material stdout ----
+
+thread 'normal_section_reference_tests::sampled_references_preserve_normal_section_distances_and_material' (1313282) panicked at truck-shapeops/examples/replay_occt_blend.rs:3922:25:
+assertion `left == right` failed: {"reason":"Face-dependent chamfers require a captured reference plane, cylinder or cone","selection_scope":"native-contours","status":"unhandled-intent","step_fitting_tolerance":1e-7}
+  left: String("unhandled-intent")
+ right: "operation-succeeded"
+
+
+failures:
+    normal_section_reference_tests::sampled_references_preserve_normal_section_distances_and_material
+    normal_section_reference_tests::sampled_references_reject_missing_ambiguous_and_invalid_witnesses
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 62 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-shapeops --example replay_occt_blend`
+exit_code 101

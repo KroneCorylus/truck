@@ -733,6 +733,44 @@ pub fn try_chamfer_solid_along_wire(
     d1: f64,
     tol: f64,
 ) -> Result<BlendResult, Diagnostic> {
+    chamfer_solid_wire(
+        solid,
+        wire,
+        (d0, d1),
+        tol,
+        super::chamfer::DistanceMode::TangentProjection,
+    )
+}
+
+/// Chamfers a tangent wire with straight-line distances in planes perpendicular to its edge.
+///
+/// Contacts stay on the local inward branch of each support. Unlike tangent-projected offsets,
+/// contacts are measured `d0` or `d1` from the guide in its normal section. Distances are
+/// ordered along and against the wire. Trimming, history and input-preservation guarantees
+/// are the same as [`try_chamfer_solid_along_wire`].
+pub fn try_chamfer_solid_along_wire_chord(
+    solid: &Solid,
+    wire: &Wire,
+    d0: f64,
+    d1: f64,
+    tol: f64,
+) -> Result<BlendResult, Diagnostic> {
+    chamfer_solid_wire(
+        solid,
+        wire,
+        (d0, d1),
+        tol,
+        super::chamfer::DistanceMode::NormalSection,
+    )
+}
+
+fn chamfer_solid_wire(
+    solid: &Solid,
+    wire: &Wire,
+    (d0, d1): (f64, f64),
+    tol: f64,
+    mode: super::chamfer::DistanceMode,
+) -> Result<BlendResult, Diagnostic> {
     let operation = "chamfer_solid_along_wire";
     validate_tolerance(tol, operation)?;
     Solid::try_new(solid.boundaries().clone()).map_err(|e| {
@@ -767,17 +805,18 @@ pub fn try_chamfer_solid_along_wire(
         super::chamfer::try_chamfer_along_wire_with_trim(
             &solid.boundaries()[index],
             wire,
-            d0,
-            d1,
+            (d0, d1),
             tol,
             trim,
             continued,
+            mode,
         )
     };
     let shell = build(false)
         .or_else(|error| {
             if error.code == Code::BlendConstructionFailed
                 && error.stage == "trim_faces"
+                && mode == super::chamfer::DistanceMode::TangentProjection
                 && can_continue_chamfer_contacts(&solid.boundaries()[index], wire)
             {
                 build(true)
@@ -786,8 +825,12 @@ pub fn try_chamfer_solid_along_wire(
             }
         })
         .or_else(|error| {
-            super::chamfer_collapse::chamfer(&solid.boundaries()[index], wire, d0, d1, tol)
-                .ok_or(error)
+            if mode == super::chamfer::DistanceMode::TangentProjection {
+                super::chamfer_collapse::chamfer(&solid.boundaries()[index], wire, d0, d1, tol)
+                    .ok_or(error)
+            } else {
+                Err(error)
+            }
         })
         .map_err(|e| e.operation(operation).shell(index))?;
     finish(solid, index, shell, tol).map_err(|e| e.operation(operation))

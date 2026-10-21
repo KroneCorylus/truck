@@ -1,0 +1,8 @@
+{
+  "revision": "273af446955e72cdf1389e4f54bd01dd810d27c0",
+  "test_sha256": "91be98c6a08685d3efc53062438e5eb5c73bd07297c07fd01bd32c2228b52e6b",
+  "parent_test_sha256": "f291c7a49788567b679138e5211300ce5b09f0dbc95a99d05fcec8107dd60b8c",
+  "binding_change": "The new chord entry point does not exist on the parent. The same test assertions call the existing tangent-projection entry point on the parent.",
+  "replay_tests_sha256": "4223d690b131cad1e58e9d456ac4c6eaf76795520c06edb1c47a1d46602cc015",
+  "native_test_sha256": "c989c70c22d7d45efae635ee2212b9a3daf1947a4cf69fc5abcaee3d52e004be"
+}
