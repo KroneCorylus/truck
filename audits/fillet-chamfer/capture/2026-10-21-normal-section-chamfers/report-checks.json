@@ -1,0 +1,44 @@
+{
+  "links": [
+    {
+      "href": "#done",
+      "ok": true
+    },
+    {
+      "href": "#results",
+      "ok": true
+    },
+    {
+      "href": "#remaining",
+      "ok": true
+    },
+    {
+      "href": "../../../../truck-benchmarks/results/2026-10-21-normal-section-chamfers/REPORT.md",
+      "ok": true
+    },
+    {
+      "href": "../../capture/2026-10-21-normal-section-chamfers/comparison-summary.json",
+      "ok": true
+    },
+    {
+      "href": "../../capture/2026-10-21-normal-section-chamfers/artifacts.zip",
+      "ok": true
+    },
+    {
+      "href": "../2026-10-21-clipped-chamfer-contacts/report.html",
+      "ok": true
+    },
+    {
+      "href": "HANDOFF.txt",
+      "ok": true
+    }
+  ],
+  "scrollWidth": 1265,
+  "width": 1280,
+  "preview": {
+    "width": 728,
+    "consoleErrors": 0,
+    "visuallyReviewed": true
+  },
+  "report_sha256": "089bc12face9d3bb029e512b0cd42b86f25f0290b71034ec42c1dbe94d256c6f"
+}

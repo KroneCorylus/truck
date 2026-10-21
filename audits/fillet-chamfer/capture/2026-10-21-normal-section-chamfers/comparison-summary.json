@@ -1,0 +1,2104 @@
+{
+  "kernel_revision": "40aa15af90b7969e5ead45de7f4dc0b30d804bd8",
+  "native": {
+    "passed": 396
+  },
+  "captures": 648,
+  "before_statuses": {
+    "input-import-failed": 96,
+    "operation-succeeded": 449,
+    "operation-failed": 89,
+    "unhandled-intent": 5,
+    "input-inconsistent": 9
+  },
+  "after_statuses": {
+    "input-import-failed": 96,
+    "operation-succeeded": 450,
+    "operation-failed": 91,
+    "unhandled-intent": 2,
+    "input-inconsistent": 9
+  },
+  "capture_scopes": {
+    "fillet-native-contours": 161,
+    "chamfer-native-contours": 487
+  },
+  "unchanged_intent_records": 648,
+  "successful_checks": {
+    "constructed": 450,
+    "input_unchanged": 450,
+    "geometry_consistent": 450,
+    "mesh_closed": 450,
+    "step_prepared": 450,
+    "native_valid": 450,
+    "truck_step_valid": 450,
+    "single_solid": 450,
+    "sampled_distance": 418
+  },
+  "limited_comparison_passes": 418,
+  "status_changes": [
+    {
+      "case": "chamfer/dist_dist_sequence/C1",
+      "capture": "001",
+      "changed_scope": false,
+      "before": "unhandled-intent",
+      "after": "operation-succeeded"
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/C1",
+      "capture": "002",
+      "changed_scope": false,
+      "before": "unhandled-intent",
+      "after": "operation-failed"
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/C1",
+      "capture": "003",
+      "changed_scope": false,
+      "before": "unhandled-intent",
+      "after": "operation-failed"
+    }
+  ],
+  "scope_changes": [],
+  "changed_scope_check_losses": [],
+  "unchanged_intent_regressions": [],
+  "numeric_changes": [],
+  "exact_successful_results": 449,
+  "seed_capture_changes": [],
+  "native_reference_changes": [],
+  "stored_tolerances": {
+    "threshold": 0.001,
+    "inputs": [
+      {
+        "case": "chamfer/dist_angle_sequence/B5",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.01538612357827674,
+          "vertex": 0.015386123578276744
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle_sequence/B7",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.015385866787860681,
+          "vertex": 0.015385866787860684
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle_sequence/B8",
+        "capture": "003",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.09823449952410898,
+          "vertex": 0.11256746834283206
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_dist_sequence/B5",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.015385866784913394,
+          "vertex": 0.015385866784913398
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_dist_sequence/B6",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.015386123576832314,
+          "vertex": 0.015386123576832318
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/equal_dist_sequence/B6",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.015385866785128127,
+          "vertex": 0.01538586678512813
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/equal_dist_sequence/B8",
+        "capture": "003",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.06347812877808842,
+          "vertex": 0.06923484078027042
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      }
+    ],
+    "native_results": [
+      {
+        "case": "blend/simple/D1",
+        "capture": "001",
+        "tolerances": {
+          "face": 0.0001,
+          "edge": 0.8964317893944277,
+          "vertex": 1.2642307919977536
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/simple/F5",
+        "capture": "001",
+        "tolerances": {
+          "face": 0.02190790727118659,
+          "edge": 0.02190790727118659,
+          "vertex": 0.021907907271186598
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/simple/F7",
+        "capture": "001",
+        "tolerances": {
+          "face": 1e-06,
+          "edge": 1.000000006123234e-06,
+          "vertex": 0.04540290569850494
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/simple/F9",
+        "capture": "001",
+        "tolerances": {
+          "face": 1e-06,
+          "edge": 0.005381662689997078,
+          "vertex": 0.008350113249638094
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/simple/G2",
+        "capture": "001",
+        "tolerances": {
+          "face": 0.0001,
+          "edge": 0.058118986044292886,
+          "vertex": 0.08523407424694941
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/simple/H4",
+        "capture": "001",
+        "tolerances": {
+          "face": 1e-06,
+          "edge": 22.974106952046146,
+          "vertex": 22.974106952046153
+        },
+        "status": "operation-succeeded",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/tolblend_simple/A1",
+        "capture": "001",
+        "tolerances": {
+          "face": 0.002351089158340483,
+          "edge": 0.002351089158340483,
+          "vertex": 0.0023510891583404837
+        },
+        "status": "operation-succeeded",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/tolblend_simple/A2",
+        "capture": "001",
+        "tolerances": {
+          "face": 0.01616354954173985,
+          "edge": 0.01616354954173985,
+          "vertex": 0.016163549541739857
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/tolblend_simple/D3",
+        "capture": "001",
+        "tolerances": {
+          "face": 0.07389052197953262,
+          "edge": 0.08021622051706867,
+          "vertex": 0.16809285098977023
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/tolblend_simple/D5",
+        "capture": "001",
+        "tolerances": {
+          "face": 0.008070814689590054,
+          "edge": 0.008070814689590054,
+          "vertex": 0.008070814689590058
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle/F1",
+        "capture": "001",
+        "tolerances": {
+          "face": 0.0001,
+          "edge": 0.0692833518221263,
+          "vertex": 0.06928335182212686
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle_sequence/B5",
+        "capture": "001",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.01538612357827674,
+          "vertex": 0.015386123578276744
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle_sequence/B5",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.01538612357827674,
+          "vertex": 0.015696123578276745
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle_sequence/B7",
+        "capture": "001",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.015385866787860681,
+          "vertex": 0.015385866787860684
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle_sequence/B7",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 5e-05,
+          "vertex": 0.016005866787860687
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle_sequence/B8",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.09823449952410898,
+          "vertex": 0.11256746834283206
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle_sequence/B8",
+        "capture": "003",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.09823449952410898,
+          "vertex": 0.11256746834283206
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_dist_complex/B5",
+        "capture": "001",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.00036173254411125385,
+          "vertex": 0.0010531067408991698
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_dist_sequence/B5",
+        "capture": "001",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.015385866784913394,
+          "vertex": 0.015385866784913398
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_dist_sequence/B5",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 5e-05,
+          "vertex": 0.0160058667849134
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_dist_sequence/B6",
+        "capture": "001",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.015386123576832314,
+          "vertex": 0.015386123576832318
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_dist_sequence/B6",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 5e-05,
+          "vertex": 0.01600612357683232
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/equal_dist_complex/B6",
+        "capture": "001",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.00044441723946461964,
+          "vertex": 0.0012931407907644137
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/equal_dist_complex/C1",
+        "capture": "001",
+        "tolerances": {
+          "face": 3.050212492887909e-06,
+          "edge": 0.0011785994935571728,
+          "vertex": 0.0020450305471271255
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/equal_dist_sequence/B6",
+        "capture": "001",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.015385866785128127,
+          "vertex": 0.01538586678512813
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/equal_dist_sequence/B6",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 5e-05,
+          "vertex": 0.016005866785128133
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/equal_dist_sequence/B8",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.06347812877808842,
+          "vertex": 0.06923484078027042
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/equal_dist_sequence/B8",
+        "capture": "003",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.06347812877808842,
+          "vertex": 0.06923484078027042
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      }
+    ],
+    "truck_step": [],
+    "native_result_count": 647,
+    "truck_step_count": 450
+  },
+  "added_reference_samples": [
+    {
+      "case": "chamfer/dist_angle/E4",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.22181603171874997,
+          -0.33501324343749994,
+          -0.8909990646875
+        ],
+        "normal": [
+          0.6149014542435963,
+          -0.7857119754499833,
+          0.06747513025993615
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/E6",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.28499999,
+          -2.1882446378279994,
+          3.6999999999999997
+        ],
+        "normal": [
+          0,
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/E7",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          5,
+          5,
+          -1.2347978707421863
+        ],
+        "normal": [
+          -1.0412634262723298e-15,
+          -6.827871592909873e-16,
+          1
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/E8",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          1.5729481123550917,
+          7.6685868046875,
+          0.9916491363756915
+        ],
+        "normal": [
+          0.1498847971375885,
+          0.8071947859504833,
+          0.5709388103127843
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/E9",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          1.554204996086976,
+          5.182305672265625,
+          0.8034763513118486
+        ],
+        "normal": [
+          0.20895214839580128,
+          -0.5895495042957777,
+          0.7802373880207112
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/F1",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          1.554204996086976,
+          5.182305672265625,
+          0.8034763513118486
+        ],
+        "normal": [
+          0.20895214839580128,
+          -0.5895495042957777,
+          0.7802373880207112
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_complex/B1",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.22181603171874997,
+          -0.33501324343749994,
+          -0.8909990646875
+        ],
+        "normal": [
+          0.6149014542435963,
+          -0.7857119754499833,
+          0.06747513025993615
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_complex/B1",
+      "capture": "001",
+      "selection": 1,
+      "sample": {
+        "point": [
+          0.22181603171874997,
+          -0.33501324343749994,
+          -0.8909990646875
+        ],
+        "normal": [
+          0.6149014542435963,
+          -0.7857119754499833,
+          0.06747513025993615
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_complex/B2",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.22181603171874997,
+          -0.33501324343749994,
+          -0.8909990646875
+        ],
+        "normal": [
+          0.6149014542435963,
+          -0.7857119754499833,
+          0.06747513025993615
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_complex/B2",
+      "capture": "001",
+      "selection": 1,
+      "sample": {
+        "point": [
+          0.22181603171874997,
+          -0.33501324343749994,
+          -0.8909990646875
+        ],
+        "normal": [
+          0.6149014542435963,
+          -0.7857119754499833,
+          0.06747513025993615
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_complex/B3",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.014391899718750031,
+          -0.06434965812499996,
+          -0.3789415990625
+        ],
+        "normal": [
+          0.06318498420082974,
+          -0.010431674363248161,
+          0.9979473122071726
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_complex/B3",
+      "capture": "001",
+      "selection": 1,
+      "sample": {
+        "point": [
+          0.014391899718750031,
+          -0.06434965812499996,
+          -0.3789415990625
+        ],
+        "normal": [
+          0.06318498420082974,
+          -0.010431674363248161,
+          0.9979473122071726
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_complex/B3",
+      "capture": "001",
+      "selection": 2,
+      "sample": {
+        "point": [
+          -0.34854730421875,
+          -0.36838998843750004,
+          -0.820793975
+        ],
+        "normal": [
+          -0.7814761907568073,
+          -0.6236633463154112,
+          0.018411782719049922
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_complex/B4",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.014391899718750031,
+          -0.06434965812499996,
+          -0.3789415990625
+        ],
+        "normal": [
+          0.06318498420082974,
+          -0.010431674363248161,
+          0.9979473122071726
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_complex/B4",
+      "capture": "001",
+      "selection": 1,
+      "sample": {
+        "point": [
+          0.014391899718750031,
+          -0.06434965812499996,
+          -0.3789415990625
+        ],
+        "normal": [
+          0.06318498420082974,
+          -0.010431674363248161,
+          0.9979473122071726
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_complex/B4",
+      "capture": "001",
+      "selection": 2,
+      "sample": {
+        "point": [
+          -0.34854730421875,
+          -0.36838998843750004,
+          -0.820793975
+        ],
+        "normal": [
+          -0.7814761907568073,
+          -0.6236633463154112,
+          0.018411782719049922
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_complex/B8",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          -0.062188297025876825,
+          -0.2627470662754181,
+          0.6903382056737407
+        ],
+        "normal": [
+          0.9854028684824038,
+          -0.1702381820158787,
+          0.00038492931683466376
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_complex/B8",
+      "capture": "001",
+      "selection": 1,
+      "sample": {
+        "point": [
+          -0.07077559468450484,
+          0.011126408105807051,
+          0.30352366424402644
+        ],
+        "normal": [
+          -0.07510855233790271,
+          0.11586797378627528,
+          0.9904207782636467
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_complex/B8",
+      "capture": "001",
+      "selection": 2,
+      "sample": {
+        "point": [
+          -0.07077559468450484,
+          0.011126408105807051,
+          0.30352366424402644
+        ],
+        "normal": [
+          -0.07510855233790271,
+          0.11586797378627528,
+          0.9904207782636467
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_complex/B9",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          5,
+          5,
+          0.5
+        ],
+        "normal": [
+          0,
+          -0.09950371902099892,
+          0.9950371902099892
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_complex/B9",
+      "capture": "001",
+      "selection": 1,
+      "sample": {
+        "point": [
+          5,
+          5,
+          0.5
+        ],
+        "normal": [
+          0,
+          -0.09950371902099892,
+          0.9950371902099892
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_complex/B9",
+      "capture": "001",
+      "selection": 2,
+      "sample": {
+        "point": [
+          3.3333333,
+          7.5,
+          5.375
+        ],
+        "normal": [
+          -1,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/B1",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.22181603171874997,
+          -0.33501324343749994,
+          -0.8909990646875
+        ],
+        "normal": [
+          0.6149014542435963,
+          -0.7857119754499833,
+          0.06747513025993615
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/B1",
+      "capture": "002",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.2586972279727471,
+          -0.30718670898669986,
+          -0.8882349420700573
+        ],
+        "normal": [
+          0.5812657542939774,
+          -0.8115083989465205,
+          0.05986853367427701
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/B2",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.22181603171874997,
+          -0.33501324343749994,
+          -0.8909990646875
+        ],
+        "normal": [
+          0.6149014542435963,
+          -0.7857119754499833,
+          0.06747513025993615
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/B2",
+      "capture": "002",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.2586987669066475,
+          -0.30718559602752354,
+          -0.8882347976241163
+        ],
+        "normal": [
+          0.5812643976598526,
+          -0.8115093949190101,
+          0.05986820501159808
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/B3",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.014391899718750031,
+          -0.06434965812499996,
+          -0.3789415990625
+        ],
+        "normal": [
+          0.06318498420082974,
+          -0.010431674363248161,
+          0.9979473122071726
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/B3",
+      "capture": "002",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.04719612691282975,
+          -0.0382579192963074,
+          -0.38189025442603325
+        ],
+        "normal": [
+          0.1057288234698505,
+          0.023677565401932107,
+          0.9941130663985452
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/B3",
+      "capture": "003",
+      "selection": 0,
+      "sample": {
+        "point": [
+          -0.34836255611031214,
+          -0.36892293256381414,
+          -0.8484049866763517
+        ],
+        "normal": [
+          -0.7839644397637059,
+          -0.6207858541148296,
+          -0.004967948963128127
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/B4",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.014391899718750031,
+          -0.06434965812499996,
+          -0.3789415990625
+        ],
+        "normal": [
+          0.06318498420082974,
+          -0.010431674363248161,
+          0.9979473122071726
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/B4",
+      "capture": "002",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.04049982653029002,
+          -0.043568675156176184,
+          -0.3811004437974985
+        ],
+        "normal": [
+          0.09700845088055689,
+          0.016550400951936436,
+          0.9951459414005992
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/B4",
+      "capture": "003",
+      "selection": 0,
+      "sample": {
+        "point": [
+          -0.3484459447789959,
+          -0.36884071614279085,
+          -0.8420532553295141
+        ],
+        "normal": [
+          -0.7834407626149009,
+          -0.6214662947716941,
+          0.0004646892771290903
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/B5",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          -0.07077559468450484,
+          0.011126408105807051,
+          0.30352366424402644
+        ],
+        "normal": [
+          -0.07510855233790271,
+          0.11586797378627528,
+          0.9904207782636467
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/B5",
+      "capture": "002",
+      "selection": 0,
+      "sample": {
+        "point": [
+          -0.07077296622157475,
+          0.01152355414605223,
+          0.30347737548015197
+        ],
+        "normal": [
+          -0.0751448359705633,
+          0.11599839385542927,
+          0.9904027596134403
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/B7",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          -0.07077559468450484,
+          0.011126408105807051,
+          0.30352366424402644
+        ],
+        "normal": [
+          -0.07510855233790271,
+          0.11586797378627528,
+          0.9904207782636467
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/B7",
+      "capture": "002",
+      "selection": 0,
+      "sample": {
+        "point": [
+          -0.07077296622157475,
+          0.01152355414605223,
+          0.30347737548015197
+        ],
+        "normal": [
+          -0.0751448359705633,
+          0.11599839385542927,
+          0.9904027596134403
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/B8",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          -0.062188297025876825,
+          -0.2627470662754181,
+          0.6903382056737407
+        ],
+        "normal": [
+          0.9854028684824038,
+          -0.1702381820158787,
+          0.00038492931683466376
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/B8",
+      "capture": "002",
+      "selection": 0,
+      "sample": {
+        "point": [
+          -0.07077559468450484,
+          0.011126408105807051,
+          0.30352366424402644
+        ],
+        "normal": [
+          -0.07510855233790271,
+          0.11586797378627528,
+          0.9904207782636467
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/B8",
+      "capture": "003",
+      "selection": 0,
+      "sample": {
+        "point": [
+          -0.07077296624685298,
+          0.011523550327613362,
+          0.3034773759254589
+        ],
+        "normal": [
+          -0.07514483562153115,
+          0.11599839260138717,
+          0.9904027597867987
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/C1",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.0767168130078125,
+          -0.09568854492187498,
+          0.14961533300781252
+        ],
+        "normal": [
+          -0.07289680753270927,
+          0.267919144668428,
+          -0.9606796486715419
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/C1",
+      "capture": "002",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.07325099026262213,
+          -0.0913422953563477,
+          0.15104547737852875
+        ],
+        "normal": [
+          -0.07000234980816261,
+          0.25184373559787043,
+          -0.9652328236552286
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/C1",
+      "capture": "003",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.07522992927154734,
+          -0.09073188197723753,
+          0.1510551162320863
+        ],
+        "normal": [
+          -0.07474172095679144,
+          0.2473004552000019,
+          -0.9660518412623047
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/C1",
+      "capture": "004",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.07830024305481108,
+          -0.0943911272981441,
+          0.14984867995362017
+        ],
+        "normal": [
+          -0.07730985874344418,
+          0.2608731193379684,
+          -0.9622725192729691
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/C1",
+      "capture": "005",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.115596,
+          -0.14391315,
+          0.07311397572250908
+        ],
+        "normal": [
+          -0.23831073276541345,
+          0.9711889592910391,
+          0
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/C1",
+      "capture": "006",
+      "selection": 0,
+      "sample": {
+        "point": [
+          -0.07863975703125001,
+          -0.095152494765625,
+          0.09746891541438715
+        ],
+        "normal": [
+          -0.7708197036223077,
+          0.6370533608008183,
+          0
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/C1",
+      "capture": "007",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.035126555000000004,
+          -0.0441845,
+          0.10551080969558296
+        ],
+        "normal": [
+          -0.3447926955094914,
+          0.9386788572900207,
+          0
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/C1",
+      "capture": "008",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.12260399484375001,
+          6.918178859375e-09,
+          0.08520027826882662
+        ],
+        "normal": [
+          5.6426950810671137e-08,
+          -0.9999999999999983,
+          0
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/A1",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.22181603171874997,
+          -0.33501324343749994,
+          -0.8909990646875
+        ],
+        "normal": [
+          0.6149014542435963,
+          -0.7857119754499833,
+          0.06747513025993615
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/E4",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.22181603171874997,
+          -0.33501324343749994,
+          -0.8909990646875
+        ],
+        "normal": [
+          0.6149014542435963,
+          -0.7857119754499833,
+          0.06747513025993615
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/E6",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.28499999,
+          -2.1882446378279994,
+          3.6999999999999997
+        ],
+        "normal": [
+          0,
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/E7",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          5,
+          5,
+          -1.2347978707421863
+        ],
+        "normal": [
+          -1.0412634262723298e-15,
+          -6.827871592909873e-16,
+          1
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/E8",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          1.5729481123550917,
+          7.6685868046875,
+          0.9916491363756915
+        ],
+        "normal": [
+          0.1498847971375885,
+          0.8071947859504833,
+          0.5709388103127843
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/E9",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          1.554204996086976,
+          5.182305672265625,
+          0.8034763513118486
+        ],
+        "normal": [
+          0.20895214839580128,
+          -0.5895495042957777,
+          0.7802373880207112
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/F1",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          1.554204996086976,
+          5.182305672265625,
+          0.8034763513118486
+        ],
+        "normal": [
+          0.20895214839580128,
+          -0.5895495042957777,
+          0.7802373880207112
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_complex/B1",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.22181603171874997,
+          -0.33501324343749994,
+          -0.8909990646875
+        ],
+        "normal": [
+          0.6149014542435963,
+          -0.7857119754499833,
+          0.06747513025993615
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_complex/B1",
+      "capture": "001",
+      "selection": 1,
+      "sample": {
+        "point": [
+          0.22181603171874997,
+          -0.33501324343749994,
+          -0.8909990646875
+        ],
+        "normal": [
+          0.6149014542435963,
+          -0.7857119754499833,
+          0.06747513025993615
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_complex/B2",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.22181603171874997,
+          -0.33501324343749994,
+          -0.8909990646875
+        ],
+        "normal": [
+          0.6149014542435963,
+          -0.7857119754499833,
+          0.06747513025993615
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_complex/B2",
+      "capture": "001",
+      "selection": 1,
+      "sample": {
+        "point": [
+          0.22181603171874997,
+          -0.33501324343749994,
+          -0.8909990646875
+        ],
+        "normal": [
+          0.6149014542435963,
+          -0.7857119754499833,
+          0.06747513025993615
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_complex/B3",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.014391899718750031,
+          -0.06434965812499996,
+          -0.3789415990625
+        ],
+        "normal": [
+          0.06318498420082974,
+          -0.010431674363248161,
+          0.9979473122071726
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_complex/B3",
+      "capture": "001",
+      "selection": 1,
+      "sample": {
+        "point": [
+          0.014391899718750031,
+          -0.06434965812499996,
+          -0.3789415990625
+        ],
+        "normal": [
+          0.06318498420082974,
+          -0.010431674363248161,
+          0.9979473122071726
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_complex/B3",
+      "capture": "001",
+      "selection": 2,
+      "sample": {
+        "point": [
+          -0.34854730421875,
+          -0.36838998843750004,
+          -0.820793975
+        ],
+        "normal": [
+          -0.7814761907568073,
+          -0.6236633463154112,
+          0.018411782719049922
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_complex/B4",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.014391899718750031,
+          -0.06434965812499996,
+          -0.3789415990625
+        ],
+        "normal": [
+          0.06318498420082974,
+          -0.010431674363248161,
+          0.9979473122071726
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_complex/B4",
+      "capture": "001",
+      "selection": 1,
+      "sample": {
+        "point": [
+          0.014391899718750031,
+          -0.06434965812499996,
+          -0.3789415990625
+        ],
+        "normal": [
+          0.06318498420082974,
+          -0.010431674363248161,
+          0.9979473122071726
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_complex/B4",
+      "capture": "001",
+      "selection": 2,
+      "sample": {
+        "point": [
+          -0.34854730421875,
+          -0.36838998843750004,
+          -0.820793975
+        ],
+        "normal": [
+          -0.7814761907568073,
+          -0.6236633463154112,
+          0.018411782719049922
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_complex/B5",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          -0.07077559468450484,
+          0.011126408105807051,
+          0.30352366424402644
+        ],
+        "normal": [
+          -0.07510855233790271,
+          0.11586797378627528,
+          0.9904207782636467
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_complex/B5",
+      "capture": "001",
+      "selection": 1,
+      "sample": {
+        "point": [
+          -0.07077559468450484,
+          0.011126408105807051,
+          0.30352366424402644
+        ],
+        "normal": [
+          -0.07510855233790271,
+          0.11586797378627528,
+          0.9904207782636467
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_complex/B8",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          -0.062188297025876825,
+          -0.2627470662754181,
+          0.6903382056737407
+        ],
+        "normal": [
+          0.9854028684824038,
+          -0.1702381820158787,
+          0.00038492931683466376
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_complex/B8",
+      "capture": "001",
+      "selection": 1,
+      "sample": {
+        "point": [
+          -0.07077559468450484,
+          0.011126408105807051,
+          0.30352366424402644
+        ],
+        "normal": [
+          -0.07510855233790271,
+          0.11586797378627528,
+          0.9904207782636467
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_complex/B8",
+      "capture": "001",
+      "selection": 2,
+      "sample": {
+        "point": [
+          -0.07077559468450484,
+          0.011126408105807051,
+          0.30352366424402644
+        ],
+        "normal": [
+          -0.07510855233790271,
+          0.11586797378627528,
+          0.9904207782636467
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_complex/B9",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          5,
+          5,
+          0.5
+        ],
+        "normal": [
+          0,
+          -0.09950371902099892,
+          0.9950371902099892
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_complex/B9",
+      "capture": "001",
+      "selection": 1,
+      "sample": {
+        "point": [
+          5,
+          5,
+          0.5
+        ],
+        "normal": [
+          0,
+          -0.09950371902099892,
+          0.9950371902099892
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_complex/B9",
+      "capture": "001",
+      "selection": 2,
+      "sample": {
+        "point": [
+          3.3333333,
+          7.5,
+          5.375
+        ],
+        "normal": [
+          -1,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/B1",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.22181603171874997,
+          -0.33501324343749994,
+          -0.8909990646875
+        ],
+        "normal": [
+          0.6149014542435963,
+          -0.7857119754499833,
+          0.06747513025993615
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/B1",
+      "capture": "002",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.258698794701792,
+          -0.30718557592607076,
+          -0.8882347950152132
+        ],
+        "normal": [
+          0.5812643731573165,
+          -0.8115094129075068,
+          0.05986819907551554
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/B2",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.22181603171874997,
+          -0.33501324343749994,
+          -0.8909990646875
+        ],
+        "normal": [
+          0.6149014542435963,
+          -0.7857119754499833,
+          0.06747513025993615
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/B2",
+      "capture": "002",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.25869880370274556,
+          -0.3071855694165801,
+          -0.8882347941703671
+        ],
+        "normal": [
+          0.5812643652226147,
+          -0.811509418732755,
+          0.05986819715322279
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/B3",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.014391899718750031,
+          -0.06434965812499996,
+          -0.3789415990625
+        ],
+        "normal": [
+          0.06318498420082974,
+          -0.010431674363248161,
+          0.9979473122071726
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/B3",
+      "capture": "002",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.04580983090139432,
+          -0.039356723161061646,
+          -0.3817187421288264
+        ],
+        "normal": [
+          0.1039226427327159,
+          0.022195550956428747,
+          0.9943376900455845
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/B3",
+      "capture": "003",
+      "selection": 0,
+      "sample": {
+        "point": [
+          -0.34816619724340797,
+          -0.3690055454464174,
+          -0.8591304803537418
+        ],
+        "normal": [
+          -0.7847762514052445,
+          -0.619616206386044,
+          -0.014212389457780547
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/B4",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.014391899718750031,
+          -0.06434965812499996,
+          -0.3789415990625
+        ],
+        "normal": [
+          0.06318498420082974,
+          -0.010431674363248161,
+          0.9979473122071726
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/B4",
+      "capture": "002",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.02974812812586359,
+          -0.05211223744754204,
+          -0.380035078530675
+        ],
+        "normal": [
+          0.08303732047466603,
+          0.005278490660140707,
+          0.9965324585505172
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/B4",
+      "capture": "003",
+      "selection": 0,
+      "sample": {
+        "point": [
+          -0.3484142909526207,
+          -0.3688778300810735,
+          -0.8446904962732914
+        ],
+        "normal": [
+          -0.7836619423841338,
+          -0.6211849695131046,
+          -0.0017870953331436078
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/B5",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          -0.07077559468450484,
+          0.011126408105807051,
+          0.30352366424402644
+        ],
+        "normal": [
+          -0.07510855233790271,
+          0.11586797378627528,
+          0.9904207782636467
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/B5",
+      "capture": "002",
+      "selection": 0,
+      "sample": {
+        "point": [
+          -0.07077296622157475,
+          0.011523554146052562,
+          0.3034773754801519
+        ],
+        "normal": [
+          -0.07514483597056332,
+          0.1159983938554294,
+          0.9904027596134403
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/B6",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          -0.07077559468450484,
+          0.011126408105807051,
+          0.30352366424402644
+        ],
+        "normal": [
+          -0.07510855233790271,
+          0.11586797378627528,
+          0.9904207782636467
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/B6",
+      "capture": "002",
+      "selection": 0,
+      "sample": {
+        "point": [
+          -0.07077296622157475,
+          0.01152355414605223,
+          0.30347737548015197
+        ],
+        "normal": [
+          -0.0751448359705633,
+          0.11599839385542927,
+          0.9904027596134403
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/C1",
+      "capture": "001",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.0767168130078125,
+          -0.09568854492187498,
+          0.14961533300781252
+        ],
+        "normal": [
+          -0.07289680753270927,
+          0.267919144668428,
+          -0.9606796486715419
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/C1",
+      "capture": "002",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.07325101604950907,
+          -0.09134232768477335,
+          0.15104546707339167
+        ],
+        "normal": [
+          -0.07000237135664612,
+          0.25184385541272875,
+          -0.965232790830947
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/C1",
+      "capture": "003",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.07522995805769148,
+          -0.09073187275653387,
+          0.1510551163653678
+        ],
+        "normal": [
+          -0.07474179669619435,
+          0.24730038170993188,
+          -0.9660518542152624
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/C1",
+      "capture": "004",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.07830027388235496,
+          -0.09439111797696986,
+          0.14984868000388574
+        ],
+        "normal": [
+          -0.07730993693544887,
+          0.2608730453966168,
+          -0.9622725330365257
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/C1",
+      "capture": "005",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.115596,
+          -0.14391315,
+          0.07801819065746282
+        ],
+        "normal": [
+          -0.23831073276541345,
+          0.9711889592910391,
+          0
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/C1",
+      "capture": "006",
+      "selection": 0,
+      "sample": {
+        "point": [
+          -0.07863975703125001,
+          -0.095152494765625,
+          0.09660483165980756
+        ],
+        "normal": [
+          -0.7708197036223077,
+          0.6370533608008183,
+          0
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/C1",
+      "capture": "007",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.035126555000000004,
+          -0.0441845,
+          0.10507582448300559
+        ],
+        "normal": [
+          -0.3447926955094914,
+          0.9386788572900207,
+          0
+        ]
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/C1",
+      "capture": "008",
+      "selection": 0,
+      "sample": {
+        "point": [
+          0.12260399484375001,
+          6.918178859375e-09,
+          0.09140509217454712
+        ],
+        "normal": [
+          5.6426950810671137e-08,
+          -0.9999999999999983,
+          0
+        ]
+      }
+    }
+  ],
+  "input_scope_counts": {
+    "no-solid": 88,
+    "solid": 560
+  },
+  "matched_native_rejections": [
+    {
+      "case": "bugs/moddata_1/bug119",
+      "capture": "001"
+    }
+  ],
+  "positive_solid_reference_count": 559,
+  "unchanged_failure_diagnostic_changes": [
+    {
+      "case": "chamfer/dist_angle_sequence/C1",
+      "capture": "001",
+      "before": {
+        "comparison": "unverified",
+        "result": {
+          "reason": "Face-dependent chamfers require a captured reference plane, cylinder or cone",
+          "selection_scope": "native-contours",
+          "status": "unhandled-intent",
+          "step_fitting_tolerance": 1e-07
+        },
+        "schema_version": 1,
+        "stage": "physical-selection",
+        "tolerance": 0.001
+      },
+      "after": {
+        "comparison": "unverified",
+        "result": {
+          "reason": "Face-dependent chamfers require planar supports, a perpendicular plane/cylinder or plane/cone rim, or a longitudinal plane/cylinder edge",
+          "selection_scope": "native-contours",
+          "status": "unhandled-intent",
+          "step_fitting_tolerance": 1e-07
+        },
+        "schema_version": 1,
+        "stage": "physical-selection",
+        "tolerance": 0.001
+      }
+    }
+  ]
+}

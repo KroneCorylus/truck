@@ -3,7 +3,7 @@
     "title": "Fillet and chamfer feature parity audit",
     "baseline": "OCCT V7_9_3 source inventory plus the recorded Truck/Pieza revisions. Includes 3D, 2D, related workflows and all textual candidates under the discovery rules.",
     "meaning_of_all": "Every dedicated test-grid entry, matching registered test/helper, discovered blend command and retained reference in this pinned checkout. This is not a claim about all mathematical configurations or current/future OCCT releases.",
-    "execution": "Clean capture: all 396 native cases pass across 648 operations. 449 constructions (+4) and 418 limited comparison passes (+3). All prior successful checks survive; 442 complete prior records are exactly unchanged. 3 prior numerical changes and 0 unchanged-status diagnostic changes. Native references and selection scopes are unchanged. The three A3 records differ only in mesh and exported-solid volume values, by at most 1.53e-14; sampled distances and all checks are unchanged. The three newly constructed C3 cases pass comparisons (maximum distance 2.101e-8). The newly constructed C1 case passes structural checks but still differs from the native shape by up to 0.008422, above the unchanged 0.001 threshold.",
+    "execution": "Clean capture: all 396 native cases pass across 648 operations. 450 constructions (+1) and 418 limited comparison passes (+0). All prior successful checks survive; 449 prior complete result/comparison records are exactly unchanged. 0 prior numerical changes. 94 reference samples were added; all other task fields, native references and selection scopes are unchanged. Of the 648 operations, 559 have valid solid inputs and native solid results; 88 have no solid input, and 1 is an expected native rejection that Truck also rejects.",
     "mapping": "Capability assessments describe observable outcomes supported or restricted by reviewed source evidence. Per-case tags and links are automated hints; they do not prove Truck handles that fixture.",
     "objective": "Achieve at least OCCT-level fillet/chamfer capabilities and robustness for equivalent modeling tasks in Truck/Pieza.",
     "equivalence": "Judge the requested geometry, dimensions, validity, editing behavior and practical performance. Different APIs, algorithms, languages, surface representations and internal operation sequences are acceptable. Missing a corresponding OCCT method is not evidence of a feature gap."
@@ -499,6 +499,12 @@
           "path": "truck-benchmarks/results/2026-10-21-clipped-chamfer-contacts/REPORT.md",
           "find": "# Clipped chamfer contacts and terminal intersections",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-21-normal-section-chamfers/REPORT.md",
+          "find": "# Normal-section chamfers and sampled reference faces",
+          "role": "test"
         }
       ],
       "required_outcome": "Bevel selected edges by equal specified setbacks on both supports, including convex and concave material.",
@@ -520,7 +526,8 @@
         "At2ea838f2, projected conic sections unwrap periodic endpoints locally and preserve explicit bounded long arcs and reversal. Three parent failures plus long-arc guard;three scales,two solid variants,three native controls with independent material/contact/STEP/history/input checks.424shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:438/408,no prior check regression. No parity upgrade.",
         "Ateea16d36, mixed disjoint chamfer components use the existing single-edge constructor when needed, preserving side orientation, remaining selections and earlier bevels. Three parent failures plus overlap guard;18positive/6negative variants,3native controls with independent material/contact/STEP/history/input checks.428shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:441/411,all438prior records exact. No parity upgrade.",
         "At fdc8092c, tilted planar-cap chamfer contacts continue over parallel convex cylindrical and planar supports. Two parent failures;four independent native controls,three distance passes and one explicitly retained10-degree discrepancy.442shapeops/115stepio/59replay/13capture,Clippy/smoke pass;baseline geometry precision failure retained. Clean capture:444/414;all443prior checks retained. No parity upgrade.",
-        "At bb56dfdd, clipped contact curves and terminal intersections pass two parent-failing parabolic tests,12 operations,3096 contact samples and independent material. Three fresh native controls pass;max distance5.323e-6.446shapeops/115stepio/62replay/13capture,Clippy/smoke pass. Clean capture:449/418;no prior check regressions. C1 discrepancies remain;no parity upgrade."
+        "At bb56dfdd, clipped contact curves and terminal intersections pass two parent-failing parabolic tests,12 operations,3096 contact samples and independent material. Three fresh native controls pass;max distance5.323e-6.446shapeops/115stepio/62replay/13capture,Clippy/smoke pass. Clean capture:449/418;no prior check regressions. C1 discrepancies remain;no parity upgrade.",
+        "At 40aa15af, explicit normal-section chord contacts and sampled reference faces pass parent-failing geometry/replay/native regressions. 24 kernel and 48 replay operations verify independent material and 9360 contact samples. Six native controls agree within2.8e-12 sampled distance. 448shapeops/115stepio/64replay/13capture,Clippy/smoke pass. Clean capture:450/418;no prior check regressions. C1 discrepancies remain;no parity upgrade."
       ]
     },
     {
@@ -702,6 +709,12 @@
           "path": "truck-benchmarks/results/2026-10-21-clipped-chamfer-contacts/REPORT.md",
           "find": "# Clipped chamfer contacts and terminal intersections",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-21-normal-section-chamfers/REPORT.md",
+          "find": "# Normal-section chamfers and sampled reference faces",
+          "role": "test"
         }
       ],
       "required_outcome": "Bevel with independently specified setbacks on the intended two support faces; orientation or storage order must not silently exchange them.",
@@ -729,7 +742,8 @@
         "At2ea838f2, projected conic sections unwrap periodic endpoints locally and preserve explicit bounded long arcs and reversal. Three parent failures plus long-arc guard;three scales,two solid variants,three native controls with independent material/contact/STEP/history/input checks.424shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:438/408,no prior check regression. No parity upgrade.",
         "Ateea16d36, mixed disjoint chamfer components use the existing single-edge constructor when needed, preserving side orientation, remaining selections and earlier bevels. Three parent failures plus overlap guard;18positive/6negative variants,3native controls with independent material/contact/STEP/history/input checks.428shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:441/411,all438prior records exact. No parity upgrade.",
         "At 51e2c1ec, unequal tilted-cap replay preserves reference-side assignments. One parent failure;32 reference/order variants and6336 contact samples;eight independent controls,five distance passes and three retained discrepancies.62replay/13capture,Clippy/smoke pass;unchanged core evidence and baseline geometry precision failure retained. Clean capture:445/415;all444prior checks retained. No parity upgrade.",
-        "At bb56dfdd, clipped contact curves and terminal intersections pass two parent-failing parabolic tests,12 operations,3096 contact samples and independent material. Three fresh native controls pass;max distance5.323e-6.446shapeops/115stepio/62replay/13capture,Clippy/smoke pass. Clean capture:449/418;no prior check regressions. C1 discrepancies remain;no parity upgrade."
+        "At bb56dfdd, clipped contact curves and terminal intersections pass two parent-failing parabolic tests,12 operations,3096 contact samples and independent material. Three fresh native controls pass;max distance5.323e-6.446shapeops/115stepio/62replay/13capture,Clippy/smoke pass. Clean capture:449/418;no prior check regressions. C1 discrepancies remain;no parity upgrade.",
+        "At 40aa15af, explicit normal-section chord contacts and sampled reference faces pass parent-failing geometry/replay/native regressions. 24 kernel and 48 replay operations verify independent material and 9360 contact samples. Six native controls agree within2.8e-12 sampled distance. 448shapeops/115stepio/64replay/13capture,Clippy/smoke pass. Clean capture:450/418;no prior check regressions. C1 discrepancies remain;no parity upgrade."
       ]
     },
     {
@@ -970,7 +984,7 @@
         {
           "repo": "truck",
           "path": "truck-shapeops/src/fillet/chamfer.rs",
-          "find": "surface.search_nearest_parameter(p + w * distance",
+          "find": "fn contact_parameter<S>(",
           "role": "implementation"
         },
         {
@@ -1044,6 +1058,12 @@
           "path": "truck-benchmarks/results/2026-10-21-clipped-chamfer-contacts/REPORT.md",
           "find": "# Clipped chamfer contacts and terminal intersections",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-21-normal-section-chamfers/REPORT.md",
+          "find": "# Normal-section chamfers and sampled reference faces",
+          "role": "test"
         }
       ],
       "required_outcome": "Produce the intended measurable setbacks on curved supports after explicitly translating dimension conventions between kernels.",
@@ -1058,7 +1078,8 @@
         "At fdc8092c, tilted planar-cap chamfer contacts continue over parallel convex cylindrical and planar supports. Two parent failures;four independent native controls,three distance passes and one explicitly retained10-degree discrepancy.442shapeops/115stepio/59replay/13capture,Clippy/smoke pass;baseline geometry precision failure retained. Clean capture:444/414;all443prior checks retained. No parity upgrade.",
         "At 51e2c1ec, unequal tilted-cap replay preserves reference-side assignments. One parent failure;32 reference/order variants and6336 contact samples;eight independent controls,five distance passes and three retained discrepancies.62replay/13capture,Clippy/smoke pass;unchanged core evidence and baseline geometry precision failure retained. Clean capture:445/415;all444prior checks retained. No parity upgrade.",
         "At 81755598, bounded local chamfer contact fitting passes two parent-failing curved-cap regressions, twelve fits and98328 dense checks within unchanged sample budget/tolerance. Downstream face trimming remains unsupported. 445/415 clean corpus; no parity upgrade.",
-        "At bb56dfdd, clipped contact curves and terminal intersections pass two parent-failing parabolic tests,12 operations,3096 contact samples and independent material. Three fresh native controls pass;max distance5.323e-6.446shapeops/115stepio/62replay/13capture,Clippy/smoke pass. Clean capture:449/418;no prior check regressions. C1 discrepancies remain;no parity upgrade."
+        "At bb56dfdd, clipped contact curves and terminal intersections pass two parent-failing parabolic tests,12 operations,3096 contact samples and independent material. Three fresh native controls pass;max distance5.323e-6.446shapeops/115stepio/62replay/13capture,Clippy/smoke pass. Clean capture:449/418;no prior check regressions. C1 discrepancies remain;no parity upgrade.",
+        "At 40aa15af, explicit normal-section chord contacts and sampled reference faces pass parent-failing geometry/replay/native regressions. 24 kernel and 48 replay operations verify independent material and 9360 contact samples. Six native controls agree within2.8e-12 sampled distance. 448shapeops/115stepio/64replay/13capture,Clippy/smoke pass. Clean capture:450/418;no prior check regressions. C1 discrepancies remain;no parity upgrade."
       ]
     },
     {

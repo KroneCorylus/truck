@@ -1,6 +1,6 @@
 LATEST CHECKPOINT — 2026-10-21
-Read ../2026-10-21-clipped-chamfer-contacts/HANDOFF.txt and report.html.
-Implementation bb56dfdd preserves clipped contacts and terminal intersections. 449 constructions/418 limited passes. Native discrepancies and baseline geometry precision failure remain open. Use target/occt-span-volume-plugin.
+Read ../2026-10-21-normal-section-chamfers/HANDOFF.txt and report.html.
+Implementation 40aa15af adds explicit normal-section chamfers and sampled reference faces. 450 constructions/418 limited passes. C1 comparison/continuation and geometry precision issues remain. Use target/occt-reference-sample-plugin.
 
 HISTORICAL HANDOFF FOLLOWS
 
