@@ -1,0 +1,31 @@
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 1.96s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/parabolic_cap_chamfer.rs (target/release/deps/parabolic_cap_chamfer-eb0fe117aa397a87)
+
+running 2 tests
+test parabolic_cap_chamfers_preserve_clipped_contacts_and_material ... FAILED
+test transformed_parabolic_cap_chamfers_preserve_clipped_contacts_and_material ... FAILED
+
+failures:
+
+---- parabolic_cap_chamfers_preserve_clipped_contacts_and_material stdout ----
+
+thread 'parabolic_cap_chamfers_preserve_clipped_contacts_and_material' (343267) panicked at truck-shapeops/tests/parabolic_cap_chamfer.rs:79:22:
+parabolic contacts meet the original terminal planes: Diagnostic { code: BlendConstructionFailed, operation: "chamfer_solid_along_wire", stage: "trim_faces", message: "Blend construction failed; the numerical or geometric constraint could not be resolved.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: Some(0), related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- transformed_parabolic_cap_chamfers_preserve_clipped_contacts_and_material stdout ----
+
+thread 'transformed_parabolic_cap_chamfers_preserve_clipped_contacts_and_material' (343268) panicked at truck-shapeops/tests/parabolic_cap_chamfer.rs:79:22:
+parabolic contacts meet the original terminal planes: Diagnostic { code: BlendConstructionFailed, operation: "chamfer_solid_along_wire", stage: "trim_faces", message: "Blend construction failed; the numerical or geometric constraint could not be resolved.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: Some(0), related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+
+
+failures:
+    parabolic_cap_chamfers_preserve_clipped_contacts_and_material
+    transformed_parabolic_cap_chamfers_preserve_clipped_contacts_and_material
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p truck-shapeops --test parabolic_cap_chamfer`

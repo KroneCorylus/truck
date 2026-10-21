@@ -6,6 +6,13 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Breaking: generic `chamfer_along_wire` and `try_chamfer_along_wire` now require
+  `IntersectionCurve<C, S, S>: ToSameGeometry<C>` to retain clipped contacts and
+  intersect curved end boundaries. Add that bound to generic callers or use the
+  existing modeling-solid wrappers; their signatures and consumer calls are unchanged.
+  Parabolic-cap controls cover unequal setbacks, reversed edges, rigid transforms,
+  independently integrated material, contact distances, topology and STEP.
+
 - Correct audit volume measurements by integrating B-spline surface and boundary
   spans explicitly on a copy of the reference shape. Preserve historical records;
   verify an exact spline-prism integral, analytic controls and immutable inputs.

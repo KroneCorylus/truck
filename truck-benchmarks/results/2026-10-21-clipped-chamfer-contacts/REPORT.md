@@ -1,0 +1,15 @@
+# Clipped chamfer contacts and terminal intersections
+
+Keep the trimmed support contact curves after face trimming. Recover their endpoint parameters on the original ruled surface: reversing a trimmed B-spline changes its parameter origin, so its new scalar range cannot be reused as the original surface coordinate. Preserve existing end rulings when they already lie on the terminal face; otherwise intersect the original chamfer and terminal supports, checking sampled solutions, transverse normals and endpoints before accepting the new boundary.
+
+Breaking generic bound: chamfer_along_wire and try_chamfer_along_wire require IntersectionCurve<C,S,S>:ToSameGeometry<C>. The modeling wrappers have unchanged signatures. The only consumer call found is PiezaCAD/cad-core/src/kernel/blend.rs:229, using try_chamfer_solid_along_wire; it needs no migration. No consumer files or pins changed.
+
+Two tests fail on parent fdba44c6 at trim_faces. The unchanged tests pass twelve operations: three cap/wall setback pairs, both edge directions and a rigid transform. They verify independent material, 3,096 contact-distance samples, topology, geometric consistency, closed meshes, STEP and immutable inputs. No prior assertion was weakened.
+
+Independent material derivation: the top is f(t)=1+k*(t-1/2)^2, k=0.4, swept across unit width. Contact points are (cap,t,f(t)) and (0,t+wall*f'(t)/sqrt(1+f'(t)^2),f(t)-wall/sqrt(1+f'(t)^2)). With r=lambda*wall, solve u/(2*k)+r*u/sqrt(1+u^2)=1/2 for the clipped positive endpoint slope. The removed volume is cap times the integral from lambda=0 to1 of 2*F, where F=r*(u*sqrt(1+u^2)+asinh(u))/(4*k)+r^2*(u+atan(u))/2+k*r^3*u^3/(3*(1+u^2)^(3/2)). Composite Simpson values at128,256,512,1024 intervals agree to displayed precision. Retained volumes are1.0282092032510828,1.030257419115786,1.030258855283983 for setbacks(.1,.1),(.1,.06),(.06,.1).
+
+Three fresh native controls preserve their inputs and give valid solids. Exported Truck controls pass validity, single-solid and bidirectional sampled boundary comparisons at unchanged0.001. Maximum sampled distance is5.322124042307376e-6; maximum exported volume error against the independent calculation is1.4971202055846788e-10. Native controls differ from that calculation by at most8.2e-8. Volume tools use the corrected span integration from2b125f41.
+
+Full release validation:446 shapeops passes/one existing ignore,115 stepio passes,62 replay tests,13 capture tests,all-target Clippy and single-thread actions smoke. Replay built last. Unchanged geometry/modeling/meshalgo hashes retain prior evidence, including the unresolved parent pcurve_derivation precision failure. No performance or global error-bound claim.
+
+C1 native corpus discrepancies remain unresolved; this checkpoint proves the clipped-contact mechanism using independent controls. The clean capture after the implementation commit records actual scope and any new constructions. The earlier native-volume checkpoint preserves the separate C1 investigation and failed comparisons.

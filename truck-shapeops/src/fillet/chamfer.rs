@@ -379,7 +379,8 @@ where
 /// contact curves. This includes the rim of a prism with filleted vertical edges.
 ///
 /// Each open end must terminate on a single face at the contact endpoints; both ends may
-/// share that face. The chamfer must fit
+/// share that face. Clipped contacts keep their support geometry, with intersection curves
+/// closing the chamfer against terminal faces. The chamfer must fit
 /// inside its supporting faces and avoid distant faces. Branching selections and non-tangent
 /// corners are unsupported. Original faces retain their
 /// order, followed by one ruled chamfer face per wire edge. Returns `None` on failed construction.
@@ -395,6 +396,7 @@ where
     S: FilletedSurface<C> + SearchNearestParameter<D2, Point = Point3>,
     PCurve<BSplineCurve<Point2>, S>: ToSameGeometry<C>,
     BSplineSurface<Point3>: ToSameGeometry<S>,
+    IntersectionCurve<C, S, S>: ToSameGeometry<C>,
 {
     try_chamfer_along_wire(shell, wire, d0, d1, tol).ok()
 }
@@ -412,6 +414,7 @@ where
     S: FilletedSurface<C> + SearchNearestParameter<D2, Point = Point3>,
     PCurve<BSplineCurve<Point2>, S>: ToSameGeometry<C>,
     BSplineSurface<Point3>: ToSameGeometry<S>,
+    IntersectionCurve<C, S, S>: ToSameGeometry<C>,
 {
     try_chamfer_along_wire_with_trim(
         shell,
@@ -438,6 +441,7 @@ where
     S: FilletedSurface<C> + SearchNearestParameter<D2, Point = Point3>,
     PCurve<BSplineCurve<Point2>, S>: ToSameGeometry<C>,
     BSplineSurface<Point3>: ToSameGeometry<S>,
+    IntersectionCurve<C, S, S>: ToSameGeometry<C>,
 {
     let operation = "chamfer_along_wire";
     validate_tolerance(tol, operation)?;
@@ -598,8 +602,32 @@ where
             };
         }
     }
+    if !continue_contacts {
+        for (contact, edges) in contacts.iter_mut().zip(&trimmed.contacts) {
+            *contact = edges.each_ref().map(Edge::oriented_curve);
+        }
+    }
     let n = wire.len();
     let nv = if closed { n } else { n + 1 };
+    let cross_parameters = |k: usize, j: usize, at_end: bool| -> Option<[f64; 2]> {
+        let (a, b) = surfaces[k].range_tuple().0;
+        let hint = if at_end { b } else { a };
+        let mut parameters = [hint; 2];
+        for (side, parameter) in parameters.iter_mut().enumerate() {
+            let column = if side == 0 { sides[k].0 } else { sides[k].1 };
+            let point = trimmed.vertices[j][side].point();
+            if !surfaces[k].subs(hint, column).near(&point) {
+                let curve = surfaces[k].row_curve(column as usize);
+                *parameter = curve
+                    .search_nearest_parameter(point, Some(hint), 100)?
+                    .clamp(a, b);
+                if !curve.subs(*parameter).near(&point) {
+                    return None;
+                }
+            }
+        }
+        Some(parameters)
+    };
     let mut cross = Vec::new();
     for k in 0..n {
         for (side, curve) in contacts[k].iter().enumerate() {
@@ -612,19 +640,33 @@ where
                 return Err(failed().stage("trim_faces").selection(k));
             }
         }
-        let t = surfaces[k].range_tuple().0 .0;
+        let parameters =
+            cross_parameters(k, k, false).ok_or_else(|| failed().stage("trim_faces"))?;
         cross.push(ruling_edge(
-            (&trimmed.vertices[k][0], Point2::new(t, sides[k].0)),
-            (&trimmed.vertices[k][1], Point2::new(t, sides[k].1)),
+            (
+                &trimmed.vertices[k][0],
+                Point2::new(parameters[0], sides[k].0),
+            ),
+            (
+                &trimmed.vertices[k][1],
+                Point2::new(parameters[1], sides[k].1),
+            ),
             surfaces[k].to_same_geometry(),
         ));
     }
     if !closed {
         let k = n - 1;
-        let t = surfaces[k].range_tuple().0 .1;
+        let parameters =
+            cross_parameters(k, n, true).ok_or_else(|| failed().stage("trim_faces"))?;
         cross.push(ruling_edge(
-            (&trimmed.vertices[n][0], Point2::new(t, sides[k].0)),
-            (&trimmed.vertices[n][1], Point2::new(t, sides[k].1)),
+            (
+                &trimmed.vertices[n][0],
+                Point2::new(parameters[0], sides[k].0),
+            ),
+            (
+                &trimmed.vertices[n][1],
+                Point2::new(parameters[1], sides[k].1),
+            ),
             surfaces[k].to_same_geometry(),
         ));
         let mut ends: Vec<(usize, Vec<usize>)> = Vec::new();
@@ -645,6 +687,34 @@ where
             let [(index, _)] = candidates.as_slice() else {
                 return Err(failed().stage("trim_end_faces"));
             };
+            let surface = shell[*index].oriented_surface();
+            let guide = cross[j].curve();
+            let (a, b) = guide.range_tuple();
+            if (0..=16).any(|i| {
+                let point = guide.subs(a + (b - a) * i as f64 / 16.);
+                surface.search_parameter(point, None, 100).is_none()
+            }) {
+                let k = if j == 0 { 0 } else { n - 1 };
+                let intersection =
+                    IntersectionCurve::new(surface, surfaces[k].to_same_geometry(), guide);
+                for i in 0..=32 {
+                    let t = a + (b - a) * i as f64 / 32.;
+                    let (point, uv0, uv1) = intersection
+                        .search_triple(t, 100)
+                        .ok_or_else(|| failed().stage("trim_end_faces"))?;
+                    let normal0 = intersection.surface0().normal(uv0.x, uv0.y);
+                    let normal1 = intersection.surface1().normal(uv1.x, uv1.y);
+                    let transverse = normal0.cross(normal1).magnitude2();
+                    if !transverse.is_finite()
+                        || transverse <= TOLERANCE2
+                        || (i == 0 && !point.near(&cross[j].front().point()))
+                        || (i == 32 && !point.near(&cross[j].back().point()))
+                    {
+                        return Err(failed().stage("trim_end_faces"));
+                    }
+                }
+                cross[j].set_curve(intersection.to_same_geometry());
+            }
             if let Some((_, junctions)) = ends.iter_mut().find(|(i, _)| i == index) {
                 junctions.push(j);
             } else {

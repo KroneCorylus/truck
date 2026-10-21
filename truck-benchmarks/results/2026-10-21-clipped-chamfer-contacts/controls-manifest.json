@@ -1,0 +1,241 @@
+{
+  "archive_sha256": "fa93f1bfa9cfb2b6b6309c6dc664ec47299fd4cba6d01b3f28e49e031027dd1d",
+  "members": {
+    "native-parabolic-chamfer/summary.json": "3cf7838659468f416ed8b0c6e16f8c6c535702303fec5e13b1700c1fadb5438b",
+    "native-parabolic-chamfer/0.input.brep": "0519d5e0d33616ebabe50ccaee3b3e657637c4662abb04fd984c98ab2b5e15f8",
+    "native-parabolic-chamfer/0.input.step": "f6973d9cc75b581f5bd9ce6f6f7b6a408919af721908ce36d2e1ab5ae2109267",
+    "native-parabolic-chamfer/0.result.brep": "c6a07258b2863d40f8f447198379e2759e294396d79fc423bcb2cfe84efbf810",
+    "native-parabolic-chamfer/0.result.step": "87ebe36b65ec1027d8f91e0a5922022c9f8ffcecdf5824f066ab4b4443200a08",
+    "native-parabolic-chamfer/1.input.brep": "0519d5e0d33616ebabe50ccaee3b3e657637c4662abb04fd984c98ab2b5e15f8",
+    "native-parabolic-chamfer/1.input.step": "3c57ea92361b24c7e970dd89f58c16906736b5b7d45e319b3e996ccbdff029fb",
+    "native-parabolic-chamfer/1.result.brep": "4d27672f3ad17210a92cb4356452744e3d5210aa9ebdcb981affed84caf495fa",
+    "native-parabolic-chamfer/1.result.step": "453423eef2fb38cdb54c02bbf71a681e6b94a0791302c3eb0ae38bc42ab87482",
+    "native-parabolic-chamfer/2.input.brep": "0519d5e0d33616ebabe50ccaee3b3e657637c4662abb04fd984c98ab2b5e15f8",
+    "native-parabolic-chamfer/2.input.step": "9b20d3bfeeb2f06582362b82d5d7b982d66a45e024de83e92cff71eae462f058",
+    "native-parabolic-chamfer/2.result.brep": "2937e4566b7c379a5c9f396eecadf30775de8e9acc58b871f660a6a66da684fb",
+    "native-parabolic-chamfer/2.result.step": "6fa7a1dc470077e8b086b062ffaef0897eb59b1d33c1c9c45217c3463ba6ce3c",
+    "truck-parabolic-chamfer/0.input.step": "7cf2499a7ffb6a02d607277bc916f754b7f265e286a2f84c8e68b52e1d69eb01",
+    "truck-parabolic-chamfer/0.result.step": "284fe4efca133130112e4606e69272c609c52417be3463477fc79817b6c57340",
+    "truck-parabolic-chamfer/1.input.step": "1b82cd32e3741d53cf2a28c66c241008260621b0ce2fbe38c66fbc51fdf7b956",
+    "truck-parabolic-chamfer/1.result.step": "41cd9ad8038386664bff29bfe3bec3b90477391b5b7234677fa604a75094b4b8",
+    "truck-parabolic-chamfer/2.input.step": "9a9246daf84bbb108d7330e62c1a1a85213596ecddb770c03553643984744c39",
+    "truck-parabolic-chamfer/2.result.step": "49316ae1fb274605d992c2952163119140b8c7f41b4f3a899b0e6997c1d55b7c",
+    "truck-parabolic-chamfer/0.input.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "truck-parabolic-chamfer/0.input.comparison.json": "a2c249f8ec32b99738239cc29897a0499c21155b689cea4c97ec1adb6d57a4bc",
+    "truck-parabolic-chamfer/0.result.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "truck-parabolic-chamfer/0.result.comparison.json": "f06ab29dc6552cc98a4376dd4fff05ac66ca3683549892f24add3fa28991ab48",
+    "truck-parabolic-chamfer/1.input.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "truck-parabolic-chamfer/1.input.comparison.json": "a2c249f8ec32b99738239cc29897a0499c21155b689cea4c97ec1adb6d57a4bc",
+    "truck-parabolic-chamfer/1.result.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "truck-parabolic-chamfer/1.result.comparison.json": "0d4b870d126e0e241673776d5b83cc05fa93a334f7f1dac7023f59e7c1bff983",
+    "truck-parabolic-chamfer/2.input.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "truck-parabolic-chamfer/2.input.comparison.json": "a2c249f8ec32b99738239cc29897a0499c21155b689cea4c97ec1adb6d57a4bc",
+    "truck-parabolic-chamfer/2.result.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "truck-parabolic-chamfer/2.result.comparison.json": "72785987fe0bdc1df66b9646724413530bb20687f7319b44174ea3c859a4578b",
+    "proof/parabolic-chamfer-native.cpp": "6a21c2b216115b5bf6306a8dc7379131c0bbca2f205044d398494c6769fd3783",
+    "proof/parabolic-chamfer-native-build.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "proof/parabolic-chamfer-native.txt": "2fb2adba0bc78fbd259c81d022b58d4485a70bca47b3436b57355606df68b352",
+    "proof/parabolic-chamfer-export.rs": "1ffc452c778433791fa931b1c85fe8f1e3482d693ac7e3b5348acdf2b46cd5cc",
+    "proof/parabolic-chamfer-export-command.json": "d958c72942451f594f6afa764034cc07f4209c2ef01157b5374e6df3cdbe57f2",
+    "proof/parabolic-chamfer-export-build.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "proof/parabolic-chamfer-export.txt": "d67884e9062ddcc0976bd216eae6ec124069cbd8de4ec8b3d3ebf2db2d9de8da",
+    "proof/parabolic-chamfer-volume.py": "122dca872c9c62db030566df1922a57b82ab555b3798cdf5b4ef7b3676dc8b3a",
+    "proof/parabolic-chamfer-volume.json": "fb69bdb4974f5eb4ddcd8bba73d58b91216bae42b12c8984e6e270c6d1f404d5",
+    "proof/compare-parabolic-chamfer.py": "c58132b07d2020e5c919e59544ae0233e8f5560a88583bb48ddef07402e95a5a",
+    "proof/parabolic-chamfer-comparisons.json": "b44c063f367970087d927a6f133058589dd5510c4445dd35278eb9d1b05c3cd0",
+    "proof/parabolic-chamfer-comparisons.txt": "c4c5d447b537ecb82937ef6a486c41b31db9e05f1837a05e01194b55695d3feb",
+    "proof/clipped-contact-focused.txt": "16adbe6aad2c19727fcec8e14c1acdab820c352f9c22da2bb70838fa6949a11c",
+    "proof/clipped-contact-integration.txt": "c1aa91f870316f9aa9b743bbfc0fcfa3122e94f9f80dde116a322c9c38b8d7eb"
+  },
+  "comparisons": [
+    {
+      "index": 0,
+      "cap": 0.1,
+      "wall": 0.1,
+      "expected_volume": 1.0282092032510828,
+      "native": {
+        "index": 0,
+        "cap": 0.1,
+        "wall": 0.1,
+        "input_volume": 1.0333333333333328,
+        "volume": 1.0282091993966993,
+        "valid": true,
+        "input_unchanged": true
+      },
+      "input": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 1.0333333333333328,
+        "truck_volume": 1.033333333333333,
+        "native_to_truck_max_distance": 1.1102230246251565e-16,
+        "native_to_truck_samples": 1308,
+        "truck_to_native_max_distance": 1.1102230246251565e-16,
+        "truck_to_native_samples": 1308,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "result": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 1.0282091993966993,
+        "truck_volume": 1.0282092033329067,
+        "native_to_truck_max_distance": 1.724992393553602e-07,
+        "native_to_truck_samples": 1557,
+        "truck_to_native_max_distance": 2.802926343212185e-07,
+        "truck_to_native_samples": 1557,
+        "native_tolerances": {
+          "face": 1.82682548111865e-06,
+          "edge": 1.82682548111865e-06,
+          "vertex": 1.82682548104829e-05
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      }
+    },
+    {
+      "index": 1,
+      "cap": 0.1,
+      "wall": 0.06,
+      "expected_volume": 1.030257419115786,
+      "native": {
+        "index": 1,
+        "cap": 0.1,
+        "wall": 0.06,
+        "input_volume": 1.0333333333333328,
+        "volume": 1.0302573371230275,
+        "valid": true,
+        "input_unchanged": true
+      },
+      "input": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 1.0333333333333328,
+        "truck_volume": 1.033333333333333,
+        "native_to_truck_max_distance": 1.1102230246251565e-16,
+        "native_to_truck_samples": 1308,
+        "truck_to_native_max_distance": 1.1102230246251565e-16,
+        "truck_to_native_samples": 1308,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "result": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 1.0302573371230277,
+        "truck_volume": 1.030257418966074,
+        "native_to_truck_max_distance": 4.764053206670196e-06,
+        "native_to_truck_samples": 1557,
+        "truck_to_native_max_distance": 5.322124042307376e-06,
+        "truck_to_native_samples": 1557,
+        "native_tolerances": {
+          "face": 6.4999076228224e-06,
+          "edge": 6.4999076228224e-06,
+          "vertex": 6.49990762276239e-05
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      }
+    },
+    {
+      "index": 2,
+      "cap": 0.06,
+      "wall": 0.1,
+      "expected_volume": 1.030258855283983,
+      "native": {
+        "index": 2,
+        "cap": 0.06,
+        "wall": 0.1,
+        "input_volume": 1.0333333333333328,
+        "volume": 1.0302588529713042,
+        "valid": true,
+        "input_unchanged": true
+      },
+      "input": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 1.0333333333333328,
+        "truck_volume": 1.033333333333333,
+        "native_to_truck_max_distance": 1.1102230246251565e-16,
+        "native_to_truck_samples": 1308,
+        "truck_to_native_max_distance": 1.1102230246251565e-16,
+        "truck_to_native_samples": 1308,
+        "native_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      },
+      "result": {
+        "schema_version": 1,
+        "comparison": "sampled-only",
+        "native_valid": true,
+        "truck_step_valid": true,
+        "native_solids": 1,
+        "truck_solids": 1,
+        "native_volume": 1.0302588529713042,
+        "truck_volume": 1.0302588553344592,
+        "native_to_truck_max_distance": 1.2551163405297772e-07,
+        "native_to_truck_samples": 1557,
+        "truck_to_native_max_distance": 2.3827468428502415e-07,
+        "truck_to_native_samples": 1557,
+        "native_tolerances": {
+          "face": 1.82682548111865e-06,
+          "edge": 1.82682548111865e-06,
+          "vertex": 1.82682548104829e-05
+        },
+        "truck_step_tolerances": {
+          "face": 1e-07,
+          "edge": 1e-07,
+          "vertex": 1e-07
+        }
+      }
+    }
+  ]
+}
