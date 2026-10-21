@@ -6,6 +6,12 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Correct sampled audit distances when gradient projection misses a minimum on
+  a freeform face. Add trim-classified tree-search candidates while preserving
+  boundary distances, sample points and thresholds. Copy target topology before
+  assembling its boundary so measurement preserves input flags. Native controls
+  cover exact surface subsets, transforms, trims, nested solids and input bytes.
+
 - Add `try_chamfer_solid_along_wire_chord` for straight-line setbacks measured
   in the guide's normal section. A bounded local solve shares the existing
   contact fitting, trimming and solid validation; tangent-projection APIs retain

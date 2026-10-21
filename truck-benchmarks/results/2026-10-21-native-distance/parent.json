@@ -1,0 +1,12 @@
+{
+  "revision": "7b2604ec0bc218b01dada56f2ff1b68bee10a466",
+  "exit_code": 1,
+  "checks": 24,
+  "failures": 3,
+  "source_sha256": {
+    "compare_shapes.cpp": "7a33a41be2f053319caaf119efba4f7d322e80f311a23ddab83c1a2552bb862f",
+    "test_native_distance.cpp": "93a68b15a5e1408d2862265b5524f6128c3025276ebefc1659ed973337add3af",
+    "test_native_distance.sh": "5c01b27f9bc5e29399c20e67b97aa20f494fdc551ba2e5a1ab6b26e44ad8608d",
+    "fixtures/curved-cap-chamfer.brep": "ba749b8e78ff582577155022b3570defe2f2aced60098d6b066bab3e67b4ada8"
+  }
+}

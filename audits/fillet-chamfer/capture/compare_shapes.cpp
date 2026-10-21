@@ -2,10 +2,12 @@
 #include "shape_volume.hpp"
 #include <BRepAdaptor_Curve.hxx>
 #include <BRepAdaptor_Surface.hxx>
+#include <BRepBuilderAPI_Copy.hxx>
 #include <BRepBuilderAPI_MakeVertex.hxx>
 #include <BRepCheck_Analyzer.hxx>
 #include <BRepClass_FaceClassifier.hxx>
 #include <BRepExtrema_DistShapeShape.hxx>
+#include <BRepExtrema_ExtPF.hxx>
 #include <BRepGProp.hxx>
 #include <BRepTools.hxx>
 #include <BRep_Builder.hxx>
@@ -17,8 +19,10 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <memory>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 namespace {
 struct Residual {
@@ -31,13 +35,35 @@ Residual distance(const TopoDS_Shape& source, const TopoDS_Shape& target) {
   TopoDS_Compound boundary;
   BRep_Builder builder;
   builder.MakeCompound(boundary);
-  for (TopExp_Explorer it(target, TopAbs_FACE); it.More(); it.Next())
+  // Adding a face to the compound changes its Free flag; copy topology first.
+  const auto target_copy = BRepBuilderAPI_Copy(target, false, false).Shape();
+  for (TopExp_Explorer it(target_copy, TopAbs_FACE); it.More(); it.Next())
     builder.Add(boundary, it.Current());
+  std::vector<std::pair<TopoDS_Face, std::unique_ptr<BRepExtrema_ExtPF>>> projectors;
+  for (TopExp_Explorer it(boundary, TopAbs_FACE); it.More(); it.Next()) {
+    const auto face = TopoDS::Face(it.Current());
+    if (BRepAdaptor_Surface(face).GetType() < GeomAbs_BezierSurface) continue;
+    // Gradient search can miss a freeform minimum. Tree candidates are trim-classified.
+    auto projection = std::make_unique<BRepExtrema_ExtPF>();
+    projection->Initialize(face, Extrema_ExtFlag_MIN, Extrema_ExtAlgo_Tree);
+    projectors.emplace_back(face, std::move(projection));
+  }
   auto measure = [&](const gp_Pnt& point) {
-    const BRepExtrema_DistShapeShape query(BRepBuilderAPI_MakeVertex(point), boundary);
+    const auto vertex = BRepBuilderAPI_MakeVertex(point).Vertex();
+    const BRepExtrema_DistShapeShape query(vertex, boundary);
     if (!query.IsDone() || !std::isfinite(query.Value()))
       throw std::runtime_error("distance query failed");
-    result.maximum = std::max(result.maximum, query.Value());
+    double minimum = query.Value();
+    for (auto& [face, projection] : projectors) {
+      projection->Perform(vertex, face);
+      if (!projection->IsDone()) continue;
+      for (int i = 1; i <= projection->NbExt(); ++i) {
+        const double squared = projection->SquareDistance(i);
+        if (std::isfinite(squared) && squared >= 0.)
+          minimum = std::min(minimum, std::sqrt(squared));
+      }
+    }
+    result.maximum = std::max(result.maximum, minimum);
     ++result.samples;
   };
   for (TopExp_Explorer it(source, TopAbs_EDGE); it.More(); it.Next()) {
