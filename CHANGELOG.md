@@ -6,6 +6,10 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Correct audit volume measurements by integrating B-spline surface and boundary
+  spans explicitly on a copy of the reference shape. Preserve historical records;
+  verify an exact spline-prism integral, analytic controls and immutable inputs.
+
 - Refine failed chamfer contact intervals locally within the existing sample
   budget and tolerance, with bounded retries. Curved-cap regressions cover
   both directions and unequal setbacks; downstream face trimming remains open.

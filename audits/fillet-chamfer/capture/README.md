@@ -32,6 +32,19 @@ directions between sampled boundaries. It samples 25 points per edge and an
 11×11 UV grid per trimmed face. Distance targets are face compounds, so a point
 inside a solid is not automatically assigned zero boundary distance.
 
+Volume uses Gauss–Kronrod integration with B-spline surface spans and explicit
+boundary-knot subdivision on a copy. Plain adaptive Gauss integration can miss
+spline spans while reporting a small error estimate. The exact spline-prism
+regression checks both native capture and STEP comparison, plus analytic shapes,
+curved references, rigid transforms, open inputs and input preservation:
+
+```sh
+bash audits/fillet-chamfer/capture/test_native_volume.sh target/occt-sdk target/native-volume-tests
+```
+
+The integration tolerance is a numerical request, not a certified global bound.
+Historical archives retain their original measurements and method provenance.
+
 ## Reproduce
 
 Requires the same OCCT 7.9.3 runtime/SDK, Tcl 9 headers, DRAW, sway and Xwayland as

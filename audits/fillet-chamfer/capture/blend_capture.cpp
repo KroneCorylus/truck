@@ -1,4 +1,5 @@
 #include "shape_tolerances.hpp"
+#include "shape_volume.hpp"
 #include <BRepAdaptor_Curve.hxx>
 #include <BRepAdaptor_Surface.hxx>
 #include <BRepBuilderAPI_Copy.hxx>
@@ -41,13 +42,13 @@ void export_shape(const TopoDS_Shape& shape, const std::string& prefix) {
 void properties(std::ostream& out, const TopoDS_Shape& shape) {
   int solids = 0;
   for (TopExp_Explorer it(shape, TopAbs_SOLID); it.More(); it.Next()) ++solids;
-  GProp_GProps volume, area;
-  BRepGProp::VolumeProperties(shape, volume, 1e-9, true, false);
+  const double volume = blend_audit::shape_volume(shape);
+  GProp_GProps area;
   BRepGProp::SurfaceProperties(shape, area, 1e-9);
-  if (!std::isfinite(volume.Mass()) || !std::isfinite(area.Mass()))
+  if (!std::isfinite(area.Mass()))
     throw std::runtime_error("nonfinite shape properties");
   out << "\"native_valid\":" << (BRepCheck_Analyzer(shape).IsValid() ? "true" : "false")
-      << ",\"solids\":" << solids << ",\"volume\":" << volume.Mass() << ",\"area\":" << area.Mass();
+      << ",\"solids\":" << solids << ",\"volume\":" << volume << ",\"area\":" << area.Mass();
   blend_audit::write_shape_tolerances(out, shape, "stored_tolerances");
 }
 

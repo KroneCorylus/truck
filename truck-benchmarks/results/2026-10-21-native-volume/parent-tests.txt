@@ -1,0 +1,28 @@
+open face capture expected=0 actual=0 passed=1
+open face comparison expected=0 actual=0 passed=1
+open face input_unchanged=1
+box capture expected=24 actual=24 passed=1
+box comparison expected=24 actual=24 passed=1
+box input_unchanged=1
+cylinder capture expected=37.699111843077517 actual=37.69911184307751 passed=1
+cylinder comparison expected=37.699111843077517 actual=37.69911184307751 passed=1
+cylinder input_unchanged=1
+sphere capture expected=4.1887902047863905 actual=4.1887902047863896 passed=1
+sphere comparison expected=4.1887902047863905 actual=4.1887902047863896 passed=1
+sphere input_unchanged=1
+spline exact integral capture expected=1.8629500000000001 actual=1.0321922379442865 passed=0
+spline exact integral comparison expected=1.8629500000000001 actual=1.0321922379442865 passed=0
+spline exact integral input_unchanged=1
+/home/krone/Development/Pieza_WS/truck/target/native-volume-final-parent-source/fixtures/curved-cap-input.brep capture expected=0.0029734793641782342 actual=0.0029822103397482338 passed=0
+/home/krone/Development/Pieza_WS/truck/target/native-volume-final-parent-source/fixtures/curved-cap-input.brep comparison expected=0.0029734793641782342 actual=0.0029822103397482338 passed=0
+/home/krone/Development/Pieza_WS/truck/target/native-volume-final-parent-source/fixtures/curved-cap-input.brep input_unchanged=1
+/home/krone/Development/Pieza_WS/truck/target/native-volume-final-parent-source/fixtures/curved-cap-input.brep transformed capture expected=0.0029734793641782342 actual=0.0029822103397482329 passed=0
+/home/krone/Development/Pieza_WS/truck/target/native-volume-final-parent-source/fixtures/curved-cap-input.brep transformed comparison expected=0.0029734793641782342 actual=0.0029822103397482329 passed=0
+/home/krone/Development/Pieza_WS/truck/target/native-volume-final-parent-source/fixtures/curved-cap-input.brep transformed input_unchanged=1
+/home/krone/Development/Pieza_WS/truck/target/native-volume-final-parent-source/fixtures/curved-cap-chamfer.brep capture expected=0.002952545217684737 actual=0.0029607268498375093 passed=0
+/home/krone/Development/Pieza_WS/truck/target/native-volume-final-parent-source/fixtures/curved-cap-chamfer.brep comparison expected=0.002952545217684737 actual=0.0029607268498375093 passed=0
+/home/krone/Development/Pieza_WS/truck/target/native-volume-final-parent-source/fixtures/curved-cap-chamfer.brep input_unchanged=1
+/home/krone/Development/Pieza_WS/truck/target/native-volume-final-parent-source/fixtures/curved-cap-chamfer.brep transformed capture expected=0.002952545217684737 actual=0.0029607268498375132 passed=0
+/home/krone/Development/Pieza_WS/truck/target/native-volume-final-parent-source/fixtures/curved-cap-chamfer.brep transformed comparison expected=0.002952545217684737 actual=0.0029607268498375132 passed=0
+/home/krone/Development/Pieza_WS/truck/target/native-volume-final-parent-source/fixtures/curved-cap-chamfer.brep transformed input_unchanged=1
+27 checks, 10 failures

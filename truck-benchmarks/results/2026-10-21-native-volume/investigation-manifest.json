@@ -1,0 +1,19 @@
+{
+  "archive_sha256": "3bac7415a5800784f0f65d51eb3081da8cd5ea513dcdb2f71e240b0f1aa2765d",
+  "members": {
+    "curved-cap-trim-probe.txt": "0a044259a00c394b6a20aee4dce78848faaad7d623266acd112d146fcbbc5ec4",
+    "curved-cap-trimming-candidate.rs": "df0b3d59bc09bf91014e1a44c6df441b4182350ab3bcb4444f819ad7d58db843",
+    "curved-cap-chamfer-tests.rs": "ab3c77d3a5c411cfee6f2a7e7269ef9aa40f816370c15cd8b839c54f6f5d51cb",
+    "curved-cap-chamfer-parent-tests.txt": "465bc2e907795aa2345931262ed38fd0d6bbb0337a0b2b19218cc7fbeccf7d7f",
+    "curved-cap-chamfer-parameters.txt": "1bb385150af34d849c619be04584a0dd53237654367533d66fe23b5622622fbb",
+    "curved-cap-material-probe.txt": "cfae34f607261870029c6b114117192b217e1512a7d9f947248a7ca3ac9897bb",
+    "curved-cap-candidate.step": "55615be4e044c4c524eb1c2a1f8f7f7946e3deaac5b3018c2f7cc34a0f0fe7fa",
+    "curved-cap-candidate-comparison.json": "aa11e23eea431e9543209e712fcaf5d023a25ffb212129a5514a739cd8c85633",
+    "curved-cap-volume.cpp": "3e00856241cc8687fe833d4ff68bb5f0229607b1eee481a80e902de0586aef8b",
+    "curved-cap-volume.txt": "fbb653d8e1a0c2751a15356cf8ef48aa74e0c7ed2667d577febe3dff30a09867",
+    "curved-cap-volume-mesh.cpp": "766d2756be46d6dea85113dc3b62e196d258cf6070332787100d845790021334",
+    "curved-cap-volume-mesh.txt": "24e23f3b374e2face0e4d020339e5afeece12489c7d6723f5470c2a44063e824",
+    "curved-cap-volume-mesh-build.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "warning": "Curved-cap construction candidate and draft tests are investigation only. They are not applied to the kernel; material and native geometry discrepancies remain."
+}

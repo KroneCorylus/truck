@@ -1,0 +1,13 @@
+# Native volume integration across spline spans
+
+Both capture and STEP comparison used ordinary adaptive Gauss integration. An exact cubic B-spline prism has x(u)=u and height control values h_i. Its unit-depth volume is sum(h_i*(k_(i+4)-k_i)/4) = 1.86295; both old producers report 1.0321922379442865. This analytic counterexample establishes the integration defect independently of Truck.
+
+Use Gauss-Kronrod integration with B-spline surface spans. Boundary spans on planar/extruded surfaces also require explicit subdivision: alone, GK gives 1.8633665852747963 for the prism. Split 3D and parameter-space boundary curves on a deep copy with zero knot-removal tolerances, preserving original surfaces and inputs. Integrate closed shells only; open inputs retain zero volume. Failed splitting or integration reports an error instead of an invented measurement. The requested 1e-9 precision is not a certified global bound.
+
+27 native checks pass: both producers, an open face, analytic box/cylinder/sphere, the exact spline prism, C1 input/result and rigid transforms, plus serialized input preservation. The exact same tests produce 17 passes and 10 failures on b9494814. All 13 capture and 22 catalog tests pass. Native tools build with warnings enabled. All Rust source/fixture hashes match the completed 444 shapeops / 115 stepio / 62 replay validation; Clippy and action smoke evidence remain valid. The known parent pcurve_derivation failure and existing ignore remain unresolved. Replay rebuilt last against the restored kernel.
+
+C1 input: prior Gauss volume 0.0029822103397482338; corrected 0.0029734793641782338. Refined Truck mesh approaches 0.0029734651483863824, and native triangulation approaches 0.0029734275892637162. C1 native result: prior 0.0029607268498375093; corrected 0.0029525452279172051. The native result mesh/integral discrepancy remains explicit in the archive; stability is not a global correctness proof.
+
+The trimming investigation is preserved but NOT applied. Trimmed contacts must replace stale originals; reversed trimmed curves shift their parameter origins; curved terminal walls require intersection boundaries. The candidate passes topology/geometry checks but retains native distance differences 0.0047179757843023263 and 0.0084211551702114782, above the unchanged 0.001 threshold. Its draft material tests fail. No complete curved-cap capability is claimed and no existing test was weakened.
+
+A clean capture after the implementation commit will document measurement-only changes. Historical archives are preserved. No consumer change, push, PR, parity upgrade or performance claim.

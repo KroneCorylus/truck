@@ -1,0 +1,11 @@
+{
+  "revision": "b9494814e9d89235773c31da6acfae3f96023ba7",
+  "passed": 17,
+  "failed": 10,
+  "source_sha256": {
+    "audits/fillet-chamfer/capture/test_native_volume.cpp": "001d99e324660ac2f500efc2117435e8b0a22fa33e021df8be9ffebbe8c9a11a",
+    "audits/fillet-chamfer/capture/test_native_volume.sh": "16a85171347876ef744ded583af1ad417860638e74a6dc5a35dd75bd1dbd9ab5",
+    "audits/fillet-chamfer/capture/blend_capture.cpp": "dcd5cbdd2ea866a8dd212d2fc9afea3e0b4581aa355a2c16835533e8f1d6d14c",
+    "audits/fillet-chamfer/capture/compare_shapes.cpp": "4101db77b0cd4382fff2ccc0ea19aca9070c145546d14f5bde9602dcd189ce4b"
+  }
+}

@@ -1,4 +1,5 @@
 #include "shape_tolerances.hpp"
+#include "shape_volume.hpp"
 #include <BRepAdaptor_Curve.hxx>
 #include <BRepAdaptor_Surface.hxx>
 #include <BRepBuilderAPI_MakeVertex.hxx>
@@ -70,10 +71,7 @@ int solids(const TopoDS_Shape& shape) {
 }
 
 double volume(const TopoDS_Shape& shape) {
-  GProp_GProps properties;
-  BRepGProp::VolumeProperties(shape, properties, 1e-9, true, false);
-  if (!std::isfinite(properties.Mass())) throw std::runtime_error("nonfinite volume");
-  return properties.Mass();
+  return blend_audit::shape_volume(shape);
 }
 }
 
