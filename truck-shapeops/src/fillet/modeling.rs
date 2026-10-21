@@ -2,7 +2,7 @@
 
 use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};
 use truck_base::diagnostics::{validate_tolerance, Code, Diagnostic};
-use truck_modeling::{EdgeID, Face, FaceID, ScalarFunctionD1, Shell, Solid, Surface, Wire};
+use truck_modeling::{EdgeID, Face, FaceID, Rad, ScalarFunctionD1, Shell, Solid, Surface, Wire};
 
 /// A modeling solid after a blend, with face correspondence for downstream naming.
 ///
@@ -762,6 +762,65 @@ pub fn try_chamfer_solid_along_wire_chord(
         tol,
         super::chamfer::DistanceMode::NormalSection,
     )
+}
+
+/// Chamfers a tangent wire with a reference chord and a bevel angle in each normal section.
+///
+/// `reference` identifies an adjacent face and therefore the oriented reference side of the
+/// wire. The chord is measured from the guide to that side's new contact. The angle, strictly
+/// between zero and pi/2, is measured from its local section tangent toward the other support.
+/// Both contacts remain on their local inward branches; unsupported continuation is rejected.
+pub fn try_chamfer_solid_along_wire_angle(
+    solid: &Solid,
+    wire: &Wire,
+    reference: FaceID,
+    distance: f64,
+    angle: Rad<f64>,
+    tol: f64,
+) -> Result<BlendResult, Diagnostic> {
+    let operation = "chamfer_solid_along_wire_angle";
+    validate_tolerance(tol, operation)?;
+    positive(distance, "distance", operation)?;
+    if !angle.0.is_finite() || angle.0 <= 0. || angle.0 >= std::f64::consts::FRAC_PI_2 {
+        return Err(
+            Diagnostic::new(Code::InvalidParameter, operation, "validate_input")
+                .parameter("angle", angle.0),
+        );
+    }
+    if wire.is_empty() {
+        return Err(Diagnostic::new(
+            Code::EmptySelection,
+            operation,
+            "validate_input",
+        ));
+    }
+    let invalid_reference =
+        || Diagnostic::new(Code::UnsupportedTopology, operation, "validate_reference");
+    let face = solid
+        .face_iter()
+        .find(|f| f.id() == reference)
+        .ok_or_else(invalid_reference)?;
+    let mut reference_side = None;
+    for edge in wire {
+        if let Some(boundary) = face.edge_iter().find(|e| e.id() == edge.id()) {
+            let side = boundary.front() != edge.front();
+            if reference_side.replace(side).is_some_and(|old| old != side) {
+                return Err(invalid_reference());
+            }
+        }
+    }
+    let reference_side = reference_side.ok_or_else(invalid_reference)?;
+    chamfer_solid_wire(
+        solid,
+        wire,
+        (distance, distance),
+        tol,
+        super::chamfer::DistanceMode::NormalSectionAngle {
+            reference_side,
+            radians: angle.0,
+        },
+    )
+    .map_err(|e| e.operation(operation))
 }
 
 fn chamfer_solid_wire(

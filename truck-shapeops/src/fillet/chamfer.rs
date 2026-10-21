@@ -6,10 +6,11 @@ use truck_base::diagnostics::{validate_tolerance, Code, Diagnostic};
 /// Number of samples along the edge is at least this, so a cubic interpolation is always possible.
 const MIN_SAMPLES: usize = 4;
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq)]
 pub(super) enum DistanceMode {
     TangentProjection,
     NormalSection,
+    NormalSectionAngle { reference_side: bool, radians: f64 },
 }
 
 fn contact_parameter<S>(
@@ -75,7 +76,144 @@ where
     None
 }
 
-/// Samples the contact curves of a chamfer along `edge` using the requested distance metric.
+fn angle_contact_parameter<S>(
+    surface: &S,
+    guide: Point3,
+    tangent: Vector3,
+    (reference, reference_normal): (Point3, Vector3),
+    reference_sign: f64,
+    angle: f64,
+    hint: Option<(f64, f64)>,
+) -> Option<(f64, f64)>
+where
+    S: ParametricSurface3D
+        + SearchParameter<D2, Point = Point3>
+        + SearchNearestParameter<D2, Point = Point3>,
+{
+    let origin = surface.search_parameter(guide, hint, 100)?;
+    let normal = surface.normal(origin.0, origin.1);
+    let inward = normal.cross(tangent) * -reference_sign;
+    let section = reference_normal.cross(tangent).normalize() * reference_sign;
+    let direction =
+        -section * angle.cos() - tangent.cross(section) * (reference_sign * angle.sin());
+    let perpendicular = tangent.cross(direction);
+    let length = (guide - reference).dot(normal) / direction.dot(normal);
+    if !length.is_finite() || length <= 0. {
+        return None;
+    }
+    let mut uv =
+        surface.search_nearest_parameter(reference + direction * length, Some(origin), 100)?;
+    // The bevel ray is the intersection of two planes through the reference contact.
+    let residual = |uv: (f64, f64)| {
+        let delta = surface.subs(uv.0, uv.1) - reference;
+        Vector2::new(delta.dot(tangent), delta.dot(perpendicular))
+    };
+    let tolerance = (guide.distance(reference) * 1e-10).max(1e-12);
+    for _ in 0..32 {
+        let point = surface.subs(uv.0, uv.1);
+        let value = residual(uv);
+        if !value.x.is_finite() || !value.y.is_finite() || (point - guide).dot(inward) <= 0. {
+            return None;
+        }
+        if value.magnitude2() <= tolerance * tolerance {
+            return ((point - reference).dot(direction) > 0.
+                && surface.normal(uv.0, uv.1).dot(normal) > 0.)
+                .then_some(uv);
+        }
+        let du = surface.uder(uv.0, uv.1);
+        let dv = surface.vder(uv.0, uv.1);
+        let a = Vector2::new(du.dot(tangent), du.dot(perpendicular));
+        let b = Vector2::new(dv.dot(tangent), dv.dot(perpendicular));
+        let det = a.x * b.y - b.x * a.y;
+        if !det.is_finite() || det.abs() <= 1e-12 * a.magnitude() * b.magnitude() {
+            return None;
+        }
+        let step = Vector2::new(
+            (b.y * value.x - b.x * value.y) / det,
+            (a.x * value.y - a.y * value.x) / det,
+        );
+        uv = (0..8).find_map(|i| {
+            let step = step / 2_f64.powi(i);
+            let next = (uv.0 - step.x, uv.1 - step.y);
+            (next.0.is_finite()
+                && next.1.is_finite()
+                && residual(next).magnitude2() < value.magnitude2())
+            .then_some(next)
+        })?;
+    }
+    None
+}
+
+fn unwrap_contact<S: ParametricSurface3D>(
+    surface: &S,
+    uv: &mut (f64, f64),
+    hint: Option<(f64, f64)>,
+) {
+    if let Some((u, v)) = hint {
+        if let Some(period) = surface.u_period() {
+            uv.0 += ((u - uv.0) / period).round() * period;
+        }
+        if let Some(period) = surface.v_period() {
+            uv.1 += ((v - uv.1) / period).round() * period;
+        }
+    }
+}
+
+fn contact_pair<S>(
+    surface0: &S,
+    surface1: &S,
+    point: Point3,
+    tangent: Vector3,
+    (d0, d1): (f64, f64),
+    hints: &mut [Option<(f64, f64)>; 2],
+    mode: DistanceMode,
+) -> Option<[(Point2, Point3); 2]>
+where
+    S: ParametricSurface3D
+        + SearchParameter<D2, Point = Point3>
+        + SearchNearestParameter<D2, Point = Point3>,
+{
+    let surfaces = [surface0, surface1];
+    let mut parameters = if let DistanceMode::NormalSectionAngle {
+        reference_side,
+        radians,
+    } = mode
+    {
+        let side = usize::from(reference_side);
+        let sign = if reference_side { -1. } else { 1. };
+        let reference = surfaces[side];
+        let uv = contact_parameter(reference, point, tangent, d0, sign, hints[side], mode)?;
+        let other = angle_contact_parameter(
+            surfaces[1 - side],
+            point,
+            tangent,
+            (reference.subs(uv.0, uv.1), reference.normal(uv.0, uv.1)),
+            sign,
+            radians,
+            hints[1 - side],
+        )?;
+        if reference_side {
+            [other, uv]
+        } else {
+            [uv, other]
+        }
+    } else {
+        [
+            contact_parameter(surface0, point, tangent, d0, 1., hints[0], mode)?,
+            contact_parameter(surface1, point, tangent, d1, -1., hints[1], mode)?,
+        ]
+    };
+    for side in 0..2 {
+        unwrap_contact(surfaces[side], &mut parameters[side], hints[side]);
+        hints[side] = Some(parameters[side]);
+    }
+    Some(std::array::from_fn(|side| {
+        let uv = parameters[side];
+        (Point2::from(uv), surfaces[side].subs(uv.0, uv.1))
+    }))
+}
+
+/// Samples the contact curves of a chamfer along `edge` using the requested section constraints.
 #[allow(clippy::type_complexity)]
 fn sample_contact_points<C, S>(
     edge: &C,
@@ -89,28 +227,26 @@ where
     C: FilletedCurve<S> + ParameterDivision1D<Point = Point3>,
     S: FilletedSurface<C> + SearchNearestParameter<D2, Point = Point3>,
 {
-    let contact = |surface: &S, distance: f64, sign: f64, hint: &mut Option<(f64, f64)>| {
-        let mut samples = Vec::with_capacity(params.len());
-        for &t in params {
-            let p = edge.subs(t);
-            let e = edge.der(t).normalize();
-            let mut uv = contact_parameter(surface, p, e, distance, sign, *hint, mode)?;
-            if let Some((u, v)) = *hint {
-                if let Some(period) = surface.u_period() {
-                    uv.0 += ((u - uv.0) / period).round() * period;
-                }
-                if let Some(period) = surface.v_period() {
-                    uv.1 += ((v - uv.1) / period).round() * period;
-                }
-            }
-            *hint = Some(uv);
-            samples.push((Point2::from(uv), surface.subs(uv.0, uv.1)));
+    let mut samples = [
+        Vec::with_capacity(params.len()),
+        Vec::with_capacity(params.len()),
+    ];
+    let mut hints = [None; 2];
+    for &t in params {
+        let pair = contact_pair(
+            surface0,
+            surface1,
+            edge.subs(t),
+            edge.der(t).normalize(),
+            (d0, d1),
+            &mut hints,
+            mode,
+        )?;
+        for (samples, contact) in samples.iter_mut().zip(pair) {
+            samples.push(contact);
         }
-        Some(samples)
-    };
-    let samples0 = contact(surface0, d0, 1.0, &mut None)?;
-    let samples1 = contact(surface1, d1, -1.0, &mut None)?;
-    Some([samples0, samples1])
+    }
+    Some(samples)
 }
 
 fn interpolate<P>(params: &[f64], points: impl Iterator<Item = P>) -> BSplineCurve<P>
@@ -607,16 +743,14 @@ where
                 let t = pair[0] + (pair[1] - pair[0]) * i as f64 / 4.0;
                 let p = curve.subs(t);
                 let tangent = curve.der(t).normalize();
-                for (side, support, spline, distance, sign) in
-                    [(0, &s0, &c0, d0, 1.0), (1, &s1, &c1, d1, -1.0)]
-                {
-                    let uv = contact_parameter(support, p, tangent, distance, sign, None, mode)
-                        .ok_or_else(failed)?;
+                let expected = contact_pair(&s0, &s1, p, tangent, (d0, d1), &mut [None; 2], mode)
+                    .ok_or_else(failed)?;
+                for (side, spline) in [(0, &c0), (1, &c1)] {
                     let q = contact[side].subs(t);
                     let advance = contact[side].der(t).dot(tangent);
                     if !advance.is_finite()
                         || advance <= 0.0
-                        || q.distance(support.subs(uv.0, uv.1)) > tol
+                        || q.distance(expected[side].1) > tol
                         || q.distance(spline.subs(t)) > tol
                     {
                         return Err(failed().stage("validate_contact").selection(index));

@@ -6,6 +6,14 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Add `try_chamfer_solid_along_wire_angle` for a reference-face chord and bevel
+  angle in the guide's normal section. Solve the other support contact from the
+  reference tangent at its new contact, then reuse fitting, trimming and solid
+  validation. Replay carries variable angle constraints across a whole tangent
+  contour. Independent curved-cap controls verify material, contacts, reference
+  sides, reversed wires, transforms and STEP; general support continuation and
+  corner collapse remain unsupported by this angle construction.
+
 - Correct sampled audit distances when gradient projection misses a minimum on
   a freeform face. Add trim-classified tree-search candidates while preserving
   boundary distances, sample points and thresholds. Copy target topology before

@@ -1,0 +1,8 @@
+{
+  "revision": "594db26f5ca043e7e6cbb28f5ed051519841ae77",
+  "test_sha256": "0c3c3ca070c0798eaf63d74e84ed65b98d0dbe926a5fdcd097e7cb112a78f6dc",
+  "parent_test_sha256": "7f280d3d275b65d0891e099150e05f4090397a59b7dcc0f7f5846772251855a0",
+  "binding_change": "The new distance-angle API does not exist on the parent. The same geometry assertions use an explicit adapter to the existing chord API with distance and distance*tan(angle), ordered by the reference face. Parent replay assertions are unchanged.",
+  "parent_adapter": "\nfn try_chamfer_solid_along_wire_angle(\n solid:&Solid,wire:&Wire,reference:FaceID,distance:f64,angle:Rad<f64>,tol:f64,\n)->std::result::Result<BlendResult,truck_base::diagnostics::Diagnostic>{\n let face=solid.face_iter().find(|f|f.id()==reference).unwrap();\n let edge=wire.front().unwrap();\n let found=face.edge_iter().find(|e|e.id()==edge.id()).unwrap();\n let side=usize::from(found.front()!=edge.front());\n let mut distances=[distance;2];distances[1-side]=distance*angle.0.tan();\n try_chamfer_solid_along_wire_chord(solid,wire,distances[0],distances[1],tol)\n}\n",
+  "replay_test_sha256": "0a4c7f3b660c01aef3c0c276403d12a356b689eb7313dad1c42904e357e53a70"
+}

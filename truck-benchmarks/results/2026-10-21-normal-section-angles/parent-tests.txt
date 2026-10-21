@@ -1,0 +1,33 @@
+$ cargo test --release -p truck-shapeops --test normal_section_angle normal_section_angles_preserve
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/target/normal-angle-parent-source/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 8.11s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/normal_section_angle.rs (/home/krone/Development/Pieza_WS/truck/target/release/deps/normal_section_angle-f70d0cfd72f86ec5)
+
+running 2 tests
+test transformed_normal_section_angles_preserve_contacts_and_material ... FAILED
+test normal_section_angles_preserve_contacts_and_material ... FAILED
+
+failures:
+
+---- transformed_normal_section_angles_preserve_contacts_and_material stdout ----
+
+thread 'transformed_normal_section_angles_preserve_contacts_and_material' (1507285) panicked at truck-shapeops/tests/normal_section_angle.rs:133:33:
+normal-section chord is 0.057735026918962484, expected 0.07295140846898024
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- normal_section_angles_preserve_contacts_and_material stdout ----
+
+thread 'normal_section_angles_preserve_contacts_and_material' (1507284) panicked at truck-shapeops/tests/normal_section_angle.rs:133:33:
+normal-section chord is 0.057735026918962595, expected 0.07295140846898024
+
+
+failures:
+    normal_section_angles_preserve_contacts_and_material
+    transformed_normal_section_angles_preserve_contacts_and_material
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.02s
+
+error: test failed, to rerun pass `-p truck-shapeops --test normal_section_angle`
+exit_code 101

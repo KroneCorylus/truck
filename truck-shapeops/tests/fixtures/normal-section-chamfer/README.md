@@ -14,3 +14,12 @@ reference normal, and vary both distances.
 For a curved-side chord d, x = d*sqrt(2/(1+sqrt(1+4*k^2*d^2))). With planar
 setback w, the retained volume is 1+k/3-w*x/2+k*x^3/6. The exact section and
 native controls independently determine the expected material.
+
+Distance-angle controls use d=0.1 and angles 30, 45 and 60 degrees on either
+reference face. For a curved reference, the same chord formula fixes x and the
+wall setback is x*(2*k*x+tan(alpha))/(1-2*k*x*tan(alpha))-k*x^2. For a planar
+reference with setback d, the local curved contact is
+x=2*d/(cot(alpha)+sqrt(cot(alpha)^2-4*k*d)). These formulas use the tangent at
+the new reference contact, and the same independent material integral above.
+Twelve native controls and parent-failing kernel/replay regressions are recorded
+in `truck-benchmarks/results/2026-10-21-normal-section-angles/`.

@@ -56,7 +56,7 @@ as serialized entity references.
 | Area | Diagnostic API |
 | --- | --- |
 | Booleans | `try_and`, `try_or`, `try_subtract`, `try_subtract_with_effect`, `try_solid_components` |
-| Modeling blends | `try_fillet_solid_edges`, `try_fillet_solid_edges_with_radii`, `try_fillet_solid_along_wire`, `try_chamfer_solid_edge`, `try_chamfer_solid_along_wire` |
+| Modeling blends | `try_fillet_solid_edges`, `try_fillet_solid_edges_with_radii`, `try_fillet_solid_along_wire`, `try_chamfer_solid_edge`, `try_chamfer_solid_along_wire`, `try_chamfer_solid_along_wire_chord`, `try_chamfer_solid_along_wire_angle` |
 | Generic shell blends | `try_fillet_edges`, `try_fillet_along_wire`, `try_chamfer_along_wire` |
 | Local operations | `try_move_faces`, `try_offset_faces`, `try_replace_surfaces`, `try_delete_face`, `try_draft`, `try_shell`, `try_thicken`, `try_intersect_surfaces` |
 | Meshing | `triangulation_with_diagnostics`, `robust_triangulation_with_diagnostics`, `try_triangulation` |

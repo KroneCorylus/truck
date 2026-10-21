@@ -1,0 +1,43 @@
+$ bash audits/fillet-chamfer/capture/test_reference_sample.sh target/occt-sdk target/normal-angle-native-reference-check
+curvature=0.8 moved=0 sample_captured=1
+[32;1m
+*******************************************************************
+******        Statistics on Transfer (Write)                 ******[0m
+[32;1m
+*******************************************************************
+******        Transfer Mode = 0  I.E.  As Is       ******[0m
+[32;1m******        Transferring Shape, ShapeType = 2                      ******[0m
+[32;1m** WorkSession : Sending all data[0m
+[32;1m Step File Name : /home/krone/Development/Pieza_WS/truck/target/normal-angle-native-reference-check/0.input.step(352 ents)  Write  Done[0m
+curvature=0.8 moved=1 sample_captured=1
+[32;1m
+*******************************************************************
+******        Statistics on Transfer (Write)                 ******[0m
+[32;1m
+*******************************************************************
+******        Transfer Mode = 0  I.E.  As Is       ******[0m
+[32;1m******        Transferring Shape, ShapeType = 2                      ******[0m
+[32;1m** WorkSession : Sending all data[0m
+[32;1m Step File Name : /home/krone/Development/Pieza_WS/truck/target/normal-angle-native-reference-check/1.input.step(352 ents)  Write  Done[0m
+curvature=-0.4 moved=0 sample_captured=1
+[32;1m
+*******************************************************************
+******        Statistics on Transfer (Write)                 ******[0m
+[32;1m
+*******************************************************************
+******        Transfer Mode = 0  I.E.  As Is       ******[0m
+[32;1m******        Transferring Shape, ShapeType = 2                      ******[0m
+[32;1m** WorkSession : Sending all data[0m
+[32;1m Step File Name : /home/krone/Development/Pieza_WS/truck/target/normal-angle-native-reference-check/2.input.step(352 ents)  Write  Done[0m
+curvature=-0.4 moved=1 sample_captured=1
+[32;1m
+*******************************************************************
+******        Statistics on Transfer (Write)                 ******[0m
+[32;1m
+*******************************************************************
+******        Transfer Mode = 0  I.E.  As Is       ******[0m
+[32;1m******        Transferring Shape, ShapeType = 2                      ******[0m
+[32;1m** WorkSession : Sending all data[0m
+[32;1m Step File Name : /home/krone/Development/Pieza_WS/truck/target/normal-angle-native-reference-check/3.input.step(352 ents)  Write  Done[0m
+8 checks, 0 failures
+exit_code 0

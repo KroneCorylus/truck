@@ -432,11 +432,69 @@ fn longitudinal_plane_angle_chord(
     (chord.is_finite() && chord > 0.).then_some(chord)
 }
 
+fn linear_chamfer_section(first: &Face, second: &Face) -> Option<(f64, f64)> {
+    match (
+        &first.oriented_surface().elementary(),
+        &second.oriented_surface().elementary(),
+    ) {
+        (Some((Elementary::Plane(a), forward_a)), Some((Elementary::Plane(b), forward_b))) => {
+            let a = a.normal() * if *forward_a { 1. } else { -1. };
+            let b = b.normal() * if *forward_b { 1. } else { -1. };
+            Some((-a.dot(b), a.cross(b).magnitude()))
+        }
+        (Some((Elementary::Plane(p), _)), Some((Elementary::Cylinder { axis, .. }, _)))
+        | (Some((Elementary::Cylinder { axis, .. }, _)), Some((Elementary::Plane(p), _)))
+            if p.normal().cross(*axis).magnitude() < 1e-8 =>
+        {
+            Some((0., 1.))
+        }
+        (
+            Some((Elementary::Plane(p), plane_forward)),
+            Some((
+                Elementary::Cone {
+                    axis, half_angle, ..
+                },
+                cone_forward,
+            )),
+        )
+        | (
+            Some((
+                Elementary::Cone {
+                    axis, half_angle, ..
+                },
+                cone_forward,
+            )),
+            Some((Elementary::Plane(p), plane_forward)),
+        ) if p.normal().cross(*axis).magnitude() < 1e-8 => {
+            let sign = if plane_forward == cone_forward {
+                1.
+            } else {
+                -1.
+            };
+            Some((
+                sign * p.normal().dot(*axis) * half_angle.0.sin(),
+                half_angle.0.cos(),
+            ))
+        }
+        _ => None,
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+enum ChamferParameters {
+    Distances([f64; 2]),
+    Angle {
+        distance: f64,
+        radians: f64,
+        reference: FaceID,
+    },
+}
+
 fn chamfer_selection(
     input: &Solid,
     selection: &[Value],
     native_contours: bool,
-) -> Result<Vec<(Edge, [f64; 2])>, Value> {
+) -> Result<Vec<(Edge, ChamferParameters)>, Value> {
     let invalid = |reason: &str| json!({"status":"harness-error","error":reason});
     let unsupported = |reason: &str| json!({"status":"unhandled-intent","reason":reason});
     if selection.is_empty() {
@@ -688,10 +746,25 @@ fn chamfer_selection(
         } else {
             None
         };
+        let variable_angle = mode == "distance-angle"
+            && matched.iter().any(|edge| {
+                if longitudinal_cylinders(input, edge).is_some() {
+                    return false;
+                }
+                let adjacent: Vec<_> = input
+                    .face_iter()
+                    .filter(|face| face.edge_iter().any(|e| e.id() == edge.id()))
+                    .collect();
+                let [first, second] = adjacent.as_slice() else {
+                    return true;
+                };
+                linear_chamfer_section(first, second).is_none()
+            });
         let requested = distances;
         for edge in matched {
             let longitudinal = longitudinal_cylinders(input, &edge);
             distances = requested;
+            let mut angle_constraint = None;
             if let Some(reference_side) = reference_side {
                 let oriented = wire
                     .as_ref()
@@ -721,34 +794,16 @@ fn chamfer_selection(
                         "Contour faces do not define unique oriented sides",
                     ));
                 };
-                let supports: Vec<_> = adjacent
-                    .iter()
-                    .map(|f| f.oriented_surface().elementary())
-                    .collect();
-                let linear_section = match (&supports[0], &supports[1]) {
-                    (Some((Elementary::Plane(a), forward_a)), Some((Elementary::Plane(b), forward_b))) => {
-                        let a = a.normal() * if *forward_a { 1. } else { -1. };
-                        let b = b.normal() * if *forward_b { 1. } else { -1. };
-                        Some((-a.dot(b), a.cross(b).magnitude()))
-                    }
-                    (Some((Elementary::Plane(p), _)), Some((Elementary::Cylinder { axis, .. }, _)))
-                    | (Some((Elementary::Cylinder { axis, .. }, _)), Some((Elementary::Plane(p), _)))
-                        if p.normal().cross(*axis).magnitude() < 1e-8 => Some((0., 1.)),
-                    (Some((Elementary::Plane(p), _)), Some((Elementary::Cylinder { axis, .. }, _)))
-                    | (Some((Elementary::Cylinder { axis, .. }, _)), Some((Elementary::Plane(p), _)))
-                        if mode == "two-distances" && p.normal().dot(*axis).abs() > 1e-8 => None,
-                    (Some((Elementary::Plane(p), plane_forward)), Some((Elementary::Cone { axis, half_angle, .. }, cone_forward)))
-                    | (Some((Elementary::Cone { axis, half_angle, .. }, cone_forward)), Some((Elementary::Plane(p), plane_forward)))
-                        if p.normal().cross(*axis).magnitude() < 1e-8 => {
-                            let sign = if plane_forward == cone_forward { 1. } else { -1. };
-                            Some((sign * p.normal().dot(*axis) * half_angle.0.sin(), half_angle.0.cos()))
-                        }
-                    _ if longitudinal.is_some() || mode == "two-distances" => None,
-                    _ => return Err(unsupported("Face-dependent chamfers require planar supports, a perpendicular plane/cylinder or plane/cone rim, or a longitudinal plane/cylinder edge")),
-                };
+                let linear_section = linear_chamfer_section(adjacent[0], adjacent[1]);
                 if mode == "distance-angle" {
                     let tangent = requested[1] / requested[0];
-                    if let Some((cos_beta, sin_beta)) = linear_section {
+                    if variable_angle {
+                        angle_constraint = Some(ChamferParameters::Angle {
+                            distance: requested[0],
+                            radians: tangent.atan(),
+                            reference: adjacent[*side].id(),
+                        });
+                    } else if let Some((cos_beta, sin_beta)) = linear_section {
                         // Sine rule in the corner section: d1 = d0 sin(alpha) / sin(beta + alpha).
                         let denominator = sin_beta + cos_beta * tangent;
                         if sin_beta <= 1e-12 || denominator <= 1e-12 {
@@ -757,8 +812,7 @@ fn chamfer_selection(
                             ));
                         }
                         distances[1] = requested[1] / denominator;
-                    } else {
-                        let radii = longitudinal.unwrap();
+                    } else if let Some(radii) = longitudinal {
                         distances[1] = if radii.iter().all(Option::is_some) {
                             parallel_cylinder_angle_chord(
                                 adjacent[*side],
@@ -790,6 +844,12 @@ fn chamfer_selection(
                         .ok_or_else(|| {
                             unsupported("Longitudinal angle has no supported local contact")
                         })?;
+                    } else {
+                        angle_constraint = Some(ChamferParameters::Angle {
+                            distance: requested[0],
+                            radians: tangent.atan(),
+                            reference: adjacent[*side].id(),
+                        });
                     }
                     if !distances[1].is_finite() || distances[1] <= 0. {
                         return Err(invalid("Invalid derived chamfer distance"));
@@ -799,7 +859,7 @@ fn chamfer_selection(
                     distances.swap(0, 1);
                 }
             }
-            if let Some(radii) = longitudinal {
+            if let Some(radii) = longitudinal.filter(|_| angle_constraint.is_none()) {
                 for (side, radius) in radii.into_iter().enumerate() {
                     let Some(radius) = radius else { continue };
                     let ratio = distances[side] / radius / 2.;
@@ -815,14 +875,15 @@ fn chamfer_selection(
                     }
                 }
             }
-            if let Some(previous) = assignments.insert(edge.id(), distances) {
-                if previous != distances {
+            let parameters = angle_constraint.unwrap_or(ChamferParameters::Distances(distances));
+            if let Some(previous) = assignments.insert(edge.id(), parameters) {
+                if previous != parameters {
                     return Err(invalid(
                         "Conflicting chamfer distances for the same physical edge",
                     ));
                 }
             } else {
-                selected.push((edge, distances));
+                selected.push((edge, parameters));
             }
         }
     }
@@ -830,6 +891,77 @@ fn chamfer_selection(
         return Err(unsupported("No native-effective chamfer selections"));
     }
     Ok(selected)
+}
+
+fn chamfer_angle_wire(
+    input: &Solid,
+    selected: &[(Edge, ChamferParameters)],
+) -> Result<BlendResult, truck_base::diagnostics::Diagnostic> {
+    use truck_base::diagnostics::{Code, Diagnostic};
+    let unsupported = || {
+        Diagnostic::new(
+            Code::UnsupportedTopology,
+            "chamfer_solid_along_wire_angle",
+            "validate_wire",
+        )
+    };
+    let edges: Vec<_> = selected.iter().map(|(edge, _)| edge.clone()).collect();
+    let wire = as_wire(&edges).ok_or_else(unsupported)?;
+    let mut request: Option<(f64, f64, bool, FaceID)> = None;
+    for (edge, parameters) in selected {
+        let ChamferParameters::Angle {
+            distance,
+            radians,
+            reference,
+        } = *parameters
+        else {
+            return Err(unsupported());
+        };
+        let face = input
+            .face_iter()
+            .find(|f| f.id() == reference)
+            .ok_or_else(unsupported)?;
+        let boundary = face
+            .edge_iter()
+            .find(|e| e.id() == edge.id())
+            .ok_or_else(unsupported)?;
+        let oriented = wire
+            .iter()
+            .find(|e| e.id() == edge.id())
+            .ok_or_else(unsupported)?;
+        let side = boundary.front() != oriented.front();
+        if let Some((d, angle, previous, _)) = request {
+            if (distance - d).abs() > 1e-12 * d
+                || (radians - angle).abs() > 1e-12 * angle
+                || side != previous
+            {
+                return Err(unsupported());
+            }
+        } else {
+            request = Some((distance, radians, side, reference));
+        }
+    }
+    let (distance, radians, _, reference) = request.ok_or_else(unsupported)?;
+    try_chamfer_solid_along_wire_angle(input, &wire, reference, distance, Rad(radians), TOL)
+}
+
+#[cfg(test)]
+fn chamfer_distance_selection(
+    input: &Solid,
+    selection: &[Value],
+    native_contours: bool,
+) -> Result<Vec<(Edge, [f64; 2])>, Value> {
+    chamfer_selection(input, selection, native_contours).map(|selected| {
+        selected
+            .into_iter()
+            .map(|(edge, parameters)| {
+                let ChamferParameters::Distances(distances) = parameters else {
+                    panic!("expected constant distance assignments")
+                };
+                (edge, distances)
+            })
+            .collect()
+    })
 }
 
 fn fillet_contour_selection(input: &Solid, task: &Value) -> Result<Vec<(Edge, f64)>, Value> {
@@ -1020,7 +1152,21 @@ fn replay_task(
             Ok(selected) => selected,
             Err(report) => return Ok(report),
         };
-        let assignments: Vec<_> = selected.iter().map(|(e, d)| (e.id(), *d)).collect();
+        stage.set("blend");
+        let angle_result = selected
+            .iter()
+            .any(|(_, parameters)| matches!(parameters, ChamferParameters::Angle { .. }))
+            .then(|| chamfer_angle_wire(&input, &selected));
+        let assignments: Vec<_> = selected
+            .iter()
+            .filter_map(|(e, parameters)| {
+                if let ChamferParameters::Distances(distances) = parameters {
+                    Some((e.id(), *distances))
+                } else {
+                    None
+                }
+            })
+            .collect();
         let edges: Vec<_> = selected.into_iter().map(|(e, _)| e).collect();
         let ids: Vec<_> = edges.iter().map(|e| e.id()).collect();
         stage.set("blend");
@@ -1032,46 +1178,50 @@ fn replay_task(
                             && face.oriented_surface().elementary().is_none()
                     })
             });
-        let result = (if normal_section {
-            Err(truck_base::diagnostics::Diagnostic::new(
-                truck_base::diagnostics::Code::UnsupportedTopology,
-                "chamfer_solid_along_wire",
-                "validate_wire",
-            ))
+        let result = if let Some(result) = angle_result {
+            result
         } else {
-            try_chamfer_solid_edges_with_distances(&input, &assignments, TOL)
-        })
-        .or_else(|error| {
-            if let Some(wire) = as_wire(&edges) {
-                let ordered: Option<Vec<_>> = wire
-                    .iter()
-                    .map(|edge| {
-                        let mut distances = assignments.iter().find(|(id, _)| *id == edge.id())?.1;
-                        let boundary = input
-                            .face_iter()
-                            .find_map(|face| face.edge_iter().find(|e| e.id() == edge.id()))?;
-                        if boundary.front() != edge.front() {
-                            distances.swap(0, 1);
-                        }
-                        Some(distances)
-                    })
-                    .collect();
-                if let Some(ordered) = ordered {
-                    let [d0, d1] = ordered[0];
-                    if ordered
+            (if normal_section {
+                Err(truck_base::diagnostics::Diagnostic::new(
+                    truck_base::diagnostics::Code::UnsupportedTopology,
+                    "chamfer_solid_along_wire",
+                    "validate_wire",
+                ))
+            } else {
+                try_chamfer_solid_edges_with_distances(&input, &assignments, TOL)
+            })
+            .or_else(|error| {
+                if let Some(wire) = as_wire(&edges) {
+                    let ordered: Option<Vec<_>> = wire
                         .iter()
-                        .all(|d| (d[0] - d0).abs() <= 1e-12 * d0 && (d[1] - d1).abs() <= 1e-12 * d1)
-                    {
-                        return if normal_section {
-                            try_chamfer_solid_along_wire_chord(&input, &wire, d0, d1, TOL)
-                        } else {
-                            try_chamfer_solid_along_wire(&input, &wire, d0, d1, TOL)
-                        };
+                        .map(|edge| {
+                            let mut distances =
+                                assignments.iter().find(|(id, _)| *id == edge.id())?.1;
+                            let boundary = input
+                                .face_iter()
+                                .find_map(|face| face.edge_iter().find(|e| e.id() == edge.id()))?;
+                            if boundary.front() != edge.front() {
+                                distances.swap(0, 1);
+                            }
+                            Some(distances)
+                        })
+                        .collect();
+                    if let Some(ordered) = ordered {
+                        let [d0, d1] = ordered[0];
+                        if ordered.iter().all(|d| {
+                            (d[0] - d0).abs() <= 1e-12 * d0 && (d[1] - d1).abs() <= 1e-12 * d1
+                        }) {
+                            return if normal_section {
+                                try_chamfer_solid_along_wire_chord(&input, &wire, d0, d1, TOL)
+                            } else {
+                                try_chamfer_solid_along_wire(&input, &wire, d0, d1, TOL)
+                            };
+                        }
                     }
                 }
-            }
-            Err(error)
-        });
+                Err(error)
+            })
+        };
         (ids, result)
     } else {
         stage.set("physical-selection");
@@ -1692,7 +1842,8 @@ mod native_contour_tests {
         ) {
             let input = import(&format!("{prefix}.input.step")).unwrap();
             let assignments =
-                chamfer_selection(&input, task["selection"].as_array().unwrap(), true).unwrap();
+                chamfer_distance_selection(&input, task["selection"].as_array().unwrap(), true)
+                    .unwrap();
             let top_distance = if task["selection"][0]["mode"] == "two-distances" {
                 0.04
             } else {
@@ -2218,7 +2369,7 @@ mod cylindrical_reference_tests {
             chosen["distances"] = json!([vertical * scale, radial * scale]);
         }
         let before = serde_json::to_string(&input.compress()).unwrap();
-        let assignments = chamfer_selection(&input, &[chosen.clone()], true).unwrap();
+        let assignments = chamfer_distance_selection(&input, &[chosen.clone()], true).unwrap();
         assert_eq!(assignments.len(), 1);
         for (edge, distances) in assignments {
             let adjacent: Vec<_> = input
@@ -2310,7 +2461,7 @@ mod cylindrical_reference_tests {
             ] {
                 let mut chosen = chosen();
                 chosen["reference_cylinder"][field] = value;
-                let error = chamfer_selection(&input, &[chosen], true).unwrap_err();
+                let error = chamfer_distance_selection(&input, &[chosen], true).unwrap_err();
                 assert_eq!(error["status"], status, "{error}");
             }
             let mut missing = chosen();
@@ -2319,13 +2470,13 @@ mod cylindrical_reference_tests {
                 .unwrap()
                 .remove("reference_cylinder");
             assert_eq!(
-                chamfer_selection(&input, &[missing], true).unwrap_err()["status"],
+                chamfer_distance_selection(&input, &[missing], true).unwrap_err()["status"],
                 "unhandled-intent"
             );
             let mut conflict = chosen();
             conflict["reference_plane"] = json!({"origin":[0.,0.,10.],"normal":[0.,0.,1.]});
             assert_eq!(
-                chamfer_selection(&input, &[conflict], true).unwrap_err()["status"],
+                chamfer_distance_selection(&input, &[conflict], true).unwrap_err()["status"],
                 "harness-error"
             );
             assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
@@ -2440,7 +2591,7 @@ mod conical_reference_tests {
             chosen["distances"] = json!([d0 * scale, d1 * scale]);
         }
         let before = serde_json::to_string(&input.compress()).unwrap();
-        let assignments = chamfer_selection(&input, &[chosen.clone()], true).unwrap();
+        let assignments = chamfer_distance_selection(&input, &[chosen.clone()], true).unwrap();
         assert_eq!(assignments.len(), 2);
         for (edge, distances) in assignments {
             let adjacent: Vec<_> = input
@@ -2535,14 +2686,14 @@ mod conical_reference_tests {
         ] {
             let mut chosen = chosen(false, true);
             chosen["reference_cone"][field] = value;
-            let error = chamfer_selection(&input, &[chosen], true).unwrap_err();
+            let error = chamfer_distance_selection(&input, &[chosen], true).unwrap_err();
             assert_eq!(error["status"], status, "{error}");
         }
         for name in ["reference_plane", "reference_cylinder"] {
             let mut conflict = chosen(false, true);
             conflict[name] = json!({});
             assert_eq!(
-                chamfer_selection(&input, &[conflict], true).unwrap_err()["status"],
+                chamfer_distance_selection(&input, &[conflict], true).unwrap_err()["status"],
                 "harness-error"
             );
         }
@@ -2642,7 +2793,7 @@ mod longitudinal_chamfer_distance_tests {
         }
         let before = serde_json::to_string(&input.compress()).unwrap();
         let psi = 2. * (chord / 10.).asin();
-        let assignments = chamfer_selection(&input, &[chosen.clone()], true).unwrap();
+        let assignments = chamfer_distance_selection(&input, &[chosen.clone()], true).unwrap();
         assert_eq!(assignments.len(), 1);
         for (edge, distances) in assignments {
             let adjacent: Vec<_> = input
@@ -2731,7 +2882,8 @@ mod longitudinal_chamfer_distance_tests {
             let mut task = task("equal", false);
             task["selection"][0]["distance"] = json!(distance);
             let error =
-                chamfer_selection(&input, task["selection"].as_array().unwrap(), true).unwrap_err();
+                chamfer_distance_selection(&input, task["selection"].as_array().unwrap(), true)
+                    .unwrap_err();
             assert_eq!(error["status"], "unhandled-intent");
         }
         assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
@@ -2884,7 +3036,7 @@ mod longitudinal_plane_angle_tests {
         let removed = (x * h - h * p.x + p.x * q.y - h * q.x - 25. * psi).abs() / 2.;
         let expected = (original_volume - 10. * removed) * scale.powi(3);
         let before = serde_json::to_string(&input.compress()).unwrap();
-        let selected = chamfer_selection(&input, &[chosen.clone()], true).unwrap();
+        let selected = chamfer_distance_selection(&input, &[chosen.clone()], true).unwrap();
         assert_eq!(selected.len(), 1);
         for (edge, distances) in selected {
             let adjacent: Vec<_> = input
@@ -3041,7 +3193,7 @@ mod longitudinal_plane_angle_tests {
                 chosen["reference_cylinder"] =
                     json!({"origin":[0.,0.,0.],"axis":[0.,0.,1.],"radius":5.});
             }
-            let error = chamfer_selection(&input, &[chosen.clone()], true).unwrap_err();
+            let error = chamfer_distance_selection(&input, &[chosen.clone()], true).unwrap_err();
             assert_eq!(error["status"], "unhandled-intent");
             assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
         }
@@ -3198,7 +3350,7 @@ mod parallel_cylinder_chord_tests {
             chosen["distance"] = json!(chords[0] * scale);
         }
         let before = serde_json::to_string(&input.compress()).unwrap();
-        let selected = chamfer_selection(&input, &[chosen.clone()], true).unwrap();
+        let selected = chamfer_distance_selection(&input, &[chosen.clone()], true).unwrap();
         assert_eq!(selected.len(), 1);
         for (edge, distances) in selected {
             let adjacent: Vec<_> = input
@@ -3370,7 +3522,7 @@ mod parallel_cylinder_chord_tests {
         chosen["distance"] = json!(8.);
         chosen["angle_degrees"] = json!(30.);
         chosen["reference_cylinder"] = json!({"origin":[0.,0.,0.],"axis":[0.,0.,1.],"radius":5.});
-        let error = chamfer_selection(&input, &[chosen.clone()], true).unwrap_err();
+        let error = chamfer_distance_selection(&input, &[chosen.clone()], true).unwrap_err();
         assert_eq!(error["status"], "unhandled-intent");
         assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
         std::fs::remove_file(path).unwrap();
@@ -3389,7 +3541,7 @@ mod parallel_cylinder_chord_tests {
         chosen["mode"] = json!("distance-angle");
         chosen["angle_degrees"] = json!(45.);
         chosen["reference_cylinder"] = json!({"origin":[0.,0.,0.],"axis":[0.,0.,1.],"radius":5.});
-        let error = chamfer_selection(&input, &[chosen.clone()], true).unwrap_err();
+        let error = chamfer_distance_selection(&input, &[chosen.clone()], true).unwrap_err();
         assert_eq!(error["status"], "unhandled-intent");
         assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
         std::fs::remove_file(path).unwrap();
@@ -3410,7 +3562,7 @@ mod parallel_cylinder_chord_tests {
             chosen["distances"] = json!(distances);
             chosen["reference_cylinder"] =
                 json!({"origin":[0.,0.,0.],"axis":[0.,0.,1.],"radius":5.});
-            let error = chamfer_selection(&input, &[chosen], true).unwrap_err();
+            let error = chamfer_distance_selection(&input, &[chosen], true).unwrap_err();
             assert_eq!(error["status"], "unhandled-intent");
             assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
         }
@@ -3530,7 +3682,8 @@ mod cylindrical_terminal_fan_tests {
         }
         let before = serde_json::to_string(&input.compress()).unwrap();
         let selected =
-            chamfer_selection(&input, task["selection"].as_array().unwrap(), true).unwrap();
+            chamfer_distance_selection(&input, task["selection"].as_array().unwrap(), true)
+                .unwrap();
         assert_eq!(selected.len(), count);
         let assignments: Vec<_> = selected.iter().map(|(edge, d)| (edge.id(), *d)).collect();
         let output = try_chamfer_solid_edges_with_distances(&input, &assignments, TOL).unwrap();
@@ -3788,9 +3941,10 @@ mod tilted_cap_distance_tests {
                 let input = import(&format!("{prefix}.input.step")).unwrap();
                 let before = serde_json::to_string(&input.compress()).unwrap();
                 let selected =
-                    chamfer_selection(&input, task["selection"].as_array().unwrap(), true).expect(
-                        "tilted two-distance requests have explicit reference-side assignments",
-                    );
+                    chamfer_distance_selection(&input, task["selection"].as_array().unwrap(), true)
+                        .expect(
+                            "tilted two-distance requests have explicit reference-side assignments",
+                        );
                 assert_eq!(selected.len(), 3);
                 for (edge, distances) in &selected {
                     let cap_face = input
@@ -3867,7 +4021,7 @@ mod tilted_cap_distance_tests {
     }
 
     #[test]
-    fn tilted_distance_angle_requests_remain_unhandled() {
+    fn tilted_distance_angle_requests_preserve_variable_section_constraints() {
         for degrees in [-2, 2, 10] {
             let (step, mut task) = fixture(degrees);
             let directory = std::env::temp_dir().join(format!(
@@ -3884,9 +4038,26 @@ mod tilted_cap_distance_tests {
             chosen["distance"] = json!(0.1);
             chosen["angle_degrees"] = json!(60.);
             chosen.as_object_mut().unwrap().remove("distances");
-            let error =
-                chamfer_selection(&solid, task["selection"].as_array().unwrap(), true).unwrap_err();
-            assert_eq!(error["status"], "unhandled-intent");
+            let selected =
+                chamfer_selection(&solid, task["selection"].as_array().unwrap(), true).unwrap();
+            assert_eq!(selected.len(), 3);
+            for (edge, parameters) in selected {
+                let ChamferParameters::Angle {
+                    distance,
+                    radians,
+                    reference,
+                } = parameters
+                else {
+                    panic!("expected variable angle constraint")
+                };
+                assert_eq!(distance, 0.1);
+                assert!((radians - 60_f64.to_radians()).abs() < 1e-12);
+                let face = solid.face_iter().find(|f| f.id() == reference).unwrap();
+                assert!(face.edge_iter().any(|e| e.id() == edge.id()));
+                assert!(
+                    matches!(face.oriented_surface().elementary(),Some((Elementary::Plane(p),_)) if p.normal().z.abs()>0.9)
+                );
+            }
             assert_eq!(before, serde_json::to_string(&solid.compress()).unwrap());
             assert_eq!(std::fs::read_to_string(path).unwrap(), step);
             std::fs::remove_dir_all(directory).unwrap();
@@ -4059,11 +4230,163 @@ mod normal_section_reference_tests {
                 }
                 _ => unreachable!(),
             };
-            let result =
-                chamfer_selection(&input, task["selection"].as_array().unwrap(), true).unwrap_err();
-            assert_eq!(result["status"], expected, "{kind}: {result}");
+            if kind == "angle" {
+                let selected =
+                    chamfer_selection(&input, task["selection"].as_array().unwrap(), true).unwrap();
+                assert_eq!(selected.len(), 1);
+                let ChamferParameters::Angle {
+                    distance,
+                    radians,
+                    reference,
+                } = selected[0].1
+                else {
+                    panic!("expected variable angle constraint")
+                };
+                assert_eq!(distance, 0.3);
+                assert!((radians - 30_f64.to_radians()).abs() < 1e-12);
+                let face = input.face_iter().find(|f| f.id() == reference).unwrap();
+                assert!(face.edge_iter().any(|e| e.id() == selected[0].0.id()));
+                assert!(face.oriented_surface().elementary().is_none());
+            } else {
+                let result =
+                    chamfer_distance_selection(&input, task["selection"].as_array().unwrap(), true)
+                        .unwrap_err();
+                assert_eq!(result["status"], expected, "{kind}: {result}");
+            }
             assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
         }
         std::fs::remove_dir_all(dir).unwrap();
+    }
+    #[test]
+    fn sampled_reference_angles_preserve_contacts_and_material() {
+        for index in 0..4 {
+            let (step, task) = fixture(index);
+            let matrix = if index % 2 == 0 {
+                Matrix4::identity()
+            } else {
+                Matrix4::from_translation(Vector3::new(0.3, -0.2, 0.1))
+                    * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.7))
+            };
+            let inverse = matrix.invert().unwrap();
+            let curvature: f64 = if index < 2 { 0.8 } else { -0.4 };
+            for wall_reference in [false, true] {
+                for reverse in [false, true] {
+                    for degrees in [30_f64, 45., 60.] {
+                        let d = 0.1_f64;
+                        let tangent = degrees.to_radians().tan();
+                        let x = if wall_reference {
+                            2. * d
+                                / (1. / tangent
+                                    + (1. / (tangent * tangent) - 4. * curvature * d).sqrt())
+                        } else {
+                            d * (2. / (1. + (1. + 4. * curvature * curvature * d * d).sqrt()))
+                                .sqrt()
+                        };
+                        let wall = if wall_reference {
+                            d
+                        } else {
+                            x * (2. * curvature * x + tangent) / (1. - 2. * curvature * x * tangent)
+                                - curvature * x * x
+                        };
+                        let cap = (x * x + curvature * curvature * x.powi(4)).sqrt();
+                        let dir = std::env::temp_dir().join(format!(
+                            "truck-normal-angle-{}-{index}-{wall_reference}-{reverse}-{cap}-{wall}",
+                            std::process::id()
+                        ));
+                        std::fs::create_dir_all(&dir).unwrap();
+                        let prefix = dir.join("001");
+                        let prefix = prefix.to_str().unwrap();
+                        std::fs::write(format!("{prefix}.input.step"), step).unwrap();
+                        let mut task = task.clone();
+                        let chosen = &mut task["selection"][0];
+                        chosen["mode"] = json!("distance-angle");
+                        chosen["distance"] = json!(d);
+                        chosen["angle_degrees"] = json!(degrees);
+                        chosen.as_object_mut().unwrap().remove("distances");
+                        if wall_reference {
+                            chosen.as_object_mut().unwrap().remove("reference_sample");
+                            let p = matrix.transform_point(Point3::origin());
+                            let n = matrix.transform_vector(Vector3::unit_x());
+                            chosen["reference_plane"] =
+                                json!({"origin":[p.x,p.y,p.z],"normal":[n.x,n.y,n.z]});
+                        }
+                        if reverse {
+                            chosen["points"].as_array_mut().unwrap().reverse();
+                            for edge in chosen["contour_edges"].as_array_mut().unwrap() {
+                                edge["points"].as_array_mut().unwrap().reverse();
+                            }
+                            if !chosen["reference_sample"].is_null() {
+                                for q in
+                                    chosen["reference_sample"]["normal"].as_array_mut().unwrap()
+                                {
+                                    *q = json!(-q.as_f64().unwrap());
+                                }
+                            }
+                        }
+                        std::fs::write(format!("{prefix}.input.json"), task.to_string()).unwrap();
+                        let result = replay(prefix, &Cell::new("start")).unwrap();
+                        assert_eq!(result["status"], "operation-succeeded", "{result}");
+                        assert_eq!(result["selected_edges"], 1);
+                        for field in [
+                            "input_unchanged",
+                            "geometry_consistent",
+                            "mesh_closed",
+                            "step_prepared",
+                        ] {
+                            assert_eq!(result[field], true, "{field}: {result}");
+                        }
+                        let output = import(&format!("{prefix}.truck.step")).unwrap();
+                        let x = cap
+                            * (2. / (1. + (1. + 4. * curvature * curvature * cap * cap).sqrt()))
+                                .sqrt();
+                        let expected =
+                            1. + curvature / 3. - wall * x / 2. + curvature * x.powi(3) / 6.;
+                        replay_common::assert_solid(&output, expected, &[0], 1e-6);
+                        replay_common::blend::assert_step(&output, expected, 2e-6);
+                        let mut seen = HashSet::new();
+                        let mut counts = [0; 2];
+                        for edge in output.edge_iter().filter(|e| seen.insert(e.id())) {
+                            let c = edge.oriented_curve();
+                            let (a, b) = c.range_tuple();
+                            let mid = inverse.transform_point(c.subs((a + b) / 2.));
+                            let side = if mid.x.abs() < 1e-6 && (mid.z - (1. - wall)).abs() < 1e-6 {
+                                0
+                            } else if (mid.x - x).abs() < 1e-6
+                                && (mid.z - (1. + curvature * x * x)).abs() < 1e-6
+                            {
+                                1
+                            } else {
+                                continue;
+                            };
+                            for i in 0..=32 {
+                                let p =
+                                    inverse.transform_point(c.subs(a + (b - a) * i as f64 / 32.));
+                                let distance = p.distance(Point3::new(0., p.y, 1.));
+                                assert!(
+                                    (distance - if side == 0 { wall } else { cap }).abs() < 1e-6
+                                );
+                                assert!((p.x - if side == 0 { 0. } else { x }).abs() < 1e-6);
+                                assert!(
+                                    (p.z - if side == 0 {
+                                        1. - wall
+                                    } else {
+                                        1. + curvature * x * x
+                                    })
+                                    .abs()
+                                        < 1e-6
+                                );
+                                counts[side] += 1;
+                            }
+                        }
+                        assert_eq!(counts, [33, 33]);
+                        assert_eq!(
+                            std::fs::read_to_string(format!("{prefix}.input.step")).unwrap(),
+                            step
+                        );
+                        std::fs::remove_dir_all(dir).unwrap();
+                    }
+                }
+            }
+        }
     }
 }
