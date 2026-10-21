@@ -1,0 +1,33 @@
+NATIVE VOLUME REFERENCES — 2026-10-21
+CHECKPOINT COMPLETE. Continue in validated achievement groups when requested.
+
+# Native volume integration: clean capture
+
+Implementation 2b125f413b273a6eb9542cf31ad74163546b9722.
+
+Corrected the audit’s native volume measurements. An exact B-spline prism has volume 1.86295; both old audit producers reported 1.03219224. Gauss–Kronrod integration now respects surface spans and boundary-knot intervals, using a temporary copy. Original reference shapes, tolerances and historical archives are preserved.
+
+All 27 native checks pass; ten failed on the parent. Controls cover an open face, box, cylinder, sphere, the exact spline prism, curved native references, rigid transforms and serialized input preservation. Native tools build cleanly; 13 capture and 22 catalog tests pass. Rust source hashes are unchanged, retaining the completed 444 shapeops, 115 stepio and 62 replay checks, Clippy and benchmark smoke. The known geometry precision failure and existing ignore remain explicit.
+
+Clean capture: all 396 native cases pass across 648 operations. Counts remain 445 constructions and 415 limited comparison passes. All prior successful Truck result records and all non-volume comparison fields are exactly unchanged. 537 input and 547 native-result volume fields changed; 35 native-result changes exceed 1e-8 relative. These are measurement corrections, not new geometry capabilities.
+
+Statuses: {"input-import-failed": 96, "operation-succeeded": 445, "operation-failed": 93, "unhandled-intent": 5, "input-inconsistent": 9}.
+
+Archive SHA256: ad3323736adbd79fc14c6d8abfc0d77da56d0a6cf46dbd53f337894faaf10f8c.
+
+No parity or speed claim. Finite sampling and requested integration tolerances do not certify global bounds. The unpublished trimming candidate and its failing tests are preserved in the investigation archive.
+
+NEXT
+Curved-cap C1 remains unsupported. Unpublished target/curved-cap-trimming-candidate.rs uses trimmed contacts, resolves changed parameter origins through the original ruled surface, and uses intersection boundaries at curved end walls. It passes geometric/topology checks but fails the draft material test and native distances (0.004718 / 0.008421 versus 0.001). Do not merge it as complete support. The draft test expected the old wrong native volume; establish an independent correct material contract before continuing, without loosening prior assertions. The corrected candidate/native integral difference remains about 3.1e-6 and requires diagnosis. Capture003 additionally needs contact continuation to the neighbouring boundary.
+Investigation archive: truck-benchmarks/results/2026-10-21-native-volume/investigation.zip. It preserves candidate source, draft tests, native comparisons and mesh/integration diagnostics. Native C1 result mesh/integral disagreement remains open. The exact synthetic prism independently proves the reference integration bug. New plugin is target/occt-span-volume-plugin; use it, not the old cone-reference plugin, for new captures.
+Helpers: target/validate-native-volume.py, package-native-volume-proof.py, package-native-volume-full.py, write-native-volume-checkpoint.py. Raw target/occt-capture-native-volume. Rust source is unchanged from b9494814/81755598. Previous geometry checkpoint remains authoritative; this checkpoint replaces volume measurements only.
+
+METHOD
+Read AGENTS.md. Parent-failing tests;no weakened assertions;shared solid/STEP checks.
+CARGO_BUILD_JOBS=12;rustfmt +nightly --config skip_children=true;no cargo fmt.
+Freeze production during builds/tests/captures;release tests,Clippy,actions smoke;build replay LAST.
+Commit implementation/proof before clean capture,then HTML/catalog/handoff. Force-add JSON/ZIP/STEP;diff check excludes *.step.
+No consumer/pin changes,push,PR,subagents or unsupported speed/parity claims.
+Plugin target/occt-cone-reference-plugin;SDK target/occt-sdk/usr/lib64;OCCT ../investigations/sequential-holes-2026-10-10/occt;publicdata target/occt-public-chamfer-data.
+Capture workers4,timeout120,freshoutput. Raw target/occt-capture-collapsed-fillet-contacts;controls target/native-collapsed-contacts and target/native-collapsed-contacts-closed.
+Helpers target/validate-collapsed-contacts.py,replay-collapsed-contacts.py,package-collapsed-contacts-proof.py,package-collapsed-contacts-full.py,write-collapsed-contacts-checkpoint.py. Packaging is not idempotent.

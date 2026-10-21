@@ -1,7 +1,6 @@
-LATEST CHECKPOINT — 2026-10-20
-CHECKPOINT COMPLETE. Read the remaining work before continuing.
-Read ../2026-10-20-adaptive-chamfer-contacts/HANDOFF.txt and report.html.
-Implementation 81755598; 445 constructions/415 limited passes. Curved-cap face trimming and baseline precision failure remain unresolved.
+LATEST CHECKPOINT — 2026-10-21
+Read ../2026-10-21-native-volume/HANDOFF.txt and report.html.
+Implementation 2b125f41 corrects native volume integration. 445 constructions/415 limited passes unchanged. Use target/occt-span-volume-plugin. Curved-cap geometry candidate is archived, not merged.
 
 HISTORICAL HANDOFF FOLLOWS
 
