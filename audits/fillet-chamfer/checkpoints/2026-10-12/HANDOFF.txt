@@ -1,6 +1,6 @@
 LATEST CHECKPOINT — 2026-10-21
-Read ../2026-10-21-normal-section-chamfers/HANDOFF.txt and report.html.
-Implementation 40aa15af adds explicit normal-section chamfers and sampled reference faces. 450 constructions/418 limited passes. C1 comparison/continuation and geometry precision issues remain. Use target/occt-reference-sample-plugin.
+Read ../2026-10-21-native-distance/HANDOFF.txt and report.html.
+Implementation 5fe64d33 corrects native freeform distance measurement. 450 constructions/418 limited passes; 141 positive solid cases unresolved. Use target/occt-distance-tree-plugin.
 
 HISTORICAL HANDOFF FOLLOWS
 

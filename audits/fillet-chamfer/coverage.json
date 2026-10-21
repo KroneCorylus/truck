@@ -3,10 +3,16 @@
     "title": "Fillet and chamfer feature parity audit",
     "baseline": "OCCT V7_9_3 source inventory plus the recorded Truck/Pieza revisions. Includes 3D, 2D, related workflows and all textual candidates under the discovery rules.",
     "meaning_of_all": "Every dedicated test-grid entry, matching registered test/helper, discovered blend command and retained reference in this pinned checkout. This is not a claim about all mathematical configurations or current/future OCCT releases.",
-    "execution": "Clean capture: all 396 native cases pass across 648 operations. 450 constructions (+1) and 418 limited comparison passes (+0). All prior successful checks survive; 449 prior complete result/comparison records are exactly unchanged. 0 prior numerical changes. 94 reference samples were added; all other task fields, native references and selection scopes are unchanged. Of the 648 operations, 559 have valid solid inputs and native solid results; 88 have no solid input, and 1 is an expected native rejection that Truck also rejects.",
+    "execution": "All 396 native cases pass across 648 operations. Truck still constructs 450; every Truck result, task and native reference is unchanged. 418 now pass the limited comparisons (+0). 279 complete successful result/comparison records are exactly unchanged; 171 have changed distance measurements only. No previous check regresses. These are measurement corrections, not new Truck constructions. 141 of 559 positive solid operations remain unresolved; 88 inputs have no solid and one rejection matches native.",
     "mapping": "Capability assessments describe observable outcomes supported or restricted by reviewed source evidence. Per-case tags and links are automated hints; they do not prove Truck handles that fixture.",
     "objective": "Achieve at least OCCT-level fillet/chamfer capabilities and robustness for equivalent modeling tasks in Truck/Pieza.",
-    "equivalence": "Judge the requested geometry, dimensions, validity, editing behavior and practical performance. Different APIs, algorithms, languages, surface representations and internal operation sequences are acceptable. Missing a corresponding OCCT method is not evidence of a feature gap."
+    "equivalence": "Judge the requested geometry, dimensions, validity, editing behavior and practical performance. Different APIs, algorithms, languages, surface representations and internal operation sequences are acceptable. Missing a corresponding OCCT method is not evidence of a feature gap.",
+    "native_distance_correction": {
+      "implementation": "5fe64d3337b2a2f327c22945beea146ebc2972e5",
+      "report": "capture/2026-10-21-native-distance/REPORT.md",
+      "summary": "capture/2026-10-21-native-distance/comparison-summary.json",
+      "method": "Original boundary query plus trim-classified tree surface projections; unchanged samples and thresholds; topology copied before measurement. No parity claim."
+    }
   },
   "status_definitions": {
     "implemented-with-tests": "The stated capability has an implementation and relevant assertions, through any equivalent construction. Executed checks are recorded separately where available; broader OCCT case parity remains unverified.",

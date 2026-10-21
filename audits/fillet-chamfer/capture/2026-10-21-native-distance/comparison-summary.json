@@ -1,0 +1,2381 @@
+{
+  "kernel_revision": "5fe64d3337b2a2f327c22945beea146ebc2972e5",
+  "native": {
+    "passed": 396
+  },
+  "captures": 648,
+  "before_statuses": {
+    "input-import-failed": 96,
+    "operation-succeeded": 450,
+    "operation-failed": 91,
+    "unhandled-intent": 2,
+    "input-inconsistent": 9
+  },
+  "after_statuses": {
+    "input-import-failed": 96,
+    "operation-succeeded": 450,
+    "operation-failed": 91,
+    "unhandled-intent": 2,
+    "input-inconsistent": 9
+  },
+  "capture_scopes": {
+    "fillet-native-contours": 161,
+    "chamfer-native-contours": 487
+  },
+  "unchanged_intent_records": 648,
+  "successful_checks": {
+    "constructed": 450,
+    "input_unchanged": 450,
+    "geometry_consistent": 450,
+    "mesh_closed": 450,
+    "step_prepared": 450,
+    "native_valid": 450,
+    "truck_step_valid": 450,
+    "single_solid": 450,
+    "sampled_distance": 418
+  },
+  "limited_comparison_passes": 418,
+  "status_changes": [],
+  "scope_changes": [],
+  "changed_scope_check_losses": [],
+  "unchanged_intent_regressions": [],
+  "numeric_changes": [
+    {
+      "case": "blend/simple/B2",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 1.1145437438620046e-05,
+          "after": 3.589154895265036e-06
+        }
+      }
+    },
+    {
+      "case": "blend/simple/C7",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 5.446463829811499e-07,
+          "after": 1.1709177085208854e-08
+        }
+      }
+    },
+    {
+      "case": "blend/simple/C9",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 9.859430261266402e-06,
+          "after": 3.727742214675717e-06
+        }
+      }
+    },
+    {
+      "case": "blend/simple/D4",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 5.7803450732914956e-05,
+          "after": 5.780345073276246e-05
+        }
+      }
+    },
+    {
+      "case": "blend/simple/D8",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 1.1040777917310774e-05,
+          "after": 1.1040777908338639e-05
+        },
+        "truck_to_native_max_distance": {
+          "before": 1.1690789596434712e-05,
+          "after": 1.1690789572092746e-05
+        }
+      }
+    },
+    {
+      "case": "blend/simple/E1",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 8.02615200664508e-06,
+          "after": 3.0829748263278135e-09
+        }
+      }
+    },
+    {
+      "case": "blend/simple/E7",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 8.712630292692261e-06,
+          "after": 8.712630292511628e-06
+        },
+        "truck_to_native_max_distance": {
+          "before": 9.136871315374e-06,
+          "after": 9.13687128893592e-06
+        }
+      }
+    },
+    {
+      "case": "blend/simple/E9",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "truck_to_native_max_distance": {
+          "before": 4.164557972574163e-05,
+          "after": 4.1645579724054e-05
+        }
+      }
+    },
+    {
+      "case": "blend/simple/F4",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.958840013858681e-06,
+          "after": 2.6531960944772783e-08
+        },
+        "truck_to_native_max_distance": {
+          "before": 1.6562721485467981e-09,
+          "after": 1.9999353437350588e-11
+        }
+      }
+    },
+    {
+      "case": "blend/simple/F6",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "truck_to_native_max_distance": {
+          "before": 1.9999354374730732e-11,
+          "after": 1.9999353437350588e-11
+        }
+      }
+    },
+    {
+      "case": "blend/simple/F8",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 8.402155578847773e-06,
+          "after": 1.957748074298282e-08
+        }
+      }
+    },
+    {
+      "case": "blend/simple/G1",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "truck_to_native_max_distance": {
+          "before": 0.018545749048141102,
+          "after": 0.018545749048122263
+        }
+      }
+    },
+    {
+      "case": "blend/simple/G3",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 1.1409450059813582e-05,
+          "after": 4.321483354501203e-09
+        },
+        "truck_to_native_max_distance": {
+          "before": 9.411814409087239e-06,
+          "after": 2.580656294715064e-07
+        }
+      }
+    },
+    {
+      "case": "blend/simple/G5",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 0.001706935290957981,
+          "after": 0.0017069352909579647
+        },
+        "truck_to_native_max_distance": {
+          "before": 0.00170290628978652,
+          "after": 0.0017029062897358394
+        }
+      }
+    },
+    {
+      "case": "blend/simple/G7",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 6.39180880152669e-06,
+          "after": 3.6545508434116477e-09
+        }
+      }
+    },
+    {
+      "case": "blend/simple/G9",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 0.0008899970366070568,
+          "after": 0.0008899970365994438
+        }
+      }
+    },
+    {
+      "case": "blend/simple/H2",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 1.4044390880783083e-05,
+          "after": 7.959170618064925e-06
+        },
+        "truck_to_native_max_distance": {
+          "before": 1.4100022058012386e-05,
+          "after": 9.607898050157841e-06
+        }
+      }
+    },
+    {
+      "case": "blend/simple/I5",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 0.00030376476478721635,
+          "after": 0.0003037647647844381
+        },
+        "truck_to_native_max_distance": {
+          "before": 0.000303764186427848,
+          "after": 0.00030376418642462133
+        }
+      }
+    },
+    {
+      "case": "blend/simple/I6",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 0.00030376476478721635,
+          "after": 0.0003037647647844381
+        },
+        "truck_to_native_max_distance": {
+          "before": 0.000303764186427848,
+          "after": 0.00030376418642462133
+        }
+      }
+    },
+    {
+      "case": "blend/simple/I7",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 0.00024498125192201533,
+          "after": 0.00024498125191358105
+        }
+      }
+    },
+    {
+      "case": "blend/simple/I9",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 1.1145437443852106e-05,
+          "after": 8.265748968519382e-06
+        }
+      }
+    },
+    {
+      "case": "blend/simple/J1",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 7.469711062006424e-06,
+          "after": 7.469711045713202e-06
+        }
+      }
+    },
+    {
+      "case": "blend/simple/J2",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "truck_to_native_max_distance": {
+          "before": 7.535456583714329e-06,
+          "after": 7.535456582406827e-06
+        }
+      }
+    },
+    {
+      "case": "blend/simple/J4",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "truck_to_native_max_distance": {
+          "before": 1.441799231484773e-05,
+          "after": 1.4417992298258634e-05
+        }
+      }
+    },
+    {
+      "case": "blend/simple/J5",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "truck_to_native_max_distance": {
+          "before": 7.273034086609714e-06,
+          "after": 7.2730340711607915e-06
+        }
+      }
+    },
+    {
+      "case": "blend/simple/J8",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "truck_to_native_max_distance": {
+          "before": 0.08908512359529569,
+          "after": 0.08908512359529525
+        }
+      }
+    },
+    {
+      "case": "blend/simple/J9",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 9.419886071687929e-05,
+          "after": 9.419886071620425e-05
+        },
+        "truck_to_native_max_distance": {
+          "before": 0.00010987859336826511,
+          "after": 9.399571855400874e-05
+        }
+      }
+    },
+    {
+      "case": "blend/simple/K2",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "truck_to_native_max_distance": {
+          "before": 0.04583577492595724,
+          "after": 0.045835774925956516
+        }
+      }
+    },
+    {
+      "case": "blend/simple/Q4",
+      "capture": "002",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 0.0003265245980066554,
+          "after": 0.0003265245980065833
+        }
+      }
+    },
+    {
+      "case": "blend/simple/V1",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.1089539599994186e-06,
+          "after": 2.4237311584120695e-11
+        }
+      }
+    },
+    {
+      "case": "blend/simple/Z1",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 1.4267094959148398e-05,
+          "after": 1.4267094959015663e-05
+        }
+      }
+    },
+    {
+      "case": "boolean/history/A7",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 1.0367366991496098e-14,
+          "after": 8.926082647349967e-15
+        }
+      }
+    },
+    {
+      "case": "bugs/heal/bug26244",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 8.63771868759181e-06,
+          "after": 7.275656176346408e-06
+        }
+      }
+    },
+    {
+      "case": "bugs/modalg_7/bug30940_3",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.3441845121833323e-06,
+          "after": 5.16700309715261e-09
+        },
+        "truck_to_native_max_distance": {
+          "before": 4.123751737977231e-09,
+          "after": 3.2620057636816006e-14
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/A3",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.229100205894138e-08,
+          "after": 4.4089115779499936e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/A5",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.4834527242885283e-09,
+          "after": 3.0461597920844706e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/A6",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.4834527084671093e-09,
+          "after": 3.0461598247131215e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/A8",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.2800297065568815e-08,
+          "after": 2.8402135718831353e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/A9",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 1.6684774635511106e-08,
+          "after": 1.6684774635284194e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/B1",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.2800297065568815e-08,
+          "after": 2.8402135718438336e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/B3",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 1.3321770490138124e-08,
+          "after": 5.9203926853524475e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/B4",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 1.275144972590372e-08,
+          "after": 8.162686350830225e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/B5",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 1.251237507374296e-08,
+          "after": 7.681315546131375e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/B6",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 1.2751449831492313e-08,
+          "after": 6.482029776099112e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/B7",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 5.981716727832213e-09,
+          "after": 1.7670525492445577e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/B8",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 5.063333902353106e-09,
+          "after": 1.7670525492445577e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/B9",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 5.947517926443091e-09,
+          "after": 5.947517759074897e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/C1",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 1.275144972590372e-08,
+          "after": 7.964813073323914e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/C2",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 5.9816046610724394e-09,
+          "after": 2.3908428913364503e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/C3",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 6.456871805990902e-09,
+          "after": 2.61099410388919e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/C4",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 6.4742551459010265e-09,
+          "after": 2.4835370264569378e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/C5",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 6.4742551459010265e-09,
+          "after": 2.6989781674715293e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/C6",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.324313631810704e-08,
+          "after": 3.323874167344281e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/C7",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 1.483091097427584e-08,
+          "after": 1.4830910968039672e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/C8",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.1837966348518965e-08,
+          "after": 3.183375747735597e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/C9",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.816600496060949e-08,
+          "after": 2.3069190893928973e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/D1",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.324313631810704e-08,
+          "after": 3.323874167344281e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/D2",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 1.483091097427584e-08,
+          "after": 1.4830910968039672e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/D3",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.1837966348518965e-08,
+          "after": 3.183375747735597e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/D4",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.816600496060949e-08,
+          "after": 2.3069190893928973e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/D5",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.324313631810704e-08,
+          "after": 3.323874167298898e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/D6",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 1.4830910906638111e-08,
+          "after": 1.4830910881292103e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/D7",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.1837966348518965e-08,
+          "after": 3.183375747780979e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/D8",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.816600496060949e-08,
+          "after": 2.306919076300793e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/D9",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.324313631810704e-08,
+          "after": 3.323874167298898e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/E1",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 1.4830910906638111e-08,
+          "after": 1.4830910881292103e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/E2",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.1837966348518965e-08,
+          "after": 3.183375747780979e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/E3",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.816600496060949e-08,
+          "after": 2.306919076300793e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle/F4",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 4.840299078398936e-09,
+          "after": 2.1511972606083603e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A4",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.229100205894138e-08,
+          "after": 4.4089115779499936e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A6",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.2800297065568815e-08,
+          "after": 2.8402135718831353e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A6",
+      "capture": "004",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.2800297065568815e-08,
+          "after": 2.8402135704560548e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A7",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 1.4830910980564492e-08,
+          "after": 1.483091094003557e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A7",
+      "capture": "004",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 1.48309109505182e-08,
+          "after": 1.4830910934026313e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A8",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.2800297065568815e-08,
+          "after": 2.8402135718438336e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/A8",
+      "capture": "004",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.2800297065568815e-08,
+          "after": 2.8402135704560548e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/C3",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.1005115310076893e-08,
+          "after": 9.077753135719953e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_angle_sequence/C3",
+      "capture": "003",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.100511531447571e-08,
+          "after": 4.453564217699836e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/A3",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.229100205894138e-08,
+          "after": 4.408911531008467e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/A5",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.4834527242885283e-09,
+          "after": 3.4813254634248264e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/A6",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.483452708467104e-09,
+          "after": 3.4813255213360153e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/A8",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.337396037395572e-08,
+          "after": 2.984663167289471e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/B1",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.337396037395572e-08,
+          "after": 2.984663171013272e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/B2",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 1.3933810799560584e-08,
+          "after": 1.3265170013367814e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/B5",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 1.2948509989525423e-08,
+          "after": 7.448675778591759e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/B6",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 1.2948510217855632e-08,
+          "after": 5.754506360174107e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/B7",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 5.981716727832213e-09,
+          "after": 1.986002799886405e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/B8",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 6.3758372552497825e-09,
+          "after": 1.986002799886405e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/B9",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 5.947517926443091e-09,
+          "after": 5.9475177255861065e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/C2",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 0.015607524823052431,
+          "after": 0.015607524823052322
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/C3",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 0.01560752459221806,
+          "after": 0.01560752459221793
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/C5",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 6.4742551459010265e-09,
+          "after": 3.046159792445044e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/C6",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 0.043481524422551605,
+          "after": 0.0434815244225516
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/C8",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.151985145887029e-08,
+          "after": 3.1457860694079984e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/C9",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.59575248214314e-08,
+          "after": 1.7274501567380067e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/D1",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 0.043481524422551605,
+          "after": 0.0434815244225516
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/D3",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.151985145887029e-08,
+          "after": 3.1457860694079984e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/D4",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.59575248214314e-08,
+          "after": 1.7274501567380067e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/D6",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 0.04348150855081843,
+          "after": 0.04348150855081842
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/D7",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.151985145887029e-08,
+          "after": 3.1457860912006057e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/D8",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.59575248214314e-08,
+          "after": 1.7274501556720644e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/E1",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 0.04348150855081843,
+          "after": 0.04348150855081842
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/E2",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.151985145887029e-08,
+          "after": 3.1457860912006057e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/E3",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.59575248214314e-08,
+          "after": 1.7274501556720644e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist/F4",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 4.8402990783984265e-09,
+          "after": 2.151197260608681e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A4",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.229100205894138e-08,
+          "after": 4.408911531008467e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A6",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.337396037395572e-08,
+          "after": 2.9846631660482034e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A6",
+      "capture": "004",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.337396037395572e-08,
+          "after": 2.984663167289471e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A7",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 1.3933810781958557e-08,
+          "after": 1.326516999994037e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A7",
+      "capture": "004",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 1.3933810781958557e-08,
+          "after": 1.3265170013367814e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A8",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.337396037395572e-08,
+          "after": 2.984663171013272e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A8",
+      "capture": "004",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.337396037395572e-08,
+          "after": 2.9846631673300614e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A9",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 1.3933810799560584e-08,
+          "after": 1.3265170000955142e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/A9",
+      "capture": "004",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 1.3933810799560582e-08,
+          "after": 1.3265170013367814e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/C1",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 0.0034836224983474796,
+          "after": 0.003483622498347459
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/C3",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.1005115310076893e-08,
+          "after": 9.340930511742747e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/dist_dist_sequence/C3",
+      "capture": "003",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.100511531447571e-08,
+          "after": 4.67019281323268e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/A3",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.229100205894138e-08,
+          "after": 4.408911624544493e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/A5",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.4834527242885283e-09,
+          "after": 3.4813256760516645e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/A6",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.483452708467104e-09,
+          "after": 3.481325610794364e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/A8",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.9665742589838913e-08,
+          "after": 2.09740751856864e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/A9",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.9665742589838913e-08,
+          "after": 2.359583442930424e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/B1",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.9665742589838913e-08,
+          "after": 2.09740751856864e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/B2",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.9665742589838913e-08,
+          "after": 2.09740751856864e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/B3",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 1.2948509989525423e-08,
+          "after": 7.448675778591759e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/B4",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 1.2948509989525423e-08,
+          "after": 7.448675778591759e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/B5",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 1.2948509989525423e-08,
+          "after": 7.448675778591759e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/B6",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 1.2948509989525423e-08,
+          "after": 7.448675778591759e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/B7",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 5.981716727832213e-09,
+          "after": 1.986002799886405e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/B8",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 5.981716727832213e-09,
+          "after": 1.986002799886405e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/B9",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 5.947517926443091e-09,
+          "after": 5.947517861654749e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/C1",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 1.2948509989525423e-08,
+          "after": 7.448675778591759e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/C2",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 5.9816046610724394e-09,
+          "after": 3.0461598001515197e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/C3",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 5.9816046610724394e-09,
+          "after": 3.0461598001515197e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/C4",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 5.9816046610724394e-09,
+          "after": 3.0461598001515197e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/C5",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 6.4742551459010265e-09,
+          "after": 2.610994153012396e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/C6",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.9665742589838913e-08,
+          "after": 2.740394931121161e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/C7",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.9665742589838913e-08,
+          "after": 2.740394931121161e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/C8",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.9665742589838913e-08,
+          "after": 2.740394931121161e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/C9",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.59575248214314e-08,
+          "after": 2.397845577877858e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/D1",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.9665742589838913e-08,
+          "after": 2.740394931121161e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/D2",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.9665742589838913e-08,
+          "after": 2.740394931121161e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/D3",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.9665742589838913e-08,
+          "after": 2.740394931121161e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/D4",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.59575248214314e-08,
+          "after": 2.397845577877858e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/D5",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.9665742589838913e-08,
+          "after": 2.7403949430334184e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/D6",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.9665742589838913e-08,
+          "after": 2.7403949430334184e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/D7",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.9665742589838913e-08,
+          "after": 2.7403949430334184e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/D8",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.59575248214314e-08,
+          "after": 2.397845567852333e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/D9",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.9665742589838913e-08,
+          "after": 2.7403949430334184e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/E1",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.9665742589838913e-08,
+          "after": 2.7403949430334184e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/E2",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.9665742589838913e-08,
+          "after": 2.7403949430334184e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/E3",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.59575248214314e-08,
+          "after": 2.397845567852333e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/E5",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 0.0005065612539313334,
+          "after": 0.000506561253931316
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist/F4",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 4.8402990783984265e-09,
+          "after": 2.151197260608681e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A4",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.229100205894138e-08,
+          "after": 4.408911624544493e-09
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A6",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.9665742589838913e-08,
+          "after": 2.09740751856864e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A6",
+      "capture": "004",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.9665742589838913e-08,
+          "after": 2.097407517779872e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A7",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.9665742589838913e-08,
+          "after": 2.09740751856864e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A7",
+      "capture": "004",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.9665742589838913e-08,
+          "after": 2.097407517779872e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A8",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.9665742589838913e-08,
+          "after": 2.09740751856864e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A8",
+      "capture": "004",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.9665742589838913e-08,
+          "after": 2.097407517811962e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A9",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.9665742589838913e-08,
+          "after": 2.09740751856864e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/A9",
+      "capture": "004",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.9665742589838913e-08,
+          "after": 2.097407517811962e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/C1",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 0.004717975784302287,
+          "after": 0.00159296928609856
+        },
+        "truck_to_native_max_distance": {
+          "before": 0.008421155170209213,
+          "after": 0.0018391369290612373
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/C3",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.1005115310076893e-08,
+          "after": 1.2837881971077767e-08
+        }
+      }
+    },
+    {
+      "case": "chamfer/equal_dist_sequence/C3",
+      "capture": "003",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 2.100511531447571e-08,
+          "after": 4.8647825453486975e-09
+        }
+      }
+    },
+    {
+      "case": "feat/featrf/A4",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.5644795258947638e-06,
+          "after": 1.9299229176082797e-06
+        }
+      }
+    },
+    {
+      "case": "feat/featrf/A5",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.5644795258947638e-06,
+          "after": 1.9299229176082797e-06
+        }
+      }
+    },
+    {
+      "case": "feat/featrf/A6",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.5644795258947638e-06,
+          "after": 1.9299229176082797e-06
+        }
+      }
+    },
+    {
+      "case": "feat/featrf/A8",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.5644795258947638e-06,
+          "after": 9.991440583007958e-07
+        }
+      }
+    },
+    {
+      "case": "feat/featrf/B4",
+      "capture": "001",
+      "changed_scope": false,
+      "changes": {
+        "native_to_truck_max_distance": {
+          "before": 3.5644795258947638e-06,
+          "after": 1.9299229176082797e-06
+        }
+      }
+    }
+  ],
+  "exact_successful_results": 279,
+  "seed_capture_changes": [],
+  "native_reference_changes": [],
+  "stored_tolerances": {
+    "threshold": 0.001,
+    "inputs": [
+      {
+        "case": "chamfer/dist_angle_sequence/B5",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.01538612357827674,
+          "vertex": 0.015386123578276744
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle_sequence/B7",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.015385866787860681,
+          "vertex": 0.015385866787860684
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle_sequence/B8",
+        "capture": "003",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.09823449952410898,
+          "vertex": 0.11256746834283206
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_dist_sequence/B5",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.015385866784913394,
+          "vertex": 0.015385866784913398
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_dist_sequence/B6",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.015386123576832314,
+          "vertex": 0.015386123576832318
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/equal_dist_sequence/B6",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.015385866785128127,
+          "vertex": 0.01538586678512813
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/equal_dist_sequence/B8",
+        "capture": "003",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.06347812877808842,
+          "vertex": 0.06923484078027042
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      }
+    ],
+    "native_results": [
+      {
+        "case": "blend/simple/D1",
+        "capture": "001",
+        "tolerances": {
+          "face": 0.0001,
+          "edge": 0.8964317893944277,
+          "vertex": 1.2642307919977536
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/simple/F5",
+        "capture": "001",
+        "tolerances": {
+          "face": 0.02190790727118659,
+          "edge": 0.02190790727118659,
+          "vertex": 0.021907907271186598
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/simple/F7",
+        "capture": "001",
+        "tolerances": {
+          "face": 1e-06,
+          "edge": 1.000000006123234e-06,
+          "vertex": 0.04540290569850494
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/simple/F9",
+        "capture": "001",
+        "tolerances": {
+          "face": 1e-06,
+          "edge": 0.005381662689997078,
+          "vertex": 0.008350113249638094
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/simple/G2",
+        "capture": "001",
+        "tolerances": {
+          "face": 0.0001,
+          "edge": 0.058118986044292886,
+          "vertex": 0.08523407424694941
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/simple/H4",
+        "capture": "001",
+        "tolerances": {
+          "face": 1e-06,
+          "edge": 22.974106952046146,
+          "vertex": 22.974106952046153
+        },
+        "status": "operation-succeeded",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/tolblend_simple/A1",
+        "capture": "001",
+        "tolerances": {
+          "face": 0.002351089158340483,
+          "edge": 0.002351089158340483,
+          "vertex": 0.0023510891583404837
+        },
+        "status": "operation-succeeded",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/tolblend_simple/A2",
+        "capture": "001",
+        "tolerances": {
+          "face": 0.01616354954173985,
+          "edge": 0.01616354954173985,
+          "vertex": 0.016163549541739857
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/tolblend_simple/D3",
+        "capture": "001",
+        "tolerances": {
+          "face": 0.07389052197953262,
+          "edge": 0.08021622051706867,
+          "vertex": 0.16809285098977023
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "blend/tolblend_simple/D5",
+        "capture": "001",
+        "tolerances": {
+          "face": 0.008070814689590054,
+          "edge": 0.008070814689590054,
+          "vertex": 0.008070814689590058
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle/F1",
+        "capture": "001",
+        "tolerances": {
+          "face": 0.0001,
+          "edge": 0.0692833518221263,
+          "vertex": 0.06928335182212686
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle_sequence/B5",
+        "capture": "001",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.01538612357827674,
+          "vertex": 0.015386123578276744
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle_sequence/B5",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.01538612357827674,
+          "vertex": 0.015696123578276745
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle_sequence/B7",
+        "capture": "001",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.015385866787860681,
+          "vertex": 0.015385866787860684
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle_sequence/B7",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 5e-05,
+          "vertex": 0.016005866787860687
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle_sequence/B8",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.09823449952410898,
+          "vertex": 0.11256746834283206
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_angle_sequence/B8",
+        "capture": "003",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.09823449952410898,
+          "vertex": 0.11256746834283206
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_dist_complex/B5",
+        "capture": "001",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.00036173254411125385,
+          "vertex": 0.0010531067408991698
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_dist_sequence/B5",
+        "capture": "001",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.015385866784913394,
+          "vertex": 0.015385866784913398
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_dist_sequence/B5",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 5e-05,
+          "vertex": 0.0160058667849134
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_dist_sequence/B6",
+        "capture": "001",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.015386123576832314,
+          "vertex": 0.015386123576832318
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/dist_dist_sequence/B6",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 5e-05,
+          "vertex": 0.01600612357683232
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/equal_dist_complex/B6",
+        "capture": "001",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.00044441723946461964,
+          "vertex": 0.0012931407907644137
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/equal_dist_complex/C1",
+        "capture": "001",
+        "tolerances": {
+          "face": 3.050212492887909e-06,
+          "edge": 0.0011785994935571728,
+          "vertex": 0.0020450305471271255
+        },
+        "status": "operation-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/equal_dist_sequence/B6",
+        "capture": "001",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.015385866785128127,
+          "vertex": 0.01538586678512813
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/equal_dist_sequence/B6",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 5e-05,
+          "vertex": 0.016005866785128133
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/equal_dist_sequence/B8",
+        "capture": "002",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.06347812877808842,
+          "vertex": 0.06923484078027042
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      },
+      {
+        "case": "chamfer/equal_dist_sequence/B8",
+        "capture": "003",
+        "tolerances": {
+          "face": 5e-05,
+          "edge": 0.06347812877808842,
+          "vertex": 0.06923484078027042
+        },
+        "status": "input-import-failed",
+        "limited_comparison": false
+      }
+    ],
+    "truck_step": [],
+    "native_result_count": 647,
+    "truck_step_count": 450
+  },
+  "added_reference_samples": [],
+  "input_scope_counts": {
+    "no-solid": 88,
+    "solid": 560
+  },
+  "matched_native_rejections": [
+    {
+      "case": "bugs/moddata_1/bug119",
+      "capture": "001"
+    }
+  ],
+  "positive_solid_reference_count": 559,
+  "unchanged_failure_diagnostic_changes": [],
+  "new_limited_comparison_passes": []
+}

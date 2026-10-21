@@ -1,0 +1,44 @@
+{
+  "links": [
+    {
+      "href": "#done",
+      "ok": true
+    },
+    {
+      "href": "#results",
+      "ok": true
+    },
+    {
+      "href": "#remaining",
+      "ok": true
+    },
+    {
+      "href": "../../../../truck-benchmarks/results/2026-10-21-native-distance/REPORT.md",
+      "ok": true
+    },
+    {
+      "href": "../../capture/2026-10-21-native-distance/comparison-summary.json",
+      "ok": true
+    },
+    {
+      "href": "../../capture/2026-10-21-native-distance/artifacts.zip",
+      "ok": true
+    },
+    {
+      "href": "../2026-10-21-normal-section-chamfers/report.html",
+      "ok": true
+    },
+    {
+      "href": "HANDOFF.txt",
+      "ok": true
+    }
+  ],
+  "scrollWidth": 1265,
+  "width": 1280,
+  "preview": {
+    "width": 728,
+    "consoleErrors": 0,
+    "visuallyReviewed": true
+  },
+  "report_sha256": "a835c2709b3d144bc6e841e1eb58c399df71f605dcf8e04b4a816a89cc034e62"
+}
