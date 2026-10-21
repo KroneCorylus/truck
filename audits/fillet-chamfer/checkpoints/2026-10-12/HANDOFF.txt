@@ -1,8 +1,8 @@
 LATEST CHECKPOINT — 2026-10-20
 ACTIVE: Continue work and commit achievements until done or told to stop.
-Read ../2026-10-20-tilted-cap-chamfers/HANDOFF.txt and report.html.
-Implementation fdc8092c supports tilted-cap chamfer contact continuation.
-Full capture:444/414;no prior check regressions. Known parent geometry precision failure and10-degree native discrepancy remain. Full parity unverified.
+Read ../2026-10-20-tilted-cap-unequal/HANDOFF.txt and report.html.
+Implementation 51e2c1ec replays unequal setbacks on tilted plane/cylinder rims.
+Full capture:445/415;no prior check regressions. Known parent geometry precision failure and native-control discrepancies remain. Full parity unverified.
 
 HISTORICAL HANDOFF FOLLOWS
 

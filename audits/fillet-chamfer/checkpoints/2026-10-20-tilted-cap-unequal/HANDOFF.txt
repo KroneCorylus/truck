@@ -1,0 +1,41 @@
+UNEQUAL TILTED-CAP CHAMFERS — 2026-10-20
+ACTIVE: Continue work and commit achievements until done or told to stop.
+
+# Unequal tilted-cap chamfers: clean full capture
+
+Runtime 51e2c1eca1e9be15cf2f7ada067a6323ff39823d. All 396 native entries pass; 648 operations retain requests, scopes and native properties. All 444 previous constructions retain checks; 444 complete prior records are exactly unchanged. Numerical changes: 0. Unchanged-status failure diagnostic changes: 0.
+
+445 constructions (+1); 415 limited sampled passes (+1) at 0.001. 30 constructed discrepancies remain.
+Statuses: {"input-import-failed": 96, "operation-succeeded": 445, "operation-failed": 93, "unhandled-intent": 5, "input-inconsistent": 9}.
+- chamfer/dist_dist/E5/001: unhandled-intent → operation-succeeded
+
+Replay now accepts unequal setbacks on tilted plane/cylinder rims while preserving the captured reference side across the full native contour. The production change is three lines in replay; kernel geometry is unchanged. Tilted distance-angle requests remain unsupported because they need a varying local-angle construction.
+
+One success contract fails on the parent; horizontal and angle-rejection controls pass. Three tests cover 24 tilted and 8 horizontal reference/order combinations, material, immutable inputs and STEP. Exported geometry checks 6,336 cap/wall contact points. Eight fresh native controls produce valid solids: five meet the unchanged 0.001 distance threshold, three fail at 0.001292, 0.006632 and 0.001599. Independent guide witnesses prove native cap-contact shortfalls above 0.001 for all three. Their causes and global error bounds remain unresolved; failed comparisons are retained.
+
+62 release replay tests, 13 capture tests, all-target release Clippy and single-thread actions smoke pass. Replay built last. Unchanged core hashes retain 442 shapeops and 115 stepio checks, including the previous mechanical iterator cleanup and focused retests, plus 289/91/102 geometry/modeling/meshalgo passes. The independently reproduced parent pcurve_derivation precision failure and existing ignores remain explicit. No existing test was weakened or skipped.
+
+Proof: truck-benchmarks/results/2026-10-20-tilted-cap-unequal/REPORT.md.
+Archive: 8386 byte-verified members; SHA256 8f09c688f0ae2db460ff39b39c9d293a5af8277512d16a65c1f2e0ada3c4dec3.
+Finite samples do not establish a global bound or full parity. No consumer/dependency/tolerance change, push, PR or performance claim.
+
+NEXT
+Read target/oblique-cap-chamfer-next.txt and target/chamfer-sequence-C1-surfaces.json for the remaining missing-reference C1 cases. Four walls are extrusions and two caps are genuinely curved B-splines; do not classify them as planes. Direct probes fail for both distance orders:captures001/003 at find_contact and002 at trim_faces. See target/curved-cap-direct-probe.rs/.txt and build-command.json. Diagnose the kernel before expanding capture/replay scope. Read target/remaining-fillet-next.txt and target/pcurve-precision-next.txt for other candidates. Keep the tilted-cap 10-degree native discrepancy explicitly unresolved. Equal-distance E5 is already supported; this checkpoint targets unequal-distance E5. Its angle variant remains unhandled intent. D3 requires an apex junction; I8 requires non-tangent junctions. No radius snapping for bug828.
+
+PREVIOUS
+Tilted-cap contacts fdc8092c/ca632294:444/414,all443prior records exact. Mixed corners3bd4ef6d/ca175695:443/413,all443records exact. Procedural cylinders51e609eb/8778f76f:443/413,two explained STEP circle upgrades. Earlier discrepancy proofs remain authoritative.
+
+METHOD
+Read AGENTS.md. Parent-failing tests;no weakened assertions;shared solid/STEP checks.
+CARGO_BUILD_JOBS=12;rustfmt +nightly --config skip_children=true;no cargo fmt.
+Freeze production during builds/tests/captures;release tests,Clippy,actions smoke;build replay LAST.
+Commit implementation/proof before clean capture,then HTML/catalog/handoff. Force-add JSON/ZIP/STEP;diff check excludes *.step.
+No consumer/pin changes,push,PR,subagents or unsupported speed/parity claims.
+Plugin target/occt-cone-reference-plugin;SDK target/occt-sdk/usr/lib64;OCCT ../investigations/sequential-holes-2026-10-10/occt;publicdata target/occt-public-chamfer-data.
+Capture workers4,timeout120,freshoutput. Raw target/occt-capture-collapsed-fillet-contacts;controls target/native-collapsed-contacts and target/native-collapsed-contacts-closed.
+Helpers target/validate-collapsed-contacts.py,replay-collapsed-contacts.py,package-collapsed-contacts-proof.py,package-collapsed-contacts-full.py,write-collapsed-contacts-checkpoint.py. Packaging is not idempotent.
+
+CURRENT HELPERS
+Raw target/occt-capture-tilted-cap-unequal; controls target/native-tilted-cap-unequal and target/tilted-cap-unequal-controls. Helpers target/validate-tilted-cap-unequal.py,replay-tilted-cap-unequal.py,package-tilted-cap-unequal-proof.py,package-tilted-cap-unequal-full.py,write-tilted-cap-unequal-checkpoint.py. The native comparison script intentionally retains three distance failures; do not treat its exit1 as a new regression or relax its threshold.
+READ-ONLY FOLLOW-UP
+All257 projection samples succeed on both C1 supports, but the copied unchanged fitter exhausts its uniform ladder. For capture003 it tries10,19,37,73,145 samples, then rejects289 against the257 budget without trying257. target/curved-cap-fit-probe.txt records the trace; target/curved-cap-direct-probe.rs includes the diagnostic copy. This is a candidate, not a proven fix. Do not loosen fitting tolerance or infer that successful contact fitting guarantees a valid solid; capture002 already fails later in trimming.
