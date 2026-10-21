@@ -1,6 +1,6 @@
 LATEST CHECKPOINT — 2026-10-21
-Read ../2026-10-21-native-volume/HANDOFF.txt and report.html.
-Implementation 2b125f41 corrects native volume integration. 445 constructions/415 limited passes unchanged. Use target/occt-span-volume-plugin. Curved-cap geometry candidate is archived, not merged.
+Read ../2026-10-21-clipped-chamfer-contacts/HANDOFF.txt and report.html.
+Implementation bb56dfdd preserves clipped contacts and terminal intersections. 449 constructions/418 limited passes. Native discrepancies and baseline geometry precision failure remain open. Use target/occt-span-volume-plugin.
 
 HISTORICAL HANDOFF FOLLOWS
 

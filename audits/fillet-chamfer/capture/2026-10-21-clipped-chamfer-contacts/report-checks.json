@@ -1,0 +1,47 @@
+{
+  "links": [
+    {
+      "href": "#done",
+      "ok": true
+    },
+    {
+      "href": "#results",
+      "ok": true
+    },
+    {
+      "href": "#remaining",
+      "ok": true
+    },
+    {
+      "href": "../../../../truck-benchmarks/results/2026-10-21-clipped-chamfer-contacts/REPORT.md",
+      "ok": true
+    },
+    {
+      "href": "../../capture/2026-10-21-clipped-chamfer-contacts/comparison-summary.json",
+      "ok": true
+    },
+    {
+      "href": "../../capture/2026-10-21-clipped-chamfer-contacts/artifacts.zip",
+      "ok": true
+    },
+    {
+      "href": "../2026-10-21-native-volume/report.html",
+      "ok": true
+    },
+    {
+      "href": "HANDOFF.txt",
+      "ok": true
+    }
+  ],
+  "scrollWidth": 1265,
+  "width": 1280,
+  "report_sha256": "48da80644b395e41bfdefcba235baff8f0e9b3419822d0a8a5354cef6ffe5b34",
+  "horizontal_overflow": false,
+  "visual_check": {
+    "tool": "html_preview",
+    "width": 1280,
+    "content_height": 1968,
+    "console_messages": [],
+    "result": "Layout inspected; no clipping or overlap."
+  }
+}
