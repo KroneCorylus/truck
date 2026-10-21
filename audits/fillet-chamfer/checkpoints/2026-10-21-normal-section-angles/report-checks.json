@@ -1,0 +1,51 @@
+{
+  "links": [
+    {
+      "href": "#done",
+      "ok": true
+    },
+    {
+      "href": "#results",
+      "ok": true
+    },
+    {
+      "href": "#remaining",
+      "ok": true
+    },
+    {
+      "href": "../../../../truck-benchmarks/results/2026-10-21-normal-section-angles/REPORT.md",
+      "ok": true
+    },
+    {
+      "href": "../../capture/2026-10-21-normal-section-angles/C1-GUIDE.md",
+      "ok": true
+    },
+    {
+      "href": "../../capture/2026-10-21-normal-section-angles/CONE-REFERENCE.md",
+      "ok": true
+    },
+    {
+      "href": "../../capture/2026-10-21-normal-section-angles/comparison-summary.json",
+      "ok": true
+    },
+    {
+      "href": "../../capture/2026-10-21-normal-section-angles/artifacts.zip",
+      "ok": true
+    },
+    {
+      "href": "../2026-10-21-native-distance/report.html",
+      "ok": true
+    },
+    {
+      "href": "HANDOFF.txt",
+      "ok": true
+    }
+  ],
+  "scrollWidth": 1265,
+  "width": 1280,
+  "visual_preview_widths": [
+    728,
+    360
+  ],
+  "report_sha256": "392274e9e7d4ca080781a8eb3ef2126070642968e45535c2d0ced55051543f0e"
+}

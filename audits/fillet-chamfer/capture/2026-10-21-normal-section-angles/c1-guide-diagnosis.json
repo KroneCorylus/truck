@@ -1,0 +1,26 @@
+{
+  "archive_sha256": "ab3ebff147d2e865cfa6038a24aa89247c73f9c53c20c71fbf65108bc0f23b57",
+  "member_sha256": {
+    "probe-c1-native-guide.cpp": "00318e3fc0c5fa0c2b374d4526264d9e7e4319ac8e285036e08cffb37f3ba3d1",
+    "probe-c1-native-guide.txt": "d77deb83c015d5b4845ed65ddb253a0fbecf2097c61048f09396c53a0fee6c02",
+    "probe-c1-native-guide-build.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "probe-c1-native-guide-dense.cpp": "f5d9c05b12b4ede0a789443c96482875c84783ea3e40e28c1e25fbc02fe0f99d",
+    "probe-c1-native-guide-dense.txt": "f46e981f7b6b5823c8656adb09499928f1485c668cf755febbbdd7bb3c7bcb5a",
+    "probe-c1-native-guide-dense-build.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "probe-c1-native-guide-dense-command.json": "a8de8d56f76c25f40e40c94b0b192b51b204ac58696a907fb1cacee0058db63c",
+    "c1-recomputed-angle.brep": "217d550a198faca284107d59e65234158a16f5ffb2b08cade33550bfaceff3fc",
+    "c1-computed-guide.brep": "a9e8b6a98b8e205d35c50c5bfb4bdc1101330e8a792ba8091082007bcd0bada8",
+    "probe-c1-contact-chords.cpp": "1c173f0b2401990c9154f1db91b838ab1a7e12ec0c10d9a6b4d0bb84572d6c81",
+    "probe-c1-contact-chords-dense.cpp": "05fd2d76f3d3af8bd3cd18c7a6e222acef879d4d1dbf6ff456743c121e0bf370",
+    "probe-c1-contact-chords-dense.txt": "114e20f85a93138aae9883998d45f06aa7a380fbd874b222d7c70a688e496b64",
+    "probe-c1-contact-chords.txt": "3a644ee3f983baafd2f16bd4509eb3c48a14bb08e7395ac8a47f96a9f4d29d76",
+    "normal-section-native-command.json": "7a25500908774165f6ac43679eb02d883c9672954724f4cc2b0349b9d4f41a2e",
+    "native-c1-input-transport.json": "02532f56ab6f5f90428781b372d5941cdc34a0c4ef9273dc53aff19c775a43e2",
+    "truck-c1-input-transport.json": "8a02e3765b439644217315ba8a1061754a750c599c4cb57dc1679ce4dbc84e8f"
+  },
+  "original_to_native_guide_sampled_distance": 0.005971920944933963,
+  "dense_guide_sample_upper_bound": 0.00597193016809689,
+  "original_guide_samples": 1001,
+  "dense_native_guide_samples": 20001,
+  "contact_samples_per_edge": 15
+}

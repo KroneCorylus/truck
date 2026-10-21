@@ -1,0 +1,41 @@
+NORMAL-SECTION ANGLES — 2026-10-21
+CHECKPOINT COMPLETE.
+
+# Normal-section distance-angle chamfers: clean capture
+
+Implementation 354f307151e7a6f35c15dd2f4d072da55fb6dd81.
+
+Added a reference-face distance-angle chamfer API. It solves the reference chord in the guide’s normal plane and the other contact at the requested angle to the new reference tangent, using the existing fitting, trimming, history and solid checks. Replay propagates typed angle constraints across the entire tangent contour. Existing distance modes keep their behavior.
+
+451 release shapeops checks, 115 stepio checks, 65 replay tests, 13 capture tests, all-target Clippy and single-thread actions smoke pass. Native reference (8), volume (27) and distance (24) checks pass. Two geometry regressions and one replay regression fail on the committed parent. Independent controls cover 48 kernel and 48 replay operations, 15,552 contact samples, both reference faces, reverse selections, transforms, topology, immutable inputs and STEP. Twelve native controls match analytic material within 3.4e-16 and exported Truck boundaries within 6.8e-12 in sampled comparisons. One existing ignore and the known geometry precision failure remain explicit.
+
+Clean capture: all 396 native cases pass across 648 operations. 451 constructions (+1) and 418 limited comparison passes (+0). All 450 prior successful result/comparison records, every task, native reference and selection scope are unchanged. C1’s distance-angle operation now constructs but still fails the unchanged 0.001 sampled comparison threshold. E5 now reaches construction and fails at trimming. Supporting the request does not mean its final result matches the native result.
+
+Statuses: {"input-import-failed": 96, "operation-succeeded": 451, "operation-failed": 92, "input-inconsistent": 9}.
+
+Status changes: [{"case": "chamfer/dist_angle/E5", "capture": "001", "changed_scope": false, "before": "unhandled-intent", "after": "operation-failed"}, {"case": "chamfer/dist_angle_sequence/C1", "capture": "001", "changed_scope": false, "before": "unhandled-intent", "after": "operation-succeeded"}].
+
+141 of 559 positive solid operations remain unresolved; 33 are constructed discrepancies.
+
+Archive SHA256: 7920b80fa87b9c0099e867da5f6db7542be87b82e08fd4292383da9627bb66b5.
+
+The parent geometry tests use a documented adapter to the existing chord API with d and d*tan(angle), because the new angle API did not exist. Parent replay assertions are unchanged. General support continuation/corner collapse is not enabled for the angle solver. No parity, global-error or performance claim. No consumer/pin changes, push or PR.
+
+C1 diagnosis: the native builder smooths its internal guide. At 1,001 input-edge samples the measured deviation reaches 0.00597; independent dense sampling agrees. Native contacts follow that internal guide, while Truck contacts follow the original edge. This helps explain the mismatch but does not change its failed comparison status or establish global accuracy. See ../../capture/2026-10-21-normal-section-angles/C1-GUIDE.md and c1-guide-diagnosis.zip.
+NEXT
+Native reference-quality follow-up: C1 internal guide smoothing and unit-cone reference-face invariance failures are reproducible. Read ../../capture/2026-10-21-normal-section-angles/C1-GUIDE.md and CONE-REFERENCE.md; both include archived native probes and hashes. Do not change Truck geometry to imitate these discrepancies or silently reclassify corpus comparisons. Cone controls reproduce unequal setback errors with either named reference face, while equal-distance controls agree. Dist_dist/C6 has corresponding contact coordinates; other cases need separate diagnosis.
+Both formerly unsupported angle requests now reach the geometry pipeline. C1 dist_angle_sequence/001 constructs but its sampled distances are about0.002300/0.002446 versus0.001. E5 still fails trim_faces. Enabling the existing projected-contact continuation did not resolve E5 and was reverted before validation. Angle continuation/collapse remain disabled. General mixed and curved junctions remain required.
+The new typed replay constraints use one variable angle mode across a contour, including its planar members. Do not feed mixed angle and derived-distance assignments to the wire builder. Old constant-section conversions retain their tests. The new public API uses a reference FaceID and Rad<f64>; no old API changed. Sole consumer call remains PiezaCAD/cad-core/src/kernel/blend.rs:229, try_chamfer_solid_along_wire; no consumer/pin migration.
+Independent angle controls:target/native-angle-controls,target/truck-normal-angle. Helpers:target/validate-normal-angle.py,package-normal-angle-proof.py,package-normal-angle-full.py,write-normal-angle-checkpoint.py,export-normal-angle.py. Parent:target/normal-angle-parent-source at594db26f. When sharing Cargo target directories across worktrees, clean the shapeops package on both sides; source paths can otherwise reuse stale test artifacts. Replay is built LAST after final validation.
+Use target/occt-distance-tree-plugin (corrected spline-span volume integration and freeform distance search). Current raw full capture:target/occt-capture-normal-section-angles. Do not revive historical Gauss volume or gradient-only distance expectations.
+Read-only follow-up:seven solid import failures are C1 angle captures002-008, bounded-edge endpoint searches. Their native vertex tolerances reach about0.000117, above strict kernel consistency. Do not simply loosen import assertions. The eighth, C1 equal capture006, contains a B-spline parameter curve on a swept support; exact mapping into the existing modeling PCurve type gets past conversion but the imported solid remains geometrically inconsistent. Scratch diagnosis:target/inspect-solid-import.rs/.txt. No import production changes are included.
+
+METHOD
+Read AGENTS.md. Parent-failing tests; no weakened assertions; shared solid/material/STEP checks.
+CARGO_BUILD_JOBS=12; rustfmt +nightly --config skip_children=true on touched Rust only; no cargo fmt.
+Freeze production during builds/tests/captures. Full release checks, all-target Clippy, single-thread actions smoke; build replay LAST.
+Commit implementation and proof before clean capture; then HTML/catalog/handoff commit. Force-add ignored JSON/ZIP/STEP/BREP fixtures. git diff --check excludes *.step and *.brep because native fixtures retain original whitespace.
+No consumer/pin changes, push, PR, subagents or unsupported performance/parity claims.
+SDK target/occt-sdk/usr/lib64;nativecheckout ../investigations/sequential-holes-2026-10-10/occt;publicdata target/occt-public-chamfer-data.
+Capture workers4,timeout120,freshoutput. Packaging is not idempotent. Never print full task/capture records: contour point arrays are large; whitelist output fields.
+Known baseline:truck-geometry pcurve_derivation absolute precision failure reproduced on parent. Preserve it explicitly; no tolerance relaxation.

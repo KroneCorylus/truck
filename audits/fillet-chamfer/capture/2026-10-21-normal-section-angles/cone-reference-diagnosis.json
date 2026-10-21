@@ -1,0 +1,139 @@
+{
+  "native_operations": 6,
+  "all_native_valid": true,
+  "rows": [
+    {
+      "reference": "plane",
+      "distances": [
+        0.1,
+        0.2
+      ],
+      "contacts": [
+        [
+          0.14142135623730953,
+          0.8585786437626906,
+          0.19999999999999998
+        ],
+        [
+          0.0,
+          0.9,
+          0.09999999999999998
+        ]
+      ]
+    },
+    {
+      "reference": "plane",
+      "distances": [
+        0.2,
+        0.1
+      ],
+      "contacts": [
+        [
+          0.07071067811865477,
+          0.9292893218813453,
+          0.09999999999999999
+        ],
+        [
+          0.0,
+          0.8906163678643946,
+          0.10938363213560542
+        ]
+      ]
+    },
+    {
+      "reference": "plane",
+      "distances": [
+        0.1,
+        0.1
+      ],
+      "contacts": [
+        [
+          0.07071067811865477,
+          0.9292893218813453,
+          0.09999999999999999
+        ],
+        [
+          0.0,
+          0.9,
+          0.09999999999999998
+        ]
+      ]
+    },
+    {
+      "reference": "cone",
+      "distances": [
+        0.1,
+        0.2
+      ],
+      "contacts": [
+        [
+          0.07071067811865475,
+          0.9292893218813454,
+          0.0999999999999999
+        ],
+        [
+          0.0,
+          0.8,
+          0.19999999999999996
+        ]
+      ]
+    },
+    {
+      "reference": "cone",
+      "distances": [
+        0.2,
+        0.1
+      ],
+      "contacts": [
+        [
+          0.07734590803390137,
+          0.9226540919660987,
+          0.1093836321356054
+        ],
+        [
+          0.0,
+          0.9,
+          0.09999999999999998
+        ]
+      ]
+    },
+    {
+      "reference": "cone",
+      "distances": [
+        0.1,
+        0.1
+      ],
+      "contacts": [
+        [
+          0.07071067811865477,
+          0.9292893218813453,
+          0.09999999999999999
+        ],
+        [
+          0.0,
+          0.9,
+          0.09999999999999998
+        ]
+      ]
+    }
+  ],
+  "archive_sha256": "9f5b7fe12e9e2177c25585992b3703d75166f04a28e8967053f40df6b6a51f1c",
+  "member_sha256": {
+    "0.input.brep": "8b3ba2590828a65757488b163ccd58530efba7b6abd63046d945a627396ed73e",
+    "0.result.brep": "d504c7506651fc848346cb91b7730add02426e8975d140b03578475f85a86f77",
+    "1.input.brep": "8b3ba2590828a65757488b163ccd58530efba7b6abd63046d945a627396ed73e",
+    "1.result.brep": "602fda2e25f272097d7dd6a993f1726cfe19b5b132ac78f55c410bd1a20d40fa",
+    "2.input.brep": "8b3ba2590828a65757488b163ccd58530efba7b6abd63046d945a627396ed73e",
+    "2.result.brep": "fdf0248bb25eba1d625936df322957fee524da5e74bb22c54c32449d8f50355f",
+    "3.input.brep": "8b3ba2590828a65757488b163ccd58530efba7b6abd63046d945a627396ed73e",
+    "3.result.brep": "91ca842101eeab3ebd2d51a5a9dfe42ed3b1728fcb55d5160a72810a23c3b899",
+    "4.input.brep": "8b3ba2590828a65757488b163ccd58530efba7b6abd63046d945a627396ed73e",
+    "4.result.brep": "2739a4ae539901d31650f2267ecbca4f41ac005f50fcdebdcc166af95c68afbd",
+    "5.input.brep": "8b3ba2590828a65757488b163ccd58530efba7b6abd63046d945a627396ed73e",
+    "5.result.brep": "ec333fe055ee6eeca5171c768a2242b672a1b817b06a50463870e3018e1e93bb",
+    "probe-native-cone-distances.cpp": "c9dfcb7b4832a50e3f445276dfbf970d14361cccac5efba2d4e1740bf44c368b",
+    "probe-native-cone-distances.txt": "83c6dc6a3631f8b5fd86f83e08af6b8353bf5569722722baaee7e81ee3678c65",
+    "probe-native-cone-distances-build.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "probe-native-cone-distances-command.json": "9fbd6b9db19ab72957b88d774022f161661655c96908251626e37eebaf78e864"
+  }
+}

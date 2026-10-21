@@ -1,6 +1,6 @@
 LATEST CHECKPOINT — 2026-10-21
-Read ../2026-10-21-native-distance/HANDOFF.txt and report.html.
-Implementation 5fe64d33 corrects native freeform distance measurement. 450 constructions/418 limited passes; 141 positive solid cases unresolved. Use target/occt-distance-tree-plugin.
+Read ../2026-10-21-normal-section-angles/HANDOFF.txt and report.html.
+Implementation 354f3071 adds variable normal-section distance-angle contacts. 451 constructions/418 limited passes; 141 positive solid operations unresolved. Use target/occt-distance-tree-plugin.
 
 HISTORICAL HANDOFF FOLLOWS
 
