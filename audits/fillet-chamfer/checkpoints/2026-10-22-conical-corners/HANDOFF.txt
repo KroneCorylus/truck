@@ -1,0 +1,45 @@
+CONICAL SUPPORT CORNERS — 2026-10-22
+CHECKPOINT COMPLETE. CONTINUE REMAINING CASES.
+
+# Conical support corners: clean capture
+
+Implementation 67ac586bbfe6ce098121f084946574ee5ed72df9.
+
+Three selected edges on an outward cone and two planes now join an exact rolling sphere, toroidal cap rounds and fitted cone/radial-plane blends. Regular hyperbolic rolling centers handle axial terminations. Fitted contacts intersect remote caps before trim assembly; geometry, closure and trim checks remain.
+
+467 release shapeops tests, 119 STEP tests, 74 replay tests, 13 capture tests, all-target Clippy and the single-thread benchmark smoke check pass. Native reference (8), volume (27) and distance (24) checks pass. Two regressions fail on the parent with identical sources and fixtures. Controls cover 48 procedural operations, eight oversized rejections and eight normalized imported selections. Four original-scale production replays pass their construction checks. One existing ignore, two existing test warnings and the known geometry precision failure remain explicit.
+
+All 396 native cases pass across 648 captured operations. 477 constructions (+4) and 437 limited comparison passes (+0). All 473 previous successful result/comparison records are exactly unchanged, as are every input task, native reference and selection scope.
+
+The initial four-worker capture encountered a kernel-confirmed out-of-memory kill in J3. A one-worker J3 retry exactly matched the previous result and native comparison with identical code, executables and inputs. The complete capture was then repeated with one worker; all 473 previous successes match exactly. The failed attempt, kernel log and serial retry are retained in capture-retry.zip with checked hashes.
+
+C2, C6, C8 and D1 now construct but remain sampled-comparison discrepancies. C2 and C8 native corner samples differ from their exact radius-10 sphere by about 0.1655 and 4.8284; corresponding Truck samples lie on the sphere to numerical precision. Independent material integration converges within 2e-8 and checks raw and exported STEP solids. These observations do not explain every discrepancy. Canonical thresholds and statuses remain unchanged; no global-error bound or full parity is claimed.
+
+Statuses: {"input-import-failed": 95, "operation-succeeded": 477, "operation-failed": 66, "input-inconsistent": 10}.
+
+122 of 559 positive solid operations remain unresolved; 40 are constructed discrepancies.
+
+Archive SHA256: 9a8cb1f2dfe4d335428b7b7cf4f83a6b4a01e1171472d2ab37dcadeff0680423.
+
+No assertions, thresholds or replay fitting budgets changed. No parity, global-error or performance claim. No consumer/pin changes, push or PR.
+
+NEXT
+Continue until all cases are addressed; do not stop after this checkpoint.
+Use one capture worker: four overlapping replays exhausted RAM; initial OOM and exact serial retry are preserved in capture-retry.zip/json. Final capture repeats all cases with one worker and all 473 old successes exactly unchanged.
+Raw capture target/occt-capture-conical-corners. Parent target/conical-corner-parent-source at 86864851. Helpers target/prove-conical-corner-parent.py, validate-conical-corners.py, verify-conical-corner-replays.py, package-conical-corner-proof.py, package-conical-corners-full.py, write-conical-corner-checkpoint.py.
+Cone proof has48 procedural operations,8 collision rejections,8 normalized native selections and4 original-scale replays. Independent active-constraint projection and domain-aware quadrature128/256 differ below2e-8. All four native comparisons remain discrepancies; C2/C8 sphere residual diagnoses are archived. Do not relabel them or relax comparator thresholds. C6/D1 discrepancies remain only partially diagnosed.
+Next family: torus/two-plane corners E6/E8/F1/F3. target/torus-corner-design contains native surface inspection; all four have one outward torus plus four planes. E6/F3 select lower rim+meridian+lower radial; E8/F1 select upper rim+meridian+upper radial. Torus inward offset preserves major radius and reduces minor radius by r. For one cap and radial wall, intersect the offset torus with the two offset planes to locate the exact corner sphere. Torus/cap rounds are exact tori. Torus/radial-plane centers can be parameterized by minor angle theta: rho=major+(minor-r)*cos(theta); lateral=sqrt(rho*rho-r*r); height=(minor-r)*sin(theta). Fit contact circles using exact support UVs, then intersect remote side contacts with their terminal. F1/F3 meridians span160degrees and need explicit sheet/branch preservation. An isolated torus prototype now exists in target/torus-corner-source, prepared by target/prepare-torus-corner-probe.py. E6/E8/F3 construct, but all remain native comparison discrepancies. target/torus_corner_junctions.rs passes36 procedural operations across3radii,2placements,2selectionorders;6oversized and1mixed-sign rejections preserve input. target/torus-native-replay.rs passes6normalized imported selections with STEP enabled. Independent target/torus-corner-volume.cpp integrates E6/E8 by offset-solid projection and F3 by subtracting a rounded inner cavity from its filled outer dome;128/256 convergence below1e-7,256/512 at radius.1 below5e-9. F1 has signeddihedrals(+1,-.93969,+1), and is deliberately rejected; it needs a mixed convex/concave junction. No torus root changes, parent proof, full validation or clean capture yet. Read target/torus-corner-design.txt before proceeding. Current native comparison max distances E6 .09921, E8 .01228, F3 .14737; do notcountthemresolved.
+Additional isolated mixed-corner work: target/mixed-curved-ready-source starts from the torus prototype and retries failed open tangent-chain trims with internal contact-range continuation on the original guides. Existing successful paths remain first. F1 can be built by rounding the concave rim then the resulting tangent three-edge wall chain; six normalized controls (three radii, both chain directions) pass radius<1e-5, ten G1 joins>1-1e-7, independent material, STEP and unchanged input. Independent flux oracle target/mixed-torus-volume.cpp and derivation target/mixed-torus-volume-method.txt; radius.1 volume1.535440006371805. Original-scale sampled native comparison with production-equivalent fit tolerance .001 gives max .00023017, but this is prototype evidence, not a canonical pass. Direct three-edge API composition passes twelve controls across three radii, two placements and both selection orders; four oversized rejections preserve input, and isolated library Clippy passes; target/mixed-curved-direct-controls.rs. H7 sequential probe constructs without full proof; H3 fails a remote polar termination. None of this is in root, and no old assertion or canonical comparator has been changed. Finish convex torus checkpoint before integrating mixed work.
+The cone prototype sweep showed only C2/C6/C8/D1 gaining construction. H9 now reaches local construction but rejects OutsideNeighbour, instead of the prior NonPlanarFace; inspect before extending scope. General curved two-edge junctions and multi-support corners remain unsupported.
+Sphere checkpoint98af2566/86864851 stays at473/437 before this change. D9/E4 native reference and E4 surface-volume integration discrepancies stay explicit. The original-scale repeated E4 STEP stress experiment was stopped after20minutes/8GB and is not passing evidence; do not restart automatically.
+G9 contacts cross two seams at different stations; X1 radius15 exceeds prior convex cylinder radius10 and requires a new corner patch. C2 sequential chamfers consume prior0.2 cuts with new0.5 cuts. Seven solid imports and ten inconsistent solids remain in the C1 sequences. A1 retains a chamfer-corner discrepancy. Unequal shared-vertex radii A4/P9 need a different corner construction. Earlier checkpoints retain reference diagnoses. Consumer unchanged; no push/PR.
+
+METHOD
+Read AGENTS.md. Parent-failing tests; no weakened assertions; shared solid/material/STEP checks.
+CARGO_BUILD_JOBS=12; rustfmt +nightly --config skip_children=true on touched Rust only; no cargo fmt.
+Freeze production during builds/tests/captures. Full release checks, all-target Clippy, single-thread actions smoke; build replay LAST.
+Commit implementation and proof before clean capture; then HTML/catalog/handoff commit. Force-add ignored JSON/ZIP/STEP/BREP fixtures. git diff --check excludes *.step and *.brep because native fixtures retain original whitespace.
+No consumer/pin changes, push, PR, subagents or unsupported performance/parity claims.
+SDK target/occt-sdk/usr/lib64;nativecheckout ../investigations/sequential-holes-2026-10-10/occt;publicdata target/occt-public-chamfer-data.
+Capture workers1,timeout120,freshoutput. Four-worker capture caused a confirmed global OOM; retained retry evidence explains the serial policy. Packaging is not idempotent. Never print full task/capture records: contour point arrays are large; whitelist output fields.
+Known baseline:truck-geometry pcurve_derivation absolute precision failure reproduced on parent. Preserve it explicitly; no tolerance relaxation.
