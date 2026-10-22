@@ -1,0 +1,42 @@
+EXTRUDED SPLINE PARAMETER CURVES — 2026-10-22
+CHECKPOINT COMPLETE. CONTINUE REMAINING CASES.
+
+# Extruded spline parameter curves: clean capture
+
+Implementation fc7757a214dd571c3c11dd99fe4c33e01692bdec.
+
+B-spline parameter curves on exactly parameterized extruded supports now import without approximation. Finite extrusion domains include complete parameter-curve bounds, including small endpoint extrapolation from STEP round trips. Malformed and collapsed traces remain rejected.
+
+452 release shapeops tests, 119 stepio tests, 66 replay tests, 13 capture tests, all-target Clippy and single-thread actions smoke pass. Native reference (8), volume (27) and distance (24) checks pass. Three regressions fail on the committed parent with identical tests and fixtures. Controls cover 64 exact traces, 8,256 point/tangent/curvature samples and 16 imported face domains with 8,256 boundary samples. The actual C1 fixture also passes exact trace and face-domain checks. One existing ignore and the known geometry precision failure remain explicit.
+
+All 396 native cases pass across 648 operations. 452 constructions (+0) and 419 limited comparison passes (+0). All 452 prior successful result/comparison records, every input task, native reference and selection scope are unchanged. C1 equal-distance capture 006 moves from input-import-failed to input-inconsistent: its missing representation is supported, while its remaining off-surface edges still fail strict consistency. This checkpoint does not add a successful chamfer or comparison pass.
+
+Statuses: {"input-import-failed": 95, "operation-succeeded": 452, "operation-failed": 91, "input-inconsistent": 10}.
+
+Status changes: [{"case": "chamfer/equal_dist_sequence/C1", "capture": "006", "changed_scope": false, "before": "input-import-failed", "after": "input-inconsistent"}].
+
+140 of 559 positive solid operations remain unresolved; 33 are constructed discrepancies.
+
+Archive SHA256: 10a7d3c28611c128ea1fc83c3437e81487f1a48cc45fd0651a95873cbd79ab63.
+
+No assertions or thresholds are weakened. No parity, global-error or performance claim. No consumer/pin changes, push or PR.
+
+NEXT
+Continue remaining construction groups; the user's instruction is to continue until all cases are addressed, without stopping after this checkpoint.
+Raw full capture:target/occt-capture-spline-pcurves. Plugin:target/occt-distance-tree-plugin. Parent:target/spline-pcurve-parent-source at e3568eb7. Helpers:target/validate-spline-pcurves.py,package-spline-pcurve-proof.py,package-spline-pcurves-full.py,write-spline-pcurve-checkpoint.py. Build replay last; clean stepio and shapeops on root after shared-worktree parent builds.
+NEXT PROTOTYPE IS SCRATCH ONLY, NOT VALIDATED OR APPLIED: target/curved-terminal-proposal/{planar.rs,chamfer_miter.rs,planar_edge.rs,planar_fillet.rs}; generator target/prepare-curved-terminal-proposal.py. It extends local planar fillet junctions to single curved terminal faces when multiple edges are selected. It preserves existing planar corner construction, intersects constant-radius cylinders with terminal supports, and trims neighboring conic edges instead of replacing them with lines. Do not claim it works before building and validating.
+Regression target/curved-terminal-junction-test.rs builds procedural quarter cylinder/cone sectors and has already failed on current production after passing input material checks. It uses an absolute common/mod.rs path only because it is scratch; change to mod common when installing into truck-shapeops/tests. Sixteen planned operations cover two geometries, two radii, transformed scales and reversed selection order, exact radii, nine tangency joins, closed mesh, independent material and STEP. First compile may expose prototype errors. Parent proof still required for final tests.
+Independent volume oracle target/curved-terminal-volume.py/.json: integrate quarter-disk cross-sections clipped by the rounded three-plane corner. Cylinder B1 agrees with native material within2.52e-7 at volume192228; cone B9 within1.33e-8 at volume517494. Keep those independent equations in the tests. Other curved junctions need separate controls.
+C1 equal006 now imports but remains inconsistent. Seven angle-sequence imports still fail bounded-edge endpoints; ten C1 solids now report geometric inconsistency. Root fixture tests explicitly prove the exact trace and its face bounds, not whole-solid consistency. Scratch diagnosis:target/c1-input-diagnosis and inspect-solid-consistency.rs. Do not loosen checks or conflate representation support with healing.
+Read-only comparison locations:target/probe-comparison-locations.py/.cpp, comparison-locations-{G1,H4,K2}.txt/.json. G1 worstnativepoint is an edge endpoint region; H4's truck-to-native maximum occurs at the retained ellipsoid pole. Existing H4 tests have an independent material integral and assert pole preservation. The native result volume decreases at that concave axis while Truck's increases; investigate native geometry before changing Truck to imitate it. No native-reference conclusion is established for H4 yet. C1 guide smoothing and unit-cone reference-face diagnoses remain in 2026-10-21-normal-section-angles.
+Consumer PiezaCAD/cad-core/src/kernel/blend.rs:229 still calls try_chamfer_solid_along_wire. No consumer/pin migration.
+
+METHOD
+Read AGENTS.md. Parent-failing tests; no weakened assertions; shared solid/material/STEP checks.
+CARGO_BUILD_JOBS=12; rustfmt +nightly --config skip_children=true on touched Rust only; no cargo fmt.
+Freeze production during builds/tests/captures. Full release checks, all-target Clippy, single-thread actions smoke; build replay LAST.
+Commit implementation and proof before clean capture; then HTML/catalog/handoff commit. Force-add ignored JSON/ZIP/STEP/BREP fixtures. git diff --check excludes *.step and *.brep because native fixtures retain original whitespace.
+No consumer/pin changes, push, PR, subagents or unsupported performance/parity claims.
+SDK target/occt-sdk/usr/lib64;nativecheckout ../investigations/sequential-holes-2026-10-10/occt;publicdata target/occt-public-chamfer-data.
+Capture workers4,timeout120,freshoutput. Packaging is not idempotent. Never print full task/capture records: contour point arrays are large; whitelist output fields.
+Known baseline:truck-geometry pcurve_derivation absolute precision failure reproduced on parent. Preserve it explicitly; no tolerance relaxation.
