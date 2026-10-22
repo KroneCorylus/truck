@@ -1,0 +1,41 @@
+CYLINDER RIM FILLET CORNERS — 2026-10-22
+CHECKPOINT COMPLETE. CONTINUE REMAINING CASES.
+
+# Cylinder rim fillet corners: clean capture
+
+Implementation 4ffc8523107c00d692bcc14218dec2df56b04b34.
+
+Three selected edges can now meet between an outer cylinder, a perpendicular cap and a radial plane. Exact offset intersections place a spherical corner shared by two cylindrical rounds and a toroidal rim. Circular contact arcs preserve the trimmed sweep, including cuts beyond the original rim midpoint.
+
+458 release shapeops tests, 119 STEP tests, 69 replay tests, 13 capture tests, all-target Clippy and the single-thread benchmark smoke check pass. Native reference (8), volume (27) and distance (24) checks pass. Two regressions fail on the parent with identical sources and fixtures. Controls cover 24 successful variants, four collision rejections, 3,672 tangent-normal pairs and four imported selections at two STEP fitting budgets. One existing ignore, an existing test warning and the known geometry precision failure remain explicit.
+
+All 396 native cases pass across 648 captured operations. 462 constructions (+2) and 429 limited comparison passes (+2). All 460 previous successful result/comparison records are exactly unchanged, as are every input task, native reference and selection scope.
+
+New limited passes: blend/simple/B3/001 and blend/simple/B7/001.
+
+Statuses: {"input-import-failed": 95, "operation-succeeded": 462, "operation-failed": 81, "input-inconsistent": 10}.
+
+130 of 559 positive solid operations remain unresolved; 33 are constructed discrepancies.
+
+Independent section integration gives B3 volume 190760.57996317057 and B7 volume 580239.2966730265, within 1.2e-9 absolute volume of native.
+
+Archive SHA256: e5214f1736ce1964cd369e0f6411f02a49449842a6ed634eb010433d87413900.
+
+No assertions, thresholds or replay fitting budgets changed. No global-error, parity or performance claim. No consumer/pin changes, push or PR.
+
+NEXT
+Continue until all cases are addressed; do not stop after this checkpoint.
+Raw capture target/occt-capture-cylindrical-corners. Parent target/cylindrical-corner-parent-source at 3627c53f. Helpers target/prove-cylindrical-corner-parent.py, validate-cylindrical-corners.py, package-cylindrical-corner-proof.py, package-cylindrical-corners-full.py, write-cylindrical-corner-checkpoint.py.
+Next equal_dist_complex/A1: two transition triangles in chamfer_miter have reversed boundary orientation. The current bevel-normal-sum heuristic is wrong for unequal convex bevels on a nonconvex solid. Scratch target/miter-diagnostic.rs uses the remaining original edge and its longer adjacent face segment to orient the transition. It constructs A1 consistently and closed, but native comparison still fails: volume 1.0931899122619453 versus native 1.0929679122618834 and sampled maxima 0.0212132/0.0288675. This is a topology repair, not a resolved native-comparison case. The focused 64-case procedural regression target/chamfer-transition-orientation.rs fails on the current public API; scratch target/chamfer-transition-prototype.rs passes. Independent volume=3000-10*a*a/2-20*b*b/2+a*b*(a+b)/6, derived by splitting cut prisms at z=b*x/a. Test both orders, both caps, both sides, four setback pairs and rigid/uniform scaling. Existing mixed controls are being checked in target/chamfer-transition-mixed-controls.rs. Diagnostic instrumentation is ONLY under target; remove it when integrating the small orientation fix. Need parent-proof, native regression, full validation and fresh capture.
+The earlier curved-terminal checkpoint records C1 imports/inconsistency, consumed chamfer boundaries, nonlinear cone corners and native-reference diagnoses. Keep all unresolved comparisons explicit. Do not imitate native incorrect material.
+Consumer ../PiezaCAD/cad-core/src/kernel/blend.rs:229 unchanged. No push or PR.
+
+METHOD
+Read AGENTS.md. Parent-failing tests; no weakened assertions; shared solid/material/STEP checks.
+CARGO_BUILD_JOBS=12; rustfmt +nightly --config skip_children=true on touched Rust only; no cargo fmt.
+Freeze production during builds/tests/captures. Full release checks, all-target Clippy, single-thread actions smoke; build replay LAST.
+Commit implementation and proof before clean capture; then HTML/catalog/handoff commit. Force-add ignored JSON/ZIP/STEP/BREP fixtures. git diff --check excludes *.step and *.brep because native fixtures retain original whitespace.
+No consumer/pin changes, push, PR, subagents or unsupported performance/parity claims.
+SDK target/occt-sdk/usr/lib64;nativecheckout ../investigations/sequential-holes-2026-10-10/occt;publicdata target/occt-public-chamfer-data.
+Capture workers4,timeout120,freshoutput. Packaging is not idempotent. Never print full task/capture records: contour point arrays are large; whitelist output fields.
+Known baseline:truck-geometry pcurve_derivation absolute precision failure reproduced on parent. Preserve it explicitly; no tolerance relaxation.

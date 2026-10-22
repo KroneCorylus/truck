@@ -1,6 +1,6 @@
 LATEST CHECKPOINT — 2026-10-22
-Read ../2026-10-22-polar-terminals/HANDOFF.txt and report.html.
-Implementation aa770b1f fixes sphere-pole terminal contacts. 460 constructions/427 limited passes; 132 positive solid operations unresolved. Use target/occt-distance-tree-plugin.
+Read ../2026-10-22-cylindrical-corners/HANDOFF.txt and report.html.
+Implementation 4ffc8523 adds cylinder rim fillet corners. 462 constructions/429 limited passes; 130 positive solid operations unresolved. Use target/occt-distance-tree-plugin.
 
 HISTORICAL HANDOFF FOLLOWS
 

@@ -3,7 +3,7 @@
     "title": "Fillet and chamfer feature parity audit",
     "baseline": "OCCT V7_9_3 source inventory plus the recorded Truck/Pieza revisions. Includes 3D, 2D, related workflows and all textual candidates under the discovery rules.",
     "meaning_of_all": "Every dedicated test-grid entry, matching registered test/helper, discovered blend command and retained reference in this pinned checkout. This is not a claim about all mathematical configurations or current/future OCCT releases.",
-    "execution": "All 396 native cases pass across 648 captured operations. 460 constructions (+1) and 427 limited comparison passes (+1). All 459 prior successes retain their checks; 458 result/comparison records are exactly unchanged. E1 also uses the analytic fallback: its sampled maximum distance and STEP material error decrease. Every input task, native reference and selection scope is unchanged. 132 of 559 positive solid operations remain unresolved; 88 inputs have no solid and one rejection matches native.",
+    "execution": "All 396 native cases pass across 648 captured operations. 462 constructions (+2) and 429 limited comparison passes (+2). All 460 previous successful result/comparison records are exactly unchanged, as are every input task, native reference and selection scope. 130 of 559 positive solid operations remain unresolved; 88 inputs have no solid and one rejection matches native.",
     "mapping": "Capability assessments describe observable outcomes supported or restricted by reviewed source evidence. Per-case tags and links are automated hints; they do not prove Truck handles that fixture.",
     "objective": "Achieve at least OCCT-level fillet/chamfer capabilities and robustness for equivalent modeling tasks in Truck/Pieza.",
     "equivalence": "Judge the requested geometry, dimensions, validity, editing behavior and practical performance. Different APIs, algorithms, languages, surface representations and internal operation sequences are acceptable. Missing a corresponding OCCT method is not evidence of a feature gap.",
@@ -2260,6 +2260,12 @@
           "path": "truck-benchmarks/results/2026-10-22-polar-terminals/REPORT.md",
           "find": "# Sphere-pole terminal",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-22-cylindrical-corners/REPORT.md",
+          "find": "# Cylinder rim fillet corners",
+          "role": "test"
         }
       ],
       "required_outcome": "Terminate a blend correctly against oblique end faces while preserving the requested radius and a valid boundary.",
@@ -2272,7 +2278,8 @@
         "At dbb54343, draft/angle/F1 terminates a vertical planar-edge fillet against a sphere. Independent filleted volume is 21454.331120055493; native integration of Truck STEP differs by 0.000298534. Bidirectional sampled distances are below 1.910e-6 at replay tolerance .001. The later native draft operation is not captured.",
         "At 0522d735, an independent G1 rolling-radius/contact oracle verifies native input supports, radius1000 and analytic controls across three sample grids. Native maximum radius residual0.14305548 and plane-contact distance0.34871939 exceed Truck STEP values4.5934381e-6 and0.00021494676. Default/tight native rebuilds reproduce the discrepancy. Both existing two-edge fillet solid/STEP regressions pass unchanged. This identifies sampled native reference error without changing geometry, thresholds or the 231/220 corpus counts; G1 remains a sampled mismatch and no global bound/full parity is claimed.",
         "At da62f251, planar multi-edge fillet corners meet curved terminal faces. Two identical-source parent-failing regressions; 32 geometric variants, eight rejections, 5168 tangent-normal pairs, eight imported selections at two STEP budgets. 454 shapeops/119 STEP/67 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 459/426: seven new limited passes, all 452 prior successes exactly unchanged. This covers curved terminal cuts, not arbitrary curved-support corner filling.",
-        "At aa770b1f, sphere-pole terminal contacts use an analytic fallback after numerical intersection fails. Two identical-source parent-failing regressions; eight geometric variants, two rejections, 264 support samples and two imported selections at two STEP budgets. 456 shapeops/119 STEP/68 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 460/427: E2 gains a limited pass; all 459 previous successes retain their checks, with 458 exactly unchanged and improved E1 sampled distance/material."
+        "At aa770b1f, sphere-pole terminal contacts use an analytic fallback after numerical intersection fails. Two identical-source parent-failing regressions; eight geometric variants, two rejections, 264 support samples and two imported selections at two STEP budgets. 456 shapeops/119 STEP/68 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 460/427: E2 gains a limited pass; all 459 previous successes retain their checks, with 458 exactly unchanged and improved E1 sampled distance/material.",
+        "At 4ffc8523, outer-cylinder/cap/radial-plane three-edge corners use exact sphere, cylinder and torus patches. Two identical-source parent-failing regressions; 24 variants, four rejections, 3672 tangent-normal pairs and four imported selections. 458 shapeops/119 STEP/69 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 462/429: B3 and B7 gain limited passes; all 460 prior successes are exactly unchanged."
       ]
     },
     {
@@ -2394,12 +2401,19 @@
           "path": "truck-benchmarks/results/2026-10-22-polar-terminals/REPORT.md",
           "find": "# Sphere-pole terminal",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-22-cylindrical-corners/REPORT.md",
+          "find": "# Cylinder rim fillet corners",
+          "role": "test"
         }
       ],
       "required_outcome": "Join three equal-radius, same-concavity rounds at a valid corner over general planar support angles.",
       "verification": [
         "At da62f251, planar multi-edge fillet corners meet curved terminal faces. Two identical-source parent-failing regressions; 32 geometric variants, eight rejections, 5168 tangent-normal pairs, eight imported selections at two STEP budgets. 454 shapeops/119 STEP/67 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 459/426: seven new limited passes, all 452 prior successes exactly unchanged. This covers curved terminal cuts, not arbitrary curved-support corner filling.",
-        "At aa770b1f, sphere-pole terminal contacts use an analytic fallback after numerical intersection fails. Two identical-source parent-failing regressions; eight geometric variants, two rejections, 264 support samples and two imported selections at two STEP budgets. 456 shapeops/119 STEP/68 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 460/427: E2 gains a limited pass; all 459 previous successes retain their checks, with 458 exactly unchanged and improved E1 sampled distance/material."
+        "At aa770b1f, sphere-pole terminal contacts use an analytic fallback after numerical intersection fails. Two identical-source parent-failing regressions; eight geometric variants, two rejections, 264 support samples and two imported selections at two STEP budgets. 456 shapeops/119 STEP/68 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 460/427: E2 gains a limited pass; all 459 previous successes retain their checks, with 458 exactly unchanged and improved E1 sampled distance/material.",
+        "At 4ffc8523, outer-cylinder/cap/radial-plane three-edge corners use exact sphere, cylinder and torus patches. Two identical-source parent-failing regressions; 24 variants, four rejections, 3672 tangent-normal pairs and four imported selections. 458 shapeops/119 STEP/69 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 462/429: B3 and B7 gain limited passes; all 460 prior successes are exactly unchanged."
       ]
     },
     {
@@ -2493,12 +2507,19 @@
           "path": "truck-benchmarks/results/2026-10-22-polar-terminals/REPORT.md",
           "find": "# Sphere-pole terminal",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-22-cylindrical-corners/REPORT.md",
+          "find": "# Cylinder rim fillet corners",
+          "role": "test"
         }
       ],
       "required_outcome": "Construct valid transitions where convex and concave blends meet, including oblique support configurations.",
       "verification": [
         "At da62f251, planar multi-edge fillet corners meet curved terminal faces. Two identical-source parent-failing regressions; 32 geometric variants, eight rejections, 5168 tangent-normal pairs, eight imported selections at two STEP budgets. 454 shapeops/119 STEP/67 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 459/426: seven new limited passes, all 452 prior successes exactly unchanged. This covers curved terminal cuts, not arbitrary curved-support corner filling.",
-        "At aa770b1f, sphere-pole terminal contacts use an analytic fallback after numerical intersection fails. Two identical-source parent-failing regressions; eight geometric variants, two rejections, 264 support samples and two imported selections at two STEP budgets. 456 shapeops/119 STEP/68 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 460/427: E2 gains a limited pass; all 459 previous successes retain their checks, with 458 exactly unchanged and improved E1 sampled distance/material."
+        "At aa770b1f, sphere-pole terminal contacts use an analytic fallback after numerical intersection fails. Two identical-source parent-failing regressions; eight geometric variants, two rejections, 264 support samples and two imported selections at two STEP budgets. 456 shapeops/119 STEP/68 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 460/427: E2 gains a limited pass; all 459 previous successes retain their checks, with 458 exactly unchanged and improved E1 sampled distance/material.",
+        "At 4ffc8523, outer-cylinder/cap/radial-plane three-edge corners use exact sphere, cylinder and torus patches. Two identical-source parent-failing regressions; 24 variants, four rejections, 3672 tangent-normal pairs and four imported selections. 458 shapeops/119 STEP/69 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 462/429: B3 and B7 gain limited passes; all 460 prior successes are exactly unchanged."
       ]
     },
     {
@@ -2625,12 +2646,19 @@
           "path": "truck-benchmarks/results/2026-10-22-polar-terminals/REPORT.md",
           "find": "# Sphere-pole terminal",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-22-cylindrical-corners/REPORT.md",
+          "find": "# Cylinder rim fillet corners",
+          "role": "test"
         }
       ],
       "required_outcome": "Close multi-blend corners on general curved supports with valid contact and continuity, independent of patch construction method.",
       "verification": [
         "At da62f251, planar multi-edge fillet corners meet curved terminal faces. Two identical-source parent-failing regressions; 32 geometric variants, eight rejections, 5168 tangent-normal pairs, eight imported selections at two STEP budgets. 454 shapeops/119 STEP/67 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 459/426: seven new limited passes, all 452 prior successes exactly unchanged. This covers curved terminal cuts, not arbitrary curved-support corner filling.",
-        "At aa770b1f, sphere-pole terminal contacts use an analytic fallback after numerical intersection fails. Two identical-source parent-failing regressions; eight geometric variants, two rejections, 264 support samples and two imported selections at two STEP budgets. 456 shapeops/119 STEP/68 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 460/427: E2 gains a limited pass; all 459 previous successes retain their checks, with 458 exactly unchanged and improved E1 sampled distance/material."
+        "At aa770b1f, sphere-pole terminal contacts use an analytic fallback after numerical intersection fails. Two identical-source parent-failing regressions; eight geometric variants, two rejections, 264 support samples and two imported selections at two STEP budgets. 456 shapeops/119 STEP/68 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 460/427: E2 gains a limited pass; all 459 previous successes retain their checks, with 458 exactly unchanged and improved E1 sampled distance/material.",
+        "At 4ffc8523, outer-cylinder/cap/radial-plane three-edge corners use exact sphere, cylinder and torus patches. Two identical-source parent-failing regressions; 24 variants, four rejections, 3672 tangent-normal pairs and four imported selections. 458 shapeops/119 STEP/69 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 462/429: B3 and B7 gain limited passes; all 460 prior successes are exactly unchanged."
       ]
     },
     {
@@ -4355,6 +4383,12 @@
           "path": "truck-benchmarks/results/2026-10-22-polar-terminals/REPORT.md",
           "find": "# Sphere-pole terminal",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-22-cylindrical-corners/REPORT.md",
+          "find": "# Cylinder rim fillet corners",
+          "role": "test"
         }
       ],
       "required_outcome": "Deliver blend results usable for closed meshing, STEP interchange and further modeling while preserving dimensions and validity.",
@@ -4406,7 +4440,8 @@
         "At 71edbef1, open chamfers rebuild a shared terminal face with both end bridges. Two parent-failing regressions cover six equal/unequal,scaled,transformed/reversed variants with analytic material/cone/normals and shared solid/STEP checks. Three native controls export valid single STEP,maxsample6.97e-9. Fullshapeops391pass/0fail/1existingignored,33replay,Clippy/smoke pass. Cleanfullcapture:231construct/220limitedpasses,all231successful results/comparisons exactly unchanged. No parity upgrade.",
         "At fc7757a2, extruded spline parameter curves retain exact traces and complete finite face bounds. Three identical-source parent-failing regressions;64 traces,8256 trace samples,16 domains,8256 boundary samples and actual C1 fixture.452shapeops/119stepio/66replay/13capture,Clippy/smoke pass. Clean capture:452/419;452 prior complete results unchanged. C1 equal006 imports but remains geometrically inconsistent;no comparison upgrade.",
         "At da62f251, planar multi-edge fillet corners meet curved terminal faces. Two identical-source parent-failing regressions; 32 geometric variants, eight rejections, 5168 tangent-normal pairs, eight imported selections at two STEP budgets. 454 shapeops/119 STEP/67 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 459/426: seven new limited passes, all 452 prior successes exactly unchanged. This covers curved terminal cuts, not arbitrary curved-support corner filling.",
-        "At aa770b1f, sphere-pole terminal contacts use an analytic fallback after numerical intersection fails. Two identical-source parent-failing regressions; eight geometric variants, two rejections, 264 support samples and two imported selections at two STEP budgets. 456 shapeops/119 STEP/68 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 460/427: E2 gains a limited pass; all 459 previous successes retain their checks, with 458 exactly unchanged and improved E1 sampled distance/material."
+        "At aa770b1f, sphere-pole terminal contacts use an analytic fallback after numerical intersection fails. Two identical-source parent-failing regressions; eight geometric variants, two rejections, 264 support samples and two imported selections at two STEP budgets. 456 shapeops/119 STEP/68 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 460/427: E2 gains a limited pass; all 459 previous successes retain their checks, with 458 exactly unchanged and improved E1 sampled distance/material.",
+        "At 4ffc8523, outer-cylinder/cap/radial-plane three-edge corners use exact sphere, cylinder and torus patches. Two identical-source parent-failing regressions; 24 variants, four rejections, 3672 tangent-normal pairs and four imported selections. 458 shapeops/119 STEP/69 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 462/429: B3 and B7 gain limited passes; all 460 prior successes are exactly unchanged."
       ]
     },
     {
