@@ -1,6 +1,6 @@
 LATEST CHECKPOINT — 2026-10-22
-Read ../2026-10-22-conical-corners/HANDOFF.txt and report.html.
-Implementation 67ac586b constructs conical support corners. 477 constructions/437 limited passes; 122 positive solid operations unresolved. Use target/occt-distance-tree-plugin.
+Read ../2026-10-22-torus-corners/HANDOFF.txt and report.html.
+Implementation 066b4880 constructs toroidal support corners. 480 constructions/437 limited passes; 122 positive solid operations unresolved. Use target/occt-distance-tree-plugin.
 
 HISTORICAL HANDOFF FOLLOWS
 
