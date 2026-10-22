@@ -4546,6 +4546,24 @@ mod curved_terminal_junction_tests {
     }
 
     #[test]
+    fn native_cylindrical_corners_preserve_material_and_selection() {
+        check(&[
+            (
+                "B3",
+                include_str!("../tests/fixtures/cylindrical-corner-junctions/B3.input.step"),
+                include_str!("../tests/fixtures/cylindrical-corner-junctions/B3.input.json"),
+                190760.57996317057,
+            ),
+            (
+                "B7",
+                include_str!("../tests/fixtures/cylindrical-corner-junctions/B7.input.step"),
+                include_str!("../tests/fixtures/cylindrical-corner-junctions/B7.input.json"),
+                580239.2966730265,
+            ),
+        ]);
+    }
+
+    #[test]
     fn native_polar_terminal_preserves_corner_material_and_selection() {
         check(&[(
             "E2",

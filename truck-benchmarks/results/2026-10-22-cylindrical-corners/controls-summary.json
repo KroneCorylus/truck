@@ -1,0 +1,127 @@
+{
+  "procedural_operations": 24,
+  "collision_rejections": 4,
+  "tangent_normal_pairs": 3672,
+  "imported_selections": 4,
+  "step_budgets": [
+    5e-05,
+    1e-07
+  ],
+  "native_comparisons": {
+    "B3": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 190760.5799631704,
+      "truck_volume": 190760.57998432574,
+      "native_to_truck_max_distance": 1.8012518206490514e-13,
+      "native_to_truck_samples": 1941,
+      "truck_to_native_max_distance": 4.9259883723571986e-14,
+      "truck_to_native_samples": 1858,
+      "native_tolerances": {
+        "face": 1e-07,
+        "edge": 1e-07,
+        "vertex": 1e-07
+      },
+      "truck_step_tolerances": {
+        "face": 1e-07,
+        "edge": 1e-07,
+        "vertex": 1e-07
+      }
+    },
+    "B7": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 580239.2966730256,
+      "truck_volume": 580239.2966632245,
+      "native_to_truck_max_distance": 5.123796534383003e-14,
+      "native_to_truck_samples": 1910,
+      "truck_to_native_max_distance": 4.2780337774645346e-14,
+      "truck_to_native_samples": 1777,
+      "native_tolerances": {
+        "face": 1e-07,
+        "edge": 0.0001,
+        "vertex": 0.0001
+      },
+      "truck_step_tolerances": {
+        "face": 1e-07,
+        "edge": 1e-07,
+        "vertex": 1e-07
+      }
+    }
+  },
+  "independent_integrals": [
+    {
+      "case": "B3",
+      "outer_radius": 50.0,
+      "height": 100.0,
+      "fillet_radius": 10.0,
+      "sector_angle": 1.5707963267948966,
+      "simpson": [
+        190760.57996317054,
+        190760.57996317057,
+        190760.57996317057
+      ],
+      "native_volume": 190760.57996317022,
+      "absolute_error": 3.4924596548080444e-10
+    },
+    {
+      "case": "B7",
+      "outer_radius": 50.0,
+      "height": 100.0,
+      "fillet_radius": 10.0,
+      "sector_angle": 4.71238898038469,
+      "simpson": [
+        580239.296673027,
+        580239.2966730265,
+        580239.2966730265
+      ],
+      "native_volume": 580239.2966730254,
+      "absolute_error": 1.1641532182693481e-09
+    }
+  ],
+  "archive_sha256": "99e21f490c70dd9e94ee5d11a795c37c0046a7f322e91afff7b4c7cb6f80a271",
+  "archive_members": 33,
+  "member_sha256": {
+    "probe/B3/001.input.step": "cfcbb81d7f24341dea78ee632b197949270919fcd1cc2a162464e886e6564d9b",
+    "probe/B3/001.input.json": "66ce263128984d5ee5c7f9693cd0407dfac7a5018ffbf904cd286282291718b9",
+    "probe/B3/001.result.brep": "b39f58919ba339ff8017c2bad01b11cce794b6424baabe3518768d80b8e62cdd",
+    "probe/B3/001.result.step": "2adef8d4d7c72c970fcfc51c8c919a4de87ccad1244b6787ae2b800dab099541",
+    "probe/B3/001.result.json": "777ec3b2650d9dbf0382597541356c2df2ce0835f7bd71a932ceaa2e7ddd7dd8",
+    "probe/B3/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "probe/B3/replay.log": "bdda950f046fbcbe205cda4de2ffbdbc97f2390943262022c50fc18e3f60b44f",
+    "probe/B3/001.truck.step": "54a7a54b43899e18171784908d69de5ccd3381f9c216d3cc7602245a6571f393",
+    "probe/B3/001.truck.json": "ecbc26ec354074725ac9393f0a7d6f57b5c7ace500f875551520cb81a33dff92",
+    "probe/B3/compare.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "probe/B3/001.comparison.json": "3c370c4783693c8636fb2de7f362b0b7713efd56bf0e65b6d180f2474efed4b8",
+    "probe/B7/001.input.step": "925271a18864c653597ff2e9fc46feb352445d49d72c5da3dd7e22ebe5a83826",
+    "probe/B7/001.input.json": "5f674807313f364ea2823edf88625491b9678974a381be2822f05a1660d8e2ed",
+    "probe/B7/001.result.brep": "677e5926d543486eb5197a0d5f3c6e557de68d2c26c2ffb727c5ed49e2aa7d95",
+    "probe/B7/001.result.step": "a3bbe33606040f6c1dbd2d42a912a5fb98b177b4341c69b50797a450c50ad2d3",
+    "probe/B7/001.result.json": "ab818c6f3ba85913ff50ba3149b79e6ca89a2dd528a70599981486d26041f8f0",
+    "probe/B7/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "probe/B7/replay.log": "f40c3f5f8e1272fe5d43157221562045c0aa467f5d27d89682ddfe4bb55a3016",
+    "probe/B7/001.truck.step": "ac1f0636d86316d97e1bcc2dc7670cfac54448dfca850142c9ae87c4749e86ce",
+    "probe/B7/001.truck.json": "cf53d22eca4e7d7a75d0d21ff1fb72ab651a2acfa485c0832a8cda63636fdabd",
+    "probe/B7/compare.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "probe/B7/001.comparison.json": "e3f36a34a6de1893a9cd5e163d16cc2928f137378ee57e1f0ce258bce2d15bf8",
+    "helpers/prove-cylindrical-corner-parent.py": "fea04bf4388175a3b6fefb85312f3d6c518978e12f0b6a24d42e66dfd90ac279",
+    "helpers/validate-cylindrical-corners.py": "690f1d581a4cb3065c32fcf82b5076373f4b0d2682be62fb8e2e127599f26530",
+    "helpers/cylindrical-corner-volume.py": "bf9e355906dd610b41478cfcb25f2703066fea7c9c29f1b4c98e40a127769111",
+    "helpers/cylindrical-corner-volume.json": "f11dbdb6bf02274a8da0f3873634647b26422c58fa5ac5ee823b39e7ce348751",
+    "parent/truck-shapeops/tests/cylindrical_corner_junctions.rs": "e1bab9b04d2ad50b9e6cc85283e90b39a20940b3b9cb4f357e26df6abfac4644",
+    "parent/truck-shapeops/examples/replay_occt_blend.rs": "e4329c9923929f5821b62fe80bbbbd0106b83ff5699a14418f9c0adf4096c9f5",
+    "parent/truck-shapeops/tests/fixtures/cylindrical-corner-junctions/B3.input.step": "33207b3ba8a5e32f05444b6edfd4487e2f2cc1ba6ff14a4ef5901c5d964382ed",
+    "parent/truck-shapeops/tests/fixtures/cylindrical-corner-junctions/B3.input.json": "66ce263128984d5ee5c7f9693cd0407dfac7a5018ffbf904cd286282291718b9",
+    "parent/truck-shapeops/tests/fixtures/cylindrical-corner-junctions/B7.input.step": "c47257af7e1ab4ede750cbb4928b8962fe7493cd42b8af2b4e5d92297059995e",
+    "parent/truck-shapeops/tests/fixtures/cylindrical-corner-junctions/B7.input.json": "5f674807313f364ea2823edf88625491b9678974a381be2822f05a1660d8e2ed",
+    "parent/truck-shapeops/tests/fixtures/cylindrical-corner-junctions/README.md": "7d3fa95120f3998ec1900ca36936cedef4bfbd42e818848e8df9bcbae1b444fb"
+  }
+}

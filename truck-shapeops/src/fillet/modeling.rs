@@ -166,6 +166,10 @@ pub fn try_fillet_solid_along_wire<R: ScalarFunctionD1>(
 /// edge have a tangent toroidal corner when the face the convex edges share is
 /// perpendicular to the two walls, which may meet at any angle. Other mixed junctions are
 /// unsupported. Contacts must fit the adjacent faces and avoid holes within twice `tol`.
+/// Three selected edges meeting between an outer cylinder, a perpendicular cap and a
+/// radial plane also support an exact spherical corner, joining two cylindrical rounds
+/// and a toroidal rim. The radius must stay below half the outer cylinder radius and
+/// the contacts must fit all three remote terminations.
 /// Straight edges between planes or a plane and an axial cylindrical ruling also support
 /// curved end faces. Connected channel rims meet at exact intersections of the blend
 /// surfaces, including elliptical miters between equal-radius cylinders. Contacts may

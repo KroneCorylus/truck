@@ -1,0 +1,22 @@
+{
+  "revision": "3627c53f8ff108748f1b10354ad2f586ec2390db",
+  "test_sha256": {
+    "truck-shapeops/tests/cylindrical_corner_junctions.rs": "e1bab9b04d2ad50b9e6cc85283e90b39a20940b3b9cb4f357e26df6abfac4644",
+    "truck-shapeops/examples/replay_occt_blend.rs": "e4329c9923929f5821b62fe80bbbbd0106b83ff5699a14418f9c0adf4096c9f5",
+    "truck-shapeops/tests/fixtures/cylindrical-corner-junctions/B3.input.step": "33207b3ba8a5e32f05444b6edfd4487e2f2cc1ba6ff14a4ef5901c5d964382ed",
+    "truck-shapeops/tests/fixtures/cylindrical-corner-junctions/B3.input.json": "66ce263128984d5ee5c7f9693cd0407dfac7a5018ffbf904cd286282291718b9",
+    "truck-shapeops/tests/fixtures/cylindrical-corner-junctions/B7.input.step": "c47257af7e1ab4ede750cbb4928b8962fe7493cd42b8af2b4e5d92297059995e",
+    "truck-shapeops/tests/fixtures/cylindrical-corner-junctions/B7.input.json": "5f674807313f364ea2823edf88625491b9678974a381be2822f05a1660d8e2ed",
+    "truck-shapeops/tests/fixtures/cylindrical-corner-junctions/README.md": "7d3fa95120f3998ec1900ca36936cedef4bfbd42e818848e8df9bcbae1b444fb"
+  },
+  "parent_test_sha256": {
+    "truck-shapeops/tests/cylindrical_corner_junctions.rs": "e1bab9b04d2ad50b9e6cc85283e90b39a20940b3b9cb4f357e26df6abfac4644",
+    "truck-shapeops/examples/replay_occt_blend.rs": "e4329c9923929f5821b62fe80bbbbd0106b83ff5699a14418f9c0adf4096c9f5",
+    "truck-shapeops/tests/fixtures/cylindrical-corner-junctions/B3.input.step": "33207b3ba8a5e32f05444b6edfd4487e2f2cc1ba6ff14a4ef5901c5d964382ed",
+    "truck-shapeops/tests/fixtures/cylindrical-corner-junctions/B3.input.json": "66ce263128984d5ee5c7f9693cd0407dfac7a5018ffbf904cd286282291718b9",
+    "truck-shapeops/tests/fixtures/cylindrical-corner-junctions/B7.input.step": "c47257af7e1ab4ede750cbb4928b8962fe7493cd42b8af2b4e5d92297059995e",
+    "truck-shapeops/tests/fixtures/cylindrical-corner-junctions/B7.input.json": "5f674807313f364ea2823edf88625491b9678974a381be2822f05a1660d8e2ed",
+    "truck-shapeops/tests/fixtures/cylindrical-corner-junctions/README.md": "7d3fa95120f3998ec1900ca36936cedef4bfbd42e818848e8df9bcbae1b444fb"
+  },
+  "binding_change": null
+}

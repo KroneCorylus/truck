@@ -6,6 +6,13 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Three-edge fillet corners can join an outer cylinder, its perpendicular cap
+  and a radial plane. Offset support intersections place the rolling sphere;
+  two cylindrical blends and a toroidal rim share exact spherical corner arcs.
+  Circular contact arcs preserve their trimmed sweep, including cuts beyond the
+  original rim midpoint. Procedural and native B3/B7 controls check radii,
+  tangency, material, unchanged inputs, closed meshes and STEP.
+
 - Recover line/sphere terminal intersections when polar surface coordinates make
   the numerical solver singular. Use an analytic sphere intersection only when
   the existing solver fails, preserving successful numerical contacts. Polar

@@ -61,6 +61,82 @@ pub(super) fn fillet(
         let mut contact = |k: usize, f: usize, point: &Vertex| {
             contacts[k][usize::from(data.sides[k][0] != f)][end_index(k)] = point.clone();
         };
+        let cylinder = faces.iter().copied().find(|&f| {
+            data.cylinders[f].is_some() && chosen.iter().any(|&k| data.sides[k].contains(&f))
+        });
+        if let Some(f) = cylinder {
+            if faces.len() != 3 || !(chosen.len() == 1 || chosen.len() == 3) {
+                return Err(error(Code::UnsupportedTopology));
+            }
+            let (origin, axis, outer) = data.cylinders[f].unwrap();
+            if outer <= 2. * radius {
+                return Err(error(Code::OutsideNeighbour));
+            }
+            let cap = *faces
+                .iter()
+                .find(|&&j| {
+                    data.planes[j].is_some_and(|(n, _)| n.cross(axis).magnitude() < TOLERANCE)
+                })
+                .ok_or_else(|| error(Code::UnsupportedGeometry))?;
+            let wall = *faces.iter().find(|&&j| j != f && j != cap).unwrap();
+            let (n, d) = data.planes[cap].unwrap();
+            let (m, e) = data.planes[wall].ok_or_else(|| error(Code::UnsupportedGeometry))?;
+            if m.dot(axis).abs() > TOLERANCE || (e - m.dot(origin.to_vec())).abs() > TOLERANCE {
+                return Err(error(Code::UnsupportedGeometry));
+            }
+            let touched: HashSet<_> = chosen.iter().flat_map(|&k| data.sides[k]).collect();
+            let offset = |f| if touched.contains(&f) { radius } else { 0. };
+            let axial = origin + axis * ((d - offset(cap) - n.dot(origin.to_vec())) / n.dot(axis));
+            let h = e - offset(wall) - m.dot(origin.to_vec());
+            let radial = vertex.point() - origin - axis * (vertex.point() - origin).dot(axis);
+            let lateral = radial - m * radial.dot(m);
+            let square = (outer - radius).powi(2) - h * h;
+            if !square.is_finite() || square <= 0. || lateral.so_small() {
+                return Err(error(Code::OutsideNeighbour));
+            }
+            let center = axial + m * h + lateral.normalize() * square.sqrt();
+            let delta = center - origin;
+            let cylinder_normal = (delta - axis * delta.dot(axis)).normalize();
+            let normal = |j: usize| {
+                if j == f {
+                    cylinder_normal
+                } else {
+                    data.planes[j].unwrap().0
+                }
+            };
+            let face_contacts: HashMap<_, _> = touched
+                .iter()
+                .map(|&j| (j, Vertex::new(center + radius * normal(j))))
+                .collect();
+            for &k in incident {
+                if chosen.contains(&k) {
+                    for f in data.sides[k] {
+                        contact(k, f, &face_contacts[&f]);
+                    }
+                    ends[k][end_index(k)] = Some(End {
+                        center,
+                        miter: None,
+                    });
+                } else {
+                    let p = data.sides[k]
+                        .iter()
+                        .find_map(|f| face_contacts.get(f))
+                        .ok_or_else(|| error(Code::UnsupportedTopology))?;
+                    for f in data.sides[k] {
+                        contact(k, f, p);
+                    }
+                }
+            }
+            if chosen.len() == 3 {
+                spheres.push((
+                    v,
+                    center,
+                    1.,
+                    faces.iter().map(|&f| normal(f)).collect::<Vec<_>>(),
+                ));
+            }
+            continue;
+        }
         if faces.iter().any(|&f| data.planes[f].is_none()) {
             let [k] = chosen[..] else {
                 return Err(error(Code::UnsupportedTopology));
@@ -436,7 +512,12 @@ pub(super) fn fillet(
             }
         }
         if chosen.len() == 3 {
-            spheres.push((v, center, s, faces));
+            spheres.push((
+                v,
+                center,
+                s,
+                faces.iter().map(|&f| s * normal(f)).collect::<Vec<_>>(),
+            ));
         }
     }
     let mut trims = Vec::new();
@@ -472,12 +553,29 @@ pub(super) fn fillet(
             trims.push([piece.clone(), piece]);
             continue;
         }
-        let line_a = make_line(&a0, &a1)?;
-        let line_b = make_line(&b0, &b1)?;
         let [a, b] = data.sides[k];
-        let [n, m] = [a, b].map(|f| data.planes[f].unwrap().0);
-        let s = sign(k);
+        let cylinder = [a, b].iter().find_map(|&f| data.cylinders[f]);
+        let rim = cylinder.filter(|(_, axis, _)| {
+            [a, b].iter().any(|&f| {
+                data.planes[f].is_some_and(|(n, _)| n.cross(*axis).magnitude() < TOLERANCE)
+            })
+        });
+        let make_contact = |p: &Vertex, q: &Vertex| {
+            if let Some((origin, axis, _)) = rim {
+                circular_contact(edge, p, q, origin, axis)
+                    .ok_or_else(|| error(Code::OutsideNeighbour))
+            } else {
+                make_line(p, q)
+            }
+        };
+        let line_a = make_contact(&a0, &a1)?;
+        let line_b = make_contact(&b0, &b1)?;
+        let [n, m] = [a, b].map(|f| data.planes[f].map_or(Vector3::zero(), |(n, _)| n));
+        let s = if cylinder.is_some() { 1. } else { sign(k) };
         let arc = |end: End, p: &Vertex, q: &Vertex| -> Edge {
+            if cylinder.is_some() {
+                return circle(p, q, end.center);
+            }
             let from = end.center + s * radius * n;
             let to = end.center + s * radius * m;
             let base = circle(&Vertex::new(from), &Vertex::new(to), end.center);
@@ -503,7 +601,9 @@ pub(super) fn fillet(
         let arc1 = complex_ends
             .remove(&(k, 1))
             .unwrap_or_else(|| vec![reuse_arc(&mut shared_arcs, arc(e1, &a1, &b1))].into());
-        let mut surface: Surface = if complex {
+        let mut surface: Surface = if let Some((origin, axis, _)) = rim {
+            Processor::new(RevolutedCurve::by_revolution(arc0[0].curve(), origin, axis)).into()
+        } else if complex {
             let direction = axis.normalize();
             let mut positions: Vec<_> = arc0
                 .vertex_iter()
@@ -531,7 +631,12 @@ pub(super) fn fillet(
             let c1 = arc1[0].oriented_curve().lift_up();
             NurbsSurface::new(BSplineSurface::homotopy(c0, c1)).into()
         };
-        if surface.normal(0.5, 0.5).dot(n + m) < 0. {
+        let mut outward = n + m;
+        if let Some((origin, axis, _)) = cylinder {
+            let delta = surface.subs(0.5, 0.5) - origin;
+            outward += (delta - axis * delta.dot(axis)).normalize();
+        }
+        if surface.normal(0.5, 0.5).dot(outward) < 0. {
             surface.invert();
         }
         let mut boundary = Wire::from(vec![line_a.inverse()]);
@@ -625,11 +730,7 @@ pub(super) fn fillet(
                 .map_err(|e| error(Code::InvalidOutputTopology).with_coded_source(e))?,
         );
     }
-    for (v, center, s, faces) in spheres {
-        let normals: Vec<_> = faces
-            .iter()
-            .map(|&f| s * data.planes[f].unwrap().0)
-            .collect();
+    for (v, center, s, normals) in spheres {
         let y = (data.vertices[v].point() - center).normalize();
         let z = normals[0].cross(y).normalize();
         let x = y.cross(z);
@@ -703,4 +804,35 @@ fn order_wire(mut edges: Vec<Edge>) -> Result<Wire, Diagnostic> {
         return Err(error());
     }
     Ok(wire)
+}
+
+fn circular_contact(
+    edge: &Edge,
+    a: &Vertex,
+    b: &Vertex,
+    origin: Point3,
+    axis: Vector3,
+) -> Option<Edge> {
+    let curve = edge.curve();
+    let (lo, hi) = curve.range_tuple();
+    let mid = curve.subs((lo + hi) / 2.);
+    let radial = mid - origin - axis * (mid - origin).dot(axis);
+    let sense = axis.cross(radial).dot(curve.der((lo + hi) / 2.)).signum();
+    let center = origin + axis * (a.point() - origin).dot(axis);
+    let u = a.point() - center;
+    let v = b.point() - center;
+    let angle = (sense * axis.dot(u.cross(v)).atan2(u.dot(v))).rem_euclid(std::f64::consts::TAU);
+    if !angle.is_finite()
+        || angle <= TOLERANCE
+        || u.so_small()
+        || !u.magnitude().near(&v.magnitude())
+    {
+        return None;
+    }
+    let half = sense * angle / 2.;
+    Some(builder::circle_arc(
+        a,
+        b,
+        center + u * half.cos() + axis.cross(u) * half.sin(),
+    ))
 }

@@ -1,0 +1,27 @@
+$ bash audits/fillet-chamfer/capture/test_native_distance.sh target/occt-sdk target/cylindrical-corner-native-distance-check
+box identity expected=0 measured=0 passed=1
+box identity inputs_unchanged=1
+cylinder identity expected=0 measured=8.9509041826236192e-16 passed=1
+cylinder identity inputs_unchanged=1
+sphere identity expected=0 measured=3.4638242249419731e-16 passed=1
+sphere identity inputs_unchanged=1
+separated boxes forward expected=3 measured=3 passed=1
+separated boxes forward inputs_unchanged=1
+separated boxes reverse expected=3 measured=3 passed=1
+separated boxes reverse inputs_unchanged=1
+inside box to boundary expected=0.5 measured=0.5 passed=1
+inside box to boundary inputs_unchanged=1
+outside box to inner boundary expected=0.8660254037844386 measured=0.8660254037844386 passed=1
+outside box to inner boundary inputs_unchanged=1
+trimmed spline excludes outside projection expected=0.29999999999999999 measured=0.30000000000000004 passed=1
+trimmed spline excludes outside projection inputs_unchanged=1
+trimmed spline includes boundary distance expected=0.36055512754639896 measured=0.36055512754639896 passed=1
+trimmed spline includes boundary distance inputs_unchanged=1
+native surface subset expected=0 measured=2.3221980631040627e-16 passed=1
+native surface subset inputs_unchanged=1
+transformed native subset 0.500000 expected=0 measured=4.4517209175491517e-16 passed=1
+transformed native subset 0.500000 inputs_unchanged=1
+transformed native subset 2.500000 expected=0 measured=6.4258803293916342e-16 passed=1
+transformed native subset 2.500000 inputs_unchanged=1
+24 checks, 0 failures
+exit_code 0

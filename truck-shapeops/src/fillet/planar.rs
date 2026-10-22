@@ -235,6 +235,7 @@ pub(super) struct Neighborhood {
     pub original_edges: Vec<Edge>,
     pub edge_index: HashMap<EdgeID, usize>,
     pub planes: Vec<Option<(Vector3, f64)>>,
+    pub cylinders: Vec<Option<(Point3, Vector3, f64)>>,
     pub incident: Vec<Vec<usize>>,
     pub sides: Vec<[usize; 2]>,
 }
@@ -243,7 +244,7 @@ pub(super) fn neighborhood(
     shell: &Shell,
     selected: &HashSet<EdgeID>,
     operation: &'static str,
-    curved_terminals: bool,
+    curved_fillets: bool,
 ) -> Result<Neighborhood, Diagnostic> {
     let error = |code| Diagnostic::new(code, operation, "validate_neighborhood");
     let mut vertices = Vec::new();
@@ -296,6 +297,41 @@ pub(super) fn neighborhood(
             incident[vertex_index[&v.id()]].push(k);
         }
     }
+    let cylinders: Vec<_> = shell
+        .iter()
+        .map(|face| {
+            if !curved_fillets {
+                return None;
+            }
+            match face.oriented_surface().elementary()? {
+                (
+                    Elementary::Cylinder {
+                        origin,
+                        axis,
+                        radius,
+                    },
+                    true,
+                ) => Some((origin, axis, radius)),
+                _ => None,
+            }
+        })
+        .collect();
+    let cylindrical_corner = selected.len() == 3
+        && incident.iter().any(|edges| {
+            if edges.len() != 3
+                || !edges
+                    .iter()
+                    .all(|&k| selected.contains(&original_edges[k].id()))
+            {
+                return false;
+            }
+            let faces: HashSet<_> = edges.iter().flat_map(|&k| sides[k]).collect();
+            faces.len() == 3
+                && faces.iter().filter(|&&f| cylinders[f].is_some()).count() == 1
+                && faces
+                    .iter()
+                    .all(|&f| planes[f].is_some() || cylinders[f].is_some())
+        });
     for edges in &incident {
         if !edges
             .iter()
@@ -317,18 +353,26 @@ pub(super) fn neighborhood(
             .copied()
             .filter(|&k| selected.contains(&original_edges[k].id()))
             .collect();
-        let curved_terminal = curved_terminals
+        let curved_terminal = curved_fillets
             && edges.len() == 3
             && chosen.len() == 1
             && sides[chosen[0]].iter().all(|&f| planes[f].is_some());
+        let cylindrical_end = cylindrical_corner
+            && edges.len() == 3
+            && (chosen.len() == 1 || chosen.len() == 3)
+            && edges
+                .iter()
+                .flat_map(|&k| sides[k])
+                .all(|f| planes[f].is_some() || cylinders[f].is_some());
         for &k in edges {
             for f in sides[k] {
-                if planes[f].is_none() && !curved_terminal {
+                if planes[f].is_none() && !curved_terminal && !cylindrical_end {
                     return Err(error(Code::NonPlanarFace).face(f));
                 }
             }
             let edge = &original_edges[k];
             if !matches!(edge.curve(), Curve::Line(_))
+                && !cylindrical_end
                 && (!curved_terminal || selected.contains(&edge.id()))
             {
                 return Err(error(Code::UnsupportedGeometry));
@@ -338,16 +382,29 @@ pub(super) fn neighborhood(
                 return Err(error(Code::DegenerateCurve));
             }
             let [a, b] = sides[k];
-            if selected.contains(&edge.id())
-                && planes[a]
-                    .unwrap()
-                    .0
-                    .cross(planes[b].unwrap().0)
-                    .dot(axis.normalize())
-                    .abs()
-                    <= TOLERANCE
-            {
-                return Err(error(Code::BlendConstructionFailed));
+            if selected.contains(&edge.id()) {
+                let dihedral = if let (Some((n, _)), Some((m, _))) = (planes[a], planes[b]) {
+                    n.cross(m).dot(axis.normalize())
+                } else {
+                    let curve = edge.curve();
+                    let (lo, hi) = curve.range_tuple();
+                    let t = (lo + hi) / 2.;
+                    let normal = |f: usize| {
+                        if let Some((n, _)) = planes[f] {
+                            return n;
+                        }
+                        let (origin, axis, _) = cylinders[f].unwrap();
+                        let delta = curve.subs(t) - origin;
+                        (delta - axis * delta.dot(axis)).normalize()
+                    };
+                    normal(a).cross(normal(b)).dot(curve.der(t).normalize())
+                };
+                if !dihedral.is_finite() || dihedral.abs() <= TOLERANCE {
+                    return Err(error(Code::BlendConstructionFailed));
+                }
+                if cylindrical_end && dihedral < 0. {
+                    return Err(error(Code::UnsupportedGeometry));
+                }
             }
         }
     }
@@ -358,6 +415,7 @@ pub(super) fn neighborhood(
         planes,
         incident,
         sides,
+        cylinders,
     })
 }
 
