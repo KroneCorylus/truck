@@ -1,0 +1,40 @@
+{
+  "volume": [
+    "g++",
+    "-O3",
+    "-std=c++17",
+    "conical-corner-volume.cpp",
+    "-o",
+    "PROGRAM"
+  ],
+  "volume_run": "PROGRAM N RADIUS; N is 128 or 256; radii 0.03,0.06,0.1",
+  "diagnostic": [
+    "g++",
+    "-std=c++17",
+    "-O2",
+    "-Wall",
+    "-Wextra",
+    "-Wpedantic",
+    "-isystem",
+    "target/occt-sdk/usr/include/opencascade",
+    "-I",
+    "audits/fillet-chamfer/capture",
+    "target/fillet-X1-diagnostic/native-surfaces.cpp",
+    "-Ltarget/occt-sdk/usr/lib64",
+    "-lTKDESTEP",
+    "-lTKXSBase",
+    "-lTKShHealing",
+    "-lTKFillet",
+    "-lTKTopAlgo",
+    "-lTKGeomAlgo",
+    "-lTKBRep",
+    "-lTKGeomBase",
+    "-lTKG3d",
+    "-lTKG2d",
+    "-lTKMath",
+    "-lTKernel",
+    "-o",
+    "target/fillet-X1-diagnostic/native-surfaces"
+  ],
+  "note": "Replace source/output with spherical-corner-residual.cpp/program. Run native tools with LD_LIBRARY_PATH=target/occt-sdk/usr/lib64. Canonical comparison thresholds and projector remain unchanged."
+}

@@ -174,6 +174,10 @@ pub fn try_fillet_solid_along_wire<R: ScalarFunctionD1>(
 /// joining a cylindrical round to two exact toroidal blends. The inward-offset sphere and
 /// planes must intersect, and the contact curves must reach their remote planar boundaries
 /// without consuming a support face. This includes corners at a sphere pole.
+/// Outward cones also support three-edge corners with radial planes and perpendicular
+/// caps. Exact offset-cone intersections locate the sphere; cone/radial-plane blends
+/// follow hyperbolic rolling centers, and cone/cap blends are toroidal. The contacts
+/// must remain inside their original neighbouring boundaries.
 /// Straight edges between planes or a plane and an axial cylindrical ruling also support
 /// curved end faces. Connected channel rims meet at exact intersections of the blend
 /// surfaces, including elliptical miters between equal-radius cylinders. Contacts may

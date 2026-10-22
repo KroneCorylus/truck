@@ -2,6 +2,7 @@ use super::planar::{neighborhood, valid_boundaries};
 use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};
 use std::result::Result;
 use truck_base::diagnostics::{Code, Diagnostic};
+use truck_geometry::prelude::ContactCircle;
 use truck_modeling::*;
 
 #[derive(Clone, Copy)]
@@ -41,6 +42,7 @@ pub(super) fn fillet(
     let mut tori = Vec::new();
     let mut shared_arcs = HashMap::default();
     let mut complex_ends = HashMap::default();
+    let mut cone_terminals = HashMap::default();
     let mut curved_terminals = HashSet::default();
     for (v, incident) in data.incident.iter().enumerate() {
         let chosen: Vec<_> = incident
@@ -61,6 +63,119 @@ pub(super) fn fillet(
         let mut contact = |k: usize, f: usize, point: &Vertex| {
             contacts[k][usize::from(data.sides[k][0] != f)][end_index(k)] = point.clone();
         };
+        let cone_face = faces.iter().copied().find(|&f| {
+            data.cone_supports[f].is_some() && chosen.iter().any(|&k| data.sides[k].contains(&f))
+        });
+        if let Some(f) = cone_face {
+            if faces.len() != 3 || !(chosen.len() == 1 || chosen.len() == 3) {
+                return Err(error(Code::UnsupportedTopology));
+            }
+            let cone = data.cone_supports[f].unwrap();
+            let (apex, axis, angle) = cone;
+            let planes: Vec<_> = faces.iter().copied().filter(|&j| j != f).collect();
+            let [a, b] = [planes[0], planes[1]];
+            let pa = data.planes[a].ok_or_else(|| error(Code::UnsupportedGeometry))?;
+            let pb = data.planes[b].ok_or_else(|| error(Code::UnsupportedGeometry))?;
+            if chosen.len() == 3 {
+                let center = cone_planes(
+                    cone,
+                    radius,
+                    [(pa.0, pa.1 - radius), (pb.0, pb.1 - radius)],
+                    vertex.point(),
+                )
+                .ok_or_else(|| error(Code::OutsideNeighbour))?;
+                let normals: HashMap<_, _> = [(a, pa.0), (b, pb.0), (f, cone_normal(cone, center))]
+                    .into_iter()
+                    .collect();
+                let points: HashMap<_, _> = faces
+                    .iter()
+                    .map(|&j| (j, Vertex::new(center + radius * normals[&j])))
+                    .collect();
+                for &k in &chosen {
+                    for j in data.sides[k] {
+                        contact(k, j, &points[&j]);
+                    }
+                    ends[k][end_index(k)] = Some(End {
+                        center,
+                        miter: None,
+                    });
+                }
+                spheres.push((
+                    v,
+                    center,
+                    1.,
+                    faces.iter().map(|j| normals[j]).collect::<Vec<_>>(),
+                ));
+            } else {
+                let k = chosen[0];
+                let edge = &data.original_edges[k];
+                let plane = *data.sides[k].iter().find(|&&j| j != f).unwrap();
+                let terminal = *planes.iter().find(|&&j| j != plane).unwrap();
+                let (n, d) = data.planes[plane].unwrap();
+                let (m, e) = data.planes[terminal].unwrap();
+                let (center, cone_point, plane_point) = if n.cross(axis).magnitude() < TOLERANCE {
+                    let center =
+                        cone_planes(cone, radius, [(n, d - radius), (m, e)], vertex.point())
+                            .ok_or_else(|| error(Code::OutsideNeighbour))?;
+                    (
+                        center,
+                        center + radius * cone_normal(cone, center),
+                        center + radius * n,
+                    )
+                } else {
+                    if n.dot(axis).abs() > TOLERANCE || (d - n.dot(apex.to_vec())).abs() > TOLERANCE
+                    {
+                        return Err(error(Code::UnsupportedGeometry));
+                    }
+                    let u = cone_lateral(cone, n, edge)
+                        .ok_or_else(|| error(Code::UnsupportedGeometry))?;
+                    let center = |h: f64| -> Option<Point3> {
+                        let rho = h * angle.0.tan() - radius / angle.0.cos();
+                        let square = rho * rho - radius * radius;
+                        (rho > 0. && square >= 0.)
+                            .then(|| apex + axis * h - n * radius + u * square.sqrt())
+                    };
+                    if m.cross(axis).magnitude() < TOLERANCE {
+                        let h = (e - m.dot(apex.to_vec())) / m.dot(axis);
+                        let cp = center(h + radius * angle.0.sin())
+                            .ok_or_else(|| error(Code::OutsideNeighbour))?;
+                        let cq = center(h).ok_or_else(|| error(Code::OutsideNeighbour))?;
+                        cone_terminals.insert((k, end_index(k)), terminal);
+                        (cq, cp + radius * cone_normal(cone, cp), cq + radius * n)
+                    } else if m.dot(axis).abs() < TOLERANCE
+                        && (e - m.dot(apex.to_vec())).abs() < TOLERANCE
+                        && m.dot(n).abs() < TOLERANCE
+                    {
+                        let h = (radius + radius / angle.0.cos()) / angle.0.tan();
+                        let c = apex + axis * h - n * radius;
+                        (c, c + radius * cone_normal(cone, c), c + radius * n)
+                    } else {
+                        return Err(error(Code::UnsupportedGeometry));
+                    }
+                };
+                let points: HashMap<_, _> = [
+                    (f, Vertex::new(cone_point)),
+                    (plane, Vertex::new(plane_point)),
+                ]
+                .into_iter()
+                .collect();
+                for &j in &[f, plane] {
+                    contact(k, j, &points[&j]);
+                    let other = *incident
+                        .iter()
+                        .find(|&&i| i != k && data.sides[i].contains(&j))
+                        .ok_or_else(|| error(Code::UnsupportedTopology))?;
+                    for side in data.sides[other] {
+                        contact(other, side, &points[&j]);
+                    }
+                }
+                ends[k][end_index(k)] = Some(End {
+                    center,
+                    miter: None,
+                });
+            }
+            continue;
+        }
         let sphere = faces.iter().copied().find(|&f| {
             data.sphere_supports[f].is_some() && chosen.iter().any(|&k| data.sides[k].contains(&f))
         });
@@ -628,6 +743,121 @@ pub(super) fn fillet(
             ));
         }
     }
+    // Intersect fitted contacts with terminal planes before any shared trim edge is assembled.
+    let mut cone_fits = HashMap::default();
+    for (k, edge) in data.original_edges.iter().enumerate() {
+        if !selected.contains(&edge.id()) {
+            continue;
+        }
+        let [a, b] = data.sides[k];
+        let Some(f) = [a, b]
+            .into_iter()
+            .find(|&f| data.cone_supports[f].is_some())
+        else {
+            continue;
+        };
+        let cone = data.cone_supports[f].unwrap();
+        let (apex, axis, angle) = cone;
+        let plane = if a == f { b } else { a };
+        let (n, d) = data.planes[plane].ok_or_else(|| error(Code::UnsupportedGeometry))?;
+        if n.cross(axis).magnitude() < TOLERANCE {
+            continue;
+        }
+        if n.dot(axis).abs() > TOLERANCE || (d - n.dot(apex.to_vec())).abs() > TOLERANCE {
+            return Err(error(Code::UnsupportedGeometry));
+        }
+        let u = cone_lateral(cone, n, edge).ok_or_else(|| error(Code::UnsupportedGeometry))?;
+        let stations: Vec<_> = (0..2)
+            .map(|end| {
+                [a, b].map(|j| {
+                    let p = contacts[k][usize::from(j != a)][end].point();
+                    let c = p - radius * if j == f { cone_normal(cone, p) } else { n };
+                    (c - apex).dot(u)
+                })
+            })
+            .collect();
+        let increasing = (edge.back().point() - edge.front().point()).dot(u) > 0.;
+        let xs = std::array::from_fn::<_, 2, _>(|end| {
+            if (end == 1) == increasing {
+                stations[end].into_iter().fold(f64::NEG_INFINITY, f64::max)
+            } else {
+                stations[end].into_iter().fold(f64::INFINITY, f64::min)
+            }
+        });
+        if !xs[0].is_finite() || !xs[1].is_finite() || (xs[1] - xs[0]).abs() <= TOLERANCE {
+            return Err(error(Code::OutsideNeighbour));
+        }
+        let surfaces = [shell[a].oriented_surface(), shell[b].oriented_surface()];
+        let fit = ApproxFilletSurface::approx_contact_circles(
+            &surfaces[0],
+            &surfaces[1],
+            (0., 1.),
+            tol / 100.,
+            |t| {
+                let x = xs[0] + (xs[1] - xs[0]) * t;
+                let rho = (x * x + radius * radius).sqrt();
+                let h = (rho + radius / angle.0.cos()) / angle.0.tan();
+                let c = apex + axis * h - n * radius + u * x;
+                let dc = (u + axis * x / (angle.0.tan() * rho)) * (xs[1] - xs[0]);
+                let points =
+                    [a, b].map(|j| c + radius * if j == f { cone_normal(cone, c) } else { n });
+                let hints = [
+                    surfaces[0].search_parameter(points[0], None, 100)?,
+                    surfaces[1].search_parameter(points[1], None, 100)?,
+                ]
+                .map(|(u, v)| Point2::new(u, v));
+                ContactCircle::try_from_contacts(
+                    (c, dc),
+                    t,
+                    &surfaces[0],
+                    &surfaces[1],
+                    -radius,
+                    hints,
+                )
+            },
+        )
+        .ok_or_else(|| error(Code::BlendConstructionFailed))?;
+        let mut curves: [Curve; 2] = [
+            fit.side_pcurve0().to_same_geometry(),
+            fit.side_pcurve1().to_same_geometry(),
+        ];
+        let surface: Surface = fit.to_same_geometry();
+        let mut lines = Vec::new();
+        for (side, curve) in curves.iter_mut().enumerate() {
+            let mut ts = [0., 1.];
+            for (end, t) in ts.iter_mut().enumerate() {
+                if let Some(&terminal) = cone_terminals.get(&(k, end)) {
+                    let wall = data.planes[terminal].unwrap();
+                    *t = cone_curve_plane(curve, wall, *t)
+                        .ok_or_else(|| error(Code::OutsideNeighbour))?;
+                    contacts[k][side][end].set_point(curve.subs(*t));
+                }
+            }
+            if ts[1] <= ts[0] {
+                return Err(error(Code::OutsideNeighbour));
+            }
+            if ts[1] < 1. {
+                curve.cut(ts[1]);
+            }
+            if ts[0] > 0. {
+                *curve = curve.cut(ts[0]);
+            }
+            lines.push(Edge::new(
+                &contacts[k][side][0],
+                &contacts[k][side][1],
+                curve.clone(),
+            ));
+        }
+        for (end, (p, q)) in contacts[k][0].iter().zip(&contacts[k][1]).enumerate() {
+            if let Some(&terminal) = cone_terminals.get(&(k, end)) {
+                let arc = terminal_cross_arc(p, q, &surface, &shell[terminal].oriented_surface())
+                    .ok_or_else(|| error(Code::BlendConstructionFailed))?;
+                cache_arc(&mut shared_arcs, &arc);
+                complex_ends.insert((k, end), Wire::from(vec![arc]));
+            }
+        }
+        cone_fits.insert(k, (surface, [lines[0].clone(), lines[1].clone()]));
+    }
     let mut trims = Vec::new();
     let mut arcs: Vec<Option<[Wire; 2]>> = vec![None; data.original_edges.len()];
     let mut generated = Vec::new();
@@ -662,6 +892,12 @@ pub(super) fn fillet(
             continue;
         }
         let [a, b] = data.sides[k];
+        let cone = [a, b].iter().find_map(|&f| data.cone_supports[f]);
+        let cone_rim = cone.filter(|(_, axis, _)| {
+            [a, b].iter().any(|&f| {
+                data.planes[f].is_some_and(|(n, _)| n.cross(*axis).magnitude() < TOLERANCE)
+            })
+        });
         let sphere = [a, b].iter().find_map(|&f| data.sphere_supports[f]);
         let sphere_plane = sphere.and_then(|_| [a, b].iter().find_map(|&f| data.planes[f]));
         let cylinder = [a, b].iter().find_map(|&f| data.cylinders[f]);
@@ -674,23 +910,26 @@ pub(super) fn fillet(
             if let Some(((origin, _), (axis, _))) = sphere.zip(sphere_plane) {
                 circular_contact(edge, p, q, origin, axis)
                     .ok_or_else(|| error(Code::OutsideNeighbour))
-            } else if let Some((origin, axis, _)) = rim {
+            } else if let Some((origin, axis, _)) = rim.or(cone_rim.map(|(p, a, _)| (p, a, 0.))) {
                 circular_contact(edge, p, q, origin, axis)
                     .ok_or_else(|| error(Code::OutsideNeighbour))
             } else {
                 make_line(p, q)
             }
         };
-        let line_a = make_contact(&a0, &a1)?;
-        let line_b = make_contact(&b0, &b1)?;
+        let [line_a, line_b] = if let Some((_, lines)) = cone_fits.get(&k) {
+            lines.clone()
+        } else {
+            [make_contact(&a0, &a1)?, make_contact(&b0, &b1)?]
+        };
         let [n, m] = [a, b].map(|f| data.planes[f].map_or(Vector3::zero(), |(n, _)| n));
-        let s = if cylinder.is_some() || sphere.is_some() {
+        let s = if cylinder.is_some() || sphere.is_some() || cone.is_some() {
             1.
         } else {
             sign(k)
         };
         let arc = |end: End, p: &Vertex, q: &Vertex| -> Edge {
-            if cylinder.is_some() || sphere.is_some() {
+            if cylinder.is_some() || sphere.is_some() || cone.is_some() {
                 return circle(p, q, end.center);
             }
             let from = end.center + s * radius * n;
@@ -718,7 +957,11 @@ pub(super) fn fillet(
         let arc1 = complex_ends
             .remove(&(k, 1))
             .unwrap_or_else(|| vec![reuse_arc(&mut shared_arcs, arc(e1, &a1, &b1))].into());
-        let mut surface: Surface = if let Some((sphere, plane)) = sphere.zip(sphere_plane) {
+        let mut surface: Surface = if let Some((surface, _)) = cone_fits.remove(&k) {
+            surface
+        } else if let Some((apex, axis, _)) = cone_rim {
+            Processor::new(RevolutedCurve::by_revolution(arc0[0].curve(), apex, axis)).into()
+        } else if let Some((sphere, plane)) = sphere.zip(sphere_plane) {
             sphere_rim_surface(edge, sphere, plane, radius)
                 .ok_or_else(|| error(Code::OutsideNeighbour))?
         } else if let Some((origin, axis, _)) = rim {
@@ -758,6 +1001,9 @@ pub(super) fn fillet(
         }
         if let Some((origin, _)) = sphere {
             outward += (surface.subs(0.5, 0.5) - origin).normalize();
+        }
+        if let Some(cone) = cone {
+            outward += cone_normal(cone, surface.subs(0.5, 0.5));
         }
         if surface.normal(0.5, 0.5).dot(outward) < 0. {
             surface.invert();
@@ -1033,4 +1279,81 @@ fn terminal_cross_arc(p: &Vertex, q: &Vertex, support: &Surface, wall: &Surface)
         Box::new(arc.curve()),
     )));
     Some(arc)
+}
+
+type ConeSupport = (Point3, Vector3, Rad<f64>);
+fn cone_normal((apex, axis, angle): ConeSupport, point: Point3) -> Vector3 {
+    let delta = point - apex;
+    (delta - axis * delta.dot(axis)).normalize() * angle.0.cos() - axis * angle.0.sin()
+}
+fn cone_planes(
+    cone: ConeSupport,
+    radius: f64,
+    planes: [(Vector3, f64); 2],
+    hint: Point3,
+) -> Option<Point3> {
+    let (apex, axis, angle) = cone;
+    let shifted = apex + axis * (radius / angle.0.sin());
+    let [(n, d), (m, e)] = planes;
+    let direction = n.cross(m);
+    if direction.so_small() {
+        return None;
+    }
+    let direction = direction.normalize();
+    let foot = solve([(n, d), (m, e), (direction, direction.dot(shifted.to_vec()))])?;
+    let delta = foot - shifted;
+    let h = delta.dot(axis);
+    let along = direction.dot(axis);
+    let sec2 = 1. + angle.0.tan().powi(2);
+    let a = 1. - sec2 * along * along;
+    let b = 2. * (delta.dot(direction) - sec2 * h * along);
+    let c = delta.magnitude2() - sec2 * h * h;
+    let roots = if a.abs() < 1e-12 {
+        if b.abs() < 1e-12 {
+            return None;
+        }
+        vec![-c / b]
+    } else {
+        let disc = b * b - 4. * a * c;
+        if disc < 0. || !disc.is_finite() {
+            return None;
+        }
+        let q = -0.5 * (b + disc.sqrt().copysign(b));
+        if q == 0. {
+            vec![-b / (2. * a)]
+        } else {
+            vec![q / a, c / q]
+        }
+    };
+    roots
+        .into_iter()
+        .filter(|t| t.is_finite())
+        .map(|t| foot + direction * t)
+        .filter(|p| (*p - shifted).dot(axis) > 0.)
+        .min_by(|p, q| p.distance2(hint).total_cmp(&q.distance2(hint)))
+}
+
+fn cone_lateral((apex, axis, _): ConeSupport, n: Vector3, edge: &Edge) -> Option<Vector3> {
+    let delta = (edge.front().point() + edge.back().point().to_vec()) * 0.5 - apex;
+    let lateral = delta - axis * delta.dot(axis) - n * delta.dot(n);
+    (!lateral.so_small()).then(|| lateral.normalize())
+}
+fn cone_curve_plane(curve: &Curve, (n, d): (Vector3, f64), hint: f64) -> Option<f64> {
+    let mut t = hint;
+    for _ in 0..30 {
+        let residual = n.dot(curve.subs(t).to_vec()) - d;
+        if residual.abs() < TOLERANCE / 10. {
+            return Some(t);
+        }
+        let deriv = n.dot(curve.der(t));
+        if deriv.abs() < 1e-12 {
+            return None;
+        }
+        t -= residual / deriv;
+        if !(-1e-8..=1. + 1e-8).contains(&t) {
+            return None;
+        }
+        t = t.clamp(0., 1.);
+    }
+    None
 }

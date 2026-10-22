@@ -6,6 +6,13 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Join three selected edges on an outward cone and two planes using an exact rolling
+  sphere, toroidal cap rounds and fitted cone/radial-plane blends. Hyperbolic center
+  paths remain regular at axial terminations; fitted contacts intersect remote caps
+  before trim assembly. Independent material, radius, tangency and STEP controls
+  cover truncated cones and apex sectors. Native C2/C6/C8/D1 comparison discrepancies
+  remain explicit.
+
 - Join three selected edges on an outward spherical support and two planes with
   an exact rolling sphere, two toroidal blends and a cylindrical round. Curved
   contacts trim against their remote planar boundaries. Independent material,

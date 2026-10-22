@@ -1,0 +1,30 @@
+{
+  "revision": "86864851f3cec4b934a59d62886d9c468e5ed56c",
+  "test_sha256": {
+    "truck-shapeops/tests/conical_corner_junctions.rs": "97c563b552b7878000ff15e7bb15e15cbb6a8638c672e45141fb05c6a742bdae",
+    "truck-shapeops/examples/replay_occt_blend.rs": "08a49d306363554a72f83c204d23eeccaa5d4973bce59157ac9b567e31a502f7",
+    "truck-shapeops/tests/fixtures/conical-corner-junctions/C2.input.step": "92a9922a756306c347b3160db1a073f6e7ac9db792463411126ad36479122808",
+    "truck-shapeops/tests/fixtures/conical-corner-junctions/C2.input.json": "3c909a9c99f4e723e255f7075767459b956c8be7b01fea21af346c2182dd28f0",
+    "truck-shapeops/tests/fixtures/conical-corner-junctions/C6.input.step": "3a91957e8e62ec7bb900535e326d75072b8479b8808063bbe59b182d28ccac2c",
+    "truck-shapeops/tests/fixtures/conical-corner-junctions/C6.input.json": "478e2216374e7d4f678e4f3f6087f32db16b5d58e0d6809e525bdaade80fb658",
+    "truck-shapeops/tests/fixtures/conical-corner-junctions/C8.input.step": "ac7af9fd225243f9eb4fe6c988831d12583a74f76b486de5a551c8a4707c85af",
+    "truck-shapeops/tests/fixtures/conical-corner-junctions/C8.input.json": "6e7844b196e0c4fa1eb9fbf2eee138500c8bfbccea15e4758df938503ee5c723",
+    "truck-shapeops/tests/fixtures/conical-corner-junctions/D1.input.step": "6c0e76be0e0002b0edc2a67a56a4f731552d47ecbbaaece0335716ecaa86b4b2",
+    "truck-shapeops/tests/fixtures/conical-corner-junctions/D1.input.json": "afdab4b9c1c27723ad4bcc2a8a6e0bbc1db89e93cb55c5d62a254afd56bd7392",
+    "truck-shapeops/tests/fixtures/conical-corner-junctions/README.md": "0407fd8399a201f028e05bf34ca610b33f4e0fbcf9dc100b6ec0827603b10e01"
+  },
+  "parent_test_sha256": {
+    "truck-shapeops/tests/conical_corner_junctions.rs": "97c563b552b7878000ff15e7bb15e15cbb6a8638c672e45141fb05c6a742bdae",
+    "truck-shapeops/examples/replay_occt_blend.rs": "08a49d306363554a72f83c204d23eeccaa5d4973bce59157ac9b567e31a502f7",
+    "truck-shapeops/tests/fixtures/conical-corner-junctions/C2.input.step": "92a9922a756306c347b3160db1a073f6e7ac9db792463411126ad36479122808",
+    "truck-shapeops/tests/fixtures/conical-corner-junctions/C2.input.json": "3c909a9c99f4e723e255f7075767459b956c8be7b01fea21af346c2182dd28f0",
+    "truck-shapeops/tests/fixtures/conical-corner-junctions/C6.input.step": "3a91957e8e62ec7bb900535e326d75072b8479b8808063bbe59b182d28ccac2c",
+    "truck-shapeops/tests/fixtures/conical-corner-junctions/C6.input.json": "478e2216374e7d4f678e4f3f6087f32db16b5d58e0d6809e525bdaade80fb658",
+    "truck-shapeops/tests/fixtures/conical-corner-junctions/C8.input.step": "ac7af9fd225243f9eb4fe6c988831d12583a74f76b486de5a551c8a4707c85af",
+    "truck-shapeops/tests/fixtures/conical-corner-junctions/C8.input.json": "6e7844b196e0c4fa1eb9fbf2eee138500c8bfbccea15e4758df938503ee5c723",
+    "truck-shapeops/tests/fixtures/conical-corner-junctions/D1.input.step": "6c0e76be0e0002b0edc2a67a56a4f731552d47ecbbaaece0335716ecaa86b4b2",
+    "truck-shapeops/tests/fixtures/conical-corner-junctions/D1.input.json": "afdab4b9c1c27723ad4bcc2a8a6e0bbc1db89e93cb55c5d62a254afd56bd7392",
+    "truck-shapeops/tests/fixtures/conical-corner-junctions/README.md": "0407fd8399a201f028e05bf34ca610b33f4e0fbcf9dc100b6ec0827603b10e01"
+  },
+  "binding_change": null
+}

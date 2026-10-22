@@ -236,6 +236,7 @@ pub(super) struct Neighborhood {
     pub edge_index: HashMap<EdgeID, usize>,
     pub planes: Vec<Option<(Vector3, f64)>>,
     pub cylinders: Vec<Option<(Point3, Vector3, f64)>>,
+    pub cone_supports: Vec<Option<(Point3, Vector3, Rad<f64>)>>,
     pub sphere_supports: Vec<Option<(Point3, f64)>>,
     pub incident: Vec<Vec<usize>>,
     pub sides: Vec<[usize; 2]>,
@@ -298,12 +299,11 @@ pub(super) fn neighborhood(
             incident[vertex_index[&v.id()]].push(k);
         }
     }
-    let (cylinders, sphere_supports): (Vec<_>, Vec<_>) = shell
-        .iter()
-        .map(|face| {
-            if !curved_fillets {
-                return (None, None);
-            }
+    let mut cylinders = vec![None; shell.len()];
+    let mut sphere_supports = vec![None; shell.len()];
+    let mut cone_supports = vec![None; shell.len()];
+    if curved_fillets {
+        for (f, face) in shell.iter().enumerate() {
             match face.oriented_surface().elementary() {
                 Some((
                     Elementary::Cylinder {
@@ -312,14 +312,26 @@ pub(super) fn neighborhood(
                         radius,
                     },
                     true,
-                )) => (Some((origin, axis, radius)), None),
-                Some((Elementary::Sphere { center, radius }, true)) => {
-                    (None, Some((center, radius)))
+                )) => {
+                    cylinders[f] = Some((origin, axis, radius));
                 }
-                _ => (None, None),
+                Some((Elementary::Sphere { center, radius }, true)) => {
+                    sphere_supports[f] = Some((center, radius));
+                }
+                Some((
+                    Elementary::Cone {
+                        apex,
+                        axis,
+                        half_angle,
+                    },
+                    true,
+                )) => {
+                    cone_supports[f] = Some((apex, axis, half_angle));
+                }
+                _ => {}
             }
-        })
-        .unzip();
+        }
+    }
     let analytic_corner = selected.len() == 3
         && incident.iter().any(|edges| {
             if edges.len() != 3
@@ -333,11 +345,18 @@ pub(super) fn neighborhood(
             faces.len() == 3
                 && faces
                     .iter()
-                    .filter(|&&f| cylinders[f].is_some() || sphere_supports[f].is_some())
+                    .filter(|&&f| {
+                        cylinders[f].is_some()
+                            || sphere_supports[f].is_some()
+                            || cone_supports[f].is_some()
+                    })
                     .count()
                     == 1
                 && faces.iter().all(|&f| {
-                    planes[f].is_some() || cylinders[f].is_some() || sphere_supports[f].is_some()
+                    planes[f].is_some()
+                        || cylinders[f].is_some()
+                        || sphere_supports[f].is_some()
+                        || cone_supports[f].is_some()
                 })
         });
     for edges in &incident {
@@ -369,7 +388,10 @@ pub(super) fn neighborhood(
             && edges.len() == 3
             && (chosen.len() == 1 || chosen.len() == 3)
             && edges.iter().flat_map(|&k| sides[k]).all(|f| {
-                planes[f].is_some() || cylinders[f].is_some() || sphere_supports[f].is_some()
+                planes[f].is_some()
+                    || cylinders[f].is_some()
+                    || sphere_supports[f].is_some()
+                    || cone_supports[f].is_some()
             });
         for &k in edges {
             for f in sides[k] {
@@ -403,6 +425,11 @@ pub(super) fn neighborhood(
                         if let Some((center, _)) = sphere_supports[f] {
                             return (curve.subs(t) - center).normalize();
                         }
+                        if let Some((apex, axis, angle)) = cone_supports[f] {
+                            let delta = curve.subs(t) - apex;
+                            return (delta - axis * delta.dot(axis)).normalize() * angle.0.cos()
+                                - axis * angle.0.sin();
+                        }
                         let (origin, axis, _) = cylinders[f].unwrap();
                         let delta = curve.subs(t) - origin;
                         (delta - axis * delta.dot(axis)).normalize()
@@ -427,6 +454,7 @@ pub(super) fn neighborhood(
         sides,
         cylinders,
         sphere_supports,
+        cone_supports,
     })
 }
 

@@ -1,0 +1,276 @@
+{
+  "procedural_operations": 48,
+  "collision_rejections": 8,
+  "normalized_imported_selections": 8,
+  "original_scale_replays": 4,
+  "independent_material": {
+    "0.1": {
+      "128": [
+        0.5102133382219268,
+        0.5165170143172513,
+        0.06486303413222506,
+        0.06687424450054306
+      ],
+      "256": [
+        0.5102133441641101,
+        0.5165170139262409,
+        0.06486303410642758,
+        0.06687424247638343
+      ]
+    },
+    "0.03": {
+      "128": [
+        0.5212408602611134,
+        0.5218328746207989,
+        0.0775939726524454,
+        0.07769377240750863
+      ],
+      "256": [
+        0.521240870010365,
+        0.5218328745769093,
+        0.07759397257151764,
+        0.0776937684252264
+      ]
+    },
+    "0.06": {
+      "128": [
+        0.5180442915493306,
+        0.5203681354339368,
+        0.07418272000291319,
+        0.07476286068736758
+      ],
+      "256": [
+        0.5180443026271753,
+        0.5203681352768481,
+        0.0741827200585616,
+        0.07476285867868677
+      ]
+    }
+  },
+  "quadrature_maximum_difference": 1.1077844641604884e-08,
+  "native_comparisons": {
+    "C2": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 510198.31945594907,
+      "truck_volume": 510213.3461893307,
+      "native_to_truck_max_distance": 0.16554551479739651,
+      "native_to_truck_samples": 1811,
+      "truck_to_native_max_distance": 0.16665316941507216,
+      "truck_to_native_samples": 1761,
+      "native_tolerances": {
+        "face": 0.0001,
+        "edge": 0.0001,
+        "vertex": 0.0001
+      },
+      "truck_step_tolerances": {
+        "face": 1e-07,
+        "edge": 5.943829760571777e-06,
+        "vertex": 5.943829760571777e-06
+      }
+    },
+    "C6": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 1559915.7135162367,
+      "truck_volume": 1559919.1493719372,
+      "native_to_truck_max_distance": 0.07249881695273501,
+      "native_to_truck_samples": 1847,
+      "truck_to_native_max_distance": 0.07173260934920989,
+      "truck_to_native_samples": 1684,
+      "native_tolerances": {
+        "face": 0.0001,
+        "edge": 0.0001,
+        "vertex": 0.0001
+      },
+      "truck_step_tolerances": {
+        "face": 1e-07,
+        "edge": 1.0937254268396977e-05,
+        "vertex": 1.0937254268396977e-05
+      }
+    },
+    "C8": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 64021.86241559177,
+      "truck_volume": 64863.02854053516,
+      "native_to_truck_max_distance": 4.828443161905576,
+      "native_to_truck_samples": 1548,
+      "truck_to_native_max_distance": 4.8514035512845055,
+      "truck_to_native_samples": 1450,
+      "native_tolerances": {
+        "face": 0.0001,
+        "edge": 0.0001,
+        "vertex": 0.0001
+      },
+      "truck_step_tolerances": {
+        "face": 1e-07,
+        "edge": 6.730576161296852e-06,
+        "vertex": 6.730576161296852e-06
+      }
+    },
+    "D1": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 66292.42889639983,
+      "truck_volume": 66874.24250630887,
+      "native_to_truck_max_distance": 1.962424760016744,
+      "native_to_truck_samples": 1585,
+      "truck_to_native_max_distance": 4.107119965063275,
+      "truck_to_native_samples": 1495,
+      "native_tolerances": {
+        "face": 0.0001,
+        "edge": 0.896431789394428,
+        "vertex": 1.26423079199775
+      },
+      "truck_step_tolerances": {
+        "face": 1e-07,
+        "edge": 6.588985520929308e-06,
+        "vertex": 6.588985520929308e-06
+      }
+    }
+  },
+  "sphere_residuals": {
+    "C2": {
+      "center": [
+        75.46607491458546,
+        -10.0,
+        10.0
+      ],
+      "radius": 10.0,
+      "native": {
+        "point": [
+          83.39260453869899,
+          -4.471547515783342,
+          8.177135147836314
+        ],
+        "sphere_residual": -0.1655455148013214
+      },
+      "truck": {
+        "point": [
+          83.80963267520491,
+          -4.631046633739107,
+          8.751247163750378
+        ],
+        "sphere_residual": -4.0678571622265736e-12
+      }
+    },
+    "C8": {
+      "center": [
+        -10.0,
+        10.0,
+        60.058874503045715
+      ],
+      "radius": 10.0,
+      "native": {
+        "point": [
+          -8.774500132884741,
+          8.774500132884818,
+          64.93137902132186
+        ],
+        "sphere_residual": -4.82844316194627
+      },
+      "truck": {
+        "point": [
+          -8.613249509436091,
+          8.613249509436095,
+          69.86468125991149
+        ],
+        "sphere_residual": -4.235012340814137e-11
+      }
+    }
+  },
+  "archive_sha256": "4c27b36a3ddc43ceb90eeecdb6d714030c88ec4e7488d5c6e32063f0621dd360",
+  "archive_members": 73,
+  "member_sha256": {
+    "probe/C2/001.input.step": "0eb881e84889f13362390b667d0129a52fc8fc93102f1eb17697c9f69182b8ee",
+    "probe/C2/001.input.json": "3c909a9c99f4e723e255f7075767459b956c8be7b01fea21af346c2182dd28f0",
+    "probe/C2/001.result.brep": "11ba60e82c9452681edb639d7d385f38a1491a67a5db26b3519ac1af22266dce",
+    "probe/C2/001.result.json": "1c988143ea931040142b52e0d0d35d2c06e32b5749442291058c43f0bf7d773e",
+    "probe/C2/001.truck.log": "2c9f7dc5f915e0fa9a8743e81e74dcc80789c577aa31f661afc87c3b591fee37",
+    "probe/C2/001.truck.step": "64a05072af631b623aff48db8d94ca97b4721d4fa522495d325f9be1a23d7d5f",
+    "probe/C2/001.truck.json": "5a73faa8c808296da1161a277d1cc0f4e24a34fa4e171b7693b1fb198431ebc1",
+    "probe/C2/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "probe/C2/001.comparison.json": "3421c8ce458958b8eb52ea8b8ccf5b81778d9d7df7993b210060b1059b0f4275",
+    "probe/C2/residual.log": "0269d031883024ccb03173b61b1fb1bfdc4bae2cc4ca1eeb74ddd27eda2a5135",
+    "probe/C2/residual.json": "3421c8ce458958b8eb52ea8b8ccf5b81778d9d7df7993b210060b1059b0f4275",
+    "probe/C6/001.input.step": "3b93f523d0729a6eb6ea0f3a0e7c9b2a20f3e64464fc92013855516bc5c55275",
+    "probe/C6/001.input.json": "478e2216374e7d4f678e4f3f6087f32db16b5d58e0d6809e525bdaade80fb658",
+    "probe/C6/001.result.brep": "6ffa2c683755cce7aa00826f1cb8c03c1473daa7ebf2a75f55ed26dfccdaebfa",
+    "probe/C6/001.result.json": "5236269230b84a40e9e3ef4736ca45b65caa3adf668478f6e9c1cd2792445d59",
+    "probe/C6/001.truck.log": "9aeca3f166e1322b27af246e99c84ce59836c3002a5132ba7f33bb8e5dab9079",
+    "probe/C6/001.truck.step": "5ae69416a15683fd8ed35d659abb945f5654503d13e5e0b0d77e682f3ac3f090",
+    "probe/C6/001.truck.json": "9078637c383eb68c8e297ff17b72a8d429136a0026854237bbe4199c0435c7be",
+    "probe/C6/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "probe/C6/001.comparison.json": "cd9ae61d13677049aedea4669f8cc040335bd2267d9a32056cd0207a0b2ae18b",
+    "probe/C6/residual.log": "1d02c591bc0dd40d7962d7f2e9d597de358916add8452450916ec4b6f07b9182",
+    "probe/C6/residual.json": "cd9ae61d13677049aedea4669f8cc040335bd2267d9a32056cd0207a0b2ae18b",
+    "probe/C8/001.input.step": "9b45f44401f26f0cc6c9747fb1e12fe083984a3d4ce732b3cbfeb91af1642c3e",
+    "probe/C8/001.input.json": "6e7844b196e0c4fa1eb9fbf2eee138500c8bfbccea15e4758df938503ee5c723",
+    "probe/C8/001.result.brep": "7b5106e4b04f830ddaf6f5572a69bacaaf8af6307ccd325ced84ae8e08e3085c",
+    "probe/C8/001.result.json": "279e88acc72878a9ff270c6022e833b77cf98968aa7586ff23f6dc725869c6ac",
+    "probe/C8/001.truck.log": "45e4c135a6ddf99c80ae20279db1428e207f2efad0ed30a89fcfc5fc1f1cccdc",
+    "probe/C8/001.truck.step": "7f38eb395c1a616ad5740ea9556af4f548c6eaa9ac6da5bded5d6b7f8437f941",
+    "probe/C8/001.truck.json": "87e706513dad05fec4a7f7946bab47614ef6da02e5632a00f39fbb3261c7d993",
+    "probe/C8/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "probe/C8/001.comparison.json": "e5fdf049bd33422b5d74c7aabdf1aa2839f1b800368d12da25a85839a09fc2a2",
+    "probe/C8/residual.log": "f25544d5b15191a31d7f0fcd07ba13096b75aacb1bc843678da5dda164b97c67",
+    "probe/C8/residual.json": "e5fdf049bd33422b5d74c7aabdf1aa2839f1b800368d12da25a85839a09fc2a2",
+    "probe/D1/001.input.step": "ef186c5442d0c3f4e3f6e8e63113dd5511a1a3d9c98ee83634b64ab58600f2e6",
+    "probe/D1/001.input.json": "afdab4b9c1c27723ad4bcc2a8a6e0bbc1db89e93cb55c5d62a254afd56bd7392",
+    "probe/D1/001.result.brep": "28c722decc08cffe3a9f5e28e8d676e48dfec3c9202fcda8a03b5d8e6c7a1104",
+    "probe/D1/001.result.json": "b0cf80272a3cc125b4ec079452cec2b3116233dd81777b2a9b484a86c5ff96df",
+    "probe/D1/001.truck.log": "3840af0604ba94c4dc36ace6ee7744150341bdab9e98077dd8f92a59da4b86bd",
+    "probe/D1/001.truck.step": "6e5212d3a425f5b1201748b8282d839ba447360f248554793295d0ddb544ff5e",
+    "probe/D1/001.truck.json": "08f01472267098b46b07fdbbe2a400a1c5424ed6008f0e38525f653ccde48c99",
+    "probe/D1/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "probe/D1/001.comparison.json": "f3a6a9a5bd881d733e56bf4b09ba3139c560f55f24e93a39888a3399519ed941",
+    "probe/D1/residual.log": "739993d394fcfab3b2f7ab1b45604942e5590885cbc73a2c06635ca3eb0882f2",
+    "probe/D1/residual.json": "f3a6a9a5bd881d733e56bf4b09ba3139c560f55f24e93a39888a3399519ed941",
+    "volume/conical-corner-volume-refined-128.txt": "546fe05aca290abb2c55558e0fe4e229015ceb46a6c6e8d87e73f3cad3e99fe7",
+    "volume/conical-corner-volume-refined-256.txt": "f1f129eae594e896edc17d4b60f34f9218bee47565d8e654efc8ee13c9412e3b",
+    "volume/conical-corner-volume-refined-128-r03.txt": "73e792a763e17d3fa47a3ba3a393e43821a166150b02d93c16cd018725d0c1b0",
+    "volume/conical-corner-volume-refined-256-r03.txt": "123d3ad77a0854b731e23e0ce2ea1f3d31dc93f3e3998d622f74a690349b040d",
+    "volume/conical-corner-volume-refined-128-r06.txt": "10bd347ce21839cfddfc44b4fa14db298326779085ce224718381fcaae0911ee",
+    "volume/conical-corner-volume-refined-256-r06.txt": "e338995af90ca2b8f281bdf7b1a42f8e43a226c65a93c35bd69327281cb406ae",
+    "volume/conical-corner-volume.cpp": "8ad95f8f07859270c8b46652a06e15d74f4460c44ee9bdc7e99b6c46985cda72",
+    "volume/controls.json": "077a8af0dab976f73bec0a0ae7e3de3f01d1944376057fb57b3dbbd119d78c14",
+    "helpers/prove-conical-corner-parent.py": "2b6fe4fd6b53e6d9e2a31b3893b9ec343e6ca0e75960bf7b02e4d5f0e2ec927f",
+    "helpers/validate-conical-corners.py": "24513c1f8c5bdae6d0d67145b4f3141d66d5cdc2b77250b8c422ce626902c771",
+    "helpers/verify-conical-corner-replays.py": "20b0733afd7e40f334888df2ceaac0c30c419d7c8fdd93041fb98024f9b6d67c",
+    "helpers/conical-corner-residual-check.py": "af60e42d998795afecaed84a51e288f9627480d1e292571c3e61cc4b1a181b15",
+    "helpers/package-conical-corner-proof.py": "d3755f0b4f5feeb3a73d876b7e429ddebbcf090a7ede337650793daae4547f20",
+    "parent/truck-shapeops/tests/conical_corner_junctions.rs": "97c563b552b7878000ff15e7bb15e15cbb6a8638c672e45141fb05c6a742bdae",
+    "parent/truck-shapeops/examples/replay_occt_blend.rs": "08a49d306363554a72f83c204d23eeccaa5d4973bce59157ac9b567e31a502f7",
+    "parent/truck-shapeops/tests/fixtures/conical-corner-junctions/C2.input.step": "92a9922a756306c347b3160db1a073f6e7ac9db792463411126ad36479122808",
+    "parent/truck-shapeops/tests/fixtures/conical-corner-junctions/C2.input.json": "3c909a9c99f4e723e255f7075767459b956c8be7b01fea21af346c2182dd28f0",
+    "parent/truck-shapeops/tests/fixtures/conical-corner-junctions/C6.input.step": "3a91957e8e62ec7bb900535e326d75072b8479b8808063bbe59b182d28ccac2c",
+    "parent/truck-shapeops/tests/fixtures/conical-corner-junctions/C6.input.json": "478e2216374e7d4f678e4f3f6087f32db16b5d58e0d6809e525bdaade80fb658",
+    "parent/truck-shapeops/tests/fixtures/conical-corner-junctions/C8.input.step": "ac7af9fd225243f9eb4fe6c988831d12583a74f76b486de5a551c8a4707c85af",
+    "parent/truck-shapeops/tests/fixtures/conical-corner-junctions/C8.input.json": "6e7844b196e0c4fa1eb9fbf2eee138500c8bfbccea15e4758df938503ee5c723",
+    "parent/truck-shapeops/tests/fixtures/conical-corner-junctions/D1.input.step": "6c0e76be0e0002b0edc2a67a56a4f731552d47ecbbaaece0335716ecaa86b4b2",
+    "parent/truck-shapeops/tests/fixtures/conical-corner-junctions/D1.input.json": "afdab4b9c1c27723ad4bcc2a8a6e0bbc1db89e93cb55c5d62a254afd56bd7392",
+    "parent/truck-shapeops/tests/fixtures/conical-corner-junctions/README.md": "0407fd8399a201f028e05bf34ca610b33f4e0fbcf9dc100b6ec0827603b10e01",
+    "diagnostics/spherical-corner-residual.cpp": "3f3245a858ee26bad4e72c023ee47f8f3fc3d674843f77416969af305fbcec46",
+    "diagnostics/conical-corner-verified-residuals.json": "a0e28274607575bba398dbff6ce71323a8fc50d1d5f7ed8f302977610dde7bd4",
+    "diagnostics/shape_volume.hpp": "55d38b26d314340da58333946ae4fed879fb96d2a48d5a9785c23fe42b897815",
+    "diagnostics/shape_tolerances.hpp": "a98d099dde75072d678bf7f444ecde390fa71fd3abe01115cb4f60b99b753651",
+    "helpers/control-commands.json": "3d0fc31cb8ac02af6cf8682f2335ee907cceec8c273c26f33156a922622bd1f7"
+  }
+}
