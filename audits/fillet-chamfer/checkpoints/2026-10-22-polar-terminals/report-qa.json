@@ -1,0 +1,17 @@
+{
+  "viewports": [
+    {
+      "width": 1100,
+      "content_height": 1896,
+      "horizontal_overflow": false
+    },
+    {
+      "width": 390,
+      "content_height": 2817,
+      "horizontal_overflow": false
+    }
+  ],
+  "visual_review": "Readable headings, body text and evidence links at both widths.",
+  "links_checked": 11,
+  "links_passed": 11
+}

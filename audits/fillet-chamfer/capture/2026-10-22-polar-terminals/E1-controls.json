@@ -1,0 +1,35 @@
+{
+  "case": "blend/simple/E1",
+  "simpson": [
+    3482832.6629430493,
+    3482832.6629430503,
+    3482832.6629430503
+  ],
+  "native_volume": 3482832.662943771,
+  "truck_step_volume": 3482832.662804162,
+  "native_difference": 7.208436727523804e-07,
+  "truck_difference": -0.0001388881355524063,
+  "controls": "Unchanged input; exact radius-10 cylinder; closed solid, independent material and STEP; one probe passes. E1 remains a limited comparison pass.",
+  "archive": "E1-controls.zip",
+  "archive_sha256": "0fdbf405d1653d5e8a46e8880b8f04c409fc4643212e449741e6499125168ace",
+  "members": {
+    "polar-axis-volume.py": "183c9468897ec9940c7a9a15b328672d2b49b3deee982852fb9f93870dd011fb",
+    "polar-axis-volume.json": "ed2a62b17f5a0da1a7b2f3bd23867e28a8d10264f9e14c1a30c59a187fbbfa89",
+    "polar-axis-material.rs": "899d621a033f05e48e3c8e048d56eba198d4d59694463d0c447f897a7a7ba781",
+    "polar-axis-material-command.json": "2f2ac4a6cd4e8185ab83d5c17aad030721d78a502f09574e9754cd25d344b628",
+    "polar-axis-material-build.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "polar-axis-material-tests.txt": "d590db355d139421d8ee62a0a538bc1670ba992b81279ade971b2e55a2df6afa",
+    "E1/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "E1/001.input.brep": "172b68310db3ba28d9268e2c93dbb1b26609b2e92c2955d5b4f1e95e6c835dae",
+    "E1/001.input.step": "2ac84cb7df8adb043eac8268f775abf3103ace68d7afa24df67a8951c3912ff3",
+    "E1/001.input.json": "4f664b0edc5aa5179af588b2fc821c94fb557e10bb1779f09d937f5aca71c93a",
+    "E1/001.result.brep": "7935a3613c41043ce802204fbbe4cbfed3e4f99687173f4e1525b59cd4a004bb",
+    "E1/001.result.step": "6eef15eddce4a819f99089366ac82509778a18b086cb9fabdc31b06a99a50a8e",
+    "E1/001.result.json": "7e56bd4d629aa2489a391d54b18cd43785845182258f56b14d156f169c099356",
+    "E1/001.truck.step": "a5e48021a6b36b77ab0c020b08c02d3e66f3bbd3013633271dc7209c70909ef4",
+    "E1/001.truck.json": "eb6a3651641b3cd2eedb10984f89bc09c78541f31294350b9ee962b47849c813",
+    "E1/001.truck.log": "46b831c206510f3bbf1b9ea6b2205ac53b5a1190ad7166cbcd8723111a9a17ea",
+    "E1/001.comparison.json": "67688104c4f7c078856a703d9a95ac30de74a161a8d29d390a08be671354b299",
+    "E1/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}
