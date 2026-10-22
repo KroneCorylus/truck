@@ -716,9 +716,12 @@ fn separate_chamfer_wires(
 /// On a planar rim bounded by perpendicular planes and convex cylinders, an inset may
 /// consume circular contacts. These corners end in exact conical tips; adjacent planar
 /// chamfers share a ridge beyond each tip. Consumed arcs must be bounded by straight edges.
-/// Open chains must terminate on straight edges and the cuts must retain the support faces.
+/// For consumed corners, open chains must terminate on straight edges and retain the support faces.
 /// At an open end, a straight terminal edge may extend toward the new contact, allowing
 /// chamfers at concave radial steps. Interior and closed-chain edges remain bounded.
+/// Open cylinder/plane rim contacts may continue to curved terminal boundaries. Cylindrical
+/// terminal supports retain their analytic geometry while their parameter domains grow to
+/// include the new boundary.
 pub fn chamfer_solid_along_wire(
     solid: &Solid,
     wire: &Wire,
@@ -897,6 +900,28 @@ fn chamfer_solid_wire(
             }
         })
         .map_err(|e| e.operation(operation).shell(index))?;
+    let shell = shell
+        .into_iter()
+        .map(|face| {
+            if solid.boundaries()[index]
+                .iter()
+                .any(|old| old.id() == face.id())
+            {
+                return face;
+            }
+            let surface = face.oriented_surface();
+            if !matches!(
+                surface.elementary(),
+                Some((truck_modeling::Elementary::Cylinder { .. }, _))
+            ) || face.is_geometric_consistent()
+            {
+                return face;
+            }
+            let boundaries = face.boundaries();
+            let surface = super::planar_edge::extend_surface(surface, &boundaries, tol);
+            Face::new(boundaries, surface)
+        })
+        .collect();
     finish(solid, index, shell, tol).map_err(|e| e.operation(operation))
 }
 

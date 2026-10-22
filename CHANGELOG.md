@@ -6,6 +6,12 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Continue open cylinder/plane chamfer contacts to curved terminal boundaries.
+  Changed cylindrical terminal faces can extend their parameter domains while
+  preserving their analytic geometry. Independent lens-section material controls
+  cover both caps, unequal setbacks, reversed wires and transformed solids;
+  native C3 sequential equal-distance, two-distance and angle cases regress this path.
+
 - Orient unequal two-edge chamfer transition faces against the adjacent surviving
   boundary. Convex bevel pairs on nonconvex solids no longer produce reversed
   transition triangles. Independent material controls cover both setback orders,

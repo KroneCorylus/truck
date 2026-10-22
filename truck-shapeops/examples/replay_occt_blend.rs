@@ -4631,3 +4631,104 @@ mod chamfer_transition_orientation_tests {
         }
     }
 }
+
+#[cfg(test)]
+mod open_chamfer_terminal_tests {
+    use super::*;
+    #[test]
+    fn native_open_chamfers_continue_to_cylindrical_terminals() {
+        for (name, step, intent, volume) in [
+            (
+                "equal",
+                include_str!("../tests/fixtures/open-chamfer-terminals/equal.input.step"),
+                include_str!("../tests/fixtures/open-chamfer-terminals/equal.input.json"),
+                107.06244889555366,
+            ),
+            (
+                "distances",
+                include_str!("../tests/fixtures/open-chamfer-terminals/distances.input.step"),
+                include_str!("../tests/fixtures/open-chamfer-terminals/distances.input.json"),
+                107.08145863251472,
+            ),
+            (
+                "angle",
+                include_str!("../tests/fixtures/open-chamfer-terminals/angle.input.step"),
+                include_str!("../tests/fixtures/open-chamfer-terminals/angle.input.json"),
+                107.08417532726342,
+            ),
+        ] {
+            for reverse in [false, true] {
+                let directory = std::env::temp_dir().join(format!(
+                    "truck-open-chamfer-terminal-{}-{name}-{reverse}",
+                    std::process::id()
+                ));
+                std::fs::create_dir_all(&directory).unwrap();
+                let prefix = directory.join("001");
+                let prefix = prefix.to_str().unwrap();
+                let task: Value = serde_json::from_str(intent).unwrap();
+                std::fs::write(format!("{prefix}.input.step"), step).unwrap();
+                std::fs::write(format!("{prefix}.input.json"), intent).unwrap();
+                let result = replay(prefix, &Cell::new("start")).unwrap();
+                assert_eq!(result["status"], "operation-succeeded", "{result}");
+                assert_eq!(result["selected_edges"], 1);
+                assert_eq!(result["selection_scope"], "native-contours");
+                for field in [
+                    "input_unchanged",
+                    "geometry_consistent",
+                    "mesh_closed",
+                    "step_prepared",
+                ] {
+                    assert_eq!(result[field], true, "{field}: {result}");
+                }
+                let input = import(&format!("{prefix}.input.step")).unwrap();
+                let before = serde_json::to_string(&input.compress()).unwrap();
+                let selected =
+                    chamfer_selection(&input, task["selection"].as_array().unwrap(), true).unwrap();
+                assert_eq!(selected.len(), 1);
+                let (edge, parameters) = &selected[0];
+                let mut wire: Wire = vec![edge.clone()].into();
+                if reverse {
+                    wire.invert();
+                }
+                let solid = match parameters {
+                    ChamferParameters::Distances(distances) => {
+                        let mut distances = *distances;
+                        let boundary = input
+                            .face_iter()
+                            .find_map(|f| f.edge_iter().find(|e| e.id() == edge.id()))
+                            .unwrap();
+                        if boundary.front() != wire[0].front() {
+                            distances.swap(0, 1);
+                        }
+                        try_chamfer_solid_along_wire(&input, &wire, distances[0], distances[1], TOL)
+                    }
+                    ChamferParameters::Angle {
+                        distance,
+                        radians,
+                        reference,
+                    } => try_chamfer_solid_along_wire_angle(
+                        &input,
+                        &wire,
+                        *reference,
+                        *distance,
+                        Rad(*radians),
+                        TOL,
+                    ),
+                }
+                .unwrap()
+                .solid;
+                assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
+                replay_common::assert_solid(&solid, volume, &[0], TOL);
+                replay_common::blend::assert_step(&solid, volume, TOL);
+                let output = import(&format!("{prefix}.truck.step")).unwrap();
+                replay_common::assert_solid(&output, volume, &[0], TOL);
+                replay_common::blend::assert_step(&output, volume, TOL);
+                assert_eq!(
+                    std::fs::read_to_string(format!("{prefix}.input.step")).unwrap(),
+                    step
+                );
+                std::fs::remove_dir_all(directory).unwrap();
+            }
+        }
+    }
+}

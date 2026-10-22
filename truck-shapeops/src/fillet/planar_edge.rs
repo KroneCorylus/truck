@@ -649,7 +649,7 @@ fn cylinder_miter(a: &Surface, b: &Surface, endpoints: [Point3; 2]) -> Option<Pl
     Some(Plane::new(origin, origin + x, origin + normal.cross(x)))
 }
 
-fn extend_surface(surface: Surface, boundaries: &[Wire], tol: f64) -> Surface {
+pub(super) fn extend_surface(surface: Surface, boundaries: &[Wire], tol: f64) -> Surface {
     // Extend the parameter domain with the boundary, preserving the analytic cylinder.
     if !matches!(surface.elementary(), Some((Elementary::Cylinder { .. }, _))) {
         return surface;

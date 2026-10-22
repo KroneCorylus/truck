@@ -787,8 +787,13 @@ where
         }
         if continue_contacts {
             let side = cap_side.ok_or_else(failed)?;
-            contact[side] = contact[side].cut(a);
-            contact[side].cut(b);
+            // Preserve shared seam stations, but let open ends reach their terminal boundary.
+            if closed || index > 0 {
+                contact[side] = contact[side].cut(a);
+            }
+            if closed || index + 1 < wire.len() {
+                contact[side].cut(b);
+            }
         }
         if continue_contacts {
             support_contacts.push(pcurves);

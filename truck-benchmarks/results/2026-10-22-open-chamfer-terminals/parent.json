@@ -1,0 +1,26 @@
+{
+  "revision": "7d271ce02cd44d3ac79f79da9dbb0ab522872f06",
+  "test_sha256": {
+    "truck-shapeops/tests/open_chamfer_terminals.rs": "d29958e464da434816cddf707e02d758e163531408638bea5a66798fb000df1b",
+    "truck-shapeops/examples/replay_occt_blend.rs": "8c0878b97f7e038951a54e2f9586e5db45192711f9c2f9df18b46940d9a96f9a",
+    "truck-shapeops/tests/fixtures/open-chamfer-terminals/equal.input.step": "5ccf51405e1b1e6bc84aa319fcca7dd775c004d7b54656bf009da53cb01d2eb4",
+    "truck-shapeops/tests/fixtures/open-chamfer-terminals/equal.input.json": "e6dae4afaaa554695d96dbf4877e019add08bd78083806e1cce97db05408a25a",
+    "truck-shapeops/tests/fixtures/open-chamfer-terminals/distances.input.step": "54acd6dd4ed3380e30cd828c84b012b9a71348648b977df1d3421a4f1217f503",
+    "truck-shapeops/tests/fixtures/open-chamfer-terminals/distances.input.json": "614a0adde9582d42ee842e3185ad6780727c3a565bd3af081e8043ba7655ee1a",
+    "truck-shapeops/tests/fixtures/open-chamfer-terminals/angle.input.step": "f9771ae4ff38d452f4dce81ee4328c26af5febd4232324524d0ea987ca731366",
+    "truck-shapeops/tests/fixtures/open-chamfer-terminals/angle.input.json": "13ef827fdece891091e3b4ecda7fa5b7260a6e6397c28072acbbb2236efe83f4",
+    "truck-shapeops/tests/fixtures/open-chamfer-terminals/README.md": "7e3686e059fc2a930385c0c2dc951229fdc70784d26f59ae3c9a43c918eb0640"
+  },
+  "parent_test_sha256": {
+    "truck-shapeops/tests/open_chamfer_terminals.rs": "d29958e464da434816cddf707e02d758e163531408638bea5a66798fb000df1b",
+    "truck-shapeops/examples/replay_occt_blend.rs": "8c0878b97f7e038951a54e2f9586e5db45192711f9c2f9df18b46940d9a96f9a",
+    "truck-shapeops/tests/fixtures/open-chamfer-terminals/equal.input.step": "5ccf51405e1b1e6bc84aa319fcca7dd775c004d7b54656bf009da53cb01d2eb4",
+    "truck-shapeops/tests/fixtures/open-chamfer-terminals/equal.input.json": "e6dae4afaaa554695d96dbf4877e019add08bd78083806e1cce97db05408a25a",
+    "truck-shapeops/tests/fixtures/open-chamfer-terminals/distances.input.step": "54acd6dd4ed3380e30cd828c84b012b9a71348648b977df1d3421a4f1217f503",
+    "truck-shapeops/tests/fixtures/open-chamfer-terminals/distances.input.json": "614a0adde9582d42ee842e3185ad6780727c3a565bd3af081e8043ba7655ee1a",
+    "truck-shapeops/tests/fixtures/open-chamfer-terminals/angle.input.step": "f9771ae4ff38d452f4dce81ee4328c26af5febd4232324524d0ea987ca731366",
+    "truck-shapeops/tests/fixtures/open-chamfer-terminals/angle.input.json": "13ef827fdece891091e3b4ecda7fa5b7260a6e6397c28072acbbb2236efe83f4",
+    "truck-shapeops/tests/fixtures/open-chamfer-terminals/README.md": "7e3686e059fc2a930385c0c2dc951229fdc70784d26f59ae3c9a43c918eb0640"
+  },
+  "binding_change": null
+}

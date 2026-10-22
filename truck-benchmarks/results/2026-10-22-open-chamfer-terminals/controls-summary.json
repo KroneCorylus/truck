@@ -1,0 +1,123 @@
+{
+  "procedural_operations": 24,
+  "collision_rejections": 2,
+  "imported_selections": 6,
+  "independent_volume": "exact disk-intersection area integrated through the chamfer depth; 1024/4096 intervals agree within 1e-10",
+  "native_comparisons": {
+    "equal": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 107.06244889555366,
+      "truck_volume": 107.0624248202152,
+      "native_to_truck_max_distance": 3.425777908351523e-05,
+      "native_to_truck_samples": 7303,
+      "truck_to_native_max_distance": 6.220627362001832e-05,
+      "truck_to_native_samples": 7204,
+      "native_tolerances": {
+        "face": 1e-07,
+        "edge": 1e-07,
+        "vertex": 9.15969916923825e-07
+      },
+      "truck_step_tolerances": {
+        "face": 1e-07,
+        "edge": 0.000279312329258797,
+        "vertex": 0.000279312329258797
+      }
+    },
+    "distances": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 107.08145863251472,
+      "truck_volume": 107.08144290239326,
+      "native_to_truck_max_distance": 2.424281126399971e-05,
+      "native_to_truck_samples": 7303,
+      "truck_to_native_max_distance": 4.629840815381e-05,
+      "truck_to_native_samples": 7204,
+      "native_tolerances": {
+        "face": 1e-07,
+        "edge": 1e-07,
+        "vertex": 9.15969916923825e-07
+      },
+      "truck_step_tolerances": {
+        "face": 1e-07,
+        "edge": 0.00018775396718294756,
+        "vertex": 0.00018775396718294756
+      }
+    },
+    "angle": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 107.08417532726342,
+      "truck_volume": 107.08416694221776,
+      "native_to_truck_max_distance": 1.4023419109141126e-05,
+      "native_to_truck_samples": 7303,
+      "truck_to_native_max_distance": 2.8759300147599466e-05,
+      "truck_to_native_samples": 7204,
+      "native_tolerances": {
+        "face": 1e-07,
+        "edge": 1e-07,
+        "vertex": 9.15969916923825e-07
+      },
+      "truck_step_tolerances": {
+        "face": 1e-07,
+        "edge": 0.00010469686949129132,
+        "vertex": 0.00010469686949129132
+      }
+    }
+  },
+  "archive_sha256": "574baddb49fdfb04abe66262260f006901694c2fec120f828433b80fddf0c9d9",
+  "archive_members": 39,
+  "member_sha256": {
+    "probe/equal/001.input.step": "af34d9b095fecabfaed2b3fbcc00a636374232fe2cd792386b85cf1e7b00204a",
+    "probe/equal/001.input.json": "e6dae4afaaa554695d96dbf4877e019add08bd78083806e1cce97db05408a25a",
+    "probe/equal/001.result.brep": "7c1e2efd7f36d44320434a631438bfe917ce7c2b2b6df97391968841ff1e07eb",
+    "probe/equal/001.result.json": "5241dea07571fb39a3585314d9f8927ae993e926b4d4b23024e7bcb817bdf98f",
+    "probe/equal/001.truck.log": "d0c4ec1cf71463d2b93ed77779ff48cd5581a8955530fda8dd9560b8560bff74",
+    "probe/equal/001.truck.step": "139e2ff7c25400da402b873de72209edfc8913e6ad9cec59fc4492a28d106ff6",
+    "probe/equal/001.truck.json": "5aa5f587717100843eb5c21035c7ef9a1ee36be41c8291eadaf0e03588f121b1",
+    "probe/equal/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "probe/equal/001.comparison.json": "9f3fbd6c9f40e7988c748cefd995e91055711ff3a80ab236cfc106adb3da923f",
+    "probe/distances/001.input.step": "86f327fbdc84dc86c1082d5543cf8e51e3b885dc7d7e3d74f8de0384770167a2",
+    "probe/distances/001.input.json": "614a0adde9582d42ee842e3185ad6780727c3a565bd3af081e8043ba7655ee1a",
+    "probe/distances/001.result.brep": "403713cab016e315b8474c641fa75cb13e93780156e7d017d0111724070ac46b",
+    "probe/distances/001.result.json": "c273b0072272c2feb8dc34de6cbb3ed3c9111bc98acb84aee6c9d9c848b28276",
+    "probe/distances/001.truck.log": "16c24bd577c800c0f126f4026f9d333ac0ce5b23b49297aa876bd16fd3e91aaa",
+    "probe/distances/001.truck.step": "e0a48eebee0946be5ab9b036e9f9bec2381d5210401861ae0472e2a2ea045200",
+    "probe/distances/001.truck.json": "a3df83bee90cd2a81dede6e37a1071319b1de2f0d569ed367d900cb60bf9e5ee",
+    "probe/distances/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "probe/distances/001.comparison.json": "a6ed1052c74ec037508337e6042bf41ee6b6a210b868325771f968b0dac8d41f",
+    "probe/angle/001.input.step": "8d4745409552441518a1a8b7cc3eb9baf41b85e5ddcc3e6eae0da31fd5516d82",
+    "probe/angle/001.input.json": "13ef827fdece891091e3b4ecda7fa5b7260a6e6397c28072acbbb2236efe83f4",
+    "probe/angle/001.result.brep": "6e04bd60dd6548217963427b3fb5dab2432df8b5deac3c094078153af99fca43",
+    "probe/angle/001.result.json": "404c6ef07b611cc86fde5b92a6454fe72961fee081ea16792bb95f2b800d31a0",
+    "probe/angle/001.truck.log": "819cb128938edaacc3fb22cd6526e42d0fa12b164a6b20d161ffef9a2e5bcf9f",
+    "probe/angle/001.truck.step": "1c5ddea03eca5842a630e4f8d0262fc2c7e2fb44fab97c904d4813d4d3be401c",
+    "probe/angle/001.truck.json": "a67f690cd527972cd6c726d997b7c7170cc0c77b4f4feb8f5c6151091b0cf79c",
+    "probe/angle/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "probe/angle/001.comparison.json": "77573ee568b36d1d0f5f6be517fde2cffc53daa1a442811cf1d2fac6d3c58599",
+    "helpers/prove-open-chamfer-terminal-parent.py": "61920d07c53ff88693da727bfe276485dde2f7084655a0969c7746ced6686a28",
+    "helpers/validate-open-chamfer-terminals.py": "0b903a295041eb1cea15f0b1408aa0c53be570d2e950e1d74f79a852059d2d97",
+    "helpers/verify-open-chamfer-terminal-replays.py": "e734bf92b25d956395e381aa4ba52212c1c14c742d5589675e445b29cc3b460b",
+    "parent/truck-shapeops/tests/open_chamfer_terminals.rs": "d29958e464da434816cddf707e02d758e163531408638bea5a66798fb000df1b",
+    "parent/truck-shapeops/examples/replay_occt_blend.rs": "8c0878b97f7e038951a54e2f9586e5db45192711f9c2f9df18b46940d9a96f9a",
+    "parent/truck-shapeops/tests/fixtures/open-chamfer-terminals/equal.input.step": "5ccf51405e1b1e6bc84aa319fcca7dd775c004d7b54656bf009da53cb01d2eb4",
+    "parent/truck-shapeops/tests/fixtures/open-chamfer-terminals/equal.input.json": "e6dae4afaaa554695d96dbf4877e019add08bd78083806e1cce97db05408a25a",
+    "parent/truck-shapeops/tests/fixtures/open-chamfer-terminals/distances.input.step": "54acd6dd4ed3380e30cd828c84b012b9a71348648b977df1d3421a4f1217f503",
+    "parent/truck-shapeops/tests/fixtures/open-chamfer-terminals/distances.input.json": "614a0adde9582d42ee842e3185ad6780727c3a565bd3af081e8043ba7655ee1a",
+    "parent/truck-shapeops/tests/fixtures/open-chamfer-terminals/angle.input.step": "f9771ae4ff38d452f4dce81ee4328c26af5febd4232324524d0ea987ca731366",
+    "parent/truck-shapeops/tests/fixtures/open-chamfer-terminals/angle.input.json": "13ef827fdece891091e3b4ecda7fa5b7260a6e6397c28072acbbb2236efe83f4",
+    "parent/truck-shapeops/tests/fixtures/open-chamfer-terminals/README.md": "7e3686e059fc2a930385c0c2dc951229fdc70784d26f59ae3c9a43c918eb0640"
+  }
+}
