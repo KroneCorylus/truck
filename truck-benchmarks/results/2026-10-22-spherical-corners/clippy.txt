@@ -1,0 +1,33 @@
+$ cargo clippy --release -p truck-shapeops -p truck-stepio -p truck-benchmarks --all-targets
+    Checking truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/truck-stepio)
+    Checking truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Checking truck-benchmarks v0.1.0 (/home/krone/Development/Pieza_WS/truck/truck-benchmarks)
+warning: float has excessive precision
+   --> truck-shapeops/tests/spherical_corner_junctions.rs:155:20
+    |
+155 |             (0.15, 3.4217834421245579, 3.4314225430002887),
+    |                    ^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#excessive_precision
+    = note: `#[warn(clippy::excessive_precision)]` on by default
+help: consider changing the type or truncating it to
+    |
+155 -             (0.15, 3.4217834421245579, 3.4314225430002887),
+155 +             (0.15, 3.421_783_442_124_558, 3.4314225430002887),
+    |
+
+warning: `truck-shapeops` (test "spherical_corner_junctions") generated 1 warning (run `cargo clippy --fix --test "spherical_corner_junctions" -p truck-shapeops -- ` to apply 1 suggestion)
+warning: this expression creates a reference which is immediately dereferenced by the compiler
+   --> truck-shapeops/tests/curved_terminal_junctions.rs:227:65
+    |
+227 | ...                   assert!(normal(face).dot(normal(&neighbour)) > 1. - 1e-7);
+    |                                                       ^^^^^^^^^^ help: change this to: `neighbour`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#needless_borrow
+    = note: `#[warn(clippy::needless_borrow)]` on by default
+
+warning: `truck-shapeops` (test "curved_terminal_junctions") generated 1 warning (run `cargo clippy --fix --test "curved_terminal_junctions" -p truck-shapeops -- ` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 5.38s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+exit_code 0

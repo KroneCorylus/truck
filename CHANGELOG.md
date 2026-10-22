@@ -6,6 +6,13 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Join three selected edges on an outward spherical support and two planes with
+  an exact rolling sphere, two toroidal blends and a cylindrical round. Curved
+  contacts trim against their remote planar boundaries. Independent material,
+  radius, tangency and STEP controls cover truncated and polar sectors; native
+  D5/D9/E4 selections regress the construction. Native comparison discrepancies
+  and E4 volume-integration inconsistencies remain explicitly recorded.
+
 - Round separated planar corner chains and curved tangent rims in one selection.
   Each connected component uses its existing supported construction, in input-shell
   order, while retaining edge-membership and generated-face interference guards.

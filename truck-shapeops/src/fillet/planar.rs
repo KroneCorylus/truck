@@ -236,6 +236,7 @@ pub(super) struct Neighborhood {
     pub edge_index: HashMap<EdgeID, usize>,
     pub planes: Vec<Option<(Vector3, f64)>>,
     pub cylinders: Vec<Option<(Point3, Vector3, f64)>>,
+    pub sphere_supports: Vec<Option<(Point3, f64)>>,
     pub incident: Vec<Vec<usize>>,
     pub sides: Vec<[usize; 2]>,
 }
@@ -297,26 +298,29 @@ pub(super) fn neighborhood(
             incident[vertex_index[&v.id()]].push(k);
         }
     }
-    let cylinders: Vec<_> = shell
+    let (cylinders, sphere_supports): (Vec<_>, Vec<_>) = shell
         .iter()
         .map(|face| {
             if !curved_fillets {
-                return None;
+                return (None, None);
             }
-            match face.oriented_surface().elementary()? {
-                (
+            match face.oriented_surface().elementary() {
+                Some((
                     Elementary::Cylinder {
                         origin,
                         axis,
                         radius,
                     },
                     true,
-                ) => Some((origin, axis, radius)),
-                _ => None,
+                )) => (Some((origin, axis, radius)), None),
+                Some((Elementary::Sphere { center, radius }, true)) => {
+                    (None, Some((center, radius)))
+                }
+                _ => (None, None),
             }
         })
-        .collect();
-    let cylindrical_corner = selected.len() == 3
+        .unzip();
+    let analytic_corner = selected.len() == 3
         && incident.iter().any(|edges| {
             if edges.len() != 3
                 || !edges
@@ -327,10 +331,14 @@ pub(super) fn neighborhood(
             }
             let faces: HashSet<_> = edges.iter().flat_map(|&k| sides[k]).collect();
             faces.len() == 3
-                && faces.iter().filter(|&&f| cylinders[f].is_some()).count() == 1
                 && faces
                     .iter()
-                    .all(|&f| planes[f].is_some() || cylinders[f].is_some())
+                    .filter(|&&f| cylinders[f].is_some() || sphere_supports[f].is_some())
+                    .count()
+                    == 1
+                && faces.iter().all(|&f| {
+                    planes[f].is_some() || cylinders[f].is_some() || sphere_supports[f].is_some()
+                })
         });
     for edges in &incident {
         if !edges
@@ -357,22 +365,21 @@ pub(super) fn neighborhood(
             && edges.len() == 3
             && chosen.len() == 1
             && sides[chosen[0]].iter().all(|&f| planes[f].is_some());
-        let cylindrical_end = cylindrical_corner
+        let analytic_end = analytic_corner
             && edges.len() == 3
             && (chosen.len() == 1 || chosen.len() == 3)
-            && edges
-                .iter()
-                .flat_map(|&k| sides[k])
-                .all(|f| planes[f].is_some() || cylinders[f].is_some());
+            && edges.iter().flat_map(|&k| sides[k]).all(|f| {
+                planes[f].is_some() || cylinders[f].is_some() || sphere_supports[f].is_some()
+            });
         for &k in edges {
             for f in sides[k] {
-                if planes[f].is_none() && !curved_terminal && !cylindrical_end {
+                if planes[f].is_none() && !curved_terminal && !analytic_end {
                     return Err(error(Code::NonPlanarFace).face(f));
                 }
             }
             let edge = &original_edges[k];
             if !matches!(edge.curve(), Curve::Line(_))
-                && !cylindrical_end
+                && !analytic_end
                 && (!curved_terminal || selected.contains(&edge.id()))
             {
                 return Err(error(Code::UnsupportedGeometry));
@@ -393,6 +400,9 @@ pub(super) fn neighborhood(
                         if let Some((n, _)) = planes[f] {
                             return n;
                         }
+                        if let Some((center, _)) = sphere_supports[f] {
+                            return (curve.subs(t) - center).normalize();
+                        }
                         let (origin, axis, _) = cylinders[f].unwrap();
                         let delta = curve.subs(t) - origin;
                         (delta - axis * delta.dot(axis)).normalize()
@@ -402,7 +412,7 @@ pub(super) fn neighborhood(
                 if !dihedral.is_finite() || dihedral.abs() <= TOLERANCE {
                     return Err(error(Code::BlendConstructionFailed));
                 }
-                if cylindrical_end && dihedral < 0. {
+                if analytic_end && dihedral < 0. {
                     return Err(error(Code::UnsupportedGeometry));
                 }
             }
@@ -416,6 +426,7 @@ pub(super) fn neighborhood(
         incident,
         sides,
         cylinders,
+        sphere_supports,
     })
 }
 

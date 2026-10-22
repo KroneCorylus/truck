@@ -1,0 +1,26 @@
+{
+  "revision": "eaf8b1570a27de64ac581d73e2794d553d9e30e3",
+  "test_sha256": {
+    "truck-shapeops/tests/spherical_corner_junctions.rs": "3e4cb73cc12dcfb23b641caa0a91e1036c7ee9c4a8282f59b20b597a165cea05",
+    "truck-shapeops/examples/replay_occt_blend.rs": "e52347719f241af492febe259fa58ca5e9127c5b00097d4368c95808245fd9ac",
+    "truck-shapeops/tests/fixtures/spherical-corner-junctions/D5.input.step": "cf8683ab93e86a5f3ade84fe24d212b2be7c9e5b49d7f3a78f30a62925ab1a30",
+    "truck-shapeops/tests/fixtures/spherical-corner-junctions/D5.input.json": "0367d201bb2f57addd69a3a3b1ddce2c774fddbc172d420cd388b0b51984839f",
+    "truck-shapeops/tests/fixtures/spherical-corner-junctions/D9.input.step": "53241bfcfc1f9428b1c403d1ce956228cbd05eef757556368d2603af891dd875",
+    "truck-shapeops/tests/fixtures/spherical-corner-junctions/D9.input.json": "7c66854be927928a58a9e17d44bbbeb6e960fe43075b767287f3cf0303ef1f08",
+    "truck-shapeops/tests/fixtures/spherical-corner-junctions/E4.input.step": "612c227f06f702613f8a04481aa0640104773e3a5f060524e719aa7d18d9e6a1",
+    "truck-shapeops/tests/fixtures/spherical-corner-junctions/E4.input.json": "2c0bd330351b4f53ae79d9dcba0fbf5085fb4e042434640d816424251795204b",
+    "truck-shapeops/tests/fixtures/spherical-corner-junctions/README.md": "d588bed70ef468bfdb99bf82ddb79d428da964480682e24e8d8ad8f22eba4d65"
+  },
+  "parent_test_sha256": {
+    "truck-shapeops/tests/spherical_corner_junctions.rs": "3e4cb73cc12dcfb23b641caa0a91e1036c7ee9c4a8282f59b20b597a165cea05",
+    "truck-shapeops/examples/replay_occt_blend.rs": "e52347719f241af492febe259fa58ca5e9127c5b00097d4368c95808245fd9ac",
+    "truck-shapeops/tests/fixtures/spherical-corner-junctions/D5.input.step": "cf8683ab93e86a5f3ade84fe24d212b2be7c9e5b49d7f3a78f30a62925ab1a30",
+    "truck-shapeops/tests/fixtures/spherical-corner-junctions/D5.input.json": "0367d201bb2f57addd69a3a3b1ddce2c774fddbc172d420cd388b0b51984839f",
+    "truck-shapeops/tests/fixtures/spherical-corner-junctions/D9.input.step": "53241bfcfc1f9428b1c403d1ce956228cbd05eef757556368d2603af891dd875",
+    "truck-shapeops/tests/fixtures/spherical-corner-junctions/D9.input.json": "7c66854be927928a58a9e17d44bbbeb6e960fe43075b767287f3cf0303ef1f08",
+    "truck-shapeops/tests/fixtures/spherical-corner-junctions/E4.input.step": "612c227f06f702613f8a04481aa0640104773e3a5f060524e719aa7d18d9e6a1",
+    "truck-shapeops/tests/fixtures/spherical-corner-junctions/E4.input.json": "2c0bd330351b4f53ae79d9dcba0fbf5085fb4e042434640d816424251795204b",
+    "truck-shapeops/tests/fixtures/spherical-corner-junctions/README.md": "d588bed70ef468bfdb99bf82ddb79d428da964480682e24e8d8ad8f22eba4d65"
+  },
+  "binding_change": null
+}

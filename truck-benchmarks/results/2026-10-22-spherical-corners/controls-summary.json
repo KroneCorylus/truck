@@ -1,0 +1,196 @@
+{
+  "procedural_operations": 36,
+  "collision_rejections": 9,
+  "normalized_imported_selections": 6,
+  "original_scale_replays": 3,
+  "independent_material": {
+    "spherical-corner-volume": {
+      "0.05": {
+        "512": 3.4411919645356064,
+        "1024": 3.4411919452738977
+      },
+      "0.1": {
+        "512": 3.4342246112162447,
+        "1024": 3.4342246313954865
+      },
+      "0.15": {
+        "512": 3.4217833861456874,
+        "1024": 3.421783442124558
+      }
+    },
+    "spherical-polar-volume": {
+      "0.05": {
+        "512": 3.4829260249152756,
+        "1024": 3.4829260368093546
+      },
+      "0.1": {
+        "512": 3.4643104238275324,
+        "1024": 3.464310439158544
+      },
+      "0.15": {
+        "512": 3.431422423749508,
+        "1024": 3.4314225430002887
+      }
+    }
+  },
+  "native_comparisons": {
+    "D5": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 3434224.5956074703,
+      "truck_volume": 3434222.9041810846,
+      "native_to_truck_max_distance": 4.84551312765623e-06,
+      "native_to_truck_samples": 1780,
+      "truck_to_native_max_distance": 2.3800721317456517e-06,
+      "truck_to_native_samples": 1769,
+      "native_tolerances": {
+        "face": 2.69301354054842e-06,
+        "edge": 1.02516638508102e-05,
+        "vertex": 6.40063881523651e-05
+      },
+      "truck_step_tolerances": {
+        "face": 1e-07,
+        "edge": 2.7949159519106507e-06,
+        "vertex": 2.7949159519106507e-06
+      }
+    },
+    "D9": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 10320838.442053972,
+      "truck_volume": 10320836.790596155,
+      "native_to_truck_max_distance": 0.0036242188828345045,
+      "native_to_truck_samples": 1810,
+      "truck_to_native_max_distance": 0.003793387848821362,
+      "truck_to_native_samples": 1702,
+      "native_tolerances": {
+        "face": 0.0001,
+        "edge": 0.0001,
+        "vertex": 0.0001
+      },
+      "truck_step_tolerances": {
+        "face": 1e-07,
+        "edge": 2.7949159519106507e-06,
+        "vertex": 2.7949159519106507e-06
+      }
+    },
+    "E4": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 3464303.897640761,
+      "truck_volume": 3463842.6991483322,
+      "native_to_truck_max_distance": 0.08870150930678636,
+      "native_to_truck_samples": 1557,
+      "truck_to_native_max_distance": 0.09261885165080681,
+      "truck_to_native_samples": 1508,
+      "native_tolerances": {
+        "face": 0.0001,
+        "edge": 0.0001,
+        "vertex": 0.0001
+      },
+      "truck_step_tolerances": {
+        "face": 1e-07,
+        "edge": 2.794915892865678e-06,
+        "vertex": 2.794915892865678e-06
+      }
+    }
+  },
+  "stress_experiment": {
+    "status": "stopped-after-profiling",
+    "pid": 1466891,
+    "reason": "Original-scale repeated STEP tessellation exceeded 20 minutes and 8 GB; active stacks in PolyBoundary::include_with_tolerance and triangulation::insert_surface. This exploratory stress test is incomplete, not a passing regression.",
+    "completed_fixtures": [
+      "D5 both selection orders",
+      "D9 both selection orders"
+    ],
+    "incomplete_fixture": "E4 first selection order",
+    "permanent_regression": "Normalized imported geometry and radii, six selections; 1 passed in 6.01 s. Original-scale production replay remains required in full corpus capture."
+  },
+  "archive_sha256": "9ddbc8aa55ae23f8c3a06612c6d5953b3456f376c9b1f13ff0e024ab2f3492c4",
+  "archive_members": 71,
+  "member_sha256": {
+    "probe/D5/001.input.step": "ef9e35cd6e89390138768f83c98e73f5392a3e0eec5210705d44a1c06ff13d0c",
+    "probe/D5/001.input.json": "0367d201bb2f57addd69a3a3b1ddce2c774fddbc172d420cd388b0b51984839f",
+    "probe/D5/001.result.brep": "1607621c178785930afb5ec8ab25aec28373c4a60041094d6a1cecffd095de0d",
+    "probe/D5/001.result.json": "96b2699a178262b504f3382e3d7fb5385ce36cb4d3943415c22ad4747ae8ae53",
+    "probe/D5/001.truck.log": "50272f229fb5bcca0691b4296b4f4a435079566c14d4bdb7f799ba5919ede1ba",
+    "probe/D5/001.truck.step": "9c6d454b9ca106876b17257a22f5e6c7628e86cabc2d6b7e6e5c28a8bcc3a90c",
+    "probe/D5/001.truck.json": "3fcaa900ef67bbb844f75226a8a42a11fd0eabe2172abb958259a54cf379c7fe",
+    "probe/D5/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "probe/D5/001.comparison.json": "3d970c55c42f6303a7b750c5a134e806fd02bf4a60029f56fb32407ed40bd743",
+    "probe/D9/001.input.step": "f011f33f3c5736a8e9d685f93d166e458d1e0b7a9d7cabe00a680ddae8018a56",
+    "probe/D9/001.input.json": "7c66854be927928a58a9e17d44bbbeb6e960fe43075b767287f3cf0303ef1f08",
+    "probe/D9/001.result.brep": "8a1f44556f4d41a61d5180b8c1352868c476074591383f4e1425c4e70ae9bc78",
+    "probe/D9/001.result.json": "ac71e1aa2e2d4984fd8d1cce37b70c43cae2915a9ec3e78b0582fd811fa40e60",
+    "probe/D9/001.truck.log": "c333583f077015b2c8c6aa270e67cbf0f768a8a34d5899b3d8cd31b09575ded3",
+    "probe/D9/001.truck.step": "af9c38c0f2e420d715814fc9443345ec8287b16a25e1dc84e8f1bafba67f8ece",
+    "probe/D9/001.truck.json": "7aff33f0e4d6b84f5793957b00641ab754d4c26499f8d826f75fae3410103486",
+    "probe/D9/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "probe/D9/001.comparison.json": "2541b4d991ce1ab6c0030523335b93a74e1bcf635472f5d24adb27d62230a9aa",
+    "probe/E4/001.input.step": "319da03842c9338e84cfcb1c3ec3e27e623b336829f8c398279b1157cf02d50d",
+    "probe/E4/001.input.json": "2c0bd330351b4f53ae79d9dcba0fbf5085fb4e042434640d816424251795204b",
+    "probe/E4/001.result.brep": "e4016097d95d260f41990147934d5d84a1b4bea699cfdc13c99623582731d0bf",
+    "probe/E4/001.result.json": "9d0cebaa7dccb2fa1975e740f1e9974c74c4c0dcc828682355139a53537bb2b3",
+    "probe/E4/001.truck.log": "43627a7038d7a56a088f264688b8552a64d66acae69d30fe20f03e2170c369c2",
+    "probe/E4/001.truck.step": "d190346f9bb79bfbe7e523373acfe6368b0b672515f15c7daf42015fe8256deb",
+    "probe/E4/001.truck.json": "a640630fc71a9324856d7cc4aa1c4594e40bdcb558fcbf2ecb9027e28e6e0028",
+    "probe/E4/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "probe/E4/001.comparison.json": "ce27b220a05d85f7ae0ea6ff1fc6901ea636ec68d4120ef61b5e48783786b473",
+    "probe/E4/brep-conversion.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "probe/E4/truck.brep": "b08d5522f41225635b8edfe0d2a448adff9b8df1423b62bfdcd02d6caae8a355",
+    "probe/E4/volume-diagnostic.txt": "1f1383f5cf5ea8de7b497a4fcce465c0bc1e4c0a34900bfc144cc8feeed10af4",
+    "probe/E4/mesh-volume.txt": "fdc0e8ab437efd4a908771942d95bf3996f984569cba39ff49da9848d1542b14",
+    "volume/spherical-corner-volume-controls.txt": "3db49d8cbdc7772fe57c3f714daeb0cc08b7d4ca16301b1aebcaef9e378ab4f3",
+    "volume/spherical-corner-volume.cpp": "2fe6a5294ed41a1158657d46017498a0f23f074cbbe1a89d5eda631bcbf18be1",
+    "volume/spherical-polar-volume-controls.txt": "bfff0e9acbce5c0a99d438075a11f74caeecf2ab7fc3de2127662c318626eaaa",
+    "volume/spherical-polar-volume.cpp": "bf75df58225178b5a17a2e3168cdb83dc18d05a91b9f7bd002c845d1a6aa04d3",
+    "helpers/prove-spherical-corner-parent.py": "5c8b9a1c343fd18dd758cf0775b207f3065aafd77fe0b8e4aa093fc142de3de4",
+    "helpers/validate-spherical-corners.py": "7d05b1330fcd736060806b4578c38f6bbb4b5988eb55ebc303c10fc914998fc1",
+    "helpers/verify-spherical-corner-replays.py": "a1b7cecb13cca2c2f332a72b301f74aa725a80dc5bca6526603f6357ae26b3e6",
+    "parent/truck-shapeops/tests/spherical_corner_junctions.rs": "3e4cb73cc12dcfb23b641caa0a91e1036c7ee9c4a8282f59b20b597a165cea05",
+    "parent/truck-shapeops/examples/replay_occt_blend.rs": "e52347719f241af492febe259fa58ca5e9127c5b00097d4368c95808245fd9ac",
+    "parent/truck-shapeops/tests/fixtures/spherical-corner-junctions/D5.input.step": "cf8683ab93e86a5f3ade84fe24d212b2be7c9e5b49d7f3a78f30a62925ab1a30",
+    "parent/truck-shapeops/tests/fixtures/spherical-corner-junctions/D5.input.json": "0367d201bb2f57addd69a3a3b1ddce2c774fddbc172d420cd388b0b51984839f",
+    "parent/truck-shapeops/tests/fixtures/spherical-corner-junctions/D9.input.step": "53241bfcfc1f9428b1c403d1ce956228cbd05eef757556368d2603af891dd875",
+    "parent/truck-shapeops/tests/fixtures/spherical-corner-junctions/D9.input.json": "7c66854be927928a58a9e17d44bbbeb6e960fe43075b767287f3cf0303ef1f08",
+    "parent/truck-shapeops/tests/fixtures/spherical-corner-junctions/E4.input.step": "612c227f06f702613f8a04481aa0640104773e3a5f060524e719aa7d18d9e6a1",
+    "parent/truck-shapeops/tests/fixtures/spherical-corner-junctions/E4.input.json": "2c0bd330351b4f53ae79d9dcba0fbf5085fb4e042434640d816424251795204b",
+    "parent/truck-shapeops/tests/fixtures/spherical-corner-junctions/README.md": "d588bed70ef468bfdb99bf82ddb79d428da964480682e24e8d8ad8f22eba4d65",
+    "diagnostics/spherical-corner-residual.cpp": "3f3245a858ee26bad4e72c023ee47f8f3fc3d674843f77416969af305fbcec46",
+    "diagnostics/spherical-volume-diagnostic.cpp": "8209b961666c31f56756d95944d1a6fb8a5f918fd7f558e0fc6d95839cde70bc",
+    "diagnostics/spherical-mesh-volume.cpp": "c6df3f36ca727b70fb5e8dd25b21690974f59da2f05f8df9b4c49f37830992c3",
+    "diagnostics/spherical-corner-stress-backtrace.txt": "e2d5a93503907388a13b3eb4266f6f7f9173227bc761d8b1f5eefbfbbd7350e5",
+    "diagnostics/spherical-corner-stress-status.json": "eed25638954a43b4fe00a1833eaa6a9bfbba2a7cbf5f579ad8bfedb1a62f4d02",
+    "diagnostics/spherical-corner-full-replay-tests.txt": "31f794921162b943b8c142a6b1b5bd816bdc6f2fe2552d7132cec8c5ab557331",
+    "diagnostics/step-to-brep.cpp": "2bd636a24335a5c9d881c16a576b1c7c7b3fc3e67598a9a1e4b2771bc79c9f2f",
+    "diagnostics/E4/001.input.json": "2c0bd330351b4f53ae79d9dcba0fbf5085fb4e042434640d816424251795204b",
+    "diagnostics/E4/001.truck.log": "43627a7038d7a56a088f264688b8552a64d66acae69d30fe20f03e2170c369c2",
+    "diagnostics/E4/001.truck.json": "a640630fc71a9324856d7cc4aa1c4594e40bdcb558fcbf2ecb9027e28e6e0028",
+    "diagnostics/E4/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "diagnostics/E4/001.comparison.json": "ce27b220a05d85f7ae0ea6ff1fc6901ea636ec68d4120ef61b5e48783786b473",
+    "diagnostics/E4/residual.log": "509d2b90e9f0f3560bdb43e7d970a9ada173e2f6fc1ee92cc5049decb202cdb7",
+    "diagnostics/E4/diagnostic.json": "ce27b220a05d85f7ae0ea6ff1fc6901ea636ec68d4120ef61b5e48783786b473",
+    "diagnostics/E4/surfaces.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "diagnostics/E4/truck-surfaces.txt": "2c1e44b4e094921938c1768a2104a52b7cc96adfa3fa5f1bd23ab17a320f364d",
+    "diagnostics/E4/native-surfaces.txt": "de4a1bf98d19052400e693277157f51cf4c9163795e82ab1975191b5e1a75598",
+    "diagnostics/E4/truck-volume-diagnostic.txt": "1f1383f5cf5ea8de7b497a4fcce465c0bc1e4c0a34900bfc144cc8feeed10af4",
+    "diagnostics/E4/native-volume-diagnostic.txt": "65e808ff25c842baf5b5938025d820051c5a5a41f6b79099011677c3403274c7",
+    "diagnostics/E4/truck-mesh-volume.txt": "fdc0e8ab437efd4a908771942d95bf3996f984569cba39ff49da9848d1542b14",
+    "diagnostics/E4/native-mesh-volume.txt": "fbee45ad1c10936f7a8984ede95511dded1c65b916abf7bbc1409aff414ed7b8",
+    "diagnostics/shape_volume.hpp": "55d38b26d314340da58333946ae4fed879fb96d2a48d5a9785c23fe42b897815",
+    "diagnostics/shape_tolerances.hpp": "a98d099dde75072d678bf7f444ecde390fa71fd3abe01115cb4f60b99b753651",
+    "helpers/control-commands.json": "7ee86d55699c8211c4587bed5ed46abc59e3a656ec9b61991d2d393ac6943f23"
+  }
+}

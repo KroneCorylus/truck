@@ -1,0 +1,39 @@
+{
+  "volume": [
+    "g++",
+    "-O3",
+    "-std=c++17",
+    "SOURCE.cpp",
+    "-o",
+    "PROGRAM"
+  ],
+  "diagnostic": [
+    "g++",
+    "-std=c++17",
+    "-O2",
+    "-Wall",
+    "-Wextra",
+    "-Wpedantic",
+    "-isystem",
+    "target/occt-sdk/usr/include/opencascade",
+    "-I",
+    "audits/fillet-chamfer/capture",
+    "target/fillet-X1-diagnostic/native-surfaces.cpp",
+    "-Ltarget/occt-sdk/usr/lib64",
+    "-lTKDESTEP",
+    "-lTKXSBase",
+    "-lTKShHealing",
+    "-lTKFillet",
+    "-lTKTopAlgo",
+    "-lTKGeomAlgo",
+    "-lTKBRep",
+    "-lTKGeomBase",
+    "-lTKG3d",
+    "-lTKG2d",
+    "-lTKMath",
+    "-lTKernel",
+    "-o",
+    "target/fillet-X1-diagnostic/native-surfaces"
+  ],
+  "note": "Replace source and output with the named diagnostic; add -lTKMesh for spherical-mesh-volume. Run native tools with LD_LIBRARY_PATH=target/occt-sdk/usr/lib64. Stress experiment was stopped and is not passing evidence."
+}

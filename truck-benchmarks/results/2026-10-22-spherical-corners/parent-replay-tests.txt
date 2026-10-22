@@ -1,0 +1,26 @@
+$ cargo test --release -p truck-shapeops --example replay_occt_blend native_spherical_corners
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/target/spherical-corner-parent-source/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 4.56s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running unittests examples/replay_occt_blend.rs (/home/krone/Development/Pieza_WS/truck/target/release/examples/replay_occt_blend-bd2259d8fa5b09df)
+
+running 1 test
+test spherical_corner_tests::native_spherical_corners_preserve_selection_material_and_step ... FAILED
+
+failures:
+
+---- spherical_corner_tests::native_spherical_corners_preserve_selection_material_and_step stdout ----
+
+thread 'spherical_corner_tests::native_spherical_corners_preserve_selection_material_and_step' (1564710) panicked at truck-shapeops/examples/replay_occt_blend.rs:4801:91:
+called `Result::unwrap()` on an `Err` value: Diagnostic { code: NonPlanarFace, operation: "fillet_solid_edges", stage: "validate_input", message: "This fillet operation requires planar faces.", context: Context { operand: None, shell_index: Some(0), face_index: Some(0), edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    spherical_corner_tests::native_spherical_corners_preserve_selection_material_and_step
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 72 filtered out; finished in 0.34s
+
+error: test failed, to rerun pass `-p truck-shapeops --example replay_occt_blend`
+exit_code 101

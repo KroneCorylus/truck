@@ -61,6 +61,114 @@ pub(super) fn fillet(
         let mut contact = |k: usize, f: usize, point: &Vertex| {
             contacts[k][usize::from(data.sides[k][0] != f)][end_index(k)] = point.clone();
         };
+        let sphere = faces.iter().copied().find(|&f| {
+            data.sphere_supports[f].is_some() && chosen.iter().any(|&k| data.sides[k].contains(&f))
+        });
+        if let Some(f) = sphere {
+            if faces.len() != 3 || !(chosen.len() == 1 || chosen.len() == 3) {
+                return Err(error(Code::UnsupportedTopology));
+            }
+            let (origin, outer) = data.sphere_supports[f].unwrap();
+            let inner = outer - radius;
+            if inner <= 0. {
+                return Err(error(Code::OutsideNeighbour));
+            }
+            let planes: Vec<_> = faces.iter().copied().filter(|&j| j != f).collect();
+            let [a, b] = [planes[0], planes[1]];
+            let [pa, pb] =
+                [a, b].map(|j| data.planes[j].ok_or_else(|| error(Code::UnsupportedGeometry)));
+            let (pa, pb) = (pa?, pb?);
+            if chosen.len() == 3 {
+                let center = sphere_planes(
+                    origin,
+                    inner,
+                    [(pa.0, pa.1 - radius), (pb.0, pb.1 - radius)],
+                    vertex.point(),
+                )
+                .ok_or_else(|| error(Code::OutsideNeighbour))?;
+                let normals: HashMap<_, _> =
+                    [(a, pa.0), (b, pb.0), (f, (center - origin).normalize())]
+                        .into_iter()
+                        .collect();
+                let points: HashMap<_, _> = faces
+                    .iter()
+                    .map(|&j| (j, Vertex::new(center + radius * normals[&j])))
+                    .collect();
+                for &k in &chosen {
+                    for j in data.sides[k] {
+                        contact(k, j, &points[&j]);
+                    }
+                    ends[k][end_index(k)] = Some(End {
+                        center,
+                        miter: None,
+                    });
+                }
+                spheres.push((
+                    v,
+                    center,
+                    1.,
+                    faces.iter().map(|j| normals[j]).collect::<Vec<_>>(),
+                ));
+            } else {
+                let k = chosen[0];
+                let edge = &data.original_edges[k];
+                let plane = *data.sides[k].iter().find(|&&j| j != f).unwrap();
+                let terminal = *planes.iter().find(|&&j| j != plane).unwrap();
+                let (n, d) = data.planes[plane].unwrap();
+                let terminal_plane = data.planes[terminal].unwrap();
+                let h = d - radius - n.dot(origin.to_vec());
+                let sphere_point = sphere_planes(
+                    origin,
+                    outer,
+                    [
+                        (n, n.dot(origin.to_vec()) + outer / inner * h),
+                        terminal_plane,
+                    ],
+                    vertex.point(),
+                )
+                .ok_or_else(|| error(Code::OutsideNeighbour))?;
+                let plane_point = sphere_planes(
+                    origin + n * radius,
+                    inner,
+                    [(n, d), terminal_plane],
+                    vertex.point(),
+                )
+                .ok_or_else(|| error(Code::OutsideNeighbour))?;
+                let points: HashMap<_, _> = [
+                    (f, Vertex::new(sphere_point)),
+                    (plane, Vertex::new(plane_point)),
+                ]
+                .into_iter()
+                .collect();
+                for &j in &[f, plane] {
+                    contact(k, j, &points[&j]);
+                    let other = *incident
+                        .iter()
+                        .find(|&&i| i != k && data.sides[i].contains(&j))
+                        .ok_or_else(|| error(Code::UnsupportedTopology))?;
+                    for side in data.sides[other] {
+                        contact(other, side, &points[&j]);
+                    }
+                }
+                let support = sphere_rim_surface(edge, (origin, outer), (n, d), radius)
+                    .ok_or_else(|| error(Code::OutsideNeighbour))?;
+                let [a, b] = data.sides[k];
+                let arc = terminal_cross_arc(
+                    &points[&a],
+                    &points[&b],
+                    &support,
+                    &shell[terminal].oriented_surface(),
+                )
+                .ok_or_else(|| error(Code::BlendConstructionFailed))?;
+                cache_arc(&mut shared_arcs, &arc);
+                complex_ends.insert((k, end_index(k)), Wire::from(vec![arc]));
+                ends[k][end_index(k)] = Some(End {
+                    center: origin + (sphere_point - origin) * (inner / outer),
+                    miter: None,
+                });
+            }
+            continue;
+        }
         let cylinder = faces.iter().copied().find(|&f| {
             data.cylinders[f].is_some() && chosen.iter().any(|&k| data.sides[k].contains(&f))
         });
@@ -554,6 +662,8 @@ pub(super) fn fillet(
             continue;
         }
         let [a, b] = data.sides[k];
+        let sphere = [a, b].iter().find_map(|&f| data.sphere_supports[f]);
+        let sphere_plane = sphere.and_then(|_| [a, b].iter().find_map(|&f| data.planes[f]));
         let cylinder = [a, b].iter().find_map(|&f| data.cylinders[f]);
         let rim = cylinder.filter(|(_, axis, _)| {
             [a, b].iter().any(|&f| {
@@ -561,7 +671,10 @@ pub(super) fn fillet(
             })
         });
         let make_contact = |p: &Vertex, q: &Vertex| {
-            if let Some((origin, axis, _)) = rim {
+            if let Some(((origin, _), (axis, _))) = sphere.zip(sphere_plane) {
+                circular_contact(edge, p, q, origin, axis)
+                    .ok_or_else(|| error(Code::OutsideNeighbour))
+            } else if let Some((origin, axis, _)) = rim {
                 circular_contact(edge, p, q, origin, axis)
                     .ok_or_else(|| error(Code::OutsideNeighbour))
             } else {
@@ -571,9 +684,13 @@ pub(super) fn fillet(
         let line_a = make_contact(&a0, &a1)?;
         let line_b = make_contact(&b0, &b1)?;
         let [n, m] = [a, b].map(|f| data.planes[f].map_or(Vector3::zero(), |(n, _)| n));
-        let s = if cylinder.is_some() { 1. } else { sign(k) };
+        let s = if cylinder.is_some() || sphere.is_some() {
+            1.
+        } else {
+            sign(k)
+        };
         let arc = |end: End, p: &Vertex, q: &Vertex| -> Edge {
-            if cylinder.is_some() {
+            if cylinder.is_some() || sphere.is_some() {
                 return circle(p, q, end.center);
             }
             let from = end.center + s * radius * n;
@@ -601,7 +718,10 @@ pub(super) fn fillet(
         let arc1 = complex_ends
             .remove(&(k, 1))
             .unwrap_or_else(|| vec![reuse_arc(&mut shared_arcs, arc(e1, &a1, &b1))].into());
-        let mut surface: Surface = if let Some((origin, axis, _)) = rim {
+        let mut surface: Surface = if let Some((sphere, plane)) = sphere.zip(sphere_plane) {
+            sphere_rim_surface(edge, sphere, plane, radius)
+                .ok_or_else(|| error(Code::OutsideNeighbour))?
+        } else if let Some((origin, axis, _)) = rim {
             Processor::new(RevolutedCurve::by_revolution(arc0[0].curve(), origin, axis)).into()
         } else if complex {
             let direction = axis.normalize();
@@ -635,6 +755,9 @@ pub(super) fn fillet(
         if let Some((origin, axis, _)) = cylinder {
             let delta = surface.subs(0.5, 0.5) - origin;
             outward += (delta - axis * delta.dot(axis)).normalize();
+        }
+        if let Some((origin, _)) = sphere {
+            outward += (surface.subs(0.5, 0.5) - origin).normalize();
         }
         if surface.normal(0.5, 0.5).dot(outward) < 0. {
             surface.invert();
@@ -835,4 +958,79 @@ fn circular_contact(
         b,
         center + u * half.cos() + axis.cross(u) * half.sin(),
     ))
+}
+
+fn sphere_planes(
+    origin: Point3,
+    radius: f64,
+    planes: [(Vector3, f64); 2],
+    hint: Point3,
+) -> Option<Point3> {
+    let [(n, d), (m, e)] = planes;
+    let axis = n.cross(m);
+    if axis.so_small() {
+        return None;
+    }
+    let direction = axis.normalize();
+    let foot = solve([(n, d), (m, e), (direction, direction.dot(origin.to_vec()))])?;
+    let square = radius * radius - foot.distance2(origin);
+    if square <= 0. || !square.is_finite() {
+        return None;
+    }
+    let offset = direction * square.sqrt();
+    let points = [foot + offset, foot - offset];
+    Some(if points[0].distance2(hint) < points[1].distance2(hint) {
+        points[0]
+    } else {
+        points[1]
+    })
+}
+fn sphere_rim_surface(
+    edge: &Edge,
+    (origin, outer): (Point3, f64),
+    (axis, d): (Vector3, f64),
+    radius: f64,
+) -> Option<Surface> {
+    let inner = outer - radius;
+    let h = d - radius - axis.dot(origin.to_vec());
+    let square = inner * inner - h * h;
+    if inner <= 0. || square <= 0. || !square.is_finite() {
+        return None;
+    }
+    let curve = edge.curve();
+    let (lo, hi) = curve.range_tuple();
+    let p = curve.subs((lo + hi) / 2.);
+    let lateral = p - origin - axis * (p - origin).dot(axis);
+    if lateral.so_small() {
+        return None;
+    }
+    let center = origin + axis * h + lateral.normalize() * square.sqrt();
+    let sphere = Vertex::new(origin + (center - origin) * (outer / inner));
+    let plane = Vertex::new(center + axis * radius);
+    let section = circle(&sphere, &plane, center);
+    Some(Processor::new(RevolutedCurve::by_revolution(section.curve(), origin, axis)).into())
+}
+fn terminal_cross_arc(p: &Vertex, q: &Vertex, support: &Surface, wall: &Surface) -> Option<Edge> {
+    let direction = q.point() - p.point();
+    let uv0 = support.search_parameter(p.point(), None, 100)?;
+    let uv1 = support.search_parameter(q.point(), None, 100)?;
+    let tangent = |v: &Vertex, (u, w): (f64, f64)| {
+        let (x, y) = wall.search_parameter(v.point(), None, 100)?;
+        let mut tangent = support.normal(u, w).cross(wall.normal(x, y));
+        if tangent.dot(direction) < 0. {
+            tangent = -tangent;
+        }
+        (!tangent.so_small()).then_some(tangent)
+    };
+    let arc: Edge = super::create_pcurve_edge(
+        (p, uv0, tangent(p, uv0)?),
+        (q, uv1, tangent(q, uv1)?),
+        support.clone(),
+    )?;
+    arc.set_curve(Curve::IntersectionCurve(IntersectionCurve::new(
+        Box::new(wall.clone()),
+        Box::new(support.clone()),
+        Box::new(arc.curve()),
+    )));
+    Some(arc)
 }

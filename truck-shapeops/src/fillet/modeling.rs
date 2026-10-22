@@ -170,6 +170,10 @@ pub fn try_fillet_solid_along_wire<R: ScalarFunctionD1>(
 /// radial plane also support an exact spherical corner, joining two cylindrical rounds
 /// and a toroidal rim. The radius must stay below half the outer cylinder radius and
 /// the contacts must fit all three remote terminations.
+/// An outward spherical support and two planes also admit a three-edge spherical corner,
+/// joining a cylindrical round to two exact toroidal blends. The inward-offset sphere and
+/// planes must intersect, and the contact curves must reach their remote planar boundaries
+/// without consuming a support face. This includes corners at a sphere pole.
 /// Straight edges between planes or a plane and an axial cylindrical ruling also support
 /// curved end faces. Connected channel rims meet at exact intersections of the blend
 /// surfaces, including elliptical miters between equal-radius cylinders. Contacts may
