@@ -1,0 +1,14 @@
+{
+  "revision": "e3568eb7917d87198a5f73c01754bc505fd8fca0",
+  "test_sha256": {
+    "truck-stepio/tests/spline_extrusion_pcurves.rs": "430ac1c83ab7af81eda89d048607adb3cc0c42777ca8ddae74e220bb179c3208",
+    "truck-stepio/tests/spline_pcurve_bounds.rs": "0d2c1ba06a9c3ae339c6f2c5f1061e6a9dd55bf684477d21e8bde9c23e232afe",
+    "truck-stepio/tests/fixtures/spline-extrusion-pcurves/C1-equal-006.step": "865feac228f1d3302e9cd9868815412351af61aa0155b5750668d29468b9afd2"
+  },
+  "parent_test_sha256": {
+    "truck-stepio/tests/spline_extrusion_pcurves.rs": "430ac1c83ab7af81eda89d048607adb3cc0c42777ca8ddae74e220bb179c3208",
+    "truck-stepio/tests/spline_pcurve_bounds.rs": "0d2c1ba06a9c3ae339c6f2c5f1061e6a9dd55bf684477d21e8bde9c23e232afe",
+    "truck-stepio/tests/fixtures/spline-extrusion-pcurves/C1-equal-006.step": "865feac228f1d3302e9cd9868815412351af61aa0155b5750668d29468b9afd2"
+  },
+  "binding_change": null
+}

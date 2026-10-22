@@ -255,6 +255,41 @@ fn fitted(
 }
 
 fn positive_control_hull(curve: &Curve3D) -> Option<Vec<Point3>> {
+    if let Curve3D::PCurve(pcurve) = curve {
+        let Surface::SweptCurve(SweptCurve::ExtrudedCurve(extruded)) = pcurve.surface().as_ref()
+        else {
+            return None;
+        };
+        let parameters = match pcurve.curve().as_ref() {
+            Curve2D::Line(line) => vec![line.0, line.1],
+            Curve2D::BSplineCurve(trace) => trace.control_points().clone(),
+            _ => return None,
+        };
+        if parameters.is_empty()
+            || parameters
+                .iter()
+                .any(|p| !p.x.is_finite() || !p.y.is_finite())
+        {
+            return None;
+        }
+        let low = parameters.iter().map(|p| p.y).fold(f64::INFINITY, f64::min);
+        let high = parameters
+            .iter()
+            .map(|p| p.y)
+            .fold(f64::NEG_INFINITY, f64::max);
+        let vector = extruded.extruding_vector();
+        // The trace lies in the profile hull translated over the complete sweep-coordinate hull.
+        let u0 = parameters.iter().map(|p| p.x).fold(f64::INFINITY, f64::min);
+        let u1 = parameters
+            .iter()
+            .map(|p| p.x)
+            .fold(f64::NEG_INFINITY, f64::max);
+        return extrusion_profile_hull(extruded.entity_curve(), (u0, u1))?
+            .into_iter()
+            .flat_map(|p| [p + vector * low, p + vector * high])
+            .map(|p| (p.x.is_finite() && p.y.is_finite() && p.z.is_finite()).then_some(p))
+            .collect();
+    }
     truck_modeling::Curve::try_from(curve)
         .ok()?
         .try_lift_up()?
@@ -263,6 +298,48 @@ fn positive_control_hull(curve: &Curve3D) -> Option<Vec<Point3>> {
         .map(|p| {
             (p.w > 0. && [p.x, p.y, p.z, p.w].iter().all(|x| x.is_finite()))
                 .then(|| Point3::from_homogeneous(*p))
+        })
+        .collect()
+}
+
+fn extrusion_profile_hull(curve: &Curve3D, (a, b): (f64, f64)) -> Option<Vec<Point3>> {
+    let (u0, u1) = curve.range_tuple();
+    if a >= u0 && b <= u1 {
+        return positive_control_hull(curve);
+    }
+    if let Curve3D::Line(line) = curve {
+        return Some(vec![line.subs(a), line.subs(b)]);
+    }
+    if !matches!(curve, Curve3D::BSplineCurve(_) | Curve3D::NurbsCurve(_)) {
+        return None;
+    }
+    let lifted = truck_modeling::Curve::try_from(curve).ok()?.try_lift_up()?;
+    let mut controls = lifted.control_points().clone();
+    let spans = lifted.bezier_decomposition();
+    for (span, range) in [(spans.first()?, (a, u0)), (spans.last()?, (u1, b))] {
+        if range.0 >= range.1 {
+            continue;
+        }
+        let (s, t) = span.range_tuple();
+        let (alpha, beta) = ((range.0 - s) / (t - s), (range.1 - s) / (t - s));
+        let degree = span.degree();
+        // Bezier blossom evaluation bounds the same polynomial extension beyond either endpoint.
+        for i in 0..=degree {
+            let mut points = span.control_points().clone();
+            for j in 0..degree {
+                let x = if j < degree - i { alpha } else { beta };
+                for k in 0..degree - j {
+                    points[k] = points[k] * (1. - x) + points[k + 1] * x;
+                }
+            }
+            controls.push(points[0]);
+        }
+    }
+    controls
+        .into_iter()
+        .map(|p| {
+            (p.w > 0. && [p.x, p.y, p.z, p.w].iter().all(|x| x.is_finite()))
+                .then(|| Point3::from_homogeneous(p))
         })
         .collect()
 }

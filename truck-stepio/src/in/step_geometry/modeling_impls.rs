@@ -8,6 +8,7 @@
 //! Isoparametric pcurves on spline surfaces become exact spatial splines.
 //! Other linear pcurves on cylinders, cones, spheres and tori retain their exact geometry.
 //! Linear pcurves on extruded lines, ellipses and splines retain their exact surface coordinates.
+//! B-spline parameter curves on those same extrusions retain their exact parameterization.
 //! Other pcurves are rejected.
 //!
 //! ```
@@ -66,6 +67,61 @@ impl TryFrom<&Curve3D> for ModelingCurve {
             Curve3D::BSplineCurve(curve) => Self::BSplineCurve(curve.clone()),
             Curve3D::NurbsCurve(curve) => Self::NurbsCurve(curve.clone()),
             Curve3D::PCurve(pcurve) => {
+                if let Curve2D::BSplineCurve(trace) = pcurve.curve().as_ref() {
+                    let Surface::SweptCurve(SweptCurve::ExtrudedCurve(surface)) =
+                        pcurve.surface().as_ref()
+                    else {
+                        return Err("unsupported imported spline pcurve".into());
+                    };
+                    if !matches!(
+                        surface.entity_curve(),
+                        Curve3D::Line(_)
+                            | Curve3D::Conic(Conic3D::Ellipse(_))
+                            | Curve3D::BSplineCurve(_)
+                            | Curve3D::NurbsCurve(_)
+                    ) {
+                        return Err("unsupported imported spline pcurve profile".into());
+                    }
+                    if trace
+                        .control_points()
+                        .iter()
+                        .any(|p| !p.x.is_finite() || !p.y.is_finite())
+                        || trace.knot_vec().iter().any(|t| !t.is_finite())
+                    {
+                        return Err("non-finite imported spline pcurve".into());
+                    }
+                    let controls = trace.control_points();
+                    if controls.iter().all(|p| p == &controls[0])
+                        || (surface.extruding_vector() == Vector3::zero()
+                            && controls.iter().all(|p| p.x == controls[0].x))
+                    {
+                        return Err("degenerate imported spline pcurve geometry".into());
+                    }
+                    let curve = Self::PCurve(truck_modeling::PCurve::new(
+                        trace.clone(),
+                        Box::new(ModelingSurface::try_from(pcurve.surface().as_ref())?),
+                    ));
+                    let (knots, _) = trace.knot_vec().to_single_multi();
+                    let mut regular = false;
+                    for interval in knots.windows(2) {
+                        for i in 0..=trace.degree().max(1) * 6 {
+                            let t = interval[0]
+                                + (interval[1] - interval[0]) * i as f64
+                                    / (trace.degree().max(1) * 6) as f64;
+                            regular |= curve.der(t) != Vector3::zero();
+                            if [curve.subs(t).to_vec(), curve.der(t), curve.der2(t)]
+                                .iter()
+                                .any(|v| !v.x.is_finite() || !v.y.is_finite() || !v.z.is_finite())
+                            {
+                                return Err("non-finite imported spline pcurve geometry".into());
+                            }
+                        }
+                    }
+                    if !regular {
+                        return Err("degenerate imported spline pcurve geometry".into());
+                    }
+                    return Ok(curve);
+                }
                 let Curve2D::Line(line) = pcurve.curve().as_ref() else {
                     return Err("unsupported imported pcurve".into());
                 };

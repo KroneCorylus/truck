@@ -6,6 +6,12 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Import B-spline parameter curves on exactly parameterized extruded supports.
+  Preserve their points, derivatives and parameter ranges, and fit finite sweep
+  domains from complete parameter-curve bounds, including endpoint roundoff.
+  Reject non-finite and collapsed traces; strict edge and solid consistency
+  checks remain unchanged.
+
 - Join distance-angle chamfers across tangent cylinder/plane walls under a shared
   planar cap. Bound endpoint corrections by the requested fitting tolerance,
   retain strict topology checks, and adaptively refit locally constrained contacts
