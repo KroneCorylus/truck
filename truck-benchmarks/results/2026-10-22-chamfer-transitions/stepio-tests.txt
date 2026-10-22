@@ -1,0 +1,258 @@
+$ cargo test --release -p truck-stepio
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 19.57s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running unittests src/lib.rs (target/release/deps/truck_stepio-b7b43b0b0579bc8f)
+
+running 9 tests
+test out::modeling::tests::noncircular_quadratics_remain_splines ... ok
+test r#in::deserialize_pscr ... ok
+test r#in::support_domain::tests::cone_support_bounds_do_not_clip_a_hull_across_the_apex ... ok
+test r#in::step_geometry::sphere::surface ... ok
+test out::modeling::tests::procedural_curve_export_refines_a_missed_interior_bulge ... ok
+test r#in::support_domain::tests::cone_support_bounds_keep_the_apex_at_a_generator_endpoint ... ok
+test r#in::step_geometry::geom_impls::builder ... ok
+test out::modeling::tests::extruded_ellipse_step_preserves_trim_and_normal_direction ... ok
+test out::modeling::tests::fillet_export_refines_local_error_without_relaxing_tolerance ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running tests/affine_conics.rs (target/release/deps/affine_conics-05d16d269f866291)
+
+running 1 test
+test affine_conic_arcs_keep_their_locus_and_direction_in_step ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/analytic_boundaries.rs (target/release/deps/analytic_boundaries-fb5b8443f518c8f4)
+
+running 1 test
+test circular_boolean_boundaries_remain_exact_circles_in_step ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/assembly_strings.rs (target/release/deps/assembly_strings-70ac22ada726b6a7)
+
+running 1 test
+test assembly_labels_escape_step_strings_without_changing_geometry ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/bounded_import_edges.rs (target/release/deps/bounded_import_edges-9d45a71c0da10741)
+
+running 4 tests
+test full_closed_spline_edges_keep_distinct_endpoint_parameters ... ok
+test polyline_edges_trim_inside_one_or_multiple_segments ... ok
+test bounded_edges_reject_unmatched_and_reversed_parameter_intervals ... ok
+test spline_edges_trim_to_vertices_in_both_dimensions_and_senses ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/diagonal_import_pcurves.rs (target/release/deps/diagonal_import_pcurves-7079c91c86e03701)
+
+running 2 tests
+test diagonal_elementary_pcurves_reject_nonfinite_and_collapsed_geometry ... ok
+test diagonal_elementary_pcurves_preserve_coordinates_and_derivatives ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/extruded_import_pcurves.rs (target/release/deps/extruded_import_pcurves-c0dd109f19668d53)
+
+running 3 tests
+test extruded_pcurves_reject_nonfinite_and_collapsed_geometry ... ok
+test extruded_pcurves_reject_reparameterized_profiles ... ok
+test extruded_pcurves_preserve_seams_diagonals_and_parameter_speed ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/import_nonelliptic_conics.rs (target/release/deps/import_nonelliptic_conics-543f1b706d3eeacb)
+
+running 5 tests
+test invalid_nonelliptic_conics_return_errors ... ok
+test step_hyperbola_edges_preserve_type_endpoints_and_sense ... ok
+test step_parabola_edges_preserve_type_endpoints_and_sense ... ok
+test finite_parabolas_preserve_polynomial_geometry_and_orientation ... ok
+test finite_hyperbolas_preserve_exact_geometry_and_orientation ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/imported_support_bounds.rs (target/release/deps/imported_support_bounds-b13348f67321254f)
+
+running 4 tests
+test cylinder_step_export_uses_radial_distance_for_axially_shifted_generators ... ok
+test cone_step_export_preserves_shifted_and_scaled_generators ... ok
+test curved_trim_extrema_and_extended_parabola_parameters_are_inside_imported_support ... ok
+test spline_sweep_bounds_include_complete_polynomial_and_rational_trim_hulls ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/input/main.rs (target/release/deps/input-6fbc81d87a07ac31)
+
+running 46 tests
+test diagnostics::syntax_is_coded_and_preserves_the_parser_source ... ok
+test diagnostics::unreadable_records_and_dependency_omissions_have_distinct_codes ... ok
+test diagnostics::unsupported_surface_reports_omitted_face_and_dependency ... ok
+test assy::occt_assy ... ok
+test geometry::cartesian_point ... ok
+test geometry::axis2_placement_2d ... ok
+test geometry::direction ... ok
+test geometry::line ... ok
+test geometry::circle ... ok
+test geometry::axis2_placement_3d ... ok
+test geometry::hyperbola ... ok
+test geometry::axis1_placement ... ok
+test geometry::plane ... ok
+test geometry::ellipse ... ok
+test table::try_from_step ... ok
+test geometry::placement ... ok
+test geometry::bezier_curve ... ok
+test table::read ... ok
+test geometry::parabola ... ok
+test skipped::unreadable_vertex_takes_its_edges_and_faces_with_it ... ok
+test skipped::face_on_an_unsupported_surface_is_skipped_and_named ... ok
+test geometry::vector ... ok
+test geometry::spherical_surface ... ok
+test geometry::quasi_uniform_curve ... ok
+test geometry::toroidal_surface ... ok
+test geometry::conical_surface ... ok
+test geometry::nurbs_curve_bezier_curve ... ok
+test geometry::cylindrical_surface ... ok
+test geometry::uniform_curve ... ok
+test geometry::nurbs_curve_quasi_uniform_curve ... ok
+test geometry::nurbs_curve_uniform_curve ... ok
+test corpus::unsupported_entities_of_the_corpus_are_listed_in_the_crate_doc ... ok
+test geometry::surface_of_linear_extrusion ... ok
+test geometry::bezier_surface ... ok
+test geometry::nurbs_surface_bezier_surface ... ok
+test geometry::b_spline_curve_with_knots ... ok
+test geometry::nurbs_curve_b_spline_curve_with_knots ... ok
+test geometry::polyline ... ok
+test geometry::surface_of_revolution ... ok
+test geometry::quasi_uniform_surface ... ok
+test tessellate_shape::tessellate_shape ... ok
+test geometry::nurbs_surface_quasi_uniform_surface ... ok
+test geometry::b_spline_surface_with_knots ... ok
+test geometry::uniform_surface ... ok
+test geometry::nurbs_surface_b_spline_surface_with_knots ... ok
+test geometry::nurbs_surface_uniform_surface ... ok
+
+test result: ok. 46 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.35s
+
+     Running tests/io/main.rs (target/release/deps/io-32914bd29946d1cf)
+
+running 11 tests
+test modeling::elliptical_arc_is_written_as_ellipse ... ok
+test modeling::skewed_extrusion_stays_a_linear_extrusion ... ok
+test ioi::surface_curves_read_as_space_curves ... ok
+test oi::oi ... ok
+test modeling::cylinder_is_written_as_cylindrical_surface ... ok
+test modeling::cylinder_survives_a_round_trip ... ok
+test ioi::assy_ioi ... ok
+test modeling::conic_torus_round_trips_with_positive_volume ... ok
+test modeling::revolved_solid_is_written_with_elementary_surfaces ... ok
+test ioi::ioi ... ok
+test modeling::occt_primitives_map_onto_modeling ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.24s
+
+     Running tests/linear_import_pcurves.rs (target/release/deps/linear_import_pcurves-925a63f3f6f01bae)
+
+running 2 tests
+test planar_and_cylindrical_generator_pcurves_preserve_exact_spatial_lines ... ok
+test numerical_seam_offsets_preserve_generators_and_curved_pcurves_stay_exact ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/output/main.rs (target/release/deps/output-a545e174f1fc27dc)
+
+running 8 tests
+test derive::derive_out ... ok
+test screenshot::default_shell ... ok
+test screenshot::custom_header ... ok
+test screenshot::koch ... ok
+test screenshot::cube ... ok
+test geometry::geometry ... ok
+test topology::parse_shell ... ok
+test topology::parse_solid ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/polar_cap_bounds.rs (target/release/deps/polar_cap_bounds-edce60019426fd7e)
+
+running 2 tests
+test annular_faces_do_not_gain_a_polar_boundary ... ok
+test enclosed_poles_follow_boundary_winding_and_surface_parameters ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/spherical_corners.rs (target/release/deps/spherical_corners-18bb35ecf34e495f)
+
+running 1 test
+test spherical_corner_step_trims_are_exact_meridians_and_equators ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/spherical_import_pcurves.rs (target/release/deps/spherical_import_pcurves-d9e5d8c15673d385)
+
+running 3 tests
+test spherical_derivative_orders_follow_longitude_and_latitude ... ok
+test spherical_pcurves_reject_invalid_geometry ... ok
+test spherical_pcurves_preserve_placement_orientation_and_derivatives ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/spline_extrusion_pcurves.rs (target/release/deps/spline_extrusion_pcurves-4ba909802c90236e)
+
+running 2 tests
+test spline_extrusion_traces_reject_invalid_geometry_and_changed_parameters ... ok
+test spline_parameter_traces_preserve_extrusion_geometry_and_speed ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/spline_pcurve_bounds.rs (target/release/deps/spline_pcurve_bounds-987fb49b05a49227)
+
+running 2 tests
+test imported_c1_parameter_curve_preserves_its_exact_trace_and_face_domain ... ok
+test spline_pcurve_bounds_fit_complete_extrusion_trim_hulls ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/spline_seam_pcurves.rs (target/release/deps/spline_seam_pcurves-95f08e2cc17b3ae2)
+
+running 2 tests
+test seam_search_roundoff_preserves_the_exact_section_but_real_offsets_are_rejected ... ok
+test spline_isoparametric_trims_preserve_geometry_and_parameter_speed ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/toroidal_seam_pcurves.rs (target/release/deps/toroidal_seam_pcurves-d8baf56321eab898)
+
+running 2 tests
+test toroidal_seam_roundoff_is_bounded_and_real_diagonals_stay_exact ... ok
+test toroidal_isoparametric_trims_preserve_exact_images_and_tangents ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/unclamped_curve_domains.rs (target/release/deps/unclamped_curve_domains-8b78d70139690d3c)
+
+running 2 tests
+test unclamped_spline_surfaces_use_both_active_domains_after_rationalization ... ok
+test unclamped_spline_edges_use_the_active_domain_after_rationalization ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests truck_stepio
+
+running 6 tests
+test truck-stepio/src/out/mod.rs - out::IndexSliceDisplay (line 104) ... ok
+test truck-stepio/src/out/mod.rs - out::SliceDisplay (line 40) ... ok
+test truck-stepio/src/in/convert.rs - r#in::convert::Table::to_compressed_shell (line 313) ... ok
+test truck-stepio/src/lib.rs - r#in (line 59) ... ok
+test truck-stepio/src/in/step_geometry/mod.rs - r#in::step_geometry::modeling_impls (line 280) ... ok
+test truck-stepio/src/in/convert.rs - r#in::convert::Table::to_compressed_solid (line 369) ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+
+exit_code 0

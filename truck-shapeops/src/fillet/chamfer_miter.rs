@@ -139,7 +139,26 @@ pub(super) fn chamfer(
                 if normal.magnitude2() <= epsilon.powi(4) || !normal.magnitude2().is_finite() {
                     return Err(error(Code::OutsideNeighbour));
                 }
-                if normal.dot(bevels[a].unwrap().0 + bevels[b].unwrap().0) < 0.0 {
+                let edge = &data.original_edges[other];
+                let direction = edge.back().point() - edge.front().point();
+                let away = if edge.front() == &data.vertices[v] {
+                    direction
+                } else {
+                    -direction
+                };
+                let adjacent = if (polygon[1].point() - polygon[2].point()).dot(away) < 0. {
+                    a
+                } else {
+                    b
+                };
+                let face = *data.sides[adjacent].iter().find(|&&f| f != common).unwrap();
+                let boundary_direction = if data.sides[other][0] == face {
+                    direction
+                } else {
+                    -direction
+                };
+                // Oppose the longer surviving face boundary along the unselected edge.
+                if (polygon[2].point() - polygon[1].point()).dot(boundary_direction) > 0. {
                     normal = -normal;
                     polygon.reverse();
                 }

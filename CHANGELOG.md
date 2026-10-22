@@ -6,6 +6,12 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Orient unequal two-edge chamfer transition faces against the adjacent surviving
+  boundary. Convex bevel pairs on nonconvex solids no longer produce reversed
+  transition triangles. Independent material controls cover both setback orders,
+  both caps, both sides and rigid/uniform-scale placements. Native complex A1
+  now constructs; its remaining corner-shape comparison discrepancy stays explicit.
+
 - Three-edge fillet corners can join an outer cylinder, its perpendicular cap
   and a radial plane. Offset support intersections place the rolling sphere;
   two cylindrical blends and a toroidal rim share exact spherical corner arcs.

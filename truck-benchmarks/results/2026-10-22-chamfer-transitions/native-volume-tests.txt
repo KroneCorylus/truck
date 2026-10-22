@@ -1,0 +1,30 @@
+$ bash audits/fillet-chamfer/capture/test_native_volume.sh target/occt-sdk target/chamfer-transition-native-volume-check
+open face capture expected=0 actual=0 passed=1
+open face comparison expected=0 actual=0 passed=1
+open face input_unchanged=1
+box capture expected=24 actual=23.999999999999993 passed=1
+box comparison expected=24 actual=23.999999999999993 passed=1
+box input_unchanged=1
+cylinder capture expected=37.699111843077517 actual=37.699111843077432 passed=1
+cylinder comparison expected=37.699111843077517 actual=37.699111843077432 passed=1
+cylinder input_unchanged=1
+sphere capture expected=4.1887902047863905 actual=4.1887902047863825 passed=1
+sphere comparison expected=4.1887902047863905 actual=4.1887902047863825 passed=1
+sphere input_unchanged=1
+spline exact integral capture expected=1.8629500000000001 actual=1.8629500000000361 passed=1
+spline exact integral comparison expected=1.8629500000000001 actual=1.8629500000000361 passed=1
+spline exact integral input_unchanged=1
+/home/krone/Development/Pieza_WS/truck/audits/fillet-chamfer/capture/fixtures/curved-cap-input.brep capture expected=0.0029734793641782342 actual=0.0029734793641782338 passed=1
+/home/krone/Development/Pieza_WS/truck/audits/fillet-chamfer/capture/fixtures/curved-cap-input.brep comparison expected=0.0029734793641782342 actual=0.0029734793641782338 passed=1
+/home/krone/Development/Pieza_WS/truck/audits/fillet-chamfer/capture/fixtures/curved-cap-input.brep input_unchanged=1
+/home/krone/Development/Pieza_WS/truck/audits/fillet-chamfer/capture/fixtures/curved-cap-input.brep transformed capture expected=0.0029734793641782342 actual=0.0029734793641782347 passed=1
+/home/krone/Development/Pieza_WS/truck/audits/fillet-chamfer/capture/fixtures/curved-cap-input.brep transformed comparison expected=0.0029734793641782342 actual=0.0029734793641782347 passed=1
+/home/krone/Development/Pieza_WS/truck/audits/fillet-chamfer/capture/fixtures/curved-cap-input.brep transformed input_unchanged=1
+/home/krone/Development/Pieza_WS/truck/audits/fillet-chamfer/capture/fixtures/curved-cap-chamfer.brep capture expected=0.002952545217684737 actual=0.0029525452279172051 passed=1
+/home/krone/Development/Pieza_WS/truck/audits/fillet-chamfer/capture/fixtures/curved-cap-chamfer.brep comparison expected=0.002952545217684737 actual=0.0029525452279172051 passed=1
+/home/krone/Development/Pieza_WS/truck/audits/fillet-chamfer/capture/fixtures/curved-cap-chamfer.brep input_unchanged=1
+/home/krone/Development/Pieza_WS/truck/audits/fillet-chamfer/capture/fixtures/curved-cap-chamfer.brep transformed capture expected=0.002952545217684737 actual=0.0029525452279172077 passed=1
+/home/krone/Development/Pieza_WS/truck/audits/fillet-chamfer/capture/fixtures/curved-cap-chamfer.brep transformed comparison expected=0.002952545217684737 actual=0.0029525452279172077 passed=1
+/home/krone/Development/Pieza_WS/truck/audits/fillet-chamfer/capture/fixtures/curved-cap-chamfer.brep transformed input_unchanged=1
+27 checks, 0 failures
+exit_code 0

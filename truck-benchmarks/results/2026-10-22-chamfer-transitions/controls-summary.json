@@ -1,0 +1,50 @@
+{
+  "procedural_operations": 64,
+  "imported_selections": 2,
+  "independent_volume": "(Lx*Ly-minus-notch)*H - H*a*a/2 - L*b*b/2 + a*b*(a+b)/6",
+  "native_comparison": {
+    "schema_version": 1,
+    "comparison": "sampled-only",
+    "native_valid": true,
+    "truck_step_valid": true,
+    "native_solids": 1,
+    "truck_solids": 1,
+    "native_volume": 1.0929679122618834,
+    "truck_volume": 1.0931899122619453,
+    "native_to_truck_max_distance": 0.021213203435596465,
+    "native_to_truck_samples": 8942,
+    "truck_to_native_max_distance": 0.028867513459481395,
+    "truck_to_native_samples": 8328,
+    "native_tolerances": {
+      "face": 1e-07,
+      "edge": 0.0001,
+      "vertex": 0.0001
+    },
+    "truck_step_tolerances": {
+      "face": 1e-07,
+      "edge": 1e-07,
+      "vertex": 1e-07
+    }
+  },
+  "native_comparison_resolved": false,
+  "archive_sha256": "c06eb77939f0b275434390ab9f4928012f838dafc7e6511844a34c7d3460b5b0",
+  "archive_members": 16,
+  "member_sha256": {
+    "probe/A1/001.input.step": "ed05d5cea0c01c185e0a5dece285590175cc602977d0c064c9b1ff39d21ed864",
+    "probe/A1/001.input.json": "737fb5871ddf5f7264ef3933a0d688a1a21a4b07228d339f0f8a9a078c818f82",
+    "probe/A1/001.result.brep": "7d3db400043200869324d6ac0f828886e9de9a4cca6d1012ecaa9d6a665eaf58",
+    "probe/A1/001.result.json": "2af94640131c52f68915621e121b189b71b43bd941eade20d2f9a88d579e679f",
+    "probe/A1/001.truck.log": "470263bc1be37dc8da2625fe094c3de6063527c366ee9c88ab561da7c70cf26b",
+    "probe/A1/001.truck.step": "a211bc7d06dbb98fd50aa9c13a03eaff17e2be319d91561bed927a5afdcb1c93",
+    "probe/A1/001.truck.json": "59f496a5f2eaa31f0e6e43ec1049ac4ed558a662c3a26ecfed958cfe23447fb8",
+    "probe/A1/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "probe/A1/001.comparison.json": "edb853f583f9853f1fde2afaa438e0eeb049053560da14376410dad7e0abc111",
+    "helpers/prove-chamfer-transition-parent.py": "c00e2f9328a69572dbc60ef4e1236bf46740f871805e7dfc7aeccffb5d7e484b",
+    "helpers/validate-chamfer-transitions.py": "9103c1a3e73168209e1f1ad9f993b40fab9f69aafb666000f64a043fb0349c77",
+    "parent/truck-shapeops/tests/chamfer_transition_orientation.rs": "a8d15a1f7592a02ddd318d81f4b3b626d5b523d33dff32062c221b048c7c92d6",
+    "parent/truck-shapeops/examples/replay_occt_blend.rs": "b0954d05a71ec3c32e5ebfaa0ec6f96be07d95705255aebf5329ebb43837613f",
+    "parent/truck-shapeops/tests/fixtures/chamfer-transition-orientation/A1.input.step": "ed05d5cea0c01c185e0a5dece285590175cc602977d0c064c9b1ff39d21ed864",
+    "parent/truck-shapeops/tests/fixtures/chamfer-transition-orientation/A1.input.json": "737fb5871ddf5f7264ef3933a0d688a1a21a4b07228d339f0f8a9a078c818f82",
+    "parent/truck-shapeops/tests/fixtures/chamfer-transition-orientation/README.md": "b359b77e629fcc050187084af0a4c92c1521794f5852640d2baad5743e1c6195"
+  }
+}

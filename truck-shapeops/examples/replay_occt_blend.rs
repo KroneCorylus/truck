@@ -4573,3 +4573,61 @@ mod curved_terminal_junction_tests {
         )]);
     }
 }
+
+#[cfg(test)]
+mod chamfer_transition_orientation_tests {
+    use super::*;
+    #[test]
+    fn native_unequal_convex_transitions_preserve_closed_material() {
+        let step = include_str!("../tests/fixtures/chamfer-transition-orientation/A1.input.step");
+        let intent = include_str!("../tests/fixtures/chamfer-transition-orientation/A1.input.json");
+        for reverse in [false, true] {
+            let directory = std::env::temp_dir().join(format!(
+                "truck-chamfer-transition-{}-{reverse}",
+                std::process::id()
+            ));
+            std::fs::create_dir_all(&directory).unwrap();
+            let prefix = directory.join("001");
+            let prefix = prefix.to_str().unwrap();
+            let mut task: Value = serde_json::from_str(intent).unwrap();
+            if reverse {
+                task["selection"].as_array_mut().unwrap().reverse();
+                for edge in task["selection"].as_array_mut().unwrap() {
+                    edge["points"].as_array_mut().unwrap().reverse();
+                }
+            }
+            std::fs::write(format!("{prefix}.input.step"), step).unwrap();
+            std::fs::write(format!("{prefix}.input.json"), task.to_string()).unwrap();
+            let result = replay(prefix, &Cell::new("start")).unwrap();
+            assert_eq!(result["status"], "operation-succeeded", "{result}");
+            assert_eq!(result["selected_edges"], 17);
+            assert_eq!(result["selection_scope"], "native-contours");
+            for field in [
+                "input_unchanged",
+                "geometry_consistent",
+                "mesh_closed",
+                "step_prepared",
+            ] {
+                assert_eq!(result[field], true, "{field}: {result}");
+            }
+            let input = import(&format!("{prefix}.input.step")).unwrap();
+            let selected =
+                chamfer_distance_selection(&input, task["selection"].as_array().unwrap(), true)
+                    .unwrap();
+            let assignments: Vec<_> = selected.iter().map(|(edge, d)| (edge.id(), *d)).collect();
+            let solid = try_chamfer_solid_edges_with_distances(&input, &assignments, TOL)
+                .unwrap()
+                .solid;
+            replay_common::assert_solid(&solid, 1.0929679122618834, &[0], TOL);
+            replay_common::blend::assert_step(&solid, 1.0929679122618834, TOL);
+            let output = import(&format!("{prefix}.truck.step")).unwrap();
+            replay_common::assert_solid(&output, 1.0929679122618834, &[0], TOL);
+            replay_common::blend::assert_step(&output, 1.0929679122618834, TOL);
+            assert_eq!(
+                std::fs::read_to_string(format!("{prefix}.input.step")).unwrap(),
+                step
+            );
+            std::fs::remove_dir_all(directory).unwrap();
+        }
+    }
+}

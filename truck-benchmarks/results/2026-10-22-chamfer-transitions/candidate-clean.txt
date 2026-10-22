@@ -1,0 +1,3 @@
+$ cargo clean --release -p truck-stepio -p truck-shapeops
+     Removed 325 files, 198.6MiB total
+exit_code 0

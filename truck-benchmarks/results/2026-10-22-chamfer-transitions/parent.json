@@ -1,0 +1,18 @@
+{
+  "revision": "14ef4d5758173e0f4463a03e99f276ee06eca9c7",
+  "test_sha256": {
+    "truck-shapeops/tests/chamfer_transition_orientation.rs": "a8d15a1f7592a02ddd318d81f4b3b626d5b523d33dff32062c221b048c7c92d6",
+    "truck-shapeops/examples/replay_occt_blend.rs": "b0954d05a71ec3c32e5ebfaa0ec6f96be07d95705255aebf5329ebb43837613f",
+    "truck-shapeops/tests/fixtures/chamfer-transition-orientation/A1.input.step": "ed05d5cea0c01c185e0a5dece285590175cc602977d0c064c9b1ff39d21ed864",
+    "truck-shapeops/tests/fixtures/chamfer-transition-orientation/A1.input.json": "737fb5871ddf5f7264ef3933a0d688a1a21a4b07228d339f0f8a9a078c818f82",
+    "truck-shapeops/tests/fixtures/chamfer-transition-orientation/README.md": "b359b77e629fcc050187084af0a4c92c1521794f5852640d2baad5743e1c6195"
+  },
+  "parent_test_sha256": {
+    "truck-shapeops/tests/chamfer_transition_orientation.rs": "a8d15a1f7592a02ddd318d81f4b3b626d5b523d33dff32062c221b048c7c92d6",
+    "truck-shapeops/examples/replay_occt_blend.rs": "b0954d05a71ec3c32e5ebfaa0ec6f96be07d95705255aebf5329ebb43837613f",
+    "truck-shapeops/tests/fixtures/chamfer-transition-orientation/A1.input.step": "ed05d5cea0c01c185e0a5dece285590175cc602977d0c064c9b1ff39d21ed864",
+    "truck-shapeops/tests/fixtures/chamfer-transition-orientation/A1.input.json": "737fb5871ddf5f7264ef3933a0d688a1a21a4b07228d339f0f8a9a078c818f82",
+    "truck-shapeops/tests/fixtures/chamfer-transition-orientation/README.md": "b359b77e629fcc050187084af0a4c92c1521794f5852640d2baad5743e1c6195"
+  },
+  "binding_change": null
+}
