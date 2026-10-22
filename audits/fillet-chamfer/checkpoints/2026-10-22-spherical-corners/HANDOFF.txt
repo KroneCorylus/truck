@@ -1,0 +1,40 @@
+SPHERICAL SUPPORT CORNERS — 2026-10-22
+CHECKPOINT COMPLETE. CONTINUE REMAINING CASES.
+
+# Spherical support corners: clean capture
+
+Implementation 98af2566b52af1fba72b8726bddf0a5219ddc7f5.
+
+Three selected edges on an outward sphere and two planes now join an exact rolling sphere, two toroidal blends and a cylindrical round. Contact curves trim against their remote planar boundaries. Existing geometry, closure and trim checks remain; consumed terminal faces reject without changing input.
+
+465 release shapeops tests, 119 STEP tests, 73 replay tests, 13 capture tests, all-target Clippy and the single-thread benchmark smoke check pass. Native reference (8), volume (27) and distance (24) checks pass. Two regressions fail on the parent with identical sources and fixtures. Controls cover 36 procedural operations, nine oversized rejections and six normalized imported selections. Three original-scale production replays pass their construction checks. One existing ignore, a test warning and the known geometry precision failure remain explicit.
+
+All 396 native cases pass across 648 captured operations. 473 constructions (+3) and 437 limited comparison passes (+1). All 470 previous successful result/comparison records are exactly unchanged, as are every input task, native reference and selection scope.
+
+D5 now passes the unchanged sampled-distance threshold. D9 and E4 now construct but remain comparison discrepancies. Their native corner geometry differs from exact rolling spheres. E4 also exposes inconsistent native surface-volume integration: tessellation of the exported STEP agrees with the raw solid and independent material integral within the chord budget. The canonical comparator and its statuses remain unchanged. These checks do not establish a global error bound or full parity.
+
+Statuses: {"input-import-failed": 95, "operation-succeeded": 473, "operation-failed": 70, "input-inconsistent": 10}.
+
+122 of 559 positive solid operations remain unresolved; 36 are constructed discrepancies.
+
+Archive SHA256: a26fbd4333cb0755162af8ada957005a9295bf43bdc03abede116493badb12a2.
+
+No assertions, thresholds or replay fitting budgets changed. No parity, global-error or performance claim. No consumer/pin changes, push or PR.
+
+NEXT
+Continue until all cases are addressed; do not stop after this checkpoint.
+Raw capture target/occt-capture-spherical-corners. Parent target/spherical-corner-parent-source at eaf8b157. Helpers target/prove-spherical-corner-parent.py, validate-spherical-corners.py, verify-spherical-corner-replays.py, package-spherical-corner-proof.py, package-spherical-corners-full.py, write-spherical-corner-checkpoint.py.
+Cone work is now an uncommitted, isolated prototype under target/conical-corner-source, prepared by target/prepare-conical-corner-probe.py and conical-corner-{end-block,fit-block,helpers,math}.rs. Root production source remains the sphere commit. Standalone conical-corner-{library,replay,test}-command.json build it without touching Cargo artifacts. Four native cases C2/C6/C8/D1 construct consistent closed STEP solids with unchanged inputs. All remain sampled discrepancies; do not count them as resolved or commit without proof. First fit tol/4 failed the strict nine-boundary tangency test; tightening new-path fit to tol/100 passes without weakening the test. target/conical_corner_junctions.rs currently covers one radius, two placements and two selection orders on four procedural shapes; 16 operations pass exact radii/center, nine tangent joins, material and STEP. It uses preliminary material constants; independent projection integration target/conical-corner-volume.cpp has a refined domain-aware integration, with convergence experiments running. Add more radii, collision controls, normalized native regressions, parent failure proof, full validation and clean capture before landing. Native comparisons need diagnosis; C8/D1 show especially large discrepancies. No final cone solid proof yet. Read target/conical-corner-design.txt for equations and target/conical-corner-probes for preliminary replay/comparison evidence.
+Spherical corner source is now committed. D9/E4 remain comparison discrepancies. Native E4 corner point deviates0.0887015 from exact radius10 sphere; independent material~3464310.44. Raw mesh and native tessellation of exported STEP agree within chord budget. OCCT surface-volume integrators disagree with tessellations and each other. Proof archive includes source, convergence and diagnostic evidence. Do not change canonical thresholds or relabel discrepancies.
+Original-scale repeated STEP stress experiment was stopped during E4 after20minutes/8GB, not passing. Profiling: PolyBoundary::include_with_tolerance and triangulation::insert_surface. Permanent normalized native regression covers six imported selections; original-scale production replay is covered by full capture. Do not restart the stress experiment automatically.
+G9 contacts cross two seams at different stations; X1 radius15 exceeds prior convex cylinder radius10 and requires a new corner patch; C2 sequential chamfers consume prior0.2 cuts with new0.5 cuts. C1 curved terminations, seven solid imports and ten inconsistent solids remain. A1 retains corner discrepancy. Earlier checkpoints retain native-reference diagnoses. Consumer unchanged; no push/PR.
+
+METHOD
+Read AGENTS.md. Parent-failing tests; no weakened assertions; shared solid/material/STEP checks.
+CARGO_BUILD_JOBS=12; rustfmt +nightly --config skip_children=true on touched Rust only; no cargo fmt.
+Freeze production during builds/tests/captures. Full release checks, all-target Clippy, single-thread actions smoke; build replay LAST.
+Commit implementation and proof before clean capture; then HTML/catalog/handoff commit. Force-add ignored JSON/ZIP/STEP/BREP fixtures. git diff --check excludes *.step and *.brep because native fixtures retain original whitespace.
+No consumer/pin changes, push, PR, subagents or unsupported performance/parity claims.
+SDK target/occt-sdk/usr/lib64;nativecheckout ../investigations/sequential-holes-2026-10-10/occt;publicdata target/occt-public-chamfer-data.
+Capture workers4,timeout120,freshoutput. Packaging is not idempotent. Never print full task/capture records: contour point arrays are large; whitelist output fields.
+Known baseline:truck-geometry pcurve_derivation absolute precision failure reproduced on parent. Preserve it explicitly; no tolerance relaxation.

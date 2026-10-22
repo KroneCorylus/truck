@@ -1,6 +1,6 @@
 LATEST CHECKPOINT — 2026-10-22
-Read ../2026-10-22-separated-fillet-components/HANDOFF.txt and report.html.
-Implementation 569d5e3d rounds separated planar corners and curved rims. 470 constructions/436 limited passes; 123 positive solid operations unresolved. Use target/occt-distance-tree-plugin.
+Read ../2026-10-22-spherical-corners/HANDOFF.txt and report.html.
+Implementation 98af2566 constructs spherical support corners. 473 constructions/437 limited passes; 122 positive solid operations unresolved. Use target/occt-distance-tree-plugin.
 
 HISTORICAL HANDOFF FOLLOWS
 
