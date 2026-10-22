@@ -236,6 +236,7 @@ pub(super) struct Neighborhood {
     pub edge_index: HashMap<EdgeID, usize>,
     pub planes: Vec<Option<(Vector3, f64)>>,
     pub cylinders: Vec<Option<(Point3, Vector3, f64)>>,
+    pub torus_supports: Vec<Option<(Point3, Vector3, f64, f64)>>,
     pub cone_supports: Vec<Option<(Point3, Vector3, Rad<f64>)>>,
     pub sphere_supports: Vec<Option<(Point3, f64)>>,
     pub incident: Vec<Vec<usize>>,
@@ -301,6 +302,7 @@ pub(super) fn neighborhood(
     }
     let mut cylinders = vec![None; shell.len()];
     let mut sphere_supports = vec![None; shell.len()];
+    let mut torus_supports = vec![None; shell.len()];
     let mut cone_supports = vec![None; shell.len()];
     if curved_fillets {
         for (f, face) in shell.iter().enumerate() {
@@ -328,6 +330,17 @@ pub(super) fn neighborhood(
                 )) => {
                     cone_supports[f] = Some((apex, axis, half_angle));
                 }
+                Some((
+                    Elementary::Torus {
+                        center,
+                        axis,
+                        major,
+                        minor,
+                    },
+                    true,
+                )) => {
+                    torus_supports[f] = Some((center, axis, major, minor));
+                }
                 _ => {}
             }
         }
@@ -349,6 +362,7 @@ pub(super) fn neighborhood(
                         cylinders[f].is_some()
                             || sphere_supports[f].is_some()
                             || cone_supports[f].is_some()
+                            || torus_supports[f].is_some()
                     })
                     .count()
                     == 1
@@ -357,6 +371,7 @@ pub(super) fn neighborhood(
                         || cylinders[f].is_some()
                         || sphere_supports[f].is_some()
                         || cone_supports[f].is_some()
+                        || torus_supports[f].is_some()
                 })
         });
     for edges in &incident {
@@ -392,6 +407,7 @@ pub(super) fn neighborhood(
                     || cylinders[f].is_some()
                     || sphere_supports[f].is_some()
                     || cone_supports[f].is_some()
+                    || torus_supports[f].is_some()
             });
         for &k in edges {
             for f in sides[k] {
@@ -430,6 +446,11 @@ pub(super) fn neighborhood(
                             return (delta - axis * delta.dot(axis)).normalize() * angle.0.cos()
                                 - axis * angle.0.sin();
                         }
+                        if let Some((origin, axis, major, _)) = torus_supports[f] {
+                            let delta = curve.subs(t) - origin;
+                            let radial = delta - axis * delta.dot(axis);
+                            return (delta - radial.normalize() * major).normalize();
+                        }
                         let (origin, axis, _) = cylinders[f].unwrap();
                         let delta = curve.subs(t) - origin;
                         (delta - axis * delta.dot(axis)).normalize()
@@ -455,6 +476,7 @@ pub(super) fn neighborhood(
         cylinders,
         sphere_supports,
         cone_supports,
+        torus_supports,
     })
 }
 

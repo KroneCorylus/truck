@@ -1,0 +1,12 @@
+{
+  "volume": [
+    "g++",
+    "-O3",
+    "-std=c++17",
+    "torus-corner-volume.cpp",
+    "-o",
+    "PROGRAM"
+  ],
+  "volume_run": "PROGRAM N RADIUS; N is 128, 256 or 512; radii 0.03,0.06,0.1",
+  "note": "F3 subtracts the independently integrated nonconvex inner cavity; no CAD builder or mesh is used by the volume oracle. Native comparisons retain their original thresholds."
+}

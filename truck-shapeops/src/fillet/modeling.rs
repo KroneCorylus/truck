@@ -178,6 +178,10 @@ pub fn try_fillet_solid_along_wire<R: ScalarFunctionD1>(
 /// caps. Exact offset-cone intersections locate the sphere; cone/radial-plane blends
 /// follow hyperbolic rolling centers, and cone/cap blends are toroidal. The contacts
 /// must remain inside their original neighbouring boundaries.
+/// Outward toroidal supports with perpendicular caps and radial walls admit the same
+/// three-edge convex corner construction. The offset torus locates the sphere and
+/// fitted rolling contacts preserve the meridian branch, including nonconvex profiles.
+/// Mixed convex/concave torus corners remain outside this construction.
 /// Straight edges between planes or a plane and an axial cylindrical ruling also support
 /// curved end faces. Connected channel rims meet at exact intersections of the blend
 /// surfaces, including elliptical miters between equal-radius cylinders. Contacts may

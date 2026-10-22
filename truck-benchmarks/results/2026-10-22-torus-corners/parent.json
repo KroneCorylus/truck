@@ -1,0 +1,26 @@
+{
+  "revision": "531505c8bc06df772204c9c7075d9cfa47e8b735",
+  "test_sha256": {
+    "truck-shapeops/tests/torus_corner_junctions.rs": "9512749289e217f29b110cc04b450f0e3e6d7e13ce05efddff49470953ce0cdc",
+    "truck-shapeops/examples/replay_occt_blend.rs": "8f2ed10627325ca084fde64598a4dddaf8866f354223177ff18b06a953360eea",
+    "truck-shapeops/tests/fixtures/torus-corner-junctions/E6.input.step": "138bb42e1e467270aac8918778cf81f4137fa5f6665a7a2901bf3186cc4cffa4",
+    "truck-shapeops/tests/fixtures/torus-corner-junctions/E6.input.json": "7be3327e3ddedc934c1c09b40d864220c7f9664c136118f72cdc954b2c18720d",
+    "truck-shapeops/tests/fixtures/torus-corner-junctions/E8.input.step": "138bb42e1e467270aac8918778cf81f4137fa5f6665a7a2901bf3186cc4cffa4",
+    "truck-shapeops/tests/fixtures/torus-corner-junctions/E8.input.json": "783d2187d6584e80d001dafefb56956ad1366ac5875ed3dfbdb4ef607ac98ce5",
+    "truck-shapeops/tests/fixtures/torus-corner-junctions/F3.input.step": "071122c70c88c4210e2d2b970cb7d801345eb88f541342e70dcbe2c94a246df7",
+    "truck-shapeops/tests/fixtures/torus-corner-junctions/F3.input.json": "a126573fc23d798021c91eb17056428447b7c3d4c9277fdd84c6818293eebfcf",
+    "truck-shapeops/tests/fixtures/torus-corner-junctions/README.md": "a30a9a943b6b0a6be4414d68958fa8ef1b9a8b082d3980764669cba3e8558ea7"
+  },
+  "parent_test_sha256": {
+    "truck-shapeops/tests/torus_corner_junctions.rs": "9512749289e217f29b110cc04b450f0e3e6d7e13ce05efddff49470953ce0cdc",
+    "truck-shapeops/examples/replay_occt_blend.rs": "8f2ed10627325ca084fde64598a4dddaf8866f354223177ff18b06a953360eea",
+    "truck-shapeops/tests/fixtures/torus-corner-junctions/E6.input.step": "138bb42e1e467270aac8918778cf81f4137fa5f6665a7a2901bf3186cc4cffa4",
+    "truck-shapeops/tests/fixtures/torus-corner-junctions/E6.input.json": "7be3327e3ddedc934c1c09b40d864220c7f9664c136118f72cdc954b2c18720d",
+    "truck-shapeops/tests/fixtures/torus-corner-junctions/E8.input.step": "138bb42e1e467270aac8918778cf81f4137fa5f6665a7a2901bf3186cc4cffa4",
+    "truck-shapeops/tests/fixtures/torus-corner-junctions/E8.input.json": "783d2187d6584e80d001dafefb56956ad1366ac5875ed3dfbdb4ef607ac98ce5",
+    "truck-shapeops/tests/fixtures/torus-corner-junctions/F3.input.step": "071122c70c88c4210e2d2b970cb7d801345eb88f541342e70dcbe2c94a246df7",
+    "truck-shapeops/tests/fixtures/torus-corner-junctions/F3.input.json": "a126573fc23d798021c91eb17056428447b7c3d4c9277fdd84c6818293eebfcf",
+    "truck-shapeops/tests/fixtures/torus-corner-junctions/README.md": "a30a9a943b6b0a6be4414d68958fa8ef1b9a8b082d3980764669cba3e8558ea7"
+  },
+  "binding_change": null
+}

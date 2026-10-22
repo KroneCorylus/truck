@@ -6,6 +6,13 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Round three-edge convex corners on outward toroidal supports with planar caps and
+  radial walls. Offset torus intersections locate the corner sphere; fitted rolling
+  contacts preserve their meridian branch. Independent material, radius, tangency
+  and STEP controls cover 45/160-degree profiles and native E6/E8/F3 selections.
+  Mixed convex/concave F1 remains unsupported; native comparison discrepancies stay
+  explicitly recorded.
+
 - Join three selected edges on an outward cone and two planes using an exact rolling
   sphere, toroidal cap rounds and fitted cone/radial-plane blends. Hyperbolic center
   paths remain regular at axial terminations; fitted contacts intersect remote caps

@@ -42,7 +42,7 @@ pub(super) fn fillet(
     let mut tori = Vec::new();
     let mut shared_arcs = HashMap::default();
     let mut complex_ends = HashMap::default();
-    let mut cone_terminals = HashMap::default();
+    let mut planar_terminals = HashMap::default();
     let mut curved_terminals = HashSet::default();
     for (v, incident) in data.incident.iter().enumerate() {
         let chosen: Vec<_> = incident
@@ -63,6 +63,111 @@ pub(super) fn fillet(
         let mut contact = |k: usize, f: usize, point: &Vertex| {
             contacts[k][usize::from(data.sides[k][0] != f)][end_index(k)] = point.clone();
         };
+        let torus_face = faces.iter().copied().find(|&f| {
+            data.torus_supports[f].is_some() && chosen.iter().any(|&k| data.sides[k].contains(&f))
+        });
+        if let Some(f) = torus_face {
+            if faces.len() != 3 || !(chosen.len() == 1 || chosen.len() == 3) {
+                return Err(error(Code::UnsupportedTopology));
+            }
+            let torus = data.torus_supports[f].unwrap();
+            let (origin, axis, major, minor) = torus;
+            let inner = minor - radius;
+            if inner <= 0. {
+                return Err(error(Code::OutsideNeighbour));
+            }
+            let planes: Vec<_> = faces.iter().copied().filter(|&j| j != f).collect();
+            let cap = *planes
+                .iter()
+                .find(|&&j| {
+                    data.planes[j].is_some_and(|(n, _)| n.cross(axis).magnitude() < TOLERANCE)
+                })
+                .ok_or_else(|| error(Code::UnsupportedGeometry))?;
+            let wall = *planes.iter().find(|&&j| j != cap).unwrap();
+            let (cap_n, cap_d) = data.planes[cap].unwrap();
+            let (wall_n, wall_d) =
+                data.planes[wall].ok_or_else(|| error(Code::UnsupportedGeometry))?;
+            if wall_n.dot(axis).abs() > TOLERANCE
+                || (wall_d - wall_n.dot(origin.to_vec())).abs() > TOLERANCE
+            {
+                return Err(error(Code::UnsupportedGeometry));
+            }
+            let delta = vertex.point() - origin;
+            let radial = delta - axis * delta.dot(axis);
+            let lateral = radial - wall_n * radial.dot(wall_n);
+            if lateral.so_small() {
+                return Err(error(Code::UnsupportedGeometry));
+            }
+            let u = lateral.normalize();
+            let touched: HashSet<_> = chosen.iter().flat_map(|&k| data.sides[k]).collect();
+            let mut normals = HashMap::default();
+            let mut points = HashMap::default();
+            let center;
+            if chosen.len() == 3 || touched.contains(&cap) {
+                let h = (cap_d - radius - cap_n.dot(origin.to_vec())) / cap_n.dot(axis);
+                let square = inner * inner - h * h;
+                if square <= 0. {
+                    return Err(error(Code::OutsideNeighbour));
+                }
+                let rho = major + square.sqrt().copysign(radial.magnitude() - major);
+                let w = if touched.contains(&wall) { -radius } else { 0. };
+                let square = rho * rho - w * w;
+                if rho <= 0. || square <= 0. {
+                    return Err(error(Code::OutsideNeighbour));
+                }
+                center = origin + axis * h + wall_n * w + u * square.sqrt();
+                normals.insert(f, torus_normal(torus, center));
+                normals.insert(cap, cap_n);
+                normals.insert(wall, wall_n);
+                for &j in &touched {
+                    points.insert(j, Vertex::new(center + radius * normals[&j]));
+                }
+            } else {
+                let k = chosen[0];
+                let h = (cap_d - cap_n.dot(origin.to_vec())) / cap_n.dot(axis);
+                let hint = torus_station(torus, vertex.point());
+                let angles = [minor, inner]
+                    .map(|q| torus_angle(h / q, hint).ok_or_else(|| error(Code::OutsideNeighbour)));
+                let [theta, phi] = angles;
+                let c = torus_center(torus, wall_n, u, radius, theta?)
+                    .ok_or_else(|| error(Code::OutsideNeighbour))?
+                    .0;
+                center = torus_center(torus, wall_n, u, radius, phi?)
+                    .ok_or_else(|| error(Code::OutsideNeighbour))?
+                    .0;
+                points.insert(f, Vertex::new(c + radius * torus_normal(torus, c)));
+                points.insert(wall, Vertex::new(center + radius * wall_n));
+                planar_terminals.insert((k, end_index(k)), cap);
+            }
+            for &k in incident {
+                if chosen.contains(&k) {
+                    for j in data.sides[k] {
+                        contact(k, j, &points[&j]);
+                    }
+                    ends[k][end_index(k)] = Some(End {
+                        center,
+                        miter: None,
+                    });
+                } else {
+                    let p = data.sides[k]
+                        .iter()
+                        .find_map(|j| points.get(j))
+                        .ok_or_else(|| error(Code::UnsupportedTopology))?;
+                    for j in data.sides[k] {
+                        contact(k, j, p);
+                    }
+                }
+            }
+            if chosen.len() == 3 {
+                spheres.push((
+                    v,
+                    center,
+                    1.,
+                    faces.iter().map(|j| normals[j]).collect::<Vec<_>>(),
+                ));
+            }
+            continue;
+        }
         let cone_face = faces.iter().copied().find(|&f| {
             data.cone_supports[f].is_some() && chosen.iter().any(|&k| data.sides[k].contains(&f))
         });
@@ -140,7 +245,7 @@ pub(super) fn fillet(
                         let cp = center(h + radius * angle.0.sin())
                             .ok_or_else(|| error(Code::OutsideNeighbour))?;
                         let cq = center(h).ok_or_else(|| error(Code::OutsideNeighbour))?;
-                        cone_terminals.insert((k, end_index(k)), terminal);
+                        planar_terminals.insert((k, end_index(k)), terminal);
                         (cq, cp + radius * cone_normal(cone, cp), cq + radius * n)
                     } else if m.dot(axis).abs() < TOLERANCE
                         && (e - m.dot(apex.to_vec())).abs() < TOLERANCE
@@ -744,7 +849,7 @@ pub(super) fn fillet(
         }
     }
     // Intersect fitted contacts with terminal planes before any shared trim edge is assembled.
-    let mut cone_fits = HashMap::default();
+    let mut curved_fits = HashMap::default();
     for (k, edge) in data.original_edges.iter().enumerate() {
         if !selected.contains(&edge.id()) {
             continue;
@@ -752,31 +857,61 @@ pub(super) fn fillet(
         let [a, b] = data.sides[k];
         let Some(f) = [a, b]
             .into_iter()
-            .find(|&f| data.cone_supports[f].is_some())
+            .find(|&f| data.cone_supports[f].is_some() || data.torus_supports[f].is_some())
         else {
             continue;
         };
-        let cone = data.cone_supports[f].unwrap();
-        let (apex, axis, angle) = cone;
+        let cone = data.cone_supports[f];
+        let torus = data.torus_supports[f];
+        let (origin, axis) = if let Some((p, a, _)) = cone {
+            (p, a)
+        } else {
+            let (p, a, _, _) = torus.unwrap();
+            (p, a)
+        };
         let plane = if a == f { b } else { a };
         let (n, d) = data.planes[plane].ok_or_else(|| error(Code::UnsupportedGeometry))?;
         if n.cross(axis).magnitude() < TOLERANCE {
             continue;
         }
-        if n.dot(axis).abs() > TOLERANCE || (d - n.dot(apex.to_vec())).abs() > TOLERANCE {
+        if n.dot(axis).abs() > TOLERANCE || (d - n.dot(origin.to_vec())).abs() > TOLERANCE {
             return Err(error(Code::UnsupportedGeometry));
         }
-        let u = cone_lateral(cone, n, edge).ok_or_else(|| error(Code::UnsupportedGeometry))?;
+        let curve = edge.curve();
+        let (lo, hi) = curve.range_tuple();
+        let delta = curve.subs((lo + hi) / 2.) - origin;
+        let u = if let Some(cone) = cone {
+            cone_lateral(cone, n, edge).ok_or_else(|| error(Code::UnsupportedGeometry))?
+        } else {
+            (delta - axis * delta.dot(axis) - n * delta.dot(n)).normalize()
+        };
+        let normal = |p| {
+            if let Some(cone) = cone {
+                cone_normal(cone, p)
+            } else {
+                torus_normal(torus.unwrap(), p)
+            }
+        };
+        let station = |p: Point3| {
+            if let Some(torus) = torus {
+                torus_station(torus, p)
+            } else {
+                (p - origin).dot(u)
+            }
+        };
         let stations: Vec<_> = (0..2)
             .map(|end| {
                 [a, b].map(|j| {
                     let p = contacts[k][usize::from(j != a)][end].point();
-                    let c = p - radius * if j == f { cone_normal(cone, p) } else { n };
-                    (c - apex).dot(u)
+                    station(p - radius * if j == f { normal(p) } else { n })
                 })
             })
             .collect();
-        let increasing = (edge.back().point() - edge.front().point()).dot(u) > 0.;
+        let increasing = if cone.is_some() {
+            (edge.back().point() - edge.front().point()).dot(u) > 0.
+        } else {
+            station(edge.back().point()) > station(edge.front().point())
+        };
         let xs = std::array::from_fn::<_, 2, _>(|end| {
             if (end == 1) == increasing {
                 stations[end].into_iter().fold(f64::NEG_INFINITY, f64::max)
@@ -795,12 +930,18 @@ pub(super) fn fillet(
             tol / 100.,
             |t| {
                 let x = xs[0] + (xs[1] - xs[0]) * t;
-                let rho = (x * x + radius * radius).sqrt();
-                let h = (rho + radius / angle.0.cos()) / angle.0.tan();
-                let c = apex + axis * h - n * radius + u * x;
-                let dc = (u + axis * x / (angle.0.tan() * rho)) * (xs[1] - xs[0]);
-                let points =
-                    [a, b].map(|j| c + radius * if j == f { cone_normal(cone, c) } else { n });
+                let (c, dc) = if let Some((apex, axis, angle)) = cone {
+                    let rho = (x * x + radius * radius).sqrt();
+                    let h = (rho + radius / angle.0.cos()) / angle.0.tan();
+                    (
+                        apex + axis * h - n * radius + u * x,
+                        u + axis * x / (angle.0.tan() * rho),
+                    )
+                } else {
+                    torus_center(torus.unwrap(), n, u, radius, x)?
+                };
+                let dc = dc * (xs[1] - xs[0]);
+                let points = [a, b].map(|j| c + radius * if j == f { normal(c) } else { n });
                 let hints = [
                     surfaces[0].search_parameter(points[0], None, 100)?,
                     surfaces[1].search_parameter(points[1], None, 100)?,
@@ -826,9 +967,9 @@ pub(super) fn fillet(
         for (side, curve) in curves.iter_mut().enumerate() {
             let mut ts = [0., 1.];
             for (end, t) in ts.iter_mut().enumerate() {
-                if let Some(&terminal) = cone_terminals.get(&(k, end)) {
+                if let Some(&terminal) = planar_terminals.get(&(k, end)) {
                     let wall = data.planes[terminal].unwrap();
-                    *t = cone_curve_plane(curve, wall, *t)
+                    *t = contact_curve_plane(curve, wall, *t)
                         .ok_or_else(|| error(Code::OutsideNeighbour))?;
                     contacts[k][side][end].set_point(curve.subs(*t));
                 }
@@ -849,14 +990,14 @@ pub(super) fn fillet(
             ));
         }
         for (end, (p, q)) in contacts[k][0].iter().zip(&contacts[k][1]).enumerate() {
-            if let Some(&terminal) = cone_terminals.get(&(k, end)) {
+            if let Some(&terminal) = planar_terminals.get(&(k, end)) {
                 let arc = terminal_cross_arc(p, q, &surface, &shell[terminal].oriented_surface())
                     .ok_or_else(|| error(Code::BlendConstructionFailed))?;
                 cache_arc(&mut shared_arcs, &arc);
                 complex_ends.insert((k, end), Wire::from(vec![arc]));
             }
         }
-        cone_fits.insert(k, (surface, [lines[0].clone(), lines[1].clone()]));
+        curved_fits.insert(k, (surface, [lines[0].clone(), lines[1].clone()]));
     }
     let mut trims = Vec::new();
     let mut arcs: Vec<Option<[Wire; 2]>> = vec![None; data.original_edges.len()];
@@ -892,6 +1033,12 @@ pub(super) fn fillet(
             continue;
         }
         let [a, b] = data.sides[k];
+        let torus = [a, b].iter().find_map(|&f| data.torus_supports[f]);
+        let torus_rim = torus.filter(|(_, axis, _, _)| {
+            [a, b].iter().any(|&f| {
+                data.planes[f].is_some_and(|(n, _)| n.cross(*axis).magnitude() < TOLERANCE)
+            })
+        });
         let cone = [a, b].iter().find_map(|&f| data.cone_supports[f]);
         let cone_rim = cone.filter(|(_, axis, _)| {
             [a, b].iter().any(|&f| {
@@ -910,26 +1057,29 @@ pub(super) fn fillet(
             if let Some(((origin, _), (axis, _))) = sphere.zip(sphere_plane) {
                 circular_contact(edge, p, q, origin, axis)
                     .ok_or_else(|| error(Code::OutsideNeighbour))
-            } else if let Some((origin, axis, _)) = rim.or(cone_rim.map(|(p, a, _)| (p, a, 0.))) {
+            } else if let Some((origin, axis, _)) = rim
+                .or(cone_rim.map(|(p, a, _)| (p, a, 0.)))
+                .or(torus_rim.map(|(p, a, _, _)| (p, a, 0.)))
+            {
                 circular_contact(edge, p, q, origin, axis)
                     .ok_or_else(|| error(Code::OutsideNeighbour))
             } else {
                 make_line(p, q)
             }
         };
-        let [line_a, line_b] = if let Some((_, lines)) = cone_fits.get(&k) {
+        let [line_a, line_b] = if let Some((_, lines)) = curved_fits.get(&k) {
             lines.clone()
         } else {
             [make_contact(&a0, &a1)?, make_contact(&b0, &b1)?]
         };
         let [n, m] = [a, b].map(|f| data.planes[f].map_or(Vector3::zero(), |(n, _)| n));
-        let s = if cylinder.is_some() || sphere.is_some() || cone.is_some() {
+        let s = if cylinder.is_some() || sphere.is_some() || cone.is_some() || torus.is_some() {
             1.
         } else {
             sign(k)
         };
         let arc = |end: End, p: &Vertex, q: &Vertex| -> Edge {
-            if cylinder.is_some() || sphere.is_some() || cone.is_some() {
+            if cylinder.is_some() || sphere.is_some() || cone.is_some() || torus.is_some() {
                 return circle(p, q, end.center);
             }
             let from = end.center + s * radius * n;
@@ -957,9 +1107,11 @@ pub(super) fn fillet(
         let arc1 = complex_ends
             .remove(&(k, 1))
             .unwrap_or_else(|| vec![reuse_arc(&mut shared_arcs, arc(e1, &a1, &b1))].into());
-        let mut surface: Surface = if let Some((surface, _)) = cone_fits.remove(&k) {
+        let mut surface: Surface = if let Some((surface, _)) = curved_fits.remove(&k) {
             surface
-        } else if let Some((apex, axis, _)) = cone_rim {
+        } else if let Some((apex, axis, _)) =
+            cone_rim.or(torus_rim.map(|(p, a, _, _)| (p, a, Rad(0.))))
+        {
             Processor::new(RevolutedCurve::by_revolution(arc0[0].curve(), apex, axis)).into()
         } else if let Some((sphere, plane)) = sphere.zip(sphere_plane) {
             sphere_rim_surface(edge, sphere, plane, radius)
@@ -1004,6 +1156,9 @@ pub(super) fn fillet(
         }
         if let Some(cone) = cone {
             outward += cone_normal(cone, surface.subs(0.5, 0.5));
+        }
+        if let Some(torus) = torus {
+            outward += torus_normal(torus, surface.subs(0.5, 0.5));
         }
         if surface.normal(0.5, 0.5).dot(outward) < 0. {
             surface.invert();
@@ -1338,7 +1493,7 @@ fn cone_lateral((apex, axis, _): ConeSupport, n: Vector3, edge: &Edge) -> Option
     let lateral = delta - axis * delta.dot(axis) - n * delta.dot(n);
     (!lateral.so_small()).then(|| lateral.normalize())
 }
-fn cone_curve_plane(curve: &Curve, (n, d): (Vector3, f64), hint: f64) -> Option<f64> {
+fn contact_curve_plane(curve: &Curve, (n, d): (Vector3, f64), hint: f64) -> Option<f64> {
     let mut t = hint;
     for _ in 0..30 {
         let residual = n.dot(curve.subs(t).to_vec()) - d;
@@ -1356,4 +1511,50 @@ fn cone_curve_plane(curve: &Curve, (n, d): (Vector3, f64), hint: f64) -> Option<
         t = t.clamp(0., 1.);
     }
     None
+}
+
+type TorusSupport = (Point3, Vector3, f64, f64);
+fn torus_normal((origin, axis, major, _): TorusSupport, p: Point3) -> Vector3 {
+    let delta = p - origin;
+    let radial = delta - axis * delta.dot(axis);
+    (delta - radial.normalize() * major).normalize()
+}
+fn torus_station((origin, axis, major, minor): TorusSupport, point: Point3) -> f64 {
+    let d = point - origin;
+    let z = d.dot(axis);
+    let rho = (d - axis * z).magnitude();
+    (z / minor).atan2((rho - major) / minor)
+}
+fn torus_center(
+    torus: TorusSupport,
+    n: Vector3,
+    u: Vector3,
+    radius: f64,
+    theta: f64,
+) -> Option<(Point3, Vector3)> {
+    let (origin, axis, major, minor) = torus;
+    let q = minor - radius;
+    if q <= 0. {
+        return None;
+    }
+    let rho = major + q * theta.cos();
+    let square = rho * rho - radius * radius;
+    if square <= 0. || !square.is_finite() {
+        return None;
+    }
+    let x = square.sqrt();
+    let c = origin + u * x - n * radius + axis * q * theta.sin();
+    let dc = -u * (rho * q * theta.sin() / x) + axis * q * theta.cos();
+    Some((c, dc))
+}
+
+fn torus_angle(sine: f64, hint: f64) -> Option<f64> {
+    if !(-1. ..=1.).contains(&sine) {
+        return None;
+    }
+    let a = sine.asin();
+    [a, std::f64::consts::PI - a]
+        .into_iter()
+        .map(|a| a + std::f64::consts::TAU * ((hint - a) / std::f64::consts::TAU).round())
+        .min_by(|a, b| (a - hint).abs().total_cmp(&(b - hint).abs()))
 }

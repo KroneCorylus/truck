@@ -1,0 +1,206 @@
+{
+  "procedural_operations": 36,
+  "oversized_rejections": 6,
+  "mixed_sign_rejections": 1,
+  "normalized_imported_selections": 6,
+  "original_scale_replays": 3,
+  "independent_material": {
+    "rows": {
+      "0.03": {
+        "n128": [
+          2.0265388033870493,
+          2.0271738770837873,
+          1.5383464898666537
+        ],
+        "n256": [
+          2.0265388031152822,
+          2.027173877045031,
+          1.538346428764247
+        ]
+      },
+      "0.06": {
+        "n128": [
+          2.02290921228098,
+          2.025553492665322,
+          1.5332824938454244
+        ],
+        "n256": [
+          2.022909211218013,
+          2.025553492505257,
+          1.5332824447959748
+        ]
+      },
+      "0.1": {
+        "n128": [
+          2.0138943260273874,
+          2.0216724403712165,
+          1.5198481248835711
+        ],
+        "n256": [
+          2.013894323167084,
+          2.0216724399060886,
+          1.5198480862125514
+        ]
+      }
+    },
+    "maximum_difference": 6.110240668988354e-08
+  },
+  "quadrature_maximum_difference": 6.110240668988354e-08,
+  "quadrature_256_512_difference": 4.281188736854347e-09,
+  "native_comparisons": {
+    "E6": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 2013887.0915045892,
+      "truck_volume": 2013894.3201573316,
+      "native_to_truck_max_distance": 0.0976313291797221,
+      "native_to_truck_samples": 1864,
+      "truck_to_native_max_distance": 0.09921255393618769,
+      "truck_to_native_samples": 1799,
+      "native_tolerances": {
+        "face": 0.0001,
+        "edge": 0.0001,
+        "vertex": 0.0001
+      },
+      "truck_step_tolerances": {
+        "face": 1e-07,
+        "edge": 1.285046307934928e-05,
+        "vertex": 1.285046307934928e-05
+      }
+    },
+    "E8": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 2021672.092329819,
+      "truck_volume": 2021672.4373263775,
+      "native_to_truck_max_distance": 0.012280920793549565,
+      "native_to_truck_samples": 1884,
+      "truck_to_native_max_distance": 0.012248305408605768,
+      "truck_to_native_samples": 1809,
+      "native_tolerances": {
+        "face": 0.0001,
+        "edge": 0.0001,
+        "vertex": 0.0001
+      },
+      "truck_step_tolerances": {
+        "face": 1e-07,
+        "edge": 7.949278144750052e-06,
+        "vertex": 7.949278144750052e-06
+      }
+    },
+    "F3": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 1519836.2783114775,
+      "truck_volume": 1519848.0682305584,
+      "native_to_truck_max_distance": 0.14736762621609242,
+      "native_to_truck_samples": 1801,
+      "truck_to_native_max_distance": 0.14585661620481064,
+      "truck_to_native_samples": 1691,
+      "native_tolerances": {
+        "face": 0.0001,
+        "edge": 0.0001,
+        "vertex": 0.0001
+      },
+      "truck_step_tolerances": {
+        "face": 1e-07,
+        "edge": 1.2970369163940856e-05,
+        "vertex": 1.2970369163940856e-05
+      }
+    }
+  },
+  "cone_prototype_preservation": [
+    {
+      "case": "C2",
+      "truck_result_exact": true,
+      "native_comparison_exact": true
+    },
+    {
+      "case": "C6",
+      "truck_result_exact": true,
+      "native_comparison_exact": true
+    },
+    {
+      "case": "C8",
+      "truck_result_exact": true,
+      "native_comparison_exact": true
+    },
+    {
+      "case": "D1",
+      "truck_result_exact": true,
+      "native_comparison_exact": true
+    }
+  ],
+  "archive_sha256": "fb76c63395724ae041b9e9a403c36b1ee9e3699f3f6e78a72c84a89ecfe995c5",
+  "archive_members": 56,
+  "member_sha256": {
+    "probe/E6/001.input.step": "508181551ee211484579cf7042175d74d4e01547d206a5799eb1d714f5db428d",
+    "probe/E6/001.input.json": "7be3327e3ddedc934c1c09b40d864220c7f9664c136118f72cdc954b2c18720d",
+    "probe/E6/001.result.brep": "aebd1fb6a5f2604432c42208f46b614426e3313c6774ed854fe4f06528477ed5",
+    "probe/E6/001.result.json": "741051764bf91526c7ad20733c8b8a24f71ce0309da9ea3690762650b8d49894",
+    "probe/E6/001.truck.log": "200c049ed4b2c1a0f7d2c386d5c64e20dbe04f4dcceba499c679abbf10095c92",
+    "probe/E6/001.truck.step": "6ecae51c996792328a90116951597ccc4421a264e3d5d16c60d76e4f96e91ed2",
+    "probe/E6/001.truck.json": "0da85156420008176c06dd1f39c3012dc3471d5597b9e5925e25cb780175f0cd",
+    "probe/E6/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "probe/E6/001.comparison.json": "d5a7866057cf01335562758beadcb446965893048b45a2c447f03704cf94d34a",
+    "probe/E8/001.input.step": "ec95175d1bbd3fa8755379c049d7035bec279ffdc42e498345813ba6c1e186e7",
+    "probe/E8/001.input.json": "783d2187d6584e80d001dafefb56956ad1366ac5875ed3dfbdb4ef607ac98ce5",
+    "probe/E8/001.result.brep": "f0dbd0e1604a5029cfdea800fe5b493455b77f08c56abcbb32ac53ec4ad22b5b",
+    "probe/E8/001.result.json": "6e34bf98c3ec5283f731596e3349d8278ab5293d9dc25630c969717346c5924a",
+    "probe/E8/001.truck.log": "4bc5ae45de9c3c6f9a4185e319ca698bee251108f492a55705ec510f64aee0f8",
+    "probe/E8/001.truck.step": "a4e0c69bc602431698bff50ac922ab446d5cdb706754b785886275efcd6234de",
+    "probe/E8/001.truck.json": "8211d2bafc3875a78c3c7e58e43635f2ba7f9aac667c91f4a6d0b1db91c67f15",
+    "probe/E8/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "probe/E8/001.comparison.json": "9512fb19f84ab4e538292418b7bb79d37a6a99cc368d09ff3a088636f5eeaf57",
+    "probe/F3/001.input.step": "2f3ca1d1bc3ca2861b4b4c8650be8b6e1d27dde8d493f32d0666be719f956f93",
+    "probe/F3/001.input.json": "a126573fc23d798021c91eb17056428447b7c3d4c9277fdd84c6818293eebfcf",
+    "probe/F3/001.result.brep": "3227e543e0a9a66324f2aa6703817faa9a60e37b4b70f108d8a99cb46ba082f5",
+    "probe/F3/001.result.json": "401fc241b7e4c17fe0e70921bee1e587e28d20fdfaed9ffeba382445886ca622",
+    "probe/F3/001.truck.log": "a61b0f9bf1101260ce9c085883216ebd084010d16931c898fe3ea7d31f934e72",
+    "probe/F3/001.truck.step": "755cd2ecb2b3cfc9441ee7a0ab3a33d3d4274bc7912652b040bf5c14870c5bb6",
+    "probe/F3/001.truck.json": "18a43fdcb5b90c8747fc2ed0e66881e37595769a1c94804428d9d98baa909c99",
+    "probe/F3/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "probe/F3/001.comparison.json": "6176aa68dfac8f31c75f12a67641075ba24c8b0aeb41e4ef3955cec4ec2bc9da",
+    "volume/torus-corner-volume-nonconvex-128.txt": "fd5ff4ed69b659064253eb54f95356ca74042f61d14b2496b260d9a854479ed4",
+    "volume/torus-corner-volume-nonconvex-256.txt": "4633ae4072e342b582a9fd47053668c845c408c4ec6e728e0dcbf9ee6ceeb86c",
+    "volume/torus-corner-volume-nonconvex-128-r03.txt": "52a9f615ea07cb84a4e87350b2966204a65b1ddd7e173171f54a93dbe924e585",
+    "volume/torus-corner-volume-nonconvex-256-r03.txt": "84dfa4999f285f592ebfb24b82144a8350a6e1be1d0fb4bf9987f15866abd6c2",
+    "volume/torus-corner-volume-nonconvex-128-r06.txt": "27f7a3f1894c456aa92fc27d3901e9f95e204875cf139c3f516e9b0c8361541a",
+    "volume/torus-corner-volume-nonconvex-256-r06.txt": "0a09ceea26d44b868efa243edcae18bdeb43b180cd834d8978e7ad59b1e834ec",
+    "volume/torus-corner-volume-nonconvex-512.txt": "bdd2133fccb1a0ea8f75f8c05ad3ca2be0ff35b86a5e1a239b41496084b4287b",
+    "volume/torus-corner-volume.cpp": "19a69aceedf42c85ac9678cbb7d1463fee2d9312702c71c60c5497d541bf598d",
+    "volume/controls.json": "90d3c9d80a576a2861d08d5125102dc08f959470d2f9f4cee4c5965247ffcbe7",
+    "helpers/prove-torus-corner-parent.py": "62d1f767e3177a1765f03acd6866d0d228ee1232217a7d3b46eabbd758f71523",
+    "helpers/validate-torus-corners.py": "4b4acbe5782bfd7ffd9fc64f0dc50a5b3f3773bd85edae7cb8fd3538c317d901",
+    "helpers/verify-torus-corner-replays.py": "9230254d44a3e8c26fbc64a6eba6575bac241faa16d2a3b9d81217c2ed06150c",
+    "helpers/package-torus-corner-proof.py": "cbd2110669636624c24800eb18eeb5743b8212d16e28069552dfccab47bbf0cd",
+    "parent/truck-shapeops/tests/torus_corner_junctions.rs": "9512749289e217f29b110cc04b450f0e3e6d7e13ce05efddff49470953ce0cdc",
+    "parent/truck-shapeops/examples/replay_occt_blend.rs": "8f2ed10627325ca084fde64598a4dddaf8866f354223177ff18b06a953360eea",
+    "parent/truck-shapeops/tests/fixtures/torus-corner-junctions/E6.input.step": "138bb42e1e467270aac8918778cf81f4137fa5f6665a7a2901bf3186cc4cffa4",
+    "parent/truck-shapeops/tests/fixtures/torus-corner-junctions/E6.input.json": "7be3327e3ddedc934c1c09b40d864220c7f9664c136118f72cdc954b2c18720d",
+    "parent/truck-shapeops/tests/fixtures/torus-corner-junctions/E8.input.step": "138bb42e1e467270aac8918778cf81f4137fa5f6665a7a2901bf3186cc4cffa4",
+    "parent/truck-shapeops/tests/fixtures/torus-corner-junctions/E8.input.json": "783d2187d6584e80d001dafefb56956ad1366ac5875ed3dfbdb4ef607ac98ce5",
+    "parent/truck-shapeops/tests/fixtures/torus-corner-junctions/F3.input.step": "071122c70c88c4210e2d2b970cb7d801345eb88f541342e70dcbe2c94a246df7",
+    "parent/truck-shapeops/tests/fixtures/torus-corner-junctions/F3.input.json": "a126573fc23d798021c91eb17056428447b7c3d4c9277fdd84c6818293eebfcf",
+    "parent/truck-shapeops/tests/fixtures/torus-corner-junctions/README.md": "a30a9a943b6b0a6be4414d68958fa8ef1b9a8b082d3980764669cba3e8558ea7",
+    "diagnostics/cone-preservation.json": "b926cd21b3400b9a7ed78bff23f18b44d4184101c457e086de7a94e1f77a3e32",
+    "diagnostics/torus-corner-design.txt": "faa387da354bd2046edcf796ada793ebf0264f340b06839306dedcf8dca1f703",
+    "diagnostics/E6.truck-surfaces.txt": "a1c42dbbc30e06d307549a280c65208e05e65497784702e61b09f75690aa8c7a",
+    "diagnostics/E8.truck-surfaces.txt": "7e7d1a08c2c5d274d67feda91c6b5b67e786a4c4435557d64690abd7d7ee86fa",
+    "diagnostics/F1.truck-surfaces.txt": "9817cb973b24d41e096ccf65d80aff80757485a08f4c79df862c27033b20dcf1",
+    "diagnostics/F3.truck-surfaces.txt": "4067bce0e97c9af8fafa07cdf984cd01650ae533c6d00a244ca1c2bb737c531a",
+    "helpers/control-commands.json": "2e2fd09fdb57bfbe80579a632af0d276a77ab690ceb54551edc466966a783f81"
+  }
+}
