@@ -3,7 +3,7 @@
     "title": "Fillet and chamfer feature parity audit",
     "baseline": "OCCT V7_9_3 source inventory plus the recorded Truck/Pieza revisions. Includes 3D, 2D, related workflows and all textual candidates under the discovery rules.",
     "meaning_of_all": "Every dedicated test-grid entry, matching registered test/helper, discovered blend command and retained reference in this pinned checkout. This is not a claim about all mathematical configurations or current/future OCCT releases.",
-    "execution": "All 396 native cases pass across 648 captured operations. 463 constructions (+1) and 429 limited comparison passes (+0). All 462 previous successful result/comparison records are exactly unchanged, as are every input task, native reference and selection scope. 130 of 559 positive solid operations remain unresolved; 88 inputs have no solid and one rejection matches native.",
+    "execution": "All 396 native cases pass across 648 captured operations. 469 constructions (+6) and 435 limited comparison passes (+6). All 463 prior successes retain every validation result and sampled distance. 460 result/comparison records are exactly unchanged. Three E5 records have numerical volume changes: two at roundoff level, and the angle case by 2.38e-7 in STEP volume. Direct before/after sampled distance is below 6.7e-6; repeated outputs agree below 3.6e-10. Input tasks, native references and selection scopes are unchanged. 124 of 559 positive solid operations remain unresolved; 88 inputs have no solid and one rejection matches native.",
     "mapping": "Capability assessments describe observable outcomes supported or restricted by reviewed source evidence. Per-case tags and links are automated hints; they do not prove Truck handles that fixture.",
     "objective": "Achieve at least OCCT-level fillet/chamfer capabilities and robustness for equivalent modeling tasks in Truck/Pieza.",
     "equivalence": "Judge the requested geometry, dimensions, validity, editing behavior and practical performance. Different APIs, algorithms, languages, surface representations and internal operation sequences are acceptable. Missing a corresponding OCCT method is not evidence of a feature gap.",
@@ -2272,6 +2272,12 @@
           "path": "truck-benchmarks/results/2026-10-22-chamfer-transitions/REPORT.md",
           "find": "# Chamfer transition boundary orientation",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-22-open-chamfer-terminals/REPORT.md",
+          "find": "# Open chamfer contacts and cylindrical terminals",
+          "role": "test"
         }
       ],
       "required_outcome": "Terminate a blend correctly against oblique end faces while preserving the requested radius and a valid boundary.",
@@ -2286,7 +2292,8 @@
         "At da62f251, planar multi-edge fillet corners meet curved terminal faces. Two identical-source parent-failing regressions; 32 geometric variants, eight rejections, 5168 tangent-normal pairs, eight imported selections at two STEP budgets. 454 shapeops/119 STEP/67 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 459/426: seven new limited passes, all 452 prior successes exactly unchanged. This covers curved terminal cuts, not arbitrary curved-support corner filling.",
         "At aa770b1f, sphere-pole terminal contacts use an analytic fallback after numerical intersection fails. Two identical-source parent-failing regressions; eight geometric variants, two rejections, 264 support samples and two imported selections at two STEP budgets. 456 shapeops/119 STEP/68 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 460/427: E2 gains a limited pass; all 459 previous successes retain their checks, with 458 exactly unchanged and improved E1 sampled distance/material.",
         "At 4ffc8523, outer-cylinder/cap/radial-plane three-edge corners use exact sphere, cylinder and torus patches. Two identical-source parent-failing regressions; 24 variants, four rejections, 3672 tangent-normal pairs and four imported selections. 458 shapeops/119 STEP/69 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 462/429: B3 and B7 gain limited passes; all 460 prior successes are exactly unchanged.",
-        "At ee89b042, unequal convex chamfer transition triangles oppose surviving adjacent boundaries. Two identical-source parent-failing regressions; 64 procedural variants with independent material and two native selection orders. 459 shapeops/119 STEP/70 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 463/429; A1 constructs but retains a corner-geometry discrepancy; all 462 prior successes exactly unchanged."
+        "At ee89b042, unequal convex chamfer transition triangles oppose surviving adjacent boundaries. Two identical-source parent-failing regressions; 64 procedural variants with independent material and two native selection orders. 459 shapeops/119 STEP/70 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 463/429; A1 constructs but retains a corner-geometry discrepancy; all 462 prior successes exactly unchanged.",
+        "At cb0ae1b7, open cylinder/plane contacts continue to curved terminal boundaries, and changed cylindrical supports retain the displaced boundary in their parameter domain. Two identical-source parent-failing regressions; 24 procedural variants, two rejections and six imported selections. 461 shapeops/119 STEP/71 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 469/435: C3 combined001 and sequence002 gain six limited passes. All 463 prior successes retain their checks; 460 result/comparison records are exactly unchanged, with small E5 volume differences explicitly archived."
       ]
     },
     {
@@ -2420,6 +2427,12 @@
           "path": "truck-benchmarks/results/2026-10-22-chamfer-transitions/REPORT.md",
           "find": "# Chamfer transition boundary orientation",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-22-open-chamfer-terminals/REPORT.md",
+          "find": "# Open chamfer contacts and cylindrical terminals",
+          "role": "test"
         }
       ],
       "required_outcome": "Join three equal-radius, same-concavity rounds at a valid corner over general planar support angles.",
@@ -2427,7 +2440,8 @@
         "At da62f251, planar multi-edge fillet corners meet curved terminal faces. Two identical-source parent-failing regressions; 32 geometric variants, eight rejections, 5168 tangent-normal pairs, eight imported selections at two STEP budgets. 454 shapeops/119 STEP/67 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 459/426: seven new limited passes, all 452 prior successes exactly unchanged. This covers curved terminal cuts, not arbitrary curved-support corner filling.",
         "At aa770b1f, sphere-pole terminal contacts use an analytic fallback after numerical intersection fails. Two identical-source parent-failing regressions; eight geometric variants, two rejections, 264 support samples and two imported selections at two STEP budgets. 456 shapeops/119 STEP/68 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 460/427: E2 gains a limited pass; all 459 previous successes retain their checks, with 458 exactly unchanged and improved E1 sampled distance/material.",
         "At 4ffc8523, outer-cylinder/cap/radial-plane three-edge corners use exact sphere, cylinder and torus patches. Two identical-source parent-failing regressions; 24 variants, four rejections, 3672 tangent-normal pairs and four imported selections. 458 shapeops/119 STEP/69 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 462/429: B3 and B7 gain limited passes; all 460 prior successes are exactly unchanged.",
-        "At ee89b042, unequal convex chamfer transition triangles oppose surviving adjacent boundaries. Two identical-source parent-failing regressions; 64 procedural variants with independent material and two native selection orders. 459 shapeops/119 STEP/70 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 463/429; A1 constructs but retains a corner-geometry discrepancy; all 462 prior successes exactly unchanged."
+        "At ee89b042, unequal convex chamfer transition triangles oppose surviving adjacent boundaries. Two identical-source parent-failing regressions; 64 procedural variants with independent material and two native selection orders. 459 shapeops/119 STEP/70 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 463/429; A1 constructs but retains a corner-geometry discrepancy; all 462 prior successes exactly unchanged.",
+        "At cb0ae1b7, open cylinder/plane contacts continue to curved terminal boundaries, and changed cylindrical supports retain the displaced boundary in their parameter domain. Two identical-source parent-failing regressions; 24 procedural variants, two rejections and six imported selections. 461 shapeops/119 STEP/71 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 469/435: C3 combined001 and sequence002 gain six limited passes. All 463 prior successes retain their checks; 460 result/comparison records are exactly unchanged, with small E5 volume differences explicitly archived."
       ]
     },
     {
@@ -2533,6 +2547,12 @@
           "path": "truck-benchmarks/results/2026-10-22-chamfer-transitions/REPORT.md",
           "find": "# Chamfer transition boundary orientation",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-22-open-chamfer-terminals/REPORT.md",
+          "find": "# Open chamfer contacts and cylindrical terminals",
+          "role": "test"
         }
       ],
       "required_outcome": "Construct valid transitions where convex and concave blends meet, including oblique support configurations.",
@@ -2540,7 +2560,8 @@
         "At da62f251, planar multi-edge fillet corners meet curved terminal faces. Two identical-source parent-failing regressions; 32 geometric variants, eight rejections, 5168 tangent-normal pairs, eight imported selections at two STEP budgets. 454 shapeops/119 STEP/67 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 459/426: seven new limited passes, all 452 prior successes exactly unchanged. This covers curved terminal cuts, not arbitrary curved-support corner filling.",
         "At aa770b1f, sphere-pole terminal contacts use an analytic fallback after numerical intersection fails. Two identical-source parent-failing regressions; eight geometric variants, two rejections, 264 support samples and two imported selections at two STEP budgets. 456 shapeops/119 STEP/68 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 460/427: E2 gains a limited pass; all 459 previous successes retain their checks, with 458 exactly unchanged and improved E1 sampled distance/material.",
         "At 4ffc8523, outer-cylinder/cap/radial-plane three-edge corners use exact sphere, cylinder and torus patches. Two identical-source parent-failing regressions; 24 variants, four rejections, 3672 tangent-normal pairs and four imported selections. 458 shapeops/119 STEP/69 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 462/429: B3 and B7 gain limited passes; all 460 prior successes are exactly unchanged.",
-        "At ee89b042, unequal convex chamfer transition triangles oppose surviving adjacent boundaries. Two identical-source parent-failing regressions; 64 procedural variants with independent material and two native selection orders. 459 shapeops/119 STEP/70 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 463/429; A1 constructs but retains a corner-geometry discrepancy; all 462 prior successes exactly unchanged."
+        "At ee89b042, unequal convex chamfer transition triangles oppose surviving adjacent boundaries. Two identical-source parent-failing regressions; 64 procedural variants with independent material and two native selection orders. 459 shapeops/119 STEP/70 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 463/429; A1 constructs but retains a corner-geometry discrepancy; all 462 prior successes exactly unchanged.",
+        "At cb0ae1b7, open cylinder/plane contacts continue to curved terminal boundaries, and changed cylindrical supports retain the displaced boundary in their parameter domain. Two identical-source parent-failing regressions; 24 procedural variants, two rejections and six imported selections. 461 shapeops/119 STEP/71 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 469/435: C3 combined001 and sequence002 gain six limited passes. All 463 prior successes retain their checks; 460 result/comparison records are exactly unchanged, with small E5 volume differences explicitly archived."
       ]
     },
     {
@@ -2679,6 +2700,12 @@
           "path": "truck-benchmarks/results/2026-10-22-chamfer-transitions/REPORT.md",
           "find": "# Chamfer transition boundary orientation",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-22-open-chamfer-terminals/REPORT.md",
+          "find": "# Open chamfer contacts and cylindrical terminals",
+          "role": "test"
         }
       ],
       "required_outcome": "Close multi-blend corners on general curved supports with valid contact and continuity, independent of patch construction method.",
@@ -2686,7 +2713,8 @@
         "At da62f251, planar multi-edge fillet corners meet curved terminal faces. Two identical-source parent-failing regressions; 32 geometric variants, eight rejections, 5168 tangent-normal pairs, eight imported selections at two STEP budgets. 454 shapeops/119 STEP/67 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 459/426: seven new limited passes, all 452 prior successes exactly unchanged. This covers curved terminal cuts, not arbitrary curved-support corner filling.",
         "At aa770b1f, sphere-pole terminal contacts use an analytic fallback after numerical intersection fails. Two identical-source parent-failing regressions; eight geometric variants, two rejections, 264 support samples and two imported selections at two STEP budgets. 456 shapeops/119 STEP/68 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 460/427: E2 gains a limited pass; all 459 previous successes retain their checks, with 458 exactly unchanged and improved E1 sampled distance/material.",
         "At 4ffc8523, outer-cylinder/cap/radial-plane three-edge corners use exact sphere, cylinder and torus patches. Two identical-source parent-failing regressions; 24 variants, four rejections, 3672 tangent-normal pairs and four imported selections. 458 shapeops/119 STEP/69 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 462/429: B3 and B7 gain limited passes; all 460 prior successes are exactly unchanged.",
-        "At ee89b042, unequal convex chamfer transition triangles oppose surviving adjacent boundaries. Two identical-source parent-failing regressions; 64 procedural variants with independent material and two native selection orders. 459 shapeops/119 STEP/70 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 463/429; A1 constructs but retains a corner-geometry discrepancy; all 462 prior successes exactly unchanged."
+        "At ee89b042, unequal convex chamfer transition triangles oppose surviving adjacent boundaries. Two identical-source parent-failing regressions; 64 procedural variants with independent material and two native selection orders. 459 shapeops/119 STEP/70 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 463/429; A1 constructs but retains a corner-geometry discrepancy; all 462 prior successes exactly unchanged.",
+        "At cb0ae1b7, open cylinder/plane contacts continue to curved terminal boundaries, and changed cylindrical supports retain the displaced boundary in their parameter domain. Two identical-source parent-failing regressions; 24 procedural variants, two rejections and six imported selections. 461 shapeops/119 STEP/71 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 469/435: C3 combined001 and sequence002 gain six limited passes. All 463 prior successes retain their checks; 460 result/comparison records are exactly unchanged, with small E5 volume differences explicitly archived."
       ]
     },
     {
@@ -4423,6 +4451,12 @@
           "path": "truck-benchmarks/results/2026-10-22-chamfer-transitions/REPORT.md",
           "find": "# Chamfer transition boundary orientation",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-22-open-chamfer-terminals/REPORT.md",
+          "find": "# Open chamfer contacts and cylindrical terminals",
+          "role": "test"
         }
       ],
       "required_outcome": "Deliver blend results usable for closed meshing, STEP interchange and further modeling while preserving dimensions and validity.",
@@ -4476,7 +4510,8 @@
         "At da62f251, planar multi-edge fillet corners meet curved terminal faces. Two identical-source parent-failing regressions; 32 geometric variants, eight rejections, 5168 tangent-normal pairs, eight imported selections at two STEP budgets. 454 shapeops/119 STEP/67 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 459/426: seven new limited passes, all 452 prior successes exactly unchanged. This covers curved terminal cuts, not arbitrary curved-support corner filling.",
         "At aa770b1f, sphere-pole terminal contacts use an analytic fallback after numerical intersection fails. Two identical-source parent-failing regressions; eight geometric variants, two rejections, 264 support samples and two imported selections at two STEP budgets. 456 shapeops/119 STEP/68 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 460/427: E2 gains a limited pass; all 459 previous successes retain their checks, with 458 exactly unchanged and improved E1 sampled distance/material.",
         "At 4ffc8523, outer-cylinder/cap/radial-plane three-edge corners use exact sphere, cylinder and torus patches. Two identical-source parent-failing regressions; 24 variants, four rejections, 3672 tangent-normal pairs and four imported selections. 458 shapeops/119 STEP/69 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 462/429: B3 and B7 gain limited passes; all 460 prior successes are exactly unchanged.",
-        "At ee89b042, unequal convex chamfer transition triangles oppose surviving adjacent boundaries. Two identical-source parent-failing regressions; 64 procedural variants with independent material and two native selection orders. 459 shapeops/119 STEP/70 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 463/429; A1 constructs but retains a corner-geometry discrepancy; all 462 prior successes exactly unchanged."
+        "At ee89b042, unequal convex chamfer transition triangles oppose surviving adjacent boundaries. Two identical-source parent-failing regressions; 64 procedural variants with independent material and two native selection orders. 459 shapeops/119 STEP/70 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 463/429; A1 constructs but retains a corner-geometry discrepancy; all 462 prior successes exactly unchanged.",
+        "At cb0ae1b7, open cylinder/plane contacts continue to curved terminal boundaries, and changed cylindrical supports retain the displaced boundary in their parameter domain. Two identical-source parent-failing regressions; 24 procedural variants, two rejections and six imported selections. 461 shapeops/119 STEP/71 replay/13 capture, Clippy/smoke and native checks pass. Clean capture 469/435: C3 combined001 and sequence002 gain six limited passes. All 463 prior successes retain their checks; 460 result/comparison records are exactly unchanged, with small E5 volume differences explicitly archived."
       ]
     },
     {

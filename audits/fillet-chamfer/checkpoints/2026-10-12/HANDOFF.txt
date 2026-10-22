@@ -1,6 +1,6 @@
 LATEST CHECKPOINT — 2026-10-22
-Read ../2026-10-22-chamfer-transitions/HANDOFF.txt and report.html.
-Implementation ee89b042 repairs chamfer transition orientation. 463 constructions/429 limited passes; 130 positive solid operations unresolved. Use target/occt-distance-tree-plugin.
+Read ../2026-10-22-open-chamfer-terminals/HANDOFF.txt and report.html.
+Implementation cb0ae1b7 continues open chamfer contacts to curved terminals. 469 constructions/435 limited passes; 124 positive solid operations unresolved. Use target/occt-distance-tree-plugin.
 
 HISTORICAL HANDOFF FOLLOWS
 
