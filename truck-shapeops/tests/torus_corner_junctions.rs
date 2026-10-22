@@ -264,7 +264,7 @@ fn torus_corners_preserve_radius_tangency_and_material() {
 }
 
 #[test]
-fn torus_corner_collisions_preserve_input() {
+fn torus_corner_collisions_and_mixed_round_preserve_input() {
     for kind in 0..3 {
         let (input, selected) = sector(kind);
         let before = serde_json::to_string(&input.compress()).unwrap();
@@ -275,6 +275,9 @@ fn torus_corner_collisions_preserve_input() {
     }
     let (input, selected) = sector(3);
     let before = serde_json::to_string(&input.compress()).unwrap();
-    assert!(try_fillet_solid_edges(&input, &selected, 0.1, 0.001).is_err());
+    let result = try_fillet_solid_edges(&input, &selected, 0.1, 0.001).unwrap();
+    assert_eq!(result.generated_faces.len(), 4);
+    common::assert_solid(&result.solid, 1.535_440_006_371_804, &[0], 0.0003);
+    common::blend::assert_step(&result.solid, 1.535_440_006_371_804, 0.0003);
     assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
 }

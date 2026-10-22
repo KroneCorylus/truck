@@ -6,6 +6,14 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Round mixed curved corners with one concave rim and two convex edges sharing a
+  planar wall. Continue internal open-chain contacts when the original trim fails,
+  then retain final geometry and trim guards. Independent radius, tangency,
+  material and STEP controls cover toroidal F1 and cylindrical H7 selections.
+  F1's former unsupported-case assertion now checks the supported solid; all
+  oversized rejection controls remain. H7's native comparison discrepancy stays
+  explicitly recorded.
+
 - Round three-edge convex corners on outward toroidal supports with planar caps and
   radial walls. Offset torus intersections locate the corner sphere; fitted rolling
   contacts preserve their meridian branch. Independent material, radius, tangency

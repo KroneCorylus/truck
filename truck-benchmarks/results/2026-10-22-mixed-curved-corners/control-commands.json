@@ -1,0 +1,12 @@
+{
+  "volume_compile": [
+    "g++",
+    "-O3",
+    "-std=c++17",
+    "SOURCE.cpp",
+    "-o",
+    "PROGRAM"
+  ],
+  "volume_run": "PROGRAM N RADIUS; N=128,256 and RADIUS=.03,.06,.1",
+  "note": "Independent boundary flux F=(0,y,0), divergence1. No CAD/native/mesh dependencies. Failed coarse-fit H7 G1 controls retained; composed fits tightened without weakening assertions. Canonical native statuses and thresholds remain unchanged."
+}

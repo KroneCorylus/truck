@@ -181,7 +181,10 @@ pub fn try_fillet_solid_along_wire<R: ScalarFunctionD1>(
 /// Outward toroidal supports with perpendicular caps and radial walls admit the same
 /// three-edge convex corner construction. The offset torus locates the sphere and
 /// fitted rolling contacts preserve the meridian branch, including nonconvex profiles.
-/// Mixed convex/concave torus corners remain outside this construction.
+/// A trivalent corner with one concave rim and two convex edges sharing a planar
+/// wall can instead round the concave rim first, then its three-edge tangent chain.
+/// Internal open-chain contacts continue across the common support when needed;
+/// remote terminals and final trim checks still bound the construction.
 /// Straight edges between planes or a plane and an axial cylindrical ruling also support
 /// curved end faces. Connected channel rims meet at exact intersections of the blend
 /// surfaces, including elliptical miters between equal-radius cylinders. Contacts may
@@ -277,6 +280,9 @@ pub fn try_fillet_solid_edges(
                 error.code,
                 Code::UnsupportedGeometry | Code::UnsupportedTopology | Code::NonPlanarFace
             ) {
+                if let Some(result) = mixed_curved_corner(solid, index, edges, radius, tol) {
+                    return Ok(result);
+                }
                 if let Some(result) = separate_contours(solid, index, edges, radius, tol) {
                     return Ok(result);
                 }
@@ -1142,6 +1148,145 @@ fn validate_selection(
         shell = Some(index);
     }
     shell.ok_or_else(|| Diagnostic::new(Code::EmptySelection, operation, "validate_input"))
+}
+
+fn mixed_curved_corner(
+    solid: &Solid,
+    index: usize,
+    selected: &[EdgeID],
+    radius: f64,
+    tol: f64,
+) -> Option<BlendResult> {
+    use truck_modeling::*;
+    if selected.len() != 3 {
+        return None;
+    }
+    let fit_tol = tol / 100.;
+    let shell = &solid.boundaries()[index];
+    let mut remaining: HashSet<_> = selected.iter().copied().collect();
+    let edges: Vec<_> = shell
+        .edge_iter()
+        .filter(|e| remaining.remove(&e.id()))
+        .collect();
+    if edges.len() != 3 {
+        return None;
+    }
+    let common = [edges[0].front(), edges[0].back()]
+        .into_iter()
+        .find(|v| edges.iter().all(|e| e.front() == *v || e.back() == *v))?;
+    let mut incident = HashSet::default();
+    for edge in shell
+        .edge_iter()
+        .filter(|e| e.front() == common || e.back() == common)
+    {
+        incident.insert(edge.id());
+    }
+    if incident.len() != 3 {
+        return None;
+    }
+    let mut concave = None;
+    for (i, edge) in edges.iter().enumerate() {
+        let edge = edge.absolute_clone();
+        let curve = edge.curve();
+        let (a, b) = curve.range_tuple();
+        let mut sign = 0.;
+        for j in 0..=16 {
+            let t = a + (b - a) * (j as f64 + 0.5) / 17.;
+            let p = curve.subs(t);
+            let mut normals = [None, None];
+            for face in shell.iter() {
+                if let Some(e) = face.edge_iter().find(|e| e.id() == edge.id()) {
+                    let surface = face.oriented_surface();
+                    let (u, v) = surface.search_parameter(p, None, 100)?;
+                    let side = usize::from(!e.orientation());
+                    if normals[side]
+                        .replace(surface.normal(u, v).normalize())
+                        .is_some()
+                    {
+                        return None;
+                    }
+                }
+            }
+            let d = normals[0]?.cross(normals[1]?).dot(curve.der(t).normalize());
+            if !d.is_finite() || d.abs() < 1e-7 || (sign != 0. && sign * d < 0.) {
+                return None;
+            }
+            sign = d.signum();
+        }
+        if sign < 0. && concave.replace(i).is_some() {
+            return None;
+        }
+    }
+    let concave = concave?;
+    let convex: Vec<_> = edges
+        .iter()
+        .enumerate()
+        .filter(|(i, _)| *i != concave)
+        .map(|(_, e)| e)
+        .collect();
+    let wall = shell.iter().position(|f| {
+        matches!(f.surface(), Surface::Plane(_))
+            && convex
+                .iter()
+                .all(|e| f.edge_iter().any(|q| q.id() == e.id()))
+    })?;
+    if shell[wall]
+        .edge_iter()
+        .any(|e| e.id() == edges[concave].id())
+    {
+        return None;
+    }
+    let ends: Vec<_> = convex
+        .iter()
+        .map(|e| {
+            if e.front() == common {
+                e.back().clone()
+            } else {
+                e.front().clone()
+            }
+        })
+        .collect();
+    let first = try_fillet_solid_along_wire(
+        solid,
+        &Wire::from(vec![edges[concave].clone()]),
+        radius,
+        fit_tol,
+    )
+    .ok()?;
+    if first.generated_faces.len() != 1 {
+        return None;
+    }
+    let middle: HashSet<_> = first.generated_faces[0]
+        .edge_iter()
+        .map(|e| e.id())
+        .collect();
+    let mut path = None;
+    for boundary in first.solid.boundaries()[index][wall].boundaries() {
+        for wire in [boundary.clone(), boundary.inverse()] {
+            let Some(start) = wire.iter().position(|e| e.front() == &ends[0]) else {
+                continue;
+            };
+            let mut candidate = Wire::new();
+            for j in 0..wire.len() {
+                let edge = wire[(start + j) % wire.len()].clone();
+                let done = edge.back() == &ends[1];
+                candidate.push_back(edge);
+                if done {
+                    break;
+                }
+            }
+            if candidate.len() == 3
+                && candidate.back_vertex() == Some(&ends[1])
+                && middle.contains(&candidate[1].id())
+                && super::along_wire::is_tangent_continuous(&candidate, false)
+                && path.replace(candidate).is_some()
+            {
+                return None;
+            }
+        }
+    }
+    let second = try_fillet_solid_along_wire(&first.solid, &path?, radius, fit_tol).ok()?;
+    finish(solid, index, second.solid.boundaries()[index].clone(), tol).ok()
 }
 
 #[cfg(test)]

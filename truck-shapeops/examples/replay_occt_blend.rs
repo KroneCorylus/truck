@@ -4950,3 +4950,210 @@ mod torus_corner_tests {
         }
     }
 }
+
+#[cfg(test)]
+mod mixed_curved_corner_tests {
+    use super::*;
+    #[test]
+    fn native_mixed_curved_corners_preserve_contacts_selection_material_and_step() {
+        let fixtures = [
+            (
+                "F1",
+                include_str!("../tests/fixtures/mixed-curved-corner-junctions/F1.input.step"),
+                include_str!("../tests/fixtures/mixed-curved-corner-junctions/F1.input.json"),
+                [1.5395408738884995, 1.5383527170561335, 1.5354400063718039],
+            ),
+            (
+                "H7",
+                include_str!("../tests/fixtures/mixed-curved-corner-junctions/H7.input.step"),
+                include_str!("../tests/fixtures/mixed-curved-corner-junctions/H7.input.json"),
+                [13.155379367422732, 13.155192864203238, 13.15443141695207],
+            ),
+        ];
+        for (name, step, intent, volumes) in fixtures {
+            let directory = std::env::temp_dir().join(format!(
+                "truck-mixed-curved-corner-{}-{name}",
+                std::process::id()
+            ));
+            std::fs::create_dir_all(&directory).unwrap();
+            let path = directory.join("input.step");
+            std::fs::write(&path, step).unwrap();
+            let original = import(path.to_str().unwrap()).unwrap();
+            let task: Value = serde_json::from_str(intent).unwrap();
+            let selection = fillet_contour_selection(&original, &task).unwrap();
+            assert_eq!(selection.len(), 3);
+            for moved in [false, true] {
+                let factor: f64 = if moved { 2.5 } else { 1. };
+                let placement = if moved {
+                    Matrix4::from_translation(Vector3::new(7., -11., 13.))
+                        * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.73))
+                        * Matrix4::from_scale(factor)
+                } else {
+                    Matrix4::identity()
+                };
+                let inverse = placement.invert().unwrap();
+                let matrix = placement * Matrix4::from_scale(0.01);
+                let input = builder::transformed(&original, matrix);
+                let before = serde_json::to_string(&input.compress()).unwrap();
+                let mut ids: Vec<_> = selection
+                    .iter()
+                    .map(|(edge, _)| {
+                        let c = edge.oriented_curve();
+                        let (a, b) = c.range_tuple();
+                        replay_common::blend::edge_through(
+                            &input.boundaries()[0],
+                            matrix.transform_point(c.subs((a + b) / 2.)),
+                        )
+                        .id()
+                    })
+                    .collect();
+                for (radius, expected) in [0.03, 0.06, 0.1].into_iter().zip(volumes) {
+                    for _ in 0..2 {
+                        let selected: Vec<_> =
+                            ids.iter().map(|&id| (id, radius * factor)).collect();
+                        let result =
+                            try_fillet_solid_edges_with_radii(&input, &selected, 1e-5 * factor)
+                                .unwrap();
+                        let solid = &result.solid;
+                        assert_eq!(result.generated_faces.len(), 4);
+                        assert!(solid.is_geometric_consistent());
+                        let wall = input
+                            .face_iter()
+                            .find_map(|f| {
+                                if f.edge_iter().filter(|e| ids.contains(&e.id())).count() == 2 {
+                                    if let Surface::Plane(p) = f.oriented_surface() {
+                                        let n = p.normal().normalize();
+                                        if inverse.transform_vector(n).normalize().z.abs() < 0.1 {
+                                            return Some((n, n.dot(p.origin().to_vec())));
+                                        }
+                                    }
+                                    None
+                                } else {
+                                    None
+                                }
+                            })
+                            .unwrap();
+                        let cap = input
+                            .face_iter()
+                            .find_map(|f| {
+                                if f.edge_iter().filter(|e| ids.contains(&e.id())).count() == 2 {
+                                    if let Surface::Plane(p) = f.oriented_surface() {
+                                        let n = p.normal().normalize();
+                                        if inverse.transform_vector(n).normalize().z.abs() > 0.9 {
+                                            return Some((n, n.dot(p.origin().to_vec())));
+                                        }
+                                    }
+                                    None
+                                } else {
+                                    None
+                                }
+                            })
+                            .unwrap();
+                        let original_supports: HashSet<_> = input
+                            .face_iter()
+                            .filter(|f| f.edge_iter().any(|e| ids.contains(&e.id())))
+                            .map(|f| f.id())
+                            .collect();
+                        let mut tangent_faces: HashSet<_> =
+                            result.generated_faces.iter().map(|f| f.id()).collect();
+                        tangent_faces.extend(
+                            result
+                                .modified_faces
+                                .iter()
+                                .filter(|(id, _)| original_supports.contains(id))
+                                .map(|(_, f)| f.id()),
+                        );
+                        let mut worst_radius = 0_f64;
+                        let mut fits = 0;
+                        for face in &result.generated_faces {
+                            if let Surface::Fillet(fit) = face.surface() {
+                                fits += 1;
+                                let af = fit.entity();
+                                let has_wall=[af.surface0(),af.surface1()].into_iter().any(|s|matches!(s.as_ref(),Surface::Plane(p) if fit.transform().transform_vector(p.normal()).normalize().dot(wall.0).abs()>0.999999));
+                                for j in 0..=32 {
+                                    let (a, b) = af.range_tuple().1;
+                                    let v = a + (b - a) * j as f64 / 32.;
+                                    let points = [0., 1.]
+                                        .map(|u| fit.transform().transform_point(af.subs(u, v)));
+                                    let center = if has_wall {
+                                        let q = points
+                                            .iter()
+                                            .find(|p| {
+                                                (wall.0.dot(p.to_vec()) - wall.1).abs() < 1e-7
+                                            })
+                                            .expect("wall contact");
+                                        *q - wall.0 * radius * factor
+                                    } else {
+                                        let q = points
+                                            .iter()
+                                            .find(|p| (cap.0.dot(p.to_vec()) - cap.1).abs() < 1e-7)
+                                            .expect("concave cap contact");
+                                        *q + cap.0 * radius * factor
+                                    };
+                                    for i in 0..=16 {
+                                        let p = fit
+                                            .transform()
+                                            .transform_point(af.subs(i as f64 / 16., v));
+                                        worst_radius = worst_radius
+                                            .max((p.distance(center) / factor - radius).abs());
+                                    }
+                                }
+                            }
+                        }
+                        let mut seen = HashSet::new();
+                        let mut worst_dot = 1_f64;
+                        for face in &result.generated_faces {
+                            for edge in face.edge_iter() {
+                                if seen.contains(&edge.id()) {
+                                    continue;
+                                }
+                                let other = solid
+                                    .face_iter()
+                                    .find(|f| {
+                                        f.id() != face.id()
+                                            && f.edge_iter().any(|e| e.id() == edge.id())
+                                    })
+                                    .unwrap();
+                                if !tangent_faces.contains(&other.id()) {
+                                    continue;
+                                }
+                                seen.insert(edge.id());
+                                let c = edge.oriented_curve();
+                                let (a, b) = c.range_tuple();
+                                let surfaces = [face.oriented_surface(), other.oriented_surface()];
+                                for i in 0..=16 {
+                                    let p = c.subs(a + (b - a) * i as f64 / 16.);
+                                    let normals = surfaces.each_ref().map(|s| {
+                                        let (u, v) = s.search_parameter(p, None, 100).unwrap();
+                                        s.normal(u, v).normalize()
+                                    });
+                                    worst_dot = worst_dot.min(normals[0].dot(normals[1]));
+                                }
+                            }
+                        }
+                        println!("quality fits {fits} radius_error {worst_radius} g1_edges {} minimum_dot {worst_dot}",seen.len());
+                        assert_eq!(fits, 4);
+                        assert_eq!(seen.len(), 10);
+                        assert!(worst_radius < 1e-5);
+                        assert!(worst_dot > 1. - 1e-7);
+
+                        replay_common::assert_solid(
+                            solid,
+                            expected * factor.powi(3),
+                            &[0],
+                            0.0003 * factor,
+                        );
+                        replay_common::blend::assert_step(
+                            solid,
+                            expected * factor.powi(3),
+                            0.0003 * factor,
+                        );
+                        assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
+                        ids.reverse();
+                    }
+                }
+            }
+            std::fs::remove_dir_all(directory).unwrap();
+        }
+    }
+}

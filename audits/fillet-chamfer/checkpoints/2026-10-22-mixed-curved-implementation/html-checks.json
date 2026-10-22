@@ -1,0 +1,19 @@
+{
+  "viewports": [
+    {
+      "width": 1100,
+      "content_height": 2048,
+      "console_messages": [],
+      "visual_overflow": false
+    },
+    {
+      "width": 390,
+      "content_height": 3603,
+      "console_messages": [],
+      "visual_overflow": false
+    }
+  ],
+  "links_checked": 5,
+  "all_link_statuses": 200,
+  "report_sha256": "ab57453b74027fe896dd8a77ae5fe8e5d7e19c428254c5646abd04b4b6866a34"
+}

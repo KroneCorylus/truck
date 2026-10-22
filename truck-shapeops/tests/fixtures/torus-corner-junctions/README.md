@@ -13,5 +13,6 @@ strip is integrated from the exact rolling-sphere envelope. A convex-only volume
 calculation would omit this cavity. Native outputs have comparison discrepancies
 and are not used as independent material-volume oracles.
 
-F1 is not covered by this convex corner construction: its three selected edges
-have mixed convex/concave signs. The procedural regression retains that rejection.
+F1 uses a separate mixed convex/concave construction. Its former rejection is
+replaced by positive material, STEP and immutability checks; oversized convex
+rejections remain unchanged. Dedicated mixed controls also verify radius and G1.

@@ -311,6 +311,31 @@ where
     ApproxFilletSurface<S, S>: ToSameGeometry<S>,
     NurbsCurve<Vector4>: ToSameGeometry<C>,
 {
+    fillet_along_wire_impl(shell, wire, radius.clone(), tol, false).or_else(|error| {
+        if error.stage == "trim_faces" && !wire.is_cyclic() && wire.len() > 1 {
+            fillet_along_wire_impl(shell, wire, radius, tol, true).or(Err(error))
+        } else {
+            Err(error)
+        }
+    })
+}
+
+fn fillet_along_wire_impl<C, S, R>(
+    shell: &Shell<Point3, C, S>,
+    wire: &Wire<Point3, C>,
+    radius: R,
+    tol: f64,
+    continue_open: bool,
+) -> Result<Shell<Point3, C, S>, Diagnostic>
+where
+    C: FilletedCurve<S> + TryInto<Line<Point3>>,
+    S: FilletedSurface<C>,
+    R: ScalarFunctionD1,
+    PCurve<BSplineCurve<Point2>, S>: ToSameGeometry<C>,
+    IntersectionCurve<C, S, S>: ToSameGeometry<C>,
+    ApproxFilletSurface<S, S>: ToSameGeometry<S>,
+    NurbsCurve<Vector4>: ToSameGeometry<C>,
+{
     let operation = "fillet_along_wire";
     validate_tolerance(tol, operation)?;
     let failed = || Diagnostic::new(Code::BlendConstructionFailed, operation, "construct_blend");
@@ -554,9 +579,12 @@ where
             ends[which] = Some(walk);
         }
     }
-    if closed {
+    if closed || continue_open {
         for k in 0..n {
-            for (at_start, j) in [(true, k), (false, (k + 1) % n)] {
+            for (at_start, j) in [(true, k), (false, (k + 1) % nv)] {
+                if !closed && (j == 0 || j == n) {
+                    continue;
+                }
                 let edges = [adjacent_edge(j, 0), adjacent_edge(j, 1)];
                 let (side, edge) = match &edges {
                     [Some(edge), None] => (0, edge),
@@ -612,7 +640,7 @@ where
                         })
                 })
             });
-        let continued = polar || closed && ranges[k] != (a, b);
+        let continued = polar || (closed || continue_open) && ranges[k] != (a, b);
         let mut contacts = if continued {
             vec![rbf
                 .contact_circle((a + b) / 2.0)

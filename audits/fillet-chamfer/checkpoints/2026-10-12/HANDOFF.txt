@@ -1,6 +1,9 @@
 LATEST CHECKPOINT — 2026-10-22
-Read ../2026-10-22-torus-corners/HANDOFF.txt and report.html.
-Implementation 066b4880 constructs toroidal support corners. 480 constructions/437 limited passes; 122 positive solid operations unresolved. Use target/occt-distance-tree-plugin.
+STOPPED PER USER after the mixed F1/H7 implementation/proof commit.
+Read ../2026-10-22-mixed-curved-implementation/HANDOFF.txt and report.html.
+Targeted F1/H7 construct; F1 passes limited comparison, H7 remains a discrepancy.
+Mixed full-corpus capture is pending. Last confirmed complete totals:480 constructions/437 limited passes.
+Resume only when requested.
 
 HISTORICAL HANDOFF FOLLOWS
 

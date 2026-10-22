@@ -1,0 +1,24 @@
+{
+  "revision": "9f97532ab746207f3d716696dc6b4640a026662e",
+  "test_sha256": {
+    "truck-shapeops/tests/torus_corner_junctions.rs": "37c73e9d9fffe82ed89901223671c6b0855025952e54cb2646b7567eb2def28b",
+    "truck-shapeops/tests/mixed_curved_corner_junctions.rs": "c6e29214e2d1c4b3e1bc6c2bc639e5e8f9564573947bb02e815a2b1dc802715e",
+    "truck-shapeops/examples/replay_occt_blend.rs": "3399923cedb7501225f87ac295ab3a81aeba26191944abc1e11082fe213c974c",
+    "truck-shapeops/tests/fixtures/mixed-curved-corner-junctions/F1.input.step": "eb9f943c1f473eb630e13cd3c90aae478a06413d37ade4c96999f138f8b22029",
+    "truck-shapeops/tests/fixtures/mixed-curved-corner-junctions/F1.input.json": "80635c63339345a7fe7d4092b2c618a7d4726a591fdee358eb953a04bbe854a0",
+    "truck-shapeops/tests/fixtures/mixed-curved-corner-junctions/H7.input.step": "17a659831967694c790f62a14f29de7f4d7854aba1e4d3e475f8c3718e5d5ab3",
+    "truck-shapeops/tests/fixtures/mixed-curved-corner-junctions/H7.input.json": "50bf82deb289a84e6ed40ecfe479022dc693ceab7dbe30bf70dab96692c4f729",
+    "truck-shapeops/tests/fixtures/mixed-curved-corner-junctions/README.md": "7c0a1811878aa59472329f8f286cfd338ee08049d1cf9163056aac37b5f834ae"
+  },
+  "parent_test_sha256": {
+    "truck-shapeops/tests/torus_corner_junctions.rs": "37c73e9d9fffe82ed89901223671c6b0855025952e54cb2646b7567eb2def28b",
+    "truck-shapeops/tests/mixed_curved_corner_junctions.rs": "c6e29214e2d1c4b3e1bc6c2bc639e5e8f9564573947bb02e815a2b1dc802715e",
+    "truck-shapeops/examples/replay_occt_blend.rs": "3399923cedb7501225f87ac295ab3a81aeba26191944abc1e11082fe213c974c",
+    "truck-shapeops/tests/fixtures/mixed-curved-corner-junctions/F1.input.step": "eb9f943c1f473eb630e13cd3c90aae478a06413d37ade4c96999f138f8b22029",
+    "truck-shapeops/tests/fixtures/mixed-curved-corner-junctions/F1.input.json": "80635c63339345a7fe7d4092b2c618a7d4726a591fdee358eb953a04bbe854a0",
+    "truck-shapeops/tests/fixtures/mixed-curved-corner-junctions/H7.input.step": "17a659831967694c790f62a14f29de7f4d7854aba1e4d3e475f8c3718e5d5ab3",
+    "truck-shapeops/tests/fixtures/mixed-curved-corner-junctions/H7.input.json": "50bf82deb289a84e6ed40ecfe479022dc693ceab7dbe30bf70dab96692c4f729",
+    "truck-shapeops/tests/fixtures/mixed-curved-corner-junctions/README.md": "7c0a1811878aa59472329f8f286cfd338ee08049d1cf9163056aac37b5f834ae"
+  },
+  "binding_change": null
+}

@@ -1,0 +1,205 @@
+{
+  "procedural_operations": 12,
+  "oversized_rejections": 4,
+  "normalized_imported_operations": 24,
+  "original_scale_replays": 2,
+  "independent_material": {
+    "F1": {
+      "rows": {
+        "0.029999999999999999": {
+          "128": 1.5395408738885006,
+          "256": 1.5395408738884995
+        },
+        "0.059999999999999998": {
+          "128": 1.5383527170561333,
+          "256": 1.5383527170561335
+        },
+        "0.10000000000000001": {
+          "128": 1.535440006371805,
+          "256": 1.535440006371804
+        }
+      },
+      "maximum_difference": 1.1102230246251565e-15
+    },
+    "H7": {
+      "rows": {
+        "0.029999999999999999": {
+          "128": 13.155379367422732,
+          "256": 13.155379367422732
+        },
+        "0.059999999999999998": {
+          "128": 13.155192864203238,
+          "256": 13.155192864203238
+        },
+        "0.10000000000000001": {
+          "128": 13.15443141695207,
+          "256": 13.15443141695207
+        }
+      },
+      "maximum_difference": 0.0
+    }
+  },
+  "native_comparisons": {
+    "F1": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 1535440.0016800354,
+      "truck_volume": 1535440.0077549543,
+      "native_to_truck_max_distance": 3.997922333898183e-05,
+      "native_to_truck_samples": 1805,
+      "truck_to_native_max_distance": 3.997739723068291e-05,
+      "truck_to_native_samples": 1788,
+      "native_tolerances": {
+        "face": 2.15933079436638e-05,
+        "edge": 2.15933079436638e-05,
+        "vertex": 9.51245246963146e-05
+      },
+      "truck_step_tolerances": {
+        "face": 1e-07,
+        "edge": 2.5184514902164256e-05,
+        "vertex": 2.5184514902164256e-05
+      }
+    },
+    "H7": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 13154431.559446977,
+      "truck_volume": 13154431.404443448,
+      "native_to_truck_max_distance": 0.001525464104196783,
+      "native_to_truck_samples": 2398,
+      "truck_to_native_max_distance": 0.0015148329412815033,
+      "truck_to_native_samples": 2344,
+      "native_tolerances": {
+        "face": 1.39393054652373e-05,
+        "edge": 0.0001,
+        "vertex": 0.0001
+      },
+      "truck_step_tolerances": {
+        "face": 1e-07,
+        "edge": 1.9243567910399956e-05,
+        "vertex": 1.9243567910399956e-05
+      }
+    }
+  },
+  "H7_analytic_witnesses": {
+    "method": "Analytic mixed-corner center C(beta)=(-10,-sqrt((60+20*cos(beta))^2-100),-40+20*sin(beta)), beta in [-pi,-pi/2]. Grid bracketing then 100 ternary steps minimize squared distance; subtract radius 10. Diagnostic comparator JSON exactly equals canonical comparison. These two witness residuals do not establish a global error bound.",
+    "witnesses": [
+      {
+        "direction": "native_to_truck",
+        "canonical_max_distance": 0.001525464104196783,
+        "point": [
+          -2.2800371401767294,
+          -47.92162979208009,
+          -48.165732404677016
+        ],
+        "nearest_center_parameter": -2.493925392102015,
+        "mixed_sphere_envelope_radius_residual": 0.0015255520072052775,
+        "first_concave_torus_residual": 4.53477287567118,
+        "cylinder_wall_residual": 2.003622217037698,
+        "cap_wall_residual": 4.129675016601137
+      },
+      {
+        "direction": "truck_to_native",
+        "canonical_max_distance": 0.0015148329412815033,
+        "point": [
+          -2.2910379289887777,
+          -47.81034134591074,
+          -48.00234303054656
+        ],
+        "nearest_center_parameter": -2.5081989605315913,
+        "mixed_sphere_envelope_radius_residual": 7.723863539865761e-07,
+        "first_concave_torus_residual": 4.535845637288913,
+        "cylinder_wall_residual": 1.911495273084224,
+        "cap_wall_residual": 4.2608509202278775
+      }
+    ]
+  },
+  "archive_sha256": "ffd52c1c367d115c1c55e8002f940e2d7926fcc2fd895addf29dc8c50ee93d8e",
+  "archive_members": 76,
+  "member_sha256": {
+    "probe/F1/001.input.step": "891296b1f53ce0182988d6dcee7eee2431573e0cb6e868eba4e5a45b0d8616b9",
+    "probe/F1/001.input.json": "80635c63339345a7fe7d4092b2c618a7d4726a591fdee358eb953a04bbe854a0",
+    "probe/F1/001.result.brep": "d575257aefe5a0ed8713255a57129e08f69e4c7bafc1ed6ff911fe2cfb76c85d",
+    "probe/F1/001.result.json": "c99c58ca8377d25b81bbc1306f8a66caa9e081a1804d4d0d4e764ad8415d9cbf",
+    "probe/F1/001.truck.log": "27be1b648d93e9919e40418e729c8aa34e9190f336c239611cb0daa59bfe9f22",
+    "probe/F1/001.truck.step": "dc662bd772fac15946739090d3c40c68511941c1c4e230526df0b923a1467164",
+    "probe/F1/001.truck.json": "64dd0225c5c51195eca46e481f1f33f71e357e2dc7573f676489621d4e8afe3c",
+    "probe/F1/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "probe/F1/001.comparison.json": "1b939497a196935904fbc7e42cbd1db9c010b2bb071920c6cf77fbb7e704152d",
+    "probe/H7/001.input.step": "b747b708d899406c989ccdecd632c97dfbffbba5da0dbb8dc9def3fb07f45d18",
+    "probe/H7/001.input.json": "50bf82deb289a84e6ed40ecfe479022dc693ceab7dbe30bf70dab96692c4f729",
+    "probe/H7/001.result.brep": "f9c2cd87da2f54369fe1423307dc8c633c5be8685e34b7a7795a000c027bdb06",
+    "probe/H7/001.result.json": "10b59c85190306c2e0874bce94caab56f6b03d40df52d57cad36628b750133a6",
+    "probe/H7/001.truck.log": "87982597ef521cff72f09b3668792132505a8e94f73974a3f7e2b3c0744c83da",
+    "probe/H7/001.truck.step": "811b3bfa1b5b7c9989a75f5a557307e632f483b6f08fcf7905d43a1e700769d3",
+    "probe/H7/001.truck.json": "3c58acb447c6e223f94341a5249a51ff8923d5810857c587651903b5ac43f1c3",
+    "probe/H7/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "probe/H7/001.comparison.json": "1f864cf81bd8b361f8bb9cc66343b8910dc58e86ee193e5322f092d044700030",
+    "volume/mixed-torus-volume.cpp": "5f169b3cb397fbeff41aa73db1a6ba4dccceb2e193cebcd9a74610637447690d",
+    "volume/mixed-torus-volume-method.txt": "fb8c991652d5eb2446fbcba6315ed8ca9d8ebcb4b4b3c7bb7eabd13d82eb3fc2",
+    "volume/mixed-torus-volume-controls.txt": "bedfd8afb4e3fee3ed1211ee1fd9eba1c261290ffff8d89a7b688b10c4236bc9",
+    "volume/mixed-cylinder-volume.cpp": "ad45c57517d61426adfb4b69966462390f64816e3029ce5c51769ff5c1520d3a",
+    "volume/mixed-cylinder-volume-method.txt": "205bfe01f13499ea173a2068d272e8ac96106daf9e0846bc1322e0c93dc3f62c",
+    "volume/mixed-cylinder-volume-controls.txt": "e751d7c8e40a927134af1de16adffcb8ba5f3fc70ef49c0b2313a3c00e6fbaeb",
+    "helpers/prove-mixed-curved-corner-parent.py": "b44fc0fe7fada5b0914fe6f792dbe04dea7bc002b8e5a78ced01bc380dbb81e9",
+    "helpers/validate-mixed-curved-corners.py": "ca891805ae11c26b3149f97b44e6eda07f09d6583754d0b2bd99310e58d6e692",
+    "helpers/verify-mixed-curved-corner-replays.py": "48fbb79bf8ded08aac98b64d378826a4b96e7a8a35caf61b51963d57fce1c76b",
+    "helpers/package-mixed-curved-corner-proof.py": "d5f3412c0bea89ed538a4130322bb80bfb7a98f78b3474e42b814755ddfd914a",
+    "helpers/mixed-curved-H7-analytic-residuals.py": "d47f914beae016a95e5a7b94f2eb89f83e5e81f739ed0e8eeeca3a39649b11db",
+    "helpers/spherical-corner-residual.cpp": "3f3245a858ee26bad4e72c023ee47f8f3fc3d674843f77416969af305fbcec46",
+    "parent/truck-shapeops/tests/torus_corner_junctions.rs": "37c73e9d9fffe82ed89901223671c6b0855025952e54cb2646b7567eb2def28b",
+    "parent/truck-shapeops/tests/mixed_curved_corner_junctions.rs": "c6e29214e2d1c4b3e1bc6c2bc639e5e8f9564573947bb02e815a2b1dc802715e",
+    "parent/truck-shapeops/examples/replay_occt_blend.rs": "3399923cedb7501225f87ac295ab3a81aeba26191944abc1e11082fe213c974c",
+    "parent/truck-shapeops/tests/fixtures/mixed-curved-corner-junctions/F1.input.step": "eb9f943c1f473eb630e13cd3c90aae478a06413d37ade4c96999f138f8b22029",
+    "parent/truck-shapeops/tests/fixtures/mixed-curved-corner-junctions/F1.input.json": "80635c63339345a7fe7d4092b2c618a7d4726a591fdee358eb953a04bbe854a0",
+    "parent/truck-shapeops/tests/fixtures/mixed-curved-corner-junctions/H7.input.step": "17a659831967694c790f62a14f29de7f4d7854aba1e4d3e475f8c3718e5d5ab3",
+    "parent/truck-shapeops/tests/fixtures/mixed-curved-corner-junctions/H7.input.json": "50bf82deb289a84e6ed40ecfe479022dc693ceab7dbe30bf70dab96692c4f729",
+    "parent/truck-shapeops/tests/fixtures/mixed-curved-corner-junctions/README.md": "7c0a1811878aa59472329f8f286cfd338ee08049d1cf9163056aac37b5f834ae",
+    "diagnostics/mixed-curved-H7-0.03-forward.txt": "9e7648043fb692fabb799263f4e18137e6a85c315d337f3ba154f3568adf577e",
+    "diagnostics/mixed-curved-H7-0.03-reverse.txt": "347576728a53ad24326a9fb33d74f1cf77333dc4727196ca4bb8f076b0f13bf4",
+    "diagnostics/mixed-curved-H7-0.06-forward.txt": "3cdfce1bf3bd40a5a23e66fedf81736b43e6c24345f48e12ddd9a75c7188eb9c",
+    "diagnostics/mixed-curved-H7-0.06-reverse.txt": "19e619a0d5b63119aa7e1166391ede74ba0b01595d3c4b39932ec3120ccb889b",
+    "diagnostics/mixed-curved-H7-0.1-forward.txt": "39c05e9465c5f297b1fa5313364102de483310e51f578bf4474c0123d3ded33c",
+    "diagnostics/mixed-curved-H7-0.1-reverse.txt": "e1a0a28cabb5a187ea78637512d0f850ce239980c75751eb555ca02fe9fc8840",
+    "diagnostics/mixed-curved-H7-tight-0.03-forward.txt": "df79e11a982cea6f968bf2fd98c1b300c60c290adf0a6f4f84b8e3f43d90b917",
+    "diagnostics/mixed-curved-H7-tight-0.03-reverse.txt": "df79e11a982cea6f968bf2fd98c1b300c60c290adf0a6f4f84b8e3f43d90b917",
+    "diagnostics/mixed-curved-H7-tight-0.06-forward.txt": "b188b0eba5218bf2a892d895517738153975c70549284e55b13fbb8d8b318bb7",
+    "diagnostics/mixed-curved-H7-tight-0.06-reverse.txt": "b188b0eba5218bf2a892d895517738153975c70549284e55b13fbb8d8b318bb7",
+    "diagnostics/mixed-curved-H7-tight-0.1-forward.txt": "2c10d7dde82f803a82daaf2348d4bc74a3356ee92b78f7741073056c3b3076ec",
+    "diagnostics/mixed-curved-H7-tight-0.1-reverse.txt": "2c10d7dde82f803a82daaf2348d4bc74a3356ee92b78f7741073056c3b3076ec",
+    "diagnostics/mixed-curved-F1-tight-0.03-forward.txt": "2fcf1a6a284847aca1b016343a496a2f169577268c6c1d8e0bf285f33239f194",
+    "diagnostics/mixed-curved-F1-tight-0.03-reverse.txt": "2fcf1a6a284847aca1b016343a496a2f169577268c6c1d8e0bf285f33239f194",
+    "diagnostics/mixed-curved-F1-tight-0.06-forward.txt": "3e0641a3e91382d347260c1345635f6f11fe5381cda8bcb81c4253c134a2ce32",
+    "diagnostics/mixed-curved-F1-tight-0.06-reverse.txt": "3e0641a3e91382d347260c1345635f6f11fe5381cda8bcb81c4253c134a2ce32",
+    "diagnostics/mixed-curved-F1-tight-0.1-forward.txt": "c916cf3a53308c56f80d742f8e2dba8e09b8da9d031b5607132ddd2a656503c1",
+    "diagnostics/mixed-curved-F1-tight-0.1-reverse.txt": "c916cf3a53308c56f80d742f8e2dba8e09b8da9d031b5607132ddd2a656503c1",
+    "diagnostics/mixed-curved-F1-tight-transformed-0.03-forward.txt": "e7809304a0ad94d111e6bf8524ea18f4e4d67efe82ab0f378f714e787010cad0",
+    "diagnostics/mixed-curved-F1-tight-transformed-0.03-reverse.txt": "e7809304a0ad94d111e6bf8524ea18f4e4d67efe82ab0f378f714e787010cad0",
+    "diagnostics/mixed-curved-F1-tight-transformed-0.06-forward.txt": "40977f9606a6cad94fe9e68b9b41bf9dac59e0cbacee7ff2544f083644b1f3a8",
+    "diagnostics/mixed-curved-F1-tight-transformed-0.06-reverse.txt": "40977f9606a6cad94fe9e68b9b41bf9dac59e0cbacee7ff2544f083644b1f3a8",
+    "diagnostics/mixed-curved-F1-tight-transformed-0.1-forward.txt": "fce609a7576686817c2f5d0da16c056eaa309cd3669c34638e85f8604a4aa3ff",
+    "diagnostics/mixed-curved-F1-tight-transformed-0.1-reverse.txt": "fce609a7576686817c2f5d0da16c056eaa309cd3669c34638e85f8604a4aa3ff",
+    "diagnostics/mixed-curved-H7-tight-transformed-0.03-forward.txt": "358a9b0ea6873f7a34f7086b52424bb0f9efc226329845b9a89a89a6ebf96e64",
+    "diagnostics/mixed-curved-H7-tight-transformed-0.03-reverse.txt": "358a9b0ea6873f7a34f7086b52424bb0f9efc226329845b9a89a89a6ebf96e64",
+    "diagnostics/mixed-curved-H7-tight-transformed-0.06-forward.txt": "224bc9f215f379cf13102ca915b9384d773252c984158147bf33b576aaa5cc4c",
+    "diagnostics/mixed-curved-H7-tight-transformed-0.06-reverse.txt": "224bc9f215f379cf13102ca915b9384d773252c984158147bf33b576aaa5cc4c",
+    "diagnostics/mixed-curved-H7-tight-transformed-0.1-forward.txt": "715575a5bf624c78a2e99a27d02c306e8a8a34673e1b1394a86fdf1c99e02b0c",
+    "diagnostics/mixed-curved-H7-tight-transformed-0.1-reverse.txt": "715575a5bf624c78a2e99a27d02c306e8a8a34673e1b1394a86fdf1c99e02b0c",
+    "diagnostics/mixed-curved-tight-tests.txt": "23125910cc8e71397464b6bb49098547b8158f11922a629439071c6663ade331",
+    "diagnostics/mixed-curved-final-preflight-clippy.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "diagnostics/mixed-native-tests-timeout-300.txt": "44f508307cf10cbea116f97f667335d3bc90a207b390197447b21c93355f8829",
+    "diagnostics/mixed-native-tests.txt": "e2e364f35bc5dcac002e452ce12f30e6fd9fb3770d4160a61c30b64bf2b3bd56",
+    "diagnostics/H7/residual.json": "1f864cf81bd8b361f8bb9cc66343b8910dc58e86ee193e5322f092d044700030",
+    "diagnostics/H7/residual.log": "c0297bd24a507165be20e8d27504d804f349bf5825da038044d911a02064deab",
+    "diagnostics/H7/analytic-residuals.json": "1ce3819338c0e4abaf65e81a2c5bbec8076e82c2bda765cc645be9be69f9e0d2",
+    "helpers/control-commands.json": "d4bd3dd623818ed511d75fed9d278bde89735cc49f6fbe3aac8e653306072cdc"
+  }
+}
