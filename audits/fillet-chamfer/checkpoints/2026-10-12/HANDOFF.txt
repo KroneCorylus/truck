@@ -1,6 +1,6 @@
 LATEST CHECKPOINT — 2026-10-22
-Read ../2026-10-22-open-chamfer-terminals/HANDOFF.txt and report.html.
-Implementation cb0ae1b7 continues open chamfer contacts to curved terminals. 469 constructions/435 limited passes; 124 positive solid operations unresolved. Use target/occt-distance-tree-plugin.
+Read ../2026-10-22-separated-fillet-components/HANDOFF.txt and report.html.
+Implementation 569d5e3d rounds separated planar corners and curved rims. 470 constructions/436 limited passes; 123 positive solid operations unresolved. Use target/occt-distance-tree-plugin.
 
 HISTORICAL HANDOFF FOLLOWS
 
