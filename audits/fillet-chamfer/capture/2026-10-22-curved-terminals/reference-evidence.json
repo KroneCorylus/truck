@@ -1,0 +1,359 @@
+{
+  "native_library_sha256": {
+    "libTKBO.so": "f9284f414c79dac5d9733f6f45142551fc69aaeedc4eea6c369edcf3f94ef0fa",
+    "libTKBRep.so": "7d07ff2f68ec0b494f3caa16f222e3238774dd864c7eef5d9f8fe5c892156709",
+    "libTKBin.so": "d99b4c9d4b1d23092ebe45e981220d78029ea6e3de47d8f009f0844c7ac90b3e",
+    "libTKBinL.so": "781e84373cdbe5ef4f343d5b726234acd7401c0dcbb6286d284411ab02329673",
+    "libTKBinTObj.so": "1aadedce92585b0f1cf19961653dcc3500b316c1d66e6708274cfcc141401571",
+    "libTKBinXCAF.so": "662259ee0ad2993e93fabf58142b15ed201445fa5abcd742d535093b9ffdb926",
+    "libTKBool.so": "7467d4d0996a9c2567a2f7b5c03c4022af81a63ca49b9a874649eef187099f71",
+    "libTKCAF.so": "b628df8dd35de29a7482b368d79f2dca46f7120d302e2f10e67a56626b5730a6",
+    "libTKCDF.so": "1b3d4255d3331600b489a8b14266d0547859cecc7922d6392c9d72bfad1f92d7",
+    "libTKDCAF.so": "a0df10f69c89ee879b5b2380ea60fc882da4837bf640c39b2b36a08ac9f75660",
+    "libTKDE.so": "1905ba60b07967122a3a3b9b05218ea8e5d6b27c80200cb7c84bf47208af3779",
+    "libTKDECascade.so": "5835d6ad044271f4ea7f1ee805f0b3707ff814837b8a5a18b9063f5a7f3893c6",
+    "libTKDEGLTF.so": "f318beb6a679aa024219fe223886c8d3ce39d11cfd3484fb2e484308d09ba940",
+    "libTKDEIGES.so": "81e69f7559a2cd0ff56d05dc708235f3b1cb3d0bf9a28b5fed08da2b4f86e4de",
+    "libTKDEOBJ.so": "c44865ce65c1730eedb91f84ffcd4dda7f27ef32d8041bdb62ca4eff2f2437fa",
+    "libTKDEPLY.so": "62f890dfb0317f9015a74c7cd2778475edfc2ab98af32c54a24cf35a7b29eb94",
+    "libTKDESTEP.so": "025afdb6a14daca55860b613a3774f1f71abf4a1bf4afc551f8a52a3b59a6db3",
+    "libTKDESTL.so": "e2f342e8bbf5bc7f4701cd8e0afd44b4a4eacc2dc6a2460a058e9f392f6be9ac",
+    "libTKDEVRML.so": "c5c9b6ec6acadd95623108c466fb9aca693bb3004216d5dc02394ae40218ede2",
+    "libTKDraw.so": "f57a27aa6d38e6e1d74ec9ac9fc614399d494c688731aa372cf8b300c9313895",
+    "libTKExpress.so": "585b251213f13040951dea09de80a23818efd7f617616b254110094712098aec",
+    "libTKFeat.so": "65653afb50e9cf0969b80a688f6094b8d5661e17d8e4806c7b66b528086f1811",
+    "libTKFillet.so": "98b023dddfa18f285da1037234638f142f2cf8c82df07e5c0cc39d5ebb456ade",
+    "libTKG2d.so": "7ef79098c6b07c05ad9acac089fe3fb4e8550f26f19c5a2f42de59c450cf71a2",
+    "libTKG3d.so": "c9dc250c81492e8f9446bff17018d64a93fc5ab009487509bf1c27810a3b3c12",
+    "libTKGeomAlgo.so": "389c67e1b7371882ed9804dfd2b573278a2b009bb80a496176bbfdfdbf9e28d0",
+    "libTKGeomBase.so": "0d6e11af384206ea11df7438c089442174a4413e9725a809d7b7ad5a502dae56",
+    "libTKHLR.so": "992bae41f644683602236628f2671b88f443c421e1dffc5cd99845a7cb8eb335",
+    "libTKIVtk.so": "634d47bf70cdd8c359d84b45bd5520c51fd9f525fd810326a62d491848944a31",
+    "libTKIVtkDraw.so": "b15e98d9fa9f20b5613334df0e0b93f59edec323f142d993a3ca833cc9e40c31",
+    "libTKLCAF.so": "c1e878b32990e75996ea7199493fb3d99578df7c320d6f867e162da4fd2b400d",
+    "libTKMath.so": "b0ea8007475ab8b85192bb5a6ec606a7b5f04859ac645c42ad18a5a54f43fe4d",
+    "libTKMesh.so": "031f5259343be29d7e782db5c58021a1c48137eda09581d0aa6dcf3c2715698d",
+    "libTKMeshVS.so": "dedf6b7452fd51144ba4420c06040e3550e253fdfebcb94cb1b1a8f97ffb66cd",
+    "libTKOffset.so": "a3754f00528d8f82adfa4e7c66c09b5ed2e935691123206f203e8836c341a7eb",
+    "libTKOpenGl.so": "1a6bcec80d1b628dcc5e4eacd4cc6aa9e0a9829dc552c2b8354aab2d6b6e9a43",
+    "libTKOpenGlTest.so": "74af11fa0d63f1c3ef7338465d8a5d74399bcc3ef528c68725f66c39f37f0a65",
+    "libTKPrim.so": "1fa2933404dcd2c95e22e7a8703b8a9be3cb8c485dc175389f11a046fec3e64e",
+    "libTKQADraw.so": "8622fe13019c0b61d8dd7e817ea5af3435fab4152776cf31754e9371471f1d45",
+    "libTKRWMesh.so": "1473c9b4bb0c2c10ae91cf09a6741607f53a118d1ff1f606b6262bc45f719c40",
+    "libTKService.so": "4e9ef00ce97e193557e2ca4fcf842c889cbb3bb86c9944c6a0a738cf55b38e36",
+    "libTKShHealing.so": "a3ca6af500c7ec0b900049cd84760757f65d717e3fb529af1e0e3dfdd9ad9ff8",
+    "libTKStd.so": "e7feeb9f196a8c62f0e686ad7e75757d652baafa72d1dcc4adce717371305137",
+    "libTKStdL.so": "8be0198312ebfdcbe38b9f7867b3e852e132389da41bda0b6767d24be7e40ee9",
+    "libTKTObj.so": "817cb604cd2b36a9655c8f453660317f96a111603081f8cc61a6f570373b77f8",
+    "libTKTObjDRAW.so": "eb2738d3128924a692e421fde349cf85c355ff29e30010f86ff28f472c6488ce",
+    "libTKTopAlgo.so": "e27be7f4138763c0ac0f82e477b0ee277519d6b5c37ddc6b9ae97018592ccef1",
+    "libTKTopTest.so": "69a977555c1d438a6fabc6f620b3926ff678395870292e96d17eb637fef9cca1",
+    "libTKV3d.so": "9b9f3de75194582ebb7230dbee28996e7a3063d105fea6621260a6adfe81c440",
+    "libTKVCAF.so": "7f1ec5b9eda771080413a2bf1c7740a6330ff42a9d612681bb2474a9eb55c4dd",
+    "libTKViewerTest.so": "9d1417850d398654357cc550c687161357ddcd021409240576c0323e51fbc809",
+    "libTKXCAF.so": "df1afe6724b30ae39d31bebeb002b5a8d934c352595f9cf821912d36c0e28d6b",
+    "libTKXDEDRAW.so": "94addbf823e117e7f95601ada9b7f3443b86bd7fbde157d3b68af6e5573e307e",
+    "libTKXMesh.so": "babf6d74aa75c62e8a131682f02eb0f76581f352da73128e44b85ee1e6b580e6",
+    "libTKXSBase.so": "7ffea711d6764e22691ce9e02d08af52dfc4d07dc27740dadf0a1d1fa95f3493",
+    "libTKXSDRAW.so": "98c639ffe6c48c25b2c9c7d4362fbcbff375ad166a338db551bc47a71f446bdf",
+    "libTKXSDRAWDE.so": "12ee3e8db18b6448ec6834705c3871e750c84d100af3241505a96ed36a6afe0f",
+    "libTKXSDRAWGLTF.so": "f126f4ea958c49e55635c4b2b7a15cad326763aa72c1b6eca8f664d53f8ca7dd",
+    "libTKXSDRAWIGES.so": "31f487478212bd30e5513475708f33cf5df1f2a21564691442a097d2c765f327",
+    "libTKXSDRAWOBJ.so": "6cd665fac25c6bb55f062f256bc40e64756354cd7bbbd56b1bfbd564f391f5ce",
+    "libTKXSDRAWPLY.so": "5e72180d871950213d7a059608f8788a0bcff264df2eb2991cdfcbbc4089f79f",
+    "libTKXSDRAWSTEP.so": "24b0d644efae6274b174a322a4e70658e9d8ca692985b4606356e3ffaf01ddd5",
+    "libTKXSDRAWSTL.so": "7b3aceca3a14a44601fc2a2d2526b6c71a59396eb3d7bb04d834f28acb9e5741",
+    "libTKXSDRAWVRML.so": "dbe7f98c85a0962088256c5ab10deedd266ba6dcc47918a675be0d26d04efe18",
+    "libTKXml.so": "2fd164d52ea388e0ea32cd0c3cb83161f21a38ab8b2227db671f9d3338f28740",
+    "libTKXmlL.so": "d09177b1b10ccf0cdf8e05c024fc836b0a9503ce9be2efca8ca3fed7a2854a4c",
+    "libTKXmlTObj.so": "78755945aa2bd7ddf892be4213d391102fbc15bfe2fdb179d626469227431cf7",
+    "libTKXmlXCAF.so": "fca2b788d74fd514cabb0457ebff7f558fd018db48c1f99ebe6c1fd4e1b01bed",
+    "libTKernel.so": "655ae806fb993152c14ed1b9ad7bd18b81a5ac31fc79c945d190f7c8f64bc0fb"
+  },
+  "native_runtime": "Open CASCADE Technology 7.9.3\nTk enabled (HAVE_TK)\nXlib enabled (HAVE_XLIB)\nTBB enabled (HAVE_TBB)\nFreeType enabled (HAVE_FREETYPE)\nFreeImage disabled\nFFmpeg disabled\nOpenGL: enabled (HAVE_OPENGL_EXT)\nOpenVR disabled\nRapidJSON enabled (HAVE_RAPIDJSON)\nDraco disabled\nVTK enabled (HAVE_VTK)\nExceptions enabled\nCompiler: GCC 16.2.1\nArchitecture: AMD64\nOS: Linux\n\n",
+  "h4_scale_controls": [
+    {
+      "scale": 0.5,
+      "input_valid": 1.0,
+      "valid": 0.0,
+      "input_volume": 1.644427404613403,
+      "result_volume": 1.2557424937567185,
+      "pole_distance": 0.01849318308445367
+    },
+    {
+      "scale": 1.0,
+      "input_valid": 1.0,
+      "valid": 0.0,
+      "input_volume": 13.155419236907225,
+      "result_volume": 10.287803677141707,
+      "pole_distance": 0.036700538866847814
+    },
+    {
+      "scale": 2.0,
+      "input_valid": 1.0,
+      "valid": 0.0,
+      "input_volume": 105.2433538952578,
+      "result_volume": 83.3929376805657,
+      "pole_distance": 0.07101810969775112
+    },
+    {
+      "scale": 10.0,
+      "input_valid": 1.0,
+      "valid": 1.0,
+      "input_volume": 13155.419236907224,
+      "result_volume": 13157.474232783106,
+      "pole_distance": 9.66304940411577e-06
+    },
+    {
+      "scale": 100.0,
+      "input_valid": 1.0,
+      "valid": 1.0,
+      "input_volume": 13155419.236907223,
+      "result_volume": 13151908.611383572,
+      "pole_distance": 4.142110119730745
+    }
+  ],
+  "h4_material_points": [
+    {
+      "point": [
+        -0.1,
+        0.1,
+        99.0
+      ],
+      "analytic_inside": 1.0,
+      "input_state": 0.0,
+      "native_state": 2.0,
+      "truck_state": 0.0,
+      "native_boundary_distance": 4.28355697996826
+    },
+    {
+      "point": [
+        1.0,
+        -1.0,
+        99.0
+      ],
+      "analytic_inside": 1.0,
+      "input_state": 1.0,
+      "native_state": 2.0,
+      "truck_state": 0.0,
+      "native_boundary_distance": 1.7828144952592633
+    },
+    {
+      "point": [
+        -1.0,
+        -1.0,
+        99.0
+      ],
+      "analytic_inside": 1.0,
+      "input_state": 0.0,
+      "native_state": 2.0,
+      "truck_state": 0.0,
+      "native_boundary_distance": 4.212670403551896
+    },
+    {
+      "point": [
+        -0.1,
+        0.1,
+        99.9
+      ],
+      "analytic_inside": 1.0,
+      "input_state": 0.0,
+      "native_state": 2.0,
+      "truck_state": 0.0,
+      "native_boundary_distance": 4.28355697996826
+    },
+    {
+      "point": [
+        1.0,
+        -1.0,
+        99.9
+      ],
+      "analytic_inside": 1.0,
+      "input_state": 1.0,
+      "native_state": 2.0,
+      "truck_state": 0.0,
+      "native_boundary_distance": 1.4906820067482818
+    },
+    {
+      "point": [
+        -1.0,
+        -1.0,
+        99.9
+      ],
+      "analytic_inside": 1.0,
+      "input_state": 0.0,
+      "native_state": 2.0,
+      "truck_state": 0.0,
+      "native_boundary_distance": 4.212670403551896
+    },
+    {
+      "point": [
+        -0.1,
+        0.1,
+        99.99
+      ],
+      "analytic_inside": 1.0,
+      "input_state": 0.0,
+      "native_state": 2.0,
+      "truck_state": 0.0,
+      "native_boundary_distance": 4.283448289773772
+    },
+    {
+      "point": [
+        1.0,
+        -1.0,
+        99.99
+      ],
+      "analytic_inside": 1.0,
+      "input_state": 1.0,
+      "native_state": 2.0,
+      "truck_state": 0.0,
+      "native_boundary_distance": 1.4884903013848427
+    },
+    {
+      "point": [
+        -1.0,
+        -1.0,
+        99.99
+      ],
+      "analytic_inside": 1.0,
+      "input_state": 0.0,
+      "native_state": 2.0,
+      "truck_state": 0.0,
+      "native_boundary_distance": 4.212770715728854
+    }
+  ],
+  "native_classifier_states": {
+    "IN": 0,
+    "OUT": 1,
+    "ON": 2,
+    "UNKNOWN": 3
+  },
+  "h4_independent_volume": {
+    "input_volume": 13155419.23690726,
+    "simpson": [
+      13159710.462164925,
+      13159710.462164925,
+      13159710.462164925
+    ]
+  },
+  "g1_analytic_envelope": {
+    "brep": {
+      "faces": 1,
+      "samples": 1411,
+      "envelope_z_error": 1.3469977339570782,
+      "rolling_radius_error": 0.1434368803714392,
+      "worst": [
+        190.1438410393027,
+        952.7460348931527,
+        1450.7192051965135
+      ]
+    },
+    "step": {
+      "faces": 1,
+      "samples": 1411,
+      "envelope_z_error": 0.00031937929434455725,
+      "rolling_radius_error": 4.416776833160441e-06,
+      "worst": [
+        199.98381580915776,
+        811.8121852814494,
+        1499.9190790467956
+      ]
+    }
+  },
+  "g1_independent_volume": 132185649.98388772,
+  "spherical_terminal_integrals": [
+    {
+      "case": "D3",
+      "sphere_radius": 150.0,
+      "cut_heights": [
+        -129.9038105676658,
+        129.9038105676658
+      ],
+      "fillet_radius": 10.0,
+      "concave": false,
+      "simpson": [
+        3434602.723309317,
+        3434602.7233093204,
+        3434602.7233093204
+      ],
+      "native_volume": 3434602.723309535,
+      "native_absolute_difference": 2.146698534488678e-07
+    },
+    {
+      "case": "D7",
+      "sphere_radius": 150.0,
+      "cut_heights": [
+        -129.9038105676658,
+        129.9038105676658
+      ],
+      "fillet_radius": 10.0,
+      "concave": true,
+      "simpson": [
+        10332372.630140185,
+        10332372.630140195,
+        10332372.630140195
+      ],
+      "native_volume": 10332372.630140685,
+      "native_absolute_difference": 4.898756742477417e-07
+    }
+  ],
+  "comparison_statuses_changed": false,
+  "archive_sha256": "eceb7bdf446f72359392b8260f8244efa40c26aacf53bd0edc0133ccafcf73a3",
+  "archive_members": 53,
+  "member_sha256": {
+    "captured/G1/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "captured/G1/001.input.brep": "8a9d2feb919c0fa1cd8b67251a53f6b65af66e8bc36a3e60452d24cdace5b79b",
+    "captured/G1/001.input.step": "edadfcc9c5936b73bcc4226f0ac478bebb2d0e1b65199ca75648ee44d3fdd973",
+    "captured/G1/001.input.json": "7c7d1093794a9f2148fcb9461ce6abaefb95c603aa22386b568368c48f0cfe09",
+    "captured/G1/001.result.brep": "dfadffbf54cd35bd5384653648cf3e4e15c8a3542e240a2e0c5ffc463b132543",
+    "captured/G1/001.result.step": "a7fb2d918dacc5b40ac7810b0732b0808c78a0018b79497e96263a8ebbeda7a0",
+    "captured/G1/001.result.json": "c1900939f36164b9770f6ae688ca22b3c1592a57a1cca9e7b5fb59ed8307f06f",
+    "captured/G1/001.truck.step": "064c13765379c68d0c783e9dc80e0e18161a02ce33ab2b2ea2f79599ac490084",
+    "captured/G1/001.truck.json": "afe16a8a0b743184b21316f3f5be04ff88f49d23a0624c2a7dfd49dd5c941ecc",
+    "captured/G1/001.truck.log": "39ef5f47d92ba0ecf4d31f74f032a3743bbeb63c293df85cca429cc2826e2428",
+    "captured/G1/001.comparison.json": "3eb0882818c0d8d449edeca5680a425a6f7c4c1bd347449fb9ab4e0515ede5ec",
+    "captured/G1/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "captured/H4/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "captured/H4/001.input.brep": "7586600f7eb25f31372d271611731afc9a13c50f3e49f64fc742acb087702285",
+    "captured/H4/001.input.step": "f9d2661039005175abe12b75d641d58de254bef57f06da8df12e288c14f915cb",
+    "captured/H4/001.input.json": "cd297af1754082407e7577f897ef8bb73a19fbb0b38882316897074dd4a8eb3d",
+    "captured/H4/001.result.brep": "28a323585ea4ecf71612d4912d5e4c2df64c0d06cddb6e4d1e3d79edb03e4110",
+    "captured/H4/001.result.step": "169c98852033d7f16d37b10abf7cec07389ef178f556ede62e053d24273be3bc",
+    "captured/H4/001.result.json": "a16511428fbeed4a157e7d5262a9bab5bb4f34096551c19b48f8159ee6796ef0",
+    "captured/H4/001.truck.step": "52d73b634d8b3d3fe9f1d91abf7243820bf23be6f7f42efbffe5e90cded8cd78",
+    "captured/H4/001.truck.json": "6ed74ecba9f8200a14a240dac7a8492f9a51ad7edf4091dd50127e63fcaad886",
+    "captured/H4/001.truck.log": "c627ca44c3db6af51e6ad407f29ccccc02746b178a4415f5a505c1e8d8f30375",
+    "captured/H4/001.comparison.json": "b49668de9bb13bf14a1b4f68f6aad27050273401caafb3253c371d2711a7b963",
+    "captured/H4/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "helpers/probe-native-ellipsoid-pole-matrix.cpp": "32987b2b9b291eed3731c05bc2b9e76e65140c0d9c76a63607e6df0ce8c0741e",
+    "helpers/probe-native-ellipsoid-pole-matrix-command.json": "15dc065c0101cb1cda2f54b1096e470ce33cd9206f492c235faa1e374a3b7e37",
+    "helpers/probe-native-ellipsoid-pole-matrix.txt": "287a66ea372023f7bad11e4c546b606b1162736b22525228471367c303617f3c",
+    "helpers/probe-native-pole-material.cpp": "95741a4b70c28a6584648fb8ec1d26f3cdf2ac2bf75b63f7359ec6c2be7f0ef6",
+    "helpers/probe-native-pole-material-command.json": "2f922bb690a71058cbe88778709b05e572d009cc8bd6ef15606a9cf4aba02471",
+    "helpers/probe-native-pole-material.txt": "3ce5516bed8f9a6a4847c1e14ce166d1e49c433e1a611967d1ca7a9370cec3ef",
+    "helpers/probe-parabolic-envelope.cpp": "828c407a44cb08d11a2641ac9e2997ac5efaee52a55078dd24aaa2b113ad6030",
+    "helpers/probe-parabolic-envelope-command.json": "8dc42aee8a847c84bc6dd6f6da413d961dc4e3cd9bc5d567e535497e0ca1d551",
+    "helpers/parabolic-envelope-brep.txt": "f216413bf0fceae5e149ebb1a08ee8a44e87a8ee940243afc8ec999525fc62af",
+    "helpers/parabolic-envelope-step.txt": "3bc43fe09fe2843ee9ae8ea4ac49e14b28d18856e2f713f961a77e4517978e10",
+    "helpers/ellipsoid-pole-volume.json": "bf891cc925df6cdfc09454167e9b5cf958d5a29bb8348c66e5817726b07f584b",
+    "helpers/spherical-terminal-volume.py": "25c7035ad9f19807a90bb0df0005d1132dd4932ad40a7a0c69e18cea3fae742a",
+    "helpers/spherical-terminal-volume.json": "81258f3887958eebbe8af41797de3c2bb750f0db1ceb2e7b9f12bcff5bc7a21e",
+    "controls/ellipsoid-pole-matrix-0.500000.input.brep": "cf6ebbcb93e246b348cf4ba7d83292922e386ad884b689947370f24b459d2e7f",
+    "controls/ellipsoid-pole-matrix-0.500000.result.brep": "d70b55b0ae5cbd7f1a2e0cc23a8e689d33f5d87d09d4b1be99ec9bd136c02a04",
+    "controls/ellipsoid-pole-matrix-1.000000.input.brep": "2ab427cbec5e76094c593d5730d452a8ee69616653abdeb575d0f905509c5819",
+    "controls/ellipsoid-pole-matrix-1.000000.result.brep": "b0402d0e7e4b9062f1f93e3fbbeb5e35f27aac3e81e3bb39d747216034636b3c",
+    "controls/ellipsoid-pole-matrix-2.000000.input.brep": "031dd35b04c5492a550ab55fe21e8ab634954af723c4b105e29ab318811c76de",
+    "controls/ellipsoid-pole-matrix-2.000000.result.brep": "0d72e947a977bcafacef0131991cf4f93cebf8066a82576c3d2bbf94e479cd52",
+    "controls/ellipsoid-pole-matrix-10.000000.input.brep": "80a33a9163447558c7adc36dccf63ee89fdd5372ffec1a9516279a3146884c56",
+    "controls/ellipsoid-pole-matrix-10.000000.result.brep": "6d2343eeb644b42632c911e52675f0c3e9afce120db864c80522852f08888ab6",
+    "controls/ellipsoid-pole-matrix-100.000000.input.brep": "968229e26d59b45f578f91ce710d42a90f5c6f4cc50ecff4f40842151f751ae9",
+    "controls/ellipsoid-pole-matrix-100.000000.result.brep": "09869f6b92b2003eb346d62b828e1857817084b2325b91d2a8ac704d96db536e",
+    "helpers/H4-native-input-faces.txt": "3fa4bbecbe04caeb9363d59c8e3d303e72e4291c17844e91c52d82e850dbd3d4",
+    "helpers/H4-native-result-faces.txt": "18eb1d1576081f55696fe187ba13118359976d1298f7ec140450a3b7e29ef1ad",
+    "helpers/inspect-native-blend-faces.cpp": "ef90493cd54879611230f6764a35dc8a5c29222fff7eb53853eee9e35fa61ca4",
+    "derivation/truck-shapeops/tests/TWO_EDGE_BLEND_CAPS.md": "44d2095ac76369f358fe1fdfee3c1dee0432f84c4b1b0c6dbcfc829374f57cfd",
+    "derivation/truck-shapeops/tests/two_edge_blend_caps.rs": "7c9363e1ddf5a064ded8fb0c92e5b1a29e365a486dbbb2d4643fc02e30506d47",
+    "derivation/truck-shapeops/tests/imported_ellipsoid_sectors.rs": "adfc182af54d7ca0e437bbd08651d1415eab25d71302cefc6d56d59b55f14cbb"
+  }
+}

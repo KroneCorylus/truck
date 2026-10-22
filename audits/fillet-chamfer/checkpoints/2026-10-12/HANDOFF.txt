@@ -1,6 +1,6 @@
 LATEST CHECKPOINT — 2026-10-22
-Read ../2026-10-22-spline-pcurves/HANDOFF.txt and report.html.
-Implementation fc7757a2 adds exact spline parameter-curve import and finite face bounds. 452 constructions/419 limited passes; 140 positive solid operations unresolved. Use target/occt-distance-tree-plugin.
+Read ../2026-10-22-curved-terminals/HANDOFF.txt and report.html.
+Implementation da62f251 adds curved terminal fillet corners. 459 constructions/426 limited passes; 133 positive solid operations unresolved. Use target/occt-distance-tree-plugin.
 
 HISTORICAL HANDOFF FOLLOWS
 

@@ -1,0 +1,44 @@
+CURVED TERMINAL FILLET CORNERS — 2026-10-22
+CHECKPOINT COMPLETE. CONTINUE REMAINING CASES.
+
+# Curved terminal fillet corners: clean capture
+
+Implementation da62f251d7f620451f415f992e1a263731637fd1.
+
+Planar multi-edge fillet corners now terminate on curved faces. The construction retains exact cylindrical, spherical and toroidal blend geometry, intersects terminal supports, and trims neighboring conic edges with shared topology.
+
+454 release shapeops tests, 119 STEP tests, 67 replay tests, 13 capture tests, all-target Clippy and the single-thread benchmark smoke check pass. Native reference (8), volume (27) and distance (24) checks pass. Two regressions fail on the parent with identical sources and fixtures. Controls cover 32 successful variants, eight collision rejections, 5,168 tangent-normal pairs and eight imported selections at two STEP fitting budgets. One existing ignore and the known geometry precision failure remain explicit.
+
+All 396 native cases pass across 648 captured operations. 459 constructions (+7) and 426 limited comparison passes (+7). All 452 prior successful result/comparison records are exactly unchanged, as are every input task, native reference and selection scope.
+
+New limited passes: blend/simple/B1, blend/simple/B5, blend/simple/B9, blend/simple/C4, blend/simple/D3, blend/simple/D7, blend/simple/F7.
+
+Statuses: {"input-import-failed": 95, "operation-succeeded": 459, "operation-failed": 84, "input-inconsistent": 10}.
+
+133 of 559 positive solid operations remain unresolved; 33 are constructed discrepancies.
+
+Additional independent section integrals for spherical D3/D7 agree with native material within 5e-7 absolute volume. F7 is established by the unchanged corpus checks; no independent F7 material integral is claimed. G1/H4 native-reference diagnoses are archived separately without changing comparison statuses.
+
+Archive SHA256: abad2950f7c0a005f9c98a36731062ef9da7377c9f930cd66fd989af233cf6b4.
+
+No assertions, thresholds or replay fitting budgets changed. No global-error, parity or performance claim. No consumer/pin changes, push or PR.
+
+NEXT
+Continue until all cases are addressed; do not stop after this checkpoint.
+Raw capture target/occt-capture-curved-terminals. Parent target/curved-terminal-parent-source at 3d8fc852. Helpers target/prove-curved-terminal-parent.py, validate-curved-terminals.py, package-curved-terminal-proof.py, package-curved-terminals-full.py, package-curved-terminal-reference-evidence.py, write-curved-terminal-checkpoint.py.
+Implementation32 controls/8 collisions/5168 tangent pairs and8 native selections coverB1/B5/B9/C4. Full capture additionally resolvesD3/D7/F7. Spherical integral target/spherical-terminal-volume.py is archived with reference evidence. E2 still fails OutsideNeighbour, now construct_local_fillet; instrument this next, since the same curved-terminal construction handles its geometry except the lower pole termination. Independent E2 volume target/polar-terminal-volume.py/.json =3479626.174979871, within1.76e-6 ofnative. No E2 kernel fix applied yet.
+Next larger construction family B3/B7: cylinder/plane/plane corner with selected curved rim. Scratch design target/curved-junction-next-design.txt. Quarter-sector B3 independent Green-theorem cross-section integral target/cylinder-three-face-corner-volume.json agrees withnative190760.57996317022 within4e-10. B7 remote concave endpoint needs separate analysis. Cone variants have nonlinear center loci; do not substitute cylindrical surfaces.
+C2 sequential chamfer005 may collapse a radius0.5 contact at setback0.5;010 hasdistance0.4 with earlier cuts. C3 sequence002 is an open circular rim on a thin plate. Trace along_wire trim_runs before changing rejection checks. Sourceimages are PPM bytes despite.png filenames; converted scratchpreviews target/{C2,C3}-chamfer-preview.png.
+G1/H4 native-quality evidence is now archived in this checkpoint. G1 analytic native radiusresidual0.1434 versusTruck4.42e-6; independentvolume confirms discrepancy. H4 losespole, nativeclassifies interiorpoints ON despiteboundarydistance>1, andfive native scalecontrols giveinvalidsmall-scale outputs andscale-dependentmaterial. Keepcomparisonstatus; do not imitate nativeincorrectgeometry.
+C1:7 solid imports fail bounded endpoints;10 importedsolids remain inconsistent. Sourceedges can beoffsurface2.012e-6 despiteotherexactpcurves nowpreserved. Do notrelaxconsistencychecks. Nativeguide andcone reference-face diagnoses remainin2026-10-21-normal-section-angles.
+Consumer ../PiezaCAD/cad-core/src/kernel/blend.rs:229 unchanged. No push or PR.
+
+METHOD
+Read AGENTS.md. Parent-failing tests; no weakened assertions; shared solid/material/STEP checks.
+CARGO_BUILD_JOBS=12; rustfmt +nightly --config skip_children=true on touched Rust only; no cargo fmt.
+Freeze production during builds/tests/captures. Full release checks, all-target Clippy, single-thread actions smoke; build replay LAST.
+Commit implementation and proof before clean capture; then HTML/catalog/handoff commit. Force-add ignored JSON/ZIP/STEP/BREP fixtures. git diff --check excludes *.step and *.brep because native fixtures retain original whitespace.
+No consumer/pin changes, push, PR, subagents or unsupported performance/parity claims.
+SDK target/occt-sdk/usr/lib64;nativecheckout ../investigations/sequential-holes-2026-10-10/occt;publicdata target/occt-public-chamfer-data.
+Capture workers4,timeout120,freshoutput. Packaging is not idempotent. Never print full task/capture records: contour point arrays are large; whitelist output fields.
+Known baseline:truck-geometry pcurve_derivation absolute precision failure reproduced on parent. Preserve it explicitly; no tolerance relaxation.

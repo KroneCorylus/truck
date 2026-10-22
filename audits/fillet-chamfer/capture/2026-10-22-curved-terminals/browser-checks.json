@@ -1,0 +1,32 @@
+{
+  "previews": [
+    {
+      "width": 1100,
+      "contentHeight": 2219,
+      "capturedHeight": 2219,
+      "consoleMessages": [
+        {
+          "level": "log",
+          "text": "{\"width\":1100,\"scrollWidth\":1100,\"overflow\":false,\"links\":13}"
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "contentHeight": 3348,
+      "capturedHeight": 3348,
+      "consoleMessages": [
+        {
+          "level": "log",
+          "text": "{\"width\":390,\"scrollWidth\":390,\"overflow\":false,\"links\":13}"
+        }
+      ]
+    }
+  ],
+  "link_checks": {
+    "total": 13,
+    "all_resolve": true,
+    "method": "Live browser: same-document anchors and HTTP HEAD for evidence links"
+  },
+  "visual_review": "Desktop and mobile screenshots inspected; text readable, no clipping or horizontal overflow."
+}
