@@ -4474,7 +4474,11 @@ mod curved_terminal_junction_tests {
                 1568360.953636779,
             ),
         ];
-        for (name, step, intent, expected) in fixtures {
+        check(&fixtures);
+    }
+
+    fn check(fixtures: &[(&str, &str, &str, f64)]) {
+        for &(name, step, intent, expected) in fixtures {
             for reverse in [false, true] {
                 let directory = std::env::temp_dir().join(format!(
                     "truck-curved-terminal-{}-{name}-{reverse}",
@@ -4539,5 +4543,15 @@ mod curved_terminal_junction_tests {
                 std::fs::remove_dir_all(directory).unwrap();
             }
         }
+    }
+
+    #[test]
+    fn native_polar_terminal_preserves_corner_material_and_selection() {
+        check(&[(
+            "E2",
+            include_str!("../tests/fixtures/polar-terminal-junctions/E2.input.step"),
+            include_str!("../tests/fixtures/polar-terminal-junctions/E2.input.json"),
+            3479626.174979871,
+        )]);
     }
 }

@@ -946,6 +946,12 @@ pub(super) fn line_intersection(
     near: Point3,
 ) -> Option<Point3> {
     let direction = line.1 - line.0;
+    let numerical = || {
+        let hint = surface.search_nearest_parameter(near, None, 100)?;
+        let t = (near - line.0).dot(direction) / direction.magnitude2();
+        let (_, t) = algo::surface::search_intersection_parameter(surface, hint, line, t, 100)?;
+        t.is_finite().then(|| line.subs(t))
+    };
     match surface.elementary().map(|(s, _)| s) {
         Some(Elementary::Plane(plane)) => {
             let n = plane.normal();
@@ -985,11 +991,25 @@ pub(super) fn line_intersection(
                 points[1]
             })
         }
-        _ => {
-            let hint = surface.search_nearest_parameter(near, None, 100)?;
-            let t = (near - line.0).dot(direction) / direction.magnitude2();
-            let (_, t) = algo::surface::search_intersection_parameter(surface, hint, line, t, 100)?;
-            t.is_finite().then(|| line.subs(t))
-        }
+        Some(Elementary::Sphere { center, radius }) => numerical().or_else(|| {
+            // A polar parameterization has a singular Jacobian even for a transverse line.
+            if !direction.magnitude2().is_finite() || direction.so_small() {
+                return None;
+            }
+            let axis = direction.normalize();
+            let foot = line.0 + axis * (center - line.0).dot(axis);
+            let chord2 = radius * radius - foot.distance2(center);
+            if !chord2.is_finite() || chord2 < 0. {
+                return None;
+            }
+            let offset = axis * chord2.sqrt();
+            let points = [foot - offset, foot + offset];
+            Some(if points[0].distance2(near) <= points[1].distance2(near) {
+                points[0]
+            } else {
+                points[1]
+            })
+        }),
+        _ => numerical(),
     }
 }

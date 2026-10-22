@@ -6,6 +6,12 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Recover line/sphere terminal intersections when polar surface coordinates make
+  the numerical solver singular. Use an analytic sphere intersection only when
+  the existing solver fails, preserving successful numerical contacts. Polar
+  fillet junction regressions verify radii, both terminal supports, independent
+  material, transformations, reversed selections, collision rejection and STEP.
+
 - Extend planar multi-edge fillet corners to cylindrical and conical terminal
   faces. Intersect the constant-radius blends with terminal supports and trim
   neighboring conic edges while preserving shared topology. Convex and concave

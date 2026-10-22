@@ -1,0 +1,18 @@
+{
+  "revision": "3b401517f65ab394c58a436c59cdcdae5c4f6f04",
+  "test_sha256": {
+    "truck-shapeops/tests/polar_terminal_junctions.rs": "7a5f137fabadc759afc779531e87c881bcfd77321a51fb9a2b3781e846bbad02",
+    "truck-shapeops/examples/replay_occt_blend.rs": "80e5e76c534d1b3b8e597593ba3f725a0b58e75da359f8b4f8b3a124d4cdf350",
+    "truck-shapeops/tests/fixtures/polar-terminal-junctions/E2.input.step": "6222477249af49eddfa5bbe2c9f6c8ee6c4ab651bd03e7873bc1965e664eca12",
+    "truck-shapeops/tests/fixtures/polar-terminal-junctions/E2.input.json": "7e5b04aca1fd895961e469444a20fa0b19a9256b140d8e0cf46d7a94769b328d",
+    "truck-shapeops/tests/fixtures/polar-terminal-junctions/README.md": "bb7448b8698702238d1b58121db5af02c8bf5d5606d318a37dd2434406e925a5"
+  },
+  "parent_test_sha256": {
+    "truck-shapeops/tests/polar_terminal_junctions.rs": "7a5f137fabadc759afc779531e87c881bcfd77321a51fb9a2b3781e846bbad02",
+    "truck-shapeops/examples/replay_occt_blend.rs": "80e5e76c534d1b3b8e597593ba3f725a0b58e75da359f8b4f8b3a124d4cdf350",
+    "truck-shapeops/tests/fixtures/polar-terminal-junctions/E2.input.step": "6222477249af49eddfa5bbe2c9f6c8ee6c4ab651bd03e7873bc1965e664eca12",
+    "truck-shapeops/tests/fixtures/polar-terminal-junctions/E2.input.json": "7e5b04aca1fd895961e469444a20fa0b19a9256b140d8e0cf46d7a94769b328d",
+    "truck-shapeops/tests/fixtures/polar-terminal-junctions/README.md": "bb7448b8698702238d1b58121db5af02c8bf5d5606d318a37dd2434406e925a5"
+  },
+  "binding_change": null
+}

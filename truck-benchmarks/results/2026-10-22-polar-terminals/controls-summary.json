@@ -1,0 +1,72 @@
+{
+  "procedural_operations": 8,
+  "collision_rejections": 2,
+  "terminal_curve_samples": 264,
+  "imported_selections": 2,
+  "step_budgets": [
+    5e-05,
+    1e-07
+  ],
+  "native_comparison": {
+    "schema_version": 1,
+    "comparison": "sampled-only",
+    "native_valid": true,
+    "truck_step_valid": true,
+    "native_solids": 1,
+    "truck_solids": 1,
+    "native_volume": 3479626.174981632,
+    "truck_volume": 3479626.1722210203,
+    "native_to_truck_max_distance": 3.1183686050150933e-06,
+    "native_to_truck_samples": 1581,
+    "truck_to_native_max_distance": 8.71459278193159e-06,
+    "truck_to_native_samples": 1581,
+    "native_tolerances": {
+      "face": 1e-06,
+      "edge": 1e-06,
+      "vertex": 1e-06
+    },
+    "truck_step_tolerances": {
+      "face": 1e-07,
+      "edge": 4.014361535247663e-06,
+      "vertex": 4.014361535247663e-06
+    }
+  },
+  "independent_integral": {
+    "case": "E2",
+    "sphere_radius": 150.0,
+    "top_height": 129.9038105676658,
+    "fillet_radius": 10.0,
+    "input_volume": 3488838.232913458,
+    "simpson": [
+      3479626.1749798697,
+      3479626.174979871,
+      3479626.174979871
+    ],
+    "native_volume": 3479626.174981625,
+    "native_absolute_difference": 1.753680408000946e-06
+  },
+  "archive_sha256": "ad112dbfda4f3c462d32b5e7dcd3a868d1582b1619fb66d0f0887bc5ae64d33b",
+  "archive_members": 20,
+  "member_sha256": {
+    "probe/E2/001.input.step": "6222477249af49eddfa5bbe2c9f6c8ee6c4ab651bd03e7873bc1965e664eca12",
+    "probe/E2/001.input.json": "7e5b04aca1fd895961e469444a20fa0b19a9256b140d8e0cf46d7a94769b328d",
+    "probe/E2/001.input.brep": "172b68310db3ba28d9268e2c93dbb1b26609b2e92c2955d5b4f1e95e6c835dae",
+    "probe/E2/001.result.brep": "77f80ea6dddd2740bef72c8d645dcd892f6353c03f6a25102f3abeaf0973b0e4",
+    "probe/E2/001.result.json": "bac34f888596d85a31cb14cb9a628685d7d1d9142a138ffd27a2961a7d60574f",
+    "probe/E2/001.result.step": "ca0dd17239fec2319617a93935802f27a792fde6a04f5dfd0f6c8d8f47c8d674",
+    "probe/E2/001.truck.log": "1752942af85c540166d6854f2052154948a058903019b551a42281a92f981ae2",
+    "probe/E2/001.truck.step": "fd419930a7093d8900f29c97e93848c77be103d31851cedce703940768a3b145",
+    "probe/E2/001.truck.json": "f627967fbfad4e9db88b5c6c289c935d0c08a2ce67292b2444655f7f5c1e6e33",
+    "probe/E2/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "probe/E2/001.comparison.json": "3c625e11639de834d1f679f8f6cc8a51bccc8d8962a6879d830764f8f5eeaf4a",
+    "helpers/prove-polar-terminal-parent.py": "315dbc7d4f9d75d68eade81e280860cf3dac1b212b90de4e519d89b20d7f57a5",
+    "helpers/validate-polar-terminals.py": "2be5ce0eae66a043d17579bfa5a833bf89fb46b05d3fad96f57f69a58cc4449b",
+    "helpers/polar-terminal-volume.py": "747f02b2e211e3c970bb3d8f64968e17012552d8307e4d077648289345e9e962",
+    "helpers/polar-terminal-volume.json": "e10a14c2ab6fb0959204284d82f650b4946cea27cc80c54d68d526fc6e086398",
+    "parent/truck-shapeops/tests/polar_terminal_junctions.rs": "7a5f137fabadc759afc779531e87c881bcfd77321a51fb9a2b3781e846bbad02",
+    "parent/truck-shapeops/examples/replay_occt_blend.rs": "80e5e76c534d1b3b8e597593ba3f725a0b58e75da359f8b4f8b3a124d4cdf350",
+    "parent/truck-shapeops/tests/fixtures/polar-terminal-junctions/E2.input.step": "6222477249af49eddfa5bbe2c9f6c8ee6c4ab651bd03e7873bc1965e664eca12",
+    "parent/truck-shapeops/tests/fixtures/polar-terminal-junctions/E2.input.json": "7e5b04aca1fd895961e469444a20fa0b19a9256b140d8e0cf46d7a94769b328d",
+    "parent/truck-shapeops/tests/fixtures/polar-terminal-junctions/README.md": "bb7448b8698702238d1b58121db5af02c8bf5d5606d318a37dd2434406e925a5"
+  }
+}
