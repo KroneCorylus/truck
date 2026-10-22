@@ -789,7 +789,7 @@ fn section(
     Some((normals, contacts, Some(center)))
 }
 
-fn trim_edge(
+pub(super) fn trim_edge(
     old: &Edge,
     vertex: &Vertex,
     point: &Vertex,
@@ -940,7 +940,11 @@ fn trim_contact(
     None
 }
 
-fn line_intersection(surface: &Surface, line: &Line<Point3>, near: Point3) -> Option<Point3> {
+pub(super) fn line_intersection(
+    surface: &Surface,
+    line: &Line<Point3>,
+    near: Point3,
+) -> Option<Point3> {
     let direction = line.1 - line.0;
     match surface.elementary().map(|(s, _)| s) {
         Some(Elementary::Plane(plane)) => {

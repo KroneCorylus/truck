@@ -1,0 +1,28 @@
+$ cargo test --release -p truck-shapeops --test curved_terminal_junctions
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/target/curved-terminal-parent-source/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/target/curved-terminal-parent-source/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 10.79s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/curved_terminal_junctions.rs (/home/krone/Development/Pieza_WS/truck/target/release/deps/curved_terminal_junctions-12eb21b7f319e16b)
+
+running 2 tests
+test curved_terminals_reject_colliding_corner_fillets_without_mutation ... ok
+test planar_corner_fillets_trim_their_cylindrical_and_conical_terminals ... FAILED
+
+failures:
+
+---- planar_corner_fillets_trim_their_cylindrical_and_conical_terminals stdout ----
+
+thread 'planar_corner_fillets_trim_their_cylindrical_and_conical_terminals' (480102) panicked at truck-shapeops/tests/curved_terminal_junctions.rs:159:30:
+shared planar corner with curved terminal faces: Diagnostic { code: UnsupportedGeometry, operation: "fillet_solid_edges", stage: "validate_input", message: "The geometry is outside the supported scope of this operation.", context: Context { operand: None, shell_index: Some(0), face_index: Some(0), edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    planar_corner_fillets_trim_their_cylindrical_and_conical_terminals
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-shapeops --test curved_terminal_junctions`
+exit_code 101

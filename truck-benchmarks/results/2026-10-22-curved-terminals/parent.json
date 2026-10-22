@@ -1,0 +1,30 @@
+{
+  "revision": "3d8fc852acc8640c7bc63d9bd1d21f9db72bc28c",
+  "test_sha256": {
+    "truck-shapeops/tests/curved_terminal_junctions.rs": "235fef7bd199c467f4242150c9f24aaf045a38adf45750fc40fcab30383d2dd1",
+    "truck-shapeops/examples/replay_occt_blend.rs": "9092ec413bb1804b207ab520eaa990cd4e47599e2b67fd9b87cc7c06c5f3e1e8",
+    "truck-shapeops/tests/fixtures/curved-terminal-junctions/B1.input.step": "2a10ae5f4e7948092fe671c30f2df856a832c848b8ea2e70e8dd6fbb8e935341",
+    "truck-shapeops/tests/fixtures/curved-terminal-junctions/B1.input.json": "a18f053cb46bbcadf93022794f0693b43ec27f37f25334552889bb44f5f8cc9a",
+    "truck-shapeops/tests/fixtures/curved-terminal-junctions/B5.input.step": "9c4564b736c5a0c083c644b4466d0f401691d1a74ee84ead0c37bf0d5e1846de",
+    "truck-shapeops/tests/fixtures/curved-terminal-junctions/B5.input.json": "b1a32666336252a336459e3b7c08de0ee48e62b21fd62993fce45c1f7909f111",
+    "truck-shapeops/tests/fixtures/curved-terminal-junctions/B9.input.step": "75113e874d7856bb398d7d33690423796aa323446279ea0aad61316d54bfccd4",
+    "truck-shapeops/tests/fixtures/curved-terminal-junctions/B9.input.json": "7fe668919b79ba0508170cf6034d2171289c700d12a10d61ad291cc4b6d1b1e1",
+    "truck-shapeops/tests/fixtures/curved-terminal-junctions/C4.input.step": "faca21712bffab24481cd81e73f2bf4be7f3ee4921a943c04040acb0469c68a8",
+    "truck-shapeops/tests/fixtures/curved-terminal-junctions/C4.input.json": "e93f27174d0d863c220968cc137eca8a957337ee1f64cc113723b1a139f85ec9",
+    "truck-shapeops/tests/fixtures/curved-terminal-junctions/README.md": "7c62c3a9a03bba95c5769f1467ee049b4f73fc0dcc9973ccd474b82bcdb1e75e"
+  },
+  "parent_test_sha256": {
+    "truck-shapeops/tests/curved_terminal_junctions.rs": "235fef7bd199c467f4242150c9f24aaf045a38adf45750fc40fcab30383d2dd1",
+    "truck-shapeops/examples/replay_occt_blend.rs": "9092ec413bb1804b207ab520eaa990cd4e47599e2b67fd9b87cc7c06c5f3e1e8",
+    "truck-shapeops/tests/fixtures/curved-terminal-junctions/B1.input.step": "2a10ae5f4e7948092fe671c30f2df856a832c848b8ea2e70e8dd6fbb8e935341",
+    "truck-shapeops/tests/fixtures/curved-terminal-junctions/B1.input.json": "a18f053cb46bbcadf93022794f0693b43ec27f37f25334552889bb44f5f8cc9a",
+    "truck-shapeops/tests/fixtures/curved-terminal-junctions/B5.input.step": "9c4564b736c5a0c083c644b4466d0f401691d1a74ee84ead0c37bf0d5e1846de",
+    "truck-shapeops/tests/fixtures/curved-terminal-junctions/B5.input.json": "b1a32666336252a336459e3b7c08de0ee48e62b21fd62993fce45c1f7909f111",
+    "truck-shapeops/tests/fixtures/curved-terminal-junctions/B9.input.step": "75113e874d7856bb398d7d33690423796aa323446279ea0aad61316d54bfccd4",
+    "truck-shapeops/tests/fixtures/curved-terminal-junctions/B9.input.json": "7fe668919b79ba0508170cf6034d2171289c700d12a10d61ad291cc4b6d1b1e1",
+    "truck-shapeops/tests/fixtures/curved-terminal-junctions/C4.input.step": "faca21712bffab24481cd81e73f2bf4be7f3ee4921a943c04040acb0469c68a8",
+    "truck-shapeops/tests/fixtures/curved-terminal-junctions/C4.input.json": "e93f27174d0d863c220968cc137eca8a957337ee1f64cc113723b1a139f85ec9",
+    "truck-shapeops/tests/fixtures/curved-terminal-junctions/README.md": "7c62c3a9a03bba95c5769f1467ee049b4f73fc0dcc9973ccd474b82bcdb1e75e"
+  },
+  "binding_change": null
+}

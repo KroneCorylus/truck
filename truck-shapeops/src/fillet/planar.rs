@@ -243,6 +243,7 @@ pub(super) fn neighborhood(
     shell: &Shell,
     selected: &HashSet<EdgeID>,
     operation: &'static str,
+    curved_terminals: bool,
 ) -> Result<Neighborhood, Diagnostic> {
     let error = |code| Diagnostic::new(code, operation, "validate_neighborhood");
     let mut vertices = Vec::new();
@@ -311,14 +312,25 @@ pub(super) fn neighborhood(
         {
             return Err(error(Code::UnsupportedTopology));
         }
+        let chosen: Vec<_> = edges
+            .iter()
+            .copied()
+            .filter(|&k| selected.contains(&original_edges[k].id()))
+            .collect();
+        let curved_terminal = curved_terminals
+            && edges.len() == 3
+            && chosen.len() == 1
+            && sides[chosen[0]].iter().all(|&f| planes[f].is_some());
         for &k in edges {
             for f in sides[k] {
-                if planes[f].is_none() {
+                if planes[f].is_none() && !curved_terminal {
                     return Err(error(Code::NonPlanarFace).face(f));
                 }
             }
             let edge = &original_edges[k];
-            if !matches!(edge.curve(), Curve::Line(_)) {
+            if !matches!(edge.curve(), Curve::Line(_))
+                && (!curved_terminal || selected.contains(&edge.id()))
+            {
                 return Err(error(Code::UnsupportedGeometry));
             }
             let axis = edge.back().point() - edge.front().point();

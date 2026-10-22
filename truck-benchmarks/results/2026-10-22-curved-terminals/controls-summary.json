@@ -1,0 +1,241 @@
+{
+  "procedural_operations": 32,
+  "collision_rejections": 8,
+  "tangent_normal_pairs": 5168,
+  "imported_selections": 8,
+  "step_budgets": [
+    5e-05,
+    1e-07
+  ],
+  "native_comparisons": {
+    "B1": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 192228.5689374237,
+      "truck_volume": 192228.5685859727,
+      "native_to_truck_max_distance": 2.7725430755626486e-06,
+      "native_to_truck_samples": 1913,
+      "truck_to_native_max_distance": 2.2278175645777585e-06,
+      "truck_to_native_samples": 1914,
+      "native_tolerances": {
+        "face": 1e-07,
+        "edge": 1e-07,
+        "vertex": 4.99800158593189e-07
+      },
+      "truck_step_tolerances": {
+        "face": 1e-07,
+        "edge": 2.5186431184863547e-06,
+        "vertex": 2.5186431184863547e-06
+      }
+    },
+    "B5": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 589069.0945904315,
+      "truck_volume": 589069.094155206,
+      "native_to_truck_max_distance": 2.772543056940315e-06,
+      "native_to_truck_samples": 1891,
+      "truck_to_native_max_distance": 2.227817567065769e-06,
+      "truck_to_native_samples": 1892,
+      "native_tolerances": {
+        "face": 1e-07,
+        "edge": 1e-07,
+        "vertex": 7.41323397335236e-07
+      },
+      "truck_step_tolerances": {
+        "face": 1e-07,
+        "edge": 2.518643119018391e-06,
+        "vertex": 2.518643119018391e-06
+      }
+    },
+    "B9": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 517493.9339978292,
+      "truck_volume": 517493.93376169493,
+      "native_to_truck_max_distance": 2.6599259282101347e-06,
+      "native_to_truck_samples": 1832,
+      "truck_to_native_max_distance": 2.2119652856572848e-06,
+      "truck_to_native_samples": 1825,
+      "native_tolerances": {
+        "face": 1e-07,
+        "edge": 1e-07,
+        "vertex": 1.28262114404418e-07
+      },
+      "truck_step_tolerances": {
+        "face": 1e-07,
+        "edge": 2.6245901154596815e-06,
+        "vertex": 2.6245901154596815e-06
+      }
+    },
+    "C4": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 1568360.953636747,
+      "truck_volume": 1568360.9532557116,
+      "native_to_truck_max_distance": 2.6599259266812965e-06,
+      "native_to_truck_samples": 1802,
+      "truck_to_native_max_distance": 2.2119652966317634e-06,
+      "truck_to_native_samples": 1793,
+      "native_tolerances": {
+        "face": 1e-07,
+        "edge": 1e-07,
+        "vertex": 1.28262285628872e-07
+      },
+      "truck_step_tolerances": {
+        "face": 1e-07,
+        "edge": 2.6245901175898973e-06,
+        "vertex": 2.6245901175898973e-06
+      }
+    }
+  },
+  "independent_integrals": [
+    {
+      "case": "B1",
+      "dimensions": [
+        50,
+        50,
+        100,
+        10
+      ],
+      "simpson": [
+        192228.5689376754,
+        192228.56893767524,
+        192228.5689376752
+      ],
+      "native": 192228.56893742346,
+      "absolute_error": 2.5174813345074654e-07
+    },
+    {
+      "case": "B9",
+      "dimensions": [
+        90,
+        40,
+        150,
+        10
+      ],
+      "simpson": [
+        517493.9339978149,
+        517493.9339978154,
+        517493.9339978154
+      ],
+      "native": 517493.93399782863,
+      "absolute_error": 1.3213139027357101e-08
+    },
+    {
+      "case": "B5",
+      "dimensions": [
+        50,
+        50,
+        100,
+        10
+      ],
+      "simpson": [
+        589069.0945907328,
+        589069.0945907312,
+        589069.0945907312
+      ],
+      "native": 589069.0945904315,
+      "absolute_error": 2.996530383825302e-07
+    },
+    {
+      "case": "C4",
+      "dimensions": [
+        90,
+        40,
+        150,
+        10
+      ],
+      "simpson": [
+        1568360.9536367785,
+        1568360.953636779,
+        1568360.953636779
+      ],
+      "native": 1568360.9536367483,
+      "absolute_error": 3.073364496231079e-08
+    }
+  ],
+  "archive_sha256": "8a64750c549c5009b79bd8181d54eaaa8ebbce4110f00fe2970326cfd98d4fc9",
+  "archive_members": 63,
+  "member_sha256": {
+    "probe/B1/001.input.brep": "a30380461e3e7a6b5701d41be77f05a507efbcad926111d418830db6bd347fcc",
+    "probe/B1/001.input.step": "2a10ae5f4e7948092fe671c30f2df856a832c848b8ea2e70e8dd6fbb8e935341",
+    "probe/B1/001.input.json": "a18f053cb46bbcadf93022794f0693b43ec27f37f25334552889bb44f5f8cc9a",
+    "probe/B1/001.truck.log": "fedf5489c0feed6a2ad309c4015c275babb5a6bb12ab859e082b7de0a4ebf9d0",
+    "probe/B1/001.truck.step": "17384ade15dbcacb9a0502db69f2fc9c261ada51b8772a7f6f621f1ae8822b84",
+    "probe/B1/001.truck.json": "f9f3725007688764c2de5ea3b420b9db8331224f15395a19f703661847e7fa69",
+    "probe/B1/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "probe/B1/001.comparison.json": "5d196bec02f2ee0524f43c99151579b0325f61df57887eca28e823e2f1575d07",
+    "probe/B1/001.result.brep": "0bb375b5762b83d40e529d98f2b7d9c6f42813383c7180953b7329ebf47e998b",
+    "probe/B1/001.result.step": "eeaaf1ccf5b7002ea37626166adce9e1da4145e310d71c4e2454919272bdbbca",
+    "probe/B1/001.result.json": "3d68bcd0e7acb84ba8a23247eafa09973ae7120a5384a44b652dd649f475d3e8",
+    "probe/B1/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "probe/B5/001.input.brep": "98b41c73a3608e32b606607dacba9b4572f0ab3f05152b01bbb2ac73a91bf54b",
+    "probe/B5/001.input.step": "9c4564b736c5a0c083c644b4466d0f401691d1a74ee84ead0c37bf0d5e1846de",
+    "probe/B5/001.input.json": "b1a32666336252a336459e3b7c08de0ee48e62b21fd62993fce45c1f7909f111",
+    "probe/B5/001.truck.log": "54ad8d5dd6085763f0fa1b9efc2f6b394289ffac2003821647c4e8e2dc44c643",
+    "probe/B5/001.truck.step": "779a54ce92f01bec49f2d669434ff56c31955e24ac9af2068072e40034d34222",
+    "probe/B5/001.truck.json": "a36f9245be9533b1c0a7caaf6bae9c0fbe2d87f091d6717cd69fb3a9ded39f87",
+    "probe/B5/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "probe/B5/001.comparison.json": "8783c7992bb3f914c349427e13e2bf4d8e2571edb8298091e96dffdf05c3646b",
+    "probe/B5/001.result.brep": "f29b2904cce733a150765929f842979da26a0f0d51d701f2292aa8aa9df66fb5",
+    "probe/B5/001.result.step": "73b909b7ca19e102c813d55675fcc572977b9560d2eb91c898d4507a876726b5",
+    "probe/B5/001.result.json": "80859345d130a1979fa45bd8af382428e0536bf6881fd85115171b8cba56990b",
+    "probe/B5/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "probe/B9/001.input.brep": "a68849ea6dac47a69e5261c3518ad7524adba6658454cf8809168013260624da",
+    "probe/B9/001.input.step": "75113e874d7856bb398d7d33690423796aa323446279ea0aad61316d54bfccd4",
+    "probe/B9/001.input.json": "7fe668919b79ba0508170cf6034d2171289c700d12a10d61ad291cc4b6d1b1e1",
+    "probe/B9/001.truck.log": "1d8203405407de5b4d66d157cc25dae071f5e743093959e9ce63f37eedd23797",
+    "probe/B9/001.truck.step": "8f71fe91a3668117ea36f15684249f8469ac7ba9785aee49c06dc832aba732c0",
+    "probe/B9/001.truck.json": "7543c987621be96088e2a4ac1d791022400cdba4d14c3e7d6bc03475d8f2c772",
+    "probe/B9/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "probe/B9/001.comparison.json": "d6c911c57c420507eac19c3db0763c46c871e02959eeb36293dfbad33fe3c3dc",
+    "probe/B9/001.result.brep": "5fa70433796ae4106ee356a3d5284509c97cf6af8e7976f4b094c8c67e4edc5c",
+    "probe/B9/001.result.step": "f5bcd960c03dcb79d8956210b5ab3f02d7a35c15522c37c037c4881e5c7e3f91",
+    "probe/B9/001.result.json": "e07a45f751d86f39cf45ee924c14cdc44a662eefd65d0a35b9f063a3025d3613",
+    "probe/B9/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "probe/C4/001.input.brep": "c2e7c3e29f19e12d100fec0cf372f3ddf0c0200afb07acd93f19d47a322bbafd",
+    "probe/C4/001.input.step": "faca21712bffab24481cd81e73f2bf4be7f3ee4921a943c04040acb0469c68a8",
+    "probe/C4/001.input.json": "e93f27174d0d863c220968cc137eca8a957337ee1f64cc113723b1a139f85ec9",
+    "probe/C4/001.truck.log": "3c47f431e1606a9afbf914094cfd57db638eae1482d94db420e15257aad624cf",
+    "probe/C4/001.truck.step": "ed1ce899955b79341ada992f7670da59ab2bc7fb9f127100451f1510262408fa",
+    "probe/C4/001.truck.json": "fa4bf1a7a7a19aadb26a58be62edd216f05a735e11b7b19498cf38db3795c159",
+    "probe/C4/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "probe/C4/001.comparison.json": "b8b2e5690a76b5ce6989e4e7316685b72b896bcce97ea4d8d171d67f039fac63",
+    "probe/C4/001.result.brep": "8a738dd57d641e9fb55f59547c014d6fa9fd3e2cf029d564f315c984fcee1f46",
+    "probe/C4/001.result.step": "306266f72ebbf89d0f5864a451ae73ae9a167443da943cdafe0760d0aaed3b8d",
+    "probe/C4/001.result.json": "0738af56a3ac0c44656f6ddc50adefa2dcc2f02b5b876c602267198118117c09",
+    "probe/C4/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "helpers/prove-curved-terminal-parent.py": "e4c6e4e069b84fa957251e591ad074137261c67179ccb91e65d3433e7d2a0369",
+    "helpers/validate-curved-terminals.py": "d8a88fb02826ec594de821ad466c51cfdeda2698e255a827b20f6a7216363a8c",
+    "helpers/curved-terminal-volume.py": "a1916d67871d4dff2fd272354de5633ee82b7e60aa99a253ebae076799821062",
+    "helpers/curved-terminal-volume.json": "c99ce0d1c52722525ade608392c103b184cf4d95dc73f0cc37f538b6317d3175",
+    "parent/truck-shapeops/tests/curved_terminal_junctions.rs": "235fef7bd199c467f4242150c9f24aaf045a38adf45750fc40fcab30383d2dd1",
+    "parent/truck-shapeops/examples/replay_occt_blend.rs": "9092ec413bb1804b207ab520eaa990cd4e47599e2b67fd9b87cc7c06c5f3e1e8",
+    "parent/truck-shapeops/tests/fixtures/curved-terminal-junctions/B1.input.step": "2a10ae5f4e7948092fe671c30f2df856a832c848b8ea2e70e8dd6fbb8e935341",
+    "parent/truck-shapeops/tests/fixtures/curved-terminal-junctions/B1.input.json": "a18f053cb46bbcadf93022794f0693b43ec27f37f25334552889bb44f5f8cc9a",
+    "parent/truck-shapeops/tests/fixtures/curved-terminal-junctions/B5.input.step": "9c4564b736c5a0c083c644b4466d0f401691d1a74ee84ead0c37bf0d5e1846de",
+    "parent/truck-shapeops/tests/fixtures/curved-terminal-junctions/B5.input.json": "b1a32666336252a336459e3b7c08de0ee48e62b21fd62993fce45c1f7909f111",
+    "parent/truck-shapeops/tests/fixtures/curved-terminal-junctions/B9.input.step": "75113e874d7856bb398d7d33690423796aa323446279ea0aad61316d54bfccd4",
+    "parent/truck-shapeops/tests/fixtures/curved-terminal-junctions/B9.input.json": "7fe668919b79ba0508170cf6034d2171289c700d12a10d61ad291cc4b6d1b1e1",
+    "parent/truck-shapeops/tests/fixtures/curved-terminal-junctions/C4.input.step": "faca21712bffab24481cd81e73f2bf4be7f3ee4921a943c04040acb0469c68a8",
+    "parent/truck-shapeops/tests/fixtures/curved-terminal-junctions/C4.input.json": "e93f27174d0d863c220968cc137eca8a957337ee1f64cc113723b1a139f85ec9",
+    "parent/truck-shapeops/tests/fixtures/curved-terminal-junctions/README.md": "7c62c3a9a03bba95c5769f1467ee049b4f73fc0dcc9973ccd474b82bcdb1e75e"
+  }
+}

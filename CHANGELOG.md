@@ -6,6 +6,12 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Extend planar multi-edge fillet corners to cylindrical and conical terminal
+  faces. Intersect the constant-radius blends with terminal supports and trim
+  neighboring conic edges while preserving shared topology. Convex and concave
+  controls verify radii, tangency, independent material integrals, transformed
+  scales, reversed selection order, collision rejection and STEP round trips.
+
 - Import B-spline parameter curves on exactly parameterized extruded supports.
   Preserve their points, derivatives and parameter ranges, and fit finite sweep
   domains from complete parameter-curve bounds, including endpoint roundoff.

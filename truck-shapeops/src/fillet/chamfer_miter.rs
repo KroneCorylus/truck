@@ -19,7 +19,7 @@ pub(super) fn chamfer(
         Diagnostic::new(code, "chamfer_solid_edges", "construct_miter")
             .parameter("distance", distance)
     };
-    let data = neighborhood(shell, selected, "chamfer_solid_edges")?;
+    let data = neighborhood(shell, selected, "chamfer_solid_edges", false)?;
     let epsilon = tol.min(TOLERANCE);
     let mut bevels = vec![None; data.original_edges.len()];
     // Each original edge has one endpoint pair per adjacent face. Bevels separate the pairs.

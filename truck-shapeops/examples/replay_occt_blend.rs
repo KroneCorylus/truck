@@ -4441,3 +4441,103 @@ mod normal_section_reference_tests {
         }
     }
 }
+
+#[cfg(test)]
+mod curved_terminal_junction_tests {
+    use super::*;
+
+    #[test]
+    fn native_curved_terminals_preserve_corner_material_and_selection() {
+        let fixtures = [
+            (
+                "B1",
+                include_str!("../tests/fixtures/curved-terminal-junctions/B1.input.step"),
+                include_str!("../tests/fixtures/curved-terminal-junctions/B1.input.json"),
+                192228.5689376752,
+            ),
+            (
+                "B5",
+                include_str!("../tests/fixtures/curved-terminal-junctions/B5.input.step"),
+                include_str!("../tests/fixtures/curved-terminal-junctions/B5.input.json"),
+                589069.0945907312,
+            ),
+            (
+                "B9",
+                include_str!("../tests/fixtures/curved-terminal-junctions/B9.input.step"),
+                include_str!("../tests/fixtures/curved-terminal-junctions/B9.input.json"),
+                517493.9339978154,
+            ),
+            (
+                "C4",
+                include_str!("../tests/fixtures/curved-terminal-junctions/C4.input.step"),
+                include_str!("../tests/fixtures/curved-terminal-junctions/C4.input.json"),
+                1568360.953636779,
+            ),
+        ];
+        for (name, step, intent, expected) in fixtures {
+            for reverse in [false, true] {
+                let directory = std::env::temp_dir().join(format!(
+                    "truck-curved-terminal-{}-{name}-{reverse}",
+                    std::process::id()
+                ));
+                std::fs::create_dir_all(&directory).unwrap();
+                let prefix = directory.join("001");
+                let prefix = prefix.to_str().unwrap();
+                let mut task: Value = serde_json::from_str(intent).unwrap();
+                if reverse {
+                    task["selection"].as_array_mut().unwrap().reverse();
+                    for selected in task["selection"].as_array_mut().unwrap() {
+                        selected["points"].as_array_mut().unwrap().reverse();
+                    }
+                    task["contours"].as_array_mut().unwrap().reverse();
+                    for contour in task["contours"].as_array_mut().unwrap() {
+                        contour["edges"].as_array_mut().unwrap().reverse();
+                        for edge in contour["edges"].as_array_mut().unwrap() {
+                            edge["points"].as_array_mut().unwrap().reverse();
+                        }
+                    }
+                }
+                std::fs::write(format!("{prefix}.input.step"), step).unwrap();
+                std::fs::write(format!("{prefix}.input.json"), task.to_string()).unwrap();
+                let result = replay(prefix, &Cell::new("start")).unwrap();
+                assert_eq!(result["status"], "operation-succeeded", "{name}: {result}");
+                assert_eq!(result["selected_edges"], 3);
+                assert_eq!(result["selection_scope"], "native-contours");
+                for field in [
+                    "input_unchanged",
+                    "geometry_consistent",
+                    "mesh_closed",
+                    "step_prepared",
+                ] {
+                    assert_eq!(result[field], true, "{name} {field}: {result}");
+                }
+                let input = import(&format!("{prefix}.input.step")).unwrap();
+                let selected = fillet_contour_selection(&input, &task).unwrap();
+                let assignments: Vec<_> = selected
+                    .iter()
+                    .map(|(edge, radius)| (edge.id(), *radius))
+                    .collect();
+                let solid = try_fillet_solid_edges_with_radii(&input, &assignments, TOL)
+                    .unwrap()
+                    .solid;
+                replay_common::assert_solid(&solid, expected, &[0], TOL);
+                replay_common::blend::assert_step(&solid, expected, TOL);
+                let output = import(&format!("{prefix}.truck.step")).unwrap();
+                replay_common::assert_topology(&output, &[0]);
+                replay_common::blend::assert_step(&output, expected, TOL);
+                let tight =
+                    replay_task(prefix, &Cell::new("start"), &task, 3, TOLERANCE / 10.).unwrap();
+                assert_eq!(tight["status"], "operation-succeeded", "{name}: {tight}");
+                assert_eq!(tight["step_prepared"], true);
+                let output = import(&format!("{prefix}.truck.step")).unwrap();
+                replay_common::assert_solid(&output, expected, &[0], TOL);
+                replay_common::blend::assert_step(&output, expected, TOL);
+                assert_eq!(
+                    std::fs::read_to_string(format!("{prefix}.input.step")).unwrap(),
+                    step
+                );
+                std::fs::remove_dir_all(directory).unwrap();
+            }
+        }
+    }
+}

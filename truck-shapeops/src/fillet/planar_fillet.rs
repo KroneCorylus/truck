@@ -20,7 +20,7 @@ pub(super) fn fillet(
         Diagnostic::new(code, "fillet_solid_edges", "construct_local_fillet")
             .parameter("radius", radius)
     };
-    let data = neighborhood(shell, selected, "fillet_solid_edges")?;
+    let data = neighborhood(shell, selected, "fillet_solid_edges", selected.len() > 1)?;
     let mut contacts: Vec<[[Vertex; 2]; 2]> = data
         .original_edges
         .iter()
@@ -41,6 +41,7 @@ pub(super) fn fillet(
     let mut tori = Vec::new();
     let mut shared_arcs = HashMap::default();
     let mut complex_ends = HashMap::default();
+    let mut curved_terminals = HashSet::default();
     for (v, incident) in data.incident.iter().enumerate() {
         let chosen: Vec<_> = incident
             .iter()
@@ -60,6 +61,96 @@ pub(super) fn fillet(
         let mut contact = |k: usize, f: usize, point: &Vertex| {
             contacts[k][usize::from(data.sides[k][0] != f)][end_index(k)] = point.clone();
         };
+        if faces.iter().any(|&f| data.planes[f].is_none()) {
+            let [k] = chosen[..] else {
+                return Err(error(Code::UnsupportedTopology));
+            };
+            let [a, b] = data.sides[k];
+            if faces.len() != 3 || data.planes[a].is_none() || data.planes[b].is_none() {
+                return Err(error(Code::UnsupportedTopology));
+            }
+            let end = *faces.iter().find(|&&f| f != a && f != b).unwrap();
+            let edge = &data.original_edges[k];
+            let delta = edge.back().point() - edge.front().point();
+            let axis = delta.normalize();
+            let s = sign(k);
+            let center = solve([
+                (normal(a), data.planes[a].unwrap().1 - s * radius),
+                (normal(b), data.planes[b].unwrap().1 - s * radius),
+                (axis, axis.dot(vertex.point().to_vec())),
+            ])
+            .ok_or_else(|| error(Code::UnsupportedGeometry))?;
+            let wall = shell[end].oriented_surface();
+            let mut points = Vec::new();
+            for side in [a, b] {
+                let origin = center + s * radius * normal(side);
+                let line = Line(origin, origin + axis);
+                let point = super::planar_edge::line_intersection(&wall, &line, vertex.point())
+                    .ok_or_else(|| error(Code::OutsideNeighbour))?;
+                let point = Vertex::new(point);
+                contact(k, side, &point);
+                let other = *incident
+                    .iter()
+                    .find(|&&j| j != k && data.sides[j].contains(&side))
+                    .ok_or_else(|| error(Code::UnsupportedTopology))?;
+                for f in data.sides[other] {
+                    contact(other, f, &point);
+                }
+                points.push(point);
+            }
+            let base = center + (edge.front().point() - vertex.point());
+            let section = circle(
+                &Vertex::new(base + s * radius * normal(a)),
+                &Vertex::new(base + s * radius * normal(b)),
+                base,
+            );
+            let support: Surface = ExtrudedCurve::by_extrusion(section.curve(), delta).into();
+            let [p, q] = [&points[0], &points[1]];
+            let direction = q.point() - p.point();
+            let uv = |v: &Vertex| support.search_parameter(v.point(), None, 100);
+            let [uv0, uv1] =
+                [uv(p), uv(q)].map(|v| v.ok_or_else(|| error(Code::BlendConstructionFailed)));
+            let (uv0, uv1) = (uv0?, uv1?);
+            let tangent = |v: &Vertex, (u, w): (f64, f64)| {
+                let (x, y) = wall.search_parameter(v.point(), None, 100)?;
+                let normal = support.normal(u, w).normalize();
+                let mut tangent = normal.cross(wall.normal(x, y));
+                if tangent.so_small() {
+                    tangent = direction - normal * direction.dot(normal);
+                }
+                if tangent.dot(direction) < 0. {
+                    tangent = -tangent;
+                }
+                (!tangent.so_small()).then_some(tangent)
+            };
+            let arc: Edge = super::create_pcurve_edge(
+                (
+                    p,
+                    uv0,
+                    tangent(p, uv0).ok_or_else(|| error(Code::UnsupportedGeometry))?,
+                ),
+                (
+                    q,
+                    uv1,
+                    tangent(q, uv1).ok_or_else(|| error(Code::UnsupportedGeometry))?,
+                ),
+                support.clone(),
+            )
+            .ok_or_else(|| error(Code::BlendConstructionFailed))?;
+            arc.set_curve(Curve::IntersectionCurve(IntersectionCurve::new(
+                Box::new(wall),
+                Box::new(support),
+                Box::new(arc.curve()),
+            )));
+            cache_arc(&mut shared_arcs, &arc);
+            complex_ends.insert((k, end_index(k)), Wire::from(vec![arc]));
+            curved_terminals.insert(k);
+            ends[k][end_index(k)] = Some(End {
+                center,
+                miter: None,
+            });
+            continue;
+        }
         if faces.len() != 3 {
             let [k] = chosen[..] else {
                 return Err(error(Code::UnsupportedTopology));
@@ -363,11 +454,25 @@ pub(super) fn fillet(
             Ok(builder::line(a, b))
         };
         let [[a0, a1], [b0, b1]] = contacts[k].clone();
-        let line_a = make_line(&a0, &a1)?;
         if !selected.contains(&edge.id()) {
-            trims.push([line_a.clone(), line_a]);
+            if matches!(edge.curve(), Curve::Line(_)) {
+                let piece = make_line(&a0, &a1)?;
+                trims.push([piece.clone(), piece]);
+                continue;
+            }
+            let mut piece = edge.clone();
+            if &a0 != piece.front() {
+                piece = super::planar_edge::trim_edge(&piece, piece.front(), &a0, tol, false)
+                    .ok_or_else(|| error(Code::OutsideNeighbour))?;
+            }
+            if &a1 != piece.back() {
+                piece = super::planar_edge::trim_edge(&piece, piece.back(), &a1, tol, false)
+                    .ok_or_else(|| error(Code::OutsideNeighbour))?;
+            }
+            trims.push([piece.clone(), piece]);
             continue;
         }
+        let line_a = make_line(&a0, &a1)?;
         let line_b = make_line(&b0, &b1)?;
         let [a, b] = data.sides[k];
         let [n, m] = [a, b].map(|f| data.planes[f].unwrap().0);
@@ -400,11 +505,16 @@ pub(super) fn fillet(
             .unwrap_or_else(|| vec![reuse_arc(&mut shared_arcs, arc(e1, &a1, &b1))].into());
         let mut surface: Surface = if complex {
             let direction = axis.normalize();
-            let positions: Vec<_> = arc0
+            let mut positions: Vec<_> = arc0
                 .vertex_iter()
                 .chain(arc1.vertex_iter())
                 .map(|v| (v.point() - e0.center).dot(direction))
                 .collect();
+            if curved_terminals.contains(&k) {
+                positions.extend(
+                    [edge.front(), edge.back()].map(|v| (v.point() - e0.center).dot(direction)),
+                );
+            }
             let low = positions.iter().copied().fold(f64::INFINITY, f64::min);
             let high = positions.iter().copied().fold(f64::NEG_INFINITY, f64::max);
             let center = e0.center + direction * low;
@@ -470,9 +580,10 @@ pub(super) fn fillet(
             result.push(face.clone());
             continue;
         }
-        let normal = data.planes[f].ok_or_else(|| error(Code::NonPlanarFace))?.0;
-        if !valid_boundaries(face, &boundaries, normal, tol) {
-            return Err(error(Code::OutsideNeighbour).face(f));
+        if let Some((normal, _)) = data.planes[f] {
+            if !valid_boundaries(face, &boundaries, normal, tol) {
+                return Err(error(Code::OutsideNeighbour).face(f));
+            }
         }
         result.push(
             Face::try_new(boundaries, face.oriented_surface())
