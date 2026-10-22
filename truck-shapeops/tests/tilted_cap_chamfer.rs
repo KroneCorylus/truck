@@ -110,6 +110,157 @@ fn input_volume(angle: f64) -> f64 {
     let c = 0.4 * (10. - 3. * std::f64::consts::PI) / (12. - 3. * std::f64::consts::PI);
     0.782539615254126 * (1. - 0.16 * a) - angle.tan() * (0.5 - 0.16 * a * (1. - c))
 }
+
+fn assert_angle_contacts(result: &BlendResult, original: &Wire, inverse: Matrix4) {
+    let wall_error = |p: Point3| {
+        p.y.abs()
+            .min((p.x - 1.).abs())
+            .min(((p.x - 0.6).hypot(p.y - 0.4) - 0.4).abs())
+    };
+    let mut checked = 0;
+    for face in &result.generated_faces {
+        let Surface::BSplineSurface(surface) = face.surface() else {
+            panic!("ruled chamfer surface");
+        };
+        let ((a, b), (c, d)) = surface.range_tuple();
+        for i in 0..=32 {
+            let u = a + (b - a) * i as f64 / 32.;
+            let mut points = [c, d].map(|v| inverse.transform_point(surface.subs(u, v)));
+            if wall_error(points[0]) > wall_error(points[1]) {
+                points.swap(0, 1);
+            }
+            let [wall, cap] = points;
+            assert!(wall_error(wall) < 1e-8);
+            assert!((cap.z - (0.782539615254126 - 2_f64.to_radians().tan() * cap.x)).abs() < 1e-8);
+            let (distance, tangent) = original
+                .iter()
+                .map(|edge| {
+                    let curve = edge.oriented_curve();
+                    let (a, b) = curve.range_tuple();
+                    let t = curve
+                        .search_nearest_parameter(wall, None, 100)
+                        .unwrap()
+                        .clamp(a, b);
+                    (wall.distance(curve.subs(t)), curve.der(t).normalize())
+                })
+                .min_by(|a, b| a.0.total_cmp(&b.0))
+                .unwrap();
+            let normal = if wall.y.abs() < 1e-8 {
+                -Vector3::unit_y()
+            } else if (wall.x - 1.).abs() < 1e-8 {
+                Vector3::unit_x()
+            } else {
+                Vector3::new(wall.x - 0.6, wall.y - 0.4, 0.).normalize()
+            };
+            let section = normal.cross(tangent).normalize();
+            let angle = (cap - wall)
+                .normalize()
+                .dot(section)
+                .abs()
+                .clamp(0., 1.)
+                .acos();
+            assert!((distance - 0.1).abs() < 0.001, "chord {distance}");
+            assert!(
+                (angle - std::f64::consts::PI / 3.).abs() < 0.01,
+                "angle {angle}"
+            );
+            checked += 1;
+        }
+    }
+    assert_eq!(checked, 99);
+}
+
+#[test]
+fn tilted_cap_angle_chamfer_crosses_tangent_support_seams() {
+    let (original, original_wire) = fixture(2_f64.to_radians());
+    for scale in [1., 0.5, 5.] {
+        let matrix = if scale == 1. {
+            Matrix4::identity()
+        } else {
+            Matrix4::from_translation(Vector3::new(7., -11., 13.))
+                * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.73))
+                * Matrix4::from_scale(scale)
+        };
+        let solid = builder::transformed(&original, matrix);
+        let wire: Wire = original_wire
+            .iter()
+            .map(|edge| {
+                let a = matrix.transform_point(edge.front().point());
+                let b = matrix.transform_point(edge.back().point());
+                solid
+                    .edge_iter()
+                    .find_map(|e| {
+                        if e.front().point().near(&a) && e.back().point().near(&b) {
+                            Some(e.clone())
+                        } else if e.front().point().near(&b) && e.back().point().near(&a) {
+                            Some(e.inverse())
+                        } else {
+                            None
+                        }
+                    })
+                    .unwrap()
+            })
+            .collect();
+        let reference = solid
+            .face_iter()
+            .find(|face| {
+                matches!(
+                    face.surface().elementary(),
+                    Some((Elementary::Cylinder { .. }, _))
+                )
+            })
+            .unwrap()
+            .id();
+        let before = serde_json::to_string(&solid.compress()).unwrap();
+        for wire in [wire.clone(), wire.inverse()] {
+            let result = try_chamfer_solid_along_wire_angle(
+                &solid,
+                &wire,
+                reference,
+                0.1 * scale,
+                Rad(std::f64::consts::PI / 3.),
+                0.001 * scale,
+            );
+            assert_eq!(before, serde_json::to_string(&solid.compress()).unwrap());
+            let result = result.expect("angle contacts cross tangent cylinder/plane seams");
+            assert_history(&solid, &result, 3);
+            assert_angle_contacts(&result, &original_wire, matrix.invert().unwrap());
+            common::assert_solid(
+                &result.solid,
+                0.7237600653608591 * scale.powi(3),
+                &[0],
+                0.0001 * scale,
+            );
+            common::blend::assert_step(
+                &result.solid,
+                0.7237600653608591 * scale.powi(3),
+                0.0001 * scale,
+            );
+        }
+    }
+    let reference = original
+        .face_iter()
+        .find(|face| {
+            matches!(
+                face.surface().elementary(),
+                Some((Elementary::Cylinder { .. }, _))
+            )
+        })
+        .unwrap()
+        .id();
+    let before = serde_json::to_string(&original.compress()).unwrap();
+    assert!(try_chamfer_solid_along_wire_angle(
+        &original,
+        &original_wire,
+        reference,
+        0.1,
+        Rad(std::f64::consts::PI / 3.),
+        1e-5
+    )
+    .is_err());
+    assert_eq!(before, serde_json::to_string(&original.compress()).unwrap());
+}
+
 fn setback_error(input: &Solid, wire: &Wire, result: &BlendResult, distance: f64) -> (f64, usize) {
     let supports: Vec<_> = input
         .face_iter()

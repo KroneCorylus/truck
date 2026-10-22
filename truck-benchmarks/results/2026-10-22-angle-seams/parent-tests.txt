@@ -1,0 +1,26 @@
+$ cargo test --release -p truck-shapeops --test tilted_cap_chamfer tilted_cap_angle_chamfer_crosses_tangent_support_seams
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/target/angle-seams-parent-source/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 8.16s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/tilted_cap_chamfer.rs (/home/krone/Development/Pieza_WS/truck/target/release/deps/tilted_cap_chamfer-cd8bb9657e461910)
+
+running 1 test
+test tilted_cap_angle_chamfer_crosses_tangent_support_seams ... FAILED
+
+failures:
+
+---- tilted_cap_angle_chamfer_crosses_tangent_support_seams stdout ----
+
+thread 'tilted_cap_angle_chamfer_crosses_tangent_support_seams' (200968) panicked at truck-shapeops/tests/tilted_cap_chamfer.rs:225:33:
+angle contacts cross tangent cylinder/plane seams: Diagnostic { code: BlendConstructionFailed, operation: "chamfer_solid_along_wire_angle", stage: "trim_faces", message: "Blend construction failed; the numerical or geometric constraint could not be resolved.", context: Context { operand: None, shell_index: Some(0), face_index: None, edge_index: None, selection_index: None, related_operand: None, related_index: None, entity_id: None, related_entity_id: None, entity_type: None, parameter: None, value: None, station: None }, cause: None, source: None }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    tilted_cap_angle_chamfer_crosses_tangent_support_seams
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-shapeops --test tilted_cap_chamfer`
+exit_code 101

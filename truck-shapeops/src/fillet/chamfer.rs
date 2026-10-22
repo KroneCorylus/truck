@@ -430,26 +430,52 @@ fn fit_trimmed_contacts<C: ParametricCurve3D + BoundedCurve>(
         let (a, b) = ranges[side];
         curves[side].subs(a + (b - a) * t)
     };
-    let mut count = 5;
-    while count <= 257 {
-        let params: Vec<_> = (0..count).map(|i| i as f64 / (count - 1) as f64).collect();
+    let uniform = |count: usize| {
+        (0..count)
+            .map(|i| i as f64 / (count - 1) as f64)
+            .collect::<Vec<_>>()
+    };
+    let mut params = uniform(5);
+    let mut local = false;
+    let mut refinements = 0;
+    loop {
         let fit: [BSplineCurve<Point3>; 2] = std::array::from_fn(|side| {
             interpolate(&params, params.iter().map(|&t| point(side, t)))
         });
-        let good = params.windows(2).all(|w| {
+        let good = |w: &[f64]| {
             (0..=4).all(|i| {
                 let t = w[0] + (w[1] - w[0]) * i as f64 / 4.;
                 (0..2).all(|side| {
                     point(side, t).distance(fit[side].subs(t)) <= tol.min(TOLERANCE * 0.1)
                 })
             })
-        });
-        if good {
+        };
+        if params.windows(2).all(good) {
             return Some(fit);
         }
-        count = 2 * count - 1;
+        if !local {
+            let count = 2 * params.len() - 1;
+            if count <= 257 {
+                params = uniform(count);
+            } else {
+                // Endpoint constraints may need local refinement within the same sample budget.
+                local = true;
+                params = uniform(5);
+            }
+        } else {
+            let bad: Vec<_> = params
+                .windows(2)
+                .filter(|w| !good(w))
+                .map(|w| w[0] + (w[1] - w[0]) / 2.)
+                .collect();
+            if refinements == 16 || params.len() + bad.len() > 257 {
+                return None;
+            }
+            refinements += 1;
+            params.extend(bad);
+            params.sort_by(f64::total_cmp);
+        }
     }
-    None
 }
 
 fn ruling_edge<C, S>(
@@ -683,6 +709,7 @@ where
     }
     let mut contacts = Vec::new();
     let mut support_contacts = Vec::new();
+    let mut cap_sides = Vec::new();
     let mut surfaces = Vec::new();
     let mut sides = Vec::new();
     for (index, edge) in wire.iter().enumerate() {
@@ -765,6 +792,7 @@ where
         }
         if continue_contacts {
             support_contacts.push(pcurves);
+            cap_sides.push(cap_side.ok_or_else(failed)?);
         }
         contacts.push(contact);
         let t = (params[0] + params[params.len() - 1]) / 2.0;
@@ -780,6 +808,38 @@ where
         }
         sides.push(if swap { (1.0, 0.0) } else { (0.0, 1.0) });
         surfaces.push(surface);
+    }
+    if continue_contacts && matches!(mode, DistanceMode::NormalSectionAngle { .. }) {
+        // Continuation requires a shared planar cap, so the midpoint stays on that support.
+        let n = wire.len();
+        let mut ends: Vec<_> = contacts
+            .iter()
+            .zip(&cap_sides)
+            .map(|(pair, &side)| {
+                let curve = &pair[side];
+                let (a, b) = curve.range_tuple();
+                [curve.subs(a), curve.subs(b)]
+            })
+            .collect();
+        for k in 0..if closed { n } else { n - 1 } {
+            let j = (k + 1) % n;
+            if ends[k][1].distance(ends[j][0]) > tol {
+                return Err(failed().stage("join_contacts").selection(k));
+            }
+            let point = ends[k][1].midpoint(ends[j][0]);
+            ends[k][1] = point;
+            ends[j][0] = point;
+        }
+        for k in 0..n {
+            let side = cap_sides[k];
+            let edge = Edge::new(
+                &Vertex::new(ends[k][0]),
+                &Vertex::new(ends[k][1]),
+                contacts[k][side].clone(),
+            );
+            contacts[k][side] = constrain_contact(&support_contacts[k][side], &edge, tol)
+                .ok_or_else(|| failed().stage("join_contacts").selection(k))?;
+        }
     }
     let mut trimmed = along_wire::trim_closed_chain(shell, wire, &contacts, trim)
         .ok_or_else(|| failed().stage("trim_faces"))?;

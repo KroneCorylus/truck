@@ -769,7 +769,8 @@ pub fn try_chamfer_solid_along_wire_chord(
 /// `reference` identifies an adjacent face and therefore the oriented reference side of the
 /// wire. The chord is measured from the guide to that side's new contact. The angle, strictly
 /// between zero and pi/2, is measured from its local section tangent toward the other support.
-/// Both contacts remain on their local inward branches; unsupported continuation is rejected.
+/// Both contacts remain on their local inward branches. Tangent cylinder/plane walls under a
+/// shared planar cap may continue their contacts and join cap endpoints within `tol`.
 pub fn try_chamfer_solid_along_wire_angle(
     solid: &Solid,
     wire: &Wire,
@@ -875,7 +876,7 @@ fn chamfer_solid_wire(
         .or_else(|error| {
             if error.code == Code::BlendConstructionFailed
                 && error.stage == "trim_faces"
-                && mode == super::chamfer::DistanceMode::TangentProjection
+                && mode != super::chamfer::DistanceMode::NormalSection
                 && can_continue_chamfer_contacts(&solid.boundaries()[index], wire)
             {
                 build(true)

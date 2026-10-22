@@ -1,0 +1,12 @@
+{
+  "revision": "856900cd46366b2b9fd53b9a96e92019ebd55490",
+  "test_sha256": {
+    "truck-shapeops/tests/tilted_cap_chamfer.rs": "2284678fc2a544e876ddd10cbdbd9ccd2227563019ac33c5c98b7e3ee861e306",
+    "truck-shapeops/examples/replay_occt_blend.rs": "912a4a96c6f378bce9a6dfeb51ce55190e1872b32787e26bcdc8ffc45502c646"
+  },
+  "parent_test_sha256": {
+    "truck-shapeops/tests/tilted_cap_chamfer.rs": "2284678fc2a544e876ddd10cbdbd9ccd2227563019ac33c5c98b7e3ee861e306",
+    "truck-shapeops/examples/replay_occt_blend.rs": "912a4a96c6f378bce9a6dfeb51ce55190e1872b32787e26bcdc8ffc45502c646"
+  },
+  "binding_change": null
+}

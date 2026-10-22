@@ -1,0 +1,28 @@
+$ cargo test --release -p truck-shapeops --example replay_occt_blend imported_tilted_angle_contacts_join_and_preserve_material
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/target/angle-seams-parent-source/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 4.25s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running unittests examples/replay_occt_blend.rs (/home/krone/Development/Pieza_WS/truck/target/release/examples/replay_occt_blend-bd2259d8fa5b09df)
+
+running 1 test
+test tilted_cap_distance_tests::imported_tilted_angle_contacts_join_and_preserve_material ... FAILED
+
+failures:
+
+---- tilted_cap_distance_tests::imported_tilted_angle_contacts_join_and_preserve_material stdout ----
+
+thread 'tilted_cap_distance_tests::imported_tilted_angle_contacts_join_and_preserve_material' (201098) panicked at truck-shapeops/examples/replay_occt_blend.rs:3815:13:
+assertion `left == right` failed: {"code":"BlendConstructionFailed","error":"TRUCK_BLEND_CONSTRUCTION_FAILED: Blend construction failed; the numerical or geometric constraint could not be resolved. (chamfer_solid_along_wire_angle / trim_faces)","input_unchanged":true,"selected_edges":3,"selection_scope":"native-contours","status":"operation-failed","step_fitting_tolerance":1e-7}
+  left: String("operation-failed")
+ right: "operation-succeeded"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    tilted_cap_distance_tests::imported_tilted_angle_contacts_join_and_preserve_material
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 65 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-shapeops --example replay_occt_blend`
+exit_code 101

@@ -1,0 +1,3 @@
+$ cargo clean --release -p truck-shapeops
+     Removed 19 files, 42.1MiB total
+exit_code 0

@@ -1,0 +1,67 @@
+{
+  "kernel_operations": 6,
+  "kernel_contact_samples": 594,
+  "replay_operations": 2,
+  "probe_result": {
+    "geometry_consistent": true,
+    "input_unchanged": true,
+    "mesh_closed": true,
+    "mesh_volume": 0.7236272822461739,
+    "selected_edges": 3,
+    "selection_scope": "native-contours",
+    "status": "operation-succeeded",
+    "step_fitting_tolerance": 1e-07,
+    "step_prepared": true
+  },
+  "probe_comparison": {
+    "schema_version": 1,
+    "comparison": "sampled-only",
+    "native_valid": true,
+    "truck_step_valid": true,
+    "native_solids": 1,
+    "truck_solids": 1,
+    "native_volume": 0.7237600653608587,
+    "truck_volume": 0.7237612900981909,
+    "native_to_truck_max_distance": 4.868427789169324e-05,
+    "native_to_truck_samples": 2253,
+    "truck_to_native_max_distance": 2.6628632492743933e-05,
+    "truck_to_native_samples": 2255,
+    "native_tolerances": {
+      "face": 6.03444149406552e-06,
+      "edge": 3.24882580437519e-05,
+      "vertex": 0.0001
+    },
+    "truck_step_tolerances": {
+      "face": 1e-07,
+      "edge": 1e-07,
+      "vertex": 1e-07
+    }
+  },
+  "archive_sha256": "51ce1e514965a58c682585292fab4bb4c24c726e23ac2ea6b05b2942ec2230f0",
+  "archive_members": 23,
+  "member_sha256": {
+    "probe/display.log": "577b09232e9ebaaa0e334b7bb5ad08bb37d0ab2f769c08048f8ba2295525301d",
+    "probe/runtime.log": "1bce096d463b23cf544fa6b93bca8c017dd101b2be60e9ae5f9b2c03e89beed7",
+    "probe/results.json": "b90aec0a69a08c6d65242aa6069c91aab9e5bae9d15ad558d1d6c604011a3ce4",
+    "probe/chamfer/dist_angle/E5/run.tcl": "132308ef18c039c7379553c69ea5a236aef23fdf9bc23b5b6cd8d51107762cc8",
+    "probe/chamfer/dist_angle/E5/draw.log": "5c76344647799ac9aef22a3bcc4334bc61fc51aaea907afdb937e955772a8dca",
+    "probe/chamfer/dist_angle/E5/console.log": "f2e47c6e4ab7ee3c3d0213fbff1e10e31e0f0bbbe744a44b2085719382ce90c5",
+    "probe/chamfer/dist_angle/E5/images/E5.png": "35e8a426b5cb0fd75a2311c8f0b0bb79985bc02eb72b80e61e453dfcc00370de",
+    "probe/chamfer/dist_angle/E5/capture/001.capture.log": "074e998bcc2a604601294a2818b96cea923166ff35f5e61d76c8cf25f445387e",
+    "probe/chamfer/dist_angle/E5/capture/001.input.brep": "34a2a0f586627b7f0ac65297a26d75f7b39ac8e605a30770ec1bc3ad78ba68ed",
+    "probe/chamfer/dist_angle/E5/capture/001.input.step": "010c48c57d8485ffa4a35e4d665402d26a4f772d8be9c73b5046b371c4e629b8",
+    "probe/chamfer/dist_angle/E5/capture/001.input.json": "31e149b9752010c27ebe93446e20ad16bbbec66d4594610959e4a6f35b83ccc6",
+    "probe/chamfer/dist_angle/E5/capture/001.result.brep": "fb4c7dcabe9dcf52368df7d3d3c704023bb86529314babb5eb15068c180806bf",
+    "probe/chamfer/dist_angle/E5/capture/001.result.step": "d3f3fa36732287e47bb02352f102862e98e00b9d4ee7f6828d52901225896e54",
+    "probe/chamfer/dist_angle/E5/capture/001.result.json": "cde506890dac02ed9a7bfa638f904571313eec3135223ecb8d9cd4db9268c00a",
+    "probe/chamfer/dist_angle/E5/capture/001.truck.step": "1e30207fa0eabacb0559c675a782e92c155415e938033f60f2ad137005d2ed43",
+    "probe/chamfer/dist_angle/E5/capture/001.truck.json": "b3fdf8613e3210ad595e4f188e72ead21644a4d4ad6d0b4d63ba968d38aaf0de",
+    "probe/chamfer/dist_angle/E5/capture/001.truck.log": "e7d3c7823bd632272d0e33d8e46e68fda84275bdc1148002d035ffbfadf32969",
+    "probe/chamfer/dist_angle/E5/capture/001.comparison.json": "bc0c33cbb3005629e6904f85c69556a9b0c035de937530a269dc5662c5e392a5",
+    "probe/chamfer/dist_angle/E5/capture/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "helpers/prove-angle-seams-parent.py": "029133126727a51c1ba38315a318db3a31066bec2f9d2f1fef0ccaabfc2c75a7",
+    "helpers/validate-angle-seams.py": "93fc78459e92a9f3ee110caf9f9f8743467ddd22340deff9f2337116298cc6c1",
+    "parent/truck-shapeops/tests/tilted_cap_chamfer.rs": "2284678fc2a544e876ddd10cbdbd9ccd2227563019ac33c5c98b7e3ee861e306",
+    "parent/truck-shapeops/examples/replay_occt_blend.rs": "912a4a96c6f378bce9a6dfeb51ce55190e1872b32787e26bcdc8ffc45502c646"
+  }
+}

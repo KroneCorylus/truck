@@ -3782,6 +3782,57 @@ mod cylindrical_terminal_fan_tests {
 mod tilted_cap_distance_tests {
     use super::*;
 
+    #[test]
+    fn imported_tilted_angle_contacts_join_and_preserve_material() {
+        let (step, task) = fixture(2);
+        for reverse in [false, true] {
+            let directory = std::env::temp_dir().join(format!(
+                "truck-tilted-angle-{}-{reverse}",
+                std::process::id()
+            ));
+            std::fs::create_dir_all(&directory).unwrap();
+            let prefix = directory.join("001");
+            let prefix = prefix.to_str().unwrap();
+            std::fs::write(format!("{prefix}.input.step"), step).unwrap();
+            let mut task = task.clone();
+            let chosen = &mut task["selection"][0];
+            chosen["mode"] = json!("distance-angle");
+            chosen["distance"] = json!(0.1);
+            chosen["angle_degrees"] = json!(60.);
+            chosen.as_object_mut().unwrap().remove("reference_plane");
+            chosen.as_object_mut().unwrap().remove("distances");
+            chosen["reference_cylinder"] =
+                json!({"origin":[0.6,0.4,0.],"axis":[0.,0.,1.],"radius":0.4});
+            if reverse {
+                chosen["points"].as_array_mut().unwrap().reverse();
+                for edge in chosen["contour_edges"].as_array_mut().unwrap() {
+                    edge["points"].as_array_mut().unwrap().reverse();
+                }
+                chosen["contour_edges"].as_array_mut().unwrap().reverse();
+            }
+            std::fs::write(format!("{prefix}.input.json"), task.to_string()).unwrap();
+            let result = replay(prefix, &Cell::new("start")).unwrap();
+            assert_eq!(result["status"], "operation-succeeded", "{result}");
+            assert_eq!(result["selected_edges"], 3);
+            for field in [
+                "input_unchanged",
+                "geometry_consistent",
+                "mesh_closed",
+                "step_prepared",
+            ] {
+                assert_eq!(result[field], true, "{field}: {result}");
+            }
+            let output = import(&format!("{prefix}.truck.step")).unwrap();
+            replay_common::assert_solid(&output, 0.7237600653608591, &[0], 0.0001);
+            replay_common::blend::assert_step(&output, 0.7237600653608591, 0.0001);
+            assert_eq!(
+                std::fs::read_to_string(format!("{prefix}.input.step")).unwrap(),
+                step
+            );
+            std::fs::remove_dir_all(directory).unwrap();
+        }
+    }
+
     fn fixture(degrees: i32) -> (&'static str, Value) {
         let (step, task) = match degrees {
             0 => (

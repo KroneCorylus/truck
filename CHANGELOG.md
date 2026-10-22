@@ -6,6 +6,13 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Join distance-angle chamfers across tangent cylinder/plane walls under a shared
+  planar cap. Bound endpoint corrections by the requested fitting tolerance,
+  retain strict topology checks, and adaptively refit locally constrained contacts
+  within the existing sample and error limits. Procedural and imported tilted-cap
+  regressions verify material, contact distances and angles, transformations,
+  reversed selections, immutable inputs and STEP.
+
 - Add `try_chamfer_solid_along_wire_angle` for a reference-face chord and bevel
   angle in the guide's normal section. Solve the other support contact from the
   reference tangent at its new contact, then reuse fitting, trimming and solid
