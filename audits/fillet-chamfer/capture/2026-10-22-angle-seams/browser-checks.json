@@ -1,0 +1,11 @@
+{
+  "widths": [
+    1100,
+    390
+  ],
+  "console_errors": [],
+  "links_checked": 10,
+  "links_ok": 10,
+  "desktop_overflow": false,
+  "visual_check": "Readable at desktop and mobile widths; no clipped text or horizontal overflow."
+}

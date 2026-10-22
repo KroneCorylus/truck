@@ -1,6 +1,6 @@
-LATEST CHECKPOINT — 2026-10-21
-Read ../2026-10-21-normal-section-angles/HANDOFF.txt and report.html.
-Implementation 354f3071 adds variable normal-section distance-angle contacts. 451 constructions/418 limited passes; 141 positive solid operations unresolved. Use target/occt-distance-tree-plugin.
+LATEST CHECKPOINT — 2026-10-22
+Read ../2026-10-22-angle-seams/HANDOFF.txt and report.html.
+Implementation 9fa66393 resolves E5 distance-angle contact seams. 452 constructions/419 limited passes; 140 positive solid operations unresolved. Use target/occt-distance-tree-plugin.
 
 HISTORICAL HANDOFF FOLLOWS
 

@@ -3,7 +3,7 @@
     "title": "Fillet and chamfer feature parity audit",
     "baseline": "OCCT V7_9_3 source inventory plus the recorded Truck/Pieza revisions. Includes 3D, 2D, related workflows and all textual candidates under the discovery rules.",
     "meaning_of_all": "Every dedicated test-grid entry, matching registered test/helper, discovered blend command and retained reference in this pinned checkout. This is not a claim about all mathematical configurations or current/future OCCT releases.",
-    "execution": "Clean capture: all 396 native cases pass across 648 operations. 451 constructions (+1) and 418 limited comparison passes (+0). All 450 prior successful result/comparison records, every task, native reference and selection scope are unchanged. C1\u2019s distance-angle operation now constructs but still fails the unchanged 0.001 sampled comparison threshold. E5 now reaches construction and fails at trimming. Supporting the request does not mean its final result matches the native result. 141 of 559 positive solid operations remain unresolved; 88 inputs have no solid and one rejection matches native.",
+    "execution": "All 396 native cases pass across 648 operations. 452 constructions (+1) and 419 limited comparison passes (+1). All 451 prior successful result/comparison records, every input task, native reference and selection scope are unchanged. The E5 distance-angle case now constructs and passes the unchanged 0.001 sampled comparison threshold. 140 of 559 positive solid operations remain unresolved; 88 inputs have no solid and one rejection matches native.",
     "mapping": "Capability assessments describe observable outcomes supported or restricted by reviewed source evidence. Per-case tags and links are automated hints; they do not prove Truck handles that fixture.",
     "objective": "Achieve at least OCCT-level fillet/chamfer capabilities and robustness for equivalent modeling tasks in Truck/Pieza.",
     "equivalence": "Judge the requested geometry, dimensions, validity, editing behavior and practical performance. Different APIs, algorithms, languages, surface representations and internal operation sequences are acceptable. Missing a corresponding OCCT method is not evidence of a feature gap.",
@@ -517,6 +517,12 @@
           "path": "truck-benchmarks/results/2026-10-21-normal-section-angles/REPORT.md",
           "find": "# Normal-section distance-angle chamfers",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-22-angle-seams/REPORT.md",
+          "find": "# Distance-angle contacts",
+          "role": "test"
         }
       ],
       "required_outcome": "Bevel selected edges by equal specified setbacks on both supports, including convex and concave material.",
@@ -540,7 +546,8 @@
         "At fdc8092c, tilted planar-cap chamfer contacts continue over parallel convex cylindrical and planar supports. Two parent failures;four independent native controls,three distance passes and one explicitly retained10-degree discrepancy.442shapeops/115stepio/59replay/13capture,Clippy/smoke pass;baseline geometry precision failure retained. Clean capture:444/414;all443prior checks retained. No parity upgrade.",
         "At bb56dfdd, clipped contact curves and terminal intersections pass two parent-failing parabolic tests,12 operations,3096 contact samples and independent material. Three fresh native controls pass;max distance5.323e-6.446shapeops/115stepio/62replay/13capture,Clippy/smoke pass. Clean capture:449/418;no prior check regressions. C1 discrepancies remain;no parity upgrade.",
         "At 40aa15af, explicit normal-section chord contacts and sampled reference faces pass parent-failing geometry/replay/native regressions. 24 kernel and 48 replay operations verify independent material and 9360 contact samples. Six native controls agree within2.8e-12 sampled distance. 448shapeops/115stepio/64replay/13capture,Clippy/smoke pass. Clean capture:450/418;no prior check regressions. C1 discrepancies remain;no parity upgrade.",
-        "At 354f3071, normal-section distance-angle contacts pass parent-failing geometry/replay tests:48 kernel and48 replay operations,15552 contact samples. Twelve native controls agree within6.8e-12 sampled distance.451shapeops/115stepio/65replay/13capture,Clippy/smoke pass. Clean capture:451/418;450 prior complete results unchanged. C1 still differs and E5 trimming fails;no parity upgrade."
+        "At 354f3071, normal-section distance-angle contacts pass parent-failing geometry/replay tests:48 kernel and48 replay operations,15552 contact samples. Twelve native controls agree within6.8e-12 sampled distance.451shapeops/115stepio/65replay/13capture,Clippy/smoke pass. Clean capture:451/418;450 prior complete results unchanged. C1 still differs and E5 trimming fails;no parity upgrade.",
+        "At 9fa66393, distance-angle contacts cross tangent support seams under a shared planar cap. Two identical-source parent-failing regressions;6 kernel operations,594 contact samples,2 replay orientations.452shapeops/115stepio/66replay/13capture,Clippy/smoke pass. Clean capture:452/419;451 prior complete results unchanged. E5 passes limited comparisons;no parity upgrade."
       ]
     },
     {
@@ -902,6 +909,12 @@
           "path": "truck-benchmarks/results/2026-10-21-normal-section-angles/REPORT.md",
           "find": "# Normal-section distance-angle chamfers",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-22-angle-seams/REPORT.md",
+          "find": "# Distance-angle contacts",
+          "role": "test"
         }
       ],
       "required_outcome": "Produce a chamfer with the requested setback and angle, including non-right-angle supports, using any equivalent parameterization.",
@@ -924,7 +937,8 @@
         "Atd198a51c, planar boundary and patch checks identify the outer loop geometrically and retain its original identity. Five parent failures plus two guards;all six loop orders and transforms,16solid variants,4native controls,independent material/contact/STEP/history checks. Both native inner-rim input mutations retained.420shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:438/408,no prior check regression. No parity upgrade.",
         "At2ea838f2, projected conic sections unwrap periodic endpoints locally and preserve explicit bounded long arcs and reversal. Three parent failures plus long-arc guard;three scales,two solid variants,three native controls with independent material/contact/STEP/history/input checks.424shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:438/408,no prior check regression. No parity upgrade.",
         "Ateea16d36, mixed disjoint chamfer components use the existing single-edge constructor when needed, preserving side orientation, remaining selections and earlier bevels. Three parent failures plus overlap guard;18positive/6negative variants,3native controls with independent material/contact/STEP/history/input checks.428shapeops/59replay/13capture tests,Clippy/smoke pass;unchanged102-test mesher evidence verified. Clean capture:441/411,all438prior records exact. No parity upgrade.",
-        "At 354f3071, normal-section distance-angle contacts pass parent-failing geometry/replay tests:48 kernel and48 replay operations,15552 contact samples. Twelve native controls agree within6.8e-12 sampled distance.451shapeops/115stepio/65replay/13capture,Clippy/smoke pass. Clean capture:451/418;450 prior complete results unchanged. C1 still differs and E5 trimming fails;no parity upgrade."
+        "At 354f3071, normal-section distance-angle contacts pass parent-failing geometry/replay tests:48 kernel and48 replay operations,15552 contact samples. Twelve native controls agree within6.8e-12 sampled distance.451shapeops/115stepio/65replay/13capture,Clippy/smoke pass. Clean capture:451/418;450 prior complete results unchanged. C1 still differs and E5 trimming fails;no parity upgrade.",
+        "At 9fa66393, distance-angle contacts cross tangent support seams under a shared planar cap. Two identical-source parent-failing regressions;6 kernel operations,594 contact samples,2 replay orientations.452shapeops/115stepio/66replay/13capture,Clippy/smoke pass. Clean capture:452/419;451 prior complete results unchanged. E5 passes limited comparisons;no parity upgrade."
       ]
     },
     {
@@ -1090,6 +1104,12 @@
           "path": "truck-benchmarks/results/2026-10-21-normal-section-angles/REPORT.md",
           "find": "# Normal-section distance-angle chamfers",
           "role": "test"
+        },
+        {
+          "repo": "truck",
+          "path": "truck-benchmarks/results/2026-10-22-angle-seams/REPORT.md",
+          "find": "# Distance-angle contacts",
+          "role": "test"
         }
       ],
       "required_outcome": "Produce the intended measurable setbacks on curved supports after explicitly translating dimension conventions between kernels.",
@@ -1106,7 +1126,8 @@
         "At 81755598, bounded local chamfer contact fitting passes two parent-failing curved-cap regressions, twelve fits and98328 dense checks within unchanged sample budget/tolerance. Downstream face trimming remains unsupported. 445/415 clean corpus; no parity upgrade.",
         "At bb56dfdd, clipped contact curves and terminal intersections pass two parent-failing parabolic tests,12 operations,3096 contact samples and independent material. Three fresh native controls pass;max distance5.323e-6.446shapeops/115stepio/62replay/13capture,Clippy/smoke pass. Clean capture:449/418;no prior check regressions. C1 discrepancies remain;no parity upgrade.",
         "At 40aa15af, explicit normal-section chord contacts and sampled reference faces pass parent-failing geometry/replay/native regressions. 24 kernel and 48 replay operations verify independent material and 9360 contact samples. Six native controls agree within2.8e-12 sampled distance. 448shapeops/115stepio/64replay/13capture,Clippy/smoke pass. Clean capture:450/418;no prior check regressions. C1 discrepancies remain;no parity upgrade.",
-        "At 354f3071, normal-section distance-angle contacts pass parent-failing geometry/replay tests:48 kernel and48 replay operations,15552 contact samples. Twelve native controls agree within6.8e-12 sampled distance.451shapeops/115stepio/65replay/13capture,Clippy/smoke pass. Clean capture:451/418;450 prior complete results unchanged. C1 still differs and E5 trimming fails;no parity upgrade."
+        "At 354f3071, normal-section distance-angle contacts pass parent-failing geometry/replay tests:48 kernel and48 replay operations,15552 contact samples. Twelve native controls agree within6.8e-12 sampled distance.451shapeops/115stepio/65replay/13capture,Clippy/smoke pass. Clean capture:451/418;450 prior complete results unchanged. C1 still differs and E5 trimming fails;no parity upgrade.",
+        "At 9fa66393, distance-angle contacts cross tangent support seams under a shared planar cap. Two identical-source parent-failing regressions;6 kernel operations,594 contact samples,2 replay orientations.452shapeops/115stepio/66replay/13capture,Clippy/smoke pass. Clean capture:452/419;451 prior complete results unchanged. E5 passes limited comparisons;no parity upgrade."
       ]
     },
     {
