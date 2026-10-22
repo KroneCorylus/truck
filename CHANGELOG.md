@@ -6,6 +6,12 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Round separated planar corner chains and curved tangent rims in one selection.
+  Each connected component uses its existing supported construction, in input-shell
+  order, while retaining edge-membership and generated-face interference guards.
+  Independent material controls cover radius, placement, face order and selection
+  permutations; native Q2 checks the combined three-edge selection and STEP.
+
 - Continue open cylinder/plane chamfer contacts to curved terminal boundaries.
   Changed cylindrical terminal faces can extend their parameter domains while
   preserving their analytic geometry. Independent lens-section material controls

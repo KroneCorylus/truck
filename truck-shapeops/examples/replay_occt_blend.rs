@@ -4546,6 +4546,16 @@ mod curved_terminal_junction_tests {
     }
 
     #[test]
+    fn native_separated_corner_and_rim_preserve_material_and_selection() {
+        check(&[(
+            "Q2",
+            include_str!("../tests/fixtures/separated-fillet-components/Q2.input.step"),
+            include_str!("../tests/fixtures/separated-fillet-components/Q2.input.json"),
+            2.1864163191624213,
+        )]);
+    }
+
+    #[test]
     fn native_cylindrical_corners_preserve_material_and_selection() {
         check(&[
             (

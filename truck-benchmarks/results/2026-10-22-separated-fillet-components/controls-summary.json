@@ -1,0 +1,53 @@
+{
+  "procedural_operations": 24,
+  "collision_rejections": 1,
+  "imported_selections": 2,
+  "independent_volume": "quarter-cylinder overlap plus toroidal rim integral: 24+pi-6*r^2*(1-pi/4)+r^3*(5/3-pi/2)-pi/2*(r^2*(2-pi/2)+r^3*(pi/2-5/3))",
+  "native_comparisons": {
+    "Q2": {
+      "schema_version": 1,
+      "comparison": "sampled-only",
+      "native_valid": true,
+      "truck_step_valid": true,
+      "native_solids": 1,
+      "truck_solids": 1,
+      "native_volume": 2.1864163191624213,
+      "truck_volume": 2.1864141240233628,
+      "native_to_truck_max_distance": 5.930406894447824e-05,
+      "native_to_truck_samples": 1955,
+      "truck_to_native_max_distance": 5.934576528194879e-05,
+      "truck_to_native_samples": 1983,
+      "native_tolerances": {
+        "face": 1e-07,
+        "edge": 2.65724831559396e-07,
+        "vertex": 5.82682370066763e-07
+      },
+      "truck_step_tolerances": {
+        "face": 1e-07,
+        "edge": 7.472000922535255e-06,
+        "vertex": 7.472000922535255e-06
+      }
+    }
+  },
+  "archive_sha256": "6092ad14ebc168d6f90f97873d6d41d1c5654155b1a6019b2aa3dd0dc6c8d222",
+  "archive_members": 17,
+  "member_sha256": {
+    "probe/Q2/001.input.step": "db7b4858919e36dc8ed8f0374081dd54610d7db197e36fd70d22e583911baf4f",
+    "probe/Q2/001.input.json": "743b770f6de8f0ab42ce31f851cce06cfda4f6350663e9131c06f78ccbf069bb",
+    "probe/Q2/001.result.brep": "b4325226092b3b4693cad991867e1e01d1c2c4e35bc78a1420088a5fbc919000",
+    "probe/Q2/001.result.json": "4f3222550f7bbebf79f6276c70c0812e0a080da4b26ff19fb12829b1ae936051",
+    "probe/Q2/001.truck.log": "23b5d44997fa88b8a5a18093f1a000f477dc0d6b5c3090ad3b29090c0e665f12",
+    "probe/Q2/001.truck.step": "2467718cfae3613409183ff3b5fd103278b30a78f279c6c657aee850af92ea91",
+    "probe/Q2/001.truck.json": "2887d69abc374f6ef30d8874f69523003f783b9f71fe8a98ae8c90ea2474bf76",
+    "probe/Q2/001.comparison.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "probe/Q2/001.comparison.json": "59339408d68167a5f75b82bd81fb40be18c6570959df82b74c025bfe4954408d",
+    "helpers/prove-separated-fillet-component-parent.py": "0406b84b84ca9b793b136a8509f262469a06533d06aa42ae22f1c930efaf99a6",
+    "helpers/validate-separated-fillet-components.py": "9588216f7df839351931e02cc47136a12fbdb8c47c967f05e5e496287b672f51",
+    "helpers/verify-separated-fillet-component-replay.py": "80f96fd5ced017b60910b1bd240fa311153ae72f6e58a414a9fcac64dfa0e994",
+    "parent/truck-shapeops/tests/separated_fillet_components.rs": "2be7dc2a1acfc31a77d595bdb08d12f1eef975362d6b1da85a6633f65ce3d5e2",
+    "parent/truck-shapeops/examples/replay_occt_blend.rs": "a751518a0c21586f38e9a2db6436b2a27e8727fdb1e8565af5b2e99d2091d622",
+    "parent/truck-shapeops/tests/fixtures/separated-fillet-components/Q2.input.step": "33e54dc173288a6f5bb13aaf0b1142614a5ef14621ef111f85359652a075a1a8",
+    "parent/truck-shapeops/tests/fixtures/separated-fillet-components/Q2.input.json": "743b770f6de8f0ab42ce31f851cce06cfda4f6350663e9131c06f78ccbf069bb",
+    "parent/truck-shapeops/tests/fixtures/separated-fillet-components/README.md": "906618bd7d3339eb2c284e978aad7b2dd3eae24d8390fbb0e636c94cd158abe2"
+  }
+}

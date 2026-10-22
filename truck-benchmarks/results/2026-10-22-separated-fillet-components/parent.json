@@ -1,0 +1,18 @@
+{
+  "revision": "c649eaa905eac9ce64aec3335e0034724139c3e2",
+  "test_sha256": {
+    "truck-shapeops/tests/separated_fillet_components.rs": "2be7dc2a1acfc31a77d595bdb08d12f1eef975362d6b1da85a6633f65ce3d5e2",
+    "truck-shapeops/examples/replay_occt_blend.rs": "a751518a0c21586f38e9a2db6436b2a27e8727fdb1e8565af5b2e99d2091d622",
+    "truck-shapeops/tests/fixtures/separated-fillet-components/Q2.input.step": "33e54dc173288a6f5bb13aaf0b1142614a5ef14621ef111f85359652a075a1a8",
+    "truck-shapeops/tests/fixtures/separated-fillet-components/Q2.input.json": "743b770f6de8f0ab42ce31f851cce06cfda4f6350663e9131c06f78ccbf069bb",
+    "truck-shapeops/tests/fixtures/separated-fillet-components/README.md": "906618bd7d3339eb2c284e978aad7b2dd3eae24d8390fbb0e636c94cd158abe2"
+  },
+  "parent_test_sha256": {
+    "truck-shapeops/tests/separated_fillet_components.rs": "2be7dc2a1acfc31a77d595bdb08d12f1eef975362d6b1da85a6633f65ce3d5e2",
+    "truck-shapeops/examples/replay_occt_blend.rs": "a751518a0c21586f38e9a2db6436b2a27e8727fdb1e8565af5b2e99d2091d622",
+    "truck-shapeops/tests/fixtures/separated-fillet-components/Q2.input.step": "33e54dc173288a6f5bb13aaf0b1142614a5ef14621ef111f85359652a075a1a8",
+    "truck-shapeops/tests/fixtures/separated-fillet-components/Q2.input.json": "743b770f6de8f0ab42ce31f851cce06cfda4f6350663e9131c06f78ccbf069bb",
+    "truck-shapeops/tests/fixtures/separated-fillet-components/README.md": "906618bd7d3339eb2c284e978aad7b2dd3eae24d8390fbb0e636c94cd158abe2"
+  },
+  "binding_change": null
+}
