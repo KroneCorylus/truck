@@ -3,7 +3,7 @@
     "title": "Fillet and chamfer feature parity audit",
     "baseline": "OCCT V7_9_3 source inventory plus the recorded Truck/Pieza revisions. Includes 3D, 2D, related workflows and all textual candidates under the discovery rules.",
     "meaning_of_all": "Every dedicated test-grid entry, matching registered test/helper, discovered blend command and retained reference in this pinned checkout. This is not a claim about all mathematical configurations or current/future OCCT releases.",
-    "execution": "All 396 native cases pass across 648 captured operations. 480 constructions (+3) and 437 limited comparison passes (+0). All 477 previous successful result/comparison records are exactly unchanged, as are every input task, native reference and selection scope. 122 of 559 positive solid operations remain unresolved; 88 inputs have no solid and one rejection matches native.",
+    "execution": "Complete serial capture of committed mixed-corner implementation 9e3ce08acbf85cbff64baae84d517731ac27b382: 396 native cases, 648 operations, 482 constructions and 438 limited comparison passes. 121 of 559 positive-solid operations remain unresolved. All 480 previous successful records are exact; 88 shell inputs remain outside solid replay scope and one rejection matches native.",
     "mapping": "Capability assessments describe observable outcomes supported or restricted by reviewed source evidence. Per-case tags and links are automated hints; they do not prove Truck handles that fixture.",
     "objective": "Achieve at least OCCT-level fillet/chamfer capabilities and robustness for equivalent modeling tasks in Truck/Pieza.",
     "equivalence": "Judge the requested geometry, dimensions, validity, editing behavior and practical performance. Different APIs, algorithms, languages, surface representations and internal operation sequences are acceptable. Missing a corresponding OCCT method is not evidence of a feature gap.",
@@ -12,6 +12,11 @@
       "report": "capture/2026-10-21-native-distance/REPORT.md",
       "summary": "capture/2026-10-21-native-distance/comparison-summary.json",
       "method": "Original boundary query plus trim-classified tree surface projections; unchanged samples and thresholds; topology copied before measurement. No parity claim."
+    },
+    "latest_capture": {
+      "implementation": "9e3ce08acbf85cbff64baae84d517731ac27b382",
+      "report": "capture/2026-10-24-mixed-curved-corners/REPORT.md",
+      "summary": "capture/2026-10-24-mixed-curved-corners/comparison-summary.json"
     }
   },
   "status_definitions": {

@@ -1,0 +1,20 @@
+{
+  "command": [
+    "python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "audits/fillet-chamfer",
+    "-p",
+    "test_*.py"
+  ],
+  "cwd": "/home/krone/Development/Pieza_WS/truck",
+  "started_utc": "2026-10-24T09:29:38.035481+00:00",
+  "elapsed_seconds": 0.08270744900028149,
+  "exit_code": 0,
+  "environment": {
+    "CARGO_BUILD_JOBS": "12",
+    "RAYON_NUM_THREADS": "1"
+  }
+}
