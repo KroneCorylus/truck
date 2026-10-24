@@ -1,529 +1,132 @@
-# Fillet and chamfer completion tracker and agent handoff
+# Fillet and chamfer tracker
 
-Updated: **2026-10-24**. Owner: Krone. Repository: `/home/krone/Development/Pieza_WS/truck`, branch `master`. Verified implementation HEAD: **`5a4e3bc6`**. This handoff covers **all remaining work**, including the complete captured-operation backlog and the broader capability audit, not only the next checkpoint.
+Updated 2026-10-24. Repository `truck`, branch `master`. Goal: OCCT-level fillet/chamfer
+capability for equivalent modeling tasks, judged by dimensions, validity, editing behavior and
+latency, not by matching OCCT's API or face structure. Scope is the OCCT V7_9_3 inventory in
+[coverage.json](coverage.json). The previous 530-line tracker, with the full history and package
+plan, is in git at `834ee9f5`.
 
-The objective is OCCT-level fillet/chamfer capability and robustness for equivalent modeling tasks in Truck/Pieza. Judge physical dimensions, geometry, validity, editing behavior, and practical latency. Matching OCCT APIs, internal algorithms, patch types, or face counts is not the objective. The scope is the pinned OCCT V7_9_3 inventory in [coverage.json](coverage.json), not every possible mathematical configuration or future OCCT release.
+## Current numbers
 
-Implementation resumed on 2026-10-24 at Krone’s request with multiple subagents; the full mixed-corner capture is complete and verified; the exact-knot/STEP checkpoint and its complete capture are validated. This document prepares work for another agent; creating it does not start kernel work or launch subagents. The receiving agent should follow Krone's new assignment and stop conditions. Previous authorization covered achievement commits; no push, PR, consumer dependency change, or unrelated application change is authorized by this handoff.
+Last complete capture: `5a4e3bc6`, 396 cases / 648 operations
+([report](capture/2026-10-24-exact-knots/REPORT.md)).
 
-## Start here
+| Measure | Full run | After F5 (targeted, not yet in a full run) |
+| --- | ---: | ---: |
+| Constructs | 482 | 483 |
+| Limited comparison passes | 438 | 438 |
+| Unresolved positive solids | 121 | 121 |
+| — construction failures | 64 | 63 |
+| — solid import failures | 7 | 7 |
+| — inconsistent inputs | 6 | 6 |
+| — comparison discrepancies | 44 | 45 |
+| No-solid captures (scope review) | 88 | 88 |
 
-1. Read [repository instructions](../../AGENTS.md), this tracker, and the [latest detailed handoff](checkpoints/2026-10-22-mixed-curved-implementation/HANDOFF.txt).
-2. Inspect the actual branch, HEAD, working tree, local artifacts, and active processes. Do not assume this snapshot remains current. Preserve other people's changes.
-3. Assign a coordinator and work packages below. Record agent names, branches, and base commits in the assignment table before starting.
-4. First complete package A's fresh full corpus capture on the committed mixed-corner implementation. Keep the root source and replay binary frozen during capture. Other agents can inspect evidence and prepare isolated worktrees in parallel.
-5. Integrate validated achievements one at a time; update the operation checklist, capability checklist, checkpoint evidence, and activity log at each checkpoint.
+"Limited comparison" = valid output plus sampled two-way distance ≤ 0.001. It is not a global
+error bound. A separate nine-case capture ([cohort](capture/2026-10-24-nine-case-cohort/REPORT.md))
+adds `blend/complex/D2` (construction failure) and 8 no-solid cases.
 
-**Two separate completion levels:** the captured corpus is a finite regression baseline; the capability audit also includes scenarios, product behavior, and sketch operations outside that corpus. Finishing the 122 baseline unresolved operations does not establish full parity.
+Known, accepted test state: one ignored test, two existing Clippy warnings in shapeops tests,
+and the `pcurve_derivation` precision failure in truck-geometry.
 
-## Verified state and completed achievements
+## Open work
 
-- [x] Toroidal corner implementation committed as `066b4880`.
-- [x] Complete torus corpus capture and report committed as `9f97532a`.
-- [x] Mixed F1/H7 implementation, tests, proof, report, and restart handoff committed as `9e3ce08a`.
-- [x] Mixed regression evidence: 12 procedural operations, 24 imported operations, four new oversized rejections, and preserved six existing oversized torus rejections.
-- [x] Identical-source parent failures demonstrated for new procedural/imported tests and the intentionally expanded F1 contract.
-- [x] Mixed validation: 471 shape-operation tests, 119 STEP tests, 76 replay tests, 13 capture tests, all-target Clippy, single-thread benchmark smoke, and native reference/volume/distance checks (8/27/24).
-- [x] Final production F1/H7 original-scale replays construct consistent closed STEP with unchanged inputs. F1 passes the limited comparison; H7 still fails its distance threshold.
-- [x] Full mixed-corner corpus capture and comparison against the previous complete run; archive verified (8,497 members). Catalog refresh tracked below.
+Owners are suggestions. Case keys are `native case / capture number`; the number is `001` unless shown.
 
-The latest complete run is the **2026-10-24 exact-knot checkpoint** on `5a4e3bc6`, with 396 native cases and 648 captured operations. Of 482 previous successes, 372 result/comparison records are exact and 110 numerical changes have individual reviews; no canonical check is lost:
+**Curved fillet junctions** (19)
+`blend/simple/{F9,G4,G8,H3,H5,H9,I2,I4,I8}`, `blend/simple/X1/002`,
+`blend/tolblend_simple/{D3,D5}`, `bugs/modalg_4/bug828`, `bugs/modalg_5/bug25657_1`,
+`bugs/modalg_7/bug30940_{2,4,5,6}`, `blend/complex/G9/002` (seam/contact, overlaps imports).
 
-| Measure | Confirmed count |
-| --- | ---: |
-| Operations that construct | 482 |
-| Operations passing the limited comparison | 438 |
-| Positive solid reference operations | 559 |
-| Unresolved positive solid operations | 121 |
-| Construction failures within those 121 | 64 |
-| Solid import failures | 7 |
-| Inconsistent solid inputs | 6 |
-| Constructed comparison discrepancies | 44 |
-| Other captures with no input solid | 88 |
-| Matched native rejection | 1 |
+**Remote two-edge junctions** (3): `blend/simple/{G2,G6,H1}`. A G2 candidate from before F5 is
+in `target/b-g2-candidate/`. It is uncompiled and must be rebased onto the F5 commit.
 
-“Constructs” means the operation produced geometry; it does not establish shape equivalence. Limited comparison includes the recorded validity/material-processing checks and sampled bidirectional distance threshold of 0.001; it is not a global geometric error bound. The 88 no-solid inputs require scope review for shell/sketch tasks and must not be silently discarded from the broader audit.
+**Unequal radii** (6): `blend/simple/{A4,P9}`, `blend/tolblend_simple/A2`,
+`feat/featlf/{E2,E3}`, `blend/complex/D2`.
 
-F1's targeted distances are approximately 0.0000399792 / 0.0000399774. H7's are 0.001525464 / 0.001514833. The mixed-corner run confirmed **482 constructions and 438 limited passes**. In that run F1 was the sole new limited pass and H7 moved from construction failure to discrepancy. The exact-knot run preserves these totals; four C1 inputs now import consistently but still fail construction. All 648 operation keys/tasks, native references and 2,590 native geometry files (excluding only STEP capture timestamps) are preserved. The historical 122-row ledger below retains original dispositions and now has one resolved row.
+**Chamfer construction** (35)
+- `chamfer/{equal_dist,dist_dist,dist_angle}_complex/{A4..A9,C2}` (21). These likely share a
+  cause; investigate them together first.
+- `chamfer/equal_dist_complex/C1`.
+- `chamfer/{equal_dist,dist_dist,dist_angle}_sequence/C2` 005 and 010 (6): a 0.5 chamfer
+  consumes an earlier 0.2 chamfer. An unexecuted regression with an analytic oracle is in
+  `target/d-c2-consumed-contour-regression.rs`.
+- `chamfer/{dist_dist,equal_dist}_sequence/C1` 002, 003 (4).
+- `chamfer/dist_dist_sequence/C1` 007, 008 and `chamfer/equal_dist_sequence/C1` 006, 007 (4).
+  The inputs are now consistent; construction fails in `trim_faces`.
 
-One existing ignored test, two existing test warnings, and the known `pcurve_derivation` precision failure remain explicit. Dependency validation was reused only with matching source hashes. Do not describe the whole workspace as passing all tests.
+**Imports and inputs** (13)
+- Import failures: `chamfer/dist_angle_sequence/C1` 002–008.
+- Inconsistent inputs: `chamfer/dist_dist_sequence/C1` 004–006 and
+  `chamfer/equal_dist_sequence/C1` 004, 005, 008.
 
-## Subagent assignment and integration plan
+Fix by reconstructing geometry, never by loosening consistency tolerances.
 
-Use separate worktrees for concurrent implementation. These packages are independent investigation boundaries, not a promise of disjoint production files. B, C, E, and F can overlap in `truck-shapeops/src/fillet`; D and G can overlap in geometry, meshing, and STEP. The coordinator resolves ownership and integrates focused commits. Never copy whole experimental directories over production.
+**Discrepancies** (45). These construct but fail the 0.001 comparison. An initial
+classification is in
+[g-discrepancy-review](checkpoints/2026-10-24-mixed-curved-corners/g-discrepancy-review-2026-10-24.txt).
+- Blends: `blend/simple/{C2,C6,C8,D1,D9,E4,E6,E8,F3,F5,G1,G5,H4,H7,J6,J8,K2,K3,K4}`,
+  `blend/tolblend_simple/A1`.
+- Chamfers: `chamfer/dist_dist/{B3,B4,C1,C2,C3,C4,C6,C7,D1,D2,D5,D6,D9,E1}`,
+  `chamfer/dist_angle/A2`, `chamfer/{dist_angle,dist_dist,equal_dist}_complex/A1`,
+  `chamfer/{dist_angle,dist_dist,equal_dist}_sequence/C1/001`,
+  `chamfer/dist_angle_sequence/{A6,A8}` 005 and 006.
 
-At most **three workers plus one coordinator** can run with the currently available four slots. Rotate packages in waves. Suggested first wave: B investigates F5 tessellation, D investigates input reconstruction, G independently reviews discrepancies, while A runs the frozen baseline capture. Next waves assign C/E/F and then H/I. H and I may start read-only product investigations earlier if a worker slot is free.
+Some discrepancies may come from the reference rather than Truck. F5 is an example: Truck's
+volume matches an independent oracle to 6e-9, while OCCT's is off by 2.5 at a 0.022 face
+tolerance. Record such an exception separately, with evidence; do not count it as a pass.
 
-**Shared machine limits:** one Cargo build/test/bench at a time, `CARGO_BUILD_JOBS=12`; one full capture at a time with `--workers 1 --timeout 120`. Separate worktrees do not eliminate memory pressure or shared Cargo cache hazards. Coordinate build slots; use isolated target directories where necessary and never rebuild the production replay during capture. Read-only analysis and independent small calculations can proceed concurrently.
+**Outside the solid corpus**
+- No-solid scope (96): shell/open-surface tasks, including the eight cohort cases
+  `blend/simple/{Q9,R1,R2,R3,R5,R6,U9,V7}`. Decide which are in scope.
+- Capability families: 50 plus reference topic F05 in `coverage.json`; none is closed. Never
+  exercised: F03 (different radii at a corner), C03–C05 (distance-angle and throat chamfers),
+  W02 (mixed straight/curved selection), W08 (face-driven rolling ball), S02 and S03 (sketch
+  curves and chamfers).
+- App work in `test_cad` (sketch fillets/chamfers, references, diagnostics) needs explicit
+  authorization before any app or pin change.
 
-| Package | Scope | Agent and worktree | State | Integration dependency |
-| --- | --- | --- | --- | --- |
-| A | Coordinator, corpus, catalog, integration | `/root`, root `master` @ `5a4e3bc6` | Exact-knot full capture, catalog and report verified | First capture precedes new root kernel changes |
-| B | Extruded curved corners and F5 tessellation | `/root/b_f5`, root `master` @ `9e3ce08a`; scoped scratch patch | Isolated physical-chart/finite-facet candidate passes focused accuracy and closure; full validation and medians pending | Coordinate remote corner mechanism with C |
-| C | Remaining curved junctions and collapse | `/root/b_f5`, read-only root; G2/G6/H1 claimed | G2 independent material oracle complete; scoped implementation in scratch. G6 basis continuation remains unresolved | Integrate after A; share geometry changes with B/F |
-| D | STEP imports, pcurves, seams, inconsistent inputs | `/root/d_import`, root `master` @ `9e3ce08a`; scoped scratch patch | Exact-knot/STEP achievement committed; complete capture preserves all canonical checks; C1 construction gaps remain | Coordinate mesher/STEP changes with G |
-| E | Chamfer construction and dimensional modes | `/root/d_import`, read-only root; sequential C2 claimed | Reduced C2 retain/collapse/overshoot regression and analytic oracle prepared; not executed | D owns input repair; G owns discrepancy analysis |
-| F | Unequal, variable, and zero-radius fillets | `/root/d_import`, read-only root @ `96ca84d1` | Concrete gap/oracle review in progress | Coordinate common corner construction with C |
-| G | Independent geometry proof, discrepancies, robustness, performance | `/root/g_proof`, scoped mesher experiment in root @ `96ca84d1` | Discrepancy/scope reviews complete; independent D arithmetic-contract and G2 review | Supplies oracles and reviews to all packages |
-| H | Downstream modeling, references, diagnostics, application workflows | `/root/g_proof`, sibling PiezaCAD @ `f5a381704` | Source review complete; runtime/app work pending | Read-only app review until app changes authorized |
-| I | Sketch fillets and chamfers | `/root/g_proof`, sibling PiezaCAD @ `f5a381704` | Source/scope review complete; implementation authorization pending | Confirm product edit scope before application changes |
+**F5 follow-ups**
+- The extrusion branch samples blend orientation at chart point (0.5, 0.5). On short bodies
+  that point is outside the fitted domain (span ≈ 0.17 at height 0.13). Short-body tests at
+  heights 0.13 and 0.15 still pass. Fix it once a failing case exists.
+- Original-scale F5 replay: 11.4 s wall time and 1.7 GB peak memory. It is no longer the
+  76 s tessellation hotspot, but it needs a benchmark median before any speed claim.
+- A finite-facet mesher accuracy rewrite is parked on local branch `f5-extrusion-candidate`
+  (`6df3e1d7`). F5 does not need it, and it changes existing replay meshes: the tilted-cap
+  exact volume and curved-terminal closure tests fail. Only revisit it as its own mesher
+  change.
 
-### Common assignment prompt
+## Rules for each fix
 
-Copy this paragraph with the chosen package section when delegating:
-
-> Read `audits/fillet-chamfer/TASK_TRACKER.md` and `AGENTS.md`. Work only on package [ID] from base commit [SHA], in [WORKTREE]. Coordinate shared Cargo/capture resources with [COORDINATOR]. Review the associated operation and capability checklist entries; claim each exact case/capture before changing it. Preserve existing assertions, canonical comparison thresholds, physical selections, and input immutability. New capability/fix tests must fail on the parent with identical fixtures. Return focused commits when authorized, reproduction commands, test/benchmark evidence, before/after case results, unresolved limitations, and the next action. Do not update shared corpus/catalog files, push, change consumer pins, or launch further agents unless assigned. Stop at [SPECIFIC BOUNDARY].
-
-### Package A coordinator and complete corpus accounting
-
-Own this tracker, `audits/fillet-chamfer/capture`, shared catalog/coverage updates, integration commits, and checkpoint reports. Delegate only claimed cases and scoped files. The coordinator is the only writer of shared progress totals.
-
-- [x] Confirm source/replay hashes against `truck-benchmarks/results/2026-10-22-mixed-curved-corners/validation.json`; rebuild if needed without changing source.
-- [x] Confirm DRAWEXE, SDK, plugin, public data, native checkout snapshot, and a fresh output path. Rechecked 444 source hashes and replay SHA256; native checkout has three tracked modifications plus existing untracked `src/BOPAlgo/HoleProfile.hxx`, preserved.
-- [x] Run the complete mixed capture and preserve runtime logs and every artifact hash.
-- [x] Check all 480 prior successful Truck and comparison records for exact preservation. Investigate every change; never rewrite the baseline to hide a regression.
-- [x] Reconcile all 648 operation keys, native tasks, physical selections, input scopes, tolerance records, and source/executable hashes.
-- [x] Update this ledger from actual results, retaining original state and links to new proof for resolved rows.
-- [x] Archive capture evidence, verify archive members/hashes, refresh catalog, run catalog/capture tests, and check desktop/mobile HTML plus evidence links. 8,497 archive members, catalog `--check`, audit tests and 13 capture tests pass; report checked at 1100/390 px.
-- [x] Commit the capture/report achievement separately from implementation (2026-10-24 mixed capture checkpoint).
-- [ ] Review native inventory omissions and skipped/missing fixtures; acquire reproducible public fixtures with provenance or record the specific remaining blocker. Missing fixtures are not passes.
-- [ ] Coordinate all remaining packages and perform the final completion review below.
-
-Capture command, after prerequisites and root cleanliness are confirmed:
+1. Add a test that fails on the parent with identical fixtures. Use an independent oracle
+   (analytic or flux volume), not OCCT output. Never loosen existing assertions.
+2. Run `cargo test --release -p <affected crates>`, the `replay_occt_blend` example tests,
+   all-target Clippy, and `cargo bench -p truck-benchmarks --bench actions -- --test`.
+   Use `CARGO_BUILD_JOBS=12` and run one Cargo job at a time.
+3. Replay the targeted capture at original scale with the release replay binary, then compare
+   it with `target/occt-distance-tree-plugin/compare_shapes`.
+4. Commit the fix with a `CHANGELOG.md` line. Update the numbers above as targeted results.
+5. Run a full capture at milestones, not after every fix. Use one worker and a 120 s timeout;
+   four workers ran out of memory. The output directory must not exist.
 
 ```bash
-cd /home/krone/Development/Pieza_WS/truck
 python3 audits/fillet-chamfer/capture/run_capture.py \
   --occt ../investigations/sequential-holes-2026-10-10/occt \
-  --library-path target/occt-sdk/usr/lib64 \
-  --plugin target/occt-distance-tree-plugin \
+  --library-path target/occt-sdk/usr/lib64 --plugin target/occt-distance-tree-plugin \
   --replay target/release/examples/replay_occt_blend \
   --data-path target/occt-public-chamfer-data \
-  --output target/occt-capture-mixed-curved-corners \
-  --workers 1 --timeout 120
+  --output target/occt-capture-<name> --workers 1 --timeout 120
 ```
 
-`DRAWEXE` must be available on PATH. The output directory must not already exist. Four-worker capture previously caused a confirmed out-of-memory failure. Preserve the native checkout's three recorded preexisting modifications.
-
-Prepared local helpers: `target/package-mixed-curved-corners-full.py` and `target/write-mixed-curved-corner-checkpoint.py`. Read before running: they assume particular paths/counts, are not generally idempotent, and the writer's continuation/F5 narrative predates the stop request. Update those assumptions from evidence. If old raw capture directories are missing, recover their archived artifacts and verify hashes. Do not rerun `integrate-mixed-curved-corners.py`.
-
-### Package B extruded corners and F5 performance
-
-Primary production candidates are `fillet/planar.rs` and `fillet/planar_fillet.rs`. The isolated prototype is `target/extrusion-corner-source`; preserve current mixed `along_wire.rs`/`modeling.rs` when porting. F5 has independent remote ends; G2/G6/H1 require a two-selected-edge remote junction, shared with C.
-
-- [x] Preserve/review the authoritative prototype and its independent volume derivation (117-member provenance v3 archive; final source independently reviewed).
-- [x] Locate why F5 fitted face 5 tessellates to 505,675 points / 1,008,827 triangles: unbalanced UV metric produces folded trim triangles and seven global winding retries. Physical metric plus interior refinement fixes F5 but global and local-retry variants fail the existing loft volume control; revision required.
-- [ ] Fix the demonstrated cause without reducing geometric precision; establish meaningful before/after benchmark medians.
-- [ ] Port procedural/native tests with repository fixtures; prove parent failures and check formatting/Clippy.
-- [ ] Integrate the focused F5 source changes, run complete affected validation, rebuild final production replay, and recheck original-scale F5.
-- [ ] Commit implementation/proof; coordinator captures and archives the full corpus afterward.
-- [ ] Resolve G2/G6/H1 remote canal junctions with C; center solving alone is not successful construction.
-
-Existing evidence: 12 refined procedural operations plus four oversized rejections pass; two imported F5 order controls pass. Material uses an independent boundary-flux oracle. The original-scale prototype constructs but retains sampled distances about 0.1069274 / 0.1056517. It is not production proof.
-
-Timing diagnosis: construction about 48 ms, radius/tangency complete at 82 ms, raw material checks finish at 76.604 s, STEP at 76.800 s. A separate per-face trace attributes 27.824 s to face 5; the other faces take under 8 ms each. **Raw tessellation, not STEP, is the unresolved cost.** These traces locate work; they are not formal benchmark medians.
-
-Local sources: `target/extrusion_corner_junctions.rs`, `target/extrusion-native-module.rs`, `target/extrusion-final-procedural-tests.txt`, `target/extrusion-final-native-tests.txt`, `target/extrusion-corner-volume.cpp`, `target/extrusion-corner-volume-method.txt`, `target/generic-extrusion-corner-design.txt`, `target/extrusion-corner-timing.rs/.txt`, and `target/extrusion-corner-mesh-timing.rs/.txt`.
-
-Do not rerun the prepare/refine prototype scripts blindly: later periodic-branch fixes are absent from the initial generator. `extrusion-corner-planar-clean.rs` is stale. The refined library and procedural/native test binaries differ from the pre-refinement `extrusion-corner-replay`; rebuild before final claims. The initial wrong ellipse branch and later failed representation assumption are diagnostic history, not reasons to relax validity tests.
-
-### Package C curved junctions and topology transitions
-
-Own general fillet junction construction outside B/F's claimed cases. Start from the exact operation rows, not abbreviated case names alone.
-
-- [ ] Diagnose remaining F9/G4/G8/I2 and bug-regression construction failures before proposing a shared mechanism.
-- [ ] Resolve H3 remote polar termination; H5 curved common support; H9 outside-neighbor cone contact; I4 conical and I8 freeform junctions.
-- [ ] Resolve X1's radius-15 request around a preexisting radius-10 convex cylinder using a valid corner construction.
-- [ ] Work with B on G2/G6/H1 remote two-edge junctions.
-- [ ] Extend mixed concavity, partial selections, oblique ends, four-plus-edge corners, and topology collapse according to J/D family outcomes below.
-- [ ] Validate contact dimensions, continuity, independent material, trimming, closed output, STEP, selection order, and rejected sizes; obtain parent proof and final original-scale replays.
-
-### Package D imports and parameter geometry
-
-Own input reconstruction and STEP/pcurve/seam mechanisms; coordinate mesher changes with G.
-
-- [ ] Resolve seven `chamfer/dist_angle_sequence/C1` solid-import failures.
-- [ ] Resolve ten inconsistent C1 inputs in distance-distance/equal-distance sequences by reconstructing endpoint geometry; do not loosen consistency tolerances.
-- [ ] Resolve G9's different-station seam/contact configuration in cooperation with C. Its current captured status is construction failure, so do not assume the historical import failure still describes it.
-- [ ] Validate analytic/NURBS equivalence, split faces, moved seams, inversions, parameter scaling, and STEP round trips for affected mechanisms.
-- [ ] Review no-solid captures for legitimate shell/sketch tasks with H/I; distinguish import loss from intended non-solid geometry.
-
-### Package E chamfers
-
-Own construction failures on valid chamfer inputs and C-family dimensional semantics. D owns failed imports; G owns initial discrepancy diagnosis; return geometry fixes to E after diagnosis.
-
-- [ ] Resolve the complex equal-distance, distance-distance, and distance-angle construction failures listed in the ledger.
-- [ ] Resolve sequential C2 requests where a 0.5 chamfer consumes a previous 0.2 chamfer, plus remaining valid-input C1 sequence failures.
-- [ ] Validate side identity and physical setback conventions under selection/storage reversal and curved supports.
-- [ ] Complete distance-angle, constant-throat, and penetrating-throat outcomes, trying equivalent existing constructions before introducing APIs.
-- [ ] Validate intended dimensions after upstream angle/curvature edits and retain canonical discrepancy records until resolved with evidence.
-
-### Package F radius laws and unequal junctions
-
-Own different radii, physical radius laws, and zero-radius endpoints. Coordinate shared corner filling with C.
-
-- [ ] Resolve captured A4/P9, tolerance-grid A2, and featlf E2/E3 unequal-radius requests; verify the exact intended profile for each fixture.
-- [ ] Validate physical radius profiles on unequal-length and split chains, including derivative variation and reversed selection.
-- [ ] Establish zero-radius endpoint behavior from actual native executions and independent geometry; support valid tapering without invalid seams.
-- [ ] Prove joined convex/mixed-concavity corners with distinct incident radii, plus oversized/inconsistent requests and immutable failure.
-
-### Package G independent proof and numerical robustness
-
-Own initial investigation of all 43 baseline constructed discrepancies and newly constructed discrepancies such as H7/F5. Supply independent oracles to implementing packages rather than assuming native output is infallible.
-
-- [x] Initial review of all 43 baseline discrepancies plus H7 is recorded in [the discrepancy review](checkpoints/2026-10-24-mixed-curved-corners/g-discrepancy-review-2026-10-24.txt); unresolved cases remain unresolved. Classify every discrepancy: physical intent/convention, native reference defect, Truck construction defect, STEP fitting, comparator defect, or unresolved. Preserve raw canonical results in every category.
-- [ ] Validate H7 and F5 analytic witness diagnoses against final production output. Two worst-point witnesses do not establish a global error bound.
-- [ ] Preserve and review prior C1 guide, C2/C8 sphere, E4 volume, G1, and tolerance-grid A1 diagnoses without silently changing thresholds/statuses.
-- [ ] Resolve general self-intersection/material-membership checks, distant collisions, crossed trim loops, folded offsets, and disappearing support/contact cases.
-- [ ] Sweep near-tangent/coplanar thresholds, high curvature, scale/translation, small retained features, singular contacts, and competing branches.
-- [ ] Measure latency with `truck-benchmarks` before claiming speedups; review F5 performance with B and output-quality changes with D.
-
-Do not restart the stopped E4 original-scale STEP stress automatically or call it a pass. The separate standard original-scale ellipsoid regression passed. Review existing evidence first. A reference diagnosis can explain a discrepancy but does not make the canonical comparison pass; record any accepted reference exception separately with evidence and user agreement.
-
-### Package H modeling workflows and delivery
-
-Own W-family coverage, shell scope, propagation/selection behavior, diagnostics, and final product-readiness evidence. Inspect the actual consumer location: repository instructions mention `test_cad`, while historical audit artifacts refer to `../PiezaCAD`; establish which checkout/pin is authoritative before application work.
-
-- [ ] Verify mixed straight/curved selections, Boolean-generated intersections, all relevant feature orders, and stable physical selection after upstream edits.
-- [ ] Verify face history after splits/deletions/replacements and actionable failure/retry without input mutation.
-- [ ] Validate downstream Booleans, meshing, STEP interchange, face-driven rolling-ball/stopping-face outcomes, and open-shell/free-boundary tasks.
-- [ ] Identify required consumer changes and prepare a scoped implementation/pin migration proposal. Do not change the app or its dependency pin without explicit authorization.
-- [ ] Coordinate end-to-end product validation after kernel achievements and authorized integration.
-
-### Package I sketch operations
-
-Own S01/S02/S03. This extends beyond the solid replay corpus and requires inspecting the actual application sketch implementation.
-
-- [ ] Verify line-line, line-circle, and circle-circle fillets on both sides and trimmed domains.
-- [ ] Verify ellipse/spline corners, extension, multiple solutions, and selection of the intended solution.
-- [ ] Establish editable sketch chamfers with setbacks/angles, modification/removal, connectivity, and constraints.
-- [ ] Record reproducible missing outcomes and propose application changes; implement only within explicitly authorized app scope.
-
-## Complete operation checklist
-
-These **122 rows are generated from the last complete torus manifest** and are keyed by full native case path plus capture number. They are the full unresolved positive-solid baseline, not a shortlist. Family IDs such as `F01` below are separate identifiers from native case names such as `blend/simple/F1`.
-
-A checked operation requires a recorded final disposition and evidence: a confirmed complete-run pass, or an explicitly agreed reference/scope exception kept separate from pass totals. A prototype or successful construction alone is insufficient. Add `agent / commit / evidence / remaining issue` to each claimed row. After each complete run, reconcile all operation keys and add any newly exposed regressions; do not delete unresolved rows.
-
-Initial package assignment is a triage owner, not a proven root cause. G transfers construction fixes to B/C/D/E/F once diagnosed. The full mixed capture resolves F1; H7 remains unchecked as a constructed discrepancy. Baseline rows are retained for traceability.
-
-### Construction failures
-
-- [ ] `blend/complex/G9` / `002` — package **D**.
-- [ ] `blend/simple/A4` / `001` — package **F**.
-- [x] `blend/simple/F1` / `001` — package **A**; full 2026-10-24 capture confirms limited pass at `9e3ce08a`; [proof](capture/2026-10-24-mixed-curved-corners/comparison-summary.json).
-- [ ] `blend/simple/F5` / `001` — package **B**.
-- [ ] `blend/simple/F9` / `001` — package **C**.
-- [ ] `blend/simple/G2` / `001` — package **B**.
-- [ ] `blend/simple/G4` / `001` — package **C**.
-- [ ] `blend/simple/G6` / `001` — package **B**.
-- [ ] `blend/simple/G8` / `001` — package **C**.
-- [ ] `blend/simple/H1` / `001` — package **B**.
-- [ ] `blend/simple/H3` / `001` — package **C**.
-- [ ] `blend/simple/H5` / `001` — package **C**.
-- [ ] `blend/simple/H7` / `001` — package **G**; full 2026-10-24 capture confirms construction, but comparison still fails. Retained here as original construction-failure ledger entry; current category is discrepancy.
-- [ ] `blend/simple/H9` / `001` — package **C**.
-- [ ] `blend/simple/I2` / `001` — package **C**.
-- [ ] `blend/simple/I4` / `001` — package **C**.
-- [ ] `blend/simple/I8` / `001` — package **C**.
-- [ ] `blend/simple/P9` / `001` — package **F**.
-- [ ] `blend/simple/X1` / `002` — package **C**.
-- [ ] `blend/tolblend_simple/A2` / `001` — package **F**.
-- [ ] `blend/tolblend_simple/D3` / `001` — package **C**.
-- [ ] `blend/tolblend_simple/D5` / `001` — package **C**.
-- [ ] `bugs/modalg_4/bug828` / `001` — package **C**.
-- [ ] `bugs/modalg_5/bug25657_1` / `001` — package **C**.
-- [ ] `bugs/modalg_7/bug30940_2` / `001` — package **C**.
-- [ ] `bugs/modalg_7/bug30940_4` / `001` — package **C**.
-- [ ] `bugs/modalg_7/bug30940_5` / `001` — package **C**.
-- [ ] `bugs/modalg_7/bug30940_6` / `001` — package **C**.
-- [ ] `chamfer/dist_angle_complex/A4` / `001` — package **E**.
-- [ ] `chamfer/dist_angle_complex/A5` / `001` — package **E**.
-- [ ] `chamfer/dist_angle_complex/A6` / `001` — package **E**.
-- [ ] `chamfer/dist_angle_complex/A7` / `001` — package **E**.
-- [ ] `chamfer/dist_angle_complex/A8` / `001` — package **E**.
-- [ ] `chamfer/dist_angle_complex/A9` / `001` — package **E**.
-- [ ] `chamfer/dist_angle_complex/C2` / `001` — package **E**.
-- [ ] `chamfer/dist_angle_sequence/C2` / `005` — package **E**.
-- [ ] `chamfer/dist_angle_sequence/C2` / `010` — package **E**.
-- [ ] `chamfer/dist_dist_complex/A4` / `001` — package **E**.
-- [ ] `chamfer/dist_dist_complex/A5` / `001` — package **E**.
-- [ ] `chamfer/dist_dist_complex/A6` / `001` — package **E**.
-- [ ] `chamfer/dist_dist_complex/A7` / `001` — package **E**.
-- [ ] `chamfer/dist_dist_complex/A8` / `001` — package **E**.
-- [ ] `chamfer/dist_dist_complex/A9` / `001` — package **E**.
-- [ ] `chamfer/dist_dist_complex/C2` / `001` — package **E**.
-- [ ] `chamfer/dist_dist_sequence/C1` / `002` — package **E**.
-- [ ] `chamfer/dist_dist_sequence/C1` / `003` — package **E**.
-- [ ] `chamfer/dist_dist_sequence/C2` / `005` — package **E**.
-- [ ] `chamfer/dist_dist_sequence/C2` / `010` — package **E**.
-- [ ] `chamfer/equal_dist_complex/A4` / `001` — package **E**.
-- [ ] `chamfer/equal_dist_complex/A5` / `001` — package **E**.
-- [ ] `chamfer/equal_dist_complex/A6` / `001` — package **E**.
-- [ ] `chamfer/equal_dist_complex/A7` / `001` — package **E**.
-- [ ] `chamfer/equal_dist_complex/A8` / `001` — package **E**.
-- [ ] `chamfer/equal_dist_complex/A9` / `001` — package **E**.
-- [ ] `chamfer/equal_dist_complex/C1` / `001` — package **E**.
-- [ ] `chamfer/equal_dist_complex/C2` / `001` — package **E**.
-- [ ] `chamfer/equal_dist_sequence/C1` / `002` — package **E**.
-- [ ] `chamfer/equal_dist_sequence/C1` / `003` — package **E**.
-- [ ] `chamfer/equal_dist_sequence/C2` / `005` — package **E**.
-- [ ] `chamfer/equal_dist_sequence/C2` / `010` — package **E**.
-- [ ] `feat/featlf/E2` / `001` — package **F**.
-- [ ] `feat/featlf/E3` / `001` — package **F**.
-
-### Solid import failures
-
-- [ ] `chamfer/dist_angle_sequence/C1` / `002` — package **D**.
-- [ ] `chamfer/dist_angle_sequence/C1` / `003` — package **D**.
-- [ ] `chamfer/dist_angle_sequence/C1` / `004` — package **D**.
-- [ ] `chamfer/dist_angle_sequence/C1` / `005` — package **D**.
-- [ ] `chamfer/dist_angle_sequence/C1` / `006` — package **D**.
-- [ ] `chamfer/dist_angle_sequence/C1` / `007` — package **D**.
-- [ ] `chamfer/dist_angle_sequence/C1` / `008` — package **D**.
-
-### Inconsistent inputs
-
-- [ ] `chamfer/dist_dist_sequence/C1` / `004` — package **D**.
-- [ ] `chamfer/dist_dist_sequence/C1` / `005` — package **D**.
-- [ ] `chamfer/dist_dist_sequence/C1` / `006` — package **D**.
-- [ ] `chamfer/dist_dist_sequence/C1` / `007` — package **D**. Current: input is consistent; construction fails at `trim_faces` on `5a4e3bc6`. Remains unresolved.
-- [ ] `chamfer/dist_dist_sequence/C1` / `008` — package **D**. Current: input is consistent; construction fails at `trim_faces` on `5a4e3bc6`. Remains unresolved.
-- [ ] `chamfer/equal_dist_sequence/C1` / `004` — package **D**.
-- [ ] `chamfer/equal_dist_sequence/C1` / `005` — package **D**.
-- [ ] `chamfer/equal_dist_sequence/C1` / `006` — package **D**. Current: input is consistent; construction fails at `trim_faces` on `5a4e3bc6`. Remains unresolved.
-- [ ] `chamfer/equal_dist_sequence/C1` / `007` — package **D**. Current: input is consistent; construction fails at `trim_faces` on `5a4e3bc6`. Remains unresolved.
-- [ ] `chamfer/equal_dist_sequence/C1` / `008` — package **D**.
-
-### Constructed comparison discrepancies
-
-- [ ] `blend/simple/C2` / `001` — package **G**.
-- [ ] `blend/simple/C6` / `001` — package **G**.
-- [ ] `blend/simple/C8` / `001` — package **G**.
-- [ ] `blend/simple/D1` / `001` — package **G**.
-- [ ] `blend/simple/D9` / `001` — package **G**.
-- [ ] `blend/simple/E4` / `001` — package **G**.
-- [ ] `blend/simple/E6` / `001` — package **G**.
-- [ ] `blend/simple/E8` / `001` — package **G**.
-- [ ] `blend/simple/F3` / `001` — package **G**.
-- [ ] `blend/simple/G1` / `001` — package **G**.
-- [ ] `blend/simple/G5` / `001` — package **G**.
-- [ ] `blend/simple/H4` / `001` — package **G**.
-- [ ] `blend/simple/J6` / `001` — package **G**.
-- [ ] `blend/simple/J8` / `001` — package **G**.
-- [ ] `blend/simple/K2` / `001` — package **G**.
-- [ ] `blend/simple/K3` / `001` — package **G**.
-- [ ] `blend/simple/K4` / `001` — package **G**.
-- [ ] `blend/tolblend_simple/A1` / `001` — package **G**.
-- [ ] `chamfer/dist_angle/A2` / `001` — package **G**.
-- [ ] `chamfer/dist_angle_complex/A1` / `001` — package **G**.
-- [ ] `chamfer/dist_angle_sequence/A6` / `005` — package **G**.
-- [ ] `chamfer/dist_angle_sequence/A6` / `006` — package **G**.
-- [ ] `chamfer/dist_angle_sequence/A8` / `005` — package **G**.
-- [ ] `chamfer/dist_angle_sequence/A8` / `006` — package **G**.
-- [ ] `chamfer/dist_angle_sequence/C1` / `001` — package **G**.
-- [ ] `chamfer/dist_dist/B3` / `001` — package **G**.
-- [ ] `chamfer/dist_dist/B4` / `001` — package **G**.
-- [ ] `chamfer/dist_dist/C1` / `001` — package **G**.
-- [ ] `chamfer/dist_dist/C2` / `001` — package **G**.
-- [ ] `chamfer/dist_dist/C3` / `001` — package **G**.
-- [ ] `chamfer/dist_dist/C4` / `001` — package **G**.
-- [ ] `chamfer/dist_dist/C6` / `001` — package **G**.
-- [ ] `chamfer/dist_dist/C7` / `001` — package **G**.
-- [ ] `chamfer/dist_dist/D1` / `001` — package **G**.
-- [ ] `chamfer/dist_dist/D2` / `001` — package **G**.
-- [ ] `chamfer/dist_dist/D5` / `001` — package **G**.
-- [ ] `chamfer/dist_dist/D6` / `001` — package **G**.
-- [ ] `chamfer/dist_dist/D9` / `001` — package **G**.
-- [ ] `chamfer/dist_dist/E1` / `001` — package **G**.
-- [ ] `chamfer/dist_dist_complex/A1` / `001` — package **G**.
-- [ ] `chamfer/dist_dist_sequence/C1` / `001` — package **G**.
-- [ ] `chamfer/equal_dist_complex/A1` / `001` — package **G**.
-- [ ] `chamfer/equal_dist_sequence/C1` / `001` — package **G**.
-
-### Additional nine-case cohort
-
-The separately captured inventory expansion adds nine operations. Its [combined evidence index](capture/2026-10-24-nine-case-cohort/combined-evidence-index.json) reconciles 405 cases / 657 operations across two immutable captures; this is not one fresh expanded run. Aggregate results: 560 positive-solid references, 482 constructions, 438 limited passes, 122 unresolved positive-solid operations and 96 no-solid inputs. The original 396/648 table above remains historical cohort evidence.
-
-- [ ] `blend/complex/D2` / `001` — package **F/C**: ten seeds, nine contours, unequal radii 10/5; native valid solid, Truck `UnsupportedTopology` at `validate_input`.
-- [ ] `blend/simple/{Q9,R1,R2,R3,R5,R6,U9,V7}` / `001` each — package **G/H**: zero native input/output solids; review shell-operation contracts. No solid-replay pass claimed.
-
-## Full capability checklist
-
-This covers all **50 capability families plus one reference topic** in `coverage.json`, including work outside the captured solids. The recorded status describes existing evidence, not whole-family completion. Even an `implemented-with-tests` family can have explicit remaining variation coverage. Each unchecked row requires evidence review and closure of the stated outcome, not automatically a rewrite or another test.
-
-The catalog's suggested next cases can lag newer checkpoints. Reconcile them with current manifests before repeating historical work; for example, do not restart old H2/H4 or torus investigations solely because an older family note still names them. The required outcomes below remain the closure targets. See `coverage.json` for per-family evidence, variation axes, and detailed next-case suggestions.
-
-- [ ] **F01 — Constant-radius planar fillets**. Package **C**. Recorded status: `implemented-with-tests`. Round selected planar-solid edges to the requested constant radius, for convex and concave material, while preserving a valid solid.
-- [ ] **F02 — Variable radius along a tangent chain**. Package **F**. Recorded status: `partial`. Create a smooth blend whose radius follows the requested physical profile along an entire connected chain, including unequal-length and split edges.
-- [ ] **F03 — Different radii meeting at a corner**. Package **F**. Recorded status: `unverified`. Create a valid joined corner where incident edge fillets have different specified radii, with the intended contacts and continuity.
-- [ ] **F04 — Tapered radius reaching zero**. Package **F**. Recorded status: `partial`. Taper a blend continuously to zero radius at an endpoint without leaving an invalid seam or degenerate solid.
-- [ ] **F05 — Fillet section representation choices**. Package **G**. Recorded status: `reference-only`. No independent representation-selector requirement. The resulting shape must satisfy geometric accuracy and downstream use regardless of its internal representation.
-- [ ] **F06 — Smoothness within and between blend surfaces**. Package **G**. Recorded status: `partial`. Achieve the required smoothness within blend surfaces and across their joins; distinguish that from tangency to the support faces.
-- [ ] **C01 — Equal-distance chamfers**. Package **E**. Recorded status: `implemented-with-tests`. Bevel selected edges by equal specified setbacks on both supports, including convex and concave material.
-- [ ] **C02 — Unequal chamfer distances and side identity**. Package **E**. Recorded status: `implemented-with-tests`. Bevel with independently specified setbacks on the intended two support faces; orientation or storage order must not silently exchange them.
-- [ ] **C03 — Distance-and-angle chamfers**. Package **E**. Recorded status: `unverified`. Produce a chamfer with the requested setback and angle, including non-right-angle supports, using any equivalent parameterization.
-- [ ] **C04 — Constant-throat chamfers**. Package **E**. Recorded status: `unverified`. Produce a chamfer whose normal sections maintain the requested throat dimension along the selected edge.
-- [ ] **C05 — Constant throat with penetration**. Package **E**. Recorded status: `unverified`. Produce the requested constant-throat chamfer with penetration, satisfying both the throat and offset-support constraints.
-- [ ] **C06 — Meaning of distance on curved supports**. Package **E**. Recorded status: `behavior-difference`. Produce the intended measurable setbacks on curved supports after explicitly translating dimension conventions between kernels.
-- [ ] **G01 — Plane/cylinder lips and rims**. Package **C**. Recorded status: `implemented-with-tests`. Blend lips and rims formed by planes and cylinders, for holes, bosses and channels in either material sense.
-- [ ] **G02 — Plane/cone and drafted rims**. Package **C**. Recorded status: `partial`. Blend drafted or conical rims over varying cone angles and near the apex when a valid requested result exists.
-- [ ] **G03 — Cylinder/cylinder, sphere, torus and spline support pairs**. Package **C**. Recorded status: `partial`. Blend intersections between curved supports, including cylinders, cones, spheres, tori and spline surfaces, with valid contacts and trimmed output.
-- [ ] **G04 — Equivalent analytic versus NURBS representations**. Package **D**. Recorded status: `partial`. Handle equivalent physical geometry consistently when represented analytically, as exact NURBS, with split faces, or after STEP import.
-- [ ] **G05 — Curved and closed spline spines**. Package **C**. Recorded status: `partial`. Blend along open and closed curved edges, including spline inflections and high curvature, with valid closure and contacts.
-- [ ] **T01 — Tangent propagation across support changes**. Package **C**. Recorded status: `partial`. Round or bevel a tangent chain continuously across edge splits and changes of support face.
-- [ ] **T02 — Closed chains and periodic seams**. Package **D**. Recorded status: `partial`. Complete a closed blend without gaps or invalid topology, regardless of where periodic seams lie.
-- [ ] **T03 — Branching or ambiguous chain selection**. Package **H**. Recorded status: `partial`. Resolve or report ambiguous tangent branches predictably, while allowing the intended explicit path to be selected.
-- [ ] **T04 — Open shells and free-boundary terminations**. Package **H**. Recorded status: `partial`. Blend open-shell edges and terminate correctly on free boundaries for surface-modeling tasks.
-- [ ] **J01 — Single fillet with oblique end faces**. Package **C**. Recorded status: `implemented-with-tests`. Terminate a blend correctly against oblique end faces while preserving the requested radius and a valid boundary.
-- [ ] **J02 — Single blend ending across multiple faces**. Package **C**. Recorded status: `partial`. Terminate one blend across a neighborhood of several end faces without gaps, overlaps or damage to unrelated geometry.
-- [ ] **J03 — Three equal-radius edges with the same concavity**. Package **C**. Recorded status: `implemented-with-tests`. Join three equal-radius, same-concavity rounds at a valid corner over general planar support angles.
-- [ ] **J04 — Two-edge junction with nonorthogonal supports**. Package **C**. Recorded status: `partial`. Join two selected edge rounds at an oblique corner with the required continuity and preservation of the remaining sharp edge.
-- [ ] **J05 — Mixed convex/concave corner transitions**. Package **C**. Recorded status: `partial`. Construct valid transitions where convex and concave blends meet, including oblique support configurations.
-- [ ] **J06 — Four or more interacting blends at a vertex**. Package **C**. Recorded status: `partial`. Join four or more interacting blends at a vertex when the requested configuration has a valid solution.
-- [ ] **J07 — General curved multi-blend corner filling**. Package **C**. Recorded status: `partial`. Close multi-blend corners on general curved supports with valid contact and continuity, independent of patch construction method.
-- [ ] **D01 — Contact collapse and singular tips**. Package **C**. Recorded status: `partial`. Handle valid limiting cases where contact curves collapse or tips become singular, with controlled rejection of impossible configurations.
-- [ ] **D02 — Disappearing support faces**. Package **C**. Recorded status: `partial`. Continue valid blending through the disappearance of a support face and reconstruct the remaining material correctly.
-- [ ] **D03 — Disappearing unselected edges and blend contacts**. Package **E**. Recorded status: `partial`. Continue valid blending when an unselected edge or intermediate blend contact disappears, rebuilding local topology correctly.
-- [ ] **D04 — Folded offsets and overlapping blend patches**. Package **G**. Recorded status: `partial`. Produce a valid result where one exists as offsets fold or blend patches meet; reliably reject invalid or self-intersecting outcomes.
-- [ ] **D05 — Contact crossing a trim loop or hole**. Package **G**. Recorded status: `partial`. Handle blend contacts that reach trim boundaries or holes, producing the intended material boundary or an accurate geometric rejection.
-- [ ] **D06 — Distant face/cavity collisions and global self-intersections**. Package **G**. Recorded status: `partial`. Detect or resolve collisions with distant faces and cavities so a successful blend cannot silently leave an invalid or self-intersecting body.
-- [ ] **N01 — Reliable contacts near singularities and competing solutions**. Package **G**. Recorded status: `partial`. Find the intended valid contact solution near singularities and competing branches without unstable branch jumps or false failures.
-- [ ] **N02 — Accuracy through rapidly changing curvature**. Package **G**. Recorded status: `partial`. Maintain requested geometric accuracy through rapidly changing curvature and unequal feature scales without missed contact failures.
-- [ ] **N03 — Pcurve domains, periodic parameters and seam endpoints**. Package **D**. Recorded status: `partial`. Keep blend boundaries on both supports and close them correctly when surface parameters, orientations or seam positions change.
-- [ ] **N04 — Almost tangent and nearly coplanar edges**. Package **G**. Recorded status: `partial`. Handle nearly tangent and nearly coplanar selections consistently around tolerance thresholds, without invalid output or unstable propagation.
-- [ ] **N05 — Near-limit sizes and tiny retained features**. Package **G**. Recorded status: `implemented-with-tests`. Retain valid tiny features near blend size limits and reject sizes beyond the valid geometric range consistently across transforms and scales.
-- [ ] **W01 — Sequential fillet/chamfer composition**. Package **H**. Recorded status: `partial`. Apply successive rounds and bevels to earlier feature results with correct dimensions, valid topology and stable selections.
-- [ ] **W02 — Simultaneous straight and curved selections**. Package **H**. Recorded status: `unverified`. Apply one requested selection containing straight and curved edges with the intended joined result, independent of selection enumeration order.
-- [ ] **W03 — Blends on Boolean-generated intersections**. Package **H**. Recorded status: `implemented-with-tests`. Blend physically selected intersection edges created by Boolean operations and preserve valid solid geometry.
-- [ ] **W04 — Stable references after topology edits**. Package **H**. Recorded status: `partial`. Keep downstream references attached to their intended geometry after upstream edits split, replace or remove blend topology.
-- [ ] **W05 — Closed meshes, STEP and downstream modeling**. Package **H**. Recorded status: `implemented-with-tests`. Deliver blend results usable for closed meshing, STEP interchange and further modeling while preserving dimensions and validity.
-- [ ] **W06 — Actionable failures and recovery**. Package **H**. Recorded status: `partial`. Explain failed selections and stages clearly, preserve the model and allow the user to correct or retry a failed blend.
-- [ ] **W07 — Invalid selections, parameters and immutable failure**. Package **H**. Recorded status: `implemented-with-tests`. Handle invalid, empty, duplicate or stale selections and invalid numeric parameters deterministically without panic or input mutation.
-- [ ] **W08 — Face-driven rolling ball and stopping faces**. Package **H**. Recorded status: `unverified`. Construct a round between selected support faces and terminate it at specified limiting faces, through any equivalent feature construction.
-- [ ] **W09 — Boolean and blend composition**. Package **H**. Recorded status: `implemented-with-tests`. Fuse or cut bodies, then blend the intended resulting intersection edges while preserving the modeling intent through edits.
-- [ ] **S01 — 2D line/arc fillets**. Package **I**. Recorded status: `partial`. Round trimmed planar line/arc corners to the requested radius and chosen side, retaining connected sketch geometry.
-- [ ] **S02 — 2D general curves and multiple solutions**. Package **I**. Recorded status: `unverified`. Round general planar curve corners with the intended radius, trimmed domains and selected solution when several are possible.
-- [ ] **S03 — 2D chamfers and corner edits**. Package **I**. Recorded status: `unverified`. Create and edit planar sketch chamfers with specified setbacks or angles, maintaining connectivity and edit behavior.
-
-F05 is reference-only: close its review by confirming representation differences do not cause an unresolved accuracy, interoperability, downstream-modeling, or performance issue. Do not implement an OCCT-style selector just to match an API.
-
-## Required validation and checkpoint procedure
-
-For each implementation achievement:
-
-- [ ] State the physical modeling task, intended dimensions, terminal behavior, valid size range, and independent correctness oracle.
-- [ ] Add a meaningful regression that fails on the parent with identical source and fixtures. If the result contract intentionally changes, rewrite its test first with equally strong or stronger checks and explain why.
-- [ ] Keep all existing assertions, validity guards, canonical thresholds, replay fitting budgets, and rejection behavior unless a deliberate separately proven contract change requires otherwise.
-- [ ] Check topology, closed tessellation, independent material volume, requested radius/setback/angle, required tangent continuity, input immutability, history, and STEP through the common harness. For open shells use their boundary contract.
-- [ ] Exercise relevant transforms, reversal, selection order, split/unsplit geometry, seam positions, support representations, and near-limit sizes. Record what is and is not covered.
-- [ ] Run affected release suites, all-target Clippy, single-thread actions smoke, replay/capture checks, and required native checks. Record commands, logs, source hashes, known failures, warnings, and ignored tests.
-- [ ] Build the production replay last and run original-scale targeted comparisons with it. No stale prototype binary as final proof.
-- [ ] Commit implementation and proof as one stable achievement when authorized.
-- [ ] Coordinator runs a fresh complete capture on clean committed source, verifies prior results, archives evidence, refreshes catalog, and commits the capture/report separately.
-- [ ] Update this tracker, package state, and the activity log before handing back control.
-
-Use `CARGO_BUILD_JOBS=12`. Format touched Rust only with `rustfmt +nightly --config skip_children=true`; do not run repository-wide `cargo fmt`. Use `truck-shapeops/tests/common/mod.rs` and the common blend STEP harness. Force-add intended ignored JSON/ZIP/STEP/BREP evidence. Check diffs excluding preserved native STEP/BREP bytes where needed. Do not commit logs with secrets or unrelated files.
-
-Dependency test reuse requires identical relevant source hashes and explicit baseline limitations. The known geometry precision failure must stay documented, not be weakened to achieve a green report. Benchmark smoke only proves the benchmark runs; performance claims require measured before/after medians.
-
-## Evidence and portability
-
-All paths here are relative to the repository root unless linked otherwise.
-
-| Evidence | Location |
-| --- | --- |
-| Current implementation report | [Mixed corner report](checkpoints/2026-10-22-mixed-curved-implementation/report.html) |
-| Detailed implementation and F5 handoff | [Mixed corner handoff](checkpoints/2026-10-22-mixed-curved-implementation/HANDOFF.txt) |
-| Parent proof, validation, source hashes, 76-member controls archive | [Mixed proof directory](../../truck-benchmarks/results/2026-10-22-mixed-curved-corners/REPORT.md) |
-| Latest complete corpus summary | [Mixed capture report](capture/2026-10-24-mixed-curved-corners/REPORT.md) |
-| Complete baseline operation records | [Torus manifest](capture/2026-10-22-torus-corners/results.json) |
-| Current comparison and scope accounting | [Mixed comparison summary](capture/2026-10-24-mixed-curved-corners/comparison-summary.json) |
-| Capability definitions and evidence | [Coverage](coverage.json) |
-| Generated inventory and case navigation | [Catalog](catalog.html) and [viewer](viewer.html) |
-
-Previous mixed capture archive SHA256: `5f5b0bf951da9e2e3809c52b17aa5b72e7b1c177f2ddc3086002a8828052c6be` (8,497 members).
-
-Baseline torus archive SHA256: `0bad14be0c383aa48050e7941d3311ca8665946be5e6db9f145d5e02e52ba9b8` (8,491 members).
-Mixed proof archive SHA256: `ffd52c1c367d115c1c55e8002f940e2d7926fcc2fd895addf29dc8c50ee93d8e` (76 members).
-
-The `target/` paths are **local, ignored scratch artifacts**, not guaranteed in a fresh clone or subagent worktree. Their existence was checked on 2026-10-24. Before moving to another machine, preserve the F5 source, test sources, oracle/derivation, timing logs, fixtures, and helper commands with hashes. A subagent on this machine can read the root's artifacts through absolute paths, but must copy only its scoped inputs into its own worktree and record their provenance. If those files are absent, reconstruct from committed fixtures/evidence; do not assume the F5 prototype was committed.
-
-Do not confuse raw experiment logs, pre-refinement binaries, incomplete timed-out runs, or historical unsupported-case assertions with current production evidence. Earlier handoffs are historical snapshots and can contain superseded stop/resume instructions and obsolete case diagnoses.
-
-## Completion criteria for the entire effort
-
-- [ ] Every positive-solid corpus operation has a verified final disposition; construction failures, invalid inputs, timeouts, discrepancies, and agreed exceptions remain separate categories.
-- [ ] All non-solid/shell/sketch and missing/skipped fixture scopes have been reviewed; unresolved or unavailable evidence is explicitly recorded rather than counted as success.
-- [ ] All 50 capability families have current outcome evidence or an explicitly agreed remaining scope/limitation; reference topic F05 does not become an artificial API requirement.
-- [ ] Geometric constraints, continuity, material membership, global self-intersection behavior, STEP, downstream modeling, stable references, and immutable failure are covered at the appropriate scope.
-- [ ] Practical performance meets the agreed product needs with recorded measurements; unresolved F5 tessellation cost is addressed.
-- [ ] Required application integration and sketch behavior are validated after any necessary scope authorization; consumer pins are changed only when explicitly requested.
-- [ ] Final full capture, catalog, proof archives, HTML report, and this tracker agree on commits, counts, exceptions, and remaining limitations.
-- [ ] Stable achievements are committed, working-tree status is reported, and no owned build/test/capture jobs are left running at final handoff.
-
-No overall completion percentage or universal parity claim should be inferred from the sampled corpus. If full completion cannot be demonstrated, report the exact remaining outcomes and blockers instead of marking the whole task done.
-
-## Progress log
-
-Update the existing checkboxes and package states, then append one row per stable achievement. Keep actual full-run totals separate from targeted probe results.
-
-| Date | Package | Commit or artifact | Achievement | Remaining work and next action |
-| --- | --- | --- | --- | --- |
-| 2026-10-22 | A | `9f97532a` | Torus full corpus archived: 480 construct, 437 limited passes | 122 unresolved positive solid operations |
-| 2026-10-22 | A | `9e3ce08a` | Mixed F1/H7 implementation and proof committed | Full mixed capture pending; H7 discrepancy retained |
-| 2026-10-24 | A | `TASK_TRACKER.md` | Full-work handoff, 122-operation baseline ledger, 51-family review list, and subagent packages prepared | Assign coordinator/workers; start A's capture when continuation is authorized |
-
-| 2026-10-24 | A/B/D/G | Root `master` @ `9e3ce08a`; scratch evidence under `target/` | Resumed with three workers; 444 source hashes/replay verified; 13 capture tests pass; serial baseline running. F5 winding retries and STEP isoparameter endpoint conversion have concrete probe evidence. | Freeze root source/replay until capture completes; proofs and integration pending. |
-
-| 2026-10-24 | A | `9e3ce08a` / [capture](capture/2026-10-24-mixed-curved-corners/REPORT.md) | Full mixed capture: 482 construct, 438 limited passes; 480 old successes exact; 8,497 archive members verified | 121 unresolved positive solids (60 construction, 7 import, 10 inconsistent, 44 discrepancies); F5/exact-knot candidate validation next |
-
-| 2026-10-24 | A/D | `5a4e3bc6` / [capture](capture/2026-10-24-exact-knots/REPORT.md) | Complete exact-knot capture: 482 construct, 438 limited passes; 372 exact + 110 reviewed prior successes; no lost checks | 121 unresolved: 64 construction, 7 import, 6 inconsistent, 44 discrepancies; F5 validation in progress |
-
-Next handoff must state: current HEAD/branch, changed files, active jobs, completed packages, exact validation evidence, actual corpus totals, unresolved discrepancies, local-only artifacts, and the first reproducible next action.
-
-### 2026-10-24 validation correction
-
-The first F5 meshing/shape-operation integration runs reused a mesher artifact whose binary Cargo dep-info pointed into `target/normal-angle-parent-source`. Preserve those logs as invalidated candidate evidence. The linked base/geometry/modeling/topology sources match current files, but the mesher was stale. Linked workspace packages were cleaned and rebuilt; current dep-info paths and 450 source hashes are recorded under `truck-benchmarks/results/2026-10-24-extrusion-corners/`. Clean parent mesher/procedural/native regressions fail as intended; cap benchmark median is 25.69 s. Correctly rebuilt global-metric F5 procedural checks pass in 5.37 s, but the unchanged `loft_winding` volume assertion fails (2.32131597967 versus 0.8π, allowance 0.03). The clean parent passes it. A local folded-face retry also fails because it can suppress global refinement. No F5 implementation achievement is accepted yet; preserve tests and resolve this regression before final validation/capture.
-
-The bounded local centroid/diagonal experiments also failed and are archived in `truck-benchmarks/results/2026-10-24-extrusion-corners/loft-retry-diagnosis.zip` (21 files, SHA256 `5f4b34c777f7bf720e2881265bedf6d6e3b5ff6c8352a3cdff695deb6ededd8e`). Current investigation instead scales only newly generated extrusion fillet charts using physical section/path speeds and refines facet accuracy only after parent winding succeeds. Prototype cap/loft checks pass; performance, full validation, immutable new-chart parent proof and original-scale replay remain pending. The normalized legacy cap first-pass defect remains unresolved; do not report it fixed by a producer chart change.
-
-The physical-chart contract and exact parent failure are now frozen in `truck-benchmarks/results/2026-10-24-extrusion-corners/physical-chart-prototypes.zip` (SHA256 `b27ea687cea1af498fcebd5b9f81be6012e42a0121497a1db924c19d7c0fde08`). The first-pass replacement retains all original assertions against the new producer chart; the withdrawn normalized test is preserved verbatim alongside `CHART-CONTRACT.md`. Its defect remains unresolved. Valid-parent metric rebuilding passes the cap and existing loft volume checks. Seven-sample medians still show a finest-loft regression (116 ms parent versus 173.2 ms candidate at 0.001), despite coarser loft controls returning to baseline once the accuracy target is separated from global winding subdivisions. Physical-chart parent tessellation is 27.63 ms but fails the accuracy regression; the accurate candidate is about 48 ms. That is not a like-for-like successful parent result. At that stage global generic-mesher acceptance remained blocked on performance. Subsequent Package D progress is recorded below; C2 remains an unvalidated proposal.
-
-Package D validation now has eight clean-parent behavior failures and exact-zero fixes for curve and both surface knot-removal coefficients. The unchanged geometry suite reports 160 passes, one known `pcurve_derivation` precision failure, one ignore, and 139 passing doctests; geometry Clippy passes. Downstream validation exposed and is correcting two additional effects: an internal non-finite Newton step (two new parent-failing tests and the existing modeling regression now pass), and loss of a declared spline-pcurve trace when newly correct spatial trimming bypasses the former fallback. Keep the strict existing STEP trace/derivative/domain assertions; no import achievement is accepted yet. `/root/d_import` owns the scoped STEP correction and Cargo slot.
-
-The STEP correction preserves the declared supported spline pcurve master when competing with a spatial spline; strict existing trace/derivative/domain and analytic-cylinder tests both pass unchanged. Clean-parent checks now cover 21 new behavior regressions, plus two candidate-only arithmetic-error tests. Current dependency validation: 364 tests pass, one known pcurve precision failure, one ignore; 172 doctests pass with three existing ignores. Baseline meshing: 51 tests pass, one ignore (doctests pending separately). All-target Clippy passes with the two existing shapeops test warnings; actions smoke passes. Seven-sample medians are comparable to parent (finest loft 118.5 ms versus 116 ms; sphere 27.24 ms versus 27.5 ms). Full baseline shapeops and final replay are running/pending, so this remains an uncommitted candidate. F5 producer/mesher changes are paused in `target/f5-paused-for-d/`; do not confuse this candidate with accepted F5 support. The proposed full-cell fillet grid regression passes on parent and therefore did not establish a grid fix.
-
-Full baseline shapeops validation exposed an additional unchanged R10 rejection panic (`collapsed_contacts_reject_cap_consumption_and_short_walls`) at the strict basis arithmetic wrapper. The run remains diagnostic, not acceptance evidence. Finite solver parameters can still overflow extrapolated basis coefficients; a reviewed scratch proposal separates checked arithmetic diagnostics from IEEE behavior in the infallible evaluator, retaining structural errors. Apply only after reproducing the actual backtrace; preserve all existing assertions. Root owns the single Cargo slot. The original-scale ellipsoid target passes in 297.86 s versus historical 279–285 s; these are suite durations, not matched benchmark medians.
-
-Additional local-only work: `target/b-g2-candidate/` contains an uncompiled remote-junction proposal and independent oracle; review requires finite residual/UV checks and branch/material bounds. `target/d-c2-consumed-contour-regression.rs` and its independent analytic oracle distinguish retained, exactly consumed, and overshot prior chamfers; fixture orientation and parent failure are unverified. `target/d-c1-final-replay.py` prepares the 24 final-production C1 replays with exact baseline artifacts and canonical comparison thresholds; not yet executed. None changes corpus totals or establishes accepted capability.
-
-The initial full baseline shapeops run completed: 463 passes, one existing ignore, and only the R10 rejection panic (doctests were not included). Its backtrace is in `2026-10-24-exact-knots/r10-basis-backtrace.txt`: rolling-ball contact cross-point search evaluates its spine through the infallible basis wrapper. The corrected contract shares one computation, preserves IEEE non-finite arithmetic in the infallible path, and retains explicit errors in the checked path plus structural panics. Two new arithmetic-contract regressions fail at runtime on clean parent and initial candidate, then pass corrected; unchanged R10 has eight passes. This brings clean-parent new behavior failures to 23, alongside two candidate-only error-enum tests and one finite/structural control test. Final dependency rerun: 367 pass, one known pcurve precision failure, one ignore; 172 doctests pass, three ignored. Independent source review found no blocker. Final mesher/shapeops validation is running with F5 unimplemented tests/example additions preserved under `target/f5-paused-for-d/`. Final replay, medians, commit and full capture remain pending.
-
-### Exact-knot final validation and remaining experiments
-
-The corrected D candidate completed 545 mesher/shapeops tests and 28 doctests (two existing test ignores), 76 replay tests, all-target Clippy and actions smoke. An ordinary `#[inline]` annotation on the common basis helper is the sole subsequent algorithm-source delta; its post-inline dependency/mesher/R10/replay checks and cleaned production build are recorded separately in `truck-benchmarks/results/2026-10-24-exact-knots/`. Do not relabel the earlier full-suite snapshot as the final annotated source. The known pcurve precision failure remains unchanged.
-
-Seven-sample benchmarks include an alternating fixed-CPU comparison with identical binaries/fixtures. The finest loft retains about 3% overhead (+2.88% and +3.35%); cap and sphere are approximately unchanged across run averages. Larger unpinned plate differences do not consistently reproduce. No speedup or zero-regression claim is made.
-
-The first 24-case C1 replay verifies 144 unchanged native artifacts and yields three successful constructions, seven import failures, eight construction failures and six inconsistent inputs. Four previously inconsistent inputs now reach `trim_faces` and reject: distance-distance 007/008 and equal-distance 006/007. There are no new successful operations or limited passes. The three successful comparison records exactly match the baseline. The final cleaned-source rebuild/replay confirms the same exact Truck result and comparison records; the complete corpus remains pending.
-
-F5 producer/mesher changes, physical fixtures, benchmark controls and their evidence directory are now preserved under `target/f5-paused-for-d/`, outside this checkpoint. The nearest-raw-mesh loft accuracy oracle and bulk-CDT rebuild proposal are unexecuted; their frozen archive remains in the paused F5 evidence. G2 depends on accepted F5 support; its incremental kernel patch does not apply to the present baseline. C2 remains uncompiled. No prototype establishes accepted capability.
-
-Inventory follow-up found nine skipped native blend cases with fixtures already available in the provenanced public data directory. Their isolated retry is being prepared under `target/d-inventory-review-2026-10-24/`; the 396-case/648-operation baseline remains unchanged until a separate reviewed inventory expansion.
-
-Final D checkpoint: post-inline source confirms 367 dependency passes with the one known failure/one ignore, 172 doctest passes/three ignores; 81 mesher passes/one ignore and 21 doctests; eight R10 and 76 replay passes; all-target Clippy and unmodified actions smoke pass. The cleaned production C1 archive has 226 verified members and unchanged 144 native artifacts. `validation.json` records final source, binary, logs and archive hashes. The implementation report was checked at 1100 px/light and 390 px/dark. This is a bounded parameter/import robustness achievement; all unresolved operations remain listed.
-
-### 2026-10-24 exact-knot complete capture
-
-Implementation `5a4e3bc6` completed all 396 native cases and 648 operations with one worker and a 120-second timeout. Counts remain 482 constructions / 438 limited passes / 121 unresolved positive solids: 64 construction failures, seven import failures, six inconsistent inputs and 44 comparison discrepancies. Four C1 captures changed from inconsistent input to construction failure, with unchanged inputs. All 372 exact former successes and 110 reviewed numeric changes preserve canonical checks; no new operation is resolved. The verified 8,497-member archive SHA256 is `c0e6bc4beed8568e60c4f3d9311053ffbce2a8ca798c8ebdbff3fbdfe833061d`. Capture tests 13/13 and audit tests 22/22 pass. Supplemental lockfile provenance is included because the git-based source manifest omitted the ignored workspace lockfile.
-
-The root-owned detached F5 validation checkout is `target/f5-mesher-validation-2026-10-24` at parent `5a4e3bc6`. A finite-facet refinement candidate exposed folds in polar planar trim charts; a transactional guard retains the first valid mesh when optional refinement introduces folds. Original curved-chamfer closure tests and unchanged cap/loft accuracy tests pass, as do 84 mesher tests and 21 doctests (one existing ignore). Full shapeops/replay/Clippy, final medians and original-scale comparison remain pending. F5 is not yet accepted.
-
-### 2026-10-24 native inventory expansion
-
-A separate native-only retry of `blend/complex/D2` and `blend/simple/{Q9,R1,R2,R3,R5,R6,U9,V7}` passed all nine cases using already-provenanced public fixtures. Runtime, original test/helper sources, full native source/test snapshots, library/data hashes and historical/current catalog provenance are archived in [the inventory checkpoint](runs/2026-10-24-native-inventory/REPORT.md). Native inventory becomes 543 passed / 431 skipped / 33 known failures / 19 failures over the same 1,026 cases. These native passes establish no new Truck outcome. The complete captured baseline remains 396 cases / 648 operations; the additional nine cases need a separate instrumented capture with its actual discovered operation count.
-
-### 2026-10-24 additional instrumented cohort
-
-Native inventory checkpoint `7c2ce286` was followed by a separate clean capture of the nine added cases. All nine native tests passed; nine operations were intercepted. D2 adds one positive-solid construction failure and eight cases add native no-solid scope. Exact kernel/replay/runtime/harness identities match the D full capture. The combined index verifies native script radii, full seed-to-contour membership and disjoint keys. No new Truck construction or limited pass is claimed; the latest complete single run remains 396/648.
+`DRAWEXE` must be on PATH. The native OCCT checkout has three intentional local modifications.
+
+## Log
+
+| Date | Commit | Result |
+| --- | --- | --- |
+| 2026-10-22 | `9f97532a` | Torus corners; full run 480 construct / 437 pass |
+| 2026-10-22 | `9e3ce08a` | Mixed curved corners; F1 passes, H7 constructs |
+| 2026-10-24 | `5a4e3bc6` | Exact knots and STEP masters; full run 482 / 438 |
+| 2026-10-24 | `834ee9f5` | Nine skipped native cases captured as a separate cohort |
+| 2026-10-24 | `d3858852` | Elliptical extrusion corners; F5 constructs (discrepancy 0.107, OCCT reference suspect) |
