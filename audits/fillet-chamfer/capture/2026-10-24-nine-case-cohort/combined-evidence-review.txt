@@ -1,0 +1,20 @@
+Independent nine-case native-intent and combined evidence review
+
+Reviewed both immutable capture manifests and archive hashes, all nine archived native scripts, common blend/begin scale settings, raw physical selection tasks, contour membership and operation keys. No CAD/native execution, Cargo, production edit or catalog mutation was performed.
+
+The union index is target/nine-case-union-index-2026-10-24.json, reproducible with target/build-nine-case-union-review-2026-10-24.py. It references both complete manifest/archive hashes and preserves the exact common kernel-source, replay/harness-source, executable, SDK-library and native-harness identity dictionaries. Both cohorts use the D implementation at5a4e3bc6, with different evidence-only root revisions and execution timestamps explicitly retained. Index rows identify the source cohort for every operation; neither underlying manifest is rewritten.
+
+Native intent
+All nine scripts invoke blend exactly once, and each capture contains exactly001. Archived blend/begin sets SCALE=1000 and SCALE1=10. Radius arrays match command order and scale: D2=[10,5,10,5,5,10,5,10,5,5]; Q9=2.5; R1=[11,11,11]; R2=11; R3/R5/R6=.5; U9=150; V7=50. All tasks are fillets, not chamfers. Every selected seed's complete sampled physical curve appears exactly (forward or reversed) in its recorded native contour with the same radius. Every Truck record reports native-contours scope. Full seed endpoints/count/type and contour counts are recorded in the index, not reduced to a case-name assertion.
+
+D2 restores CFI_pro10391.rle and selects10 seeds forming9 contours, with the last two radius5 circular seeds in one contour. It has one native-valid input/output solid and fails Truck validation with UnsupportedTopology. This adds exactly one unresolved positive-solid operation, not a native rejection or an import failure.
+
+Q9, R1, R2, R3, R5, R6, U9 and V7 restore their respective archived public fixtures. They contain zero solids BEFORE Truck import and their captured native outputs also have zero solids. Their scripts subsequently extract/copy a result shell; this post-command shell handling is distinct from the intercepted blend operation and does not introduce another capture key. Their native contour edge counts are3;1/1/1;4;4;12;10;1;1 respectively. R5 and R6 happen to share the sampled seed geometry but use different fixtures and different12/10-edge contour propagation; keep these as distinct intents/keys. All eight remain shell/face capability scope, not accepted solid operations.
+
+This review binds scripts, scaling, command seed order and captured contour geometry. It does not independently rerun native edge numbering to prove each textual s_N/a_N name maps to the captured edge; that connection remains the canonical instrumented harness provenance. No basis exists to reinterpret those selections or silently shrink propagated contours.
+
+Verified aggregate
+405 disjoint cases,657 disjoint operation keys;560 positive-solid references;482 constructions;438 limited comparison passes;122 unresolved positive-solid operations;44 constructed discrepancies;96 no-solid inputs. Statuses:103 input-import-failed,482 operation-succeeded,66 operation-failed,6 input-inconsistent. The extra cohort contributes9 keys, one positive gap, eight no-solid imports, and ZERO successful constructions or limited passes. The operation-failed total includes the existing matched native rejection and must not be used directly as the positive-solid gap count.
+
+Publication scope
+Call this a COMBINED IMMUTABLE EVIDENCE INDEX across the396-case/648-operation full run and a separate9-case/9-operation cohort. It is NOT a fresh405-case execution. Keep the original full capture as latest_complete_capture; a separate combined-evidence pointer or supplement can reference this index. No previously failed operation was resolved, no new limited pass was accepted, and no universal native parity/global distance claim follows. Native-only retry scripts/runtime/fixtures match, but that retry has no intercepted BREP/STEP pairs, so do not claim native geometry byte equality to it.

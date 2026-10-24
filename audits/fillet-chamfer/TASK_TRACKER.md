@@ -341,6 +341,13 @@ Initial package assignment is a triage owner, not a proven root cause. G transfe
 - [ ] `chamfer/equal_dist_complex/A1` / `001` — package **G**.
 - [ ] `chamfer/equal_dist_sequence/C1` / `001` — package **G**.
 
+### Additional nine-case cohort
+
+The separately captured inventory expansion adds nine operations. Its [combined evidence index](capture/2026-10-24-nine-case-cohort/combined-evidence-index.json) reconciles 405 cases / 657 operations across two immutable captures; this is not one fresh expanded run. Aggregate results: 560 positive-solid references, 482 constructions, 438 limited passes, 122 unresolved positive-solid operations and 96 no-solid inputs. The original 396/648 table above remains historical cohort evidence.
+
+- [ ] `blend/complex/D2` / `001` — package **F/C**: ten seeds, nine contours, unequal radii 10/5; native valid solid, Truck `UnsupportedTopology` at `validate_input`.
+- [ ] `blend/simple/{Q9,R1,R2,R3,R5,R6,U9,V7}` / `001` each — package **G/H**: zero native input/output solids; review shell-operation contracts. No solid-replay pass claimed.
+
 ## Full capability checklist
 
 This covers all **50 capability families plus one reference topic** in `coverage.json`, including work outside the captured solids. The recorded status describes existing evidence, not whole-family completion. Even an `implemented-with-tests` family can have explicit remaining variation coverage. Each unchecked row requires evidence review and closure of the stated outcome, not automatically a rewrite or another test.
@@ -516,3 +523,7 @@ The root-owned detached F5 validation checkout is `target/f5-mesher-validation-2
 ### 2026-10-24 native inventory expansion
 
 A separate native-only retry of `blend/complex/D2` and `blend/simple/{Q9,R1,R2,R3,R5,R6,U9,V7}` passed all nine cases using already-provenanced public fixtures. Runtime, original test/helper sources, full native source/test snapshots, library/data hashes and historical/current catalog provenance are archived in [the inventory checkpoint](runs/2026-10-24-native-inventory/REPORT.md). Native inventory becomes 543 passed / 431 skipped / 33 known failures / 19 failures over the same 1,026 cases. These native passes establish no new Truck outcome. The complete captured baseline remains 396 cases / 648 operations; the additional nine cases need a separate instrumented capture with its actual discovered operation count.
+
+### 2026-10-24 additional instrumented cohort
+
+Native inventory checkpoint `7c2ce286` was followed by a separate clean capture of the nine added cases. All nine native tests passed; nine operations were intercepted. D2 adds one positive-solid construction failure and eight cases add native no-solid scope. Exact kernel/replay/runtime/harness identities match the D full capture. The combined index verifies native script radii, full seed-to-contour membership and disjoint keys. No new Truck construction or limited pass is claimed; the latest complete single run remains 396/648.

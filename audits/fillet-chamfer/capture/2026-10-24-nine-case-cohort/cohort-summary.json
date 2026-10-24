@@ -1,0 +1,330 @@
+{
+  "scope_kind": "additional-native-inventory-cohort",
+  "declared_case_ids": [
+    "blend/complex/D2",
+    "blend/simple/Q9",
+    "blend/simple/R1",
+    "blend/simple/R2",
+    "blend/simple/R3",
+    "blend/simple/R5",
+    "blend/simple/R6",
+    "blend/simple/U9",
+    "blend/simple/V7"
+  ],
+  "kernel_revision": "7c2ce2865070a56b25f1387c6121db8218b994f9",
+  "implementation_revision": "5a4e3bc666ffda4adb0ed03eeeb707c3068c1d79",
+  "baseline": {
+    "path": "audits/fillet-chamfer/capture/2026-10-24-exact-knots/results.json",
+    "sha256": "277fd99f0d03b3d7bcb6a5c2ca148812a454624d1214dc514a76483fb594ba96",
+    "cases": 396,
+    "operations": 648,
+    "unchanged": true
+  },
+  "cases": 9,
+  "captures": 9,
+  "operation_keys": [
+    {
+      "case": "blend/complex/D2",
+      "capture": "001"
+    },
+    {
+      "case": "blend/simple/Q9",
+      "capture": "001"
+    },
+    {
+      "case": "blend/simple/R1",
+      "capture": "001"
+    },
+    {
+      "case": "blend/simple/R2",
+      "capture": "001"
+    },
+    {
+      "case": "blend/simple/R3",
+      "capture": "001"
+    },
+    {
+      "case": "blend/simple/R5",
+      "capture": "001"
+    },
+    {
+      "case": "blend/simple/R6",
+      "capture": "001"
+    },
+    {
+      "case": "blend/simple/U9",
+      "capture": "001"
+    },
+    {
+      "case": "blend/simple/V7",
+      "capture": "001"
+    }
+  ],
+  "native_statuses": {
+    "passed": 9
+  },
+  "cases_without_captures": [],
+  "statuses": {
+    "operation-failed": 1,
+    "input-import-failed": 8
+  },
+  "constructions": 0,
+  "positive_solid_reference_count": 1,
+  "limited_comparison_passes": 0,
+  "constructed_comparison_discrepancies": 0,
+  "no_solid_inputs": 8,
+  "matched_native_rejections": 0,
+  "unresolved_positive_operations": [
+    {
+      "case": "blend/complex/D2",
+      "capture": "001",
+      "status": "operation-failed"
+    }
+  ],
+  "records": [
+    {
+      "case": "blend/complex/D2",
+      "capture": "001",
+      "status": "operation-failed",
+      "positive_solid_reference": true,
+      "no_solid": false,
+      "limited_pass": false,
+      "checks": {
+        "constructed": false,
+        "input_unchanged": true,
+        "geometry_consistent": false,
+        "mesh_closed": false,
+        "step_prepared": false,
+        "native_valid": false,
+        "truck_step_valid": false,
+        "single_solid": false,
+        "sampled_distance": false
+      },
+      "raw_task_sha256": "39d394b296a8f747a0c67407e044fb77f7f721f51fb3c8eb8b0c914414e76b4a",
+      "matched_native_rejection": false
+    },
+    {
+      "case": "blend/simple/Q9",
+      "capture": "001",
+      "status": "input-import-failed",
+      "positive_solid_reference": false,
+      "no_solid": true,
+      "limited_pass": false,
+      "checks": {
+        "constructed": false,
+        "input_unchanged": false,
+        "geometry_consistent": false,
+        "mesh_closed": false,
+        "step_prepared": false,
+        "native_valid": false,
+        "truck_step_valid": false,
+        "single_solid": false,
+        "sampled_distance": false
+      },
+      "raw_task_sha256": "1078c80990713832331536feeb15220de354885e42674467159cf5ff3bae1456",
+      "matched_native_rejection": false
+    },
+    {
+      "case": "blend/simple/R1",
+      "capture": "001",
+      "status": "input-import-failed",
+      "positive_solid_reference": false,
+      "no_solid": true,
+      "limited_pass": false,
+      "checks": {
+        "constructed": false,
+        "input_unchanged": false,
+        "geometry_consistent": false,
+        "mesh_closed": false,
+        "step_prepared": false,
+        "native_valid": false,
+        "truck_step_valid": false,
+        "single_solid": false,
+        "sampled_distance": false
+      },
+      "raw_task_sha256": "0e11ab84330335511784c97bb1ba96d3e0b45aec95b0259eca92356c79cf3698",
+      "matched_native_rejection": false
+    },
+    {
+      "case": "blend/simple/R2",
+      "capture": "001",
+      "status": "input-import-failed",
+      "positive_solid_reference": false,
+      "no_solid": true,
+      "limited_pass": false,
+      "checks": {
+        "constructed": false,
+        "input_unchanged": false,
+        "geometry_consistent": false,
+        "mesh_closed": false,
+        "step_prepared": false,
+        "native_valid": false,
+        "truck_step_valid": false,
+        "single_solid": false,
+        "sampled_distance": false
+      },
+      "raw_task_sha256": "2976d7bb79fa36f2c1e6afc872e8a5342d6a4eb688dc88696ebd6d9627d101ba",
+      "matched_native_rejection": false
+    },
+    {
+      "case": "blend/simple/R3",
+      "capture": "001",
+      "status": "input-import-failed",
+      "positive_solid_reference": false,
+      "no_solid": true,
+      "limited_pass": false,
+      "checks": {
+        "constructed": false,
+        "input_unchanged": false,
+        "geometry_consistent": false,
+        "mesh_closed": false,
+        "step_prepared": false,
+        "native_valid": false,
+        "truck_step_valid": false,
+        "single_solid": false,
+        "sampled_distance": false
+      },
+      "raw_task_sha256": "adbafde056103ab3ea8b86f3269ac4192502d8e50080509f577545bf1c6c89eb",
+      "matched_native_rejection": false
+    },
+    {
+      "case": "blend/simple/R5",
+      "capture": "001",
+      "status": "input-import-failed",
+      "positive_solid_reference": false,
+      "no_solid": true,
+      "limited_pass": false,
+      "checks": {
+        "constructed": false,
+        "input_unchanged": false,
+        "geometry_consistent": false,
+        "mesh_closed": false,
+        "step_prepared": false,
+        "native_valid": false,
+        "truck_step_valid": false,
+        "single_solid": false,
+        "sampled_distance": false
+      },
+      "raw_task_sha256": "47aff39aeedaedf5d43d6de38a7b6ba73a35d54faf5b2b17b2ab001556313401",
+      "matched_native_rejection": false
+    },
+    {
+      "case": "blend/simple/R6",
+      "capture": "001",
+      "status": "input-import-failed",
+      "positive_solid_reference": false,
+      "no_solid": true,
+      "limited_pass": false,
+      "checks": {
+        "constructed": false,
+        "input_unchanged": false,
+        "geometry_consistent": false,
+        "mesh_closed": false,
+        "step_prepared": false,
+        "native_valid": false,
+        "truck_step_valid": false,
+        "single_solid": false,
+        "sampled_distance": false
+      },
+      "raw_task_sha256": "f71d847788b3af422be15ad29cbc6c0b0701c315555edf47b138fd3ea0747fb6",
+      "matched_native_rejection": false
+    },
+    {
+      "case": "blend/simple/U9",
+      "capture": "001",
+      "status": "input-import-failed",
+      "positive_solid_reference": false,
+      "no_solid": true,
+      "limited_pass": false,
+      "checks": {
+        "constructed": false,
+        "input_unchanged": false,
+        "geometry_consistent": false,
+        "mesh_closed": false,
+        "step_prepared": false,
+        "native_valid": false,
+        "truck_step_valid": false,
+        "single_solid": false,
+        "sampled_distance": false
+      },
+      "raw_task_sha256": "10c4cb28f6a25867034c5c04de81d94137a4c9965ea5836ae25a3e3988d74e1f",
+      "matched_native_rejection": false
+    },
+    {
+      "case": "blend/simple/V7",
+      "capture": "001",
+      "status": "input-import-failed",
+      "positive_solid_reference": false,
+      "no_solid": true,
+      "limited_pass": false,
+      "checks": {
+        "constructed": false,
+        "input_unchanged": false,
+        "geometry_consistent": false,
+        "mesh_closed": false,
+        "step_prepared": false,
+        "native_valid": false,
+        "truck_step_valid": false,
+        "single_solid": false,
+        "sampled_distance": false
+      },
+      "raw_task_sha256": "8ec68f41c772c1c2361a7fc2c915704e763957e93f1d1c2b4101bdae374f0489",
+      "matched_native_rejection": false
+    }
+  ],
+  "native_retry_comparison": {
+    "source_hashes_equal": true,
+    "runtime_hashes_equal": true,
+    "external_fixture_hashes_equal": true,
+    "geometry_comparison": "Native-only retry archives scripts/logs/images, not intercepted input/result BREP/STEP; geometry byte equality to that retry cannot be asserted. This cohort preserves its own captured native inputs/results verbatim.",
+    "native_status_pairs": [
+      {
+        "case": "blend/complex/D2",
+        "retry": "passed",
+        "capture": "passed"
+      },
+      {
+        "case": "blend/simple/Q9",
+        "retry": "passed",
+        "capture": "passed"
+      },
+      {
+        "case": "blend/simple/R1",
+        "retry": "passed",
+        "capture": "passed"
+      },
+      {
+        "case": "blend/simple/R2",
+        "retry": "passed",
+        "capture": "passed"
+      },
+      {
+        "case": "blend/simple/R3",
+        "retry": "passed",
+        "capture": "passed"
+      },
+      {
+        "case": "blend/simple/R5",
+        "retry": "passed",
+        "capture": "passed"
+      },
+      {
+        "case": "blend/simple/R6",
+        "retry": "passed",
+        "capture": "passed"
+      },
+      {
+        "case": "blend/simple/U9",
+        "retry": "passed",
+        "capture": "passed"
+      },
+      {
+        "case": "blend/simple/V7",
+        "retry": "passed",
+        "capture": "passed"
+      }
+    ]
+  },
+  "union_status": "Separate combined-evidence-index.json verifies both immutable cohorts after native-intent review; not a fresh 405-case run.",
+  "archive_sha256": "b24995efa4adccdd332ba924775de8d60a7ac0228d6aa00700178be99cc4894b"
+}

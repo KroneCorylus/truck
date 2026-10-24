@@ -17,6 +17,25 @@
       "implementation": "5a4e3bc666ffda4adb0ed03eeeb707c3068c1d79",
       "report": "capture/2026-10-24-exact-knots/REPORT.md",
       "summary": "capture/2026-10-24-exact-knots/comparison-summary.json"
+    },
+    "additional_capture_cohorts": [
+      {
+        "report": "capture/2026-10-24-nine-case-cohort/REPORT.md",
+        "summary": "capture/2026-10-24-nine-case-cohort/cohort-summary.json",
+        "cases": 9,
+        "operations": 9
+      }
+    ],
+    "combined_capture_evidence": {
+      "index": "capture/2026-10-24-nine-case-cohort/combined-evidence-index.json",
+      "cases": 405,
+      "operations": 657,
+      "positive_solid_references": 560,
+      "constructions": 482,
+      "limited_passes": 438,
+      "unresolved_positive_solids": 122,
+      "no_solid_inputs": 96,
+      "fresh_combined_run": false
     }
   },
   "status_definitions": {

@@ -1,0 +1,18 @@
+{
+  "html_sha256": "eb0e0a89e51583c97a12ea43e4d1beaf78135949b9214699f001cb81c927d921",
+  "previews": [
+    {
+      "width": 1100,
+      "appearance": "light",
+      "contentHeight": 725,
+      "consoleMessages": []
+    },
+    {
+      "width": 390,
+      "appearance": "dark",
+      "contentHeight": 1441,
+      "consoleMessages": []
+    }
+  ],
+  "review": "Readable theme foreground, wrapped identifiers and fluid layout verified."
+}
