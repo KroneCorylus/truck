@@ -38,6 +38,7 @@ pub(super) fn fillet(
             .dot(axis)
             .signum()
     };
+    let mut extrusion_parameters = HashMap::default();
     let mut spheres = Vec::new();
     let mut tori = Vec::new();
     let mut shared_arcs = HashMap::default();
@@ -63,6 +64,104 @@ pub(super) fn fillet(
         let mut contact = |k: usize, f: usize, point: &Vertex| {
             contacts[k][usize::from(data.sides[k][0] != f)][end_index(k)] = point.clone();
         };
+
+        if let Some(f) = faces.iter().copied().find(|&f| {
+            data.extrusion_supports[f] && chosen.iter().any(|&k| data.sides[k].contains(&f))
+        }) {
+            if faces.len() != 3 || !(chosen.len() == 1 || chosen.len() == 3) {
+                return Err(error(Code::UnsupportedTopology));
+            }
+            let support = shell[f].oriented_surface();
+            let hint = support
+                .search_parameter(vertex.point(), None, 100)
+                .ok_or_else(|| error(Code::UnsupportedGeometry))?;
+            let plane_faces: Vec<_> = faces.iter().copied().filter(|&j| j != f).collect();
+            let planes: Vec<_> = plane_faces
+                .iter()
+                .map(|&j| data.planes[j].ok_or_else(|| error(Code::UnsupportedGeometry)))
+                .collect::<Result<_, _>>()?;
+            let mut points = HashMap::default();
+            let mut normals = HashMap::default();
+            let center;
+            if chosen.len() == 3 {
+                let uv = extrusion_corner_parameter(
+                    &support,
+                    radius,
+                    hint,
+                    planes[0],
+                    (planes[1].0, planes[1].1 - radius),
+                    false,
+                )
+                .ok_or_else(|| error(Code::OutsideNeighbour))?;
+                let q = support.subs(uv.0, uv.1);
+                let n = support.normal(uv.0, uv.1).normalize();
+                center = q - radius * n;
+                points.insert(f, Vertex::new(q));
+                normals.insert(f, n);
+                for (&j, &(n, _)) in plane_faces.iter().zip(&planes) {
+                    points.insert(j, Vertex::new(center + radius * n));
+                    normals.insert(j, n);
+                }
+                for &k in &chosen {
+                    if data.sides[k].contains(&f) {
+                        extrusion_parameters.insert((k, end_index(k)), [uv, uv]);
+                    }
+                }
+            } else {
+                let k = chosen[0];
+                let active = *data.sides[k].iter().find(|&&j| j != f).unwrap();
+                let terminal = *plane_faces.iter().find(|&&j| j != active).unwrap();
+                let plane = data.planes[active].unwrap();
+                let cap = data.planes[terminal].unwrap();
+                let curved_uv =
+                    extrusion_corner_parameter(&support, radius, hint, plane, cap, true)
+                        .ok_or_else(|| error(Code::OutsideNeighbour))?;
+                let planar_uv = extrusion_corner_parameter(
+                    &support,
+                    radius,
+                    hint,
+                    plane,
+                    (cap.0, cap.1 - radius * cap.0.dot(plane.0)),
+                    false,
+                )
+                .ok_or_else(|| error(Code::OutsideNeighbour))?;
+                let curved = support.subs(curved_uv.0, curved_uv.1);
+                center = support.subs(planar_uv.0, planar_uv.1)
+                    - radius * support.normal(planar_uv.0, planar_uv.1).normalize();
+                points.insert(f, Vertex::new(curved));
+                points.insert(active, Vertex::new(center + radius * plane.0));
+                extrusion_parameters.insert((k, end_index(k)), [curved_uv, planar_uv]);
+                planar_terminals.insert((k, end_index(k)), terminal);
+            }
+            for &k in incident {
+                if chosen.contains(&k) {
+                    for j in data.sides[k] {
+                        contact(k, j, &points[&j]);
+                    }
+                    ends[k][end_index(k)] = Some(End {
+                        center,
+                        miter: None,
+                    });
+                } else {
+                    let p = data.sides[k]
+                        .iter()
+                        .find_map(|j| points.get(j))
+                        .ok_or_else(|| error(Code::UnsupportedTopology))?;
+                    for j in data.sides[k] {
+                        contact(k, j, p);
+                    }
+                }
+            }
+            if chosen.len() == 3 {
+                spheres.push((
+                    v,
+                    center,
+                    1.,
+                    faces.iter().map(|j| normals[j]).collect::<Vec<_>>(),
+                ));
+            }
+            continue;
+        }
         let torus_face = faces.iter().copied().find(|&f| {
             data.torus_supports[f].is_some() && chosen.iter().any(|&k| data.sides[k].contains(&f))
         });
@@ -999,6 +1098,199 @@ pub(super) fn fillet(
         }
         curved_fits.insert(k, (surface, [lines[0].clone(), lines[1].clone()]));
     }
+
+    for (k, edge) in data.original_edges.iter().enumerate() {
+        if !selected.contains(&edge.id()) {
+            continue;
+        }
+        let [a, b] = data.sides[k];
+        let Some(f) = [a, b].into_iter().find(|&f| data.extrusion_supports[f]) else {
+            continue;
+        };
+        let plane = if a == f { b } else { a };
+        let (n, d) = data.planes[plane].ok_or_else(|| error(Code::UnsupportedGeometry))?;
+        let support = shell[f].oriented_surface();
+        let mut uv = [extrusion_parameters[&(k, 0)], extrusion_parameters[&(k, 1)]];
+        if let Some(period) = support.u_period() {
+            let c = edge.curve();
+            let (a, b) = c.range_tuple();
+            let start = support
+                .search_parameter(c.subs(a), None, 100)
+                .ok_or_else(|| error(Code::UnsupportedGeometry))?
+                .0;
+            let mut previous = start;
+            for i in 1..=32 {
+                let value = support
+                    .search_parameter(c.subs(a + (b - a) * i as f64 / 32.), None, 100)
+                    .ok_or_else(|| error(Code::UnsupportedGeometry))?
+                    .0;
+                previous = value + ((previous - value) / period).round() * period;
+            }
+            for (end, target) in [start, previous].into_iter().enumerate() {
+                for point in &mut uv[end] {
+                    point.0 += ((target - point.0) / period).round() * period;
+                }
+            }
+        }
+        let vary_u = n.dot(support.vder(uv[0][0].0, uv[0][0].1)).abs()
+            > 1e-8 * support.vder(uv[0][0].0, uv[0][0].1).magnitude();
+        let station = |p: (f64, f64)| if vary_u { p.0 } else { p.1 };
+        let increasing = station(uv[1][0]) > station(uv[0][0]);
+        let xs = std::array::from_fn::<_, 2, _>(|end| {
+            let values = uv[end].map(station);
+            if (end == 1) == increasing {
+                values.into_iter().fold(f64::NEG_INFINITY, f64::max)
+            } else {
+                values.into_iter().fold(f64::INFINITY, f64::min)
+            }
+        });
+        if !xs.iter().all(|x| x.is_finite()) || (xs[1] - xs[0]).abs() < 1e-10 {
+            return Err(error(Code::OutsideNeighbour));
+        }
+        let surfaces = [shell[a].oriented_surface(), shell[b].oriented_surface()];
+        let solve_circle = |t: f64, parameter_span: f64| {
+            let x = xs[0] + (xs[1] - xs[0]) * t;
+            let (mut u, mut v) = (
+                uv[0][0].0 * (1. - t) + uv[1][0].0 * t,
+                uv[0][0].1 * (1. - t) + uv[1][0].1 * t,
+            );
+            if vary_u {
+                u = x;
+            } else {
+                v = x;
+            }
+            for _ in 0..20 {
+                if !u.is_finite() || !v.is_finite() {
+                    return None;
+                }
+                let c = support.subs(u, v) - radius * support.normal(u, v).normalize();
+                let residual = n.dot(c.to_vec()) - d + radius;
+                if ![c.x, c.y, c.z, residual].into_iter().all(f64::is_finite) {
+                    return None;
+                }
+                if residual.abs() < 1e-10 {
+                    break;
+                }
+                let du = support.uder(u, v) - radius * support.normal_uder(u, v);
+                let dv = support.vder(u, v) - radius * support.normal_vder(u, v);
+                let divisor = n.dot(if vary_u { dv } else { du });
+                if !divisor.is_finite() || divisor.abs() < 1e-12 {
+                    return None;
+                }
+                if vary_u {
+                    v -= residual / divisor;
+                } else {
+                    u -= residual / divisor;
+                }
+            }
+            if !u.is_finite() || !v.is_finite() {
+                return None;
+            }
+            let c = support.subs(u, v) - radius * support.normal(u, v).normalize();
+            let residual = n.dot(c.to_vec()) - d + radius;
+            if ![c.x, c.y, c.z, residual].into_iter().all(f64::is_finite) || residual.abs() > 1e-9 {
+                return None;
+            }
+            let du = support.uder(u, v) - radius * support.normal_uder(u, v);
+            let dv = support.vder(u, v) - radius * support.normal_vder(u, v);
+            let divisor = n.dot(if vary_u { dv } else { du });
+            if ![du.x, du.y, du.z, dv.x, dv.y, dv.z, divisor]
+                .into_iter()
+                .all(f64::is_finite)
+                || divisor.abs() < 1e-12
+            {
+                return None;
+            }
+            let dc = if vary_u {
+                du - dv * n.dot(du) / n.dot(dv)
+            } else {
+                dv - du * n.dot(dv) / n.dot(du)
+            } * ((xs[1] - xs[0]) / parameter_span);
+            if ![dc.x, dc.y, dc.z, dc.magnitude2()]
+                .into_iter()
+                .all(f64::is_finite)
+                || dc.magnitude2() == 0.
+            {
+                return None;
+            }
+            let point = c + radius * n;
+            if ![point.x, point.y, point.z].into_iter().all(f64::is_finite) {
+                return None;
+            }
+            let plane_uv = surfaces[usize::from(b == plane)].search_parameter(point, None, 100)?;
+            if !plane_uv.0.is_finite() || !plane_uv.1.is_finite() {
+                return None;
+            }
+            let hints = if a == f {
+                [Point2::new(u, v), Point2::from(plane_uv)]
+            } else {
+                [Point2::from(plane_uv), Point2::new(u, v)]
+            };
+            let circle = ContactCircle::try_from_contacts(
+                (c, dc),
+                t * parameter_span,
+                &surfaces[0],
+                &surfaces[1],
+                -radius,
+                hints,
+            )?;
+            Some((circle, dc))
+        };
+        let (circle, center_derivative) =
+            solve_circle(0.5, 1.).ok_or_else(|| error(Code::BlendConstructionFailed))?;
+        let section: NurbsCurve<Vector4> = circle.to_same_geometry();
+        let parameter_span = center_derivative.magnitude() / section.der(0.5).magnitude();
+        if !parameter_span.is_finite() || parameter_span <= 0. {
+            return Err(error(Code::BlendConstructionFailed));
+        }
+        let fit = ApproxFilletSurface::approx_contact_circles(
+            &surfaces[0],
+            &surfaces[1],
+            (0., parameter_span),
+            tol / 100.,
+            |parameter| solve_circle(parameter / parameter_span, parameter_span).map(|x| x.0),
+        )
+        .ok_or_else(|| error(Code::BlendConstructionFailed))?;
+        let mut curves: [Curve; 2] = [
+            fit.side_pcurve0().to_same_geometry(),
+            fit.side_pcurve1().to_same_geometry(),
+        ];
+        let surface: Surface = fit.to_same_geometry();
+        let mut lines = Vec::new();
+        for (side, curve) in curves.iter_mut().enumerate() {
+            let mut ts = [0., parameter_span];
+            for (end, t) in ts.iter_mut().enumerate() {
+                if let Some(&terminal) = planar_terminals.get(&(k, end)) {
+                    *t = contact_curve_plane(curve, data.planes[terminal].unwrap(), *t)
+                        .ok_or_else(|| error(Code::OutsideNeighbour))?;
+                    contacts[k][side][end].set_point(curve.subs(*t));
+                }
+            }
+            if ts[1] <= ts[0] {
+                return Err(error(Code::OutsideNeighbour));
+            }
+            if ts[1] < parameter_span {
+                curve.cut(ts[1]);
+            }
+            if ts[0] > 0. {
+                *curve = curve.cut(ts[0]);
+            }
+            lines.push(Edge::new(
+                &contacts[k][side][0],
+                &contacts[k][side][1],
+                curve.clone(),
+            ));
+        }
+        for (end, (p, q)) in contacts[k][0].iter().zip(&contacts[k][1]).enumerate() {
+            if let Some(&terminal) = planar_terminals.get(&(k, end)) {
+                let arc = terminal_cross_arc(p, q, &surface, &shell[terminal].oriented_surface())
+                    .ok_or_else(|| error(Code::BlendConstructionFailed))?;
+                cache_arc(&mut shared_arcs, &arc);
+                complex_ends.insert((k, end), Wire::from(vec![arc]));
+            }
+        }
+        curved_fits.insert(k, (surface, [lines[0].clone(), lines[1].clone()]));
+    }
     let mut trims = Vec::new();
     let mut arcs: Vec<Option<[Wire; 2]>> = vec![None; data.original_edges.len()];
     let mut generated = Vec::new();
@@ -1033,6 +1325,7 @@ pub(super) fn fillet(
             continue;
         }
         let [a, b] = data.sides[k];
+        let extrusion = [a, b].into_iter().find(|&f| data.extrusion_supports[f]);
         let torus = [a, b].iter().find_map(|&f| data.torus_supports[f]);
         let torus_rim = torus.filter(|(_, axis, _, _)| {
             [a, b].iter().any(|&f| {
@@ -1073,13 +1366,23 @@ pub(super) fn fillet(
             [make_contact(&a0, &a1)?, make_contact(&b0, &b1)?]
         };
         let [n, m] = [a, b].map(|f| data.planes[f].map_or(Vector3::zero(), |(n, _)| n));
-        let s = if cylinder.is_some() || sphere.is_some() || cone.is_some() || torus.is_some() {
+        let s = if cylinder.is_some()
+            || sphere.is_some()
+            || cone.is_some()
+            || torus.is_some()
+            || extrusion.is_some()
+        {
             1.
         } else {
             sign(k)
         };
         let arc = |end: End, p: &Vertex, q: &Vertex| -> Edge {
-            if cylinder.is_some() || sphere.is_some() || cone.is_some() || torus.is_some() {
+            if cylinder.is_some()
+                || sphere.is_some()
+                || cone.is_some()
+                || torus.is_some()
+                || extrusion.is_some()
+            {
                 return circle(p, q, end.center);
             }
             let from = end.center + s * radius * n;
@@ -1159,6 +1462,13 @@ pub(super) fn fillet(
         }
         if let Some(torus) = torus {
             outward += torus_normal(torus, surface.subs(0.5, 0.5));
+        }
+        if let Some(f) = extrusion {
+            let support = shell[f].oriented_surface();
+            let (u, v) = support
+                .search_nearest_parameter(surface.subs(0.5, 0.5), None, 100)
+                .ok_or_else(|| error(Code::BlendConstructionFailed))?;
+            outward += support.normal(u, v).normalize();
         }
         if surface.normal(0.5, 0.5).dot(outward) < 0. {
             surface.invert();
@@ -1494,7 +1804,13 @@ fn cone_lateral((apex, axis, _): ConeSupport, n: Vector3, edge: &Edge) -> Option
     (!lateral.so_small()).then(|| lateral.normalize())
 }
 fn contact_curve_plane(curve: &Curve, (n, d): (Vector3, f64), hint: f64) -> Option<f64> {
-    let mut t = hint;
+    let (lo, hi) = curve.range_tuple();
+    if !lo.is_finite() || !hi.is_finite() || !(hi - lo).is_finite() || lo >= hi || !hint.is_finite()
+    {
+        return None;
+    }
+    let padding = (hi - lo) * 1e-8;
+    let mut t = hint.clamp(lo, hi);
     for _ in 0..30 {
         let residual = n.dot(curve.subs(t).to_vec()) - d;
         if residual.abs() < TOLERANCE / 10. {
@@ -1505,10 +1821,10 @@ fn contact_curve_plane(curve: &Curve, (n, d): (Vector3, f64), hint: f64) -> Opti
             return None;
         }
         t -= residual / deriv;
-        if !(-1e-8..=1. + 1e-8).contains(&t) {
+        if !(lo - padding..=hi + padding).contains(&t) {
             return None;
         }
-        t = t.clamp(0., 1.);
+        t = t.clamp(lo, hi);
     }
     None
 }
@@ -1557,4 +1873,71 @@ fn torus_angle(sine: f64, hint: f64) -> Option<f64> {
         .into_iter()
         .map(|a| a + std::f64::consts::TAU * ((hint - a) / std::f64::consts::TAU).round())
         .min_by(|a, b| (a - hint).abs().total_cmp(&(b - hint).abs()))
+}
+
+fn extrusion_corner_parameter(
+    surface: &Surface,
+    radius: f64,
+    hint: (f64, f64),
+    plane: (Vector3, f64),
+    terminal: (Vector3, f64),
+    on_surface: bool,
+) -> Option<(f64, f64)> {
+    let (mut u, mut v) = hint;
+    let residual = |u, v| {
+        let n = surface.normal(u, v).normalize();
+        let c = surface.subs(u, v) - radius * n;
+        let q = if on_surface { surface.subs(u, v) } else { c };
+        [
+            plane.0.dot(c.to_vec()) - plane.1 + radius,
+            terminal.0.dot(q.to_vec()) - terminal.1,
+        ]
+    };
+    for _ in 0..60 {
+        if !u.is_finite() || !v.is_finite() {
+            return None;
+        }
+        let f = residual(u, v);
+        if !f.into_iter().all(f64::is_finite) {
+            return None;
+        }
+        if f[0].abs().max(f[1].abs()) < 1e-10 {
+            return Some((u, v));
+        }
+        let su = surface.uder(u, v);
+        let sv = surface.vder(u, v);
+        let du = su - radius * surface.normal_uder(u, v);
+        let dv = sv - radius * surface.normal_vder(u, v);
+        let terminal_du = if on_surface { su } else { du };
+        let terminal_dv = if on_surface { sv } else { dv };
+        let a = plane.0.dot(du);
+        let b = plane.0.dot(dv);
+        let c = terminal.0.dot(terminal_du);
+        let d = terminal.0.dot(terminal_dv);
+        let determinant = a * d - b * c;
+        if !determinant.is_finite() || determinant.abs() < 1e-15 {
+            return None;
+        }
+        let dx = (d * f[0] - b * f[1]) / determinant;
+        let dy = (-c * f[0] + a * f[1]) / determinant;
+        if !dx.is_finite() || !dy.is_finite() {
+            return None;
+        }
+        let mut step = 1.;
+        while step > 1e-8 {
+            let g = residual(u - step * dx, v - step * dy);
+            if g.iter().all(|x| x.is_finite())
+                && g[0] * g[0] + g[1] * g[1] < f[0] * f[0] + f[1] * f[1]
+            {
+                break;
+            }
+            step *= 0.5;
+        }
+        if step <= 1e-8 {
+            return None;
+        }
+        u -= step * dx;
+        v -= step * dy;
+    }
+    None
 }

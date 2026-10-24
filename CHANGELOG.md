@@ -6,6 +6,11 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Fillet three-edge corners where an elliptical (non-elementary) extruded surface meets
+  two planes. Previously `validate_input` rejected them with `NonPlanarFace`. Blend charts
+  are scaled so both parameter directions have comparable physical speed, which keeps
+  trimmed tessellation balanced.
+
 - The checked B-spline basis API reports non-finite parameters and coefficient arithmetic.
   The infallible basis evaluator retains IEEE non-finite results for arithmetic overflow;
   zero-range and insufficient-knot errors still panic. Call

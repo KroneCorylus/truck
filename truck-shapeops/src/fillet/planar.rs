@@ -236,6 +236,7 @@ pub(super) struct Neighborhood {
     pub edge_index: HashMap<EdgeID, usize>,
     pub planes: Vec<Option<(Vector3, f64)>>,
     pub cylinders: Vec<Option<(Point3, Vector3, f64)>>,
+    pub extrusion_supports: Vec<bool>,
     pub torus_supports: Vec<Option<(Point3, Vector3, f64, f64)>>,
     pub cone_supports: Vec<Option<(Point3, Vector3, Rad<f64>)>>,
     pub sphere_supports: Vec<Option<(Point3, f64)>>,
@@ -300,6 +301,14 @@ pub(super) fn neighborhood(
             incident[vertex_index[&v.id()]].push(k);
         }
     }
+    let extrusion_supports: Vec<_> = shell
+        .iter()
+        .map(|f| {
+            curved_fillets
+                && matches!(f.surface(), Surface::Extruded(_))
+                && f.oriented_surface().elementary().is_none()
+        })
+        .collect();
     let mut cylinders = vec![None; shell.len()];
     let mut sphere_supports = vec![None; shell.len()];
     let mut torus_supports = vec![None; shell.len()];
@@ -362,7 +371,7 @@ pub(super) fn neighborhood(
                         cylinders[f].is_some()
                             || sphere_supports[f].is_some()
                             || cone_supports[f].is_some()
-                            || torus_supports[f].is_some()
+                            || (torus_supports[f].is_some() || extrusion_supports[f])
                     })
                     .count()
                     == 1
@@ -371,7 +380,7 @@ pub(super) fn neighborhood(
                         || cylinders[f].is_some()
                         || sphere_supports[f].is_some()
                         || cone_supports[f].is_some()
-                        || torus_supports[f].is_some()
+                        || (torus_supports[f].is_some() || extrusion_supports[f])
                 })
         });
     for edges in &incident {
@@ -407,7 +416,7 @@ pub(super) fn neighborhood(
                     || cylinders[f].is_some()
                     || sphere_supports[f].is_some()
                     || cone_supports[f].is_some()
-                    || torus_supports[f].is_some()
+                    || (torus_supports[f].is_some() || extrusion_supports[f])
             });
         for &k in edges {
             for f in sides[k] {
@@ -451,6 +460,13 @@ pub(super) fn neighborhood(
                             let radial = delta - axis * delta.dot(axis);
                             return (delta - radial.normalize() * major).normalize();
                         }
+                        if extrusion_supports[f] {
+                            let surface = shell[f].oriented_surface();
+                            return surface
+                                .search_parameter(curve.subs(t), None, 100)
+                                .map(|(u, v)| surface.normal(u, v).normalize())
+                                .unwrap_or(Vector3::new(f64::NAN, f64::NAN, f64::NAN));
+                        }
                         let (origin, axis, _) = cylinders[f].unwrap();
                         let delta = curve.subs(t) - origin;
                         (delta - axis * delta.dot(axis)).normalize()
@@ -477,6 +493,7 @@ pub(super) fn neighborhood(
         sphere_supports,
         cone_supports,
         torus_supports,
+        extrusion_supports,
     })
 }
 

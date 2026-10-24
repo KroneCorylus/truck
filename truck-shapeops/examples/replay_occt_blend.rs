@@ -5157,3 +5157,57 @@ mod mixed_curved_corner_tests {
         }
     }
 }
+
+#[cfg(test)]
+mod extrusion_corner_tests {
+    use super::*;
+
+    #[test]
+    fn native_extrusion_corners_preserve_selection_material_and_step() {
+        let fixtures = [(
+            "F5",
+            include_str!("../tests/fixtures/extrusion-corner-junctions/F5.input.step"),
+            include_str!("../tests/fixtures/extrusion-corner-junctions/F5.input.json"),
+            3.092505604759356,
+        )];
+        for (name, step, intent, expected) in fixtures {
+            let directory = std::env::temp_dir().join(format!(
+                "truck-extrusion-corner-{}-{name}",
+                std::process::id()
+            ));
+            std::fs::create_dir_all(&directory).unwrap();
+            let path = directory.join("input.step");
+            std::fs::write(&path, step).unwrap();
+            let original = import(path.to_str().unwrap()).unwrap();
+            let task: Value = serde_json::from_str(intent).unwrap();
+            let selection = fillet_contour_selection(&original, &task).unwrap();
+            assert_eq!(selection.len(), 3);
+            let matrix = Matrix4::from_scale(0.01);
+            let input = builder::transformed(&original, matrix);
+            let before = serde_json::to_string(&input.compress()).unwrap();
+            let mut selected: Vec<_> = selection
+                .iter()
+                .map(|(edge, r)| {
+                    let curve = edge.oriented_curve();
+                    let (a, b) = curve.range_tuple();
+                    let id = replay_common::blend::edge_through(
+                        &input.boundaries()[0],
+                        matrix.transform_point(curve.subs((a + b) / 2.)),
+                    )
+                    .id();
+                    (id, r * 0.01)
+                })
+                .collect();
+            for _ in 0..2 {
+                let result = try_fillet_solid_edges_with_radii(&input, &selected, 1e-5).unwrap();
+                assert_eq!(result.generated_faces.len(), 4);
+                assert!(result.solid.is_geometric_consistent());
+                replay_common::assert_solid(&result.solid, expected, &[0], 0.0003);
+                replay_common::blend::assert_step(&result.solid, expected, 0.0003);
+                assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
+                selected.reverse();
+            }
+            std::fs::remove_dir_all(directory).unwrap();
+        }
+    }
+}
