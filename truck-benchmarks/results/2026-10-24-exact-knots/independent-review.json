@@ -1,0 +1,17 @@
+{
+  "status": "no functional blocker found; final integration suite pending",
+  "review": "target/g-d-final-review-2026-10-24.txt",
+  "sha256": {
+    "truck-geometry/src/errors.rs": "96c0750bca68d83d7485f2f9ad672de7e4f574af2671b4fb55f0a4196487f674",
+    "truck-geometry/src/nurbs/knot_vec.rs": "25d397da931ee0e826b4480ba47d37a127d4f187b173287d447abd985c603058",
+    "truck-geometry/src/nurbs/mod.rs": "501956adea22aa52709c9cb72f3fc36497b37c048b5f7827db4893da2086c7a4",
+    "truck-geometry/src/nurbs/bspcurve.rs": "5b65b18fa3721f3a72179b9bc648a3c89c4d630d77ac73a67a32b3b23a69f0fb",
+    "truck-geometry/src/nurbs/bspsurface.rs": "684c61be9705333f7ec8cf9f1cc967142abb5871ad369de50d73d04f46bbdbf6",
+    "truck-geotrait/src/algo/curve.rs": "da61a6c2407e672d14943e27b56a9eca9987dce69954b611b52c414bbef3873d",
+    "truck-geotrait/src/algo/surface.rs": "26f00d7ab2212b715b84fc5e65bb05d23b385063fe4e3ca597e6aca268bc2c22",
+    "truck-stepio/src/in/mod.rs": "b25009c639c02fd1bb52b22e2878cf36c8688edfc814498d43572927ca265cf5",
+    "CHANGELOG.md": "2c17f6ad3c55bfaf90045277e3aa3f47cd6c5d197c7daf0bc033a84f14e0dc93",
+    "DIAGNOSTICS.md": "85bb67404c0d841cd3c34a7bb5a3008185c876b919646dd27648c921df421035"
+  },
+  "builds_run": false
+}

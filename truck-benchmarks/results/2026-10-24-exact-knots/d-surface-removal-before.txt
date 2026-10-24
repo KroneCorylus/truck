@@ -1,0 +1,22 @@
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+    Finished `release` profile [optimized] target(s) in 0.31s
+     Running tests/clustered_surface_knot_removal.rs (target/release/deps/clustered_surface_knot_removal-3b62f74819abe2fb)
+
+running 1 test
+test clustered_surface_insertions_can_be_removed_in_both_directions ... FAILED
+
+failures:
+
+---- clustered_surface_insertions_can_be_removed_in_both_directions stdout ----
+
+thread 'clustered_surface_insertions_can_be_removed_in_both_directions' (336231) panicked at truck-geometry/tests/clustered_surface_knot_removal.rs:31:53:
+called `Result::unwrap()` on an `Err` value: CannotRemoveKnot(4)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    clustered_surface_insertions_can_be_removed_in_both_directions
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-geometry --test clustered_surface_knot_removal`

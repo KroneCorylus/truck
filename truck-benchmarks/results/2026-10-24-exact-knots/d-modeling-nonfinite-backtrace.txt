@@ -1,0 +1,36 @@
+   Compiling truck-geotrait v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-geotrait)
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+   Compiling truck-topology v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-topology)
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-modeling)
+    Finished `release` profile [optimized] target(s) in 3.05s
+     Running unittests src/lib.rs (target/release/deps/truck_modeling-cd403b47d5ae25bb)
+
+running 1 test
+
+thread 'geometry::inclusion_tests::bad_seeded_results_fall_back_and_off_surface_curves_stay_rejected' (352900) panicked at truck-geometry/src/nurbs/knot_vec.rs:211:27:
+Knot arithmetic is not finite; use a representable parameter domain.
+stack backtrace:
+   0: __rustc::rust_begin_unwind
+   1: core::panicking::panic_fmt
+   2: <truck_geometry::nurbs::KnotVec>::bspline_basis_functions
+   3: <truck_geometry::decorators::ApproxFilletSurface<alloc::boxed::Box<truck_modeling::geometry::Surface>, alloc::boxed::Box<truck_modeling::geometry::Surface>>>::section_control_points
+   4: <truck_geometry::decorators::ApproxFilletSurface<alloc::boxed::Box<truck_modeling::geometry::Surface>, alloc::boxed::Box<truck_modeling::geometry::Surface>> as truck_geotrait::traits::surface::ParametricSurface>::subs
+   5: truck_base::newton::solve::<cgmath::vector::Vector2<f64>, cgmath::matrix::Matrix2<f64>, truck_geotrait::algo::surface::search_parameter<cgmath::point::Point3<f64>, truck_geometry::decorators::ApproxFilletSurface<alloc::boxed::Box<truck_modeling::geometry::Surface>, alloc::boxed::Box<truck_modeling::geometry::Surface>>>::{closure#0}>
+   6: <truck_geometry::decorators::Processor<truck_geometry::decorators::ApproxFilletSurface<alloc::boxed::Box<truck_modeling::geometry::Surface>, alloc::boxed::Box<truck_modeling::geometry::Surface>>, cgmath::matrix::Matrix4<f64>> as truck_geotrait::traits::search_parameter::SearchParameter<truck_geotrait::traits::search_parameter::D2>>::search_parameter::<truck_geotrait::traits::search_parameter::SPHint2D>
+   7: <truck_modeling::geometry::Surface as truck_geotrait::traits::search_parameter::SearchParameter<truck_geotrait::traits::search_parameter::D2>>::search_parameter::<truck_geotrait::traits::search_parameter::SPHint2D>
+   8: <truck_modeling::geometry::inclusion_tests::Counted as truck_geotrait::traits::search_parameter::SearchParameter<truck_geotrait::traits::search_parameter::D2>>::search_parameter::<core::option::Option<(f64, f64)>>
+   9: core::iter::traits::iterator::Iterator::all::check::<i32, truck_modeling::geometry::sampled_include<truck_modeling::geometry::inclusion_tests::Counted>::{closure#1}>::{closure#0}
+  10: truck_modeling::geometry::sampled_include::<truck_modeling::geometry::inclusion_tests::Counted>
+  11: truck_modeling::geometry::inclusion_tests::bad_seeded_results_fall_back_and_off_surface_curves_stay_rejected
+  12: <truck_modeling::geometry::inclusion_tests::bad_seeded_results_fall_back_and_off_surface_curves_stay_rejected::{closure#0} as core::ops::function::FnOnce<()>>::call_once
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
+test geometry::inclusion_tests::bad_seeded_results_fall_back_and_off_surface_curves_stay_rejected ... FAILED
+
+failures:
+
+failures:
+    geometry::inclusion_tests::bad_seeded_results_fall_back_and_off_surface_curves_stay_rejected
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 12 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-modeling --lib`

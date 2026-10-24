@@ -1,0 +1,24 @@
+$ target/d-inline-benchmark-binary --bench tessellation::(thin_curved_loft|physical_extrusion_cap_accuracy|sphere_pole_tessellation|cylinder_tolerance|plate) --sample-count 7 --sample-size 1
+CARGO_BUILD_JOBS=12 RAYON_NUM_THREADS=1
+Timer precision: 10 ns
+actions                                fastest       │ slowest       │ median        │ mean          │ samples │ iters
+╰─ tessellation                                      │               │               │               │         │
+   ├─ cylinder_tolerance                             │               │               │               │         │
+   │  ├─ 0.001                         491 µs        │ 676.1 µs      │ 560.1 µs      │ 587.7 µs      │ 7       │ 7
+   │  ├─ 0.01                          122.4 µs      │ 134.4 µs      │ 125.8 µs      │ 126.9 µs      │ 7       │ 7
+   │  ╰─ 0.1                           50.56 µs      │ 54.33 µs      │ 51.08 µs      │ 51.65 µs      │ 7       │ 7
+   ├─ physical_extrusion_cap_accuracy  27.5 ms       │ 31.84 ms      │ 27.67 ms      │ 28.28 ms      │ 7       │ 7
+   ├─ plate                                          │               │               │               │         │
+   │  ├─ 1                             184.9 µs      │ 199 µs        │ 187 µs        │ 190 µs        │ 7       │ 7
+   │  ├─ 10                            1.237 ms      │ 1.308 ms      │ 1.259 ms      │ 1.263 ms      │ 7       │ 7
+   │  ├─ 30                            3.996 ms      │ 4.115 ms      │ 4.023 ms      │ 4.04 ms       │ 7       │ 7
+   │  ╰─ 100                           18.69 ms      │ 18.73 ms      │ 18.72 ms      │ 18.72 ms      │ 7       │ 7
+   ├─ sphere_pole_tessellation         24.17 ms      │ 24.24 ms      │ 24.19 ms      │ 24.2 ms       │ 7       │ 7
+   ╰─ thin_curved_loft                               │               │               │               │         │
+      ├─ 0.001                         100.8 ms      │ 102.9 ms      │ 101 ms        │ 101.5 ms      │ 7       │ 7
+      ├─ 0.01                          74.49 ms      │ 74.99 ms      │ 74.68 ms      │ 74.65 ms      │ 7       │ 7
+      ╰─ 0.05                          78.87 ms      │ 79.63 ms      │ 78.99 ms      │ 79.07 ms      │ 7       │ 7
+
+
+exit_code 0
+elapsed_seconds 3.734314

@@ -1,0 +1,19 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "truck-geometry",
+    "--test",
+    "basis_arithmetic_contract"
+  ],
+  "cwd": "/home/krone/Development/Pieza_WS/truck",
+  "started_utc": "2026-10-24T11:42:37.745587+00:00",
+  "elapsed_seconds": 1.700245272999382,
+  "exit_code": 101,
+  "environment": {
+    "CARGO_BUILD_JOBS": "12",
+    "RAYON_NUM_THREADS": "1"
+  }
+}

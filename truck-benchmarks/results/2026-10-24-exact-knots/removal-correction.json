@@ -1,0 +1,18 @@
+{
+  "source_hashes": {
+    "truck-geometry/src/nurbs/bspcurve.rs": "5b65b18fa3721f3a72179b9bc648a3c89c4d630d77ac73a67a32b3b23a69f0fb",
+    "truck-geometry/src/nurbs/bspsurface.rs": "684c61be9705333f7ec8cf9f1cc967142abb5871ad369de50d73d04f46bbdbf6",
+    "truck-geometry/tests/clustered_surface_knot_removal.rs": "34205ffbb8df5e59f481d157fed240af67578aa43e080a4112122b4a6972c981"
+  },
+  "geometry_command": "cargo test --release -p truck-geometry --no-fail-fast",
+  "geometry_tests": {
+    "passed": 160,
+    "failed": 1,
+    "ignored": 1,
+    "failure": "pcurve_derivation (known existing precision failure)"
+  },
+  "doctests_passed": 139,
+  "clippy_command": "cargo clippy --release -p truck-geometry --all-targets",
+  "clippy_exit": 0,
+  "surface_parent_proof": "Identical source test fails before the two surface coefficient changes on exact-knot candidate; this is pre-correction proof, not a separate clean96ca parent rebuild. Original eight parent behavior failures remain unchanged."
+}

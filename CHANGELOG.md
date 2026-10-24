@@ -6,6 +6,26 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- The checked B-spline basis API reports non-finite parameters and coefficient arithmetic.
+  The infallible basis evaluator retains IEEE non-finite results for arithmetic overflow;
+  zero-range and insufficient-knot errors still panic. Call
+  `try_bspline_basis_functions` when callers need explicit arithmetic diagnostics.
+
+- Breaking: STEP imports now prefer a declared nonrational 2D spline pcurve master on supported extrusions over a competing spatial spline. Callers inspecting imported curve variants must accept `Curve3D::PCurve`. Closed edges and failed master trims retain the spatial fallback; analytic line and conic canonicalization is unchanged.
+
+- Reject non-finite seeds and overflowed steps in the generic curve/surface Newton searches before evaluating geometry, including nearest-point and surface/curve intersection searches.
+
+- Breaking: `KnotVec::multiplicity` and `to_single_multi` now distinguish all
+  numerically distinct knots; `BSplineCurve::cut` and `BSplineSurface::ucut`/`vcut`
+  retain the requested parameter instead of snapping within the geometric tolerance.
+  Canonicalize intentional repeated knots explicitly before construction. Small finite parameter domains are
+  supported when conservative first/second derivative coefficient bounds over
+  degree-wide knot supports are representable.
+  Handle new `truck_geometry::errors::Error::NonFiniteKnotArithmetic` and
+  `CollapsedKnotSpan` variants for unrepresentable arithmetic and normalization
+  that would merge distinct knots. Normalize the parameter chart before
+  construction where appropriate; normalization rejects collisions without mutation.
+
 - Round mixed curved corners with one concave rim and two convex edges sharing a
   planar wall. Continue internal open-chain contacts when the original trim fails,
   then retain final geometry and trim guards. Independent radius, tangency,

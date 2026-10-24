@@ -1,0 +1,28 @@
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 10.31s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/preferred_spline_master.rs (target/release/deps/preferred_spline_master-3cbc53100aeb918b)
+
+running 1 test
+test declared_spline_master_preserves_position_derivatives_and_domain ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/spline_extrusion_pcurves.rs (target/release/deps/spline_extrusion_pcurves-4ba909802c90236e)
+
+running 2 tests
+test spline_extrusion_traces_reject_invalid_geometry_and_changed_parameters ... ok
+test spline_parameter_traces_preserve_extrusion_geometry_and_speed ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/spline_pcurve_bounds.rs (target/release/deps/spline_pcurve_bounds-987fb49b05a49227)
+
+running 2 tests
+test imported_c1_parameter_curve_preserves_its_exact_trace_and_face_domain ... ok
+test spline_pcurve_bounds_fit_complete_extrusion_trim_hulls ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+

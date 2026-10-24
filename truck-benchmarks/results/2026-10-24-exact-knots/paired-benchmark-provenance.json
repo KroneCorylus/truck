@@ -1,0 +1,28 @@
+{
+  "parent_commit": "96ca84d1c2ac0f49b2b40e7d58615eb5ee0e2988",
+  "parent_source_sha256": {
+    "truck-geometry/src/errors.rs": "9d0a6324d1f430e731429ef8e1cf505504d60b150bcc695aea4e0329506061f3",
+    "truck-geometry/src/nurbs/bspcurve.rs": "adbee883da46e615780025e9eb7c70a18485288f48a34db4847036636c4f55a2",
+    "truck-geometry/src/nurbs/bspsurface.rs": "2eeb97524342ffbb6a06fedfc16933fea09647d45fd12e5d2bd49008b8e93f21",
+    "truck-geometry/src/nurbs/knot_vec.rs": "fe616c239d7313fdcbec10bbdc4bc6b919cc8341f6d3b572a08daac9db157c28",
+    "truck-geometry/src/nurbs/mod.rs": "b91df9b853c3c6963f8d3104e3f1c33e231dc715bbbbc1f8b6f003f222bb9bea",
+    "truck-geotrait/src/algo/curve.rs": "afcd203a90746b8e9b945d5c2c07d4468c2301fd5ee1c44c8a78a096ab7580cf",
+    "truck-geotrait/src/algo/surface.rs": "c93683ccddd13c7b8e841d9ccf893f15fcc67a144961fde516d6faa1482779c0",
+    "truck-stepio/src/in/mod.rs": "b05ed5edd5b64a65625ea873909af03fc3335900b445c367dd317ab2b850baef"
+  },
+  "restored_candidate_sha256": {
+    "truck-geometry/src/errors.rs": "96c0750bca68d83d7485f2f9ad672de7e4f574af2671b4fb55f0a4196487f674",
+    "truck-geometry/src/nurbs/bspcurve.rs": "5b65b18fa3721f3a72179b9bc648a3c89c4d630d77ac73a67a32b3b23a69f0fb",
+    "truck-geometry/src/nurbs/bspsurface.rs": "684c61be9705333f7ec8cf9f1cc967142abb5871ad369de50d73d04f46bbdbf6",
+    "truck-geometry/src/nurbs/knot_vec.rs": "25d397da931ee0e826b4480ba47d37a127d4f187b173287d447abd985c603058",
+    "truck-geometry/src/nurbs/mod.rs": "501956adea22aa52709c9cb72f3fc36497b37c048b5f7827db4893da2086c7a4",
+    "truck-geotrait/src/algo/curve.rs": "da61a6c2407e672d14943e27b56a9eca9987dce69954b611b52c414bbef3873d",
+    "truck-geotrait/src/algo/surface.rs": "26f00d7ab2212b715b84fc5e65bb05d23b385063fe4e3ca597e6aca268bc2c22",
+    "truck-stepio/src/in/mod.rs": "b25009c639c02fd1bb52b22e2878cf36c8688edfc814498d43572927ca265cf5"
+  },
+  "same_fixtures": true,
+  "same_benchmark_module": true,
+  "samples": 7,
+  "sample_size": 1,
+  "rayon_threads": 1
+}

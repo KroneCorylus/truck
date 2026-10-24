@@ -1,0 +1,49 @@
+$ cargo test --release -p truck-geometry --test clustered_knot_geometry --test knot_derivative_geometry --test knot_arithmetic_errors --no-fail-fast
+CARGO_BUILD_JOBS=12 RAYON_NUM_THREADS=1
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+    Finished `release` profile [optimized] target(s) in 1.79s
+     Running tests/clustered_knot_geometry.rs (target/release/deps/clustered_knot_geometry-7e3dfb71820571c6)
+
+running 5 tests
+test clustered_spans_keep_geometry_and_derivatives_across_affine_charts ... ok
+test both_surface_cut_directions_preserve_degree_and_clustered_spans ... ok
+test nearby_distinct_knots_are_not_repetitions ... ok
+test exact_cut_preserves_nearby_knot_spans_and_trim_endpoints ... ok
+test normalization_preserves_distinct_knots_and_exact_multiplicities ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/knot_arithmetic_errors.rs (target/release/deps/knot_arithmetic_errors-944161669c7e368f)
+
+running 2 tests
+test a_tiny_interior_span_with_wide_degree_supports_remains_supported ... ok
+test unrepresentable_knot_arithmetic_returns_errors_and_normalization_is_atomic ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/knot_derivative_geometry.rs (target/release/deps/knot_derivative_geometry-ab97ca0fc77d7daa)
+
+running 2 tests
+test surface_first_second_and_mixed_derivatives_keep_their_polynomial_values ... ok
+test curved_polynomial_and_rational_derivatives_survive_chart_changes_and_knot_edits ... FAILED
+
+failures:
+
+---- curved_polynomial_and_rational_derivatives_survive_chart_changes_and_knot_edits stdout ----
+
+thread 'curved_polynomial_and_rational_derivatives_survive_chart_changes_and_knot_edits' (332574) panicked at truck-geometry/tests/knot_derivative_geometry.rs:113:50:
+called `Result::unwrap()` on an `Err` value: CannotRemoveKnot(4)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    curved_polynomial_and_rational_derivatives_survive_chart_changes_and_knot_edits
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-geometry --test knot_derivative_geometry`
+error: 1 target failed:
+    `-p truck-geometry --test knot_derivative_geometry`
+
+exit_code 101
+elapsed_seconds 1.813385

@@ -1,0 +1,13 @@
+{
+  "widths": [
+    1100,
+    390
+  ],
+  "appearances": [
+    "light",
+    "dark"
+  ],
+  "console_errors": 0,
+  "review": "No clipping; corrected light-theme link contrast after preview.",
+  "report_sha256": "13f4f6f0d654cc0533899ea9fc07b5873e8df871f4d75611bbeb137b1b872af8"
+}

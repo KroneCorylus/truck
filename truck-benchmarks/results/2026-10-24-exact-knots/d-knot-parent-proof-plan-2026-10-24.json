@@ -1,0 +1,17 @@
+{
+  "behavior_tests_that_compile_on_parent": [
+    "truck-geometry/tests/clustered_knot_geometry.rs",
+    "truck-geometry/tests/knot_derivative_geometry.rs",
+    "truck-stepio/tests/clustered_spline_pcurve.rs"
+  ],
+  "candidate_api_guard_tests": [
+    "truck-geometry/tests/knot_arithmetic_errors.rs"
+  ],
+  "sha256": {
+    "truck-geometry/tests/clustered_knot_geometry.rs": "69e647eeec62012522a70c2735560695ebfc1390e82b076d97cb635868cb9b99",
+    "truck-geometry/tests/knot_derivative_geometry.rs": "cb2a4992104eef4f029864e830e18941808aae979344b903070a2321a606639e",
+    "truck-stepio/tests/clustered_spline_pcurve.rs": "c1c0296ac1a7fa6f83c3a1cce12c270eb164726c61bd4458263a894378183c07",
+    "truck-geometry/tests/knot_arithmetic_errors.rs": "38e09ff41ef31e632d792f8c74b92921dc531ea580f25da0365bd038a6bde8e1"
+  },
+  "patch_sha256": "0356fdf8e418bacd386170bbe75af597202443b669eda2248269e06feada1e87"
+}

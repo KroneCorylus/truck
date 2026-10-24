@@ -23,6 +23,14 @@ pub enum Error {
     /// ```
     #[error("This knot vector consists single value.")]
     ZeroRange,
+    /// A knot domain, span reciprocal, supported derivative bound or basis coefficient is not finite.
+    /// Constructor bounds are sufficient conditions, not proof that every rejected
+    /// curve has an unrepresentable exact derivative.
+    #[error("Knot arithmetic is not finite; use a representable parameter domain.")]
+    NonFiniteKnotArithmetic,
+    /// Normalization would merge distinct knots into the same floating-point parameter.
+    #[error("Knot normalization collapses a nonzero span.")]
+    CollapsedKnotSpan,
     /// Fails concatting two knot vectors if there is a difference between the back knot of
     /// the former knot vector and the front knot of the latter knot vector.
     /// # Examples
@@ -217,6 +225,8 @@ impl Error {
     pub fn code(&self) -> &'static str {
         match self {
             Self::ZeroRange => "TRUCK_GEOMETRY_ZERO_RANGE",
+            Self::NonFiniteKnotArithmetic => "TRUCK_GEOMETRY_NON_FINITE_KNOT_ARITHMETIC",
+            Self::CollapsedKnotSpan => "TRUCK_GEOMETRY_COLLAPSED_KNOT_SPAN",
             Self::DifferentBackFront(..) => "TRUCK_GEOMETRY_DIFFERENT_BACK_FRONT",
             Self::NotClampedKnotVector => "TRUCK_GEOMETRY_NOT_CLAMPED_KNOT_VECTOR",
             Self::NotSortedVector => "TRUCK_GEOMETRY_NOT_SORTED_VECTOR",

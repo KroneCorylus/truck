@@ -45,9 +45,16 @@ impl<P> BSplineSurface<P> {
                 knot_vecs.1.len(),
                 control_points[0].len(),
             ))
-        } else if knot_vecs.0.range_length().so_small() || knot_vecs.1.range_length().so_small() {
-            Err(Error::ZeroRange)
         } else {
+            let u_bound = knot_vecs
+                .0
+                .validate_spans(knot_vecs.0.len() - control_points.len() - 1)?;
+            let v_bound = knot_vecs
+                .1
+                .validate_spans(knot_vecs.1.len() - control_points[0].len() - 1)?;
+            if !(u_bound * v_bound).is_finite() {
+                return Err(Error::NonFiniteKnotArithmetic);
+            }
             let len = control_points[0].len();
             if control_points.iter().any(|vec| vec.len() != len) {
                 Err(Error::IrregularControlPoints)
@@ -866,7 +873,7 @@ impl<P: ControlPoint<f64> + Tolerance> BSplineSurface<P> {
         for i in (idx - k)..idx {
             let delta = knot_vec[i + k + 1] - knot_vec[i];
             let a = inv_or_zero(delta) * (knot_vec[idx] - knot_vec[i]);
-            if a.so_small() {
+            if a == 0.0 {
                 break;
             } else {
                 let vec = self
@@ -964,7 +971,7 @@ impl<P: ControlPoint<f64> + Tolerance> BSplineSurface<P> {
         for i in (idx - k)..idx {
             let delta = knot_vec[i + k + 1] - knot_vec[i];
             let a = inv_or_zero(delta) * (knot_vec[idx] - knot_vec[i]);
-            if a.so_small() {
+            if a == 0.0 {
                 break;
             } else {
                 let vec = self
@@ -1210,7 +1217,7 @@ impl<P: ControlPoint<f64> + Tolerance> BSplineSurface<P> {
     ///     }
     /// }
     /// ```
-    pub fn ucut(&mut self, mut u: f64) -> BSplineSurface<P> {
+    pub fn ucut(&mut self, u: f64) -> BSplineSurface<P> {
         let degree = self.udegree();
 
         let idx = match self.uknot_vec().floor(u) {
@@ -1224,8 +1231,7 @@ impl<P: ControlPoint<f64> + Tolerance> BSplineSurface<P> {
                 return bspline;
             }
         };
-        let s = if u.near(&self.uknot_vec()[idx]) {
-            u = self.uknot_vec()[idx];
+        let s = if u == self.uknot_vec()[idx] {
             self.uknot_vec().multiplicity(idx)
         } else {
             0
@@ -1703,7 +1709,7 @@ where P: EuclideanSpace<Scalar = f64, Diff = <P as ControlPoint<f64>>::Diff>
                     .row_curve(self.control_points[0].len() - 1)
                     .parameter_division(range.0, tol)
                     .0;
-                (merge(first, second), vec![range.1.0, range.1.1])
+                (merge(first, second), vec![range.1 .0, range.1 .1])
             }
             [true, _] => {
                 let first = self.column_curve(0).parameter_division(range.1, tol).0;
@@ -1711,7 +1717,7 @@ where P: EuclideanSpace<Scalar = f64, Diff = <P as ControlPoint<f64>>::Diff>
                     .column_curve(self.control_points.len() - 1)
                     .parameter_division(range.1, tol)
                     .0;
-                (vec![range.0.0, range.0.1], merge(first, second))
+                (vec![range.0 .0, range.0 .1], merge(first, second))
             }
             _ => algo::surface::parameter_division(self, range, tol),
         }

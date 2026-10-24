@@ -1,0 +1,260 @@
+{
+  "settings": {
+    "samples": 7,
+    "iterations_per_sample": 1,
+    "rayon_threads": 1,
+    "cpu": 2,
+    "order": [
+      "candidate",
+      "parent",
+      "parent",
+      "candidate"
+    ]
+  },
+  "medians": [
+    {
+      "log": "pinned-alternating-1-candidate.txt",
+      "median": "506.3 \u00b5s",
+      "case": "cylinder/0.001"
+    },
+    {
+      "log": "pinned-alternating-1-candidate.txt",
+      "median": "123.3 \u00b5s",
+      "case": "cylinder/0.01"
+    },
+    {
+      "log": "pinned-alternating-1-candidate.txt",
+      "median": "50.76 \u00b5s",
+      "case": "cylinder/0.1"
+    },
+    {
+      "log": "pinned-alternating-1-candidate.txt",
+      "median": "27.49 ms",
+      "case": "physical-cap"
+    },
+    {
+      "log": "pinned-alternating-1-candidate.txt",
+      "median": "188.2 \u00b5s",
+      "case": "plate/1"
+    },
+    {
+      "log": "pinned-alternating-1-candidate.txt",
+      "median": "1.243 ms",
+      "case": "plate/10"
+    },
+    {
+      "log": "pinned-alternating-1-candidate.txt",
+      "median": "4.011 ms",
+      "case": "plate/30"
+    },
+    {
+      "log": "pinned-alternating-1-candidate.txt",
+      "median": "18.71 ms",
+      "case": "plate/100"
+    },
+    {
+      "log": "pinned-alternating-1-candidate.txt",
+      "median": "27.86 ms",
+      "case": "sphere-pole"
+    },
+    {
+      "log": "pinned-alternating-1-candidate.txt",
+      "median": "114.5 ms",
+      "case": "loft/0.001"
+    },
+    {
+      "log": "pinned-alternating-1-candidate.txt",
+      "median": "84.31 ms",
+      "case": "loft/0.01"
+    },
+    {
+      "log": "pinned-alternating-1-candidate.txt",
+      "median": "89.18 ms",
+      "case": "loft/0.05"
+    },
+    {
+      "log": "pinned-alternating-2-parent.txt",
+      "median": "521 \u00b5s",
+      "case": "cylinder/0.001"
+    },
+    {
+      "log": "pinned-alternating-2-parent.txt",
+      "median": "121.7 \u00b5s",
+      "case": "cylinder/0.01"
+    },
+    {
+      "log": "pinned-alternating-2-parent.txt",
+      "median": "47.92 \u00b5s",
+      "case": "cylinder/0.1"
+    },
+    {
+      "log": "pinned-alternating-2-parent.txt",
+      "median": "27.43 ms",
+      "case": "physical-cap"
+    },
+    {
+      "log": "pinned-alternating-2-parent.txt",
+      "median": "176.5 \u00b5s",
+      "case": "plate/1"
+    },
+    {
+      "log": "pinned-alternating-2-parent.txt",
+      "median": "1.202 ms",
+      "case": "plate/10"
+    },
+    {
+      "log": "pinned-alternating-2-parent.txt",
+      "median": "3.848 ms",
+      "case": "plate/30"
+    },
+    {
+      "log": "pinned-alternating-2-parent.txt",
+      "median": "17.8 ms",
+      "case": "plate/100"
+    },
+    {
+      "log": "pinned-alternating-2-parent.txt",
+      "median": "28.33 ms",
+      "case": "sphere-pole"
+    },
+    {
+      "log": "pinned-alternating-2-parent.txt",
+      "median": "111.3 ms",
+      "case": "loft/0.001"
+    },
+    {
+      "log": "pinned-alternating-2-parent.txt",
+      "median": "81.36 ms",
+      "case": "loft/0.01"
+    },
+    {
+      "log": "pinned-alternating-2-parent.txt",
+      "median": "85.76 ms",
+      "case": "loft/0.05"
+    },
+    {
+      "log": "pinned-alternating-3-parent.txt",
+      "median": "485.4 \u00b5s",
+      "case": "cylinder/0.001"
+    },
+    {
+      "log": "pinned-alternating-3-parent.txt",
+      "median": "119.6 \u00b5s",
+      "case": "cylinder/0.01"
+    },
+    {
+      "log": "pinned-alternating-3-parent.txt",
+      "median": "47.37 \u00b5s",
+      "case": "cylinder/0.1"
+    },
+    {
+      "log": "pinned-alternating-3-parent.txt",
+      "median": "26.78 ms",
+      "case": "physical-cap"
+    },
+    {
+      "log": "pinned-alternating-3-parent.txt",
+      "median": "178.6 \u00b5s",
+      "case": "plate/1"
+    },
+    {
+      "log": "pinned-alternating-3-parent.txt",
+      "median": "1.192 ms",
+      "case": "plate/10"
+    },
+    {
+      "log": "pinned-alternating-3-parent.txt",
+      "median": "3.829 ms",
+      "case": "plate/30"
+    },
+    {
+      "log": "pinned-alternating-3-parent.txt",
+      "median": "17.76 ms",
+      "case": "plate/100"
+    },
+    {
+      "log": "pinned-alternating-3-parent.txt",
+      "median": "27.12 ms",
+      "case": "sphere-pole"
+    },
+    {
+      "log": "pinned-alternating-3-parent.txt",
+      "median": "113.6 ms",
+      "case": "loft/0.001"
+    },
+    {
+      "log": "pinned-alternating-3-parent.txt",
+      "median": "82.8 ms",
+      "case": "loft/0.01"
+    },
+    {
+      "log": "pinned-alternating-3-parent.txt",
+      "median": "87.63 ms",
+      "case": "loft/0.05"
+    },
+    {
+      "log": "pinned-alternating-4-candidate.txt",
+      "median": "479.6 \u00b5s",
+      "case": "cylinder/0.001"
+    },
+    {
+      "log": "pinned-alternating-4-candidate.txt",
+      "median": "122.2 \u00b5s",
+      "case": "cylinder/0.01"
+    },
+    {
+      "log": "pinned-alternating-4-candidate.txt",
+      "median": "48.18 \u00b5s",
+      "case": "cylinder/0.1"
+    },
+    {
+      "log": "pinned-alternating-4-candidate.txt",
+      "median": "26.55 ms",
+      "case": "physical-cap"
+    },
+    {
+      "log": "pinned-alternating-4-candidate.txt",
+      "median": "180.1 \u00b5s",
+      "case": "plate/1"
+    },
+    {
+      "log": "pinned-alternating-4-candidate.txt",
+      "median": "1.192 ms",
+      "case": "plate/10"
+    },
+    {
+      "log": "pinned-alternating-4-candidate.txt",
+      "median": "3.856 ms",
+      "case": "plate/30"
+    },
+    {
+      "log": "pinned-alternating-4-candidate.txt",
+      "median": "17.81 ms",
+      "case": "plate/100"
+    },
+    {
+      "log": "pinned-alternating-4-candidate.txt",
+      "median": "27.52 ms",
+      "case": "sphere-pole"
+    },
+    {
+      "log": "pinned-alternating-4-candidate.txt",
+      "median": "117.4 ms",
+      "case": "loft/0.001"
+    },
+    {
+      "log": "pinned-alternating-4-candidate.txt",
+      "median": "82.73 ms",
+      "case": "loft/0.01"
+    },
+    {
+      "log": "pinned-alternating-4-candidate.txt",
+      "median": "87.56 ms",
+      "case": "loft/0.05"
+    }
+  ],
+  "interpretation": "Fixed-core finest-loft overhead persists: +2.88% and +3.35%. Large unpinned plate gap does not consistently reproduce. Modest variable overhead remains; no speedup or zero-regression claim.",
+  "source_provenance": "alternating-benchmark-provenance.json",
+  "initial_direct_runs": "alternating-1..4 lacked --bench and are smoke-only, not timings",
+  "final_algorithm_delta": "ordinary #[inline] annotation only relative to full-suite source snapshot"
+}

@@ -1,0 +1,100 @@
+Package F read-only review 2026-10-24. Exact-knot and C2 patches frozen.
+No builds, production/catalog/application edits. Current Cargo slot owned by G.
+
+Application requirements from tracker F02/F03/F04 are physical radius profiles,
+joined distinct-radius corners, and valid taper to zero. No OCCT representation
+selector, patch count or matching internal parameterization is required.
+PiezaCAD/cad-core/src/kernel/blend.rs:199 currently passes a scalar radius into
+try_fillet_solid_along_wire. Search found no application variable-law or per-edge
+unequal-radius caller. That does not remove the explicitly requested capability
+scope; it bounds migration, and avoids pretending an existing app call is broken.
+
+Exact corpus failures (2026-10-24-mixed-curved-corners/results.json plus archive):
+- blend/simple/A4/001: 100x100x10 box; three edges incident at(100,0,10),
+ radii10 on vertical length10,5 on each length100 horizontal topedge.
+- blend/simple/P9/001: cube5; topedges(5,0,5)->(5,5,5),r1 and
+ (0,0,5)->(5,0,5),r0.5. Smallest named geometric junction.
+- blend/tolblend_simple/A2/001: four ridges into apex(25,35,25) from
+ (0,0,50),(0,0,0),(50,0,50),(50,0,0), radii1,1.5,2,2.5 respectively.
+ Native result stores tolerances as large as0.01616354954; do not adopt as oracle.
+- feat/featlf/E2/001 and E3/001: identical captured selections, five r0.1,
+ two r0.3. r0.1 topedge(1.349954654104,5,1)->(0,5,1) meets r0.3 vertical
+ edge(1.349954654104,5,0)->(1.349954654104,5,1); other selected edges separate.
+All five imports succeed and return UnsupportedTopology/validate_input, immutable
+input. All captured effective contours are constant radius. These rows provide
+no evidence for physical variable laws or zero endpoints.
+
+Production entrypoint: fillet/modeling.rs::try_fillet_solid_edges_with_radii,
+around304. Equal assignments delegate to existing equal-radius construction.
+Unequal assignments reject ANY shared vertex before planar_edge::blend_edges.
+Merely removing rejection does not construct a joined corner. Existing
+unequal_fillet_radii.rs::unequal_radius_junctions_and_overlapping_parallel_rounds_are_rejected
+explicitly asserts rejection of two adjacent boxedges r1/r2. Rewrite intended
+junction assertion FIRST to require successful physically correct joined corner,
+retain oversized parallel6/5 rejection, valid opposite1/2 material/STEP and
+input immutability. Do not weaken or silently delete entire regression.
+
+Smallest independently provable capability step: F02 physical length law on
+unequally split straight tangent chain. This is a NEW contract, not a defect in
+current documented API: one unit per selected edge is explicit in modeling.rs:83
+and along_wire.rs::EdgeRadius. Existing modeling_blends.rs variable-chain test
+has two equal length2 edges; comment explicitly converts radius slope/2.
+Current derivative mapping is affine edge-index only. It cannot make one physical
+profile invariant to a change in edge subdivision without caller-specific law.
+
+Minimal model: provide one canonical physical arc-distance coordinate s from
+oriented wire start to end. For local curve t, s(t)=prefix + integral|C'(u)|du;
+R_t=R_s|C'|, R_tt=R_ss|C'|^2 + R_s(C' dot C'')/|C'|.
+Do not approximate s by edge fraction for arbitrary splines. Initial exact scope
+may be straight and circular chains with constant parameter speed; reject beyond
+that explicit scope until an accurate monotone arc-length map is available.
+Choose API deliberately: repo favors replacing old parameter convention rather
+than compatibility aliases. Changing existing law domain requires Breaking line,
+public docs, and rewriting law-based tests before implementation. Scalar radii
+are invariant; application's one scalar call needs no code change. Update both
+along_wire::EdgeRadius and continued_support use, not one route only. Radius
+sampling currently32 stations per edge also needs derivative/error-aware checks;
+fixed samples are not proof of arbitrary supplied function positivity/regularity.
+
+Independent numeric witness: target/d-package-f-oracle.py/.json. Length4 chain,
+split at1 versus2 versus no split; physical R(s)=0.2+0.05s. True join at1 has r.25.
+Naive edge-index R(u)=.2+.1u gives r.3 there, physical slopes .1 and .0333333 rather
+than .05; integrated R^2 .4333333 versus .3733333. Convex perpendicular wedge
+removed volume=(1-pi/4)*integral R(s)^2 ds; wrong extra material removed .0128761
+(see generated JSON for exact float). Compare R and derivatives against explicit
+polynomial values at physical stations, not production arc-length-map output.
+Use quadratic law as second derivative control, rigid transforms/scales, reverse
+wire with law R_reverse(s)=R(L-s), split lengths1/3 then.7/.3/3. Keep unchanged
+input, shared-solid exact volume and STEP downstream proof. A parent-compiling
+behavior test requires deliberate rewrite of API-domain contract first; a newAPI
+compilefailure alone is not behavioral parent proof.
+
+P9 minimal unequal-corner investigation next:
+Two right-angle convex cylinder strips with radius1 and.5, meeting one boxcorner.
+Keep those radii/contacts exact away from junction; no common sphere can be assumed
+for unequal rolling radii. Establish tangent junction shape and trimmed extent
+from independent support/contact equations; numerical native volume123.690425792457
+is a comparison, not exact oracle. Independent material should integrate clipped
+analytic strip contributions plus separately derived junction, avoiding overlaps.
+A generic fitted filler without that oracle is not a justified smallest fix.
+Coordinate with C's corner construction; do not create second unrelated corner
+pipeline or extend planar_fillet while F5 integration owns it.
+
+F04 zero taper:
+Current along_wire.rs checks radius<=0 at all samples, including endpoints;
+zero endpoints therefore deliberately rejected. Existing unsupported_operations
+control includes a law crossing through zero into negative values; keep it failing.
+A valid taper-to-zero requires terminal topology with a shared apex, no zero-length
+edge/zero-area face, and regular finite limiting surface derivatives. Relaxing
+positivity alone cannot establish that. Establish actual native zero-end execution
+and profile first. Current mixed-manifest search found no null or nonpositive
+constant_radius contour, so five named rows cannot be used to claim such evidence.
+Historical fixture fillet-contours/A4-variable.json has constant_radius:null plus
+seed values. Replay explicitly rejects it; capture does not encode full physical
+law or derivatives. Do not infer interpolation from two seed radii. Any capture
+extension must record actual law/stations, not invent an OCCT-style public API.
+
+No production fix or parent-failing execution claimed. Recommended next smallest
+work: settle physical law domain contract, then exact constant-speed split-chain
+adapter with independent polynomial material/derivative tests. In parallel with
+C, derive two-edge P9 junction before extending all five unequal cases.

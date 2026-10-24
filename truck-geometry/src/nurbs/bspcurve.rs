@@ -24,6 +24,8 @@ impl<P> BSplineCurve<P> {
     /// * If there are no control points, returns [`Error::EmptyControlPoint<f64>s`].
     /// * If the number of knots is less than or equal to the one of control points, returns [`Error::TooShortKnotVector`].
     /// * If the range of the knot vector is zero, returns [`Error::ZeroRange`].
+    /// * Non-finite knot domains or unrepresentable first/second derivative bounds return
+    ///   [`Error::NonFiniteKnotArithmetic`].
     ///
     /// [`Error::EmptyControlPoint<f64>s`]: errors/enum.Error.html#variant.EmptyControlPoint<f64>s
     /// [`Error::TooShortKnotVector`]: errors/enum.Error.html#variant.TooShortKnotVector
@@ -36,9 +38,8 @@ impl<P> BSplineCurve<P> {
                 knot_vec.len(),
                 control_points.len(),
             ))
-        } else if knot_vec.range_length().so_small() {
-            Err(Error::ZeroRange)
         } else {
+            knot_vec.validate_spans(knot_vec.len() - control_points.len() - 1)?;
             Ok(BSplineCurve::new_unchecked(knot_vec, control_points))
         }
     }
@@ -604,7 +605,7 @@ impl<P: ControlPoint<f64> + Tolerance> BSplineCurve<P> {
         for i in (idx - k)..idx {
             let delta = knot_vec[i + k + 1] - knot_vec[i];
             let a = inv_or_zero(delta) * (knot_vec[idx] - knot_vec[i]);
-            if a.so_small() {
+            if a == 0.0 {
                 break;
             } else {
                 let p = *new_points.last().unwrap();
@@ -979,7 +980,7 @@ impl<P: ControlPoint<f64>> ParameterTransform for BSplineCurve<P> {
 }
 
 impl<P: ControlPoint<f64> + Tolerance> Cut for BSplineCurve<P> {
-    fn cut(&mut self, mut t: f64) -> BSplineCurve<P> {
+    fn cut(&mut self, t: f64) -> BSplineCurve<P> {
         let degree = self.degree();
 
         let idx = match self.knot_vec.floor(t) {
@@ -992,8 +993,7 @@ impl<P: ControlPoint<f64> + Tolerance> Cut for BSplineCurve<P> {
                 return bspline;
             }
         };
-        let s = if t.near(&self.knot_vec[idx]) {
-            t = self.knot_vec[idx];
+        let s = if t == self.knot_vec[idx] {
             self.knot_vec.multiplicity(idx)
         } else {
             0

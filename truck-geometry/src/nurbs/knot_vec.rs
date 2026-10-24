@@ -22,6 +22,54 @@ impl KnotVec {
         }
     }
 
+    pub(super) fn validate_range(&self) -> Result<()> {
+        let range = self.range_length();
+        if range == 0.0 {
+            return Err(Error::ZeroRange);
+        }
+        if !self[0].is_finite()
+            || !self[self.len() - 1].is_finite()
+            || !range.is_finite()
+            || !(1.0 / range).is_finite()
+        {
+            return Err(Error::NonFiniteKnotArithmetic);
+        }
+        Ok(())
+    }
+
+    pub(super) fn validate_spans(&self, degree: usize) -> Result<f64> {
+        self.validate_range()?;
+        if self.windows(2).any(|pair| {
+            let span = pair[1] - pair[0];
+            span != 0.0 && !(1.0 / span).is_finite()
+        }) {
+            return Err(Error::NonFiniteKnotArithmetic);
+        }
+        let support_bound = |order: usize| {
+            let width = self
+                .windows(order + 1)
+                .map(|knots| knots[order] - knots[0])
+                .filter(|width| *width > 0.0)
+                .fold(f64::INFINITY, f64::min);
+            2.0 * order as f64 / width
+        };
+        // Derivative denominators span degree-wide supports, not just adjacent knots.
+        let first = if degree > 0 {
+            support_bound(degree)
+        } else {
+            0.0
+        };
+        let second = if degree > 1 {
+            first * support_bound(degree - 1)
+        } else {
+            0.0
+        };
+        if !first.is_finite() || !second.is_finite() {
+            return Err(Error::NonFiniteKnotArithmetic);
+        }
+        Ok(first)
+    }
+
     /// Returns whether two knot vectors have the same range.
     /// # Examples
     /// ```
@@ -72,9 +120,7 @@ impl KnotVec {
     /// assert_eq!(knot_vec.multiplicity(5), 3);
     /// ```
     #[inline(always)]
-    pub fn multiplicity(&self, i: usize) -> usize {
-        self.iter().filter(|u| self[i].near(u)).count()
-    }
+    pub fn multiplicity(&self, i: usize) -> usize { self.iter().filter(|u| self[i] == **u).count() }
 
     /// Adds a knot and return the index of the added knot.
     /// # Examples
@@ -104,7 +150,11 @@ impl KnotVec {
 
     /// Calculates B-spline basis functions at `t` with degree `degree` and `der_rank`th-order derivation.
     /// # Panics
-    /// If the length of `self` is not more than `degree`, panic occurs.
+    /// Panics for a zero knot range or when the knot count is insufficient for `degree`.
+    /// # Arithmetic
+    /// This infallible evaluator follows IEEE arithmetic: non-finite parameters or
+    /// arithmetic overflow may produce non-finite coefficients. Use
+    /// [`Self::try_bspline_basis_functions`] to reject these conditions explicitly.
     /// # Remarks
     /// In this package, the B-spline basis function is based on the characteristic function of
     /// the right-open intervals [s, t). So, the value corresponding to the end point t = t_n is always 0.0.
@@ -160,7 +210,7 @@ impl KnotVec {
     /// }
     /// ```
     pub fn bspline_basis_functions(&self, degree: usize, der_rank: usize, t: f64) -> BasisWindow {
-        match self.try_bspline_basis_functions(degree, der_rank, t) {
+        match self.compute_bspline_basis_functions(degree, der_rank, t, false) {
             Ok(got) => got,
             Err(error) => panic!("{}", error),
         }
@@ -170,6 +220,8 @@ impl KnotVec {
     /// # Failures
     /// - If the range of the knot vector is zero, returns [`Error::ZeroRange`].
     /// - If the length of `self` is not more than `degree`, returns [`Error::TooLargeDegree`].
+    /// - If the parameter, knot arithmetic or resulting basis coefficients are non-finite,
+    ///   returns [`Error::NonFiniteKnotArithmetic`].
     /// # Remarks
     /// In this package, the B-spline basis function is based on the characteristic function of
     /// the right-open intervals [s, t). So, the value corresponding to the end point t = t_n is always 0.0.
@@ -234,10 +286,27 @@ impl KnotVec {
         der_rank: usize,
         t: f64,
     ) -> Result<BasisWindow> {
-        let n = self.len() - 1;
-        if self[0].near(&self[n]) {
+        self.compute_bspline_basis_functions(degree, der_rank, t, true)
+    }
+
+    #[inline]
+    fn compute_bspline_basis_functions(
+        &self,
+        degree: usize,
+        der_rank: usize,
+        t: f64,
+        check_arithmetic: bool,
+    ) -> Result<BasisWindow> {
+        if check_arithmetic {
+            self.validate_range()?;
+            if !t.is_finite() {
+                return Err(Error::NonFiniteKnotArithmetic);
+            }
+        } else if self.range_length() == 0.0 {
             return Err(Error::ZeroRange);
-        } else if n < degree {
+        }
+        let n = self.len() - 1;
+        if n < degree {
             return Err(Error::TooLargeDegree(n + 1, degree));
         }
         if degree < der_rank {
@@ -289,6 +358,9 @@ impl KnotVec {
             }
         }
 
+        if check_arithmetic && eval.iter().any(|value| !value.is_finite()) {
+            return Err(Error::NonFiniteKnotArithmetic);
+        }
         let len = usize::min(degree + 1, n - degree - global_base);
         Ok(BasisWindow::new(global_base, _eval, len, n - degree))
     }
@@ -340,7 +412,9 @@ impl KnotVec {
 
     /// Normalizes the knot vector i.e. makes the first value 0 and the last value 1.
     /// # Failures
-    /// Returns [`Error::ZeroRange`] if the range of the knot vector is so small.
+    /// Returns [`Error::ZeroRange`] for a zero range, [`Error::NonFiniteKnotArithmetic`]
+    /// for non-finite arithmetic, or [`Error::CollapsedKnotSpan`] if distinct knots
+    /// would become equal. Failure leaves the vector unchanged.
     /// # Examples
     /// ```
     /// use truck_geometry::prelude::KnotVec;
@@ -351,15 +425,31 @@ impl KnotVec {
     /// ```
     pub fn try_normalize(&mut self) -> Result<&mut Self> {
         let range = self.range_length();
-        if range.so_small() {
+        if range == 0.0 {
             return Err(Error::ZeroRange);
         }
-        Ok(self.transform(1.0 / range, -self[0] / range))
+        let first = self[0];
+        if !first.is_finite() || !range.is_finite() {
+            return Err(Error::NonFiniteKnotArithmetic);
+        }
+        let normalized: Vec<_> = self.iter().map(|knot| (knot - first) / range).collect();
+        if normalized.iter().any(|knot| !knot.is_finite()) {
+            return Err(Error::NonFiniteKnotArithmetic);
+        }
+        if self
+            .windows(2)
+            .zip(normalized.windows(2))
+            .any(|(before, after)| before[0] < before[1] && after[0] >= after[1])
+        {
+            return Err(Error::CollapsedKnotSpan);
+        }
+        self.0 = normalized;
+        Ok(self)
     }
 
     /// Normalizes the knot vector i.e. makes the first value 0 and the last value 1.
     /// # Panics
-    /// Panic occurs if the range of the knot vector is so small.
+    /// Panics if the range is zero, normalization is non-finite, or distinct knots collapse.
     /// # Examples
     /// ```
     /// use truck_geometry::prelude::KnotVec;
@@ -501,7 +591,7 @@ impl KnotVec {
         let mut mult = 1;
         while let Some(knot) = iter.next() {
             if let Some(next) = iter.peek() {
-                if knot.near(next) {
+                if knot == *next {
                     mult += 1;
                 } else {
                     knots.push(*knot);

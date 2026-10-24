@@ -1,0 +1,21 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "truck-stepio",
+    "--test",
+    "clustered_spline_pcurve",
+    "--",
+    "--nocapture"
+  ],
+  "cwd": "/home/krone/Development/Pieza_WS/truck",
+  "started_utc": "2026-10-24T11:03:52.872580+00:00",
+  "elapsed_seconds": 11.98568980500022,
+  "exit_code": 101,
+  "environment": {
+    "CARGO_BUILD_JOBS": "12",
+    "RAYON_NUM_THREADS": "1"
+  }
+}

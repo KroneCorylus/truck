@@ -1,0 +1,30 @@
+$ cargo test --release -p truck-geotrait --test nonfinite_search_callbacks --test nonfinite_surface_search -- --nocapture
+CARGO_BUILD_JOBS=12 RAYON_NUM_THREADS=1
+   Compiling truck-geotrait v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-geotrait)
+    Finished `release` profile [optimized] target(s) in 0.35s
+     Running tests/nonfinite_search_callbacks.rs (target/release/deps/nonfinite_search_callbacks-ed0aef9922c45f82)
+
+running 9 tests
+test curve_exact_rejects_nonfinite_seeds ... ok
+test curve_exact_rejects_overflowed_iterates ... ok
+test curve_nearest_rejects_nonfinite_seeds ... ok
+test curve_nearest_rejects_overflowed_iterates ... ok
+test nearest_surface_3d_rejects_overflowed_iterates ... ok
+test nearest_surface_rejects_nonfinite_seeds ... ok
+test surface_curve_intersection_rejects_nonfinite_seeds ... ok
+test nearest_surface_2d_rejects_overflowed_iterates ... ok
+test surface_curve_intersection_rejects_overflowed_iterates ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/nonfinite_surface_search.rs (target/release/deps/nonfinite_surface_search-2fb9b390abe6e11f)
+
+running 2 tests
+test surface_search_rejects_nonfinite_seeds_before_evaluation ... ok
+test surface_search_stops_before_evaluating_an_overflowed_newton_step ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+exit_code 0
+elapsed_seconds 0.377113

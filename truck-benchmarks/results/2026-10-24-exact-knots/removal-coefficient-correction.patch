@@ -1,0 +1,31 @@
+--- a/truck-geometry/src/nurbs/bspcurve.rs
++++ b/truck-geometry/src/nurbs/bspcurve.rs
+@@ -605,7 +605,7 @@
+         for i in (idx - k)..idx {
+             let delta = knot_vec[i + k + 1] - knot_vec[i];
+             let a = inv_or_zero(delta) * (knot_vec[idx] - knot_vec[i]);
+-            if a.so_small() {
++            if a == 0.0 {
+                 break;
+             } else {
+                 let p = *new_points.last().unwrap();
+--- a/truck-geometry/src/nurbs/bspsurface.rs
++++ b/truck-geometry/src/nurbs/bspsurface.rs
+@@ -873,7 +873,7 @@
+         for i in (idx - k)..idx {
+             let delta = knot_vec[i + k + 1] - knot_vec[i];
+             let a = inv_or_zero(delta) * (knot_vec[idx] - knot_vec[i]);
+-            if a.so_small() {
++            if a == 0.0 {
+                 break;
+             } else {
+                 let vec = self
+@@ -971,7 +971,7 @@
+         for i in (idx - k)..idx {
+             let delta = knot_vec[i + k + 1] - knot_vec[i];
+             let a = inv_or_zero(delta) * (knot_vec[idx] - knot_vec[i]);
+-            if a.so_small() {
++            if a == 0.0 {
+                 break;
+             } else {
+                 let vec = self

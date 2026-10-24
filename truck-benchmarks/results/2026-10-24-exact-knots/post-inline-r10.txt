@@ -1,0 +1,24 @@
+$ cargo test --release -p truck-shapeops --test R10-sequential-fillet
+CARGO_BUILD_JOBS=12 RAYON_NUM_THREADS=1
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 12.46s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/R10-sequential-fillet.rs (target/release/deps/R10_sequential_fillet-fb6bd51e7e27b261)
+
+running 8 tests
+test first_fillet_input_and_second_wire_control ... ok
+test collapsed_contacts_reject_cap_consumption_and_short_walls ... ok
+test collapsed_corner_survives_similarity_transforms ... ok
+test closed_collapsed_corners_merge_contacts_across_the_wire_seam ... ok
+test procedural_first_round_supports_equal_radius_continuation ... ok
+test adjacent_second_fillet_must_not_panic_or_mutate_input ... ok
+test smaller_second_radius_on_original_fixture_preserves_geometry_and_history ... ok
+test sequential_radii_sizes_and_edge_orders ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 11.98s
+
+
+exit_code 0
+elapsed_seconds 24.482546

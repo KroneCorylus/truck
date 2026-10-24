@@ -1,0 +1,87 @@
+$ cargo test --release -p truck-geometry -p truck-stepio -p truck-geotrait --test clustered_surface_knot_removal --test preferred_spline_master --test nonfinite_surface_search --no-fail-fast
+CARGO_BUILD_JOBS=12 RAYON_NUM_THREADS=1
+   Compiling truck-geotrait v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-geotrait)
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+   Compiling truck-topology v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-topology)
+   Compiling truck-polymesh v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-polymesh)
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-modeling)
+   Compiling truck-meshalgo v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-meshalgo)
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 12.33s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/clustered_surface_knot_removal.rs (target/release/deps/clustered_surface_knot_removal-ce57eeb589d27256)
+
+running 1 test
+test clustered_surface_insertions_can_be_removed_in_both_directions ... FAILED
+
+failures:
+
+---- clustered_surface_insertions_can_be_removed_in_both_directions stdout ----
+
+thread 'clustered_surface_insertions_can_be_removed_in_both_directions' (373944) panicked at truck-geometry/tests/clustered_surface_knot_removal.rs:35:53:
+called `Result::unwrap()` on an `Err` value: CannotRemoveKnot(4)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    clustered_surface_insertions_can_be_removed_in_both_directions
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-geometry --test clustered_surface_knot_removal`
+     Running tests/nonfinite_surface_search.rs (target/release/deps/nonfinite_surface_search-05e6ca694fb0fe76)
+
+running 2 tests
+test surface_search_rejects_nonfinite_seeds_before_evaluation ... FAILED
+test surface_search_stops_before_evaluating_an_overflowed_newton_step ... FAILED
+
+failures:
+
+---- surface_search_rejects_nonfinite_seeds_before_evaluation stdout ----
+
+thread 'surface_search_rejects_nonfinite_seeds_before_evaluation' (373946) panicked at truck-geotrait/tests/nonfinite_surface_search.rs:11:9:
+assertion failed: u.is_finite() && v.is_finite()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- surface_search_stops_before_evaluating_an_overflowed_newton_step stdout ----
+
+thread 'surface_search_stops_before_evaluating_an_overflowed_newton_step' (373947) panicked at truck-geotrait/tests/nonfinite_surface_search.rs:11:9:
+assertion failed: u.is_finite() && v.is_finite()
+
+
+failures:
+    surface_search_rejects_nonfinite_seeds_before_evaluation
+    surface_search_stops_before_evaluating_an_overflowed_newton_step
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-geotrait --test nonfinite_surface_search`
+     Running tests/preferred_spline_master.rs (target/release/deps/preferred_spline_master-2699a45bae5862c6)
+
+running 1 test
+test declared_spline_master_preserves_position_derivatives_and_domain ... FAILED
+
+failures:
+
+---- declared_spline_master_preserves_position_derivatives_and_domain stdout ----
+
+thread 'declared_spline_master_preserves_position_derivatives_and_domain' (373949) panicked at truck-stepio/tests/preferred_spline_master.rs:21:9:
+assertion failed: matches!(converted, Curve3D::PCurve(_))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    declared_spline_master_preserves_position_derivatives_and_domain
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+error: test failed, to rerun pass `-p truck-stepio --test preferred_spline_master`
+error: 3 targets failed:
+    `-p truck-geometry --test clustered_surface_knot_removal`
+    `-p truck-geotrait --test nonfinite_surface_search`
+    `-p truck-stepio --test preferred_spline_master`
+
+exit_code 101
+elapsed_seconds 12.383237

@@ -1,0 +1,22 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "truck-geometry",
+    "--test",
+    "clustered_knot_geometry",
+    "--test",
+    "knot_derivative_geometry",
+    "--no-fail-fast"
+  ],
+  "cwd": "/home/krone/Development/Pieza_WS/truck",
+  "started_utc": "2026-10-24T11:03:32.333487+00:00",
+  "elapsed_seconds": 2.3101137439989543,
+  "exit_code": 101,
+  "environment": {
+    "CARGO_BUILD_JOBS": "12",
+    "RAYON_NUM_THREADS": "1"
+  }
+}

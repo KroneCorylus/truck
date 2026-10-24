@@ -1,0 +1,23 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "truck-geotrait",
+    "--test",
+    "nonfinite_search_callbacks",
+    "--test",
+    "nonfinite_surface_search",
+    "--",
+    "--nocapture"
+  ],
+  "cwd": "/home/krone/Development/Pieza_WS/truck",
+  "started_utc": "2026-10-24T11:17:28.152424+00:00",
+  "elapsed_seconds": 0.37711293999927875,
+  "exit_code": 0,
+  "environment": {
+    "CARGO_BUILD_JOBS": "12",
+    "RAYON_NUM_THREADS": "1"
+  }
+}

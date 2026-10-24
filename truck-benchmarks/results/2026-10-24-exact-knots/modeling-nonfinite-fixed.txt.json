@@ -1,0 +1,21 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "truck-modeling",
+    "--lib",
+    "bad_seeded_results_fall_back_and_off_surface_curves_stay_rejected",
+    "--",
+    "--nocapture"
+  ],
+  "cwd": "/home/krone/Development/Pieza_WS/truck",
+  "started_utc": "2026-10-24T11:11:38.417416+00:00",
+  "elapsed_seconds": 3.0730475380005373,
+  "exit_code": 0,
+  "environment": {
+    "CARGO_BUILD_JOBS": "12",
+    "RAYON_NUM_THREADS": "1"
+  }
+}

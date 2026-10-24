@@ -1,0 +1,42 @@
+{
+  "application": "/home/krone/Development/Pieza_WS/PiezaCAD",
+  "head": "f5a381704a12c8d93f02e7d79665d595dea55dd2",
+  "mode": "Read-only source search; no application changes, runtime validation or dependency migration",
+  "queries": [
+    {
+      "pattern": "Curve3D::",
+      "returncode": 1,
+      "matches": []
+    },
+    {
+      "pattern": "SurfaceCurve",
+      "returncode": 1,
+      "matches": []
+    },
+    {
+      "pattern": "PreferredSurfaceCurveRepresentation",
+      "returncode": 1,
+      "matches": []
+    },
+    {
+      "pattern": "truck_geometry::errors",
+      "returncode": 1,
+      "matches": []
+    },
+    {
+      "pattern": "NonFiniteKnotArithmetic",
+      "returncode": 1,
+      "matches": []
+    },
+    {
+      "pattern": "CollapsedKnotSpan",
+      "returncode": 1,
+      "matches": []
+    },
+    {
+      "pattern": "TRUCK_GEOMETRY_",
+      "returncode": 1,
+      "matches": []
+    }
+  ]
+}

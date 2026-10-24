@@ -1855,13 +1855,51 @@ pub struct SurfaceCurve {
     master_representation: PreferredSurfaceCurveRepresentation,
 }
 
-/// The 3D curve is used even when a pcurve is the master representation: an edge of truck needs
-/// a space curve, and a pcurve carries a copy of its surface. The master pcurve is the fallback
-/// when the 3D curve cannot be parsed.
+impl SurfaceCurve {
+    fn spline_master(&self) -> Option<(&Pcurve, PCurve)> {
+        let CurveAny::BoundedCurve(spatial) = &self.curve_3d else {
+            return None;
+        };
+        if !matches!(spatial.as_ref(), BoundedCurveAny::BSplineCurve(_)) {
+            return None;
+        }
+        let index = match self.master_representation {
+            PreferredSurfaceCurveRepresentation::Curve3D => return None,
+            PreferredSurfaceCurveRepresentation::PcurveS1 => 0,
+            PreferredSurfaceCurveRepresentation::PcurveS2 => 1,
+        };
+        let PcurveOrSurface::Pcurve(source) = self.associated_geometry.get(index)? else {
+            return None;
+        };
+        let curve = PCurve::try_from(source.as_ref()).ok()?;
+        if !matches!(curve.curve().as_ref(), Curve2D::BSplineCurve(_)) {
+            return None;
+        }
+        let Surface::SweptCurve(SweptCurve::ExtrudedCurve(surface)) = curve.surface().as_ref()
+        else {
+            return None;
+        };
+        matches!(
+            surface.entity_curve(),
+            Curve3D::Line(_)
+                | Curve3D::Conic(Conic3D::Ellipse(_))
+                | Curve3D::BSplineCurve(_)
+                | Curve3D::NurbsCurve(_)
+        )
+        .then_some((source.as_ref(), curve))
+    }
+}
+
+/// Analytic spatial curves retain their canonical representation. A declared spline pcurve
+/// master on a supported extrusion takes precedence over a competing spatial spline, which
+/// may only approximate that trace. Other master pcurves remain parsing fallbacks.
 impl TryFrom<&SurfaceCurve> for Curve3D {
     type Error = StepConvertingError;
     fn try_from(value: &SurfaceCurve) -> Result<Self, Self::Error> {
         use PreferredSurfaceCurveRepresentation as PSCR;
+        if let Some((_, curve)) = value.spline_master() {
+            return Ok(Self::PCurve(curve));
+        }
         let curve_3d = Self::try_from(&value.curve_3d);
         let pcurve_index = match value.master_representation {
             PSCR::Curve3D => return curve_3d,
@@ -2485,7 +2523,8 @@ where
 fn trim_bounded_edge<C, P>(mut curve: C, p: P, q: P) -> Result<C, StepConvertingError>
 where
     C: Cut<Point = P> + SearchParameter<D1, Point = P>,
-    P: Copy + Tolerance, {
+    P: Copy + Tolerance,
+{
     if !curve.front().near(&p) {
         let u = curve
             .search_parameter(p, None, 100)
@@ -2746,8 +2785,19 @@ impl EdgeCurve {
                 Curve3D::PCurve(truck::PCurve::new(Box::new(curve2d), Box::new(surface)))
             }
             CurveAny::SurfaceCurve(c) => {
-                // The 3D curve first, as in `TryFrom<&SurfaceCurve>`. The inner call already
-                // applies `same_sense`.
+                if !p.near(&q) {
+                    if let Some((master, _)) = c.spline_master() {
+                        if let Ok(curve) = Self::sub_parse_curve3d(
+                            &CurveAny::Pcurve(Box::new(master.clone())),
+                            p,
+                            q,
+                            same_sense,
+                        ) {
+                            return Ok(curve);
+                        }
+                    }
+                }
+                // Canonical spatial geometry or fallback; the inner call applies `same_sense`.
                 let curve_3d = Self::sub_parse_curve3d(&c.curve_3d, p, q, same_sense);
                 use PreferredSurfaceCurveRepresentation::*;
                 let pcurve_index = match c.master_representation {

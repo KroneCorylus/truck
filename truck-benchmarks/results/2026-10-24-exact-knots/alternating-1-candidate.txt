@@ -1,0 +1,23 @@
+$ target/d-inline-benchmark-binary tessellation::(thin_curved_loft|physical_extrusion_cap_accuracy|sphere_pole_tessellation|cylinder_tolerance|plate) --sample-count 7 --sample-size 1
+CARGO_BUILD_JOBS=12 RAYON_NUM_THREADS=1
+actions
+╰─ tessellation
+   ├─ cylinder_tolerance
+   │  ├─ 0.001
+   │  ├─ 0.01
+   │  ╰─ 0.1
+   ├─ physical_extrusion_cap_accuracy
+   ├─ plate
+   │  ├─ 1
+   │  ├─ 10
+   │  ├─ 30
+   │  ╰─ 100
+   ├─ sphere_pole_tessellation
+   ╰─ thin_curved_loft
+      ├─ 0.001
+      ├─ 0.01
+      ╰─ 0.05
+
+
+exit_code 0
+elapsed_seconds 1.703232

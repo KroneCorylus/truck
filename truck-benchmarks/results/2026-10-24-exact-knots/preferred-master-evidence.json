@@ -1,0 +1,33 @@
+{
+  "hashes": {
+    "truck-stepio/src/in/mod.rs": "b25009c639c02fd1bb52b22e2878cf36c8688edfc814498d43572927ca265cf5",
+    "truck-stepio/tests/preferred_spline_master.rs": "a93b9a7208bf6a4d3027e46d93ad38f6776ed7b01911c3c348331d13bb5eb84a",
+    "truck-stepio/tests/spline_pcurve_bounds.rs": "0d2c1ba06a9c3ae339c6f2c5f1061e6a9dd55bf684477d21e8bde9c23e232afe",
+    "truck-stepio/tests/fixtures/spline-extrusion-pcurves/C1-equal-006.step": "865feac228f1d3302e9cd9868815412351af61aa0155b5750668d29468b9afd2"
+  },
+  "focused_tests_passed": 5,
+  "analytic_cylinder_control": "pass unchanged",
+  "before_fix": "new direct test fails on exact-knot candidate before STEP fix; clean parent repetition still owned by coordinator",
+  "representation_change": {
+    "STEP_edge": 2035,
+    "surface_curve": 2036,
+    "spatial_spline": 2037,
+    "declared_master_pcurve": 2224,
+    "imported_edge_index": 10
+  },
+  "candidate_before_stepfix_counts": {
+    "shells": 1,
+    "edges": 27,
+    "faces": 11,
+    "spline_pcurves": 0,
+    "skipped": 0
+  },
+  "old_existing_rlib_counts": {
+    "shells": 1,
+    "edges": 27,
+    "faces": 11,
+    "spline_pcurves": 1,
+    "skipped": 0
+  },
+  "old_rlib_caveat": "Existing90b584801e8a1303 rlib used for localization, not clean-parent source-verified proof."
+}

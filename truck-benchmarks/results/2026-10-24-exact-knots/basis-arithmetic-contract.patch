@@ -1,0 +1,131 @@
+--- /dev/null
++++ b/truck-geometry/tests/basis_arithmetic_contract.rs
+@@ -0,0 +1,36 @@
++use truck_geometry::prelude::*;
++use truck_geometry::errors::Error;
++
++#[test]
++fn finite_extrapolation_overflow_is_ieee_infallibly_and_diagnosed_fallibly() {
++    let knots = KnotVec::bezier_knot(3);
++    let basis = knots.bspline_basis_functions(3, 0, 1e200);
++    assert!(basis.as_slice().iter().any(|x| !x.is_finite()));
++    assert!(knots.try_bspline_basis_functions(3, 0, 1e200).is_err());
++}
++
++#[test]
++fn nonfinite_parameters_are_ieee_infallibly_and_rejected_fallibly() {
++    let knots = KnotVec::bezier_knot(3);
++    for t in [f64::NAN, f64::INFINITY, f64::NEG_INFINITY] {
++        let basis = knots.bspline_basis_functions(3, 0, t);
++        assert!(basis.as_slice().iter().any(|x| !x.is_finite()));
++        assert!(knots.try_bspline_basis_functions(3, 0, t).is_err());
++    }
++}
++
++#[test]
++fn basis_paths_share_finite_values_and_preserve_structural_errors() {
++    let knots = KnotVec::bezier_knot(3);
++    for rank in 0..=4 {
++        for t in [-1., 0., 0.3, 1., 2.] {
++            assert_eq!(knots.bspline_basis_functions(3, rank, t).to_full_array(),
++                knots.try_bspline_basis_functions(3, rank, t).unwrap().to_full_array());
++        }
++    }
++    let zero = KnotVec::from(vec![0., 0., 0., 0.]);
++    assert!(matches!(zero.try_bspline_basis_functions(1, 0, 0.), Err(Error::ZeroRange)));
++    assert!(std::panic::catch_unwind(|| zero.bspline_basis_functions(1, 0, 0.)).is_err());
++    assert!(matches!(knots.try_bspline_basis_functions(8, 0, 0.), Err(Error::TooLargeDegree(..))));
++    assert!(std::panic::catch_unwind(|| knots.bspline_basis_functions(8, 0, 0.)).is_err());
++}
+--- a/truck-geometry/src/nurbs/knot_vec.rs
++++ b/truck-geometry/src/nurbs/knot_vec.rs
+@@ -150,7 +150,11 @@
+ 
+     /// Calculates B-spline basis functions at `t` with degree `degree` and `der_rank`th-order derivation.
+     /// # Panics
+-    /// If the length of `self` is not more than `degree`, panic occurs.
++    /// Panics for a zero knot range or when the knot count is insufficient for `degree`.
++    /// # Arithmetic
++    /// This infallible evaluator follows IEEE arithmetic: non-finite parameters or
++    /// arithmetic overflow may produce non-finite coefficients. Use
++    /// [`Self::try_bspline_basis_functions`] to reject these conditions explicitly.
+     /// # Remarks
+     /// In this package, the B-spline basis function is based on the characteristic function of
+     /// the right-open intervals [s, t). So, the value corresponding to the end point t = t_n is always 0.0.
+@@ -206,7 +210,7 @@
+     /// }
+     /// ```
+     pub fn bspline_basis_functions(&self, degree: usize, der_rank: usize, t: f64) -> BasisWindow {
+-        match self.try_bspline_basis_functions(degree, der_rank, t) {
++        match self.compute_bspline_basis_functions(degree, der_rank, t, false) {
+             Ok(got) => got,
+             Err(error) => panic!("{}", error),
+         }
+@@ -282,9 +286,23 @@
+         der_rank: usize,
+         t: f64,
+     ) -> Result<BasisWindow> {
+-        self.validate_range()?;
+-        if !t.is_finite() {
+-            return Err(Error::NonFiniteKnotArithmetic);
++        self.compute_bspline_basis_functions(degree, der_rank, t, true)
++    }
++
++    fn compute_bspline_basis_functions(
++        &self,
++        degree: usize,
++        der_rank: usize,
++        t: f64,
++        check_arithmetic: bool,
++    ) -> Result<BasisWindow> {
++        if check_arithmetic {
++            self.validate_range()?;
++            if !t.is_finite() {
++                return Err(Error::NonFiniteKnotArithmetic);
++            }
++        } else if self.range_length() == 0.0 {
++            return Err(Error::ZeroRange);
+         }
+         let n = self.len() - 1;
+         if n < degree {
+@@ -339,7 +357,7 @@
+             }
+         }
+ 
+-        if eval.iter().any(|value| !value.is_finite()) {
++        if check_arithmetic && eval.iter().any(|value| !value.is_finite()) {
+             return Err(Error::NonFiniteKnotArithmetic);
+         }
+         let len = usize::min(degree + 1, n - degree - global_base);
+--- a/DIAGNOSTICS.md
++++ b/DIAGNOSTICS.md
+@@ -57,8 +57,13 @@
+ spline construction. `TRUCK_GEOMETRY_COLLAPSED_KNOT_SPAN` reports normalization
+ that would merge distinct knots; failed normalization leaves its input unchanged.
+ `TRUCK_GEOMETRY_ZERO_RANGE` remains the zero-range condition.
+-The fallible basis API reports arithmetic failure; its infallible wrapper still panics
+-on an error as documented. Constructor derivative bounds use degree-wide supports
++The fallible basis API rejects non-finite parameters and computed basis coefficients.
++The infallible basis evaluator preserves IEEE arithmetic results, including NaN or infinity
++from non-finite parameters or overflowing extrapolation; it still panics on zero-range or
++insufficient-knot structural errors. It does not convert arithmetic overflow into a new
++exception inside generic infallible curve/surface evaluation. Call the fallible basis API
++when arithmetic diagnostics are required, and validate computed geometry at solver or
++operation boundaries. Constructor derivative bounds use degree-wide supports
+ and define a conservative supported-domain policy; a failed bound is not proof that
+ an exact derivative is unrepresentable. Cuts, insertion, unchecked construction and
+ parameter transforms do not revalidate these constructor bounds. This does not provide
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -5,6 +5,11 @@
+ (2026-08-31); earlier history is in git.
+ 
+ ## Unreleased
++
++- The checked B-spline basis API reports non-finite parameters and coefficient arithmetic.
++  The infallible basis evaluator retains IEEE non-finite results for arithmetic overflow;
++  zero-range and insufficient-knot errors still panic. Call
++  `try_bspline_basis_functions` when callers need explicit arithmetic diagnostics.
+ 
+ - Breaking: STEP imports now preserve a declared spline pcurve master on supported extrusions over a competing spatial spline. Callers inspecting imported curve variants must accept `Curve3D::PCurve`; analytic line and conic canonicalization is unchanged.
+ 

@@ -1,0 +1,11 @@
+{
+  "parent_commit": "96ca84d1c2ac0f49b2b40e7d58615eb5ee0e2988",
+  "sha256": {
+    "truck-geometry/tests/clustered_knot_geometry.rs": "69e647eeec62012522a70c2735560695ebfc1390e82b076d97cb635868cb9b99",
+    "truck-geometry/tests/knot_derivative_geometry.rs": "cb2a4992104eef4f029864e830e18941808aae979344b903070a2321a606639e",
+    "truck-stepio/tests/clustered_spline_pcurve.rs": "c1c0296ac1a7fa6f83c3a1cce12c270eb164726c61bd4458263a894378183c07"
+  },
+  "parent_geometry": "parent-geometry.txt",
+  "parent_stepio": "parent-stepio.txt",
+  "limitations": "New error-enum tests are candidate-only, not counted as parent behavior failures. F5 production sources temporarily restored to this parent during these runs."
+}

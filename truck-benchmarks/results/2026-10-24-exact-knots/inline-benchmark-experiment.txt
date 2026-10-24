@@ -1,0 +1,36 @@
+$ cargo bench -p truck-benchmarks --bench actions -- tessellation::(thin_curved_loft|physical_extrusion_cap_accuracy|sphere_pole_tessellation|cylinder_tolerance|plate) --sample-count 7 --sample-size 1
+CARGO_BUILD_JOBS=12 RAYON_NUM_THREADS=1
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-modeling)
+   Compiling truck-meshalgo v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-meshalgo)
+   Compiling truck-drafting v0.1.0 (/home/krone/Development/Pieza_WS/truck/truck-drafting)
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+   Compiling truck-hlr v0.1.0 (/home/krone/Development/Pieza_WS/truck/truck-hlr)
+   Compiling truck-benchmarks v0.1.0 (/home/krone/Development/Pieza_WS/truck/truck-benchmarks)
+    Finished `bench` profile [optimized] target(s) in 14.33s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running benches/actions.rs (target/release/deps/actions-d92deb45127f2497)
+Timer precision: 10 ns
+actions                                fastest       │ slowest       │ median        │ mean          │ samples │ iters
+╰─ tessellation                                      │               │               │               │         │
+   ├─ cylinder_tolerance                             │               │               │               │         │
+   │  ├─ 0.001                         450.7 µs      │ 749.6 µs      │ 471.7 µs      │ 519.1 µs      │ 7       │ 7
+   │  ├─ 0.01                          111.5 µs      │ 118.5 µs      │ 113.7 µs      │ 114.5 µs      │ 7       │ 7
+   │  ╰─ 0.1                           45.37 µs      │ 49.66 µs      │ 45.88 µs      │ 46.57 µs      │ 7       │ 7
+   ├─ physical_extrusion_cap_accuracy  24.75 ms      │ 28.78 ms      │ 25.18 ms      │ 25.62 ms      │ 7       │ 7
+   ├─ plate                                          │               │               │               │         │
+   │  ├─ 1                             160.4 µs      │ 179.6 µs      │ 163 µs        │ 166.8 µs      │ 7       │ 7
+   │  ├─ 10                            1.072 ms      │ 1.101 ms      │ 1.084 ms      │ 1.084 ms      │ 7       │ 7
+   │  ├─ 30                            3.457 ms      │ 3.736 ms      │ 3.494 ms      │ 3.537 ms      │ 7       │ 7
+   │  ╰─ 100                           16.03 ms      │ 16.17 ms      │ 16.14 ms      │ 16.13 ms      │ 7       │ 7
+   ├─ sphere_pole_tessellation         24.57 ms      │ 25.56 ms      │ 24.92 ms      │ 24.91 ms      │ 7       │ 7
+   ╰─ thin_curved_loft                               │               │               │               │         │
+      ├─ 0.001                         100.1 ms      │ 104.7 ms      │ 100.4 ms      │ 101.2 ms      │ 7       │ 7
+      ├─ 0.01                          73.68 ms      │ 74.16 ms      │ 73.85 ms      │ 73.9 ms       │ 7       │ 7
+      ╰─ 0.05                          78.03 ms      │ 78.94 ms      │ 78.32 ms      │ 78.43 ms      │ 7       │ 7
+
+
+exit_code 0
+elapsed_seconds 18.049518

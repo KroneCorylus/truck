@@ -1,0 +1,35 @@
+$ cargo test --release -p truck-geometry --test basis_arithmetic_contract
+CARGO_BUILD_JOBS=12 RAYON_NUM_THREADS=1
+   Compiling truck-geotrait v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-geotrait)
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+    Finished `release` profile [optimized] target(s) in 1.68s
+     Running tests/basis_arithmetic_contract.rs (target/release/deps/basis_arithmetic_contract-ba7665e8ccde5a0e)
+
+running 3 tests
+test finite_extrapolation_overflow_is_ieee_infallibly_and_diagnosed_fallibly ... FAILED
+test basis_paths_share_finite_values_and_preserve_structural_errors ... ok
+test nonfinite_parameters_are_ieee_infallibly_and_rejected_fallibly ... FAILED
+
+failures:
+
+---- finite_extrapolation_overflow_is_ieee_infallibly_and_diagnosed_fallibly stdout ----
+
+thread 'finite_extrapolation_overflow_is_ieee_infallibly_and_diagnosed_fallibly' (437566) panicked at truck-geometry/src/nurbs/knot_vec.rs:211:27:
+Knot arithmetic is not finite; use a representable parameter domain.
+
+---- nonfinite_parameters_are_ieee_infallibly_and_rejected_fallibly stdout ----
+
+thread 'nonfinite_parameters_are_ieee_infallibly_and_rejected_fallibly' (437567) panicked at truck-geometry/src/nurbs/knot_vec.rs:211:27:
+Knot arithmetic is not finite; use a representable parameter domain.
+
+
+failures:
+    finite_extrapolation_overflow_is_ieee_infallibly_and_diagnosed_fallibly
+    nonfinite_parameters_are_ieee_infallibly_and_rejected_fallibly
+
+test result: FAILED. 1 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-geometry --test basis_arithmetic_contract`
+
+exit_code 101
+elapsed_seconds 1.700245

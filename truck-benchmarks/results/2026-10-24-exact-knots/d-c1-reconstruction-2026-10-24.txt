@@ -1,0 +1,76 @@
+C1 INPUT RECONSTRUCTION — SCOPED DESIGN / ORACLE — 2026-10-24
+Read-only investigation during coordinator F5 validation. No Rust builds, Cargo runs, production edits or imported-input mutation. Root checkpoint stated by coordinator:96ca84d1. These are independent numerical witnesses and a proposed scope, not implemented repairs or successful operation outcomes.
+
+CLAIMED CASES
+chamfer/dist_angle_sequence/C1/002..008 (7 imports); chamfer/dist_dist_sequence/C1/004..008 and chamfer/equal_dist_sequence/C1/004..008 (10 inconsistent inputs). Dist/equal007/008 can additionally contain the previously identified exact-knot PCurve conversion defect; validate that patch separately before final case dispositions.
+
+EVIDENCE / NUMERICAL METHOD
+Source is committed torus artifacts.zip, unchanged native STEP/BREP captures. target/d-c1-reconstruction-probe-2026-10-24.py implements independent de Boor evaluation, direct STEP profile/surface extraction, damped Newton with finite-difference Jacobians, and pivoted small linear solves. No Truck, OCCT, meshing or CAD fitting code is used. Three-support vertex solve uses six surface parameters and six point-coincidence equations. Two-support edge witness uses four parameters, three coincidence equations and a transverse guide station. Root residuals are local witnesses, not certified existence/uniqueness or global bounds. Output JSON records coordinates, parameters, residuals and domains. Local native tolerances were recovered from BREP TShapes by matching vertex coordinates (<7e-13) and the exact oriented edge endpoint pairs with location0; do not substitute capture-wide maximum tolerances.
+
+A. ANGLE002: RECONSTRUCT THE SHARED VERTEX FROM THREE SUPPORTS FIRST
+STEP24 supports32/69/354: shift8.511901859e-6; local vertex tolerance8.281879405e-5.
+STEP89 supports32/694/354: shift6.533992148e-5; local tolerance1.016820281e-4.
+STEP971 supports69/354/1029: shift2.048192130e-5; local tolerance9.108071214e-5.
+STEP1330 supports694/354/1029: shift7.109811665e-5; local tolerance1.066477426e-4.
+All four solve to coincident support points with residual<8e-16, inside their individual native vertex balls. For the two bottom vertices, x/y stay fixed and z changes: the support-defined intersection is visibly more reliable than the loose native vertex location.
+Importantly, rebuilt vertices lie on the EXISTING original space curves to strict Truck precision: edge88 residuals2.53e-11/5.90e-10; edge9704.08e-13/8.59e-13; edge1329~3e-13/1e-13 at nearest parameters; edge1358 worst1.504e-7. Edge1329 start parameter is-2.23e-8, but the actual bounded endpoint is only~3.6e-10 away, below existing endpoint near-check; do not loosen the bounded-domain guard. Chamfer support354 at vertex1330 also has tiny parameter overshoot~9e-9; physical/domain checks must stay explicit.
+Minimal demonstrated first step: solve one shared topological vertex against its three incident unchanged supports, then re-trim all incident original curves together. Do not independently snap each edge end or overwrite curve control points. Four individually selected closest edge endpoints could disagree and produce cracks. Do not refit original support surfaces. Four-star numerical proof is for angle002; later angle captures have additional corner stars that still require individual probes.
+The same first-chamfer degree14 guide control points/knots occur unchanged in all seven angle inputs. Its edge has local tolerance2.799793941e-6 throughout; vertex24's offending loose location persists, so a shared mechanism is justified. Later captures trim the guide and introduce new endpoints with tolerance only2.799793941e-6; never apply old vertex movement budgets to those new endpoints.
+
+B. DIST/EQUAL004..008: RECONSTRUCT THE TWO-SUPPORT EDGE INTERIOR, KEEP CORRECT VERTICES
+Exact de Boor calculations reproduce the prior strict-inclusion failures, independent of the knot implementation. The degree11 space curve, including controls and knots, is identical across004..008 within each family. Its original endpoints already solve their three-support stars:004 shifts~1e-13;005 new endpoints shift6.66e-10(dist) /1.282e-8(equal). Moving these vertices cannot repair the interior discrepancy.
+At004 worst sampled support-gap witnesses:
+- dist edge1605, guide1609, supports510/157: original gap1.434906890e-6; exact intersection correction2.257747342e-6; local BREP edge31 tolerance2.600798545e-6.
+- equal edge2102, guide2104, supports504/154: original gap1.434913465e-6; exact correction2.023531184e-6; local BREP edge34 tolerance2.604944033e-6.
+Both pair solves have residual<1e-16. Their exact intersections are OUTSIDE the finite chamfer patches: dist u=.1386208963 versus maximum.1385990441; equal u=-.0000218523 versus minimum0. Physical displacement to the clamped patch boundary is2.2601e-6/2.0262e-6. Thus even004 is not just a replacement edge on the existing bounded patch; it needs deliberately bounded polynomial support continuation and updated trim/domain coverage, or a rejection. Existing support-domain guards must not simply be bypassed.
+At005 worst sampled witnesses, exact correction exceeds the ORIGINAL LOCAL EDGE tolerance:
+- dist guide1155, supports1326/191: gap1.718133424e-6; correction2.713953855e-6 > edge tolerance2.600798545e-6.
+- equal guide27, supports523/191: gap2.002838046e-6; correction2.830848176e-6 > edge tolerance2.604944033e-6.
+These are concrete counterexamples to claiming that every precise two-support repair lies within the native edge ball. The same inherited guide and local edge tolerance persist in006..008, but this does not prove identical maxima on every shortened trim. Pair solves are transverse (~39.46/45.16 degrees at004), so this is approximation mismatch, not a singular tangent junction.
+Native tolerance describes the representation's uncertainty, not unlimited authorization to move geometry. Before an automatic repair contract, decide which representation is authoritative and what error envelope the result must preserve. Under a strict original-space-curve displacement budget equal to the local edge tolerance,005 witnesses must stay rejected. Do not quietly use global comparison.001, capture-wide max edge/vertex tolerance, a sum of unrelated tolerances, or an arbitrary halfway curve to call them repaired.
+
+MINIMAL PROPOSED IMPLEMENTATION BOUNDARY
+1. Land/validate exact-knot arithmetic separately, then rerun diagnostics on all17 unchanged STEP inputs.
+2. Implement only an explicitly budgeted trivalent imported-vertex recovery first, with original supports fixed, deterministic bounded local solve, one vertex shared by its whole incident star, original curve re-trimming, strict final endpoint/support consistency and clear rejection. Angle002 is its smallest real fixture. Check all incident curves and support domains, not just the four edges shown here.
+3. Independently investigate a constrained two-support boundary reconstruction for the degree11 chamfer/extrusion feature, anchored at already consistent endpoint stars. Use original curve stations only to select the branch; find the two-surface intersection, then prove correction bounds and finite-domain coverage. Preserve the support equations and existing neighboring boundary curves. Do not mix this larger task into vertex recovery.
+4. The archived STEP files carry generic uncertainty, while local BREP tolerances live outside the current generic STEP importer/capture task's per-entity schema. A production repair must not hardcode C1 IDs or borrow capture-wide tolerance maxima. A future explicit import-recovery budget/diagnostic interface needs a separate API design; a capture-only fixture adapter is proof tooling, not the kernel fix. Do not change the shared capture schema or consumer in this package without coordinator ownership.
+
+REGRESSIONS AND INDEPENDENT ORACLES
+- Synthetic three-support stars with deliberate loose vertices, distinct local budgets, both orientations, affine placements/scales and ambiguous/degenerate/budget-exceeding rejects; assert identical inputs on failed repair and one vertex identity across every incident edge. Preserve old bounded-curve invalid/reversed/closed-loop tests unchanged.
+- Real unchanged angle002 STEP/BREP provenance: four solved vertex displacements within individual stored radii, unchanged original surfaces and untouched geometry, strict original curve endpoints, valid oriented shell/solid, closed tessellation, STEP roundtrip. A repaired import is not a successful chamfer operation.
+- For two-support curves, independent analytic/procedural spline–extrusion examples with known intersection and endpoints; check both support residuals over every polynomial span, derivative/tangent direction, branch/order/reversal and domain coverage. A finite set of129 witnesses does not prove the full correction envelope: use Bernstein interval subdivision or another certified/adaptive bound for both geometric residual and displacement against the original guide before accepting a finite-domain extension.
+- Native004 candidate must prove bounded correction and material change; native005 counterexamples must preserve refusal under a2.60e-6 edge-displacement contract. Keep separate evidence if a different explicit contract is later approved.
+- Preserve material by keeping all support equations fixed and topology/orientation unchanged, restricting trim movements to the proven local boundary envelope. Independently integrate divergence flux on retained patches plus reconstructed boundaries, and compare signed material against the original native BREP/STEP with its approximation uncertainty separately stated. Mesh closure and a small volume difference alone do not prove correct material or eliminate self-intersection.
+- Parent proofs should isolate import/reconstruction behavior from the subsequent chamfer's success. Run the17 records unchanged only after the coordinator owns a build slot; no operation status can be promoted based on this design alone.
+
+UNCHANGED FEATURE ID / LOCAL EDGE TOLERANCE LEDGER
+dist_angle_sequence/002: guide['92'], edges['88'], local[{'step_edge': '88', 'brep_edge': '35', 'tolerance': 2.79979394098556e-06, 'endpoint_tolerances': [8.28187940527275e-05, 0.000101682028129452]}]
+dist_angle_sequence/003: guide['835'], edges['831'], local[{'step_edge': '831', 'brep_edge': '33', 'tolerance': 2.79979394098556e-06, 'endpoint_tolerances': [8.28187940527275e-05, 0.000101682028129452]}]
+dist_angle_sequence/004: guide['2427'], edges['2423'], local[{'step_edge': '2423', 'brep_edge': '27', 'tolerance': 2.79979394098556e-06, 'endpoint_tolerances': [8.28187940527275e-05, 0.000101682028129452]}]
+dist_angle_sequence/005: guide['3122'], edges['3120'], local[{'step_edge': '3120', 'brep_edge': '16', 'tolerance': 2.79979394098556e-06, 'endpoint_tolerances': [8.28187940527275e-05, 2.79979394098556e-06]}]
+dist_angle_sequence/006: guide['2627'], edges['2623'], local[{'step_edge': '2623', 'brep_edge': '51', 'tolerance': 2.79979394098556e-06, 'endpoint_tolerances': [8.28187940527275e-05, 2.79979394098556e-06]}]
+dist_angle_sequence/007: guide['4634'], edges['4630'], local[{'step_edge': '4630', 'brep_edge': '46', 'tolerance': 2.79979394098556e-06, 'endpoint_tolerances': [8.28187940527275e-05, 2.79979394098556e-06]}]
+dist_angle_sequence/008: guide['6267'], edges['6263'], local[{'step_edge': '6263', 'brep_edge': '37', 'tolerance': 2.79979394098556e-06, 'endpoint_tolerances': [8.28187940527275e-05, 2.79979394098556e-06]}]
+dist_dist_sequence/004: guide['1609'], edges['1605'], local[{'step_edge': '1605', 'brep_edge': '31', 'tolerance': 2.60079854502793e-06, 'endpoint_tolerances': [0.0001, 2.51847811954635e-05]}]
+dist_dist_sequence/005: guide['1155'], edges['1151'], local[{'step_edge': '1151', 'brep_edge': '55', 'tolerance': 2.60079854502793e-06, 'endpoint_tolerances': [0.0001, 2.60079854502793e-06]}]
+dist_dist_sequence/006: guide['5995'], edges['5991'], local[{'step_edge': '5991', 'brep_edge': '24', 'tolerance': 2.60079854502793e-06, 'endpoint_tolerances': [0.0001, 2.60079854502793e-06]}]
+dist_dist_sequence/007: guide['5435'], edges['5431'], local[{'step_edge': '5431', 'brep_edge': '39', 'tolerance': 2.60079854502793e-06, 'endpoint_tolerances': [0.0001, 2.60079854502793e-06]}]
+dist_dist_sequence/008: guide['5907'], edges['5903'], local[{'step_edge': '5903', 'brep_edge': '46', 'tolerance': 2.60079854502793e-06, 'endpoint_tolerances': [0.0001, 2.60079854502793e-06]}]
+equal_dist_sequence/004: guide['2104'], edges['2102'], local[{'step_edge': '2102', 'brep_edge': '34', 'tolerance': 2.60494403335457e-06, 'endpoint_tolerances': [0.0001, 2.52275971131575e-05]}]
+equal_dist_sequence/005: guide['27'], edges['21'], local[{'step_edge': '21', 'brep_edge': '61', 'tolerance': 2.60494403335457e-06, 'endpoint_tolerances': [0.0001, 2.60494403335457e-06]}]
+equal_dist_sequence/006: guide['3736'], edges['3732'], local[{'step_edge': '3732', 'brep_edge': '22', 'tolerance': 2.60494403335457e-06, 'endpoint_tolerances': [0.0001, 2.60494403335457e-06]}]
+equal_dist_sequence/007: guide['3218'], edges['3214'], local[{'step_edge': '3214', 'brep_edge': '39', 'tolerance': 2.60494403335457e-06, 'endpoint_tolerances': [0.0001, 2.60494403335457e-06]}]
+equal_dist_sequence/008: guide['3987'], edges['3983'], local[{'step_edge': '3983', 'brep_edge': '44', 'tolerance': 2.60494403335457e-06, 'endpoint_tolerances': [0.0001, 2.60494403335457e-06]}]
+
+Probe script SHA256 ef6b25b5e44c65b5d9843ce587766234252f7d5a0b4b452ff6923c64235a976d
+Probe JSON SHA256 475a2da877a813ee7537fba4ee8b7039af7592cb7d49460cb227cbfdd7ccf907
+
+REPRODUCE THE COMPLETE SMALL NUMERICAL REVIEW
+From repository root, run: python3 target/d-c1-reconstruction-reproduce-2026-10-24.py
+This imports the evaluator helper, reads the unchanged archive and four saved Rust-inspector parameter ranges, and writes target/d-c1-reconstruction-reproduced-2026-10-24.json. It invokes no CAD executables, compiler or Cargo. The reproduction was run successfully while root owned the build slot.
+target/d-c1-reconstruction-reproduce-2026-10-24.py SHA256 58cab45762881f43ad023c7ece4114d91739bacae6e43ba041957d9841e14ded
+target/d-c1-reconstruction-reproduced-2026-10-24.json SHA256 584a28912d6b4ded68969441a4ef6cacc32c61dc854a7ab344a253e358800696
+target/d-import-review-2026-10-24/dist_dist_sequence-004.txt SHA256 46b875a555610f21ae2dd28f6834b764da1fcbe478c5c0ee76d9c27ab8f0a3de
+target/d-import-review-2026-10-24/dist_dist_sequence-005.txt SHA256 c64beb26815c2a962dc103b29990b4696673779d9b5c0a0c4b08eecda67e8f33
+target/d-import-review-2026-10-24/equal_dist_sequence-004.txt SHA256 307180242ad6b58f23dc332d2b918b49d09380e6b1450120c30df31e9bdc7e9a
+target/d-import-review-2026-10-24/equal_dist_sequence-005.txt SHA256 4ea99ccdf661767eebb2b25a2d61ad1492a69af4ebe90a276ad5a9100b25ef7e

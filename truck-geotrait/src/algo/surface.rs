@@ -192,6 +192,12 @@ impl SsnpVector for Vector2 {
     where
         S: ParametricSurface<Point = Point2, Vector = Vector2>,
     {
+        if !u.is_finite() || !v.is_finite() {
+            return CalcOutput {
+                value: Vector2::zero(),
+                derivation: Matrix2::zero(),
+            };
+        }
         CalcOutput {
             value: surface.subs(u, v) - point,
             derivation: Matrix2::from_cols(surface.uder(u, v), surface.vder(u, v)),
@@ -212,6 +218,12 @@ impl SsnpVector for Vector3 {
     where
         S: ParametricSurface<Point = Self::Point, Vector = Self>,
     {
+        if !u.is_finite() || !v.is_finite() || !w.is_finite() {
+            return CalcOutput {
+                value: Vector3::zero(),
+                derivation: Matrix3::zero(),
+            };
+        }
         let diff = surface.subs(u, v) - point;
         let uder = surface.uder(u, v);
         let vder = surface.vder(u, v);
@@ -245,6 +257,9 @@ where
     P::Diff: SsnpVector<Point = P>,
     S: ParametricSurface<Point = P, Vector = P::Diff>,
 {
+    if !hint.0.is_finite() || !hint.1.is_finite() {
+        return None;
+    }
     // A polar seed can already be converged even though its Jacobian is singular.
     if surface.subs(hint.0, hint.1).distance2(point) < TOLERANCE2 * TOLERANCE2 {
         return Some(hint);
@@ -314,6 +329,12 @@ where
     S: ParametricSurface<Point = P, Vector = P::Diff>,
 {
     let function = move |param: Vector2| {
+        if !param.x.is_finite() || !param.y.is_finite() {
+            return CalcOutput {
+                value: Vector2::zero(),
+                derivation: Matrix2::zero(),
+            };
+        }
         // Thin patches amplify roundoff into parameter changes. An already exact
         // geometric residual must not fail because those changes keep oscillating.
         if surface.subs(param.x, param.y).near2(&point) {
@@ -346,9 +367,17 @@ where
     C: ParametricCurve3D,
     S: ParametricSurface3D,
 {
-    let function = move |Vector3 { x, y, z }| CalcOutput {
-        value: surface.subs(x, y) - curve.subs(z),
-        derivation: Matrix3::from_cols(surface.uder(x, y), surface.vder(x, y), -curve.der(z)),
+    let function = move |Vector3 { x, y, z }: Vector3| {
+        if !x.is_finite() || !y.is_finite() || !z.is_finite() {
+            return CalcOutput {
+                value: Vector3::zero(),
+                derivation: Matrix3::zero(),
+            };
+        }
+        CalcOutput {
+            value: surface.subs(x, y) - curve.subs(z),
+            derivation: Matrix3::from_cols(surface.uder(x, y), surface.vder(x, y), -curve.der(z)),
+        }
     };
     let hint = Vector3::new(hint0.0, hint0.1, hint1);
     let Vector3 { x, y, z } = newton::solve(function, hint, trials).ok()?;

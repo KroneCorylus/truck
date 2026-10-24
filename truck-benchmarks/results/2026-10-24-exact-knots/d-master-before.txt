@@ -1,0 +1,31 @@
+   Compiling truck-geotrait v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-geotrait)
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+   Compiling truck-topology v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-topology)
+   Compiling truck-polymesh v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-polymesh)
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-modeling)
+   Compiling truck-meshalgo v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-meshalgo)
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 11.96s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running tests/preferred_spline_master.rs (target/release/deps/preferred_spline_master-3cbc53100aeb918b)
+
+running 1 test
+test declared_spline_master_preserves_position_derivatives_and_domain ... FAILED
+
+failures:
+
+---- declared_spline_master_preserves_position_derivatives_and_domain stdout ----
+
+thread 'declared_spline_master_preserves_position_derivatives_and_domain' (363715) panicked at truck-stepio/tests/preferred_spline_master.rs:18:9:
+assertion failed: matches!(converted, Curve3D::PCurve(_))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    declared_spline_master_preserves_position_derivatives_and_domain
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+error: test failed, to rerun pass `-p truck-stepio --test preferred_spline_master`

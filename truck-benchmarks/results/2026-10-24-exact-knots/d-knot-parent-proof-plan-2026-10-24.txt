@@ -1,0 +1,51 @@
+EXACT-KNOT PATCH: PARENT-PROOF SEPARATION / CALLER REVIEW — 2026-10-24
+No builds/Cargo/source changes performed during this review. Root currently has coordinator-owned F5 source/test/changelog edits; preserve them.
+
+PATCH APPLICABILITY
+The full patch now conflicts ONLY at CHANGELOG.md because coordinator added F5's entry after the patch was authored. Read-only `git apply --check --exclude=CHANGELOG.md target/d-knot-exact.patch` passes. After F5 integration, root should apply non-changelog hunks and insert the knot Breaking entry alongside the existing entries manually. Do not regenerate a diff against stale patch-tree/CHANGELOG.md, which would remove coordinator text. Patch SHA remains the value in accompanying JSON.
+
+IDENTICAL-SOURCE BEHAVIOR PROOF
+Source files under target/d-import-review-2026-10-24/patch-tree:
+1 truck-geometry/tests/clustered_knot_geometry.rs:5tests, existing APIs only. Existing standalone parent run0pass/5fail. Exact multiplicity/grouping, curve cuts, normalization, surface u/v cuts, degrees/end multiplicities.
+2 truck-geometry/tests/knot_derivative_geometry.rs:2tests, existing APIs only. Existing standalone parent run0pass/2fail. Independent curved Bernstein rational/polynomial derivative and surface mixed derivative oracles, insertion/removal/reversal.
+3 truck-stepio/tests/clustered_spline_pcurve.rs:1test, existing APIs only. Existing standalone parent run0pass/1fail. Isoparametric conversion preserves spatial image/endpoints across nearby distinct knots.
+Copy these exact bytes to a coordinator-prepared isolated checkout of the selected implementation parent; copy the exact same bytes to candidate. Do not copy new errors/tests into parent, alter old tests or adapt these behavior assertions. Record base SHA, files/digests, commands, exit status and logs on both sides.
+Future parent commands, only after the single Cargo slot is released:
+CARGO_BUILD_JOBS=12 CARGO_TARGET_DIR=/absolute/isolated/parent-target cargo test --release -p truck-geometry --test clustered_knot_geometry --test knot_derivative_geometry
+CARGO_BUILD_JOBS=12 CARGO_TARGET_DIR=/absolute/isolated/parent-target cargo test --release -p truck-stepio --test clustered_spline_pcurve
+These commands are not executed by this design file. Parent geometry source should be the actual chosen pre-knot integration base, ideally the integrated F5 achievement once stable, not an assumed stale rlib. Standalone exploratory rustc logs already record production dependency graph in target/d-import-review-2026-10-24/build.json but do not replace the final clean Cargo parent proof.
+
+NEW API ERROR CONTRACT PROOF
+truck-geometry/tests/knot_arithmetic_errors.rs uses the deliberately new Error::NonFiniteKnotArithmetic / Error::CollapsedKnotSpan variants explicitly. It cannot compile against an unmodified parent; do NOT count that compiler failure as a behavior regression. Keep this two-test candidate suite separate. It covers finite-error classification/atomic recovery and G's tiny interior span with broad degree supports remaining supported. Pre-patch numerical counterexamples and prior code-string/acceptance probes can explain the bug, but are not byte-identical new-enum parent tests.
+Future candidate command after integration:
+CARGO_BUILD_JOBS=12 cargo test --release -p truck-geometry --test clustered_knot_geometry --test knot_derivative_geometry --test knot_arithmetic_errors
+CARGO_BUILD_JOBS=12 cargo test --release -p truck-stepio --test clustered_spline_pcurve --test spline_seam_pcurves
+Then required affected full geometry/modeling/STEP/shapeops suites, all-target Clippy, single-thread benchmark smoke and original-scale replays. Preserve separately documented known pcurve_derivation precision failure; never weaken it to claim a green workspace. Performance measurements needed for speed claims, not provided here.
+
+READ-ONLY ROOT TEST/CALLER REVIEW
+- geometry cubic_approximation_tolerance.rs checks multiplicities generated from exactly shared segment endpoints, including tiny geometric fitting tolerances; unchanged assertions should remain mandatory. These are fitting tolerances, not permission to coalesce distinct parameter knots.
+- geometry circle.rs full rotated/reversed rational circle checks exact knot grouping and positive weights; unchanged and relevant.
+- stepio spline_seam_pcurves.rs asserts values and first/second derivatives, chart speed, reversal, roundoff-only seams, true diagonal/domain overshoot rejection. Keep unchanged; new exact-knot behavior is not a representation switch.
+- geometry bspcurve.rs try_concat maps DifferentBackFront and otherwise treats the error as internal invariant; this patch does not introduce new errors into KnotVec::try_concat, so its match does not need an API migration merely because the Error enum expands. Still exercise its existing tests.
+- No other root match found exhaustively destructuring the geometry variants changed here. Error::code mapping is explicitly extended in the patch.
+- Current consumer ../PiezaCAD: kernel/face.rs builds integer repeated knots, kernel/evaluation.rs already uses exact repeated-end comparisons, kernel/loft.rs:290 invokes curve.cut; no consumer calls to multiplicity/to_single_multi/u/vcut or direct Error-variant matches found. Existing API names stay; migration note states changed behavior and new error variants. No consumer modification or dependency change proposed.
+- Conservative domain bounds apply only at checked construction. Cut/insertion/unchecked construction/parameter transformation can bypass them; no universal safety guarantee. Nonfinite control-point computations and arbitrary high derivatives remain outside this bounded fix. Candidate tests may expose further numerical conditioning issues near inserted knots; resolve from evidence rather than weakening oracle assertions.
+
+PATH HASHES
+{
+  "behavior_tests_that_compile_on_parent": [
+    "truck-geometry/tests/clustered_knot_geometry.rs",
+    "truck-geometry/tests/knot_derivative_geometry.rs",
+    "truck-stepio/tests/clustered_spline_pcurve.rs"
+  ],
+  "candidate_api_guard_tests": [
+    "truck-geometry/tests/knot_arithmetic_errors.rs"
+  ],
+  "sha256": {
+    "truck-geometry/tests/clustered_knot_geometry.rs": "69e647eeec62012522a70c2735560695ebfc1390e82b076d97cb635868cb9b99",
+    "truck-geometry/tests/knot_derivative_geometry.rs": "cb2a4992104eef4f029864e830e18941808aae979344b903070a2321a606639e",
+    "truck-stepio/tests/clustered_spline_pcurve.rs": "c1c0296ac1a7fa6f83c3a1cce12c270eb164726c61bd4458263a894378183c07",
+    "truck-geometry/tests/knot_arithmetic_errors.rs": "38e09ff41ef31e632d792f8c74b92921dc531ea580f25da0365bd038a6bde8e1"
+  },
+  "patch_sha256": "0356fdf8e418bacd386170bbe75af597202443b669eda2248269e06feada1e87"
+}

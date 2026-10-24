@@ -1,0 +1,11 @@
+{
+  "parent_commit": "96ca84d1c2ac0f49b2b40e7d58615eb5ee0e2988",
+  "test_sha256": "e13f3dbf7e285dbc4abb02e55273c767f8bb7e3a1d1c502af8225b90d6d6cb66",
+  "behavior_regressions": 2,
+  "structural_and_finite_control_tests": 1,
+  "parent_log": "parent-basis-contract.txt",
+  "initial_candidate_log": "basis-contract-before.txt",
+  "existing_rejection_backtrace": "r10-basis-backtrace.txt",
+  "parent_production_restore": "target/d-basis-parent-proof.py; all modified tracked src/*.rs restored to HEAD during proof, original candidate restored in finally",
+  "assertions": "Unchanged between parent, initial candidate and corrected candidate."
+}

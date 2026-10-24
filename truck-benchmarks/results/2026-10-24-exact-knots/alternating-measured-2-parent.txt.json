@@ -1,0 +1,19 @@
+{
+  "command": [
+    "target/d-parent-benchmark-binary",
+    "--bench",
+    "tessellation::(thin_curved_loft|physical_extrusion_cap_accuracy|sphere_pole_tessellation|cylinder_tolerance|plate)",
+    "--sample-count",
+    "7",
+    "--sample-size",
+    "1"
+  ],
+  "cwd": "/home/krone/Development/Pieza_WS/truck",
+  "started_utc": "2026-10-24T12:25:53.283574+00:00",
+  "elapsed_seconds": 3.688897268000801,
+  "exit_code": 0,
+  "environment": {
+    "CARGO_BUILD_JOBS": "12",
+    "RAYON_NUM_THREADS": "1"
+  }
+}

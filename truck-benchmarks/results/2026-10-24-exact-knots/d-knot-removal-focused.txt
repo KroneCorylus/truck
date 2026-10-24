@@ -1,0 +1,10 @@
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+    Finished `release` profile [optimized] target(s) in 1.70s
+     Running tests/knot_derivative_geometry.rs (target/release/deps/knot_derivative_geometry-ab97ca0fc77d7daa)
+
+running 2 tests
+test surface_first_second_and_mixed_derivatives_keep_their_polynomial_values ... ok
+test curved_polynomial_and_rational_derivatives_survive_chart_changes_and_knot_edits ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

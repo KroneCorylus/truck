@@ -1,0 +1,760 @@
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -5,6 +5,17 @@
+ (2026-08-31); earlier history is in git.
+ 
+ ## Unreleased
++
++- Breaking: `KnotVec::multiplicity` and `to_single_multi` now distinguish all
++  numerically distinct knots; `BSplineCurve::cut` and `BSplineSurface::ucut`/`vcut`
++  retain the requested parameter instead of snapping within the geometric tolerance.
++  Canonicalize intentional repeated knots explicitly before construction. Small finite parameter domains are
++  supported when conservative first/second derivative coefficient bounds over
++  degree-wide knot supports are representable.
++  Handle new `truck_geometry::errors::Error::NonFiniteKnotArithmetic` and
++  `CollapsedKnotSpan` variants for unrepresentable arithmetic and normalization
++  that would merge distinct knots. Normalize the parameter chart before
++  construction where appropriate; normalization rejects collisions without mutation.
+ 
+ - Round mixed curved corners with one concave rim and two convex edges sharing a
+   planar wall. Continue internal open-chain contacts when the original trim fails,
+--- a/DIAGNOSTICS.md
++++ b/DIAGNOSTICS.md
+@@ -50,6 +50,20 @@
+ decimal **strings** to preserve all 64 bits in JavaScript. Parameter values serialize as text
+ so that `NaN` and infinities survive reporting. Raw pointer-based topology IDs are not used
+ as serialized entity references.
++
++Geometry reports `TRUCK_GEOMETRY_NON_FINITE_KNOT_ARITHMETIC` when knot domains,
++span reciprocals, first/second derivative coefficient bounds, or calculated basis
++coefficients are non-finite. Use a representable parameter chart; `KnotVec::try_normalize` can normalize tiny finite domains before
++spline construction. `TRUCK_GEOMETRY_COLLAPSED_KNOT_SPAN` reports normalization
++that would merge distinct knots; failed normalization leaves its input unchanged.
++`TRUCK_GEOMETRY_ZERO_RANGE` remains the zero-range condition.
++The fallible basis API reports arithmetic failure; its infallible wrapper still panics
++on an error as documented. Constructor derivative bounds use degree-wide supports
++and define a conservative supported-domain policy; a failed bound is not proof that
++an exact derivative is unrepresentable. Cuts, insertion, unchecked construction and
++parameter transforms do not revalidate these constructor bounds. This does not provide
++universal panic-free spline evaluation or finite arbitrary-order derivatives and
++computations with extreme control point values.
+ 
+ ## APIs
+ 
+--- a/truck-geometry/src/errors.rs
++++ b/truck-geometry/src/errors.rs
+@@ -23,6 +23,14 @@
+     /// ```
+     #[error("This knot vector consists single value.")]
+     ZeroRange,
++    /// A knot domain, span reciprocal, supported derivative bound or basis coefficient is not finite.
++    /// Constructor bounds are sufficient conditions, not proof that every rejected
++    /// curve has an unrepresentable exact derivative.
++    #[error("Knot arithmetic is not finite; use a representable parameter domain.")]
++    NonFiniteKnotArithmetic,
++    /// Normalization would merge distinct knots into the same floating-point parameter.
++    #[error("Knot normalization collapses a nonzero span.")]
++    CollapsedKnotSpan,
+     /// Fails concatting two knot vectors if there is a difference between the back knot of
+     /// the former knot vector and the front knot of the latter knot vector.
+     /// # Examples
+@@ -217,6 +225,8 @@
+     pub fn code(&self) -> &'static str {
+         match self {
+             Self::ZeroRange => "TRUCK_GEOMETRY_ZERO_RANGE",
++            Self::NonFiniteKnotArithmetic => "TRUCK_GEOMETRY_NON_FINITE_KNOT_ARITHMETIC",
++            Self::CollapsedKnotSpan => "TRUCK_GEOMETRY_COLLAPSED_KNOT_SPAN",
+             Self::DifferentBackFront(..) => "TRUCK_GEOMETRY_DIFFERENT_BACK_FRONT",
+             Self::NotClampedKnotVector => "TRUCK_GEOMETRY_NOT_CLAMPED_KNOT_VECTOR",
+             Self::NotSortedVector => "TRUCK_GEOMETRY_NOT_SORTED_VECTOR",
+--- a/truck-geometry/src/nurbs/bspcurve.rs
++++ b/truck-geometry/src/nurbs/bspcurve.rs
+@@ -24,6 +24,8 @@
+     /// * If there are no control points, returns [`Error::EmptyControlPoint<f64>s`].
+     /// * If the number of knots is less than or equal to the one of control points, returns [`Error::TooShortKnotVector`].
+     /// * If the range of the knot vector is zero, returns [`Error::ZeroRange`].
++    /// * Non-finite knot domains or unrepresentable first/second derivative bounds return
++    ///   [`Error::NonFiniteKnotArithmetic`].
+     ///
+     /// [`Error::EmptyControlPoint<f64>s`]: errors/enum.Error.html#variant.EmptyControlPoint<f64>s
+     /// [`Error::TooShortKnotVector`]: errors/enum.Error.html#variant.TooShortKnotVector
+@@ -36,9 +38,8 @@
+                 knot_vec.len(),
+                 control_points.len(),
+             ))
+-        } else if knot_vec.range_length().so_small() {
+-            Err(Error::ZeroRange)
+         } else {
++            knot_vec.validate_spans(knot_vec.len() - control_points.len() - 1)?;
+             Ok(BSplineCurve::new_unchecked(knot_vec, control_points))
+         }
+     }
+@@ -979,7 +980,7 @@
+ }
+ 
+ impl<P: ControlPoint<f64> + Tolerance> Cut for BSplineCurve<P> {
+-    fn cut(&mut self, mut t: f64) -> BSplineCurve<P> {
++    fn cut(&mut self, t: f64) -> BSplineCurve<P> {
+         let degree = self.degree();
+ 
+         let idx = match self.knot_vec.floor(t) {
+@@ -992,8 +993,7 @@
+                 return bspline;
+             }
+         };
+-        let s = if t.near(&self.knot_vec[idx]) {
+-            t = self.knot_vec[idx];
++        let s = if t == self.knot_vec[idx] {
+             self.knot_vec.multiplicity(idx)
+         } else {
+             0
+--- a/truck-geometry/src/nurbs/bspsurface.rs
++++ b/truck-geometry/src/nurbs/bspsurface.rs
+@@ -45,9 +45,16 @@
+                 knot_vecs.1.len(),
+                 control_points[0].len(),
+             ))
+-        } else if knot_vecs.0.range_length().so_small() || knot_vecs.1.range_length().so_small() {
+-            Err(Error::ZeroRange)
+         } else {
++            let u_bound = knot_vecs
++                .0
++                .validate_spans(knot_vecs.0.len() - control_points.len() - 1)?;
++            let v_bound = knot_vecs
++                .1
++                .validate_spans(knot_vecs.1.len() - control_points[0].len() - 1)?;
++            if !(u_bound * v_bound).is_finite() {
++                return Err(Error::NonFiniteKnotArithmetic);
++            }
+             let len = control_points[0].len();
+             if control_points.iter().any(|vec| vec.len() != len) {
+                 Err(Error::IrregularControlPoints)
+@@ -1210,7 +1217,7 @@
+     ///     }
+     /// }
+     /// ```
+-    pub fn ucut(&mut self, mut u: f64) -> BSplineSurface<P> {
++    pub fn ucut(&mut self, u: f64) -> BSplineSurface<P> {
+         let degree = self.udegree();
+ 
+         let idx = match self.uknot_vec().floor(u) {
+@@ -1224,8 +1231,7 @@
+                 return bspline;
+             }
+         };
+-        let s = if u.near(&self.uknot_vec()[idx]) {
+-            u = self.uknot_vec()[idx];
++        let s = if u == self.uknot_vec()[idx] {
+             self.uknot_vec().multiplicity(idx)
+         } else {
+             0
+@@ -1703,7 +1709,7 @@
+                     .row_curve(self.control_points[0].len() - 1)
+                     .parameter_division(range.0, tol)
+                     .0;
+-                (merge(first, second), vec![range.1.0, range.1.1])
++                (merge(first, second), vec![range.1 .0, range.1 .1])
+             }
+             [true, _] => {
+                 let first = self.column_curve(0).parameter_division(range.1, tol).0;
+@@ -1711,7 +1717,7 @@
+                     .column_curve(self.control_points.len() - 1)
+                     .parameter_division(range.1, tol)
+                     .0;
+-                (vec![range.0.0, range.0.1], merge(first, second))
++                (vec![range.0 .0, range.0 .1], merge(first, second))
+             }
+             _ => algo::surface::parameter_division(self, range, tol),
+         }
+--- a/truck-geometry/src/nurbs/knot_vec.rs
++++ b/truck-geometry/src/nurbs/knot_vec.rs
+@@ -20,6 +20,54 @@
+             true => 0.0,
+             false => self[self.len() - 1] - self[0],
+         }
++    }
++
++    pub(super) fn validate_range(&self) -> Result<()> {
++        let range = self.range_length();
++        if range == 0.0 {
++            return Err(Error::ZeroRange);
++        }
++        if !self[0].is_finite()
++            || !self[self.len() - 1].is_finite()
++            || !range.is_finite()
++            || !(1.0 / range).is_finite()
++        {
++            return Err(Error::NonFiniteKnotArithmetic);
++        }
++        Ok(())
++    }
++
++    pub(super) fn validate_spans(&self, degree: usize) -> Result<f64> {
++        self.validate_range()?;
++        if self.windows(2).any(|pair| {
++            let span = pair[1] - pair[0];
++            span != 0.0 && !(1.0 / span).is_finite()
++        }) {
++            return Err(Error::NonFiniteKnotArithmetic);
++        }
++        let support_bound = |order: usize| {
++            let width = self
++                .windows(order + 1)
++                .map(|knots| knots[order] - knots[0])
++                .filter(|width| *width > 0.0)
++                .fold(f64::INFINITY, f64::min);
++            2.0 * order as f64 / width
++        };
++        // Derivative denominators span degree-wide supports, not just adjacent knots.
++        let first = if degree > 0 {
++            support_bound(degree)
++        } else {
++            0.0
++        };
++        let second = if degree > 1 {
++            first * support_bound(degree - 1)
++        } else {
++            0.0
++        };
++        if !first.is_finite() || !second.is_finite() {
++            return Err(Error::NonFiniteKnotArithmetic);
++        }
++        Ok(first)
+     }
+ 
+     /// Returns whether two knot vectors have the same range.
+@@ -72,9 +120,7 @@
+     /// assert_eq!(knot_vec.multiplicity(5), 3);
+     /// ```
+     #[inline(always)]
+-    pub fn multiplicity(&self, i: usize) -> usize {
+-        self.iter().filter(|u| self[i].near(u)).count()
+-    }
++    pub fn multiplicity(&self, i: usize) -> usize { self.iter().filter(|u| self[i] == **u).count() }
+ 
+     /// Adds a knot and return the index of the added knot.
+     /// # Examples
+@@ -170,6 +216,8 @@
+     /// # Failures
+     /// - If the range of the knot vector is zero, returns [`Error::ZeroRange`].
+     /// - If the length of `self` is not more than `degree`, returns [`Error::TooLargeDegree`].
++    /// - If the parameter, knot arithmetic or resulting basis coefficients are non-finite,
++    ///   returns [`Error::NonFiniteKnotArithmetic`].
+     /// # Remarks
+     /// In this package, the B-spline basis function is based on the characteristic function of
+     /// the right-open intervals [s, t). So, the value corresponding to the end point t = t_n is always 0.0.
+@@ -234,10 +282,12 @@
+         der_rank: usize,
+         t: f64,
+     ) -> Result<BasisWindow> {
++        self.validate_range()?;
++        if !t.is_finite() {
++            return Err(Error::NonFiniteKnotArithmetic);
++        }
+         let n = self.len() - 1;
+-        if self[0].near(&self[n]) {
+-            return Err(Error::ZeroRange);
+-        } else if n < degree {
++        if n < degree {
+             return Err(Error::TooLargeDegree(n + 1, degree));
+         }
+         if degree < der_rank {
+@@ -289,6 +339,9 @@
+             }
+         }
+ 
++        if eval.iter().any(|value| !value.is_finite()) {
++            return Err(Error::NonFiniteKnotArithmetic);
++        }
+         let len = usize::min(degree + 1, n - degree - global_base);
+         Ok(BasisWindow::new(global_base, _eval, len, n - degree))
+     }
+@@ -340,7 +393,9 @@
+ 
+     /// Normalizes the knot vector i.e. makes the first value 0 and the last value 1.
+     /// # Failures
+-    /// Returns [`Error::ZeroRange`] if the range of the knot vector is so small.
++    /// Returns [`Error::ZeroRange`] for a zero range, [`Error::NonFiniteKnotArithmetic`]
++    /// for non-finite arithmetic, or [`Error::CollapsedKnotSpan`] if distinct knots
++    /// would become equal. Failure leaves the vector unchanged.
+     /// # Examples
+     /// ```
+     /// use truck_geometry::prelude::KnotVec;
+@@ -351,15 +406,31 @@
+     /// ```
+     pub fn try_normalize(&mut self) -> Result<&mut Self> {
+         let range = self.range_length();
+-        if range.so_small() {
++        if range == 0.0 {
+             return Err(Error::ZeroRange);
+         }
+-        Ok(self.transform(1.0 / range, -self[0] / range))
++        let first = self[0];
++        if !first.is_finite() || !range.is_finite() {
++            return Err(Error::NonFiniteKnotArithmetic);
++        }
++        let normalized: Vec<_> = self.iter().map(|knot| (knot - first) / range).collect();
++        if normalized.iter().any(|knot| !knot.is_finite()) {
++            return Err(Error::NonFiniteKnotArithmetic);
++        }
++        if self
++            .windows(2)
++            .zip(normalized.windows(2))
++            .any(|(before, after)| before[0] < before[1] && after[0] >= after[1])
++        {
++            return Err(Error::CollapsedKnotSpan);
++        }
++        self.0 = normalized;
++        Ok(self)
+     }
+ 
+     /// Normalizes the knot vector i.e. makes the first value 0 and the last value 1.
+     /// # Panics
+-    /// Panic occurs if the range of the knot vector is so small.
++    /// Panics if the range is zero, normalization is non-finite, or distinct knots collapse.
+     /// # Examples
+     /// ```
+     /// use truck_geometry::prelude::KnotVec;
+@@ -501,7 +572,7 @@
+         let mut mult = 1;
+         while let Some(knot) = iter.next() {
+             if let Some(next) = iter.peek() {
+-                if knot.near(next) {
++                if knot == *next {
+                     mult += 1;
+                 } else {
+                     knots.push(*knot);
+--- a/truck-geometry/src/nurbs/mod.rs
++++ b/truck-geometry/src/nurbs/mod.rs
+@@ -181,7 +181,8 @@
+ #[doc(hidden)]
+ #[inline(always)]
+ pub const fn inv_or_zero(delta: f64) -> f64 {
+-    if delta.abs() <= TOLERANCE {
++    // Knot spans are parameter intervals; a small nonzero span is not a repeated knot.
++    if delta == 0.0 {
+         0.0
+     } else {
+         1.0 / delta
+--- /dev/null
++++ b/truck-geometry/tests/clustered_knot_geometry.rs
+@@ -0,0 +1,134 @@
++use truck_geometry::prelude::*;
++
++fn clustered(scale: f64, offset: f64) -> BSplineCurve<Point3> {
++    let knots = [0., 0., 0., 0.5, 0.5, 0.5000001, 0.5000001, 1., 1., 1.]
++        .into_iter()
++        .map(|t| offset + scale * t)
++        .collect();
++    BSplineCurve::new(
++        knots,
++        (0..7).map(|j| Point3::new(0.3, j as f64, 2.)).collect(),
++    )
++}
++
++#[test]
++fn nearby_distinct_knots_are_not_repetitions() {
++    for scale in [1., 1e-8, 1e4] {
++        let c = clustered(scale, 0.3 * scale);
++        let k = c.knot_vec();
++        assert_eq!(k.multiplicity(3), 2);
++        assert_eq!(k.multiplicity(5), 2);
++        let (_, counts) = k.to_single_multi();
++        assert_eq!(counts, vec![3, 2, 2, 3]);
++    }
++}
++
++fn check_piecewise_line(c: &BSplineCurve<Point3>, scale: f64, offset: f64, a: f64, b: f64) {
++    let breaks = [
++        offset,
++        offset + scale * 0.5,
++        offset + scale * 0.5000001,
++        offset + scale,
++    ];
++    for segment in 0..3 {
++        let lo = breaks[segment];
++        let hi = breaks[segment + 1];
++        for fraction in [0.125, 0.25, 0.5, 0.75, 0.875] {
++            let t = lo + fraction * (hi - lo);
++            if t < a || t > b {
++                continue;
++            }
++            let local = (t - lo) / (hi - lo);
++            let expected = Point3::new(0.3, 2. * (segment as f64 + local), 2.);
++            assert!(c.subs(t).distance(expected) < 1e-8);
++            let speed = 2. / (hi - lo);
++            assert!((c.der(t) / speed - Vector3::unit_y()).magnitude() < 1e-8);
++            assert!((c.der2(t) * (hi - lo).powi(2)).magnitude() < 1e-8);
++        }
++    }
++}
++
++#[test]
++fn clustered_spans_keep_geometry_and_derivatives_across_affine_charts() {
++    for scale in [1., 1e-8, 1e4] {
++        let offset = 0.3 * scale;
++        let c = clustered(scale, offset);
++        check_piecewise_line(&c, scale, offset, offset, offset + scale);
++        assert!(c.front().distance(Point3::new(0.3, 0., 2.)) < 1e-12);
++        assert!(c.back().distance(Point3::new(0.3, 6., 2.)) < 1e-12);
++    }
++}
++
++#[test]
++fn exact_cut_preserves_nearby_knot_spans_and_trim_endpoints() {
++    for scale in [1., 1e-8, 1e4] {
++        let offset = 0.3 * scale;
++        for end in [0.50000005, 0.5000001, 0.50000015] {
++            let mut c = clustered(scale, offset);
++            let (a, b) = (offset + scale * 0.1, offset + scale * end);
++            let expected_front = c.subs(a);
++            let expected_back = c.subs(b);
++            c = c.cut(a);
++            c.cut(b);
++            assert_eq!(c.range_tuple(), (a, b));
++            assert_eq!(c.degree(), 2);
++            assert_eq!(c.knot_vec().multiplicity(0), 3);
++            assert_eq!(c.knot_vec().multiplicity(c.knot_vec().len() - 1), 3);
++            assert!(c.front().distance(expected_front) < 1e-8);
++            assert!(c.back().distance(expected_back) < 1e-8);
++            check_piecewise_line(&c, scale, offset, a, b);
++        }
++    }
++}
++
++#[test]
++fn normalization_preserves_distinct_knots_and_exact_multiplicities() {
++    for scale in [1., 1e-8, 1e4] {
++        let mut knots = clustered(scale, 0.3 * scale).knot_vec().clone();
++        knots.try_normalize().unwrap();
++        let (single, counts) = knots.to_single_multi();
++        assert_eq!(counts, vec![3, 2, 2, 3]);
++        assert_eq!(single.len(), 4);
++        assert!(single[1] < single[2]);
++        assert!((single[1] - 0.5).abs() < 1e-14);
++        assert!((single[2] - 0.5000001).abs() < 1e-14);
++    }
++}
++
++#[test]
++fn both_surface_cut_directions_preserve_degree_and_clustered_spans() {
++    for swap in [false, true] {
++        let curve = clustered(1., 0.);
++        let points = (0..7)
++            .map(|i| vec![Point3::new(i as f64, 0., 2.), Point3::new(i as f64, 1., 2.)])
++            .collect();
++        let mut original =
++            BSplineSurface::new((curve.knot_vec().clone(), KnotVec::bezier_knot(1)), points);
++        if swap {
++            original.swap_axes();
++        }
++        for cut in [0.50000005, 0.5000001, 0.50000015] {
++            let mut left = original.clone();
++            let right = if swap { left.vcut(cut) } else { left.ucut(cut) };
++            for part in [&left, &right] {
++                assert_eq!(
++                    (part.udegree(), part.vdegree()),
++                    if swap { (1, 2) } else { (2, 1) }
++                );
++                let knots = if swap {
++                    part.vknot_vec()
++                } else {
++                    part.uknot_vec()
++                };
++                assert_eq!(knots.multiplicity(0), 3);
++                assert_eq!(knots.multiplicity(knots.len() - 1), 3);
++                let (a, b) = (knots[0], knots[knots.len() - 1]);
++                assert!(a == cut || b == cut);
++                for t in [a, a + (b - a) * 0.25, a + (b - a) * 0.75, b] {
++                    let (u, v) = if swap { (0.3, t) } else { (t, 0.3) };
++                    assert!(part.subs(u, v).distance(original.subs(u, v)) < 1e-8);
++                }
++            }
++        }
++    }
++}
+--- /dev/null
++++ b/truck-geometry/tests/knot_arithmetic_errors.rs
+@@ -0,0 +1,75 @@
++use truck_geometry::prelude::*;
++
++#[test]
++fn unrepresentable_knot_arithmetic_returns_errors_and_normalization_is_atomic() {
++    use truck_geometry::errors::{Error, Result};
++    fn arithmetic<T>(result: Result<T>) {
++        assert!(matches!(result, Err(Error::NonFiniteKnotArithmetic)));
++    }
++    let tiny = f64::from_bits(1);
++    let tiny_knots = KnotVec::from(vec![0., 0., tiny, tiny]);
++    let points = vec![Point3::origin(), Point3::new(1., 0., 0.)];
++    arithmetic(BSplineCurve::try_new(tiny_knots.clone(), points.clone()));
++    arithmetic(BSplineSurface::try_new(
++        (tiny_knots.clone(), KnotVec::bezier_knot(1)),
++        vec![points.clone(), points.clone()],
++    ));
++    arithmetic(tiny_knots.try_bspline_basis_functions(1, 0, 0.));
++    let mut recoverable = tiny_knots;
++    recoverable.try_normalize().unwrap();
++    assert_eq!(recoverable.as_slice(), &[0., 0., 1., 1.]);
++    arithmetic(BSplineCurve::try_new(
++        KnotVec::from(vec![0., 0., tiny, 1., 1.]),
++        vec![Point3::origin(); 3],
++    ));
++    for values in [
++        vec![0., 0., f64::INFINITY, f64::INFINITY],
++        vec![-f64::MAX, -f64::MAX, f64::MAX, f64::MAX],
++    ] {
++        let mut knots = KnotVec::from(values);
++        let before = knots.clone();
++        arithmetic(knots.try_normalize());
++        assert_eq!(knots, before);
++        arithmetic(BSplineCurve::try_new(knots.clone(), points.clone()));
++        arithmetic(knots.try_bspline_basis_functions(1, 0, 0.));
++    }
++    let quadratic = KnotVec::from(vec![0., 0., 0., 1e-200, 1e-200, 1e-200]);
++    arithmetic(BSplineCurve::try_new(
++        quadratic.clone(),
++        vec![
++            Point3::origin(),
++            Point3::new(1., 2., 0.),
++            Point3::new(3., 0., 1.),
++        ],
++    ));
++    assert!(quadratic.try_bspline_basis_functions(2, 0, 5e-201).is_ok());
++    arithmetic(quadratic.try_bspline_basis_functions(2, 2, 5e-201));
++    let narrow = KnotVec::from(vec![0., 0., 1e-200, 1e-200]);
++    arithmetic(BSplineSurface::try_new(
++        (narrow.clone(), narrow),
++        vec![points.clone(), points],
++    ));
++    let mut collision = KnotVec::from(vec![-1., -1., 0., 1e-20, 1., 1.]);
++    let before = collision.clone();
++    assert!(matches!(
++        collision.try_normalize(),
++        Err(Error::CollapsedKnotSpan)
++    ));
++    assert_eq!(collision, before);
++}
++
++#[test]
++fn a_tiny_interior_span_with_wide_degree_supports_remains_supported() {
++    let knots = KnotVec::from(vec![-1., -1., -1., 0., 1e-200, 0.5, 1., 1., 1.]);
++    let points = (0..6)
++        .map(|i| Point3::new(i as f64, (i * i) as f64, (i % 2) as f64))
++        .collect();
++    let curve = BSplineCurve::try_new(knots, points).unwrap();
++    for t in [-0.75, -0.1, 0., 5e-201, 0.25, 0.75, 1.] {
++        let p = curve.subs(t);
++        assert!(p.x.is_finite() && p.y.is_finite() && p.z.is_finite());
++        for d in [curve.der(t), curve.der2(t)] {
++            assert!(d.x.is_finite() && d.y.is_finite() && d.z.is_finite());
++        }
++    }
++}
+--- /dev/null
++++ b/truck-geometry/tests/knot_derivative_geometry.rs
+@@ -0,0 +1,175 @@
++use truck_geometry::prelude::*;
++
++fn bezier(values: &[Vector4], t: f64) -> Vector4 {
++    let n = values.len() - 1;
++    values
++        .iter()
++        .enumerate()
++        .map(|(i, p)| {
++            let binomial = match (n, i) {
++                (2, 1) => 2.,
++                (3, 1 | 2) => 3.,
++                _ => 1.,
++            };
++            *p * (binomial * t.powi(i as i32) * (1. - t).powi((n - i) as i32))
++        })
++        .sum()
++}
++
++fn rational_reference(controls: &[Vector4], t: f64) -> (Point3, Vector3, Vector3) {
++    let degree = controls.len() - 1;
++    let first: Vec<_> = controls
++        .windows(2)
++        .map(|p| (p[1] - p[0]) * degree as f64)
++        .collect();
++    let second: Vec<_> = first
++        .windows(2)
++        .map(|p| (p[1] - p[0]) * (degree - 1) as f64)
++        .collect();
++    let (h, d, dd) = (bezier(controls, t), bezier(&first, t), bezier(&second, t));
++    let position = h.truncate() / h.w;
++    let derivative = (d.truncate() - position * d.w) / h.w;
++    let second = (dd.truncate() - position * dd.w - 2. * derivative * d.w) / h.w;
++    (Point3::from_vec(position), derivative, second)
++}
++
++#[test]
++fn curved_polynomial_and_rational_derivatives_survive_chart_changes_and_knot_edits() {
++    for degree in [2, 3] {
++        for rational in [false, true] {
++            for scale in [1., 1e-8] {
++                let offset = 0.3 * scale;
++                let points = [
++                    Point3::new(0., 0., 0.),
++                    Point3::new(1., 2., 1.),
++                    Point3::new(3., -1., 2.),
++                    Point3::new(-1., 4., 3.),
++                ][..=degree]
++                    .to_vec();
++                let weights = [1., 0.7, 1.3, 0.9][..=degree]
++                    .iter()
++                    .map(|w| if rational { *w } else { 1. })
++                    .collect::<Vec<_>>();
++                let homogeneous: Vec<_> = points
++                    .iter()
++                    .zip(&weights)
++                    .map(|(p, w)| p.to_homogeneous() * *w)
++                    .collect();
++                let knots = [vec![offset; degree + 1], vec![offset + scale; degree + 1]].concat();
++                if !rational {
++                    let polynomial =
++                        BSplineCurve::new(KnotVec::from(knots.clone()), points.clone());
++                    for x in [0.1, 0.3, 0.8] {
++                        let (position, first, second) = rational_reference(&homogeneous, x);
++                        assert!(polynomial.subs(offset + scale * x).distance(position) < 1e-8);
++                        assert!(
++                            (polynomial.der(offset + scale * x) * scale - first).magnitude() < 1e-7
++                        );
++                        assert!(
++                            (polynomial.der2(offset + scale * x) * scale.powi(2) - second)
++                                .magnitude()
++                                < 1e-6
++                        );
++                    }
++                }
++                let mut curve: NurbsCurve<Vector4> = NurbsCurve::try_from_bspline_and_weights(
++                    BSplineCurve::new(KnotVec::from(knots), points),
++                    weights,
++                )
++                .unwrap();
++                for edited in [false, true] {
++                    if edited {
++                        curve
++                            .add_knot(offset + scale * 0.3)
++                            .add_knot(offset + scale * 0.3000001);
++                    }
++                    for reverse in [false, true] {
++                        let mut c = curve.clone();
++                        if reverse {
++                            c.invert();
++                        }
++                        for x in [0., 0.1, 0.30000005, 0.5, 0.9, 1.] {
++                            let t = offset + scale * x;
++                            let parameter = if reverse {
++                                1. - (t - offset) / scale
++                            } else {
++                                (t - offset) / scale
++                            };
++                            let (position, first, second) =
++                                rational_reference(&homogeneous, parameter);
++                            assert!(c.subs(t).distance(position) < 1e-8);
++                            assert!(
++                                (c.der(t) * scale - first * if reverse { -1. } else { 1. })
++                                    .magnitude()
++                                    < 1e-7
++                            );
++                            assert!((c.der2(t) * scale.powi(2) - second).magnitude() < 1e-6);
++                        }
++                    }
++                }
++                for x in [0.3000001, 0.3] {
++                    let knot = offset + scale * x;
++                    let index = curve.knot_vec().iter().position(|t| *t == knot).unwrap();
++                    curve.try_remove_knot(index).unwrap();
++                }
++                for x in [0.1, 0.3, 0.8] {
++                    let (position, first, second) = rational_reference(&homogeneous, x);
++                    assert!(curve.subs(offset + scale * x).distance(position) < 1e-8);
++                    assert!((curve.der(offset + scale * x) * scale - first).magnitude() < 1e-7);
++                    assert!(
++                        (curve.der2(offset + scale * x) * scale.powi(2) - second).magnitude()
++                            < 1e-6
++                    );
++                }
++            }
++        }
++    }
++}
++
++#[test]
++fn surface_first_second_and_mixed_derivatives_keep_their_polynomial_values() {
++    for scale in [1., 1e-8] {
++        let knots = KnotVec::from(vec![0., 0., 0., scale, scale, scale]);
++        let square = [0., 0., 1.];
++        let controls = (0..3)
++            .map(|i| {
++                (0..3)
++                    .map(|j| {
++                        let (u, v) = (i as f64 / 2., j as f64 / 2.);
++                        Point3::new(square[i] + u * v, square[j] + 2. * u * v, u + v)
++                    })
++                    .collect()
++            })
++            .collect();
++        let mut s = BSplineSurface::new((knots.clone(), knots), controls);
++        s.add_uknot(0.3 * scale).add_uknot(0.3000001 * scale);
++        s.add_vknot(0.6 * scale).add_vknot(0.6000001 * scale);
++        for u in [0.1, 0.30000005, 0.8] {
++            for v in [0.2, 0.60000005, 0.9] {
++                let (a, b) = (u * scale, v * scale);
++                assert!(
++                    s.subs(a, b)
++                        .distance(Point3::new(u * u + u * v, v * v + 2. * u * v, u + v))
++                        < 1e-8
++                );
++                assert!(
++                    (s.uder(a, b) * scale - Vector3::new(2. * u + v, 2. * v, 1.)).magnitude()
++                        < 1e-7
++                );
++                assert!(
++                    (s.vder(a, b) * scale - Vector3::new(u, 2. * v + 2. * u, 1.)).magnitude()
++                        < 1e-7
++                );
++                assert!(
++                    (s.uuder(a, b) * scale.powi(2) - Vector3::new(2., 0., 0.)).magnitude() < 1e-6
++                );
++                assert!(
++                    (s.uvder(a, b) * scale.powi(2) - Vector3::new(1., 2., 0.)).magnitude() < 1e-6
++                );
++                assert!(
++                    (s.vvder(a, b) * scale.powi(2) - Vector3::new(0., 2., 0.)).magnitude() < 1e-6
++                );
++            }
++        }
++    }
++}
+--- /dev/null
++++ b/truck-stepio/tests/clustered_spline_pcurve.rs
+@@ -0,0 +1,26 @@
++use truck_modeling::Curve;
++use truck_stepio::r#in::step_geometry::*;
++#[test]
++fn clustered_spline_pcurve_trim_preserves_its_image() {
++    let vk = KnotVec::from(vec![0., 0., 0., 0.5, 0.5, 0.5000001, 0.5000001, 1., 1., 1.]);
++    let points = (0..2)
++        .map(|i| {
++            (0..7)
++                .map(|j| Point3::new(i as f64, j as f64, 2.))
++                .collect()
++        })
++        .collect();
++    let surface = BSplineSurface::new((KnotVec::bezier_knot(1), vk), points);
++    let raw = Curve3D::PCurve(PCurve::new(
++        Box::new(Curve2D::Line(Line(
++            Point2::new(0.3, 0.1),
++            Point2::new(0.3, 0.50000015),
++        ))),
++        Box::new(Surface::BSplineSurface(surface)),
++    ));
++    let modeled = Curve::try_from(&raw).unwrap();
++    for t in [0., 0.25, 0.5, 0.75, 1.] {
++        assert!(raw.subs(t).distance(modeled.subs(t)) < 1e-10);
++    }
++    assert!(raw.back().distance(modeled.back()) < 1e-10);
++}

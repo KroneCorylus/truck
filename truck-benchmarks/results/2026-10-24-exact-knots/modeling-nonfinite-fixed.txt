@@ -1,0 +1,17 @@
+$ cargo test --release -p truck-modeling --lib bad_seeded_results_fall_back_and_off_surface_curves_stay_rejected -- --nocapture
+CARGO_BUILD_JOBS=12 RAYON_NUM_THREADS=1
+   Compiling truck-geotrait v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-geotrait)
+   Compiling truck-topology v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-topology)
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-modeling)
+    Finished `release` profile [optimized] target(s) in 3.04s
+     Running unittests src/lib.rs (target/release/deps/truck_modeling-cd403b47d5ae25bb)
+
+running 1 test
+test geometry::inclusion_tests::bad_seeded_results_fall_back_and_off_surface_curves_stay_rejected ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 12 filtered out; finished in 0.01s
+
+
+exit_code 0
+elapsed_seconds 3.073048

@@ -1,0 +1,189 @@
+$ cargo test --release -p truck-meshalgo
+CARGO_BUILD_JOBS=12 RAYON_NUM_THREADS=1
+   Compiling truck-geotrait v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-geotrait)
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+   Compiling truck-topology v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-topology)
+   Compiling truck-polymesh v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-polymesh)
+   Compiling truck-modeling v0.6.0 (/home/krone/Development/Pieza_WS/truck/truck-modeling)
+   Compiling truck-meshalgo v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-meshalgo)
+    Finished `release` profile [optimized] target(s) in 11.82s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running unittests src/lib.rs (target/release/deps/truck_meshalgo-6f1452336a80c8f6)
+
+running 25 tests
+test analyzers::collision::collide_triangles_test ... ok
+test analyzers::point_cloud::hashed_point_cloud::distance_point_triangle_test ... ok
+test analyzers::collision::triangle_seams_survive_roundoff_without_turning_coplanar_faces_into_crossings ... ok
+test analyzers::in_out_judge::inside100 ... ok
+test analyzers::splitting::into_components_test ... ok
+test filters::optimizing::tests::degenerate_polygon_test ... ok
+test tessellation::triangulation::par_bench ... ignored
+test filters::optimizing::tests::welding_preserves_transitive_connections_and_strict_tolerance ... ok
+test tessellation::triangulation::tests::culling_preserves_near_boundary_rejection ... ok
+test tessellation::triangulation::tests::normal_orientation_preserves_ambiguous_meridian_facets_and_flips_reliable_ones ... ok
+test analyzers::collision::sweep_finds_every_crossing_pair ... ok
+test tessellation::triangulation::tests::thin_planar_faces_keep_all_nonzero_triangles ... ok
+test tessellation::triangulation::tests::fitted_edge_endpoints_use_shared_topology_vertices ... ok
+test tessellation::triangulation::tests::polar_ellipsoid_boundaries_keep_the_large_angular_sector ... ok
+test tessellation::triangulation::tests::holes_islands_disconnected_and_concave_loops ... ok
+test analyzers::point_cloud::hashed_point_cloud::space_division_distance ... ok
+test tessellation::triangulation::tests::one_worker_and_parallel_tessellation_are_identical ... ok
+test tessellation::triangulation::tests::culling_matches_full_winding_scan ... ok
+test filters::optimizing::tests::welding_matches_pairwise_components ... ok
+test tessellation::triangulation::tests::nonperiodic_closed_profile_boundaries_keep_their_parameter_branch ... ok
+test tessellation::triangulation::tests::polar_cap_seams_preserve_fitted_trim_positions ... ok
+test tessellation::triangulation::tests::polar_cap_meshes_close_the_periodic_seam_at_the_boundary_start ... ok
+test tessellation::triangulation::tests::polar_cap_meridians_keep_the_shared_boundary_samples ... ok
+test filters::optimizing::tests::large_equal_attribute_groups ... ok
+test tessellation::triangulation::tests::refinement_uses_shared_pole_positions ... ok
+
+test result: ok. 24 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.16s
+
+     Running tests/R9-revolve-fine-tessellation.rs (target/release/deps/R9_revolve_fine_tessellation-824ff1e71e2fe152)
+
+running 4 tests
+test fine_shaft_faces_are_bounded ... ok
+test fine_shaft_welding_without_normals_control ... ok
+test fine_shaft_robust_triangulation_is_bounded_and_closed ... ok
+test fine_shaft_triangulation_is_bounded_and_closed ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/analyzers/main.rs (target/release/deps/analyzers-16976e8fb27a25f9)
+
+running 12 tests
+test point_cloud::tetrahedron_distance ... ok
+test topology::extract_boundaries0 ... ok
+test splitting::extract_planes_test ... ok
+test splitting::into_component_test ... ok
+test topology::extract_boundaries1 ... ok
+test topology::shell_condition ... ok
+test collision::in_plane ... ok
+test collision::sphere_interference ... ok
+test volume::triangle_prism ... ok
+test collision::collision_sphere ... ok
+test point_cloud::in_sphere ... ok
+test point_cloud::sphere_distance ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/collapsed_trim.rs (target/release/deps/collapsed_trim-7ed670e9b8c2ce47)
+
+running 9 tests
+test collapsed_inner_trim_is_refined_instead_of_filling_the_hole ... ok
+test curved_lenses_survive_scale_rotation_and_coarse_tolerance ... ok
+test a_clockwise_planar_trim_does_not_mean_the_whole_surface ... ok
+test a_tiny_hole_is_recovered_without_resampling_its_outer_wire ... ok
+test collapsed_trim_refinement_agrees_between_serial_and_parallel ... ok
+test recovering_a_contour_does_not_resample_an_unrelated_face ... ok
+test sub_tolerance_contours_do_not_depend_on_a_global_retry_budget ... ok
+test coarse_tessellation_preserves_arc_chord_faces ... ok
+test irrecoverable_trim_is_reported_without_inventing_a_face ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/cone_apex.rs (target/release/deps/cone_apex-53fd80a349544ef0)
+
+running 1 test
+test cone_apex_meshes_at_the_requested_tolerance ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/cylindrical_terminal_fan.rs (target/release/deps/cylindrical_terminal_fan-fe6e5c4f4190ff2a)
+
+running 4 tests
+test subdivided_terminal_fan_preserves_mesh_material ... ok
+test subdivided_terminal_fan_preserves_robust_mesh_material ... ok
+test cylindrical_terminal_fan_preserves_mesh_material ... ok
+test cylindrical_terminal_fan_preserves_robust_mesh_material ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.31s
+
+     Running tests/filters/main.rs (target/release/deps/filters-1a6c7e2ad1054413)
+
+running 9 tests
+test normal_filter::add_naive_normals_test ... ok
+test optimizing::remove_unused_attrs_test ... ok
+test optimizing::remove_degenerate_faces_test ... ok
+test structuring::triangulate_test ... ok
+test subdivision::loop_subdivision ... ok
+test normal_filter::normalize_normals_test ... ok
+test structuring::quadrangulate_test ... ok
+test optimizing::put_together_same_attrs_test ... ok
+test normal_filter::add_smooth_normals ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/loft_winding.rs (target/release/deps/loft_winding-b7f6a9df26624082)
+
+running 1 test
+test thin_curved_loft_keeps_closed_mesh_at_display_tolerances ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.09s
+
+     Running tests/pole_winding.rs (target/release/deps/pole_winding-af79d10060c1ecb9)
+
+running 1 test
+test revolved_poles_keep_boundary_parameters_on_their_spatial_points ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+     Running tests/tessellation/main.rs (target/release/deps/tessellation-064ab07c1e8ce140)
+
+running 9 tests
+test triangulation::special_cylinder ... ok
+test triangulation::robust_closed ... ok
+test triangulation::special_cylinder_csolid ... ok
+test triangulation::compare_occt_mesh ... ok
+test triangulation::compare_occt_mesh_csolid ... ok
+test triangulation::large_number_meshing ... ok
+test triangulation::solid_is_closed ... ok
+test triangulation::csolid_is_closed ... ok
+test triangulation::stepped_extrusion_refines_interior_diagonals ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/vtk.rs (target/release/deps/vtk-81f15668060b67f9)
+
+running 7 tests
+test edge ... ok
+test cshell ... ok
+test face ... ok
+test polygon ... ok
+test vertex ... ok
+test shell ... ok
+test wire ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests truck_meshalgo
+
+running 21 tests
+test truck-meshalgo/src/analyzers/splitting.rs - analyzers::splitting::Splitting::components (line 91) ... ok
+test truck-meshalgo/src/filters/structuring.rs - filters::structuring::StructuringFilter::triangulate (line 7) ... ok
+test truck-meshalgo/src/analyzers/volume.rs - analyzers::volume::CalcVolume::volume (line 37) ... ok
+test truck-meshalgo/src/filters/optimizing.rs - filters::optimizing::OptimizingFilter::remove_degenerate_faces (line 34) ... ok
+test truck-meshalgo/src/analyzers/splitting.rs - analyzers::splitting::Splitting::create_mesh_by_face_indices (line 8) ... ok
+test truck-meshalgo/src/analyzers/volume.rs - analyzers::volume::CalcVolume::volume (line 14) ... ok
+test truck-meshalgo/src/filters/normal_filters.rs - filters::normal_filters::NormalFilters::make_face_compatible_to_normal (line 128) ... ok
+test truck-meshalgo/src/filters/structuring.rs - filters::structuring::StructuringFilter::quadrangulate (line 55) ... ok
+test truck-meshalgo/src/analyzers/in_out_judge.rs - analyzers::in_out_judge::IncludingPointInDomain::inside (line 65) ... ok
+test truck-meshalgo/src/analyzers/in_out_judge.rs - analyzers::in_out_judge::IncludingPointInDomain::signed_crossing_faces (line 38) ... ok
+test truck-meshalgo/src/filters/optimizing.rs - filters::optimizing::OptimizingFilter::remove_unused_attrs (line 10) ... ok
+test truck-meshalgo/src/analyzers/volume.rs - analyzers::volume::CalcVolume::center_of_gravity (line 99) ... ok
+test truck-meshalgo/src/filters/normal_filters.rs - filters::normal_filters::NormalFilters::make_normal_compatible_to_face (line 158) ... ok
+test truck-meshalgo/src/filters/normal_filters.rs - filters::normal_filters::NormalFilters::add_smooth_normals (line 88) ... ok
+test truck-meshalgo/src/filters/normal_filters.rs - filters::normal_filters::NormalFilters::normalize_normals (line 9) ... ok
+test truck-meshalgo/src/filters/optimizing.rs - filters::optimizing::OptimizingFilter::put_together_same_attrs (line 67) ... ok
+test truck-meshalgo/src/analyzers/splitting.rs - analyzers::splitting::Splitting::extract_planes (line 56) ... ok
+test truck-meshalgo/src/filters/normal_filters.rs - filters::normal_filters::NormalFilters::add_naive_normals (line 42) ... ok
+test truck-meshalgo/src/analyzers/point_cloud/mod.rs - analyzers::point_cloud::WithPointCloud::is_clung_to_by (line 14) ... ok
+test truck-meshalgo/src/tessellation/mod.rs - tessellation::MeshableShape::triangulation (line 148) ... ok
+test truck-meshalgo/src/tessellation/mod.rs - tessellation::RobustMeshableShape::robust_triangulation (line 189) ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.03s
+
+
+exit_code 0
+elapsed_seconds 15.740465

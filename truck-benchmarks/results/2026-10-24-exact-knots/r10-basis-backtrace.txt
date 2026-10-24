@@ -1,0 +1,34 @@
+$ env RUST_BACKTRACE=1 target/release/deps/R10_sequential_fillet-fb6bd51e7e27b261 --exact collapsed_contacts_reject_cap_consumption_and_short_walls --nocapture
+CARGO_BUILD_JOBS=12 RAYON_NUM_THREADS=1
+
+running 1 test
+
+thread 'collapsed_contacts_reject_cap_consumption_and_short_walls' (436944) panicked at truck-geometry/src/nurbs/knot_vec.rs:211:27:
+Knot arithmetic is not finite; use a representable parameter domain.
+stack backtrace:
+   0: __rustc::rust_begin_unwind
+   1: core::panicking::panic_fmt
+   2: <truck_geometry::nurbs::KnotVec>::bspline_basis_functions
+   3: <core::iter::adapters::map::Map<core::ops::range::RangeInclusive<usize>, <truck_geometry::nurbs::BSplineCurve<cgmath::vector::Vector4<f64>> as truck_geotrait::traits::curve::ParametricCurve>::ders::{closure#0}> as core::iter::traits::iterator::Iterator>::next
+   4: <truck_base::ders::CurveDers<cgmath::vector::Vector4<f64>> as core::iter::traits::collect::FromIterator<cgmath::vector::Vector4<f64>>>::from_iter::<core::iter::adapters::map::Map<core::ops::range::RangeInclusive<usize>, <truck_geometry::nurbs::BSplineCurve<cgmath::vector::Vector4<f64>> as truck_geotrait::traits::curve::ParametricCurve>::ders::{closure#0}>>
+   5: <truck_modeling::geometry::Curve as truck_geotrait::traits::curve::ParametricCurve>::der_n
+   6: <truck_base::ders::CurveDers<cgmath::vector::Vector3<f64>> as core::iter::traits::collect::FromIterator<cgmath::vector::Vector3<f64>>>::from_iter::<core::iter::adapters::map::Map<core::ops::range::RangeInclusive<usize>, <truck_shapeops::fillet::along_wire::ExtendedSpine<truck_modeling::geometry::Curve> as truck_geotrait::traits::curve::ParametricCurve>::ders::{closure#0}>>
+   7: <truck_geometry::decorators::RbfSurface<truck_shapeops::fillet::along_wire::ExtendedSpine<truck_modeling::geometry::Curve>, truck_modeling::geometry::Surface, truck_modeling::geometry::Surface, truck_shapeops::fillet::along_wire::ContinuedRadius<f64>>>::search_contact_cross_point::<1, &truck_modeling::geometry::Curve>
+   8: <truck_geometry::decorators::RbfSurface<truck_shapeops::fillet::along_wire::ExtendedSpine<truck_modeling::geometry::Curve>, truck_modeling::geometry::Surface, truck_modeling::geometry::Surface, truck_shapeops::fillet::along_wire::ContinuedRadius<f64>>>::search_contact_curve1_cross_point_with_adjacent_edge::<&truck_modeling::geometry::Curve>
+   9: truck_shapeops::fillet::along_wire::fillet_along_wire_impl::<truck_modeling::geometry::Curve, truck_modeling::geometry::Surface, f64>
+  10: truck_shapeops::fillet::along_wire::try_fillet_along_wire::<truck_modeling::geometry::Curve, truck_modeling::geometry::Surface, f64>
+  11: truck_shapeops::fillet::modeling::fillet_solid_along_wire::<f64>
+  12: <R10_sequential_fillet::collapsed_contacts_reject_cap_consumption_and_short_walls::{closure#0} as core::ops::function::FnOnce<()>>::call_once
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
+test collapsed_contacts_reject_cap_consumption_and_short_walls ... FAILED
+
+failures:
+
+failures:
+    collapsed_contacts_reject_cap_consumption_and_short_walls
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.00s
+
+
+exit_code 101
+elapsed_seconds 0.006346

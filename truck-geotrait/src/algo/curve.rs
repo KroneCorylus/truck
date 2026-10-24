@@ -35,6 +35,12 @@ where
     C::Vector: InnerSpace<Scalar = f64> + Tolerance,
 {
     let function = move |t: f64| {
+        if !t.is_finite() {
+            return CalcOutput {
+                value: 0.,
+                derivation: 0.,
+            };
+        }
         let diff = curve.subs(t) - point;
         let der = curve.der(t);
         let der2 = curve.der2(t);
@@ -53,6 +59,12 @@ where
     C::Point: EuclideanSpace<Scalar = f64, Diff = C::Vector>,
     C::Vector: InnerSpace<Scalar = f64> + Tolerance, {
     let function = move |t: f64| {
+        if !t.is_finite() {
+            return CalcOutput {
+                value: 0.,
+                derivation: 0.,
+            };
+        }
         let diff = curve.subs(t) - point;
         let der = curve.der(t);
         CalcOutput {

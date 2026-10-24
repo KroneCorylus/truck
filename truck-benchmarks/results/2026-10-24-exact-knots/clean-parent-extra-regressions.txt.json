@@ -1,0 +1,28 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "truck-geometry",
+    "-p",
+    "truck-stepio",
+    "-p",
+    "truck-geotrait",
+    "--test",
+    "clustered_surface_knot_removal",
+    "--test",
+    "preferred_spline_master",
+    "--test",
+    "nonfinite_surface_search",
+    "--no-fail-fast"
+  ],
+  "cwd": "/home/krone/Development/Pieza_WS/truck",
+  "started_utc": "2026-10-24T11:15:22.805553+00:00",
+  "elapsed_seconds": 12.383236560001023,
+  "exit_code": 101,
+  "environment": {
+    "CARGO_BUILD_JOBS": "12",
+    "RAYON_NUM_THREADS": "1"
+  }
+}

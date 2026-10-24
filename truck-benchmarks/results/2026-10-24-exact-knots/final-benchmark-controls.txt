@@ -1,0 +1,28 @@
+$ cargo bench -p truck-benchmarks --bench actions -- tessellation::(thin_curved_loft|physical_extrusion_cap_accuracy|sphere_pole_tessellation|cylinder_tolerance|plate) --sample-count 7 --sample-size 1
+CARGO_BUILD_JOBS=12 RAYON_NUM_THREADS=1
+    Finished `bench` profile [optimized] target(s) in 0.07s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running benches/actions.rs (target/release/deps/actions-d92deb45127f2497)
+Timer precision: 10 ns
+actions                                fastest       │ slowest       │ median        │ mean          │ samples │ iters
+╰─ tessellation                                      │               │               │               │         │
+   ├─ cylinder_tolerance                             │               │               │               │         │
+   │  ├─ 0.001                         523.6 µs      │ 633 µs        │ 555.1 µs      │ 561.7 µs      │ 7       │ 7
+   │  ├─ 0.01                          135.8 µs      │ 143.3 µs      │ 138 µs        │ 138.7 µs      │ 7       │ 7
+   │  ╰─ 0.1                           54.83 µs      │ 56.54 µs      │ 55.33 µs      │ 55.51 µs      │ 7       │ 7
+   ├─ physical_extrusion_cap_accuracy  26.85 ms      │ 32.58 ms      │ 27.06 ms      │ 28.06 ms      │ 7       │ 7
+   ├─ plate                                          │               │               │               │         │
+   │  ├─ 1                             173 µs        │ 183.1 µs      │ 174.8 µs      │ 176.7 µs      │ 7       │ 7
+   │  ├─ 10                            1.17 ms       │ 1.236 ms      │ 1.19 ms       │ 1.199 ms      │ 7       │ 7
+   │  ├─ 30                            3.795 ms      │ 3.917 ms      │ 3.847 ms      │ 3.852 ms      │ 7       │ 7
+   │  ╰─ 100                           17.58 ms      │ 17.86 ms      │ 17.66 ms      │ 17.71 ms      │ 7       │ 7
+   ├─ sphere_pole_tessellation         27.04 ms      │ 27.43 ms      │ 27.09 ms      │ 27.13 ms      │ 7       │ 7
+   ╰─ thin_curved_loft                               │               │               │               │         │
+      ├─ 0.001                         111.2 ms      │ 115 ms        │ 112.1 ms      │ 112.6 ms      │ 7       │ 7
+      ├─ 0.01                          74.03 ms      │ 74.34 ms      │ 74.12 ms      │ 74.15 ms      │ 7       │ 7
+      ╰─ 0.05                          78.55 ms      │ 79.06 ms      │ 78.76 ms      │ 78.8 ms       │ 7       │ 7
+
+
+exit_code 0
+elapsed_seconds 3.784536

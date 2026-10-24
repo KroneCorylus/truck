@@ -1,0 +1,144 @@
+   Compiling truck-stepio v0.3.0 (/home/krone/Development/Pieza_WS/truck/truck-stepio)
+   Compiling truck-shapeops v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-shapeops)
+    Finished `release` profile [optimized] target(s) in 16.31s
+warning: the following packages contain code that will be rejected by a future version of Rust: nom v3.2.1, quick-xml v0.22.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running unittests src/lib.rs (target/release/deps/truck_stepio-b7b43b0b0579bc8f)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.00s
+
+     Running tests/affine_conics.rs (target/release/deps/affine_conics-05d16d269f866291)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests/analytic_boundaries.rs (target/release/deps/analytic_boundaries-fb5b8443f518c8f4)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests/assembly_strings.rs (target/release/deps/assembly_strings-70ac22ada726b6a7)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests/bounded_import_edges.rs (target/release/deps/bounded_import_edges-9d45a71c0da10741)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s
+
+     Running tests/clustered_spline_pcurve.rs (target/release/deps/clustered_spline_pcurve-d2c5c69351c0c7e2)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests/diagonal_import_pcurves.rs (target/release/deps/diagonal_import_pcurves-7079c91c86e03701)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+
+     Running tests/extruded_import_pcurves.rs (target/release/deps/extruded_import_pcurves-c0dd109f19668d53)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
+     Running tests/import_nonelliptic_conics.rs (target/release/deps/import_nonelliptic_conics-543f1b706d3eeacb)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.00s
+
+     Running tests/imported_support_bounds.rs (target/release/deps/imported_support_bounds-b13348f67321254f)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s
+
+     Running tests/input/main.rs (target/release/deps/input-6fbc81d87a07ac31)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 46 filtered out; finished in 0.00s
+
+     Running tests/io/main.rs (target/release/deps/io-32914bd29946d1cf)
+
+running 1 test
+test ioi::surface_curves_read_as_space_curves ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.00s
+
+     Running tests/linear_import_pcurves.rs (target/release/deps/linear_import_pcurves-925a63f3f6f01bae)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+
+     Running tests/output/main.rs (target/release/deps/output-a545e174f1fc27dc)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 8 filtered out; finished in 0.00s
+
+     Running tests/polar_cap_bounds.rs (target/release/deps/polar_cap_bounds-edce60019426fd7e)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+
+     Running tests/preferred_spline_master.rs (target/release/deps/preferred_spline_master-3cbc53100aeb918b)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests/spherical_corners.rs (target/release/deps/spherical_corners-18bb35ecf34e495f)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests/spherical_import_pcurves.rs (target/release/deps/spherical_import_pcurves-d9e5d8c15673d385)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
+     Running tests/spline_extrusion_pcurves.rs (target/release/deps/spline_extrusion_pcurves-4ba909802c90236e)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+
+     Running tests/spline_pcurve_bounds.rs (target/release/deps/spline_pcurve_bounds-987fb49b05a49227)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+
+     Running tests/spline_seam_pcurves.rs (target/release/deps/spline_seam_pcurves-95f08e2cc17b3ae2)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+
+     Running tests/toroidal_seam_pcurves.rs (target/release/deps/toroidal_seam_pcurves-d8baf56321eab898)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+
+     Running tests/unclamped_curve_domains.rs (target/release/deps/unclamped_curve_domains-8b78d70139690d3c)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+

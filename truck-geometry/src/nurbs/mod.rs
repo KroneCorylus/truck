@@ -181,7 +181,8 @@ mod nurbssurface;
 #[doc(hidden)]
 #[inline(always)]
 pub const fn inv_or_zero(delta: f64) -> f64 {
-    if delta.abs() <= TOLERANCE {
+    // Knot spans are parameter intervals; a small nonzero span is not a repeated knot.
+    if delta == 0.0 {
         0.0
     } else {
         1.0 / delta

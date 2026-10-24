@@ -1,0 +1,123 @@
+D / package E: sequential C2 chamfer construction investigation, 2026-10-24
+READ-ONLY SOURCE REVIEW; no Cargo/builds/production edits. Numerical STEP inspection only.
+
+Scope: six C2 rows in equal_dist_sequence, dist_dist_sequence, dist_angle_sequence,
+captures005/010. Archive audits/fillet-chamfer/capture/2026-10-22-torus-corners/
+results.json and artifacts.zip. All six native input/result valid single solids;
+Truck imports succeed, selects native contour of THREE edges (two circular arcs,
+one line), and fails BlendConstructionFailed at chamfer_solid_along_wire/trim_faces.
+These are construction failures, distinct from C1 import support inconsistencies.
+
+Important correction to shorthand: equal/010 requests0.4, not0.5, following a0.4
+bevel. All others request0.5; dist_dist second distance0.1; angle30degrees.
+Do NOT call all six '0.5 consumes0.2' as a diagnosed common root cause.
+
+Reproducer: python3 target/d-c2-inspect.py (pure Python stdlib, archive reads).
+It prints selected STEP edges/supports/neighbor bounds and native face/edge counts.
+No approximation kernel, import or mesher is used. Selectedequal005 STEP edges
+401(line),424(circle radius0.5),453(circle radius18.75). Shared cap face395 z10.75;
+wall faces657(y1.899999856949),841(radius0.5),868(radius18.75).
+
+PROVEN local endpoint mechanisms:
+1) equal005: short diagonal edge325 joins
+ A=(25.243289939164,1.899999856949,10.75),
+ B=(25.443289939164,1.899999856949,10.55).
+Old bevel face297 is plane x+z=35.993289939164. New equal-distance wall contact
+z10.25 cannot intersect bounded edge325; unrestricted oldplane intersection would
+be x25.743289939164, outside solid's right plane x25.443289939164(face193).
+Correct terminal boundary must traverse remaining oldbevel297 and rightface193;
+new wall contact ends (25.443289939164,1.899999856949,10.25).
+No global geometric tolerance could explain0.3 overshoot. Previousbevel face
+need not disappear: clip its surviving portion; consumed edge325 disappears.
+2) equal010: short diagonal333 joins x25.043289939164,z0 to x25.443289939164,z0.4,
+y1.899999856949. Requested0.4 contacts its far vertex exactly, so remaining
+neighbor piece has zero length and must be omitted while preserving that vertex.
+3) dist_dist005: diagonal361 x25.243289939164,z10.75 to x25.443289939164,z10.65.
+Topreference d0=.5,d1=.1 makes wallcontact z10.65, again exact endpointcollapse.
+
+Not yet localized to an executed Option-return branch (no runtime instrumentation):
+4) angle005: diagonal361 depth0.346410161514, expected newdepth .5*tan30=
+.288675134595. Its original neighboring plane is still reached inside the diagonal;
+therefore equal005's overshoot explanation is demonstrably NOT sufficient.
+5) dist_dist010: reference wall(yplane)distance.5 and otherdistance.1, bottom atz0.
+Wallcontact z.5 exceeds olddiagonal depth.4; its rightendpoint needs facewalk.
+6) angle010: reference wall distance.5, bottomsetback .5*tan30=.288675134595.
+Wallcontact z.5 likewise exceeds olddiagonaldepth.4.
+Opposite ends lie on radius18.75 cylindricalwall and prior nonorthogonal cap bevel;
+these must be tested independently, not inferred from rightendpoint evidence.
+
+Source limitations, precise locations as currently read:
+- modeling.rs:chamfer_solid_along_wire internal build retry(around893) first bounded,
+ then continued contacts for eligible plane-cap/cylinder-wall chains; original
+ trim_faces error may encompass numerous distinct None sites. No perbranch trace.
+- along_wire.rs:trim_runs(around904) intersects only the immediate prev/next edges
+ of a selected run; cannot advance beyond a consumed neighbor to next edge/face.
+- along_wire.rs:trim_closed_chain(878) rejects cuts.pieces.values().any(None).
+ trim_contact_edge(1304) correctly represents consumed edge as None; top-level
+ rejection therefore excludes exact-collapse states even if geometric contact succeeds.
+- trim_extended_contact_edge(1222) extends only selected-vertex end of a LINE;
+ it does not walk past the opposite endpoint into a new supporting face.
+- chamfer.rs aftercontact construction calls trim_closed_chain(849), then requires
+ one terminal candidateface and one ruling edge per end(around937). equal005 needs
+ more than that one terminalface; deleting the None check alone is insufficient.
+- Existing4211cfe0 isolated-edge OutsideNeighbour retry does not apply: contour has3
+ edges and trim_faces failure. chamfer_collapse handles convex circular inset/apex
+ collapse, not this neighboring endpoint topology.
+
+Smallest construction proposal (stage implementation, no broad healing fallback):
+A. Add stage-local instrumentation once buildslot is available: distinguish each
+ trim_runs return, record runface/selectededge/side and both intersection ranges,
+ consumedpiece flags, continuation attempt. Establish angle005's actual first
+ failure before committing to geometrychanges there. Do not weaken diagnostics.
+B. For zero-length neighborpieces, share the existing endpoint vertex and remove
+ edge consistently from every incident loop. Verify boundaryclosure and no empty
+ face rather than blanketrejecting None. Extend terminal boundary reconstruction
+ to refer to surviving loops; avoid duplicate/coincident degenerate edges.
+C. For overshoot, continue analytical/PCurvecontact along existing support, walk
+ oriented faceboundary to next surviving intersection, record exactly crossed
+ neighbors. Clip existing terminal faces against same ruled chamfer surface;
+ stitch multi-face terminal intersection chain with shared vertices. Preserve
+ unchanged originalsupport surfaces and all surviving trim regions. Bound walk
+ by visited topology and enforce intersection order, no revisit, no disconnected
+ remainder; reject genuinely ambiguous/general collision with existing diagnostics.
+Reuse existing along_wire endpointwalk/intersection mechanisms where constraints
+match rather than add a second independent planarhealer. Plane/cylinder support
+patch only; do not expand to general C1 spline repair here.
+D. Any new terminalpatch must retain requested supportsetbacks; do not extend old
+ bevel infinitely, shift inputvertices or borrow native1e-4 vertex tolerance.
+
+Independent proof plan:
+- Small analytic extrusion fixture with a plane+arc+plane tangent open contour,
+ prior terminalbevel widtha and depthb; choose new wall-depth below/equal/aboveb.
+ This separately tests continuation, exactcollapse, multi-face terminalwalk.
+ Include unequal and30degree reference-face roles, reversed chain/face order,
+ rigidtransform/uniformscale, immutable input, complete history including removed
+ edges, retained oldbevel face material. Parent must fail behavioral tests.
+- At sampled chain stations build normal-section coordinates from original
+ supports (circle center/radius or plane normal), not generatedpatch controls.
+ Measure each contact's physical setback on named support; for angle additionally
+ verify normal-section angle and d_other=d_reference*tan(angle) on perpendicular
+ cap/walls. Include both arc/line seams and new terminal chain, not just midpoint.
+- Material oracle: independently integrate removed cross-section area of original
+ extrusion clipped by prior bevelplanes and new ruled wedge. For circularsegments
+ use analytic sector/segment area and 1D integration with explicit error bound;
+ for planes use exact piecewise polynomial wedge-overlap formula. Subtract overlap
+ with previouscuts exactly once. Do not treat OCCT meshvolume as exactoracle.
+- Existing assert_solid exactanalyticvolume on reducedfixture, geometricconsistency,
+ every edge supported by both adjacentfaces, one closed shell, no selfintersection,
+ outwardorientations, robust STEP reimport; existing rejectioncontrols unchanged.
+- Nativecaptured C2 all6: matching support/material and boundarygeometry controls.
+ Native volumes (inputs->outputs), useful comparisons not independent exactvalues:
+ equal005 141.18097883399707 ->140.11120683852835
+ equal010 139.32265894193515 ->138.66070708439878
+ dist005 140.86533720428577 ->140.65659246275214
+ dist010 139.92052110507166 ->139.70232602164853
+ angle005 140.7043909817126 ->140.10035321730155
+ angle010 139.63987545663178 ->139.0215305005464.
+Facecount increases13->16 for005 and20->23 for010 in all3 modes. This does not
+prove no existingface disappears; do not infer identity from netcounts alone.
+
+Claims bounded: archive proves failurestage, geometry proves local impossible/
+collapsed intersections, source proves unsupported topology assumptions. Exact
+executed early-return for eachcase still requires targeted instrumentedreplay;
+no claim of six-case repair or completed independent materialproof is made.

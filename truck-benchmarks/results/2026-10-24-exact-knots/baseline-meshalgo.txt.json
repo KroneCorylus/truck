@@ -1,0 +1,33 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "truck-meshalgo",
+    "--lib",
+    "--no-fail-fast",
+    "--test",
+    "R9-revolve-fine-tessellation",
+    "--test",
+    "collapsed_trim",
+    "--test",
+    "cone_apex",
+    "--test",
+    "cylindrical_terminal_fan",
+    "--test",
+    "loft_winding",
+    "--test",
+    "pole_winding",
+    "--test",
+    "vtk"
+  ],
+  "cwd": "/home/krone/Development/Pieza_WS/truck",
+  "started_utc": "2026-10-24T11:18:27.215204+00:00",
+  "elapsed_seconds": 12.238921742999082,
+  "exit_code": 0,
+  "environment": {
+    "CARGO_BUILD_JOBS": "12",
+    "RAYON_NUM_THREADS": "1"
+  }
+}

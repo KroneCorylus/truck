@@ -1,0 +1,29 @@
+$ cargo test --release -p truck-geotrait --test nonfinite_surface_search -- --nocapture
+CARGO_BUILD_JOBS=12 RAYON_NUM_THREADS=1
+   Compiling truck-geotrait v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-geotrait)
+    Finished `release` profile [optimized] target(s) in 0.15s
+     Running tests/nonfinite_surface_search.rs (target/release/deps/nonfinite_surface_search-2fb9b390abe6e11f)
+
+running 2 tests
+
+thread 'surface_search_stops_before_evaluating_an_overflowed_newton_step' (359435) panicked at truck-geotrait/tests/nonfinite_surface_search.rs:11:9:
+assertion failed: u.is_finite() && v.is_finite()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'surface_search_rejects_nonfinite_seeds_before_evaluation' (359434) panicked at truck-geotrait/tests/nonfinite_surface_search.rs:11:9:
+assertion failed: u.is_finite() && v.is_finite()
+test surface_search_stops_before_evaluating_an_overflowed_newton_step ... FAILED
+test surface_search_rejects_nonfinite_seeds_before_evaluation ... FAILED
+
+failures:
+
+failures:
+    surface_search_rejects_nonfinite_seeds_before_evaluation
+    surface_search_stops_before_evaluating_an_overflowed_newton_step
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-geotrait --test nonfinite_surface_search`
+
+exit_code 101
+elapsed_seconds 0.171533

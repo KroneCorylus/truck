@@ -1,0 +1,13 @@
+Read-only follow-up by /root/d_import, 2026-10-24. No implementation or accepted repair.
+
+All three C1 sequence grids carry representation-context uncertainty linked from ADVANCED_BREP_SHAPE_REPRESENTATION #10 to GLOBAL_UNCERTAINTY_ASSIGNED_CONTEXT, with millimetre units:
+001: 1e-7
+002..005: 2e-5
+006..008: 5e-5
+Example equal/006: representation #10 -> context #4713 -> uncertainty #4717.
+
+Current importer explicitly lists units/uncertainty as unsupported and compressed shell/solid APIs accept no tolerance/healing policy. Native BREP per-entity tolerance budgets are not present in STEP.
+
+Angle002's 2e-5 representation uncertainty cannot justify all independently reconstructed vertex movements: vertex24 8.512e-6 is within, while vertex971 2.048e-5, vertex89 6.534e-5 and vertex1330 7.110e-5 exceed it. The native BREP permits larger movements, but a STEP-only importer cannot infer those native budgets. Pcurve/spatial disagreement measures disagreement, not authorization to move geometry.
+
+Scoped next design: preserve master geometry exactly where possible; parse representation-context units/uncertainty; expose reconstruction as an explicit import policy with a caller limit and recorded movements; retain strict reconstructed geometry consistency checks and reject movement beyond the applicable budget. This does not claim every C1 input is repairable under its STEP-declared uncertainty. Do not silently borrow capture-wide/native-only budgets.

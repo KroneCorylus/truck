@@ -1,0 +1,16 @@
+Final independent D source review — 2026-10-24
+
+Disposition: no functional blocker found in reviewed D source. This is read-only source review, not an independent test execution. Coordinator's final mesher/shapeops run remains an acceptance dependency.
+
+The corrected basis contract keeps one computation and separates strict fallible arithmetic diagnostics from infallible IEEE coefficients. Structural zero-range/degree rejection is retained. This removes the newly introduced finite-extrapolation panic mechanism without changing exact-zero knot semantics or weakening the existing R10 rejection assertion. Constructor first/second/mixed coefficient bounds remain conservative supported-domain checks, not guarantees for arbitrary control points, derivatives, edits, or unchecked construction. Atomic normalization preserves input on nonfinite arithmetic or distinct-knot collision. Exact multiplicity/cuts and inverse-zero behavior have explicit migration guidance.
+
+Finite-search guards reject parameters before the specific generic curve/surface evaluation callbacks. The nearest-surface initial shortcut is guarded; native Vector2/Vector3 nearest callbacks and surface/curve intersection callbacks are covered. This is not protection of every solver, custom trait implementation, presearch, or finite-but-extreme geometric computation. No general panic-free claim is justified.
+
+STEP rule is narrow and deterministic: a declared S1/S2 nonrational BSpline pcurve on a supported extrusion can replace a competing spatial B-spline (rational or nonrational). Analytic spatial lines/conics retain canonical conversion. Rational 2D pcurve masters and unsupported support types retain prior behavior. Direct SurfaceCurve conversion selects the parseable eligible master. EdgeCurve conversion additionally requires distinct endpoints and successful master trimming; closed edges or failed master trimming retain the spatial/fallback path. Existing fallback is therefore intentionally not unconditional master obedience.
+
+Documentation tightening recommended before checkpoint:
+1. CHANGELOG STEP entry: state nonrational spline pcurve, eligible extrusion basis, and edge endpoint-trim/closed-edge fallback explicitly; broad 'spline pcurve master on supported extrusions' otherwise sounds more general than implemented.
+2. CHANGELOG finite-search entry: say 'generic curve/surface Newton searches' rather than unqualified searches. Other decorator-specific Newton loops remain separate.
+DIAGNOSTICS and public basis arithmetic docs correctly disclaim universal finiteness/panic freedom. No stale paused-F5 production claim remains in the inspected changelog.
+
+Tests reported by coordinator, not rerun here: new basis contract has runtime parent/initial-candidate failures and corrected passes; unchanged R10 8 pass; dependency suite 367 pass plus one known pcurve failure/one ignore; doctests172 pass/3ignore. Preserve known pcurve failure status and final run provenance. Pending benchmarks/tracker/F5 work excluded from this review.

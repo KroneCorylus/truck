@@ -1,0 +1,9 @@
+{
+  "base_commit": "96ca84d1c2ac0f49b2b40e7d58615eb5ee0e2988",
+  "test_sha256": "5e1b3b96966d47098df279d8a076d3a4aba085bcbc6694009f19e1a63368375f",
+  "parent_source_sha256": "c93683ccddd13c7b8e841d9ccf893f15fcc67a144961fde516d6faa1482779c0",
+  "candidate_source_sha256": "7fdcd5873dbad40a49fe74ba0c308c923861f11d44bdb99481eeb79384ab3779",
+  "parent_log": "parent-nonfinite-search.txt",
+  "candidate_log": "candidate-nonfinite-search.txt",
+  "downstream_regression": "modeling-nonfinite-fixed.txt"
+}

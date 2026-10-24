@@ -1,0 +1,220 @@
+[
+  {
+    "manifest_path": "/home/krone/Development/Pieza_WS/truck/truck-derivers/Cargo.toml",
+    "target": "truck_derivers",
+    "fresh": true,
+    "filenames": [
+      "/home/krone/Development/Pieza_WS/truck/target/release/deps/libtruck_derivers-8bcb0458504ab7dc.so"
+    ],
+    "dep_info": [
+      {
+        "path": "target/release/deps/truck_derivers-8bcb0458504ab7dc.d",
+        "sha256": "b829399b04eab3f95709a9e7541fe070148da49c4c4848d99cfdd281e0d29bc4"
+      }
+    ]
+  },
+  {
+    "manifest_path": "/home/krone/Development/Pieza_WS/truck/truck-base/Cargo.toml",
+    "target": "truck_base",
+    "fresh": true,
+    "filenames": [
+      "/home/krone/Development/Pieza_WS/truck/target/release/deps/libtruck_base-ab7c40bf0b6494b7.rlib",
+      "/home/krone/Development/Pieza_WS/truck/target/release/deps/libtruck_base-ab7c40bf0b6494b7.rmeta"
+    ],
+    "dep_info": [
+      {
+        "path": "target/release/deps/truck_base-ab7c40bf0b6494b7.d",
+        "sha256": "e43d74f1dd78058aa7d061224f30e80919d3e0e6f3ce89c04bed0bd1f4b78401"
+      },
+      {
+        "path": "target/release/deps/truck_base-ab7c40bf0b6494b7.d",
+        "sha256": "e43d74f1dd78058aa7d061224f30e80919d3e0e6f3ce89c04bed0bd1f4b78401"
+      }
+    ]
+  },
+  {
+    "manifest_path": "/home/krone/Development/Pieza_WS/truck/truck-geotrait/Cargo.toml",
+    "target": "truck_geotrait",
+    "fresh": true,
+    "filenames": [
+      "/home/krone/Development/Pieza_WS/truck/target/release/deps/libtruck_geotrait-8ec945ba395b9876.rlib",
+      "/home/krone/Development/Pieza_WS/truck/target/release/deps/libtruck_geotrait-8ec945ba395b9876.rmeta"
+    ],
+    "dep_info": [
+      {
+        "path": "target/release/deps/truck_geotrait-8ec945ba395b9876.d",
+        "sha256": "8050aee9ed600ab42ab582297c74c36ae1ffaa1918b5d1ca4689da685fda53a1"
+      },
+      {
+        "path": "target/release/deps/truck_geotrait-8ec945ba395b9876.d",
+        "sha256": "8050aee9ed600ab42ab582297c74c36ae1ffaa1918b5d1ca4689da685fda53a1"
+      }
+    ]
+  },
+  {
+    "manifest_path": "/home/krone/Development/Pieza_WS/truck/truck-geometry/Cargo.toml",
+    "target": "truck_geometry",
+    "fresh": true,
+    "filenames": [
+      "/home/krone/Development/Pieza_WS/truck/target/release/deps/libtruck_geometry-7d0b6f516ad09023.rlib",
+      "/home/krone/Development/Pieza_WS/truck/target/release/deps/libtruck_geometry-7d0b6f516ad09023.rmeta"
+    ],
+    "dep_info": [
+      {
+        "path": "target/release/deps/truck_geometry-7d0b6f516ad09023.d",
+        "sha256": "754f55128a9a2a19f609eff416abf05971c4f628031e9f472024a827a9fa3fa2"
+      },
+      {
+        "path": "target/release/deps/truck_geometry-7d0b6f516ad09023.d",
+        "sha256": "754f55128a9a2a19f609eff416abf05971c4f628031e9f472024a827a9fa3fa2"
+      }
+    ]
+  },
+  {
+    "manifest_path": "/home/krone/Development/Pieza_WS/truck/truck-topology/Cargo.toml",
+    "target": "truck_topology",
+    "fresh": true,
+    "filenames": [
+      "/home/krone/Development/Pieza_WS/truck/target/release/deps/libtruck_topology-00bbc20902353f8e.rlib",
+      "/home/krone/Development/Pieza_WS/truck/target/release/deps/libtruck_topology-00bbc20902353f8e.rmeta"
+    ],
+    "dep_info": [
+      {
+        "path": "target/release/deps/truck_topology-00bbc20902353f8e.d",
+        "sha256": "221d58e27019a4fd0231ed23960ef75bc0254ccde50ea6da4fb0d64c9f107dc7"
+      },
+      {
+        "path": "target/release/deps/truck_topology-00bbc20902353f8e.d",
+        "sha256": "221d58e27019a4fd0231ed23960ef75bc0254ccde50ea6da4fb0d64c9f107dc7"
+      }
+    ]
+  },
+  {
+    "manifest_path": "/home/krone/Development/Pieza_WS/truck/truck-polymesh/Cargo.toml",
+    "target": "truck_polymesh",
+    "fresh": true,
+    "filenames": [
+      "/home/krone/Development/Pieza_WS/truck/target/release/deps/libtruck_polymesh-b2cc888529cd1a6c.rlib",
+      "/home/krone/Development/Pieza_WS/truck/target/release/deps/libtruck_polymesh-b2cc888529cd1a6c.rmeta"
+    ],
+    "dep_info": [
+      {
+        "path": "target/release/deps/truck_polymesh-b2cc888529cd1a6c.d",
+        "sha256": "7a78d894945d6bdf2c6cfed3adc193fd94e9dc922e7e2bde678deb598f325d91"
+      },
+      {
+        "path": "target/release/deps/truck_polymesh-b2cc888529cd1a6c.d",
+        "sha256": "7a78d894945d6bdf2c6cfed3adc193fd94e9dc922e7e2bde678deb598f325d91"
+      }
+    ]
+  },
+  {
+    "manifest_path": "/home/krone/Development/Pieza_WS/truck/truck-modeling/Cargo.toml",
+    "target": "truck_modeling",
+    "fresh": true,
+    "filenames": [
+      "/home/krone/Development/Pieza_WS/truck/target/release/deps/libtruck_modeling-c5e1620472279844.rlib",
+      "/home/krone/Development/Pieza_WS/truck/target/release/deps/libtruck_modeling-c5e1620472279844.rmeta"
+    ],
+    "dep_info": [
+      {
+        "path": "target/release/deps/truck_modeling-c5e1620472279844.d",
+        "sha256": "1138c5eb8132b192a476b44a6fb96850af32c73f1f8d09ef5bd8de36f60e14aa"
+      },
+      {
+        "path": "target/release/deps/truck_modeling-c5e1620472279844.d",
+        "sha256": "1138c5eb8132b192a476b44a6fb96850af32c73f1f8d09ef5bd8de36f60e14aa"
+      }
+    ]
+  },
+  {
+    "manifest_path": "/home/krone/Development/Pieza_WS/truck/truck-assembly/Cargo.toml",
+    "target": "truck_assembly",
+    "fresh": true,
+    "filenames": [
+      "/home/krone/Development/Pieza_WS/truck/target/release/deps/libtruck_assembly-f2d75e298fdc5b34.rlib",
+      "/home/krone/Development/Pieza_WS/truck/target/release/deps/libtruck_assembly-f2d75e298fdc5b34.rmeta"
+    ],
+    "dep_info": [
+      {
+        "path": "target/release/deps/truck_assembly-f2d75e298fdc5b34.d",
+        "sha256": "7c04cc93e250eab37a75ca7a657b8a565c42cca9991f9cae690baea1d34f4f22"
+      },
+      {
+        "path": "target/release/deps/truck_assembly-f2d75e298fdc5b34.d",
+        "sha256": "7c04cc93e250eab37a75ca7a657b8a565c42cca9991f9cae690baea1d34f4f22"
+      }
+    ]
+  },
+  {
+    "manifest_path": "/home/krone/Development/Pieza_WS/truck/truck-meshalgo/Cargo.toml",
+    "target": "truck_meshalgo",
+    "fresh": true,
+    "filenames": [
+      "/home/krone/Development/Pieza_WS/truck/target/release/deps/libtruck_meshalgo-9bbaa6a66134e524.rlib",
+      "/home/krone/Development/Pieza_WS/truck/target/release/deps/libtruck_meshalgo-9bbaa6a66134e524.rmeta"
+    ],
+    "dep_info": [
+      {
+        "path": "target/release/deps/truck_meshalgo-9bbaa6a66134e524.d",
+        "sha256": "d76d87d1bc0c5aa9716a3832d61d21d1b810ec698a4cfd5ef0c9641404c5ae15"
+      },
+      {
+        "path": "target/release/deps/truck_meshalgo-9bbaa6a66134e524.d",
+        "sha256": "d76d87d1bc0c5aa9716a3832d61d21d1b810ec698a4cfd5ef0c9641404c5ae15"
+      }
+    ]
+  },
+  {
+    "manifest_path": "/home/krone/Development/Pieza_WS/truck/truck-stepio/Cargo.toml",
+    "target": "truck_stepio",
+    "fresh": true,
+    "filenames": [
+      "/home/krone/Development/Pieza_WS/truck/target/release/deps/libtruck_stepio-90b584801e8a1303.rlib",
+      "/home/krone/Development/Pieza_WS/truck/target/release/deps/libtruck_stepio-90b584801e8a1303.rmeta"
+    ],
+    "dep_info": [
+      {
+        "path": "target/release/deps/truck_stepio-90b584801e8a1303.d",
+        "sha256": "61dc4ec4ee5c72a12cce2154eb5b937ef61db9b68d530f06b8e0e101788fc4b8"
+      },
+      {
+        "path": "target/release/deps/truck_stepio-90b584801e8a1303.d",
+        "sha256": "61dc4ec4ee5c72a12cce2154eb5b937ef61db9b68d530f06b8e0e101788fc4b8"
+      }
+    ]
+  },
+  {
+    "manifest_path": "/home/krone/Development/Pieza_WS/truck/truck-shapeops/Cargo.toml",
+    "target": "truck_shapeops",
+    "fresh": true,
+    "filenames": [
+      "/home/krone/Development/Pieza_WS/truck/target/release/deps/libtruck_shapeops-f75fc707b18b15a7.rlib",
+      "/home/krone/Development/Pieza_WS/truck/target/release/deps/libtruck_shapeops-f75fc707b18b15a7.rmeta"
+    ],
+    "dep_info": [
+      {
+        "path": "target/release/deps/truck_shapeops-f75fc707b18b15a7.d",
+        "sha256": "37ad7a7547f4a3d7021f9dfae7cb5602da72bcd4cffe4a61fbcc465cc7378b3a"
+      },
+      {
+        "path": "target/release/deps/truck_shapeops-f75fc707b18b15a7.d",
+        "sha256": "37ad7a7547f4a3d7021f9dfae7cb5602da72bcd4cffe4a61fbcc465cc7378b3a"
+      }
+    ]
+  },
+  {
+    "manifest_path": "/home/krone/Development/Pieza_WS/truck/truck-shapeops/Cargo.toml",
+    "target": "replay_occt_blend",
+    "fresh": false,
+    "filenames": [
+      "/home/krone/Development/Pieza_WS/truck/target/release/examples/replay_occt_blend"
+    ],
+    "dep_info": [
+      {
+        "path": "target/release/examples/replay_occt_blend.d",
+        "sha256": "d5c24f588336107dfb9fbd162c2cc5cb7b01d86b0e8042079cb898e574efc55c"
+      }
+    ]
+  }
+]

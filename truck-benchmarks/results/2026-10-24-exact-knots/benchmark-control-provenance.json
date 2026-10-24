@@ -1,0 +1,12 @@
+{
+  "archive_sha256": "9839b2fdec87188f0e9db3047fbd56d2a09bf100cc95e7914f1dccc83fd8f562",
+  "source_sha256": {
+    "truck-benchmarks/benches/tessellation.rs": "310226937df99b67cabe432d20e22ddb8480c2ae4345c613d815868729d3d786",
+    "truck-meshalgo/tests/fillet-cap-face.json": "75177fc3fe0403002c6e7de97023eefabb19bb558754b275cd9ec4e68698eecc",
+    "truck-meshalgo/tests/extrusion-cap-balanced-003.json": "35727367692d7e0cdab690cc9c905b54f155c8cc107131a355e83149ceba10c1"
+  },
+  "parent_source_differences_from_96ca84d1": [
+    "truck-meshalgo/src/tessellation/triangulation/tests.rs"
+  ],
+  "parent_difference_scope": "Only triangulation/tests.rs differs; this module is cfg(test) and is not compiled into the benchmark mesher library. All non-test src files match the parent commit."
+}

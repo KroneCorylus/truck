@@ -51,6 +51,25 @@ decimal **strings** to preserve all 64 bits in JavaScript. Parameter values seri
 so that `NaN` and infinities survive reporting. Raw pointer-based topology IDs are not used
 as serialized entity references.
 
+Geometry reports `TRUCK_GEOMETRY_NON_FINITE_KNOT_ARITHMETIC` when knot domains,
+span reciprocals, first/second derivative coefficient bounds, or calculated basis
+coefficients are non-finite. Use a representable parameter chart; `KnotVec::try_normalize` can normalize tiny finite domains before
+spline construction. `TRUCK_GEOMETRY_COLLAPSED_KNOT_SPAN` reports normalization
+that would merge distinct knots; failed normalization leaves its input unchanged.
+`TRUCK_GEOMETRY_ZERO_RANGE` remains the zero-range condition.
+The fallible basis API rejects non-finite parameters and computed basis coefficients.
+The infallible basis evaluator preserves IEEE arithmetic results, including NaN or infinity
+from non-finite parameters or overflowing extrapolation; it still panics on zero-range or
+insufficient-knot structural errors. It does not convert arithmetic overflow into a new
+exception inside generic infallible curve/surface evaluation. Call the fallible basis API
+when arithmetic diagnostics are required, and validate computed geometry at solver or
+operation boundaries. Constructor derivative bounds use degree-wide supports
+and define a conservative supported-domain policy; a failed bound is not proof that
+an exact derivative is unrepresentable. Cuts, insertion, unchecked construction and
+parameter transforms do not revalidate these constructor bounds. This does not provide
+universal panic-free spline evaluation or finite arbitrary-order derivatives and
+computations with extreme control point values.
+
 ## APIs
 
 | Area | Diagnostic API |

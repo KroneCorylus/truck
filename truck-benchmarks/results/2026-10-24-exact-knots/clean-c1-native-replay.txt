@@ -1,0 +1,45 @@
+$ python3 target/d-c1-final-replay.py --output target/d-c1-clean-production-2026-10-24
+CARGO_BUILD_JOBS=12 RAYON_NUM_THREADS=1
+1/24 chamfer/dist_angle_sequence/C1/001: operation-succeeded -> operation-succeeded; limited=False; 0.633s
+2/24 chamfer/dist_angle_sequence/C1/002: input-import-failed -> input-import-failed; limited=False; 0.013s
+3/24 chamfer/dist_angle_sequence/C1/003: input-import-failed -> input-import-failed; limited=False; 0.011s
+4/24 chamfer/dist_angle_sequence/C1/004: input-import-failed -> input-import-failed; limited=False; 0.017s
+5/24 chamfer/dist_angle_sequence/C1/005: input-import-failed -> input-import-failed; limited=False; 0.017s
+6/24 chamfer/dist_angle_sequence/C1/006: input-import-failed -> input-import-failed; limited=False; 0.030s
+7/24 chamfer/dist_angle_sequence/C1/007: input-import-failed -> input-import-failed; limited=False; 0.030s
+8/24 chamfer/dist_angle_sequence/C1/008: input-import-failed -> input-import-failed; limited=False; 0.036s
+9/24 chamfer/dist_dist_sequence/C1/001: operation-succeeded -> operation-succeeded; limited=False; 0.640s
+10/24 chamfer/dist_dist_sequence/C1/002: operation-failed -> operation-failed; limited=False; 0.095s
+11/24 chamfer/dist_dist_sequence/C1/003: operation-failed -> operation-failed; limited=False; 0.465s
+12/24 chamfer/dist_dist_sequence/C1/004: input-inconsistent -> input-inconsistent; limited=False; 0.035s
+13/24 chamfer/dist_dist_sequence/C1/005: input-inconsistent -> input-inconsistent; limited=False; 0.051s
+14/24 chamfer/dist_dist_sequence/C1/006: input-inconsistent -> input-inconsistent; limited=False; 0.084s
+15/24 chamfer/dist_dist_sequence/C1/007: input-inconsistent -> operation-failed; limited=False; 0.554s
+16/24 chamfer/dist_dist_sequence/C1/008: input-inconsistent -> operation-failed; limited=False; 0.207s
+17/24 chamfer/equal_dist_sequence/C1/001: operation-succeeded -> operation-succeeded; limited=False; 0.605s
+18/24 chamfer/equal_dist_sequence/C1/002: operation-failed -> operation-failed; limited=False; 0.078s
+19/24 chamfer/equal_dist_sequence/C1/003: operation-failed -> operation-failed; limited=False; 0.500s
+20/24 chamfer/equal_dist_sequence/C1/004: input-inconsistent -> input-inconsistent; limited=False; 0.046s
+21/24 chamfer/equal_dist_sequence/C1/005: input-inconsistent -> input-inconsistent; limited=False; 0.035s
+22/24 chamfer/equal_dist_sequence/C1/006: input-inconsistent -> operation-failed; limited=False; 0.117s
+23/24 chamfer/equal_dist_sequence/C1/007: input-inconsistent -> operation-failed; limited=False; 0.587s
+24/24 chamfer/equal_dist_sequence/C1/008: input-inconsistent -> input-inconsistent; limited=False; 0.066s
+{
+  "before_statuses": {
+    "operation-succeeded": 3,
+    "input-import-failed": 7,
+    "operation-failed": 4,
+    "input-inconsistent": 10
+  },
+  "after_statuses": {
+    "operation-succeeded": 3,
+    "input-import-failed": 7,
+    "operation-failed": 8,
+    "input-inconsistent": 6
+  },
+  "before_limited_passes": 0,
+  "after_limited_passes": 0
+}
+
+exit_code 0
+elapsed_seconds 28.592174

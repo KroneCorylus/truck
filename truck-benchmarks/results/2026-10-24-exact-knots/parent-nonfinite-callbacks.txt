@@ -1,0 +1,64 @@
+$ cargo test --release -p truck-geotrait --test nonfinite_search_callbacks -- --nocapture
+CARGO_BUILD_JOBS=12 RAYON_NUM_THREADS=1
+   Compiling truck-geotrait v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-geotrait)
+    Finished `release` profile [optimized] target(s) in 0.22s
+     Running tests/nonfinite_search_callbacks.rs (target/release/deps/nonfinite_search_callbacks-ed0aef9922c45f82)
+
+running 9 tests
+
+thread 'curve_exact_rejects_nonfinite_seeds' (378077) panicked at truck-geotrait/tests/nonfinite_search_callbacks.rs:63:9:
+nonfinite curve evaluation
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'curve_exact_rejects_overflowed_iterates' (378078) panicked at truck-geotrait/tests/nonfinite_search_callbacks.rs:63:9:
+nonfinite curve evaluation
+
+thread 'curve_nearest_rejects_nonfinite_seeds' (378079) panicked at truck-geotrait/tests/nonfinite_search_callbacks.rs:63:9:
+nonfinite curve evaluation
+
+thread 'curve_nearest_rejects_overflowed_iterates' (378080) panicked at truck-geotrait/tests/nonfinite_search_callbacks.rs:63:9:
+nonfinite curve evaluation
+
+thread 'nearest_surface_2d_rejects_overflowed_iterates' (378081) panicked at truck-geotrait/tests/nonfinite_search_callbacks.rs:38:1:
+nonfinite surface evaluation
+
+thread 'nearest_surface_3d_rejects_overflowed_iterates' (378082) panicked at truck-geotrait/tests/nonfinite_search_callbacks.rs:45:1:
+nonfinite surface evaluation
+
+thread 'nearest_surface_rejects_nonfinite_seeds' (378083) panicked at truck-geotrait/tests/nonfinite_search_callbacks.rs:38:1:
+nonfinite surface evaluation
+test curve_exact_rejects_nonfinite_seeds ... 
+thread 'surface_curve_intersection_rejects_nonfinite_seeds' (378084) panicked at truck-geotrait/tests/nonfinite_search_callbacks.rs:45:1:
+nonfinite surface evaluation
+FAILED
+test curve_exact_rejects_overflowed_iterates ... 
+thread 'surface_curve_intersection_rejects_overflowed_iterates' (378085) panicked at truck-geotrait/tests/nonfinite_search_callbacks.rs:45:1:
+nonfinite surface evaluation
+FAILED
+test curve_nearest_rejects_nonfinite_seeds ... FAILED
+test curve_nearest_rejects_overflowed_iterates ... FAILED
+test nearest_surface_2d_rejects_overflowed_iterates ... FAILED
+test nearest_surface_3d_rejects_overflowed_iterates ... FAILED
+test nearest_surface_rejects_nonfinite_seeds ... FAILED
+test surface_curve_intersection_rejects_nonfinite_seeds ... FAILED
+test surface_curve_intersection_rejects_overflowed_iterates ... FAILED
+
+failures:
+
+failures:
+    curve_exact_rejects_nonfinite_seeds
+    curve_exact_rejects_overflowed_iterates
+    curve_nearest_rejects_nonfinite_seeds
+    curve_nearest_rejects_overflowed_iterates
+    nearest_surface_2d_rejects_overflowed_iterates
+    nearest_surface_3d_rejects_overflowed_iterates
+    nearest_surface_rejects_nonfinite_seeds
+    surface_curve_intersection_rejects_nonfinite_seeds
+    surface_curve_intersection_rejects_overflowed_iterates
+
+test result: FAILED. 0 passed; 9 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-geotrait --test nonfinite_search_callbacks`
+
+exit_code 101
+elapsed_seconds 0.236517

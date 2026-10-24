@@ -1,0 +1,97 @@
+$ cargo test --release -p truck-geometry --test clustered_knot_geometry --test knot_derivative_geometry --no-fail-fast
+CARGO_BUILD_JOBS=12 RAYON_NUM_THREADS=1
+   Compiling truck-derivers v0.1.0 (/home/krone/Development/Pieza_WS/truck/truck-derivers)
+   Compiling truck-base v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-base)
+   Compiling truck-geotrait v0.4.0 (/home/krone/Development/Pieza_WS/truck/truck-geotrait)
+   Compiling truck-geometry v0.5.0 (/home/krone/Development/Pieza_WS/truck/truck-geometry)
+    Finished `release` profile [optimized] target(s) in 2.29s
+     Running tests/clustered_knot_geometry.rs (target/release/deps/clustered_knot_geometry-7e3dfb71820571c6)
+
+running 5 tests
+test both_surface_cut_directions_preserve_degree_and_clustered_spans ... FAILED
+test exact_cut_preserves_nearby_knot_spans_and_trim_endpoints ... FAILED
+test clustered_spans_keep_geometry_and_derivatives_across_affine_charts ... FAILED
+test nearby_distinct_knots_are_not_repetitions ... FAILED
+test normalization_preserves_distinct_knots_and_exact_multiplicities ... FAILED
+
+failures:
+
+---- both_surface_cut_directions_preserve_degree_and_clustered_spans stdout ----
+
+thread 'both_surface_cut_directions_preserve_degree_and_clustered_spans' (329727) panicked at truck-geometry/tests/clustered_knot_geometry.rs:124:17:
+assertion `left == right` failed
+  left: 2
+ right: 3
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- exact_cut_preserves_nearby_knot_spans_and_trim_endpoints stdout ----
+
+thread 'exact_cut_preserves_nearby_knot_spans_and_trim_endpoints' (329729) panicked at truck-geometry/tests/clustered_knot_geometry.rs:73:13:
+assertion `left == right` failed
+  left: (0.4, 0.8)
+ right: (0.4, 0.80000005)
+
+---- clustered_spans_keep_geometry_and_derivatives_across_affine_charts stdout ----
+
+thread 'clustered_spans_keep_geometry_and_derivatives_across_affine_charts' (329728) panicked at truck-geometry/tests/clustered_knot_geometry.rs:43:13:
+assertion failed: c.subs(t).distance(expected) < 1e-8
+
+---- nearby_distinct_knots_are_not_repetitions stdout ----
+
+thread 'nearby_distinct_knots_are_not_repetitions' (329730) panicked at truck-geometry/tests/clustered_knot_geometry.rs:19:9:
+assertion `left == right` failed
+  left: 4
+ right: 2
+
+---- normalization_preserves_distinct_knots_and_exact_multiplicities stdout ----
+
+thread 'normalization_preserves_distinct_knots_and_exact_multiplicities' (329731) panicked at truck-geometry/tests/clustered_knot_geometry.rs:90:9:
+assertion `left == right` failed
+  left: [3, 4, 3]
+ right: [3, 2, 2, 3]
+
+
+failures:
+    both_surface_cut_directions_preserve_degree_and_clustered_spans
+    clustered_spans_keep_geometry_and_derivatives_across_affine_charts
+    exact_cut_preserves_nearby_knot_spans_and_trim_endpoints
+    nearby_distinct_knots_are_not_repetitions
+    normalization_preserves_distinct_knots_and_exact_multiplicities
+
+test result: FAILED. 0 passed; 5 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-geometry --test clustered_knot_geometry`
+     Running tests/knot_derivative_geometry.rs (target/release/deps/knot_derivative_geometry-ab97ca0fc77d7daa)
+
+running 2 tests
+test curved_polynomial_and_rational_derivatives_survive_chart_changes_and_knot_edits ... FAILED
+test surface_first_second_and_mixed_derivatives_keep_their_polynomial_values ... FAILED
+
+failures:
+
+---- curved_polynomial_and_rational_derivatives_survive_chart_changes_and_knot_edits stdout ----
+
+thread 'curved_polynomial_and_rational_derivatives_survive_chart_changes_and_knot_edits' (329733) panicked at truck-geometry/tests/knot_derivative_geometry.rs:100:29:
+assertion failed: c.subs(t).distance(position) < 1e-8
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- surface_first_second_and_mixed_derivatives_keep_their_polynomial_values stdout ----
+
+thread 'surface_first_second_and_mixed_derivatives_keep_their_polynomial_values' (329734) panicked at truck-geometry/tests/knot_derivative_geometry.rs:150:17:
+assertion failed: s.subs(a, b).distance(Point3::new(u * u + u * v, v * v + 2. * u * v, u + v)) <
+    1e-8
+
+
+failures:
+    curved_polynomial_and_rational_derivatives_survive_chart_changes_and_knot_edits
+    surface_first_second_and_mixed_derivatives_keep_their_polynomial_values
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p truck-geometry --test knot_derivative_geometry`
+error: 2 targets failed:
+    `-p truck-geometry --test clustered_knot_geometry`
+    `-p truck-geometry --test knot_derivative_geometry`
+
+exit_code 101
+elapsed_seconds 2.310114
