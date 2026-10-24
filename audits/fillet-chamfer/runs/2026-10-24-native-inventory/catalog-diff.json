@@ -1,0 +1,83 @@
+[
+  {
+    "case": "blend/complex/D2",
+    "fields": [
+      "occt_executions",
+      "occt_run"
+    ],
+    "old": "skipped",
+    "new": "passed"
+  },
+  {
+    "case": "blend/simple/Q9",
+    "fields": [
+      "occt_executions",
+      "occt_run"
+    ],
+    "old": "skipped",
+    "new": "passed"
+  },
+  {
+    "case": "blend/simple/R1",
+    "fields": [
+      "occt_executions",
+      "occt_run"
+    ],
+    "old": "skipped",
+    "new": "passed"
+  },
+  {
+    "case": "blend/simple/R2",
+    "fields": [
+      "occt_executions",
+      "occt_run"
+    ],
+    "old": "skipped",
+    "new": "passed"
+  },
+  {
+    "case": "blend/simple/R3",
+    "fields": [
+      "occt_executions",
+      "occt_run"
+    ],
+    "old": "skipped",
+    "new": "passed"
+  },
+  {
+    "case": "blend/simple/R5",
+    "fields": [
+      "occt_executions",
+      "occt_run"
+    ],
+    "old": "skipped",
+    "new": "passed"
+  },
+  {
+    "case": "blend/simple/R6",
+    "fields": [
+      "occt_executions",
+      "occt_run"
+    ],
+    "old": "skipped",
+    "new": "passed"
+  },
+  {
+    "case": "blend/simple/U9",
+    "fields": [
+      "occt_executions",
+      "occt_run"
+    ],
+    "old": "skipped",
+    "new": "passed"
+  },
+  {
+    "case": "blend/simple/V7",
+    "fields": [
+      "occt_executions",
+      "occt_run"
+    ],
+    "old": "skipped",
+    "new": "passed"
+  }
+]

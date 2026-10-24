@@ -1,0 +1,232 @@
+{
+  "repository": "https://github.com/a-betenev/opencascade-dataset",
+  "revision": "d78a7a9e6de57699261fa03641ec1b5bafac39a1",
+  "tree_sha": "b3f2f6ca53f7b3dd92cd4b2b68dbd752eee00853",
+  "purpose": "Public shape files matching 32 missing native chamfer fixture names; compatibility requires actual native runs.",
+  "files": [
+    {
+      "name": "001_F",
+      "url": "https://raw.githubusercontent.com/a-betenev/opencascade-dataset/d78a7a9e6de57699261fa03641ec1b5bafac39a1/brep/001_F",
+      "git_blob_sha1": "82fc97e32404d8e40034cc576ccfaa1332cca32f",
+      "size": 1273,
+      "sha256": "be6d798bfa2025f93c015bf0dbb31f8d13eb66bb6dd609db757a160a96e83736"
+    },
+    {
+      "name": "4_K1(hlacg01).draw",
+      "url": "https://raw.githubusercontent.com/a-betenev/opencascade-dataset/d78a7a9e6de57699261fa03641ec1b5bafac39a1/brep/4_K1(hlacg01).draw",
+      "git_blob_sha1": "ef716b35d8822ad24dd8d70603a972ea80f1ff24",
+      "size": 5528,
+      "sha256": "f1408be6b23b16db43ae002939d104c4153d188f98a34317eee84dcf4c77490a"
+    },
+    {
+      "name": "4_L1(hlacg03).draw",
+      "url": "https://raw.githubusercontent.com/a-betenev/opencascade-dataset/d78a7a9e6de57699261fa03641ec1b5bafac39a1/brep/4_L1(hlacg03).draw",
+      "git_blob_sha1": "86286945e5dac4b11a635924b0edb8802c001166",
+      "size": 2568,
+      "sha256": "a4c6d9ce9071ca0490b0ed40c90204e6a51df0634edfe9229027e33b4c2422c9"
+    },
+    {
+      "name": "4_M1(hlacg04).draw",
+      "url": "https://raw.githubusercontent.com/a-betenev/opencascade-dataset/d78a7a9e6de57699261fa03641ec1b5bafac39a1/brep/4_M1(hlacg04).draw",
+      "git_blob_sha1": "a711f93a6c0da755b22bb1f62a6cc7b4ead59e4d",
+      "size": 10138,
+      "sha256": "e85f9d7a8e50a4f2d83f08661f3a885e14d2f47895dfe86ff95418fe3b031032"
+    },
+    {
+      "name": "4_N1(hlacg05).draw",
+      "url": "https://raw.githubusercontent.com/a-betenev/opencascade-dataset/d78a7a9e6de57699261fa03641ec1b5bafac39a1/brep/4_N1(hlacg05).draw",
+      "git_blob_sha1": "697e341b16b30bd48ebcd2fbf6e20970dda276fd",
+      "size": 11527,
+      "sha256": "10db00e75c062c75487f4f8d31ca86c5038a81972e2125b09f2bf1d266dd8da8"
+    },
+    {
+      "name": "4_P1(hlacg07).draw",
+      "url": "https://raw.githubusercontent.com/a-betenev/opencascade-dataset/d78a7a9e6de57699261fa03641ec1b5bafac39a1/brep/4_P1(hlacg07).draw",
+      "git_blob_sha1": "c514258cf11b5b80978708a91256dbf73b58e7e9",
+      "size": 51609,
+      "sha256": "98afd2377bee2b7c66320900553bb08f2c619104d7791092d5907da2525f4f00"
+    },
+    {
+      "name": "4_Q1(hlacg08).draw",
+      "url": "https://raw.githubusercontent.com/a-betenev/opencascade-dataset/d78a7a9e6de57699261fa03641ec1b5bafac39a1/brep/4_Q1(hlacg08).draw",
+      "git_blob_sha1": "62b6c75d6b530b7d8c2cdaaf40852d41d77dc090",
+      "size": 45264,
+      "sha256": "027bc036e073706e29f1d3b213aff2d2308fbd3f6bd622ce5bc80c63cc2c02c2"
+    },
+    {
+      "name": "8_B1.draw",
+      "url": "https://raw.githubusercontent.com/a-betenev/opencascade-dataset/d78a7a9e6de57699261fa03641ec1b5bafac39a1/brep/8_B1.draw",
+      "git_blob_sha1": "544f72c054d328a33fce140c9aea3269f9e91559",
+      "size": 6971,
+      "sha256": "d3f7e7dad274c5397f173d1be18513132050b635b71bf56996892deec0366876"
+    },
+    {
+      "name": "8_J1.draw",
+      "url": "https://raw.githubusercontent.com/a-betenev/opencascade-dataset/d78a7a9e6de57699261fa03641ec1b5bafac39a1/brep/8_J1.draw",
+      "git_blob_sha1": "d7a90585786afeb12c53b6d70a4c7394a0a5c62e",
+      "size": 19668,
+      "sha256": "3d9d9fbc6c6132bf56a3b435f6283cd5ce0d1ca1a7f1a18b74dce12aab27eb94"
+    },
+    {
+      "name": "CCH_001_ahdb.rle",
+      "url": "https://raw.githubusercontent.com/a-betenev/opencascade-dataset/d78a7a9e6de57699261fa03641ec1b5bafac39a1/brep/CCH_001_ahdb.rle",
+      "git_blob_sha1": "b6da6dc0e980754f9530d8ae73156e3a2b4626f8",
+      "size": 17618,
+      "sha256": "5b2ff66edff3777cd07b726971ac7ace7daf1a17a730dc765fc3e5d36dc4e750"
+    },
+    {
+      "name": "CCH_001_bhdc.rle",
+      "url": "https://raw.githubusercontent.com/a-betenev/opencascade-dataset/d78a7a9e6de57699261fa03641ec1b5bafac39a1/brep/CCH_001_bhdc.rle",
+      "git_blob_sha1": "5f917c8560e7017aaacbb29c850c4e1660e3b391",
+      "size": 8322,
+      "sha256": "f9015072cd69c43125e8abadaa725a776ac8eb1a57db8807d12a78a323628e71"
+    },
+    {
+      "name": "CCH_001_chez.rle",
+      "url": "https://raw.githubusercontent.com/a-betenev/opencascade-dataset/d78a7a9e6de57699261fa03641ec1b5bafac39a1/brep/CCH_001_chez.rle",
+      "git_blob_sha1": "38d7364807302e467f47f8e1bf0a9f79db37af32",
+      "size": 3572,
+      "sha256": "152427180112b79d04f4969e6ea6c4ddab386b7f45dedd9957c0075aa7cb4e15"
+    },
+    {
+      "name": "CCH_001_chfa.rle",
+      "url": "https://raw.githubusercontent.com/a-betenev/opencascade-dataset/d78a7a9e6de57699261fa03641ec1b5bafac39a1/brep/CCH_001_chfa.rle",
+      "git_blob_sha1": "4ccd5bd39eb0debb8fb0898e04444ec2c7834fb3",
+      "size": 5134,
+      "sha256": "f79c0a91dc0a7750c11fd79dc0392ad4d6b488368a2c5e68e6c8f1fffb4b2c0e"
+    },
+    {
+      "name": "CCH_001_dhdd.rle",
+      "url": "https://raw.githubusercontent.com/a-betenev/opencascade-dataset/d78a7a9e6de57699261fa03641ec1b5bafac39a1/brep/CCH_001_dhdd.rle",
+      "git_blob_sha1": "445b7033824d7a22847552421455653bfaa0c8d7",
+      "size": 2223,
+      "sha256": "a2df174e06027aaad4c9cd37db20ac780d2ed52684f8380b66ae5362e2ad5582"
+    },
+    {
+      "name": "CCH_001_ehdg.rle",
+      "url": "https://raw.githubusercontent.com/a-betenev/opencascade-dataset/d78a7a9e6de57699261fa03641ec1b5bafac39a1/brep/CCH_001_ehdg.rle",
+      "git_blob_sha1": "1539c2ead6b66d06d240810fe78941e1388d259c",
+      "size": 2219,
+      "sha256": "171b9b24cc7dc741d9c581eca2e2dde3013ccca856da2627ed076d4bbe4f27ee"
+    },
+    {
+      "name": "CCH_001_ghdh.rle",
+      "url": "https://raw.githubusercontent.com/a-betenev/opencascade-dataset/d78a7a9e6de57699261fa03641ec1b5bafac39a1/brep/CCH_001_ghdh.rle",
+      "git_blob_sha1": "30fa36c4bafa09acc879b189d4ee94600d143233",
+      "size": 3769,
+      "sha256": "1571ebcd33d97dba663fd0162c19f84ecd54dea75ae4e539f7dfaa4d4bf9fcf3"
+    },
+    {
+      "name": "CCH_001_ghfb.rle",
+      "url": "https://raw.githubusercontent.com/a-betenev/opencascade-dataset/d78a7a9e6de57699261fa03641ec1b5bafac39a1/brep/CCH_001_ghfb.rle",
+      "git_blob_sha1": "09681512beefd867cefd6847d468e47e8f088e91",
+      "size": 10460,
+      "sha256": "6f48f2a21237a552438bd84080a5fcfb9f0cc8b24b317ca0a6332e6f68b69113"
+    },
+    {
+      "name": "CCH_001_hhdi.rle",
+      "url": "https://raw.githubusercontent.com/a-betenev/opencascade-dataset/d78a7a9e6de57699261fa03641ec1b5bafac39a1/brep/CCH_001_hhdi.rle",
+      "git_blob_sha1": "aaa89282b7e3684c6c7c56ec46d878718448641b",
+      "size": 3770,
+      "sha256": "69ed78a6ebc021673c84338b12cc76fa3c429446072773d51bda4dd368d008c1"
+    },
+    {
+      "name": "CCH_001_ihdj.rle",
+      "url": "https://raw.githubusercontent.com/a-betenev/opencascade-dataset/d78a7a9e6de57699261fa03641ec1b5bafac39a1/brep/CCH_001_ihdj.rle",
+      "git_blob_sha1": "51ff1c1d49a419b73f17d6392d9700e56ac8dddf",
+      "size": 2022,
+      "sha256": "2d9f094c28664cd3cdb1f3a5a3acc5a3a2ef996be28f5a74360508024122efff"
+    },
+    {
+      "name": "CCH_001_jhdk.rle",
+      "url": "https://raw.githubusercontent.com/a-betenev/opencascade-dataset/d78a7a9e6de57699261fa03641ec1b5bafac39a1/brep/CCH_001_jhdk.rle",
+      "git_blob_sha1": "bd32ebbed65cac44c58c84c099489e365cb5d141",
+      "size": 2068,
+      "sha256": "be57bd816c9d8807eb5212a04bea2b02e1d2407d460606511023b03ac0567ab8"
+    },
+    {
+      "name": "CCH_001_khdl.rle",
+      "url": "https://raw.githubusercontent.com/a-betenev/opencascade-dataset/d78a7a9e6de57699261fa03641ec1b5bafac39a1/brep/CCH_001_khdl.rle",
+      "git_blob_sha1": "4cbe395807b761b2f573bb23f1ee91f3d47318be",
+      "size": 2062,
+      "sha256": "7d3390358066cc59f4e0cf2045f4cb2c8d19ab087c15ded39099f2d959a54c86"
+    },
+    {
+      "name": "CCH_001_lhdm.rle",
+      "url": "https://raw.githubusercontent.com/a-betenev/opencascade-dataset/d78a7a9e6de57699261fa03641ec1b5bafac39a1/brep/CCH_001_lhdm.rle",
+      "git_blob_sha1": "b56fe3f5f26253b2b90a9449b3dba44bc3de8019",
+      "size": 2106,
+      "sha256": "35cfbcc3f9aa2761b0666a718c91b8930e17a8864283df9357b4394bed48920d"
+    },
+    {
+      "name": "CCH_001_qhff.rle",
+      "url": "https://raw.githubusercontent.com/a-betenev/opencascade-dataset/d78a7a9e6de57699261fa03641ec1b5bafac39a1/brep/CCH_001_qhff.rle",
+      "git_blob_sha1": "01c7ac53bb2aca49baa98dbc7b769edff219b097",
+      "size": 22467,
+      "sha256": "70e7ddc19d08eab2d92590857977774217fb7d6fe69287957ca198a53e67793f"
+    },
+    {
+      "name": "CCH_a.rle",
+      "url": "https://raw.githubusercontent.com/a-betenev/opencascade-dataset/d78a7a9e6de57699261fa03641ec1b5bafac39a1/brep/CCH_a.rle",
+      "git_blob_sha1": "63a6722d90974fcd8720904e28a2f978ff1ab779",
+      "size": 9441,
+      "sha256": "94af92594cbd13fe60cbb533ae0d1376370cd23bafff5202dd9b1583b2403a6e"
+    },
+    {
+      "name": "CCH_osa__hfe.rle",
+      "url": "https://raw.githubusercontent.com/a-betenev/opencascade-dataset/d78a7a9e6de57699261fa03641ec1b5bafac39a1/brep/CCH_osa__hfe.rle",
+      "git_blob_sha1": "b673183754e35e6ec83903e4edfce52a7fc85024",
+      "size": 71488,
+      "sha256": "57296e2e3204f6f810e7e43b95ed00db9dcaaafe3c627e69ce0caae95c2d2d5b"
+    },
+    {
+      "name": "CCH_testchet.rle",
+      "url": "https://raw.githubusercontent.com/a-betenev/opencascade-dataset/d78a7a9e6de57699261fa03641ec1b5bafac39a1/brep/CCH_testchet.rle",
+      "git_blob_sha1": "be34e86e7e027bb3e2bd1e73842a6c74390a7636",
+      "size": 5416,
+      "sha256": "8bc18d9906a7140017f33d43ee1f69acf69fbde2488a2c95555e9231c1ed1b46"
+    },
+    {
+      "name": "CFI_cts21348.rle",
+      "url": "https://raw.githubusercontent.com/a-betenev/opencascade-dataset/d78a7a9e6de57699261fa03641ec1b5bafac39a1/brep/CFI_cts21348.rle",
+      "git_blob_sha1": "9c7d44fe08b21ac023b0dba5554c6328dae28408",
+      "size": 32661,
+      "sha256": "7eb71f8565b8ac0d068d61573f98546cbfb47b11aac80047bccbec2b4e4025fb"
+    },
+    {
+      "name": "CFI_pro10391.rle",
+      "url": "https://raw.githubusercontent.com/a-betenev/opencascade-dataset/d78a7a9e6de57699261fa03641ec1b5bafac39a1/brep/CFI_pro10391.rle",
+      "git_blob_sha1": "d130fef29c8687cb27dc457600c861dce0bf63d1",
+      "size": 29096,
+      "sha256": "cff6f349d812d30010e9ad179a84bdafa6f32e4c464fc7c5541cd53c46a20730"
+    },
+    {
+      "name": "CFI_pro14552.rle",
+      "url": "https://raw.githubusercontent.com/a-betenev/opencascade-dataset/d78a7a9e6de57699261fa03641ec1b5bafac39a1/brep/CFI_pro14552.rle",
+      "git_blob_sha1": "38886d209010fd412be0fce5abbb923f5132e2c4",
+      "size": 12707,
+      "sha256": "646874ed428036db6e3d5d724ffe3fee036c54efa74542595eaabf300a7de6c2"
+    },
+    {
+      "name": "propag",
+      "url": "https://raw.githubusercontent.com/a-betenev/opencascade-dataset/d78a7a9e6de57699261fa03641ec1b5bafac39a1/brep/propag",
+      "git_blob_sha1": "0c68f070dd7b35f7e61005cd83456a823cfe60b5",
+      "size": 91301,
+      "sha256": "2d5bcb64644c65dcfd02032d7da605002e70108bd0743150ed90d8eb4c495d5f"
+    },
+    {
+      "name": "test-fillet.brep",
+      "url": "https://raw.githubusercontent.com/a-betenev/opencascade-dataset/d78a7a9e6de57699261fa03641ec1b5bafac39a1/brep/test-fillet.brep",
+      "git_blob_sha1": "4cbda096d897e1bd768d3b9d434d57b068ea3019",
+      "size": 31718,
+      "sha256": "42fcbb9ea7836612d26aa59ca7f6bf73fcfc95ad4e0a3246f4a7bfc8e40ced64"
+    },
+    {
+      "name": "testKPart",
+      "url": "https://raw.githubusercontent.com/a-betenev/opencascade-dataset/d78a7a9e6de57699261fa03641ec1b5bafac39a1/brep/testKPart",
+      "git_blob_sha1": "0ad63ac91727ce501d0b55b4d4e5936cde65b161",
+      "size": 9337,
+      "sha256": "282beed4d33a2186ef906b9725f2a46d57b40ae22c8539283eb917b34ea33398"
+    }
+  ]
+}
