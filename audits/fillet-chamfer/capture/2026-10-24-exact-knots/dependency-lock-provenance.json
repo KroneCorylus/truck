@@ -1,0 +1,7 @@
+{
+  "kind": "supplemental-packaging-time-dependency-lock-snapshot",
+  "path": "dependency-Cargo.lock",
+  "sha256": "58085733bd90cdb3ef2b8611cd443e22dae3281b715d5bdbca8707f3238d58bb",
+  "capture_kernel_revision": "5a4e3bc666ffda4adb0ed03eeeb707c3068c1d79",
+  "limitation": "The capture manifest did not record Cargo.lock. This supplemental snapshot does not retrospectively attest every historical build dependency graph or change the archived capture manifest."
+}

@@ -1,0 +1,18 @@
+{
+  "html_sha256": "1955526884afd43440a31a2865aa0f04d4da843b2d0cf7d0464584868f310295",
+  "previews": [
+    {
+      "width": 1100,
+      "appearance": "light",
+      "contentHeight": 1609,
+      "consoleMessages": []
+    },
+    {
+      "width": 390,
+      "appearance": "dark",
+      "contentHeight": 3060,
+      "consoleMessages": []
+    }
+  ],
+  "review": "Fluid layout and wrapped identifiers checked; explicit theme foreground fixes initial dark-text inheritance. Evidence links resolve locally."
+}

@@ -1,0 +1,44 @@
+{
+  "snapshot_sha256": "18ec804b286dc628edd8bcd3263efbc198f38f102a9369c4c117bdb5ee785dfe",
+  "completed_native_cases": 396,
+  "completed_operations": 648,
+  "native_statuses": {
+    "passed": 396
+  },
+  "statuses": {
+    "input-import-failed": 95,
+    "operation-succeeded": 482,
+    "operation-failed": 65,
+    "input-inconsistent": 6
+  },
+  "limited_passes_in_completed_subset": 438,
+  "limited_passes_before_same_subset": 438,
+  "native_files_hash_verified": 3885,
+  "test_data_verified": true,
+  "status_changes": [
+    {
+      "id": "chamfer/dist_dist_sequence/C1/007",
+      "before": "input-inconsistent",
+      "after": "operation-failed"
+    },
+    {
+      "id": "chamfer/dist_dist_sequence/C1/008",
+      "before": "input-inconsistent",
+      "after": "operation-failed"
+    },
+    {
+      "id": "chamfer/equal_dist_sequence/C1/006",
+      "before": "input-inconsistent",
+      "after": "operation-failed"
+    },
+    {
+      "id": "chamfer/equal_dist_sequence/C1/007",
+      "before": "input-inconsistent",
+      "after": "operation-failed"
+    }
+  ],
+  "canonical_losses": 0,
+  "reviewed_numeric_changes": 110,
+  "exact_old_successes": 372,
+  "review_file_sha256": "07f429c2d1b5ad823263d92b1d9f260020283e49cd8d0848f8b123e292870663"
+}

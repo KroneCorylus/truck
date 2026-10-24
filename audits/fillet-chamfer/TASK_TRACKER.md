@@ -1,10 +1,10 @@
 # Fillet and chamfer completion tracker and agent handoff
 
-Updated: **2026-10-24**. Owner: Krone. Repository: `/home/krone/Development/Pieza_WS/truck`, branch `master`. Verified implementation HEAD: **`9e3ce08a`**. This handoff covers **all remaining work**, including the complete captured-operation backlog and the broader capability audit, not only the next checkpoint.
+Updated: **2026-10-24**. Owner: Krone. Repository: `/home/krone/Development/Pieza_WS/truck`, branch `master`. Verified implementation HEAD: **`5a4e3bc6`**. This handoff covers **all remaining work**, including the complete captured-operation backlog and the broader capability audit, not only the next checkpoint.
 
 The objective is OCCT-level fillet/chamfer capability and robustness for equivalent modeling tasks in Truck/Pieza. Judge physical dimensions, geometry, validity, editing behavior, and practical latency. Matching OCCT APIs, internal algorithms, patch types, or face counts is not the objective. The scope is the pinned OCCT V7_9_3 inventory in [coverage.json](coverage.json), not every possible mathematical configuration or future OCCT release.
 
-Implementation resumed on 2026-10-24 at Krone’s request with multiple subagents; the full mixed-corner capture is complete and verified; the exact-knot/STEP checkpoint is validated and awaiting its complete capture. This document prepares work for another agent; creating it does not start kernel work or launch subagents. The receiving agent should follow Krone's new assignment and stop conditions. Previous authorization covered achievement commits; no push, PR, consumer dependency change, or unrelated application change is authorized by this handoff.
+Implementation resumed on 2026-10-24 at Krone’s request with multiple subagents; the full mixed-corner capture is complete and verified; the exact-knot/STEP checkpoint and its complete capture are validated. This document prepares work for another agent; creating it does not start kernel work or launch subagents. The receiving agent should follow Krone's new assignment and stop conditions. Previous authorization covered achievement commits; no push, PR, consumer dependency change, or unrelated application change is authorized by this handoff.
 
 ## Start here
 
@@ -27,7 +27,7 @@ Implementation resumed on 2026-10-24 at Krone’s request with multiple subagent
 - [x] Final production F1/H7 original-scale replays construct consistent closed STEP with unchanged inputs. F1 passes the limited comparison; H7 still fails its distance threshold.
 - [x] Full mixed-corner corpus capture and comparison against the previous complete run; archive verified (8,497 members). Catalog refresh tracked below.
 
-The latest complete run is the **2026-10-24 mixed-corner checkpoint**, with 396 native cases and 648 captured operations. All 480 previously successful result/comparison records are exactly preserved:
+The latest complete run is the **2026-10-24 exact-knot checkpoint** on `5a4e3bc6`, with 396 native cases and 648 captured operations. Of 482 previous successes, 372 result/comparison records are exact and 110 numerical changes have individual reviews; no canonical check is lost:
 
 | Measure | Confirmed count |
 | --- | ---: |
@@ -35,16 +35,16 @@ The latest complete run is the **2026-10-24 mixed-corner checkpoint**, with 396 
 | Operations passing the limited comparison | 438 |
 | Positive solid reference operations | 559 |
 | Unresolved positive solid operations | 121 |
-| Construction failures within those 121 | 60 |
+| Construction failures within those 121 | 64 |
 | Solid import failures | 7 |
-| Inconsistent solid inputs | 10 |
+| Inconsistent solid inputs | 6 |
 | Constructed comparison discrepancies | 44 |
 | Other captures with no input solid | 88 |
 | Matched native rejection | 1 |
 
 “Constructs” means the operation produced geometry; it does not establish shape equivalence. Limited comparison includes the recorded validity/material-processing checks and sampled bidirectional distance threshold of 0.001; it is not a global geometric error bound. The 88 no-solid inputs require scope review for shell/sketch tasks and must not be silently discarded from the broader audit.
 
-F1's targeted distances are approximately 0.0000399792 / 0.0000399774. H7's are 0.001525464 / 0.001514833. The complete run now confirms **482 constructions and 438 limited passes**. F1 is the sole new limited pass; H7 moves from construction failure to discrepancy. All 648 operation keys/tasks, native references and 2,590 native geometry files (excluding only STEP capture timestamps) are preserved. The historical 122-row ledger below retains original dispositions and now has one resolved row.
+F1's targeted distances are approximately 0.0000399792 / 0.0000399774. H7's are 0.001525464 / 0.001514833. The mixed-corner run confirmed **482 constructions and 438 limited passes**. In that run F1 was the sole new limited pass and H7 moved from construction failure to discrepancy. The exact-knot run preserves these totals; four C1 inputs now import consistently but still fail construction. All 648 operation keys/tasks, native references and 2,590 native geometry files (excluding only STEP capture timestamps) are preserved. The historical 122-row ledger below retains original dispositions and now has one resolved row.
 
 One existing ignored test, two existing test warnings, and the known `pcurve_derivation` precision failure remain explicit. Dependency validation was reused only with matching source hashes. Do not describe the whole workspace as passing all tests.
 
@@ -58,10 +58,10 @@ At most **three workers plus one coordinator** can run with the currently availa
 
 | Package | Scope | Agent and worktree | State | Integration dependency |
 | --- | --- | --- | --- | --- |
-| A | Coordinator, corpus, catalog, integration | `/root`, root `master` @ `9e3ce08a` | Mixed capture/catalog checkpoint complete; integration ongoing | First capture precedes new root kernel changes |
-| B | Extruded curved corners and F5 tessellation | `/root/b_f5`, root `master` @ `9e3ce08a`; scoped scratch patch | Physical-chart candidate and parent accuracy proof frozen; mesher performance blocks acceptance | Coordinate remote corner mechanism with C |
+| A | Coordinator, corpus, catalog, integration | `/root`, root `master` @ `5a4e3bc6` | Exact-knot full capture, catalog and report verified | First capture precedes new root kernel changes |
+| B | Extruded curved corners and F5 tessellation | `/root/b_f5`, root `master` @ `9e3ce08a`; scoped scratch patch | Isolated physical-chart/finite-facet candidate passes focused accuracy and closure; full validation and medians pending | Coordinate remote corner mechanism with C |
 | C | Remaining curved junctions and collapse | `/root/b_f5`, read-only root; G2/G6/H1 claimed | G2 independent material oracle complete; scoped implementation in scratch. G6 basis continuation remains unresolved | Integrate after A; share geometry changes with B/F |
-| D | STEP imports, pcurves, seams, inconsistent inputs | `/root/d_import`, root `master` @ `9e3ce08a`; scoped scratch patch | Exact-knot/STEP candidate under full downstream validation; C1 support gaps remain | Coordinate mesher/STEP changes with G |
+| D | STEP imports, pcurves, seams, inconsistent inputs | `/root/d_import`, root `master` @ `9e3ce08a`; scoped scratch patch | Exact-knot/STEP achievement committed; complete capture preserves all canonical checks; C1 construction gaps remain | Coordinate mesher/STEP changes with G |
 | E | Chamfer construction and dimensional modes | `/root/d_import`, read-only root; sequential C2 claimed | Reduced C2 retain/collapse/overshoot regression and analytic oracle prepared; not executed | D owns input repair; G owns discrepancy analysis |
 | F | Unequal, variable, and zero-radius fillets | `/root/d_import`, read-only root @ `96ca84d1` | Concrete gap/oracle review in progress | Coordinate common corner construction with C |
 | G | Independent geometry proof, discrepancies, robustness, performance | `/root/g_proof`, scoped mesher experiment in root @ `96ca84d1` | Discrepancy/scope reviews complete; independent D arithmetic-contract and G2 review | Supplies oracles and reviews to all packages |
@@ -287,12 +287,12 @@ Initial package assignment is a triage owner, not a proven root cause. G transfe
 - [ ] `chamfer/dist_dist_sequence/C1` / `004` — package **D**.
 - [ ] `chamfer/dist_dist_sequence/C1` / `005` — package **D**.
 - [ ] `chamfer/dist_dist_sequence/C1` / `006` — package **D**.
-- [ ] `chamfer/dist_dist_sequence/C1` / `007` — package **D**.
-- [ ] `chamfer/dist_dist_sequence/C1` / `008` — package **D**.
+- [ ] `chamfer/dist_dist_sequence/C1` / `007` — package **D**. Current: input is consistent; construction fails at `trim_faces` on `5a4e3bc6`. Remains unresolved.
+- [ ] `chamfer/dist_dist_sequence/C1` / `008` — package **D**. Current: input is consistent; construction fails at `trim_faces` on `5a4e3bc6`. Remains unresolved.
 - [ ] `chamfer/equal_dist_sequence/C1` / `004` — package **D**.
 - [ ] `chamfer/equal_dist_sequence/C1` / `005` — package **D**.
-- [ ] `chamfer/equal_dist_sequence/C1` / `006` — package **D**.
-- [ ] `chamfer/equal_dist_sequence/C1` / `007` — package **D**.
+- [ ] `chamfer/equal_dist_sequence/C1` / `006` — package **D**. Current: input is consistent; construction fails at `trim_faces` on `5a4e3bc6`. Remains unresolved.
+- [ ] `chamfer/equal_dist_sequence/C1` / `007` — package **D**. Current: input is consistent; construction fails at `trim_faces` on `5a4e3bc6`. Remains unresolved.
 - [ ] `chamfer/equal_dist_sequence/C1` / `008` — package **D**.
 
 ### Constructed comparison discrepancies
@@ -435,7 +435,7 @@ All paths here are relative to the repository root unless linked otherwise.
 | Capability definitions and evidence | [Coverage](coverage.json) |
 | Generated inventory and case navigation | [Catalog](catalog.html) and [viewer](viewer.html) |
 
-Current mixed capture archive SHA256: `5f5b0bf951da9e2e3809c52b17aa5b72e7b1c177f2ddc3086002a8828052c6be` (8,497 members).
+Previous mixed capture archive SHA256: `5f5b0bf951da9e2e3809c52b17aa5b72e7b1c177f2ddc3086002a8828052c6be` (8,497 members).
 
 Baseline torus archive SHA256: `0bad14be0c383aa48050e7941d3311ca8665946be5e6db9f145d5e02e52ba9b8` (8,491 members).
 Mixed proof archive SHA256: `ffd52c1c367d115c1c55e8002f940e2d7926fcc2fd895addf29dc8c50ee93d8e` (76 members).
@@ -471,6 +471,8 @@ Update the existing checkboxes and package states, then append one row per stabl
 
 | 2026-10-24 | A | `9e3ce08a` / [capture](capture/2026-10-24-mixed-curved-corners/REPORT.md) | Full mixed capture: 482 construct, 438 limited passes; 480 old successes exact; 8,497 archive members verified | 121 unresolved positive solids (60 construction, 7 import, 10 inconsistent, 44 discrepancies); F5/exact-knot candidate validation next |
 
+| 2026-10-24 | A/D | `5a4e3bc6` / [capture](capture/2026-10-24-exact-knots/REPORT.md) | Complete exact-knot capture: 482 construct, 438 limited passes; 372 exact + 110 reviewed prior successes; no lost checks | 121 unresolved: 64 construction, 7 import, 6 inconsistent, 44 discrepancies; F5 validation in progress |
+
 Next handoff must state: current HEAD/branch, changed files, active jobs, completed packages, exact validation evidence, actual corpus totals, unresolved discrepancies, local-only artifacts, and the first reproducible next action.
 
 ### 2026-10-24 validation correction
@@ -504,3 +506,9 @@ F5 producer/mesher changes, physical fixtures, benchmark controls and their evid
 Inventory follow-up found nine skipped native blend cases with fixtures already available in the provenanced public data directory. Their isolated retry is being prepared under `target/d-inventory-review-2026-10-24/`; the 396-case/648-operation baseline remains unchanged until a separate reviewed inventory expansion.
 
 Final D checkpoint: post-inline source confirms 367 dependency passes with the one known failure/one ignore, 172 doctest passes/three ignores; 81 mesher passes/one ignore and 21 doctests; eight R10 and 76 replay passes; all-target Clippy and unmodified actions smoke pass. The cleaned production C1 archive has 226 verified members and unchanged 144 native artifacts. `validation.json` records final source, binary, logs and archive hashes. The implementation report was checked at 1100 px/light and 390 px/dark. This is a bounded parameter/import robustness achievement; all unresolved operations remain listed.
+
+### 2026-10-24 exact-knot complete capture
+
+Implementation `5a4e3bc6` completed all 396 native cases and 648 operations with one worker and a 120-second timeout. Counts remain 482 constructions / 438 limited passes / 121 unresolved positive solids: 64 construction failures, seven import failures, six inconsistent inputs and 44 comparison discrepancies. Four C1 captures changed from inconsistent input to construction failure, with unchanged inputs. All 372 exact former successes and 110 reviewed numeric changes preserve canonical checks; no new operation is resolved. The verified 8,497-member archive SHA256 is `c0e6bc4beed8568e60c4f3d9311053ffbce2a8ca798c8ebdbff3fbdfe833061d`. Capture tests 13/13 and audit tests 22/22 pass. Supplemental lockfile provenance is included because the git-based source manifest omitted the ignored workspace lockfile.
+
+The root-owned detached F5 validation checkout is `target/f5-mesher-validation-2026-10-24` at parent `5a4e3bc6`. A finite-facet refinement candidate exposed folds in polar planar trim charts; a transactional guard retains the first valid mesh when optional refinement introduces folds. Original curved-chamfer closure tests and unchanged cap/loft accuracy tests pass, as do 84 mesher tests and 21 doctests (one existing ignore). Full shapeops/replay/Clippy, final medians and original-scale comparison remain pending. F5 is not yet accepted.

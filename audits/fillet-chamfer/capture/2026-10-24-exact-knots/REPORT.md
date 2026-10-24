@@ -1,0 +1,25 @@
+# Exact-knot complete corpus capture
+
+Complete serial capture of exact-knot implementation 5a4e3bc666ffda4adb0ed03eeeb707c3068c1d79: 396 native cases, 648 operations, 482 constructions and 438 limited comparison passes. 121 of 559 positive-solid operations remain unresolved. No newly resolved operation or new limited pass is claimed.
+
+Compared with the committed mixed-corner capture, 372 successful result/comparison records are exactly unchanged and 110 changed successful records have individual reviews bound to their exact record hashes. Their existing limited-comparison dispositions are preserved. The review retains material/volume, STEP, and bidirectional-distance evidence; it does not infer equivalence solely from small numerical deltas or assign an unproven unique cause to them.
+
+All 648 operation keys, raw input tasks and summarized tasks retain the same intent and native-contour selection scope. All 2590 native geometry files are unchanged, excluding only generated FILE_NAME capture timestamps in STEP; BREP bytes are unchanged. The packager verifies source, replay, plugin/runtime, native harness, external data and archive member hashes. The capture uses one worker and a 120-second timeout.
+
+Four C1 inputs improve from inconsistent-input rejection to consistent input reaching construction, then fail at trim_faces: dist_dist_sequence/C1/007–008 and equal_dist_sequence/C1/006–007. These are input-consistency gains, not successful operations or resolved comparisons. Previously successful C1 outcomes remain unchanged.
+
+Statuses: {"input-import-failed": 95, "input-inconsistent": 6, "operation-failed": 65, "operation-succeeded": 482}. There are 44 constructed comparison discrepancies. 88 no-solid inputs already contain native shells/faces; their shell contracts remain unverified. 1 rejection matches native. F1 remains a prior limited pass; H7 remains a constructed discrepancy against the unchanged 0.001 sampled-distance threshold.
+
+This evidence-only report reuses package D validation with its recorded source snapshots. Final post-inline checks: 367 dependency tests pass, one known pcurve_derivation precision failure and one existing ignore; 172 dependency doctests pass with three ignores; 81 mesher tests and 21 doctests pass with one test ignore; eight R10 and 76 replay tests pass. All-target Clippy and actions smoke pass with two existing test warnings. The complete 545-test/28-doctest downstream run precedes the ordinary inline annotation and is explicitly tied to that earlier source, not presented as a rerun on final source.
+
+The known pcurve_derivation assertion compares derivatives around magnitude 2.83e9 with an absolute difference around 1.4e-6. Its assertion and persisted counterexample are unchanged. This is not an all-green workspace claim. The full corpus executes the production replay but does not rerun those Rust suites.
+
+Fixed-core seven-sample alternating benchmarks retain about 3% finest-loft overhead: parent 111.3/113.6 ms, candidate 114.5/117.4 ms. Cap and sphere run averages are approximately unchanged. No zero-regression claim is made; exact sources, timings and earlier superseded evidence remain in the D implementation report.
+
+Exact knot equality, bounded checked-arithmetic diagnostics, IEEE infallible basis behavior, finite-search guards and the limited declared STEP spline-master preference are documented in the implementation report. These do not establish universal finite evaluation, panic freedom, native parity, or a global geometric-error bound. F5 and G2 prototypes are separate work and are not accepted capabilities of this capture. No consumer source or dependency pin changed; stopped E4 stress was not restarted.
+
+Supplemental dependency provenance records the packaging-time Cargo.lock snapshot (SHA256 58085733bd90cdb3ef2b8611cd443e22dae3281b715d5bdbca8707f3238d58bb). The original capture manifest did not hash Cargo.lock; this supplement does not retroactively certify every historical build graph.
+
+Raw corpus archive SHA256: c0e6bc4beed8568e60c4f3d9311053ffbce2a8ca798c8ebdbff3fbdfe833061d.
+
+[Comparison summary](comparison-summary.json) · [Numeric review](numeric-review.json) · [Dependency provenance](dependency-lock-provenance.json) · [Implementation validation](../../../../truck-benchmarks/results/2026-10-24-exact-knots/REPORT.md)
