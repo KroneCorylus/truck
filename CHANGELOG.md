@@ -6,6 +6,10 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Tessellate twisted trimmed surfaces with an undivided parameter grid within tolerance.
+  A 2×2 grid, such as a bilinear patch with straight sides, was split into two triangles
+  however twisted it was; it is now refined like single-direction grids.
+
 - Fillet three-edge corners where an elliptical (non-elementary) extruded surface meets
   two planes. Previously `validate_input` rejected them with `NonPlanarFace`. Blend charts
   are scaled so both parameter directions have comparable physical speed, which keeps

@@ -1019,6 +1019,8 @@ where S: PreMeshableSurface {
     let (udiv, vdiv) = (&divisions.0, &divisions.1);
     let single_direction =
         (udiv.len() > 2 && vdiv.len() == 2) || (udiv.len() == 2 && vdiv.len() > 2);
+    // An undivided grid can still be twisted, as in a bilinear patch with straight sides.
+    let undivided = udiv.len() == 2 && vdiv.len() == 2;
     // Oblique trims can discard the curved grid's end rulings. Seed an interior one.
     let trimmed_grid = single_direction
         && polyboundary.loops.iter().any(|boundary| {
@@ -1044,7 +1046,7 @@ where S: PreMeshableSurface {
         &metric,
         divisions,
     );
-    if single_direction {
+    if single_direction || undivided {
         refine_interior(
             &mut triangulation,
             surface,

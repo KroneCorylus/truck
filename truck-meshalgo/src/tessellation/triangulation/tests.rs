@@ -692,3 +692,26 @@ fn check_pole_refinement(pole_roundoff: f64) {
     }
     assert!(mesh.neighborhood_include(&samples, tol));
 }
+
+#[test]
+fn twisted_bilinear_patch_is_refined_within_tolerance() {
+    use crate::analyzers::WithPointCloud;
+    use truck_geometry::prelude::*;
+    let surface = BSplineSurface::new(
+        (KnotVec::bezier_knot(1), KnotVec::bezier_knot(1)),
+        vec![
+            vec![Point3::new(0., 0., 0.), Point3::new(0., 1., 0.)],
+            vec![Point3::new(1., 0., 0.), Point3::new(1., 1., 1.)],
+        ],
+    );
+    let tol = 0.01;
+    let points = [(0., 0.), (1., 0.), (1., 1.), (0., 1.)]
+        .map(|(u, v)| SurfacePoint::from((Point2::new(u, v), surface.subs(u, v))));
+    let boundary = PolyBoundary::from_loops(vec![points.to_vec()]);
+    let mesh = trimming_tessellation(&surface, &boundary, tol);
+    let samples: Vec<_> = (0..=16)
+        .flat_map(|i| (0..=16).map(move |j| (i as f64 / 16., j as f64 / 16.)))
+        .map(|(u, v)| surface.subs(u, v))
+        .collect();
+    assert!(mesh.neighborhood_include(&samples, tol));
+}
