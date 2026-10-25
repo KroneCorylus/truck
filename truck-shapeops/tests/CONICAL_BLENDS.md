@@ -56,13 +56,10 @@ meridian satisfies `ρ+(aq/b-s)(z-8)=R-a`; the tests sample this equation and it
 Cavity results have volume `6336 - V_rounded_void`, with two closed boundary shells
 and reversed cavity normals. The formulas are independent of either kernel's output.
 
-## OCCT comparison and remaining scope
+## OCCT comparison
 
 `audits/fillet-chamfer/probes/conical_blends.cpp` performs the same native-coordinate
 analytic tasks in OCCT 7.9.3, recording validity, solid count, volume and sampled
 dimension equations. Its source and raw output accompany the audit. Truck's transformed,
 reversed-selection, NURBS, mesh and STEP checks are additional independent validation;
 the probe does not establish those OCCT outcomes.
-
-Oblique plane/cone intersections, varied cone angles, apex/contact collapse, curved
-terminations and arbitrary support pairs remain broader audit work.

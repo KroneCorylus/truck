@@ -49,6 +49,3 @@ The fitted OCCT patches have maximum sampled radius errors of about `3.91e-6` an
 Volume deviations from the independent formula are about `1.27e-6` and `2.22e-6`.
 The probe records these deviations rather than claiming exact surface identity.
 It does not test OCCT's transformed, NURBS, wire-reversal, G1, mesh or STEP outcomes.
-
-Arbitrary sphere intersections, toroidal/cylinder support pairs, pole contact,
-apex collapse, general spline supports and chamfer-distance semantics remain open.

@@ -1,0 +1,79 @@
+Selected next valid-input gap: blend/simple/P9/001, unequal adjacent straight fillets.
+No builds/implementation. Root current API docs intentionally exclude this topology;
+this is a requested capability extension, not a violation of its existing contract.
+
+Exact procedural reproduction, no dimensions tuned:
+box [0,5]^3. Select by endpoint positions, never edge iteration order:
+A: (5,0,5)--(5,5,5), physical constant radius 1.
+B: (0,0,5)--(5,0,5), physical constant radius 0.5.
+Both selected edges meet at (5,0,5). Native source tests/blend/simple/P9 constructs
+box 5 5 5 then blend result s 1 s_6 0.5 s_10, area check 146.393.
+Captured task resolves the topology-numbered selection to these physical witnesses.
+Native valid one-solid result volume 123.69042579245692; native volume is comparison
+evidence, not a closed-form exact junction volume.
+
+Smallest behavior regression: common::modeling::cuboid(origin,(5,5,5)); find unique
+edges by unordered endpoint pairs; serialize compressed input; call public
+try_fillet_solid_edges_with_radii with A1/B0.5 in both orders; require success and
+unchanged serialized input, valid coherent one-solid topology. Current guard in
+modeling.rs rejects any selected shared vertex before planar_edge::blend_edges:
+parent failure should be UnsupportedTopology/validate_input, not import/selection.
+Do not execute now. Test intended success must be accompanied by physical oracles
+below before allowing implementation acceptance. Rewrite ONLY the connected-edge
+expectation of existing unequal_radius_junctions_and_overlapping_parallel_rounds_are_rejected;
+retain invalid-radius controls, oversized parallel6/5 rejection, opposite1/2 material,
+STEP and immutable-input checks. Don't remove the guard without a junction builder.
+
+Independent local geometry (absolute original coordinates):
+A strip cylinder: (x-4)^2+(z-4)^2=1, axis parallel y.
+At y=2.5, quarter arc x=4+cos(theta), z=4+sin(theta), theta in[0,pi/2].
+Top contact (4,2.5,5), side contact (5,2.5,4); outward normal
+(cos(theta),0,sin(theta)).
+B strip cylinder: (y-0.5)^2+(z-4.5)^2=0.25, axis parallel x.
+At x=2.5, quarter arc y=0.5-0.5*cos(theta), z=4.5+0.5*sin(theta).
+Top contact (2.5,0.5,5), front contact (2.5,0,4.5); outward normal
+(0,-cos(theta),sin(theta)).
+Use theta=0,pi/8,pi/4,3pi/8,pi/2 and extra physical stations 2,2.5,3.
+Find contacts on actual trimmed faces, not underlying untrimmed surface extension.
+Compare nearest boundary position and oriented normals; matching one radius inferred
+from a producer parameter or generated_faces count is insufficient.
+
+Independent retained-material oracle away from junction:
+For x in[4,5], z in[4,5], and y in[2,3], removed material is exactly the part outside
+A's unit circle: cross-section area 1-pi/4, prism volume 1-pi/4.
+For y in[0,.5], z in[4.5,5], x in[2,3], corresponding removed volume
+0.25*(1-pi/4). These disjoint windows avoid the corner and remote ends.
+Use independent point-in-solid winding on verified closed output meshes at two
+converged tolerances or an independent STEP classifier; test interior witnesses on
+both sides of each analytic cylinder with clearance much larger than mesh error.
+Local analytic slice integral is independent of the production fillet implementation.
+This does NOT establish global junction material or prove native geometry correct.
+
+Junction acceptance must additionally check all patch joins positional and tangent
+continuity and no extra internal boundaries; neighboring planar/cylindrical face
+normals must agree at their actual trim contacts. A radius-1 sphere cannot be assumed
+for a radius-.5 branch. A blind union of two cylinders intersects non-tangentially:
+A normal has y=0 while B has x=0; normals can agree only where both are z-directed,
+not along a generic intersection seam. Thus Boolean strip clipping alone is not a
+smooth unequal corner. Need derive transition contact locus + tangent join with C's
+corner mechanism, then integrate that junction independently before claiming full
+physical correctness. Do not accept native volume closeness as sole junction oracle.
+
+Implementation scope once oracle is ready: modeling.rs unequal shared-vertex route
+into existing planar corner construction; planar_edge/planar_fillet common terminal
+contacts and actual unequal transition builder, coordinated with C. No second generic
+healing/filler pipeline. First stage is regression + geometry derivation, not removing
+UnsupportedTopology. This two-edge all-planar case is smaller than A4 three-edge,
+tolblend A2 four-edge/apex, featlf E2/E3 seven-edge selections; no F5/G2 dependency
+should be assumed without inspecting shared corner builder's constraints.
+
+Radius-law contract distinction:
+P9 has two CONSTANT contour radii; no interpolation or physical-versus-parameter law
+ambiguity. The five tracker unequal rows do not demonstrate variable or zero law.
+Current wire API documents one parameter unit per selected edge. Unequal physical
+chain split invariance is tracker F02 requested extension, not current API promise.
+Do not introduce R(s) arc-distance semantics silently; requires explicit public
+contract/Breaking docs, derivative chain rule and parent-behavior test design.
+Historical A4-variable capture has null constant radius but insufficient law/station
+information; seed endpoints do not specify interpolation. Zero endpoint capture must
+first record actual native law. No variable/zero native failure can be inferred here.

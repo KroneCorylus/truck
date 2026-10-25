@@ -22,7 +22,6 @@ node_modules/
 /.vscode
 /.DS_store
 WIP/
-kernel-issues/
 
 # Exact CAD boolean regression operands.
 !truck-shapeops/tests/channel-boundary-operands.json

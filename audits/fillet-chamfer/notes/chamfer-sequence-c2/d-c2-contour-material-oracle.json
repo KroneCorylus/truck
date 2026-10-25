@@ -1,0 +1,35 @@
+[
+  {
+    "a": 0.2,
+    "d": 0.1,
+    "base_volume": 991.4159265358979,
+    "input_volume": 991.2159265358979,
+    "second_wedge": 0.09544616388014983,
+    "overlap": 0.0008333333333333335,
+    "result_volume": 991.1213137053511,
+    "terminal_wall_x": 0.1,
+    "terminal_wall_z": 9.9
+  },
+  {
+    "a": 0.2,
+    "d": 0.2,
+    "base_volume": 991.4159265358979,
+    "input_volume": 991.2159265358979,
+    "second_wedge": 0.3807374579694027,
+    "overlap": 0.0026666666666666674,
+    "result_volume": 990.8378557445951,
+    "terminal_wall_x": 0,
+    "terminal_wall_z": 9.8
+  },
+  {
+    "a": 0.2,
+    "d": 0.5,
+    "base_volume": 991.4159265358979,
+    "input_volume": 991.2159265358979,
+    "second_wedge": 2.3599741582238303,
+    "overlap": 0.008666666666666673,
+    "result_volume": 988.8646190443407,
+    "terminal_wall_x": 0,
+    "terminal_wall_z": 9.5
+  }
+]

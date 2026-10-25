@@ -1,0 +1,49 @@
+C2 procedural reduction, 2026-10-24. Scratch only, UNCOMPILED/UNRUN.
+Files d-c2-consumed-contour-regression.rs and d-c2-contour-material-oracle.{py,json}.
+No root source, tracker, fixture or frozen prior patch changed.
+
+Profile: [0,0]->[8,0], radius2 quartercircle centered[8,2] to[10,2],
+then[10,10]->[0,10]->[0,0]. Extrude height10. Base volume10*(96+pi).
+First equal chamfer a=.2 on top edge x0,z10, y0..10. This removes5*a^2.
+Select physical top line/arc/line witnesses, using topface orientation. Second
+chamfer d=.1 control, d=.2 exact consumption, d=.5 overshoot. Separate tests
+ensure failing small control cannot mask diagnostics on two consumption cases.
+Repeat reversed selection and compare serialized inputs before/after each op.
+The dimensions are analytic convenient integers; .2 and.5 come from C2. R2 is
+larger than all requested distances, excluding convex corner collapse. No tuning.
+
+Analytic local cut: w=10-z. At depth0<=w<=d, selected contour inset t=d-w.
+Straight strips remove16*t. Quartercircle removes pi/4*(2^2-(2-t)^2).
+Therefore second-cut volume V2=(16+pi)*d^2/2-pi*d^3/12.
+Old wedge is x+w<a, all y0..10; it meets only first straight strip of new cut.
+Their overlap at w is(a-w)*(d-w), integrate w0..m=min(a,d):
+ O=a*d*m-(a+d)*m^2/2+m^3/3.
+Final volume=10*(96+pi)-5*a^2-V2+O. No CAD/native geometry used in formula.
+Numbers in JSON are direct evaluation, not sampled numerical integration.
+
+Terminal diagonal before second operation: x+w=a,y0,0<=w<=a.
+For d<a, surviving sidecontact intersects at x=a-d,z10-d.
+For d=a it lands on x0,z10-a, collapsing diagonal edge exactly.
+For d>a oldplane intersection has negative x, outside part. Correct sidecontact
+must end at x0,z10-d, and newterminal boundary crosses both oldbevel and x0face.
+This reproduces verified equal005/010 mechanism, not unknown angle005 cause.
+
+Frozen future test contract: base/input exactmaterial, expected result exactvolume
+via shared assert_solid +STEP, geometricconsistency, removed diagonal identity
+for d>=a, contact witnesses on both original supports for straight and circular
+segments, reversedwire same result, input unchanged on success OR failure.
+No fixed facecount. Kernel full material proof remains required even if local
+contacts appear correct. Parent must fail identical tests before productionfix.
+
+Next: copy scratch to tests/d_c2_consumed_contour.rs after slot authorized,
+run all3individually. If first chamfer or analytic circular recognition is outside
+construction scope, do not tune dimensions until it happens to pass. Diagnose
+that scope or use exact archived equal005/dist005 fixtures instead. The scratch
+fixture's construction and orientation are not yet runtime verified. Include
+sourcehashes, emittedparentdiagnostics and oracle when preserving evidence.
+
+Production plan unchanged: bounded oriented terminal-boundary walk, shared
+collapsedvertex, omit consumededge on bothloops, clip surviving oldbevel/x0face
+against same ruled chamfer, stitch multi-face termination. Do not delete existing
+None rejection without updating downstream singleterminalface assumptions.
+No implementation until the newfixture establishes actual branch evidence.

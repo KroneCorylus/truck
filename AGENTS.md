@@ -3,16 +3,20 @@
 ## What this repository is
 
 This is our fork of [ricosjp/truck](https://github.com/ricosjp/truck), and it has exactly one
-consumer: our parametric CAD application, `test_cad` (`~/Development/test_cad`). It is not a
-general-purpose library. There are no outside users to protect, so compatibility only matters
-to the extent our app needs it.
+consumer: our parametric CAD application, `test_cad`, checked out at `../PiezaCAD`. It is not
+a general-purpose library. There are no outside users to protect, so compatibility only
+matters to the extent our app needs it.
 
-The app pins a commit of this repository in its workspace `Cargo.toml`. Its core uses
+The app depends on this checkout through path dependencies in its workspace `Cargo.toml`, so
+every change here reaches it on its next build. Its core uses
 `truck-modeling`, `truck-shapeops`, `truck-meshalgo`, `truck-polymesh` and `truck-stepio`.
 Its UI renders with `truck-platform` and `truck-rendimpl`. `truck-hlr` was built for the
 app's 2D drawings but is not wired in yet. The app rebuilds the whole B-rep from scratch on
 every edit, so **kernel latency is UI latency**. When the kernel cannot do something, the app
 reports the feature as failed. A missing or fragile capability is a broken product feature.
+
+Open work, its split into parallel streams, and the validation loop are in
+[TASKS.md](TASKS.md). Start there.
 
 ## Priorities
 
@@ -94,14 +98,15 @@ RAYON_NUM_THREADS=1 cargo bench -p truck-benchmarks --bench actions             
 - Keep comments to a minimum: add one only when the code cannot make the point itself. Match
   the style of the surrounding code.
 
-## Local-only directories (gitignored)
+## Tracking work
 
-- `kernel-issues/` holds capability requests from the app. They describe a problem to
-  solve, not a design to copy. `kernel-issues/responses/` records the agreed shape and
-  scope, so read the response before working an issue. If the code contradicts it, update
-  the response. If an issue or response sets other ground rules, this file wins.
-- `WIP/` holds working plans and notes, such as `HOWTO-freecad.md` for checking STEP output
-  in FreeCAD. Delete a plan once its work has landed.
+- [TASKS.md](TASKS.md) is the only list of open work. Add new work there, and remove an item
+  when it lands; the commit and `CHANGELOG.md` record what was done. Do not start other
+  trackers, handoff files or status reports.
+- `audits/fillet-chamfer/notes/` holds investigation notes that `TASKS.md` links to. Delete a
+  note when its work lands.
+- `WIP/` (gitignored) is for local scratch and how-tos, such as `HOWTO-freecad.md` for checking
+  STEP output in FreeCAD. Plans belong in `TASKS.md`.
 
 ## Commits
 

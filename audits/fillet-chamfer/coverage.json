@@ -125,7 +125,6 @@
       ],
       "occt_scope": "Constant-radius contours with analytic special cases.",
       "truck_scope": "Convex and concave local planar constructions have independent volume and mesh regressions. The solid API also accepts separate straight edges with independent constant radii, with original-to-final history and atomic failure.",
-      "next_case": "Pair box, wedge, tetrahedron and cavity cases; compare contact radius and retained volume.",
       "evidence": [
         {
           "repo": "occt",
@@ -200,7 +199,6 @@
       ],
       "occt_scope": "Linear, interpolated and general radius laws.",
       "truck_scope": "Kernel tests cover variable-radius chains; the physical profile must be translated to its per-edge parameterization. Pieza currently stores one radius per feature, so product-level variable-radius intent remains limited.",
-      "next_case": "Use unequal edge lengths, split an edge, and compare the same physical radius law; include varying derivatives.",
       "evidence": [
         {
           "repo": "occt",
@@ -248,7 +246,6 @@
       ],
       "occt_scope": "Per-edge/contour radii and general corner filling.",
       "truck_scope": "Equal-radius joined corners are covered. The solid API now supports per-edge radii on separate straight edges, but rejects shared selected vertices when radii differ. Unequal-radius joined results remain unverified; the five captured connected unequal-radius selections now reach the kernel and fail with UnsupportedTopology.",
-      "next_case": "Three edges at a corner with radii 1, 2 and 3, convex then mixed concavity. Try existing joint and composed constructions; judge the resulting contacts, continuity and solid validity.",
       "evidence": [
         {
           "repo": "occt",
@@ -298,7 +295,6 @@
       ],
       "occt_scope": "Singular-corner machinery exists; acceptance of a particular zero-radius law needs execution.",
       "truck_scope": "Chain validation rejects radius values at or below zero, including endpoints.",
-      "next_case": "Sweep a positive radius down to zero at an endpoint and record each kernel result without presuming OCCT success.",
       "evidence": [
         {
           "repo": "occt",
@@ -325,7 +321,6 @@
       ],
       "occt_scope": "Rational, quasi-angular and polynomial section representations.",
       "truck_scope": "Truck chooses analytic or procedural surfaces internally. Matching the OCCT representation selector is not required; retain this topic only to investigate accuracy, interoperability or performance differences.",
-      "next_case": "Investigate representations only when an accuracy, STEP, downstream modeling or performance failure is observed. Do not add a selector solely to mirror OCCT.",
       "evidence": [
         {
           "repo": "occt",
@@ -352,7 +347,6 @@
       ],
       "occt_scope": "Configurable internal C0/C1/C2 and support angular tolerance; this is not a promise of G2 support-face blending.",
       "truck_scope": "Exact spherical corners now have sampled G1 normal agreement with adjacent cylindrical fillets at four-, five-, six- and eight-edge vertices. Two-edge miter constructions deliberately retain a crease. Required smoothness on general corner patches and curved chains remains unverified.",
-      "next_case": "Measure continuity in paired partially selected and asymmetric corner cases. Distinguish smooth joins between fillets from tangency to supporting faces; do not infer G2 support contact from OCCT continuity settings.",
       "evidence": [
         {
           "repo": "occt",
@@ -402,7 +396,6 @@
       ],
       "occt_scope": "Symmetric chamfers propagated along contours.",
       "truck_scope": "Planar neighborhoods, nonconvex corners and selected cylinder lips are covered. Tilted planar-cap tangent chamfer contacts can continue to original seams on parallel convex cylindrical/planar walls; four independent native controls retain one distance discrepancy.",
-      "next_case": "Pair simple OCCT fixtures with planar convex and concave solids.",
       "evidence": [
         {
           "repo": "occt",
@@ -584,7 +577,6 @@
       ],
       "occt_scope": "Two distances with an explicit reference face.",
       "truck_scope": "Per-edge distance pairs and wire direction define the two sides; the app translates named face order. Unequal setbacks on tilted plane/cylinder rims retain their captured planar or cylindrical reference;32 reference/order controls include exported setback checks. Three native control discrepancies remain documented.",
-      "next_case": "Reverse wire and face storage order and swap distances; verify contact dimensions.",
       "evidence": [
         {
           "repo": "occt",
@@ -800,7 +792,6 @@
       ],
       "occt_scope": "Explicit distance and angle mode.",
       "truck_scope": "The existing two-distance construction can express some equivalent planar chamfers after converting the intended angle and setback. That conversion, curved-support behavior and parametric edit semantics need validation; an AddDA-style method is unnecessary.",
-      "next_case": "Convert setback and angle into two support distances on a non-right-angle wedge and validate the result after changing the wedge angle. Then check a curved support where the intended angle must remain controlled.",
       "evidence": [
         {
           "repo": "occt",
@@ -975,7 +966,6 @@
       ],
       "occt_scope": "Symmetric constant-throat section constraint.",
       "truck_scope": "No constant-throat result has been established. Check whether existing distance-based constructions, with derived parameters, satisfy the same throat constraint before identifying new kernel work.",
-      "next_case": "Recreate bug28828_8 and bug28828_10 using existing Truck constructions where possible; measure throat along the edge, including changing support curvature.",
       "evidence": [
         {
           "repo": "occt",
@@ -1002,7 +992,6 @@
       ],
       "occt_scope": "Penetrating throat uses an offset support to define the section.",
       "truck_scope": "The penetrating-throat outcome has not been demonstrated. A differently named or composed construction can supply parity if it satisfies the same geometric constraints.",
-      "next_case": "Recreate bug28828_9, bug28828_11 and NURBS bug28828_6; evaluate existing setback or composed constructions against the throat and penetration dimensions.",
       "evidence": [
         {
           "repo": "occt",
@@ -1031,7 +1020,6 @@
       ],
       "occt_scope": "Classic numerical chamfer contacts satisfy a normal-section plane and a guide-to-contact chord distance.",
       "truck_scope": "Generic Truck contacts use nearest projections of tangent offsets; the same numeric parameter generally gives a different physical setback from OCCT. This is a dimension-convention difference until equivalent inputs or alternate constructions have been tested. Tilted planar-cap tangent chamfer contacts can continue to original seams on parallel convex cylindrical/planar walls; four independent native controls retain one distance discrepancy. Unequal setbacks on tilted plane/cylinder rims retain their captured planar or cylindrical reference;32 reference/order controls include exported setback checks. Three native control discrepancies remain documented.",
-      "next_case": "On a radius-2 cylinder, request a physical chord setback of 1. Translate each parameter convention and measure the result; then check varying curvature where a single converted value may be insufficient.",
       "evidence": [
         {
           "repo": "occt",
@@ -1164,7 +1152,6 @@
       ],
       "occt_scope": "Analytic line/circle special cases plus generic walking.",
       "truck_scope": "Straight axial lips, circular rims, holes and channels have tests; this does not cover all oblique intersections. Separate axial lips can use different radii in one atomic solid operation; the semiannulus regression checks independent circular-area material and rolling-cylinder normals. Plane-supported procedural cylinders now have representation-based recognition and original R10 sequential-round controls; this does not establish general procedural-surface equivalence. Mixed collapsing and regular convex cylindrical rim corners now have spherical/torus patch and independent radius/normal/material controls; general junction parity remains unverified. Tilted planar-cap tangent chamfer contacts can continue to original seams on parallel convex cylindrical/planar walls; four independent native controls retain one distance discrepancy. Unequal setbacks on tilted plane/cylinder rims retain their captured planar or cylindrical reference;32 reference/order controls include exported setback checks. Three native control discrepancies remain documented.",
-      "next_case": "Compare convex/concave lips, hole/boss rims, and a tilted plane cutting a cylinder.",
       "evidence": [
         {
           "repo": "occt",
@@ -1279,7 +1266,6 @@
       ],
       "occt_scope": "Explicit analytic plane/cone cases.",
       "truck_scope": "Plane/cone circular rim fillets and unequal-distance chamfers are validated at slopes -0.25 and +0.25, including cavities, analytic/exact NURBS supports, rigid motion and reversed wire selection. Oblique intersections, varied cone angles, apex proximity and general terminations remain unverified.",
-      "next_case": "Oblique plane/cone intersections and circular rims at varied cone angles approaching apex/contact collapse.",
       "evidence": [
         {
           "repo": "occt",
@@ -1349,7 +1335,6 @@
       ],
       "occt_scope": "Generic numerical construction extends beyond analytic special cases.",
       "truck_scope": "Plane/sphere circular rims now have independent validation for both meridian slopes, exterior/cavity orientation, exact Sphere/revolved-circle/NURBS representations, rigid transforms, reversed wires, G1, radius, volume, closed mesh, history and STEP. General cylinder/cylinder, toroidal and freeform support intersections remain unverified. Constant-radius plane/NURBS spline-pipe rims now also have independent contact, volume and STEP checks at two radii, with scaling and reversal. Open spherical-meridian fillets ending at a parameter pole now have original-scale, transformed/reversed, radius/normal, independent-volume and STEP regressions. Complete-circle toroidal inputs E5/E9 now retain consistent boundaries, independent material volume, closed meshes and STEP orientation; this does not establish all requested torus fillets. Captured torus cases E5/E7/F2 also construct with valid STEP and bidirectional sampled distances below 0.000024; other torus construction and corner cases remain open. Periodic torus inputs J3/J4/J5 now retain consistent closed geometry, independent volume and STEP round trips, including J3 original scale and rigid transformations; captured J3/J4/J5 blends now construct with valid STEP and bidirectional sampled distances below 0.000046.",
-      "next_case": "Resolve E9 torus face trimming, G9 diagonal surface-curve import and general non-coaxial cylinder/spline intersections, including contact collapse.",
       "evidence": [
         {
           "repo": "occt",
@@ -1575,7 +1560,6 @@
       ],
       "occt_scope": "Tests explicitly convert shapes to NURBS before chamfering.",
       "truck_scope": "Fixed planar spline support recognition, straight spline edge grouping in Pieza and bounded contact trimming in the generic kernel path. Planar rim fillets, asymmetric chamfers and sequential single-edge miter fillets have representation regressions. Circular rim blends also have analytic/exact-NURBS controls, including elevated degrees and shifted parameter domains. Broader invariance for curved support pairs and split faces remains open. STEP export also covers short, long and shifted longitudinal fillet domains. Conical rims now cover equivalent analytic and exact NURBS supports with reversed wires and rigid transforms. Plane-supported procedural cylinders now have representation-based recognition and original R10 sequential-round controls; this does not establish general procedural-surface equivalence.",
-      "next_case": "Compare non-cylindrical curved support pairs and split faces across analytic/NURBS/STEP representations, including smooth rolling continuations around existing rounds. Passing cylindrical rims and sequential single-edge miters does not establish general junction or freeform parity. Fillet surface parameter scaling is covered during STEP preparation; extend equivalent checks to support and boundary-curve parameters.",
       "evidence": [
         {
           "repo": "occt",
@@ -1845,7 +1829,6 @@
       ],
       "occt_scope": "Closed Bezier/spline spine regressions and general walking.",
       "truck_scope": "Generic curved supports, parabolic extrusion cap trimming and closed spline-pipe rim seams have targeted regressions. G1 constructs a valid independently checked result but still differs from the native captured surface. J9 rim contacts now continue through displaced support seams in original and transformed/reversed/reparameterized tests. General inflection, tiny-edge and freeform configurations remain unverified.",
-      "next_case": "Investigate the G1 native shape discrepancy and F9/G2 adjacent curved-edge failures, then exercise the six bug30940 cases including a closed single-edge Bezier spine.",
       "evidence": [
         {
           "repo": "occt",
@@ -1940,7 +1923,6 @@
       ],
       "occt_scope": "Contours propagate along tangent edges and tangent support series.",
       "truck_scope": "Application propagation checks edge tangents and both face normals; the kernel accepts explicitly supplied chains. Closed-wire contacts can now leave a planar outer boundary and continue onto one tangent adjacent support per original edge and side, with Q4 post/rounded-roof solid and STEP regression coverage. General open-wire and multi-neighbor support propagation remains incomplete. Mixed collapsing and regular convex cylindrical rim corners now have spherical/torus patch and independent radius/normal/material controls; general junction parity remains unverified. Tilted planar-cap tangent chamfer contacts can continue to original seams on parallel convex cylindrical/planar walls; four independent native controls retain one distance discrepancy. Unequal setbacks on tilted plane/cylinder rims retain their captured planar or cylindrical reference;32 reference/order controls include exported setback checks. Three native control discrepancies remain documented.",
-      "next_case": "Extend support continuation to open contours and multiple neighboring supports within one original edge; vary tangent continuity and contact clearance around the threshold.",
       "evidence": [
         {
           "repo": "occt",
@@ -2064,7 +2046,6 @@
       ],
       "occt_scope": "Closed/tangent states, periodic surface handling and seam-related regressions, including expected failures.",
       "truck_scope": "Cylinder rims and displaced longitudinal seams on a closed spline pipe have solid and STEP regressions. The spline case preserves a consistent contact parameter branch without requiring declared surface periodicity, including reversal and independent edge reparameterization. Broader torus and seam/termination interactions remain unverified. Separate open or closed tangent contours can be rounded atomically in one equal-radius selection, including shared original supports; later components may not change earlier generated fillets.",
-      "next_case": "Move toroidal seams through terminations and exercise closed single-edge spline contours with curvature and radius-law variation.",
       "evidence": [
         {
           "repo": "occt",
@@ -2145,7 +2126,6 @@
       ],
       "occt_scope": "Contour discovery and endpoint classification.",
       "truck_scope": "The app explicitly rejects multiple tangent continuation candidates.",
-      "next_case": "A vertex with two geometrically tangent candidates; establish desired selection semantics.",
       "evidence": [
         {
           "repo": "occt",
@@ -2172,7 +2152,6 @@
       ],
       "occt_scope": "Shell input and explicit free-boundary endpoint state.",
       "truck_scope": "Generic face/shell functions exist, while the app uses solid wrappers requiring closed output.",
-      "next_case": "A two-face open shell ending at a free boundary; separate kernel capability from app scope.",
       "evidence": [
         {
           "repo": "occt",
@@ -2205,7 +2184,6 @@
       ],
       "occt_scope": "Intersection with terminating support faces.",
       "truck_scope": "Exact planar elliptical terminations and selected curved ends are covered. Short spines with perpendicular and oblique planar caps also permit larger transverse radii when the trimmed patch fits the body. A vertical planar-edge fillet terminating on the hemisphere/box spherical face is verified through independent material, normals, closed meshes and STEP.",
-      "next_case": "Nonparallel terminal planes near loss of the retained strip, curved terminal supports, and topology-collapse transitions.",
       "evidence": [
         {
           "repo": "occt",
@@ -2358,7 +2336,6 @@
       ],
       "occt_scope": "End intersection across face neighborhoods; API documentation retains limitations.",
       "truck_scope": "Four-valent single-fillet endings and endings on two earlier chamfers have tests.",
-      "next_case": "Use nonplanar multi-face caps and changed seam placement; do not label every four-valent vertex unsupported.",
       "evidence": [
         {
           "repo": "occt",
@@ -2436,7 +2413,6 @@
       ],
       "occt_scope": "Spherical special cases and general three-corner construction.",
       "truck_scope": "Spherical corners at arbitrary planar angles, including nonconvex bodies and cavity shells.",
-      "next_case": "Pair tetrahedra and oblique reentrant solids, with one, two and three selected edges.",
       "evidence": [
         {
           "repo": "occt",
@@ -2534,7 +2510,6 @@
       ],
       "occt_scope": "Intersection and constrained-filling paths.",
       "truck_scope": "The specialized planar miter path requires perpendicular supports, but the solid-level intersection fallback already handles drafted planar rims. Equal-draft convex/cavity configurations have geometric regressions. The required continuity and more general corner configurations still need case-by-case verification.",
-      "next_case": "Broaden solid-level tests to unequal draft angles and multi-blend configurations, measuring dimensions and junction continuity. Do not infer a missing capability from restrictions in the specialized path alone.",
       "evidence": [
         {
           "repo": "occt",
@@ -2578,7 +2553,6 @@
       ],
       "occt_scope": "Concavity states distinguish same-side and opposite-side corner configurations.",
       "truck_scope": "Toroidal fillet patches require the rim face perpendicular to both walls; some remaining mixed combinations reject. Chamfers have planar transitions.",
-      "next_case": "Enumerate each concavity sign pattern, selected subset and oblique support angle.",
       "evidence": [
         {
           "repo": "occt",
@@ -2655,7 +2629,6 @@
       ],
       "occt_scope": "General n-corner construction exists, with documented and implementation limitations. An independent OCCT 7.9.3 pyramid chamfer probe succeeds for one through four selected ridges, including the opposite pair, but constructs different corner geometry for adjacent selections.",
       "truck_scope": "Convex planar vertices with all incident edges selected now support exact equal-radius spherical corners when their inward-offset planes share one center; four-, five-, six- and eight-edge pyramids are tested. Inconsistent offsets and partially selected high-valence fillets remain unsupported. Pyramid chamfers with one through four selected ridges, including opposite pairs, use valid mitered bevels. OCCT uses different curved corner patches on the paired adjacent-chamfer and all-ridge-fillet fixtures.",
-      "next_case": "Generalize corner transitions beyond a common spherical center, starting with a rectangular pyramid and partially selected ridges. Investigate required continuity of OCCT corner patches, then extend to unequal radii, curved supports and mixed concavity.",
       "evidence": [
         {
           "repo": "occt",
@@ -2737,7 +2710,6 @@
       ],
       "occt_scope": "Constrained patch filling after intersection of blend strips.",
       "truck_scope": "Exact special junctions exist; generic chain construction does not join several fillets at a vertex.",
-      "next_case": "Cylinder/cone or spline supports meeting at a multi-edge corner, with equal then unequal radii.",
       "evidence": [
         {
           "repo": "occt",
@@ -2835,7 +2807,6 @@
       ],
       "occt_scope": "Singular corners and degenerate boundaries are explicitly represented.",
       "truck_scope": "Equal-radius sequential rims on perpendicular planar and analytic cylindrical walls support collapsed spherical contacts, including representation-proven procedural cylinders and closed contours. Mixed collapsing/regular convex cylindrical corners retain exact spherical/torus support. Full cap consumption, folded offsets and near-equal transition cases remain limited.",
-      "next_case": "Investigate non-tangent junctions and near-equal cylindrical corners without weakening fold or trim guards.",
       "evidence": [
         {
           "repo": "occt",
@@ -2892,7 +2863,6 @@
       ],
       "occt_scope": "Topology reconstruction can remove/replace entities; this is not a guarantee for every collapse.",
       "truck_scope": "Touching concave rib rounds can consume a face. Ordinary chamfer construction rejects removing original faces.",
-      "next_case": "A thin support face shrinking to zero and disappearing, with parallel and intersecting rounds.",
       "evidence": [
         {
           "repo": "occt",
@@ -2925,7 +2895,6 @@
       ],
       "occt_scope": "Corner rebuilding and restricted-boundary handling.",
       "truck_scope": "Ordinary chamfer construction rejects removing unselected edges or bevel contacts; narrow exceptions exist in specialized rim handling.",
-      "next_case": "Drive the chamfer across the exact limit where one unselected edge vanishes.",
       "evidence": [
         {
           "repo": "occt",
@@ -2959,7 +2928,6 @@
       ],
       "occt_scope": "Twisted-surface state and walking checks; failure remains possible.",
       "truck_scope": "Regular-contact checks reject folded offsets. Rib patch overlap is rejected. No general recovery construction established.",
-      "next_case": "Increase radius through local curvature and overlap limits and require either a valid result or an actionable rejection.",
       "evidence": [
         {
           "repo": "occt",
@@ -2993,7 +2961,6 @@
       ],
       "occt_scope": "Walking uses domains, restrictions and endpoint intersections; boundary crossing has limitations.",
       "truck_scope": "Some neighboring patch traversal works; planar contacts approaching holes are rejected. Dense trim loops use conservative projected segment bounds and cached point projection while retaining the sampled contact and clearance predicates. Q4 now continues contacts across a planar outer trim onto a tangent curved support and reconnects the resulting face loops; continued contacts are checked against periodic trimmed domains and holes.",
-      "next_case": "Put a hole or split trim boundary directly in the contact path, varying clearance across tolerance.",
       "evidence": [
         {
           "repo": "occt",
@@ -3102,7 +3069,6 @@
       ],
       "occt_scope": "Local walking and topology construction do not establish universal collision correctness.",
       "truck_scope": "The public contract excludes distant faces and other boundaries; there is no global blend collision/self-intersection check.",
-      "next_case": "A blend approaching a remote wall or cavity; independently test intersections and material membership in both outputs.",
       "evidence": [
         {
           "repo": "occt",
@@ -3129,7 +3095,6 @@
       ],
       "occt_scope": "Start-solution failure is distinct from walking failure.",
       "truck_scope": "Contact solvers have guards and diagnostics. Along-wire contact trimming now constrains Newton evaluations to both curve domains, damps nonconvergent steps and retries a sampled seed when endpoint tangents are parallel. Competing branches across general supports remain unverified. Open polar guide endpoints now use regular offset-contact seeds and contact continuation; revolution point searches avoid undefined projected derivatives at pole seeds. Complete-circle toroidal inputs E5/E9 now retain consistent boundaries, independent material volume, closed meshes and STEP orientation; this does not establish all requested torus fillets. Oriented face-branch hints now survive rolling contact construction, inversion and trimming; inverse coplanarity is scale-consistent and singular inverse systems fail safely.",
-      "next_case": "Vary polar radius ratios and guide parameterizations, then compare competing contact branches and tangent end contacts on general supports.",
       "evidence": [
         {
           "repo": "occt",
@@ -3313,7 +3278,6 @@
       ],
       "occt_scope": "Walking controls steps/deflection and approximation tolerances.",
       "truck_scope": "Adaptive contact sampling and fitting exist; failed inserted samples propagate. Procedural STEP surface fitting now locally refines concentrated error while retaining source breaks, export tolerance and the existing control budget.",
-      "next_case": "High-curvature spike between initial samples, long/short edge ratios and tight tolerance.",
       "evidence": [
         {
           "repo": "occt",
@@ -3462,7 +3426,6 @@
       ],
       "occt_scope": "Dedicated periodic/singular extrema and parameter repairs.",
       "truck_scope": "Some exact conic seam handling and reversed-curve fixes exist. STEP fitting normalizes longitudinal fillet domains, including sub-tolerance ranges; general support, boundary-curve and paired seam coverage remains open. Periodic fillet contacts now retain continuous parameter branches, with quarter stations disambiguating full turns; chamfer contact sampling also preserves the previous periodic branch. Direct and conical solid regressions cover the exposed failures. Closed spline-pipe contacts now continue from neighboring solved sections across undeclared NURBS seams; displaced seam guide stations follow adjacent rim segments with matching speed. Open polar endpoint fitting now continues contacts to avoid switching between equivalent surface parameter branches. Complete-circle toroidal inputs E5/E9 now retain consistent boundaries, independent material volume, closed meshes and STEP orientation; this does not establish all requested torus fillets. Periodic torus inputs J3/J4/J5 now retain consistent closed geometry, independent volume and STEP round trips, including J3 original scale and rigid transformations; captured blend construction remains a separate check. G9 imported-face preprocessing now avoids reusing seam endpoints and rejects unsupported boundary graphs without panicking; raw topology, closed meshes and independent material volume pass ordinary/robust and rigid-transform regressions. Modeling conversion of its diagonal surface curves remains unsupported. Linear spherical STEP parameter curves now preserve exact spatial geometry through their coordinate map, including inverted affine supports.",
-      "next_case": "Complete G9 diagonal surface-curve modeling import after seam-safe preprocessing; investigate ellipsoidal polar projection branches and other seam/pcurve-domain configurations.",
       "evidence": [
         {
           "repo": "occt",
@@ -3784,7 +3747,6 @@
       ],
       "occt_scope": "Angular tolerances and almost-smooth-edge regressions.",
       "truck_scope": "App propagation uses a fixed normal/tangent dot threshold; coplanar chamfers are rejected.",
-      "next_case": "Sweep dihedral angle and tangent discontinuity across each threshold at multiple scales.",
       "evidence": [
         {
           "repo": "occt",
@@ -3817,7 +3779,6 @@
       ],
       "occt_scope": "Tolerance/scale test grids and shape-tolerance assertions.",
       "truck_scope": "Near-limit box fillet/chamfer regressions retain tiny valid faces. Broader sliver configurations remain unverified.",
-      "next_case": "Sweep just below, at and above size limits; translate far from the origin and repeat at different scales.",
       "evidence": [
         {
           "repo": "occt",
@@ -3859,7 +3820,6 @@
       ],
       "occt_scope": "Dedicated sequential chamfer grids and composition regressions.",
       "truck_scope": "Many feature orders are tested. Equal-radius miters support analytic, B-spline and weighted NURBS edges. Rolling continuations around cylindrical rounds support spherical collapsed contacts, including the original procedural R10 representation when coefficient data proves a cylinder. Mixed collapsing and regular convex cylindrical rim corners are supported; general topology transitions remain limited.",
-      "next_case": "Fillet\u2192fillet, fillet\u2192chamfer, chamfer\u2192fillet and chamfer\u2192chamfer with nearby and intersecting selections.",
       "evidence": [
         {
           "repo": "occt",
@@ -3929,7 +3889,6 @@
       ],
       "occt_scope": "All added contours are passed to one builder with junction construction.",
       "truck_scope": "Pieza processes straight selections and curved chains in separate sequential groups. That implementation choice is acceptable if it delivers the requested joint geometry and stable selection behavior; an outcome difference has not been demonstrated here.",
-      "next_case": "Apply the same mixed selection in varied enumeration orders. Compare dimensions, junction continuity, validity and edited results; flag only demonstrated failures or differences in those outcomes.",
       "evidence": [
         {
           "repo": "occt",
@@ -3972,7 +3931,6 @@
       ],
       "occt_scope": "Boolean/blend combinations and regression fixtures.",
       "truck_scope": "Boolean-created hole rims and channel lips have tests; arbitrary Boolean spline intersections need more coverage.",
-      "next_case": "Pair through/blind holes, rotated channels, tangent cuts and spline intersection edges.",
       "evidence": [
         {
           "repo": "occt",
@@ -4048,7 +4006,6 @@
       ],
       "occt_scope": "Generated/modified/deleted queries and OCAF recomputation tests.",
       "truck_scope": "Face ancestry and regression tests support reference persistence through some changes. Coverage after splits, deletions and replacements remains partial; matching OCCT history-query methods is unnecessary.",
-      "next_case": "Upstream edit after a face splits/disappears; re-resolve every selected edge and generated face.",
       "evidence": [
         {
           "repo": "occt",
@@ -4091,7 +4048,6 @@
       ],
       "occt_scope": "Shape, property, tolerance and downstream operation checks across the corpus.",
       "truck_scope": "Common blend checks cover topology, meshes, volume, STEP and selected Boolean operations. These do not alone prove absence of all self-intersections. Complete-circle toroidal inputs E5/E9 now retain consistent boundaries, independent material volume, closed meshes and STEP orientation; this does not establish all requested torus fillets. Periodic torus inputs J3/J4/J5 now retain consistent closed geometry, independent volume and STEP round trips, including J3 original scale and rigid transformations; captured blend construction remains a separate check. G9 imported-face preprocessing now avoids reusing seam endpoints and rejects unsupported boundary graphs without panicking; raw topology, closed meshes and independent material volume pass ordinary/robust and rigid-transform regressions. Modeling conversion of its diagonal surface curves remains unsupported.",
-      "next_case": "Trace H2/H4 replay timeouts after input repair; retain the G1 and tolerance-grid A1 shape discrepancies and general downstream validation gaps.",
       "evidence": [
         {
           "repo": "occt",
@@ -4667,7 +4623,6 @@
       ],
       "occt_scope": "Faulty contour/vertex queries, stripe status and optional partial result.",
       "truck_scope": "Structured diagnostics identify stages, selections and stations; some fallback paths retain an earlier error. Validate whether users can locate and correct a failure. An OCCT-style partial-result object is not required.",
-      "next_case": "Mix one invalid selection into a valid operation; check that diagnostics identify the cause, the input remains intact and correction/retry succeeds.",
       "evidence": [
         {
           "repo": "occt",
@@ -4749,7 +4704,6 @@
       ],
       "occt_scope": "Error reporting and robustness regressions, including invalid geometry.",
       "truck_scope": "Selection, nonfinite parameter, tolerance and input-preservation checks exist. Per-edge radius validation identifies the invalid selection index. Native replay deduplicates same-radius aliases and rejects conflicting radii for one physical edge.",
-      "next_case": "Empty/duplicate/stale edges, zero/negative/NaN sizes and nonmanifold input; no panic or input mutation.",
       "evidence": [
         {
           "repo": "occt",
@@ -4852,7 +4806,6 @@
       ],
       "occt_scope": "Separate BiTgte interface permits face pairs, selected edges and stopping faces.",
       "truck_scope": "Existing product blends start from selected edges or face boundaries. The broader face-to-face result with stopping faces is unverified; the absence of matching methods alone is not a capability finding.",
-      "next_case": "Use a face-pair fixture with an explicit stopping face and attempt equivalent existing constructions; judge the support contacts, termination and editable result.",
       "evidence": [
         {
           "repo": "occt",
@@ -4879,7 +4832,6 @@
       ],
       "occt_scope": "DRAW wrappers expose fuse/cut plus blend.",
       "truck_scope": "Existing Boolean and blend operations compose, with regression coverage for selected generated hole rims. A combined wrapper is not a separate feature requirement; broader intersection geometry is tracked under W03.",
-      "next_case": "Check fuse and cut results followed by blending their intended intersection edges, including subsequent edits. Reuse W03 geometry coverage; do not add a wrapper just to match DRAW.",
       "evidence": [
         {
           "repo": "occt",
@@ -4984,7 +4936,6 @@
       ],
       "occt_scope": "Analytic and iterative planar fillet APIs.",
       "truck_scope": "Pieza has sketch corner filleting using offset/intersection candidates; separate from the 3D kernel API.",
-      "next_case": "Line-line, line-circle and circle-circle corners, both sides, small/large radii and trimmed domains.",
       "evidence": [
         {
           "repo": "occt",
@@ -5018,7 +4969,6 @@
       ],
       "occt_scope": "Iterative fillets and solution-selection APIs cover broader curve configurations.",
       "truck_scope": "Complete sketch parity for spline/ellipse corners, multiple solutions and extension is unverified.",
-      "next_case": "Exercise all fillet2d fixtures and distinguish underlying-curve solutions from trimmed-edge solutions.",
       "evidence": [
         {
           "repo": "occt",
@@ -5052,7 +5002,6 @@
       ],
       "occt_scope": "Planar chamfer API and fillet/chamfer modification/removal in MakeFillet2d.",
       "truck_scope": "A parametric sketch-chamfer workflow has not been established in the inspected code. Existing sketch edits may construct some equivalent geometry; validate dimensional intent and later edits before classifying the feature as covered or missing.",
-      "next_case": "Create line-line chamfers with setbacks or angle, then change and remove them while retaining connectivity and constraints. Evaluate existing sketch edits as a possible equivalent route.",
       "evidence": [
         {
           "repo": "occt",

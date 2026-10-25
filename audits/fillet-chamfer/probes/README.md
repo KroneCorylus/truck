@@ -139,3 +139,13 @@ slopes and rigid transforms, with normals, history, mesh closure and STEP. Those
 additional native outcomes are unprobed. The exact task and validation are in
 `truck-shapeops/tests/SHORT_SPINE_FILLETS.md`; raw native output is
 `short_spine_fillets_occt.txt`.
+
+## Chamfer corners
+
+`chamfer_corners.cpp` chamfers edges of a 10 × 10 × 10 box (`box`) or a quarter cylinder
+(`qcyl`) and prints volume, validity and the corner faces. Arguments are groups of
+`edge d1 d2 face`; a negative `d2` requests an equal distance. `SAMPLE=1` also prints the
+poles of B-spline corner faces. Build like the cone probe, substituting `chamfer_corners`,
+and run with `LD_LIBRARY_PATH=target/occt-sdk/usr/lib64`. It was used to reproduce OCCT's
+three-corner rule (`ChFi3d_ChBuilder_C3.cxx`) in `truck-shapeops/tests/chamfer_corners.rs`
+and `chamfer_corner_cases.rs`, and the two-edge junction volumes in [TASKS.md](../../../TASKS.md).

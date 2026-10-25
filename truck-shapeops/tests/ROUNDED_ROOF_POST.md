@@ -42,7 +42,7 @@ input volume. The integration is split at both support changes with the
 correct one-sided derivatives; doubled Simpson grids must agree within 1e-7.
 The independently integrated result is approximately 149.083817359215.
 
-## Native comparison and remaining scope
+## Native comparison
 
 Native OCCT retains a major-radius-2, minor-radius-1 torus over the flat-roof
 arc and constructs two BSpline patches over the rounded roof. At azimuth zero
@@ -52,7 +52,4 @@ the post contact is (3.5,2.5,5.9364916731), and the roof contact is
 
 The targeted Truck export is native-valid with one solid, volume
 149.08379605764409, and bidirectional sampled boundary distances below 0.00033.
-This is a limited comparison at tolerance 0.001. Open-wire propagation,
-multiple different neighboring supports within one original edge, propagation
-through holes, distant collisions and downstream edits of this result remain
-outside this regression's verified scope.
+This is a limited comparison at tolerance 0.001.

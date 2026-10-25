@@ -32,6 +32,7 @@ changing anything.
 
 ## Documentation
 
+- [TASKS.md](TASKS.md): open work and how it is split across agents.
 - [DIAGNOSTICS.md](DIAGNOSTICS.md): error codes and the `try_*` APIs.
 - [BENCHMARKS.md](BENCHMARKS.md): how to measure performance, and reference numbers.
 - [CHANGELOG.md](CHANGELOG.md): every change, with breaking changes marked.

@@ -61,10 +61,3 @@ the base has `p·normal = c`. The divergence theorem therefore gives the exact v
 `[r(A_plane+A_cylinder+A_sphere)+c A_base]/3`. These expressions do not inspect output
 patches or use OCCT's volume. The downstream cut subtracts a spherical cap of height
 `h = 0.2r`, whose exact volume is `πh²(r-h/3)`.
-
-## Remaining scope
-
-This construction requires a common center and all incident edges selected. It does
-not supply a general curved corner patch for unequal radii, inconsistent offsets or
-partially selected high-valence junctions. OCCT's paired probe uses a different corner
-patch on these pyramids; equal topology counts do not establish identical geometry.

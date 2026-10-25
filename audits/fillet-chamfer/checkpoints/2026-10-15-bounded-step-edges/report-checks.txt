@@ -1,6 +1,0 @@
-Local relative links exist; all section anchors resolve.
-T3 collaborative browser navigation and DOM evaluation succeeded.
-Title: Bounded STEP edge recovery — 15 October 2026
-Sections: Work done; Full clean capture; Work left to do; Evidence and continuation.
-Measured document width1387 <= viewport1402. Broken section anchors0.
-Screenshot capture remains unavailable in this session; no visual QA claim.
