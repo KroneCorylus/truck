@@ -63,6 +63,8 @@ pub(super) fn chamfer(
     let mut corners: Vec<[Vec<Vertex>; 2]> =
         vec![[Vec::new(), Vec::new()]; data.original_edges.len()];
     let mut transitions = Vec::new();
+    // Non-planar corner quads, filled bilinearly between their straight sides.
+    let mut patches: Vec<Vec<Vertex>> = Vec::new();
     for (v, incident) in data.incident.iter().enumerate() {
         let chosen: Vec<_> = incident
             .iter()
@@ -252,30 +254,103 @@ pub(super) fn chamfer(
                     continue;
                 }
             }
-            let corner = intersection([0, 1, 2].map(|i| bevels[chosen[i]].unwrap()))?;
-            let mut clipped_faces = Vec::new();
             if concave.is_empty() {
-                for &k in &chosen {
-                    for f in data.sides[k] {
-                        let (n, d) = data.planes[f].unwrap();
-                        if n.dot(corner.point().to_vec()) > d + epsilon
-                            && !clipped_faces.contains(&f)
+                let vertex = data.vertices[v].point();
+                let common = |k: usize, j: usize| {
+                    data.sides[k]
+                        .iter()
+                        .copied()
+                        .find(|f| data.sides[j].contains(f))
+                        .ok_or_else(|| error(Code::UnsupportedTopology))
+                };
+                let mut crossings = HashMap::default();
+                for (i, j) in [(0, 1), (1, 2), (2, 0)] {
+                    let [k, other] = [chosen[i], chosen[j]];
+                    let point = intersection([
+                        data.planes[common(k, other)?].unwrap(),
+                        bevels[k].unwrap(),
+                        bevels[other].unwrap(),
+                    ])?;
+                    crossings.insert((k.min(other), k.max(other)), point);
+                }
+                let crossing = |a: usize, b: usize| crossings[&(a.min(b), a.max(b))].clone();
+                let away = |k: usize| {
+                    let edge = &data.original_edges[k];
+                    let direction = (edge.back().point() - edge.front().point()).normalize();
+                    if edge.front() == &data.vertices[v] {
+                        direction
+                    } else {
+                        -direction
+                    }
+                };
+                let depth = |k: usize, j: usize| (crossing(k, j).point() - vertex).dot(away(k));
+                // OCCT's three-corner rule: a pivot bevel is crossed by the other two no
+                // closer to the vertex than they cross each other. They end at their sections
+                // through those crossings, unless the sections nearly meet on the remaining face.
+                let plans: Vec<_> = (0..3)
+                    .filter_map(|i| {
+                        let p = chosen[i];
+                        let [d, f] = [chosen[(i + 1) % 3], chosen[(i + 2) % 3]];
+                        if depth(d, p) < depth(d, f) - epsilon
+                            || depth(f, p) < depth(f, d) - epsilon
                         {
-                            clipped_faces.push(f);
+                            return None;
                         }
+                        let x = crossing(d, f).point();
+                        let s_d = x + (depth(d, p) - depth(d, f)) * away(d);
+                        let s_f = x + (depth(f, p) - depth(f, d)) * away(f);
+                        let size = s_f
+                            .distance(crossing(p, d).point())
+                            .max(s_d.distance(crossing(p, f).point()));
+                        Some((p, d, f, s_d, s_f, s_d.distance(s_f) < 0.3 * size))
+                    })
+                    .collect();
+                let plan = plans.iter().find(|plan| plan.5).or(plans.first());
+                let mut polygon = Vec::new();
+                for (i, j) in [(0, 1), (1, 2), (2, 0)] {
+                    let [k, other] = [chosen[i], chosen[j]];
+                    let face = common(k, other)?;
+                    set_contact(k, face, &crossing(k, other));
+                    set_contact(other, face, &crossing(k, other));
+                }
+                match plan {
+                    Some(&(p, d, f, s_d, s_f, false)) => {
+                        let face = common(d, f)?;
+                        let [s_d, s_f] = [Vertex::new(s_d), Vertex::new(s_f)];
+                        set_contact(d, face, &s_d);
+                        set_contact(f, face, &s_f);
+                        polygon.extend([crossing(p, d), crossing(p, f), s_f, s_d]);
+                    }
+                    _ => {
+                        polygon.extend([0, 1, 2].map(|i| crossing(chosen[i], chosen[(i + 1) % 3])))
                     }
                 }
+                let points: Vec<_> = polygon.iter().map(Vertex::point).collect();
+                let area = polygon_area(&points);
+                if !area.magnitude2().is_finite() || area.so_small() {
+                    return Err(error(Code::OutsideNeighbour));
+                }
+                let mut normal = area.normalize();
+                let center =
+                    points.iter().map(|p| p.to_vec()).sum::<Vector3>() / points.len() as f64;
+                if normal.dot(vertex.to_vec() - center) < 0.0 {
+                    normal = -normal;
+                    polygon.reverse();
+                }
+                if points
+                    .iter()
+                    .all(|p| normal.dot(p.to_vec() - center).abs() <= epsilon)
+                {
+                    transitions.push((normal, polygon));
+                } else {
+                    patches.push(polygon);
+                }
+                continue;
             }
-            if clipped_faces.len() > 1 {
-                return Err(error(Code::OutsideNeighbour));
-            }
+            let corner = intersection([0, 1, 2].map(|i| bevels[chosen[i]].unwrap()))?;
             for &k in &chosen {
                 let end = usize::from(data.original_edges[k].front() != &data.vertices[v]);
-                corners[k][end] = if clipped_faces.is_empty() {
-                    vec![corner.clone()]
-                } else {
-                    Vec::new()
-                };
+                corners[k][end] = vec![corner.clone()];
                 for &other in chosen.iter().filter(|&&j| j != k) {
                     let common = *data.sides[k]
                         .iter()
@@ -291,44 +366,6 @@ pub(super) fn chamfer(
                         set_contact(other, common, &point);
                     }
                 }
-            }
-            if let Some(&face) = clipped_faces.first() {
-                // Clip the dominant bevel to the original face instead of extending
-                // the three-plane miter outside the solid.
-                let dominant = *chosen
-                    .iter()
-                    .find(|&&k| !data.sides[k].contains(&face))
-                    .ok_or_else(|| error(Code::UnsupportedTopology))?;
-                let mut tips = Vec::new();
-                for side in data.sides[dominant] {
-                    let k = *chosen
-                        .iter()
-                        .find(|&&k| k != dominant && data.sides[k].contains(&side))
-                        .ok_or_else(|| error(Code::UnsupportedTopology))?;
-                    let tip = intersection([
-                        data.planes[face].unwrap(),
-                        bevels[dominant].unwrap(),
-                        bevels[k].unwrap(),
-                    ])?;
-                    for &edge in &chosen {
-                        for plane in [
-                            bevels[edge].unwrap(),
-                            data.planes[data.sides[edge][0]].unwrap(),
-                            data.planes[data.sides[edge][1]].unwrap(),
-                        ] {
-                            if plane.0.dot(tip.point().to_vec()) > plane.1 + epsilon {
-                                return Err(error(Code::OutsideNeighbour));
-                            }
-                        }
-                    }
-                    set_contact(k, face, &tip);
-                    tips.push(tip);
-                }
-                let end = usize::from(data.original_edges[dominant].front() != &data.vertices[v]);
-                if end == 1 {
-                    tips.reverse();
-                }
-                corners[dominant][end] = tips;
             }
         }
     }
@@ -474,6 +511,22 @@ pub(super) fn chamfer(
                     })
                     .collect::<Result<Wire, _>>()?],
                 surface.into(),
+            )
+            .map_err(|e| error(Code::InvalidOutputTopology).with_coded_source(e))?,
+        );
+    }
+    for polygon in patches {
+        let [a, b, c, d] = [0, 1, 2, 3].map(|i| polygon[i].point());
+        let surface = BSplineSurface::new(
+            (KnotVec::bezier_knot(1), KnotVec::bezier_knot(1)),
+            vec![vec![a, d], vec![b, c]],
+        );
+        result.push(
+            Face::try_new(
+                vec![(0..4)
+                    .map(|i| shared_line(&polygon[i], &polygon[(i + 1) % 4], &mut shared))
+                    .collect::<Result<Wire, _>>()?],
+                Surface::BSplineSurface(surface),
             )
             .map_err(|e| error(Code::InvalidOutputTopology).with_coded_source(e))?,
         );

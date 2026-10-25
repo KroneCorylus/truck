@@ -6,6 +6,15 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Chamfer fully selected convex three-edge corners with OCCT's corner rule. The corner face
+  is the triangle of bevel crossings, or, when one bevel reaches past the others, a quad
+  through its crossings: planar when its four points are coplanar, otherwise a bilinear
+  B-spline patch. Previously the bevels met at an apex miter clipped by the corner planes.
+  Results change: an equal-distance corner removes `d³/12` more material than before and reports
+  four generated faces. Volumes match OCCT 7.9.3 on nine probed configurations; the corner
+  tests in `r11_corners.rs`, `chamfer_general.rs` and `blend_limits.rs` and the clipping
+  cases (now `chamfer_corner_cases.rs`) were rewritten to the new geometry.
+
 - Tessellate twisted trimmed surfaces with an undivided parameter grid within tolerance.
   A 2×2 grid, such as a bilinear patch with straight sides, was split into two triangles
   however twisted it was; it is now refined like single-direction grids.

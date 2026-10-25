@@ -97,11 +97,12 @@ fn fillet_volume(count: usize) -> f64 {
 
 fn chamfer_volume(count: usize) -> f64 {
     let d: f64 = 0.2;
-    // Inclusion-exclusion of triangular prisms: pair overlaps d^3/3, triple d^3/4.
+    // Inclusion-exclusion of triangular prisms: pair overlaps d^3/3, triple d^3/4. Three
+    // bevels close with a corner triangle, which cuts the d^3/12 tetrahedron off their apex.
     let overlap = match count {
         1 => 0.0,
         2 => d.powi(3) / 3.0,
-        3 => 3.0 * d.powi(3) / 4.0,
+        3 => 3.0 * d.powi(3) / 4.0 - d.powi(3) / 12.0,
         _ => unreachable!(),
     };
     1000.0 - count as f64 * 10.0 * d * d / 2.0 + overlap
@@ -138,7 +139,13 @@ fn check_downstream(result: &BlendResult, expected: f64, fillet: bool, transform
     } else if result.generated_faces.len() == 2 {
         990.0 - 20.0 * 0.1_f64.powi(2) / 2.0 + 0.1_f64.powi(3) / 3.0
     } else {
-        990.0 - 9.9 * 0.2_f64.powi(2) / 2.0 - 19.6 * 0.1_f64.powi(2) / 2.0 - 0.1_f64.powi(3) / 3.0
+        // The corner triangle cuts the d^3/12 tetrahedron off the bevel apex at z = 9.9; the
+        // part below the cut is that tetrahedron less (d/2)^3/6, i.e. d^3/16.
+        990.0
+            - 9.9 * 0.2_f64.powi(2) / 2.0
+            - 19.6 * 0.1_f64.powi(2) / 2.0
+            - 0.1_f64.powi(3) / 3.0
+            - 0.2_f64.powi(3) / 16.0
     };
     common::assert_solid(&cut, expected_cut, &[0], TOL);
     common::blend::assert_step(&cut, expected_cut, TOL);
@@ -292,7 +299,8 @@ fn chamfer_fixture_table_and_order() {
             let mut selected = selection_at(&input, transform)[..count].to_vec();
             let result = try_chamfer_solid_edges(&input, &selected, 0.2, TOL).unwrap();
             common::assert_solid(&result.solid, chamfer_volume(count), &[0], TOL);
-            assert_history(&input, &result, count);
+            // Three bevels also generate their corner triangle.
+            assert_history(&input, &result, if count == 3 { 4 } else { count });
             assert_convex_geometry(&result);
             selected.reverse();
             let reversed = try_chamfer_solid_edges(&input, &selected, 0.2, TOL).unwrap();
@@ -602,7 +610,7 @@ fn miters_at_both_ends_and_next_to_a_spherical_corner() {
         let expected = 1000.0 - selected.len() as f64 * 10.0 * 0.2_f64.powi(2) / 2.0
             + corners * 0.2_f64.powi(3) / 3.0
             + if third {
-                3.0 * 0.2_f64.powi(3) / 4.0
+                3.0 * 0.2_f64.powi(3) / 4.0 - 0.2_f64.powi(3) / 12.0
             } else {
                 0.0
             };

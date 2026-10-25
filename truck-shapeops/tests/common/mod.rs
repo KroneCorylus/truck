@@ -42,8 +42,7 @@ pub fn assert_topology<P, C, S>(solid: &Solid<P, C, S>, expected_genera: &[usize
 pub fn assert_mesh_closed<C, S>(solid: &Solid<Point3, C, S>, tol: f64)
 where
     C: PolylineableCurve,
-    S: MeshableSurface,
-{
+    S: MeshableSurface, {
     for (i, shell) in solid.boundaries().iter().enumerate() {
         let mut mesh = shell.triangulation(tol).to_polygon();
         mesh.put_together_same_attrs(TOLERANCE)
@@ -63,8 +62,7 @@ where
 pub fn assert_volume<C, S>(solid: &Solid<Point3, C, S>, expected: f64, tol: f64)
 where
     C: PolylineableCurve,
-    S: MeshableSurface,
-{
+    S: MeshableSurface, {
     let meshed = solid.triangulation(tol);
     let volume = meshed.to_polygon().volume();
     let curved_area: f64 = meshed
@@ -138,14 +136,10 @@ fn shell_genus<P, C, S>(shell: &Shell<P, C, S>) -> usize {
 }
 
 /// Volume of a cylinder.
-pub fn cylinder_volume(radius: f64, height: f64) -> f64 {
-    PI * radius * radius * height
-}
+pub fn cylinder_volume(radius: f64, height: f64) -> f64 { PI * radius * radius * height }
 
 /// Volume of a sphere.
-pub fn sphere_volume(radius: f64) -> f64 {
-    4.0 / 3.0 * PI * radius * radius * radius
-}
+pub fn sphere_volume(radius: f64) -> f64 { 4.0 / 3.0 * PI * radius * radius * radius }
 
 /// Volume removed by a constant-radius fillet of length `length` on a right-angle edge.
 pub fn fillet_removed_volume(radius: f64, length: f64) -> f64 {
@@ -196,4 +190,76 @@ pub fn assert_counts<P, C, S>(solid: &Solid<P, C, S>, vertices: usize, edges: us
         (vertices, edges, faces),
         "(vertices, edges, faces)"
     );
+}
+
+/// Convex polytopes `{x : n·x <= d}` with unit outward normals, as independent oracles.
+pub mod polytope {
+    use truck_meshalgo::prelude::*;
+
+    /// Vertices where three planes meet inside every half-space.
+    pub fn vertices(planes: &[(Vector3, f64)]) -> Vec<Point3> {
+        let mut points: Vec<Point3> = Vec::new();
+        for a in 0..planes.len() {
+            for b in a + 1..planes.len() {
+                for c in b + 1..planes.len() {
+                    let [(n, d), (m, e), (l, f)] = [planes[a], planes[b], planes[c]];
+                    let matrix = Matrix3::from_cols(n, m, l).transpose();
+                    if matrix.determinant().abs() < 1e-12 {
+                        continue;
+                    }
+                    let p = Point3::from_vec(matrix.invert().unwrap() * Vector3::new(d, e, f));
+                    if planes.iter().all(|(n, d)| n.dot(p.to_vec()) <= d + 1e-9)
+                        && !points.iter().any(|q| q.distance(p) < 1e-9)
+                    {
+                        points.push(p);
+                    }
+                }
+            }
+        }
+        points
+    }
+
+    /// Volume from `V = Σ d·area / 3` over the faces.
+    pub fn volume(planes: &[(Vector3, f64)]) -> f64 {
+        let points = vertices(planes);
+        planes
+            .iter()
+            .map(|&(n, d)| {
+                let mut face: Vec<_> = points
+                    .iter()
+                    .map(|p| p.to_vec())
+                    .filter(|p| (n.dot(*p) - d).abs() <= 1e-9)
+                    .collect();
+                if face.len() < 3 {
+                    return 0.0;
+                }
+                let center = face.iter().sum::<Vector3>() / face.len() as f64;
+                let x = (face[0] - center).normalize();
+                let y = n.cross(x);
+                face.sort_by(|a, b| {
+                    let angle = |p: &Vector3| (p - center).dot(y).atan2((p - center).dot(x));
+                    angle(a).total_cmp(&angle(b))
+                });
+                let area = (0..face.len())
+                    .map(|i| (face[i] - center).cross(face[(i + 1) % face.len()] - center))
+                    .sum::<Vector3>()
+                    .dot(n)
+                    / 2.0;
+                d * area / 3.0
+            })
+            .sum()
+    }
+
+    /// The plane through `points`, oriented away from `inside`.
+    pub fn plane(points: &[Point3], inside: Point3) -> (Vector3, f64) {
+        let n = (points[1] - points[0])
+            .cross(points[2] - points[0])
+            .normalize();
+        let n = if n.dot(points[0] - inside) < 0.0 {
+            -n
+        } else {
+            n
+        };
+        (n, n.dot(points[0].to_vec()))
+    }
 }

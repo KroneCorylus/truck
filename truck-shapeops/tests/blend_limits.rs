@@ -49,7 +49,7 @@ fn near_limit_fillet_retains_valid_small_faces() {
 }
 
 #[test]
-fn near_limit_chamfer_preserves_miter_contract() {
+fn near_limit_chamfer_preserves_corner_contract() {
     for transformed in [false, true] {
         let input = cube(transformed);
         let before = serde_json::to_string(&input.compress()).unwrap();
@@ -60,8 +60,9 @@ fn near_limit_chamfer_preserves_miter_contract() {
         let distance: f64 = 4.999999;
         let result = try_chamfer_solid_edges(&input, &selected, distance, 0.001).unwrap();
         assert!(result.solid.is_geometric_consistent());
-        // Inclusion-exclusion of the twelve triangular edge cuts and eight miter junctions.
-        let expected = 1000.0 - 60.0 * distance.powi(2) + 6.0 * distance.powi(3);
+        // Inclusion-exclusion of the twelve triangular edge cuts and eight bevel apexes, less
+        // the d^3/12 tetrahedron each corner triangle cuts off its apex.
+        let expected = 1000.0 - 60.0 * distance.powi(2) + 16.0 / 3.0 * distance.powi(3);
         common::assert_solid(&result.solid, expected, &[0], 0.001);
         assert_eq!(serde_json::to_string(&input.compress()).unwrap(), before);
     }

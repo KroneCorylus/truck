@@ -14,7 +14,17 @@ pub(super) fn chamfer_edges(
     let selected: HashSet<_> = edges.iter().copied().collect();
     let data = convex::validate(shell, &selected, tol, "chamfer_solid_edges");
     let data = match data {
-        Ok(data) if data.incident.iter().all(|edges| edges.len() == 3) => data,
+        // Fully chamfered corners use OCCT's corner faces, built by the miter construction.
+        Ok(data)
+            if data.incident.iter().all(|edges| {
+                edges.len() == 3
+                    && !edges
+                        .iter()
+                        .all(|&k| selected.contains(&data.original_edges[k].id()))
+            }) =>
+        {
+            data
+        }
         _ => {
             let distances = selected.iter().map(|&id| (id, [distance; 2])).collect();
             return super::chamfer_miter::chamfer(shell, &selected, &distances, tol);

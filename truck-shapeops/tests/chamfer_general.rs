@@ -163,10 +163,12 @@ fn three_edge_corners_do_not_require_a_globally_convex_body() {
     .map(|p| common::blend::edge_through(&input.boundaries()[0], p).id())
     .into();
     let result = try_chamfer_solid_edges(&input, &ids, 0.2, TOL).unwrap();
-    let expected = 3000.0 - 50.0 * 0.2_f64.powi(2) / 2.0 + 3.0 * 0.2_f64.powi(3) / 4.0;
+    // The corner triangle cuts the d^3/12 tetrahedron off the bevel apex.
+    let expected = 3000.0 - 50.0 * 0.2_f64.powi(2) / 2.0 + 3.0 * 0.2_f64.powi(3) / 4.0
+        - 0.2_f64.powi(3) / 12.0;
     common::assert_solid(&result.solid, expected, &[0], TOL);
     common::blend::assert_step(&result.solid, expected, TOL);
-    assert_eq!(result.generated_faces.len(), 3);
+    assert_eq!(result.generated_faces.len(), 4);
 }
 
 #[test]
@@ -205,15 +207,17 @@ fn asymmetric_three_edge_corner_matches_an_affine_scaled_reference() {
         })
         .into();
     let result = try_chamfer_solid_edges_with_distances(&input, &chosen, TOL).unwrap();
-    common::assert_solid(&result.solid, 1499.109, &[0], TOL);
-    common::blend::assert_step(&result.solid, 1499.109, TOL);
+    // The affine image of the equal-distance cube corner, including its corner triangle.
+    let expected = 1.5 * (1000.0 - 15.0 * 0.2_f64.powi(2) + 2.0 * 0.2_f64.powi(3) / 3.0);
+    common::assert_solid(&result.solid, expected, &[0], TOL);
+    common::blend::assert_step(&result.solid, expected, TOL);
     for vertex in reference.vertex_iter() {
         assert!(result
             .solid
             .vertex_iter()
             .any(|v| v.point().near(&vertex.point())));
     }
-    assert_eq!(result.generated_faces.len(), 3);
+    assert_eq!(result.generated_faces.len(), 4);
 }
 
 #[test]
