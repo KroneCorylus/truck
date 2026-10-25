@@ -149,15 +149,9 @@ Classification so far: [notes/discrepancies.txt](audits/fillet-chamfer/notes/dis
   `blend/simple/{Q9,R1,R2,R3,R5,R6,U9,V7}`) are in scope
   ([notes/no-solid-scope.json](audits/fillet-chamfer/notes/no-solid-scope.json)).
 - How a case counts when Truck matches an independent oracle but OCCT does not (stream F).
-- App work in `../PiezaCAD` needs explicit authorization
-  ([notes/scope-and-app-review.txt](audits/fillet-chamfer/notes/scope-and-app-review.txt)):
-  - `cad-core/src/kernel/blend.rs:115` splits mixed straight/curved selections into
-    sequential groups, so they never reach the kernel's joined junctions (W02).
-  - `apply_tools` (`cad-core/src/build.rs:1136`) subtracts each tool from the body one at a
-    time; one batch boolean per Remove feature is much faster.
-  - The app's `[profile.dev]` builds `truck-*` at `opt-level = 1`; add
-    `[profile.dev.package."truck-*"] opt-level = 3` for interactive debug builds.
-  - Sketch fillet/chamfer gaps S01–S03 (below).
+- App-side items from this audit (mixed-selection adapter, batch Remove booleans, debug
+  `opt-level`, sketch fillets S01–S03) are in [../PiezaCAD/TASKS.md](../PiezaCAD/TASKS.md)
+  stream B.
 
 ### H. Capability families
 
@@ -225,9 +219,15 @@ accuracy, STEP, modeling or performance failure.
 
 Checked against the code on 2026-10-25.
 
+- **App tests broken by recent kernel commits.** Five cad-core failures in mesh volumes and
+  STEP round trips have no known cause yet; bisect them here
+  ([../PiezaCAD/TASKS.md](../PiezaCAD/TASKS.md) A1).
 - **STEP import panics on bad knot data.** `KnotVec::from_single_multi(..).unwrap()` in
   `truck-stepio/src/in/mod.rs` (B-spline curves and both surface directions). User input
   must return an error. Small; do first.
+- **Offsets for shell and thicken.** Typed offsets of spline surfaces, curved thickening and
+  general concave shelling (plane-plane concave joins already work). Blocks the app's
+  surfacing (`../PiezaCAD/TASKS.md` C6).
 - **Sweep corners on curved or closed paths.** Open line-only paths get bisector miters;
   curved and closed paths with corners still return `PathNotSmooth`.
 - **Boolean performance** (through-holes already use the analytic path in
