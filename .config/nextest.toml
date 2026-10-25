@@ -1,0 +1,5 @@
+# Development test runs: `cargo nextest run --release -p <crate>`. Benchmarks stay serial;
+# see BENCHMARKS.md. Some replay and import tests peak near 2 GB, so cap concurrency.
+[profile.default]
+test-threads = 16
+slow-timeout = { period = "60s" }

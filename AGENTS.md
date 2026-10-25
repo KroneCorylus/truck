@@ -77,12 +77,16 @@ reports the feature as failed. A missing or fragile capability is a broken produ
 
 ```bash
 git submodule update --init                      # STEP fixtures in resources/
-cargo test -p truck-shapeops                     # test one crate (preferred while iterating)
+cargo nextest run --release -p truck-shapeops    # test one crate, all tests in parallel
+cargo test --release --doc -p truck-shapeops     # doctests (nextest does not run them)
 cargo clippy -p truck-shapeops --all-targets     # lint one crate
 RAYON_NUM_THREADS=1 cargo bench -p truck-benchmarks --bench actions -- --test   # check benchmarks still run
 RAYON_NUM_THREADS=1 cargo bench -p truck-benchmarks --bench actions             # measure
 ```
 
+- Tests run in parallel for fast iteration (`cargo install cargo-nextest --locked` once;
+  concurrency is capped in `.config/nextest.toml`). Benchmarks run serially with
+  `RAYON_NUM_THREADS=1` and nothing else running, so their timings are comparable.
 - `truck-platform` and `truck-rendimpl` are on the app's display path, and their tests need a
   GPU (`cargo make gpu-test`). The app does not use `truck-js`: keep it compiling, but do not
   invest in it.
