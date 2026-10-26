@@ -72,12 +72,21 @@ speed shortcut. **Do not count it as a comparison pass.** Durable evidence:
 [oracles/G2_MATERIAL.txt](audits/fillet-chamfer/oracles/G2_MATERIAL.txt),
 `g2_corner_witness.cpp`, `g2_material.py`, and the matched benchmark harnesses.
 
-### Next batch
+### Active batch — 2026-10-26
 
-Planned after committing the validated baseline: A2 curved chamfer corners, B1 G6/H1
-fillet extension, and D remaining C1 chamfer sequences. Each gets a separate worktree;
-release builds only with CARGO_BUILD_JOBS=8 and NEXTEST_TEST_THREADS=6. Timed benchmarks
-must be serialized by the coordinator after implementation builds stop.
+All three agents started from committed baseline `b0ba3f2b`. Coordinator owns this tracker
+and integration; agents return uncommitted changes from separate worktrees. Release only,
+CARGO_BUILD_JOBS=8 and NEXTEST_TEST_THREADS=6. Benchmarks run serially after builds stop.
+
+- **A2 curved chamfer corners — running.** Worktree `../truck-curved-chamfers`; task `node:delegated-task:command%3Amcp%3Adae5ab29-ba77-4737-96db-da406439be91%3Adelegate-task%3Atruck-a2-20261026-1`.
+- **B1 higher-degree fillet junctions — running.** Worktree `../truck-higher-fillets`; task `node:delegated-task:command%3Amcp%3Adae5ab29-ba77-4737-96db-da406439be91%3Adelegate-task%3Atruck-b-g6h1-20261026-1`.
+- **D remaining C1 chamfer sequences — running.** Worktree `../truck-c1-sequences`; task `node:delegated-task:command%3Amcp%3Adae5ab29-ba77-4737-96db-da406439be91%3Adelegate-task%3Atruck-d-c1-20261026-1`.
+
+A2 owns chamfer_miter.rs/chamfer_edges.rs; B owns planar_fillet.rs/planar.rs;
+D owns along_wire.rs and chamfer.rs terminal assembly, with modeling.rs chamfer helpers
+reserved to D. All streams own their focused tests. Request coordination before expanding
+shared-file ownership. Previous scratch worktrees remain preserved until their evidence
+and uncommitted differences can be safely cleaned up.
 
 Each stream owns the files listed and can run in parallel with the others. A file marked
 *shared* is edited by one stream at a time; ask the coordinator first. Notes under
@@ -340,6 +349,7 @@ python3 audits/fillet-chamfer/capture/run_capture.py \
 
 | Date | Commit | Result |
 | --- | --- | --- |
+| 2026-10-26 | `b0ba3f2b` | STEP knot/export fixes, G2 and C2 junctions; chamfer replay 357 / 332; G2 25.46 ms vs OCCT 29.70 ms with rolling-ball geometry preserved |
 | 2026-10-22 | `9f97532a` | Torus corners; full run 480 construct / 437 pass |
 | 2026-10-22 | `9e3ce08a` | Mixed curved corners; F1 passes, H7 constructs |
 | 2026-10-24 | `5a4e3bc6` | Exact knots and STEP masters; full run 482 / 438 |
