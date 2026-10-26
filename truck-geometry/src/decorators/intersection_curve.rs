@@ -15,16 +15,10 @@ where
     S1: ParametricSurface3D + SearchNearestParameter<D2, Point = Point3>,
 {
     let function = move |Vector4 { x, y, z, w }| {
-        let (pt0, uder0, vder0) = (
-            surface0.subs(x, y).to_vec(),
-            surface0.uder(x, y),
-            surface0.vder(x, y),
-        );
-        let (pt1, uder1, vder1) = (
-            surface1.subs(z, w).to_vec(),
-            surface1.uder(z, w),
-            surface1.vder(z, w),
-        );
+        let ders0 = surface0.ders(1, x, y);
+        let ders1 = surface1.ders(1, z, w);
+        let (pt0, uder0, vder0) = (ders0[0][0], ders0[1][0], ders0[0][1]);
+        let (pt1, uder1, vder1) = (ders1[0][0], ders1[1][0], ders1[0][1]);
         CalcOutput {
             value: (pt0 - pt1).extend(plane_normal.dot((pt0 + pt1) / 2.0 - plane_point.to_vec())),
             derivation: Matrix4::from_cols(
@@ -62,7 +56,27 @@ impl<C, S0, S1> IntersectionCurve<C, S0, S1> {
             surface1,
             leader,
             division: Default::default(),
+            inverse_division: Default::default(),
+            surface1_hint: None,
         }
+    }
+    /// Supplies the leader's parameters on the second surface to avoid rediscovering them.
+    /// At each leader parameter, the hint must have finite UV coordinates and evaluate
+    /// on the second surface to within a spatial distance strictly less than `1e-12`
+    /// of the leader point. Otherwise, evaluation falls back to the ordinary nearest
+    /// parameter search. An explicit second-surface hint in
+    /// [`Self::search_triple_with_hints`] takes precedence and bypasses this check.
+    ///
+    /// This checks spatial agreement, not UV branch identity: periodic or noninjective
+    /// supports may accept equivalent coordinates on a different branch from an
+    /// unhinted search. The hint seeds the subsequent intersection solve; it does not
+    /// add a final residual guarantee. Newton termination uses parameter-step convergence.
+    /// Mutation clears the stored hint; inversion reverses its parameterization.
+    pub fn with_surface1_parameter_hint(mut self, hint: BSplineCurve<Point2>) -> Self {
+        self.division = Default::default();
+        self.inverse_division = Default::default();
+        self.surface1_hint = Some(hint);
+        self
     }
     /// This curve is a part of intersection of `self.surface0()` and `self.surface1()`.
     #[inline(always)]
@@ -77,18 +91,24 @@ impl<C, S0, S1> IntersectionCurve<C, S0, S1> {
     #[inline(always)]
     pub fn surface0_mut(&mut self) -> &mut S0 {
         self.division = Default::default();
+        self.inverse_division = Default::default();
+        self.surface1_hint = None;
         &mut self.surface0
     }
     /// This curve is a part of intersection of `self.surface0()` and `self.surface1()`.
     #[inline(always)]
     pub fn surface1_mut(&mut self) -> &mut S1 {
         self.division = Default::default();
+        self.inverse_division = Default::default();
+        self.surface1_hint = None;
         &mut self.surface1
     }
     /// Returns the curve leading this curve.
     #[inline(always)]
     pub fn leader_mut(&mut self) -> &mut C {
         self.division = Default::default();
+        self.inverse_division = Default::default();
+        self.surface1_hint = None;
         &mut self.leader
     }
     /// destruct `self`.
@@ -119,12 +139,20 @@ where
         hint1: Option<(f64, f64)>,
         trials: usize,
     ) -> Option<(Point3, Point2, Point2)> {
+        let point = self.leader.subs(t);
+        let hint1 = hint1.or_else(|| {
+            let uv = self.surface1_hint.as_ref()?.subs(t);
+            (uv.x.is_finite()
+                && uv.y.is_finite()
+                && self.surface1.subs(uv.x, uv.y).distance2(point) < TOLERANCE2 * TOLERANCE2)
+                .then_some((uv.x, uv.y))
+        });
         double_projection(
             self.surface0(),
             hint0,
             self.surface1(),
             hint1,
-            self.leader.subs(t),
+            point,
             self.leader.der(t),
             trials,
         )
@@ -370,19 +398,26 @@ where
     #[inline(always)]
     fn cut(&mut self, t: f64) -> Self {
         self.division = Default::default();
+        self.inverse_division = Default::default();
+        self.surface1_hint = None;
         Self {
             surface0: self.surface0.clone(),
             surface1: self.surface1.clone(),
             leader: self.leader.cut(t),
             division: Default::default(),
+            inverse_division: Default::default(),
+            surface1_hint: None,
         }
     }
 }
 
 impl<C: Invertible, S0: Clone, S1: Clone> Invertible for IntersectionCurve<C, S0, S1> {
     fn invert(&mut self) {
-        self.division = Default::default();
+        std::mem::swap(&mut self.division, &mut self.inverse_division);
         self.leader.invert();
+        if let Some(hint) = &mut self.surface1_hint {
+            hint.invert();
+        }
     }
 }
 
@@ -437,6 +472,8 @@ where
 {
     fn transform_by(&mut self, trans: Matrix4) {
         self.division = Default::default();
+        self.inverse_division = Default::default();
+        self.surface1_hint = None;
         self.surface0.transform_by(trans);
         self.surface1.transform_by(trans);
         self.leader.transform_by(trans);
@@ -570,5 +607,128 @@ impl<C: PartialEq, S0: PartialEq, S1: PartialEq> PartialEq for IntersectionCurve
         self.leader == other.leader
             && self.surface0 == other.surface0
             && self.surface1 == other.surface1
+    }
+}
+
+#[test]
+fn reversed_divisions_are_shared_and_detached_on_mutation() {
+    let curve = IntersectionCurve::new(
+        Plane::xy(),
+        Plane::yz(),
+        Line(Point3::origin(), Point3::new(0., 2., 0.)),
+    );
+    let inverse = curve.inverse();
+    let expected = inverse.parameter_division((0., 1.), 0.001);
+    let mut again = curve.inverse();
+    assert!(std::sync::Arc::ptr_eq(&inverse.division, &again.division));
+    assert_eq!(again.parameter_division((0., 1.), 0.001), expected);
+    again.leader_mut().0.y = 3.;
+    assert!(!std::sync::Arc::ptr_eq(&inverse.division, &again.division));
+    assert_eq!(
+        curve.inverse().parameter_division((0., 1.), 0.001),
+        expected
+    );
+    assert_ne!(again.parameter_division((0., 1.), 0.001), expected);
+}
+
+#[cfg(test)]
+mod parameter_hint_tests {
+    use super::*;
+    #[derive(Clone)]
+    struct CountedPlane(Plane, std::rc::Rc<std::cell::Cell<usize>>);
+    impl ParametricSurface for CountedPlane {
+        type Point = Point3;
+        type Vector = Vector3;
+        fn subs(&self, u: f64, v: f64) -> Point3 { self.0.subs(u, v) }
+        fn uder(&self, u: f64, v: f64) -> Vector3 { self.0.uder(u, v) }
+        fn vder(&self, u: f64, v: f64) -> Vector3 { self.0.vder(u, v) }
+        fn uuder(&self, u: f64, v: f64) -> Vector3 { self.0.uuder(u, v) }
+        fn uvder(&self, u: f64, v: f64) -> Vector3 { self.0.uvder(u, v) }
+        fn vvder(&self, u: f64, v: f64) -> Vector3 { self.0.vvder(u, v) }
+        fn der_mn(&self, m: usize, n: usize, u: f64, v: f64) -> Vector3 {
+            self.0.der_mn(m, n, u, v)
+        }
+    }
+    impl ParametricSurface3D for CountedPlane {}
+    impl SearchNearestParameter<D2> for CountedPlane {
+        type Point = Point3;
+        fn search_nearest_parameter<H: Into<SPHint2D>>(
+            &self,
+            p: Point3,
+            hint: H,
+            trials: usize,
+        ) -> Option<(f64, f64)> {
+            self.1.set(self.1.get() + 1);
+            self.0.search_nearest_parameter(p, hint, trials)
+        }
+    }
+    #[test]
+    fn periodic_parameter_hint_accepts_equivalent_uv_and_rejects_mismatch() {
+        use std::f64::consts::{FRAC_PI_2, TAU};
+        let curve = IntersectionCurve::new(
+            Plane::xy(),
+            Sphere::new(Point3::origin(), 1.),
+            UnitCircle::<Point3>::new(),
+        );
+        let hint = |latitude, shift| {
+            BSplineCurve::new(
+                KnotVec::bezier_knot(1),
+                vec![
+                    Point2::new(latitude, shift),
+                    Point2::new(latitude, shift + 1.),
+                ],
+            )
+        };
+        let equivalent = curve
+            .clone()
+            .with_surface1_parameter_hint(hint(FRAC_PI_2, 2. * TAU));
+        let bad = curve
+            .clone()
+            .with_surface1_parameter_hint(hint(0., 2. * TAU));
+        for t in [0., 0.17, 0.6, 1.] {
+            let expected = curve.search_triple(t, 100).unwrap();
+            let (point, uv0, uv1) = equivalent.search_triple(t, 100).unwrap();
+            for expected_point in [
+                curve.leader().subs(t),
+                expected.0,
+                curve.surface0().subs(uv0.x, uv0.y),
+                curve.surface1().subs(uv1.x, uv1.y),
+            ] {
+                assert!(point.distance(expected_point) < 1e-12);
+            }
+            assert_near!(uv1, Point2::new(FRAC_PI_2, t + 2. * TAU));
+            assert!((uv1.y - expected.2.y).abs() > 6.);
+            // The pole is spatially wrong and singular for Newton: it must fall back.
+            assert_eq!(bad.search_triple(t, 100).unwrap(), expected);
+        }
+    }
+
+    #[test]
+    fn verified_parameter_hint_avoids_search_and_invalid_hint_falls_back() {
+        let calls = std::rc::Rc::new(std::cell::Cell::new(0));
+        let curve = IntersectionCurve::new(
+            Plane::xy(),
+            CountedPlane(Plane::yz(), calls.clone()),
+            Line(Point3::origin(), Point3::new(0., 2., 0.)),
+        );
+        let hint = BSplineCurve::new(
+            KnotVec::bezier_knot(1),
+            vec![Point2::new(0., 0.), Point2::new(2., 0.)],
+        );
+        let hinted = curve.clone().with_surface1_parameter_hint(hint);
+        for t in [0., 0.25, 0.7, 1.] {
+            let expected = curve.search_triple(t, 100).unwrap();
+            calls.set(0);
+            assert_eq!(hinted.search_triple(t, 100).unwrap(), expected);
+            assert_eq!(calls.get(), 0);
+            assert_near!(hinted.inverse().subs(1. - t), expected.0);
+        }
+        let bad = hinted.with_surface1_parameter_hint(BSplineCurve::new(
+            KnotVec::bezier_knot(1),
+            vec![Point2::new(9., 3.); 2],
+        ));
+        calls.set(0);
+        assert_near!(bad.subs(0.4), Point3::new(0., 0.8, 0.));
+        assert_eq!(calls.get(), 1);
     }
 }

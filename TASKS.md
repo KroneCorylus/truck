@@ -35,6 +35,50 @@ adds `blend/complex/D2` (construction failure) and 8 no-solid cases.
 
 ## Streams
 
+### Completed batch — 2026-10-26
+
+STEP malformed-knot handling, G2 quadratic remote fillets, C2 consumed chamfers, STEP
+intersection export accuracy and G2 performance work are implemented and reviewed.
+The changelog and committed tests/oracles describe the behavior; no agent remains active
+from that batch. Original implementation baseline was `afedac31`.
+
+Latest full existing-corpus replay: **486 chamfer operations, 357 constructions, 332 limited
+comparison passes**, six C2 gains and no lost checks. Optimization retained every replay
+status, diagnostic and sampled distance. A new full native recapture has not been run.
+The broader optimization suite passed 893 tests with the documented pcurve_derivation
+precision failure and two existing skips, plus 179 doctests and 77 replay tests. Final
+review follow-ups added tests/docs only: 35 geometry unit tests, 5 integration tests and
+139 doctests pass. Release Clippy retains the two known shapeops test warnings.
+
+Matched G2 benchmark: **201.320 -> 25.463 ms**, fresh OCCT **29.703 ms**, 40 samples each
+across alternating rounds on CPU0 with one worker. Repeated sampling/search grids and
+first derivatives were the dominant costs. Approximately 217 KB more peak live cached
+memory; no general never-slower guarantee. Neighboring benchmark medians showed no slowdown.
+Independent review and derivative tests across weights, transforms, reversals and tiny/large
+domains passed. Source/binary hashes and raw evidence are retained under:
+
+- `target/g2-performance-20261026/RESULTS.txt` and `review-followups/validation.json`
+- `target/g2-integration-validation-20261026/validation-results.json`
+- `target/c2-panicfix-validation-20261026/comparison-details.json`
+- `target/g2-matched-benchmark-20261026/RESULTS.txt`
+- `target/integration-benchmarks-20261026/REPORT.md`
+
+G2 reference accounting remains pending: native distances 1.13947 / 1.15467 exceed 0.001.
+Independent sphere/material witnesses support Truck's rolling-ball result. Runtime tracing
+shows OCCT chooses a three-boundary Coons fill, not a guaranteed constant-radius corner;
+100x tighter approximation tolerance leaves the discrepancy unchanged. Treat this as a
+mismatch with our rolling-ball contract, not a demonstrated OCCT API violation or intentional
+speed shortcut. **Do not count it as a comparison pass.** Durable evidence:
+[oracles/G2_MATERIAL.txt](audits/fillet-chamfer/oracles/G2_MATERIAL.txt),
+`g2_corner_witness.cpp`, `g2_material.py`, and the matched benchmark harnesses.
+
+### Next batch
+
+Planned after committing the validated baseline: A2 curved chamfer corners, B1 G6/H1
+fillet extension, and D remaining C1 chamfer sequences. Each gets a separate worktree;
+release builds only with CARGO_BUILD_JOBS=8 and NEXTEST_TEST_THREADS=6. Timed benchmarks
+must be serialized by the coordinator after implementation builds stop.
+
 Each stream owns the files listed and can run in parallel with the others. A file marked
 *shared* is edited by one stream at a time; ask the coordinator first. Notes under
 [audits/fillet-chamfer/notes/](audits/fillet-chamfer/notes) are earlier agents' read-only
@@ -68,11 +112,10 @@ corner construction (decided 2026-10-24). Reproduce OCCT behavior with
 
 Owns `truck-shapeops/src/fillet/planar_fillet.rs`, `planar.rs`.
 
-1. **G2** (`blend/simple/G2`): the patches in
-   [notes/g2-remote-junction/](audits/fillet-chamfer/notes/g2-remote-junction) apply cleanly
-   to `d86c6cfb` but were never compiled. Apply `regressions.patch`, prove the test fails on
-   the parent, then apply `kernel.patch`. Follow INTEGRATION.md. Then `G6` (quartic) and
-   `H1` (cubic), which the candidate excludes.
+1. **G6 (quartic), then H1 (cubic).** G2's bounded quadratic remote-junction construction
+   is implemented; extend only with independently derived geometry and parent-failing
+   regressions. See `tests/extrusion_remote_junction.rs` and the G2 oracle for the existing
+   contract. Current guards intentionally exclude these higher-degree cases.
 2. **F9, then G8, then G4**: two selected straight edges meeting at an extrusion corner with
    the curved cap edge unselected. Not the G2 topology and not a three-edge sphere. Exact
    source geometry and an oracle plan are in
@@ -95,18 +138,17 @@ expectation to rewrite, and a local analytic oracle are in
 `blend/simple/A4`, `blend/tolblend_simple/A2`, `feat/featlf/{E2,E3}`, `blend/complex/D2`.
 Earlier scope notes: `truck-benchmarks/results/2026-10-14-unequal-radii/REPORT.md`.
 
-### D. Chamfer sequences (14 cases)
+### D. Chamfer sequences (8 remaining cases)
 
 Owns `truck-shapeops/src/fillet/along_wire.rs`.
 
-1. `chamfer/{equal_dist,dist_dist,dist_angle}_sequence/C2` 005 and 010: a 0.5 chamfer
-   consumes an earlier 0.2 chamfer on a line–arc–line chain; fails in `trim_closed_chain` /
-   `trim_runs`. An uncompiled regression with an analytic volume is in
-   [notes/chamfer-sequence-c2/](audits/fillet-chamfer/notes/chamfer-sequence-c2). The planar
-   precedent is `tests/consumed_chamfer_neighbor.rs`.
-2. `chamfer/{dist_dist,equal_dist}_sequence/C1` 002, 003.
-3. `chamfer/dist_dist_sequence/C1` 007, 008 and `chamfer/equal_dist_sequence/C1` 006, 007:
+1. `chamfer/{dist_dist,equal_dist}_sequence/C1` 002, 003.
+2. `chamfer/dist_dist_sequence/C1` 007, 008 and `chamfer/equal_dist_sequence/C1` 006, 007:
    inputs are consistent; construction fails in `trim_faces`.
+
+C2's six 005/010 targets are implemented; all 30 C2 captures pass. Preserve their analytic
+regressions in `tests/d_c2_consumed_contour.rs`, the empty-contact rejection fix and
+[material oracle](audits/fillet-chamfer/oracles/d-c2-contour-material-oracle.py).
 
 ### E. Imported inputs (13 cases)
 
@@ -222,9 +264,6 @@ Checked against the code on 2026-10-25.
 - **App tests broken by recent kernel commits.** Five cad-core failures in mesh volumes and
   STEP round trips have no known cause yet; bisect them here
   ([../PiezaCAD/TASKS.md](../PiezaCAD/TASKS.md) A1).
-- **STEP import panics on bad knot data.** `KnotVec::from_single_multi(..).unwrap()` in
-  `truck-stepio/src/in/mod.rs` (B-spline curves and both surface directions). User input
-  must return an error. Small; do first.
 - **Offsets for shell and thicken.** Typed offsets of spline surfaces, curved thickening and
   general concave shelling (plane-plane concave joins already work). Blocks the app's
   surfacing (`../PiezaCAD/TASKS.md` C6).
@@ -262,7 +301,7 @@ results in its final message instead of editing this file.
 - **Memory.** 31 GB RAM, 32 threads. Run at most three building agents at once, each with
   `CARGO_BUILD_JOBS=8` and `NEXTEST_TEST_THREADS=6`. Some replay tests peak near 2 GB.
 - **Parallel-safe now:** A, B, C (C after B for `modeling.rs`), D, E, F. A starts with step 2;
-  B with B1; F needs no build slot for analysis.
+  B with G6/H1; F needs no build slot for analysis.
 - Each stream ends with a branch that passes the rules below on its own. The coordinator
   merges one branch at a time onto `master`, reruns the affected crates and
   `capture/replay_chamfers.py`, then updates the numbers and log here.

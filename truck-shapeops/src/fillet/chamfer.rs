@@ -611,9 +611,9 @@ where
 /// seams between consecutive supporting faces must meet those points without extending the
 /// contact curves. This includes the rim of a prism with filleted vertical edges.
 ///
-/// Each open end must terminate on a single face at the contact endpoints; both ends may
-/// share that face. Clipped contacts keep their support geometry, with intersection curves
-/// closing the chamfer against terminal faces. The chamfer must fit
+/// Open ends may share a terminal face. When a terminal neighbor is consumed, its surviving
+/// adjacent faces are trimmed together. Clipped contacts keep their support geometry, with
+/// intersection curves closing the chamfer against terminal faces. The chamfer must fit
 /// inside its supporting faces and avoid distant faces. Branching selections and non-tangent
 /// corners are unsupported. Original faces retain their
 /// order, followed by one ruled chamfer face per wire edge. Returns `None` on failed construction.
@@ -655,7 +655,7 @@ where
         (d0, d1),
         tol,
         along_wire::trim_contact_edge,
-        false,
+        (false, |_, _| None),
         DistanceMode::TangentProjection,
     )
 }
@@ -666,7 +666,7 @@ pub(super) fn try_chamfer_along_wire_with_trim<C, S>(
     (d0, d1): (f64, f64),
     tol: f64,
     trim: impl Fn(&mut C, &Edge<Point3, C>, bool) -> Option<along_wire::TrimmedContact<C>>,
-    continue_contacts: bool,
+    (continue_contacts, intersect_exit): (bool, impl Fn(&C, &S) -> Option<Option<Point3>>),
     mode: DistanceMode,
 ) -> Result<Shell<Point3, C, S>, Diagnostic>
 where
@@ -895,6 +895,7 @@ where
         }
         Some(parameters)
     };
+    let mut terminal_cross = None;
     let mut cross = Vec::new();
     for k in 0..n {
         for (side, curve) in contacts[k].iter().enumerate() {
@@ -936,109 +937,136 @@ where
             ),
             surfaces[k].to_same_geometry(),
         ));
-        let mut ends: Vec<(usize, Vec<usize>)> = Vec::new();
-        for j in [0, n] {
-            let vertex = if j == 0 {
-                wire.front_vertex().unwrap()
-            } else {
-                wire.back_vertex().unwrap()
-            };
-            let candidates: Vec<_> = shell
-                .iter()
-                .enumerate()
-                .filter(|(_, f)| {
-                    f.vertex_iter().any(|v| v.id() == vertex.id())
-                        && !f.edge_iter().any(|e| wire.iter().any(|w| w.id() == e.id()))
-                })
-                .collect();
-            let [(index, _)] = candidates.as_slice() else {
-                return Err(failed().stage("trim_end_faces"));
-            };
-            let surface = shell[*index].oriented_surface();
-            let guide = cross[j].curve();
-            let (a, b) = guide.range_tuple();
-            if (0..=16).any(|i| {
-                let point = guide.subs(a + (b - a) * i as f64 / 16.);
-                surface.search_parameter(point, None, 100).is_none()
-            }) {
-                let k = if j == 0 { 0 } else { n - 1 };
-                let intersection =
-                    IntersectionCurve::new(surface, surfaces[k].to_same_geometry(), guide);
-                for i in 0..=32 {
-                    let t = a + (b - a) * i as f64 / 32.;
-                    let (point, uv0, uv1) = intersection
-                        .search_triple(t, 100)
-                        .ok_or_else(|| failed().stage("trim_end_faces"))?;
-                    let normal0 = intersection.surface0().normal(uv0.x, uv0.y);
-                    let normal1 = intersection.surface1().normal(uv1.x, uv1.y);
-                    let transverse = normal0.cross(normal1).magnitude2();
-                    if !transverse.is_finite()
-                        || transverse <= TOLERANCE2
-                        || (i == 0 && !point.near(&cross[j].front().point()))
-                        || (i == 32 && !point.near(&cross[j].back().point()))
-                    {
-                        return Err(failed().stage("trim_end_faces"));
-                    }
-                }
-                cross[j].set_curve(intersection.to_same_geometry());
-            }
-            if let Some((_, junctions)) = ends.iter_mut().find(|(i, _)| i == index) {
-                junctions.push(j);
-            } else {
-                ends.push((*index, vec![j]));
-            }
-        }
-        // Apply both end bridges together when they trim the same terminal face.
-        for (index, junctions) in ends {
-            let face = &shell[index];
-            let mut used = vec![false; junctions.len()];
-            let mut loops = Vec::new();
-            for boundary in face.boundaries() {
-                let mut pieces = Vec::new();
-                for edge in boundary {
-                    pieces.extend(trimmed.cuts.piece(&edge).unwrap_or(Some(edge)));
-                }
-                let mut boundary = Wire::new();
-                for i in 0..pieces.len() {
-                    boundary.push_back(pieces[i].clone());
-                    let (a, b) = (pieces[i].back(), pieces[(i + 1) % pieces.len()].front());
-                    if a != b {
-                        let (bridge, edge) = junctions
-                            .iter()
-                            .enumerate()
-                            .find_map(|(i, &j)| {
-                                if used[i] {
-                                    None
-                                } else if cross[j].front() == a && cross[j].back() == b {
-                                    Some((i, cross[j].clone()))
-                                } else if cross[j].back() == a && cross[j].front() == b {
-                                    Some((i, cross[j].inverse()))
-                                } else {
-                                    None
-                                }
-                            })
+        if along_wire::has_consumed_edges(&trimmed) {
+            terminal_cross = Some(
+                along_wire::trim_consumed_chamfer_ends(
+                    shell,
+                    wire,
+                    &mut trimmed,
+                    &surfaces
+                        .iter()
+                        .map(ToSameGeometry::to_same_geometry)
+                        .collect::<Vec<S>>(),
+                    &intersect_exit,
+                )
+                .ok_or_else(|| failed().stage("trim_end_faces"))?,
+            );
+        } else {
+            let mut ends: Vec<(usize, Vec<usize>)> = Vec::new();
+            for j in [0, n] {
+                let vertex = if j == 0 {
+                    wire.front_vertex().unwrap()
+                } else {
+                    wire.back_vertex().unwrap()
+                };
+                let candidates: Vec<_> = shell
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, f)| {
+                        f.vertex_iter().any(|v| v.id() == vertex.id())
+                            && !f.edge_iter().any(|e| wire.iter().any(|w| w.id() == e.id()))
+                    })
+                    .collect();
+                let [(index, _)] = candidates.as_slice() else {
+                    return Err(failed().stage("trim_end_faces"));
+                };
+                let surface = shell[*index].oriented_surface();
+                let guide = cross[j].curve();
+                let (a, b) = guide.range_tuple();
+                if (0..=16).any(|i| {
+                    let point = guide.subs(a + (b - a) * i as f64 / 16.);
+                    surface.search_parameter(point, None, 100).is_none()
+                }) {
+                    let k = if j == 0 { 0 } else { n - 1 };
+                    let intersection =
+                        IntersectionCurve::new(surface, surfaces[k].to_same_geometry(), guide);
+                    for i in 0..=32 {
+                        let t = a + (b - a) * i as f64 / 32.;
+                        let (point, uv0, uv1) = intersection
+                            .search_triple(t, 100)
                             .ok_or_else(|| failed().stage("trim_end_faces"))?;
-                        boundary.push_back(edge);
-                        used[bridge] = true;
+                        let normal0 = intersection.surface0().normal(uv0.x, uv0.y);
+                        let normal1 = intersection.surface1().normal(uv1.x, uv1.y);
+                        let transverse = normal0.cross(normal1).magnitude2();
+                        if !transverse.is_finite()
+                            || transverse <= TOLERANCE2
+                            || (i == 0 && !point.near(&cross[j].front().point()))
+                            || (i == 32 && !point.near(&cross[j].back().point()))
+                        {
+                            return Err(failed().stage("trim_end_faces"));
+                        }
                     }
+                    cross[j].set_curve(intersection.to_same_geometry());
                 }
-                loops.push(boundary);
+                if let Some((_, junctions)) = ends.iter_mut().find(|(i, _)| i == index) {
+                    junctions.push(j);
+                } else {
+                    ends.push((*index, vec![j]));
+                }
             }
-            if used.iter().any(|used| !used) {
-                return Err(failed().stage("trim_end_faces"));
+            // Apply both end bridges together when they trim the same terminal face.
+            for (index, junctions) in ends {
+                let face = &shell[index];
+                let mut used = vec![false; junctions.len()];
+                let mut loops = Vec::new();
+                for boundary in face.boundaries() {
+                    let mut pieces = Vec::new();
+                    for edge in boundary {
+                        pieces.extend(trimmed.cuts.piece(&edge).unwrap_or(Some(edge)));
+                    }
+                    let mut boundary = Wire::new();
+                    for i in 0..pieces.len() {
+                        boundary.push_back(pieces[i].clone());
+                        let (a, b) = (pieces[i].back(), pieces[(i + 1) % pieces.len()].front());
+                        if a != b {
+                            let (bridge, edge) = junctions
+                                .iter()
+                                .enumerate()
+                                .find_map(|(i, &j)| {
+                                    if used[i] {
+                                        None
+                                    } else if cross[j].front() == a && cross[j].back() == b {
+                                        Some((i, cross[j].clone()))
+                                    } else if cross[j].back() == a && cross[j].front() == b {
+                                        Some((i, cross[j].inverse()))
+                                    } else {
+                                        None
+                                    }
+                                })
+                                .ok_or_else(|| failed().stage("trim_end_faces"))?;
+                            boundary.push_back(edge);
+                            used[bridge] = true;
+                        }
+                    }
+                    loops.push(boundary);
+                }
+                if used.iter().any(|used| !used) {
+                    return Err(failed().stage("trim_end_faces"));
+                }
+                trimmed.faces[index] = Face::try_new(loops, face.oriented_surface())
+                    .map_err(|_| failed().stage("trim_end_faces"))?;
             }
-            trimmed.faces[index] = Face::try_new(loops, face.oriented_surface())
-                .map_err(|_| failed().stage("trim_end_faces"))?;
         }
     }
     let mut faces = trimmed.faces;
     for k in 0..n {
-        let boundary = [
-            trimmed.contacts[k][0].inverse(),
-            cross[k].clone(),
-            trimmed.contacts[k][1].clone(),
-            cross[(k + 1) % nv].inverse(),
-        ];
+        let start = if k == 0 {
+            terminal_cross.as_ref().map(|ends| ends[0].clone())
+        } else {
+            None
+        }
+        .unwrap_or_else(|| vec![cross[k].clone()]);
+        let end = if k + 1 == n {
+            terminal_cross.as_ref().map(|ends| ends[1].clone())
+        } else {
+            None
+        }
+        .unwrap_or_else(|| vec![cross[(k + 1) % nv].clone()]);
+        let boundary: Vec<_> = std::iter::once(trimmed.contacts[k][0].inverse())
+            .chain(start)
+            .chain(std::iter::once(trimmed.contacts[k][1].clone()))
+            .chain(end.iter().rev().map(Edge::inverse))
+            .collect();
         faces.push(
             Face::try_new(vec![boundary.into()], surfaces[k].to_same_geometry()).map_err(|e| {
                 Diagnostic::new(Code::InvalidOutputTopology, operation, "validate_output")

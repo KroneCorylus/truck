@@ -1,0 +1,288 @@
+G2 independent material oracle — scratch evidence, no production changes
+
+Scope: original G2 quadratic profile extruded by (20,0,100), at capture scale10.
+Captured B(s)=(0,1000s,500s²), -1<=s<=1; A=(200,0,1000).
+Source inequalities: 0<=x<=200, 5x+y²/2000<=z<=5x+500.
+Source volume is exactly 400000000/3 captured units³. Three selected edges:
+upper-cap parabola, upper-cap closing chord, longitudinal ruling at s=+1.
+The remote s=-1 ruling stays sharp and is truncated at the cylinder/E crossing.
+This oracle proves no G6/H1 result or arbitrary extrusion extension behavior.
+
+RUN
+python3 audits/fillet-chamfer/oracles/g2_material.py > target/b-g2-material-oracle.log
+Only Python stdlib and NumPy are used; no Truck libraries, CAD files, meshing,
+native result/volume, or captured output surfaces are read. Root solves are
+independent 60-step bisection. Input geometry is the exact original polynomial.
+The earlier purely numerical sphere implementation and 512/1024 evidence remain
+in b-g2-material-oracle-numerical-sphere.py and *-high-order.{json,log}.
+
+DERIVATION
+Take D=(0,-1,0), F=(D.X)D, div F=1. The cap planes, closing wall and cap/wall
+cylinder have normals perpendicular D and hence ZERO flux. The complete volume
+is retained extrusion + cap/extrusion canal + selected ruling cylinder +
+selected sphere. The retained extrusion integral is split at remote Q.
+This is also the section-area formula integral xi d eta integrated over depth.
+
+Write L=sqrt(26+s²), K=sqrt(1+s²). Oriented E normal N=(5,s,-1)/L.
+Cap-plane radial direction V=(0,s,-1)/K. Cap/E rolling center is
+ C=(200-r,1000s-rs/L,500s²+1000-5r+26r/L).
+Cap/W centerline has x=200-r,z=1500-5r-rsqrt26. Its radial direction is +z.
+Canal X=C+r[n cos(phi)+V sin(phi)], n=(1,0,0), phi=q alpha(s),
+alpha(s)=acos(5/L). Seam with cap/W cylinder is
+ g(s,q)=500(s²-1)+r(26/L+sqrt26)-r sin(q alpha)(1+1/K)=0.
+Remote root lies -1<s<0. Selected stationary contact ss=-root(g(s,0));
+remote extrusion contact sq=root(g(s,1)). For these tested radii it is always
+E-first. E contact angle is small (<.28 rad) while W contact is >2.94 rad.
+No basis continuation outside [-1,1] is used.
+
+Retained E spans s in[-1,ss]. For s>=sq its upper extrusion parameter is
+v=(200-r+5r/L)/200. For remote s<=sq it is clipped by cap/W cylinder:
+ Kc=500(s²-1)+r sqrt26,
+ x=200-r+[-5Kc+sqrt(26r²-Kc²)]/26; v=x/200.
+This selects the cylinder branch continuous from Q to R, not the other root.
+The substitution s=-1+(sq+1)t² removes the square-root endpoint singularity.
+E flux integrand is 2e8*s²*v, from B_s cross A and F(B+vA).
+
+Canal: for each q in[0,1], integrate s from remote root(g(s,q)) to ss.
+Outward vector area is X_q cross X_s. alpha'(s) cancels in this cross product.
+Selected longitudinal cylinder: center C(ss)+tA, normal arc from N(ss) to m,
+m=(-5,0,1)/sqrt26. Integrate t analytically from the unselected bottom cap
+ tmin=(-200+r-r*n.R)/(n.A) to 0, then quadrature over the normal arc.
+Selected sphere: center C(ss), normals in minor spherical triangle n,N(ss),m.
+These sphere/cylinder/canal boundaries share their exact analytic arcs.
+
+INDEPENDENT SPHERE CROSS-CHECK
+Numerically integrate R=b/|b|, b=(1-u)(1-v)n+u*m+(1-u)v*N, with Jacobian
+abs(det(n,m,N))*(1-u)/|b|³. Low orders converge slowly because n,m nearly oppose.
+Separately compute exact moments of the oriented spherical triangle [n,N,m].
+For directed edge a->b, theta=acos(a.b), e=(a cross b)/sin(theta):
+ M1=integral R dOmega=.5 sum(theta*e).
+ Omega=2 atan2(det(n,N,m),1+n.N+N.m+m.n).
+ M2=integral(D.R)²dOmega=Omega/3+
+    sum[(D.e)*(D.(a+b))*tan(theta/2)]/3.
+The second identity follows from spherical Laplacian Delta[(D.R)²]=2-6(D.R)²
+and outward great-circle conormal -e. Sphere flux is r²(D.C)D.M1+r³M2.
+The final oracle uses these moments, retaining the numerical integral as an
+independent check. At r10, numerical256 vs moments differs <5e-9 captured³;
+orders512/1024 agree to floating precision. No native value enters this check.
+
+CONTROLS AND ERROR ESTIMATE
+Seven radii at orders32/64/128/256; volumes decrease strictly as radius grows.
+All finite and positive, all remove material from the exact source volume.
+Additional r=.001,.01,.1 captured controls approach exact zero-radius volume.
+Sum of signed vector-area flux projected on D is <4e-11 captured² in reported
+order256 runs. Thus shifting flux origin along D changes volume only by the
+same residual times shift; this checks patch orientation and boundary balance.
+Sampled canal, sphere and cylinder points satisfy all four original solid
+inequalities. These sampled containment checks are not interval certification.
+The 64/128/256 total spread is <=2.1e-6 captured³, dominated by floating-point
+quadrature cancellation in ~1e8 retained volume. Use 5e-6 captured³ (5e-9
+original³) as observed numerical uncertainty, NOT a formal certified error
+bound. This number is oracle precision, not permission to loosen solid/mesh
+regression assertions. A construction still must pass closure, original
+material tolerance, contact/tangency and STEP checks.
+
+RESULTS (capture coordinates; divide radius by10, volume by1000 for script)
+ r .25: 133331693.27646898
+ r .5 : 133326775.59975873
+ r 1  : 133307122.23517609
+ r 3  : 133098132.95169650
+ r 5  : 132681870.72110640
+ r 6  : 132396532.13092780
+ r 10 : 130744686.35830233
+Original-script radius .5 baseline therefore has volume132681.8707211064;
+controls .3 ->133098.1329516965, .6 ->132396.5321309278.
+Capture-coordinate radius .5 is also explicitly covered above, avoiding a
+unit ambiguity in a future procedural fixture.
+
+LIMITATIONS / NEXT IMPLEMENTATION
+This establishes an independently computed G2 ideal rolling-sphere model;
+it is not a Truck result, native parity claim or production regression pass.
+The model's complete patch accounting and source containment are explicit,
+but quadrature convergence and finite sampling do not certify arbitrary radii.
+Restrict first procedural work to these exact regular G2 inputs and tested
+radii, and retain immutable rejection of unsupported cases. Existing G6 basis
+extension and H1 nonconvex/branch questions remain separate unresolved work.
+Do not use native reported result volume as the oracle or fit any constants
+to it. Preserve this source/method alongside any later regression literals.
+
+2026-10-25 CAPTURED G2 DISCREPANCY: TWO DISTINCT CAUSES, STILL BLOCKED
+
+Investigation on task/g2-junction, parent afedac31d4776d0e4d6929d5abfb3b28fa7be5a9.
+The existing uncommitted kernel is unchanged by this investigation. Its SHA256:
+ planar.rs 60bcb5a011d2581060fe0b128192f6cf2be32a4f1316a3a0190c20e69960a51d
+ planar_fillet.rs 63118d1c2142b231239531eafff9ad3ef759851b60108613d0f93c3626907c21
+Captured artifacts under target/g2-native/ (read only), SHA256:
+ 001.input.step 2d5f7a301f7ff5427ceb6ea3f212fe4f8c2481de94d367d72952ef9e157180bf
+ 001.input.json 15215d37448ae146aa73750436ba5cbded7be944bd60285a1866b24ff91308f7
+ 001.result.brep 5e086c6a8238be8eed2432f79a5704b035b8dd69d8f39f3953b874317c544550
+ 001.truck.step 70280d5ff2d7a0dd84e1a8e2d1948a3085b10feba5735232d68253484db13d9c
+
+Input/selection audit: all radii are 10; curve_type4 is the x=200 parabola
+(8193 selection samples), and the two straight selections are the x=200,z=1500
+chord and y=1000 ruling from (0,1000,500) to (200,1000,1500). The replay reports
+three selected edges, native-contours scope, unchanged input, consistent output,
+closed mesh and valid STEP. No selection/radius mismatch was found.
+
+1. Native corner is not the ideal equal-radius rolling-ball corner.
+The analytic equation, independent of native surfaces or fitted parameters, is
+500(s*s-1)+10*(26/sqrt(26+s*s)+sqrt26)=0, s in [0,1]. Its root is
+s=0.8930667887499888. The center is
+ C=(190,891.34160147540888,1399.0098048640721).
+It is ten units from both cap/wall planes and from the extrusion at contact.
+The corner patch must lie on |X-C|=10 within the positive normal cone of n,N,m.
+
+The original comparator's maximum native->Truck point, on native face 8, is
+(190.13145221752339,897.56095698921627,1405.3194271680916).
+Its distance to C is 8.860530250046878: missing radius 1.139469749953122,
+matching the measured boundary distance 1.1394697505118225.
+Truck->native maximum 1.154667105529555 is also at face 8; its source point
+(190.8256056423395,898.348176290011,1406.0968553578839) has radius error 5.56e-10.
+Scratch per-region probe: target/g2-witness/compare_regions.cpp and regions.log.
+All other sampled face interiors in both directions have distance <5.4e-7;
+this does NOT certify unsampled interiors or boundary curves.
+
+Reproducible denser/local material witness: g2_corner_witness.cpp in this directory.
+It calculates C by scalar bisection, samples bounded face 8, and checks a radial
+section point between the native boundary and the ideal sphere. Face 8 is a
+fixture-specific enumeration, not an API identity or a face-structure requirement.
+Native face 8 is BSplineSurface (OCCT type6), 10201 samples, maximum radius
+error 1.1587087641232507 at UV=(.5,.53), point
+(191.22516675869758,897.5932513896721,1405.1404060157101).
+Truck face 8 is Sphere (type3), 7034 inside/on samples, radius error <=9.07e-10.
+The section midpoint is
+(191.30544979784545,898.00291109619172,1405.5421336081076), radius9.4206456179384084.
+Native classifies it OUT; Truck IN. Its unit radial vector has strictly positive
+coefficients (3.60560,7.57290,4.09867) in the normal basis [n,m,N], so it is in the
+ideal spherical corner's angular region. Source inequality margins are all
+positive: (191.30545,8.69455,45.81027,50.98512). This is a local material/section
+witness, independent of total volume, of native over-removal relative to the
+specified ideal rolling-ball model. It supports an exception decision for this
+corner only; it does not make the required .001 comparison pass.
+
+2. Separate Truck export defect at the remote cylinder intersection.
+The exact cylinder is (x-190)^2+(z-1399.0098048640721)^2=100.
+The captured native remote edge itself has sampled radial error .0493533826351.
+The exported Truck continuation edge has radial error .00219441163699 at
+(187.80688479080797,-969.25659518666203,1408.7641045448238).
+New regression imported_g2_step_remote_edges_stay_on_exact_cylinder samples
+512 subintervals of BOTH remote intersection edges before/after prepare_for_step
+with the replay's unchanged .00005 fitting tolerance. Results:
+ continuation: raw radial error1.56286e-9, STEP .00219441163699;
+ seam:         raw radial error4.05656e-10, STEP .0000211431246502.
+Raw-vs-leader errors at the exporter's 65 sample nodes are only1.38467e-8 and
+6.82730e-9. planar_fillet::guided_intersection intentionally stores a 64-segment
+polyline as projection guide; curve evaluation solves the exact intersection.
+truck-stepio/src/out/modeling.rs prepare_curve lines110-124 samples precisely
+those guide nodes and substitutes the leader, missing all inter-node sagitta.
+Thus the .00219 error originates in STEP preparation, not the raw G2 constructor.
+The new regression is deliberately FAILING and is an integration blocker.
+No exporter edits or producer workaround were made: stepio is outside B1 ownership.
+Action for coordinator: route this regression to the STEP owner and remove or
+correct the aliased leader shortcut (check each knot-span interior, not merely
+another commensurate uniform grid). Keep .00005 export and .001 parity thresholds.
+Then rerun regression and native replay; native corner exception still needs
+coordinator/user decision independently of the Truck export fix.
+
+Reproduce (all outputs local to this isolated checkout; SDK read only):
+ g++ -std=c++17 -O2 -Wall -Wextra \
+   -isystem ../truck/target/occt-sdk/usr/include/opencascade \
+   audits/fillet-chamfer/oracles/g2_corner_witness.cpp \
+   -L../truck/target/occt-sdk/usr/lib64 -lTKDESTEP -lTKXSBase -lTKShHealing \
+   -lTKTopAlgo -lTKGeomAlgo -lTKBRep -lTKGeomBase -lTKG3d -lTKG2d -lTKMath -lTKernel \
+   -o target/g2-witness/corner_witness
+ LD_LIBRARY_PATH=../truck/target/occt-sdk/usr/lib64 target/g2-witness/corner_witness \
+   target/g2-native/001.result.brep target/g2-native/001.truck.step
+ CARGO_BUILD_JOBS=8 NEXTEST_TEST_THREADS=6 cargo test --release -p truck-shapeops \
+   --test extrusion_remote_junction imported_g2_step_remote_edges_stay_on_exact_cylinder \
+   -- --nocapture
+Evidence: target/g2-witness/{corner.log,step-regression.log,regions.log,comparison.json}.
+Prior 474-pass suite/77 replay tests/7 doctests are historical evidence, not a pass
+for the newly strengthened suite. No benchmark measurement, tolerance relaxation,
+reference mutation, commit, PR, or completion claim was made.
+Current targeted controls: imported_g2_remote_miter_preserves_material_at_replay_tolerance
+and remote_round_cannot_cross_unselected_bottom_cap both PASS (release nextest,
+CARGO_BUILD_JOBS=8 NEXTEST_TEST_THREADS=6); see target/g2-witness/controls.log.
+The corner probe compiles with -Wall -Wextra without warnings. git diff --check passes.
+
+2026-10-25 STEP EXPORT FIX (same isolated task/g2-junction worktree)
+
+The original failure was reproduced unchanged in
+ target/g2-witness/step-regression-before.log:
+ continuation raw1.5628618399432526e-9, STEP0.0021944116369887467;
+ seam raw4.056559532727988e-10, STEP0.00002114312465018031.
+The independent stepio regression uses the analytic parabola y=0,z=x²,
+intersecting its exact polynomial extrusion with a plane. Its 64-segment guide
+has exact vertices but inaccurate interiors. It failed against the original
+exporter (export-independent-before.log); no G2/native geometry enters it.
+
+Exporter change in truck-stepio/src/out/modeling.rs:
+- Retain the B-spline leader shortcut only after the existing 65 checks AND
+  quarter/mid/three-quarter checks inside every actual knot span. The guide
+  must agree within tol/2. This is span-aware sampling, not a certified bound.
+- If the guide fails, fit the evaluated intersection separately on its guide
+  knot spans. Cutting the guide gives the correct one-sided derivatives;
+  fitting across its derivative jumps can exhaust the C1 fitter.
+- Adjacent independent Newton solves can differ slightly at their join. Fit
+  each span within tol/2, then share the join control only if its displacement
+  is <=tol/2. This prevents degree+1 internal multiplicities rejected by OCCT
+  without increasing the total geometric budget. The independent regression
+  checks analytic residual, raw/prepared agreement, endpoints, and internal
+  knot multiplicities <=degree.
+Simply deleting the shortcut was rejected: dense validation found a Newton
+failure on a transformed G2 seam near a tangent endpoint. The validated shortcut
+preserves already adequate guides. No kernel workaround or G2 fixture change.
+
+Fresh current captured-scale regression (step-regression-after.log):
+ continuation STEP3.05188772387055e-6; seam STEP2.114312465018031e-5.
+Both satisfy the unchanged .00005 fitting tolerance; raw errors are unchanged.
+The new independent regression passes (export-independent-after.log).
+
+Fresh replay uses private copies of the unchanged input/reference in
+ target/g2-export-fixed/001.{input.step,input.json,result.brep}.
+ CARGO_BUILD_JOBS=8 NEXTEST_TEST_THREADS=6 cargo run --release -p truck-shapeops \
+   --example replay_occt_blend -- target/g2-export-fixed/001
+ LD_LIBRARY_PATH=../truck/target/occt-sdk/usr/lib64 \
+   ../truck/target/occt-distance-tree-plugin/compare_shapes \
+   target/g2-export-fixed/001.result.brep target/g2-export-fixed/001.truck.step \
+   target/g2-export-fixed/001.comparison.json
+ LD_LIBRARY_PATH=../truck/target/occt-sdk/usr/lib64 target/g2-witness/corner_witness \
+   target/g2-export-fixed/001.result.brep target/g2-export-fixed/001.truck.step
+Replay: operation-succeeded, 3 selected edges, input unchanged, geometry
+consistent, mesh closed, STEP prepared, fitting tolerance .00005, parity .001.
+OCCT: native and Truck valid, one solid each. Truck edge/vertex tolerance
+2.1059905104407888e-5. The independent post-STEP probe samples 2052 remote-edge
+points and finds maximum cylinder residual2.1143124650180312e-5.
+
+Native comparison STILL FAILS, unchanged maxima:
+ native->Truck1.1394697505118225; Truck->native1.154667105529555.
+Fresh corner witness: native radius residual1.1587087641232507;
+Truck sphere residual9.068532591527401e-10; same section midpoint is native OUT,
+Truck IN, with positive source margins and positive normal-cone coefficients.
+This remains a native-corner exception awaiting coordinator/user decision,
+NOT a .001 comparison pass. The separate native remote-edge residual remains
+.049353382635079157. No shared native artifacts were modified.
+
+Performance implications: successful B-spline guide substitution now requires
+3 extra intersection evaluations per knot span in addition to the 65 checks.
+Rejected guides require adaptive fitting and dense validation per span, with
+more Newton solves and potentially more STEP control points. Exact circle
+recognition remains. No speed claim or benchmark measurement is made while
+other agents run; benchmark smoke only. Kernel hashes above remain unchanged.
+
+2026-10-26 INTERPRETATION AFTER MATCHED BENCHMARK
+
+Runtime tracing confirms OCCT PerformThreeCorner uses three-boundary
+GeomFill_ConstrainedFilling here. Its documented Coons-fill contract constrains
+boundaries and tangency, not constant spherical radius. Therefore references
+above to a native "defect" mean a material/accuracy mismatch relative to our
+stipulated ideal rolling-ball contract, not a demonstrated violation of OCCT's
+documented construction contract. The local material witness remains valid.
+Tightening TApp3d by 10x and 100x leaves corner residual ~1.1587088 unchanged.
+No evidence establishes intentional performance tuning as the cause.
+Matched warm construction: Truck202.5335ms, OCCT29.4355ms (6.88x faster),
+40 samples per configuration in two alternating rounds, fixed CPU0/one worker.
+Import, selection, meshing, STEP and final destruction excluded; Truck public
+operation validation included. This is not an accuracy-equivalent comparison.
+Full methods/source references/raw evidence:
+target/g2-matched-benchmark-20261026/RESULTS.txt

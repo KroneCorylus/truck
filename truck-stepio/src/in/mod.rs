@@ -1321,6 +1321,22 @@ pub enum KnotType {
     PiecewiseBezierKnots,
 }
 
+fn step_knot_vec(knots: &[f64], multiplicities: &[i64]) -> Result<KnotVec, StepConvertingError> {
+    if knots.len() != multiplicities.len() {
+        return Err("B-spline knot and multiplicity counts must match".into());
+    }
+    let multiplicities = multiplicities
+        .iter()
+        .map(|&n| {
+            usize::try_from(n)
+                .ok()
+                .filter(|&n| n > 0)
+                .ok_or("B-spline knot multiplicities must be positive and fit usize")
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+    Ok(KnotVec::from_single_multi(knots.to_vec(), multiplicities)?)
+}
+
 /// `b_spline_curve_with_knots`
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, Holder)]
 #[holder(table = Table)]
@@ -1342,13 +1358,7 @@ impl<P: for<'a> From<&'a CartesianPoint>> TryFrom<&BSplineCurveWithKnots> for BS
     type Error = StepConvertingError;
     #[inline(always)]
     fn try_from(curve: &BSplineCurveWithKnots) -> Result<Self, StepConvertingError> {
-        let knots = curve.knots.clone();
-        let multi = curve
-            .knot_multiplicities
-            .iter()
-            .map(|n| *n as usize)
-            .collect();
-        let knots = KnotVec::from_single_multi(knots, multi).unwrap();
+        let knots = step_knot_vec(&curve.knots, &curve.knot_multiplicities)?;
         let ctrpts = curve.control_points_list.iter().map(Into::into).collect();
         Ok(Self::try_new(knots, ctrpts)?)
     }
@@ -2198,20 +2208,8 @@ impl TryFrom<&BSplineSurfaceWithKnots> for BSplineSurface<Point3> {
     type Error = StepConvertingError;
     #[inline(always)]
     fn try_from(surface: &BSplineSurfaceWithKnots) -> Result<Self, StepConvertingError> {
-        let uknots = surface.u_knots.to_vec();
-        let umulti = surface
-            .u_multiplicities
-            .iter()
-            .map(|n| *n as usize)
-            .collect();
-        let uknots = KnotVec::from_single_multi(uknots, umulti).unwrap();
-        let vknots = surface.v_knots.to_vec();
-        let vmulti = surface
-            .v_multiplicities
-            .iter()
-            .map(|n| *n as usize)
-            .collect();
-        let vknots = KnotVec::from_single_multi(vknots, vmulti).unwrap();
+        let uknots = step_knot_vec(&surface.u_knots, &surface.u_multiplicities)?;
+        let vknots = step_knot_vec(&surface.v_knots, &surface.v_multiplicities)?;
         let ctrls = surface
             .control_points_list
             .iter()

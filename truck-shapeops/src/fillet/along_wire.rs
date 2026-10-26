@@ -202,14 +202,23 @@ pub(super) fn is_tangent_continuous<C: ParametricCurve3D + BoundedCurve + Invert
         .all(|(e0, e1)| tangent(&e0, true).near(&tangent(&e1, false)))
 }
 
-fn trim_to_point<C: FilletedCurve<S>, S>(
+fn trim_contact_parameter<C: BoundedCurve + Cut>(
     curve: &mut C,
-    point: Point3,
+    t: f64,
     at_start: bool,
 ) -> Option<()> {
-    let (t0, t1) = curve.range_tuple();
-    let hint = if at_start { t0 } else { t1 };
-    let t = curve.search_nearest_parameter(point, Some(hint), 100)?;
+    let (a, b) = curve.range_tuple();
+    // A contact must retain an interval; cutting at its opposite endpoint empties a spline.
+    if ![a, b, t].iter().all(|x| x.is_finite())
+        || a >= b
+        || t < a
+        || t > b
+        || (at_start && t == b)
+        || (!at_start && t == a)
+    {
+        return None;
+    }
+    let hint = if at_start { a } else { b };
     if !t.near(&hint) {
         if at_start {
             *curve = curve.cut(t);
@@ -217,6 +226,40 @@ fn trim_to_point<C: FilletedCurve<S>, S>(
             curve.cut(t);
         }
     }
+    Some(())
+}
+
+fn trim_to_point<C: FilletedCurve<S>, S>(
+    curve: &mut C,
+    point: Point3,
+    at_start: bool,
+) -> Option<()> {
+    let (t0, t1) = curve.range_tuple();
+    let hint = if at_start { t0 } else { t1 };
+    let valid = |t: &f64| t.is_finite() && *t >= t0 && *t <= t1;
+    let other = if at_start { t1 } else { t0 };
+    let t = if curve.subs(hint).near(&point) {
+        hint
+    } else if curve.subs(other).near(&point) {
+        other
+    } else {
+        // A continued circular contact can put the endpoint seed on the wrong Newton branch.
+        let local = curve
+            .search_nearest_parameter(point, Some(hint), 100)
+            .filter(valid);
+        local.filter(|t| curve.subs(*t).near(&point)).or_else(|| {
+            let global = curve
+                .search_nearest_parameter(point, (t0, t1), 100)
+                .filter(valid);
+            local.into_iter().chain(global).min_by(|a, b| {
+                curve
+                    .subs(*a)
+                    .distance2(point)
+                    .total_cmp(&curve.subs(*b).distance2(point))
+            })
+        })?
+    };
+    trim_contact_parameter(curve, t, at_start)?;
     Some(())
 }
 
@@ -708,18 +751,25 @@ where
         contacts,
         vertices,
         cuts,
-    } = trim_runs(shell, wire, &runs, &contact_curves, |curve, edge, start| {
-        let open_end = ends.iter().flatten().any(|walk| {
-            [0, walk.faces.len()]
-                .into_iter()
-                .any(|i| walk.edges[i].id() == edge.id())
-        });
-        if open_end {
-            trim_extended_contact_edge(curve, edge, start)
-        } else {
-            trim_contact_edge(curve, edge, start)
-        }
-    })
+    } = trim_runs(
+        shell,
+        wire,
+        &runs,
+        &contact_curves,
+        false,
+        |curve, edge, start| {
+            let open_end = ends.iter().flatten().any(|walk| {
+                [0, walk.faces.len()]
+                    .into_iter()
+                    .any(|i| walk.edges[i].id() == edge.id())
+            });
+            if open_end {
+                trim_extended_contact_edge(curve, edge, start)
+            } else {
+                trim_contact_edge(curve, edge, start)
+            }
+        },
+    )
     .ok_or_else(|| failed().stage("trim_faces"))?;
     let blend_surfaces: Vec<S> = surfaces.iter().map(|af| af.to_same_geometry()).collect();
 
@@ -894,13 +944,236 @@ where
         .into_iter()
         .flatten()
         .collect::<Vec<_>>();
-    let trimmed = trim_runs(shell, wire, &runs, contact_curves, trim)?;
-    trimmed
-        .cuts
-        .pieces
-        .values()
-        .all(Option::is_some)
-        .then_some(trimmed)
+    let trimmed = trim_runs(shell, wire, &runs, contact_curves, true, trim)?;
+    (!wire.is_cyclic() || !has_consumed_edges(&trimmed)).then_some(trimmed)
+}
+
+pub(super) fn has_consumed_edges<C, S>(trimmed: &TrimmedChain<C, S>) -> bool {
+    trimmed.cuts.pieces.values().any(Option::is_none)
+}
+
+/// Split a chamfer termination across the surviving supports of consumed neighbors.
+pub(super) fn trim_consumed_chamfer_ends<C, S>(
+    shell: &Shell<Point3, C, S>,
+    wire: &Wire<Point3, C>,
+    trimmed: &mut TrimmedChain<C, S>,
+    surfaces: &[S],
+    intersect_exit: impl Fn(&C, &S) -> Option<Option<Point3>>,
+) -> Option<[Vec<Edge<Point3, C>>; 2]>
+where
+    C: FilletedCurve<S>,
+    S: FilletedSurface<C> + SearchNearestParameter<D2, Point = Point3>,
+    PCurve<BSplineCurve<Point2>, S>: ToSameGeometry<C>,
+    IntersectionCurve<C, S, S>: ToSameGeometry<C>,
+{
+    let n = wire.len();
+    let mut result = [Vec::new(), Vec::new()];
+    let mut bridges: HashMap<usize, Vec<Edge<Point3, C>>> = HashMap::new();
+    for (which, j, k) in [(0, 0, 0), (1, n, n - 1)] {
+        let blend = &surfaces[k];
+        let mut endpoints = Vec::new();
+        for side in 0..2 {
+            let face = shell.iter().position(|face| {
+                face.edge_iter().any(|edge| {
+                    edge.id() == wire[k].id()
+                        && (edge.orientation() == wire[k].orientation()) == (side == 0)
+                })
+            })?;
+            let vertex = &trimmed.vertices[j][side];
+            let edge = shell[face]
+                .edge_iter()
+                .find(|edge| match trimmed.cuts.piece(edge) {
+                    Some(Some(piece)) => piece.front() == vertex || piece.back() == vertex,
+                    Some(None) => edge.front() == vertex || edge.back() == vertex,
+                    None => false,
+                })?;
+            endpoints.push((face, edge));
+        }
+        let mut current = endpoints[0].0;
+        let mut entry = endpoints[0].1.clone();
+        let mut vertex = trimmed.vertices[j][0].clone();
+        let target = &trimmed.vertices[j][1];
+        let mut visited = Vec::new();
+        for _ in 0..shell.len() {
+            let next = shell.iter().enumerate().find_map(|(index, face)| {
+                (index != current && face.edge_iter().any(|e| e.id() == entry.id()))
+                    .then_some(index)
+            })?;
+            if next == endpoints[1].0
+                || visited.contains(&next)
+                || shell[next]
+                    .edge_iter()
+                    .any(|edge| wire.iter().any(|selected| edge.id() == selected.id()))
+            {
+                return None;
+            }
+            visited.push(next);
+            let face = &shell[next];
+            let reaches_target = face
+                .edge_iter()
+                .any(|edge| edge.id() == endpoints[1].1.id());
+            let mut intersections = Vec::new();
+            for edge in face.edge_iter() {
+                if edge.id() == entry.id() || trimmed.cuts.pieces.contains_key(&edge.id()) {
+                    continue;
+                }
+                let Some(point) = intersect_exit(&edge.oriented_curve(), blend)? else {
+                    continue;
+                };
+                let end = if point.near(&edge.front().point()) {
+                    edge.front().clone()
+                } else if point.near(&edge.back().point()) {
+                    edge.back().clone()
+                } else {
+                    Vertex::new(point)
+                };
+                if end == vertex || (reaches_target && &end == target) {
+                    continue;
+                }
+                intersections.push((edge, end));
+            }
+            let (exit, end) = if reaches_target {
+                if !intersections.is_empty() {
+                    return None;
+                }
+                (None, target.clone())
+            } else {
+                if intersections.len() != 1 {
+                    return None;
+                }
+                let (edge, end) = intersections.pop()?;
+                let piece = if (j == 0 && &end == edge.front()) || (j == n && &end == edge.back()) {
+                    None
+                } else if (j == 0 && &end == edge.back()) || (j == n && &end == edge.front()) {
+                    Some(edge.clone())
+                } else {
+                    let t = edge
+                        .curve()
+                        .search_nearest_parameter(end.point(), None, 100)?;
+                    let (front, back) = edge.cut_with_parameter(&end, t)?;
+                    Some(if j == 0 { front } else { back })
+                };
+                trimmed.cuts.insert(&edge, piece)?;
+                (Some(edge), end)
+            };
+            let surface = face.oriented_surface();
+            let uv0 = blend.search_parameter(vertex.point(), None, 100)?;
+            let uv1 = blend.search_parameter(end.point(), None, 100)?;
+            let direction = end.point() - vertex.point();
+            let der0 = cross_tangent(blend, uv0, &surface, vertex.point(), direction)?;
+            let der1 = cross_tangent(blend, uv1, &surface, end.point(), direction)?;
+            let edge = create_pcurve_edge((&vertex, uv0, der0), (&end, uv1, der1), blend.clone())?;
+            let intersection = IntersectionCurve::new(surface, blend.clone(), edge.curve());
+            let (a, b) = intersection.range_tuple();
+            for i in 0..=32 {
+                let t = a + (b - a) * i as f64 / 32.;
+                let (point, uv0, uv1) = intersection.search_triple(t, 100)?;
+                let transverse = intersection
+                    .surface0()
+                    .normal(uv0.x, uv0.y)
+                    .cross(blend.normal(uv1.x, uv1.y))
+                    .magnitude2();
+                if !transverse.is_finite()
+                    || transverse <= TOLERANCE2
+                    || (i == 0 && !point.near(&vertex.point()))
+                    || (i == 32 && !point.near(&end.point()))
+                {
+                    return None;
+                }
+            }
+            edge.set_curve(intersection.to_same_geometry());
+            bridges.entry(next).or_default().push(if j == 0 {
+                edge.inverse()
+            } else {
+                edge.clone()
+            });
+            result[which].push(edge);
+            if reaches_target {
+                break;
+            }
+            current = next;
+            entry = exit?;
+            vertex = end;
+        }
+        if result[which].last()?.back() != target {
+            return None;
+        }
+    }
+    for (index, bridges) in bridges {
+        let mut used = vec![false; bridges.len()];
+        let mut loops = Vec::new();
+        for boundary in shell[index].boundaries() {
+            let pieces: Vec<_> = boundary
+                .into_iter()
+                .filter_map(|edge| trimmed.cuts.piece(&edge).unwrap_or(Some(edge)))
+                .collect();
+            if pieces.is_empty() {
+                return None;
+            }
+            let mut boundary = Wire::new();
+            for i in 0..pieces.len() {
+                boundary.push_back(pieces[i].clone());
+                let (a, b) = (pieces[i].back(), pieces[(i + 1) % pieces.len()].front());
+                if a != b {
+                    let (i, edge) = bridges
+                        .iter()
+                        .enumerate()
+                        .find(|(i, edge)| !used[*i] && edge.front() == a && edge.back() == b)?;
+                    used[i] = true;
+                    boundary.push_back(edge.clone());
+                }
+            }
+            loops.push(boundary);
+        }
+        if used.iter().any(|used| !used) {
+            return None;
+        }
+        trimmed.faces[index] = Face::try_new(loops, shell[index].oriented_surface()).ok()?;
+    }
+    Some(result)
+}
+
+fn trim_run_end<C: FilletedCurve<S>, S>(
+    curve: &mut C,
+    boundary: &Wire<Point3, C>,
+    start: usize,
+    at_start: bool,
+    walk_limit: usize,
+    cuts: &mut Cuts<C>,
+    trim: &impl Fn(&mut C, &Edge<Point3, C>, bool) -> Option<TrimmedContact<C>>,
+) -> Option<TrimmedContact<C>> {
+    let mut candidate = curve.clone();
+    if let Some(result) = trim(&mut candidate, &boundary[start], at_start) {
+        *curve = candidate;
+        return Some(result);
+    }
+    if walk_limit == 0 {
+        return None;
+    }
+    // Follow the boundary away from the selected run; never extrapolate a consumed edge.
+    for offset in 1..walk_limit {
+        let index = if at_start {
+            (start + boundary.len() - offset) % boundary.len()
+        } else {
+            (start + offset) % boundary.len()
+        };
+        let edge = &boundary[index];
+        let mut candidate = curve.clone();
+        if let Some((piece, vertex)) = trim_contact_edge(&mut candidate, edge, at_start) {
+            for previous in 1..offset {
+                let index = if at_start {
+                    (start + boundary.len() - previous) % boundary.len()
+                } else {
+                    (start + previous) % boundary.len()
+                };
+                cuts.insert(&boundary[index], None)?;
+            }
+            cuts.insert(edge, piece)?;
+            *curve = candidate;
+            return Some((None, vertex));
+        }
+    }
+    None
 }
 
 fn trim_runs<C, S>(
@@ -908,6 +1181,7 @@ fn trim_runs<C, S>(
     wire: &Wire<Point3, C>,
     runs: &[Run],
     contact_curves: &[[C; 2]],
+    walk_terminals: bool,
     trim: impl Fn(&mut C, &Edge<Point3, C>, bool) -> Option<TrimmedContact<C>>,
 ) -> Option<TrimmedChain<C, S>>
 where
@@ -982,7 +1256,19 @@ where
                     piece
                 }
                 None => {
-                    let (piece, vertex) = trim(&mut curves[0], prev, true)?;
+                    let (piece, vertex) = trim_run_end(
+                        &mut curves[0],
+                        boundary,
+                        (run.start + len - 1) % len,
+                        true,
+                        if walk_terminals && !wire.is_cyclic() && [0, n].contains(&start_vertex) {
+                            len - m
+                        } else {
+                            0
+                        },
+                        &mut cuts,
+                        &trim,
+                    )?;
                     cuts.insert(prev, piece.clone())?;
                     cuts.vertices[start_vertex][side] = Some(vertex);
                     piece
@@ -998,7 +1284,19 @@ where
                     piece
                 }
                 None => {
-                    let (piece, vertex) = trim(&mut curves[m - 1], next, false)?;
+                    let (piece, vertex) = trim_run_end(
+                        &mut curves[m - 1],
+                        boundary,
+                        (run.start + m) % len,
+                        false,
+                        if walk_terminals && !wire.is_cyclic() && [0, n].contains(&end_vertex) {
+                            len - m
+                        } else {
+                            0
+                        },
+                        &mut cuts,
+                        &trim,
+                    )?;
                     cuts.insert(next, piece.clone())?;
                     cuts.vertices[end_vertex][side] = Some(vertex);
                     piece
@@ -1079,10 +1377,16 @@ where
             .into_iter()
             .enumerate()
             .flat_map(|(idx, edges)| {
-                edges.unwrap_or_else(|| vec![boundaries[face_idx][boundary_idx][idx].clone()])
+                edges.unwrap_or_else(|| {
+                    let edge = &boundaries[face_idx][boundary_idx][idx];
+                    cuts.piece(edge)
+                        .unwrap_or_else(|| Some(edge.clone()))
+                        .into_iter()
+                        .collect()
+                })
             })
             .collect();
-        faces[face_idx] = Face::new(loops, shell[face_idx].oriented_surface());
+        faces[face_idx] = Face::try_new(loops, shell[face_idx].oriented_surface()).ok()?;
     }
 
     let contacts: Vec<[Edge<Point3, C>; 2]> = contacts
@@ -1276,13 +1580,7 @@ where
         return None;
     }
     let vertex = Vertex::new(curve.subs(t).midpoint(line.subs(s)));
-    if !t.near(&hint) {
-        if at_start {
-            *curve = curve.cut(t);
-        } else {
-            curve.cut(t);
-        }
-    }
+    trim_contact_parameter(curve, t, at_start)?;
     let (front, back) = if at_start {
         (edge.front(), &vertex)
     } else {
@@ -1320,13 +1618,7 @@ pub(super) fn trim_contact_edge<C: FilletedCurve<S>, S>(
     } else {
         Vertex::new(p)
     };
-    if !t.near(&hint) {
-        if at_start {
-            *curve = curve.cut(t);
-        } else {
-            curve.cut(t);
-        }
-    }
+    trim_contact_parameter(curve, t, at_start)?;
     let piece = if at_start {
         if &vertex == edge.front() {
             None
@@ -1441,6 +1733,172 @@ pub(super) fn intersect_samples(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn consumed_terminal_walk_rejects_a_twice_crossing_curved_exit() {
+        use truck_modeling::{builder, Curve, Surface};
+        let [a, b, c, d, e]: [Vertex<Point3>; 5] = builder::vertices([
+            Point3::new(0., 0., 0.),
+            Point3::new(1., 0., 0.),
+            Point3::new(0., 1., 0.),
+            Point3::new(1., -1., 0.),
+            Point3::new(2., 1., 0.),
+        ])
+        .try_into()
+        .unwrap();
+        let selected = builder::line(&a, &b);
+        let entry = builder::line(&a, &c);
+        let target = builder::line(&d, &b);
+        // y(t) - 0.5 = 4(t - 0.5)^2 - 0.5: two crossings on one exit.
+        let curved = Edge::new(
+            &c,
+            &e,
+            Curve::BSplineCurve(BSplineCurve::new(
+                KnotVec::bezier_knot(2),
+                vec![c.point(), Point3::new(1., -1., 0.), e.point()],
+            )),
+        );
+        let low0 = Vertex::new(Point3::new(3., -2., 0.));
+        let low1 = Vertex::new(Point3::new(-1., -2., 0.));
+        let loops: [Wire<Point3, Curve>; 3] = [
+            vec![selected.clone(), builder::line(&b, &c), entry.inverse()].into(),
+            vec![selected.inverse(), builder::line(&a, &d), target.clone()].into(),
+            vec![
+                entry.clone(),
+                curved.clone(),
+                builder::line(&e, &low0),
+                builder::line(&low0, &low1),
+                builder::line(&low1, &a),
+            ]
+            .into(),
+        ];
+        let shell: Shell<Point3, Curve, Surface> = loops
+            .into_iter()
+            .map(|wire| builder::try_attach_plane(&[wire]).unwrap())
+            .collect();
+        let v0 = Vertex::new(Point3::new(0., 0.5, 0.));
+        let v1 = Vertex::new(Point3::new(1., -0.5, 0.));
+        let mut cuts = Cuts {
+            vertices: Vec::new(),
+            pieces: HashMap::new(),
+        };
+        cuts.insert(&entry, Some(builder::line(&v0, &c))).unwrap();
+        cuts.insert(&target, Some(builder::line(&d, &v1))).unwrap();
+        let mut trimmed = TrimmedChain {
+            faces: shell.iter().cloned().collect(),
+            contacts: Vec::new(),
+            vertices: vec![[v0.clone(), v1.clone()], [v0, v1]],
+            cuts,
+        };
+        let blend = Surface::Plane(Plane::new(
+            Point3::new(0., 0.5, 0.),
+            Point3::new(0., 0.5, 1.),
+            Point3::new(1., 0.5, 0.),
+        ));
+        for t in [(1. - 0.5_f64.sqrt()) / 2., (1. + 0.5_f64.sqrt()) / 2.] {
+            assert!((curved.curve().subs(t).y - 0.5).abs() < 1e-12);
+        }
+        let before = serde_json::to_string(&shell.compress()).unwrap();
+        let rejected_curved = std::cell::Cell::new(false);
+        let result = trim_consumed_chamfer_ends(
+            &shell,
+            &vec![selected].into(),
+            &mut trimmed,
+            &[blend],
+            |curve, surface| {
+                let result = modeling::consumed_chamfer_exit(curve, surface);
+                if matches!(curve, Curve::BSplineCurve(_)) && result.is_none() {
+                    rejected_curved.set(true);
+                }
+                result
+            },
+        );
+        assert!(result.is_none());
+        assert!(rejected_curved.get());
+        assert_eq!(before, serde_json::to_string(&shell.compress()).unwrap());
+        assert_eq!(trimmed.cuts.pieces.len(), 2);
+    }
+
+    fn check_fully_consumed_contact(mode: usize) {
+        use truck_modeling::{Curve, Surface};
+        for at_start in [false, true] {
+            let mut contact = Curve::BSplineCurve(BSplineCurve::new(
+                KnotVec::bezier_knot(1),
+                vec![Point3::origin(), Point3::new(1., 0., 0.)],
+            ));
+            let before = serde_json::to_string(&contact).unwrap();
+            let x = if at_start { 1. } else { 0. };
+            let (y0, y1) = if mode == 2 { (1., 2.) } else { (-1., 1.) };
+            let a = Vertex::new(Point3::new(x, y0, 0.));
+            let b = Vertex::new(Point3::new(x, y1, 0.));
+            let edge = Edge::new(&a, &b, Curve::Line(Line(a.point(), b.point())));
+            let edge = if at_start { edge.inverse() } else { edge };
+            let edge_before = serde_json::to_string(&edge.curve()).unwrap();
+            let rejected = match mode {
+                0 => trim_to_point::<_, Surface>(&mut contact, Point3::new(x, 0., 0.), at_start)
+                    .is_none(),
+                1 => trim_contact_edge::<_, Surface>(&mut contact, &edge, at_start).is_none(),
+                _ => trim_extended_contact_edge::<_, Surface>(&mut contact, &edge, at_start)
+                    .is_none(),
+            };
+            assert!(
+                rejected,
+                "fully consumed contact accepted: start={at_start}"
+            );
+            assert_eq!(serde_json::to_string(&contact).unwrap(), before);
+            assert_eq!(serde_json::to_string(&edge.curve()).unwrap(), edge_before);
+        }
+    }
+
+    #[test]
+    fn shared_station_rejects_fully_consumed_contact() { check_fully_consumed_contact(0); }
+
+    #[test]
+    fn bounded_edge_rejects_fully_consumed_contact() { check_fully_consumed_contact(1); }
+
+    #[test]
+    fn extended_edge_rejects_fully_consumed_contact() { check_fully_consumed_contact(2); }
+
+    fn periodic_contact(at_start: bool) {
+        use truck_modeling::{Curve, Surface};
+        for gap in [0., TOLERANCE / 4.] {
+            let mut curve = Curve::Conic(Processor::new(TrimmedCurve::new(
+                UnitCircle::<Point3>::new(),
+                (0., std::f64::consts::TAU - gap),
+            )));
+            let before = serde_json::to_string(&curve).unwrap();
+            let point = curve.subs(if at_start { 0. } else { curve.range_tuple().1 });
+            trim_to_point::<_, Surface>(&mut curve, point, at_start).unwrap();
+            assert_eq!(serde_json::to_string(&curve).unwrap(), before);
+        }
+    }
+
+    #[test]
+    fn periodic_contact_keeps_start_endpoint() { periodic_contact(true); }
+
+    #[test]
+    fn periodic_contact_keeps_end_endpoint() { periodic_contact(false); }
+
+    #[test]
+    fn continued_cylinder_contact_trims_to_the_shared_station() {
+        use truck_modeling::{Curve, Surface};
+        let surface = Surface::RevolutedCurve(Processor::new(RevolutedCurve::by_revolution(
+            Curve::Line(Line(Point3::new(0.5, 0., 0.), Point3::new(0.5, 0., 1.))),
+            Point3::origin(),
+            Vector3::unit_z(),
+        )));
+        let mut curve: Curve = PCurve::new(
+            BSplineCurve::new(
+                KnotVec::bezier_knot(1),
+                vec![Point2::new(0.5, -2.), Point2::new(0.5, 3.5)],
+            ),
+            surface.clone(),
+        )
+        .to_same_geometry();
+        let point = surface.subs(0.5, 1.5);
+        trim_to_point::<_, Surface>(&mut curve, point, false).unwrap();
+        assert_near!(curve.subs(curve.range_tuple().1), point);
+    }
 
     #[test]
     fn straight_contact_edges_extend_only_toward_the_chain_endpoint() {

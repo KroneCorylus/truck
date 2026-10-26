@@ -224,12 +224,10 @@ impl SsnpVector for Vector3 {
                 derivation: Matrix3::zero(),
             };
         }
-        let diff = surface.subs(u, v) - point;
-        let uder = surface.uder(u, v);
-        let vder = surface.vder(u, v);
-        let uuder = surface.uuder(u, v);
-        let uvder = surface.uvder(u, v);
-        let vvder = surface.vvder(u, v);
+        let ders = surface.ders(2, u, v);
+        let diff = Point3::from_vec(ders[0][0]) - point;
+        let (uder, vder) = (ders[1][0], ders[0][1]);
+        let (uuder, uvder, vvder) = (ders[2][0], ders[1][1], ders[0][2]);
         let uv_cross = uder.cross(vder);
         CalcOutput {
             value: diff + uv_cross * w,
@@ -479,5 +477,60 @@ fn sub_parameter_division<S>(
         *udiv = new_udiv;
         *vdiv = new_vdiv;
         sub_parameter_division(surface, (udiv, vdiv), tol, trials - 1);
+    }
+}
+
+#[cfg(test)]
+mod projection_tests {
+    use super::*;
+    #[derive(Clone)]
+    struct Paraboloid(std::cell::Cell<usize>);
+    impl ParametricSurface for Paraboloid {
+        type Point = Point3;
+        type Vector = Vector3;
+        fn subs(&self, u: f64, v: f64) -> Point3 { Point3::new(u, v, u * u + v * v) }
+        fn uder(&self, u: f64, _: f64) -> Vector3 { Vector3::new(1., 0., 2. * u) }
+        fn vder(&self, _: f64, v: f64) -> Vector3 { Vector3::new(0., 1., 2. * v) }
+        fn uuder(&self, _: f64, _: f64) -> Vector3 { Vector3::new(0., 0., 2.) }
+        fn uvder(&self, _: f64, _: f64) -> Vector3 { Vector3::zero() }
+        fn vvder(&self, _: f64, _: f64) -> Vector3 { Vector3::new(0., 0., 2.) }
+        fn der_mn(&self, m: usize, n: usize, u: f64, v: f64) -> Vector3 {
+            match (m, n) {
+                (0, 0) => self.subs(u, v).to_vec(),
+                (1, 0) => self.uder(u, v),
+                (0, 1) => self.vder(u, v),
+                (2, 0) | (0, 2) => Vector3::new(0., 0., 2.),
+                _ => Vector3::zero(),
+            }
+        }
+        fn ders(&self, order: usize, u: f64, v: f64) -> SurfaceDers<Vector3> {
+            self.0.set(self.0.get() + 1);
+            let mut d = SurfaceDers::new(order);
+            for m in 0..=order {
+                for n in 0..=order - m {
+                    d[m][n] = self.der_mn(m, n, u, v);
+                }
+            }
+            d
+        }
+    }
+    #[test]
+    fn nearest_projection_batches_surface_derivatives() {
+        let surface = Paraboloid(std::cell::Cell::new(0));
+        let result = <Vector3 as SsnpVector>::subs(
+            &surface,
+            Point3::new(0., 0., 0.),
+            Vector3::new(1., 2., 0.5),
+        );
+        assert_eq!(result.value, Vector3::new(0., 0., 5.5));
+        assert_eq!(
+            result.derivation,
+            Matrix3::from_cols(
+                Vector3::new(0., 0., 2.),
+                Vector3::new(0., 0., 4.),
+                Vector3::new(-2., -4., 1.)
+            )
+        );
+        assert_eq!(surface.0.get(), 1);
     }
 }

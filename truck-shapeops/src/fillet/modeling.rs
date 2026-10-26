@@ -741,9 +741,11 @@ fn separate_chamfer_wires(
 /// For consumed corners, open chains must terminate on straight edges and retain the support faces.
 /// At an open end, a straight terminal edge may extend toward the new contact, allowing
 /// chamfers at concave radial steps. Interior and closed-chain edges remain bounded.
-/// Open cylinder/plane rim contacts may continue to curved terminal boundaries. Cylindrical
-/// terminal supports retain their analytic geometry while their parameter domains grow to
-/// include the new boundary.
+/// Open cylinder/plane rim contacts may continue to curved terminal boundaries, including
+/// concave walls and equivalent NURBS guides, for all distance conventions. Consuming a short
+/// terminal neighbor trims its surviving adjacent faces together; newly crossed exits require
+/// a planar or certified ruled blend and straight single-span boundaries. Cylindrical terminal supports
+/// retain their analytic geometry while their parameter domains grow to include the new boundary.
 pub fn chamfer_solid_along_wire(
     solid: &Solid,
     wire: &Wire,
@@ -897,7 +899,7 @@ fn chamfer_solid_wire(
             (d0, d1),
             tol,
             trim,
-            continued,
+            (continued, consumed_chamfer_exit),
             mode,
         )
     };
@@ -905,7 +907,6 @@ fn chamfer_solid_wire(
         .or_else(|error| {
             if error.code == Code::BlendConstructionFailed
                 && error.stage == "trim_faces"
-                && mode != super::chamfer::DistanceMode::NormalSection
                 && can_continue_chamfer_contacts(&solid.boundaries()[index], wire)
             {
                 build(true)
@@ -947,15 +948,171 @@ fn chamfer_solid_wire(
     finish(solid, index, shell, tol).map_err(|e| e.operation(operation))
 }
 
+// Straight single-span exits are certified against planar or cubic ruled blends.
+// Outer None rejects unsupported/ambiguous geometry; Some(None) is a proven non-crossing.
+pub(super) fn consumed_chamfer_exit(
+    curve: &truck_modeling::Curve,
+    blend: &Surface,
+) -> Option<Option<truck_modeling::Point3>> {
+    use truck_modeling::*;
+    let line = NurbsCurve::try_from(curve).ok()?;
+    if line.degree() != 1
+        || line.control_points().len() != 2
+        || !line.is_clamped()
+        || line
+            .control_points()
+            .iter()
+            .any(|p| !p.w.is_finite() || p.w <= 0.)
+    {
+        return None;
+    }
+    let (a, b) = curve.range_tuple();
+    let (p, q) = (curve.subs(a), curve.subs(b));
+    let Some((Elementary::Plane(plane), _)) = blend.elementary() else {
+        return consumed_ruled_exit(curve, blend, p, q);
+    };
+    let normal = plane.normal();
+    let origin = plane.subs(0., 0.);
+    let (d0, d1) = ((p - origin).dot(normal), (q - origin).dot(normal));
+    if !d0.is_finite() || !d1.is_finite() || (q - p).magnitude2() <= TOLERANCE2 {
+        return None;
+    }
+    if d0.abs() <= TOLERANCE && d1.abs() <= TOLERANCE {
+        return None;
+    }
+    if d0.abs() <= TOLERANCE {
+        return Some(Some(p));
+    }
+    if d1.abs() <= TOLERANCE {
+        return Some(Some(q));
+    }
+    if d0.signum() == d1.signum() {
+        return Some(None);
+    }
+    Some(Some(p + (q - p) * (d0 / (d0 - d1))))
+}
+
+fn consumed_ruled_exit(
+    curve: &truck_modeling::Curve,
+    blend: &Surface,
+    p: truck_modeling::Point3,
+    q: truck_modeling::Point3,
+) -> Option<Option<truck_modeling::Point3>> {
+    use truck_modeling::*;
+    let Surface::BSplineSurface(surface) = blend else {
+        return None;
+    };
+    let degree = surface.udegree();
+    if !(1..=3).contains(&degree)
+        || surface.vdegree() != 1
+        || !surface.uknot_vec().is_clamped(degree)
+        || !surface.vknot_vec().is_clamped(1)
+    {
+        return None;
+    }
+    let rows = surface.control_points();
+    if rows.iter().any(|row| row.len() != 2) {
+        return None;
+    }
+    let sections: Vec<_> = (0..2)
+        .map(|side| {
+            BSplineCurve::new(
+                surface.uknot_vec().clone(),
+                rows.iter().map(|row| row[side]).collect(),
+            )
+            .bezier_decomposition()
+        })
+        .collect();
+    let direction = (q - p).normalize();
+    if !direction.magnitude2().is_finite() {
+        return None;
+    }
+    let choose = |n: usize, k: usize| (0..k).fold(1., |v, i| v * (n - i) as f64 / (i + 1) as f64);
+    let mut root_span = None;
+    for (a, b) in sections[0].iter().zip(&sections[1]) {
+        // A ruling can meet the line only when (A(u)-p) × (B(u)-p) · direction = 0.
+        // Its Bernstein coefficients follow the product formula. Sign variations bound
+        // roots on each Bezier span, certifying zero or one before Newton is attempted.
+        let coefficients: Vec<f64> = (0..=2 * degree)
+            .map(|k| {
+                (k.saturating_sub(degree)..=k.min(degree))
+                    .map(|i| {
+                        let j = k - i;
+                        (a.control_point(i) - p)
+                            .cross(b.control_point(j) - p)
+                            .dot(direction)
+                            * choose(degree, i)
+                            * choose(degree, j)
+                            / choose(2 * degree, k)
+                    })
+                    .sum()
+            })
+            .collect();
+        if coefficients.iter().any(|c| !c.is_finite())
+            || coefficients[1..coefficients.len() - 1]
+                .iter()
+                .any(|c| c.abs() <= TOLERANCE2)
+        {
+            return None;
+        }
+        // Small nonzero endpoints still carry a sign: dropping it can merge distinct
+        // roots on opposite sides of a knot into one apparent shared-knot root.
+        let first_zero = coefficients[0] == 0.;
+        let last_zero = coefficients[coefficients.len() - 1] == 0.;
+        let signs =
+            &coefficients[usize::from(first_zero)..coefficients.len() - usize::from(last_zero)];
+        let variations = signs
+            .windows(2)
+            .filter(|c| c[0].signum() != c[1].signum())
+            .count();
+        if variations > 1 {
+            return None;
+        }
+        let (start, end) = a.range_tuple();
+        for span in [
+            first_zero.then_some((start, start)),
+            (variations == 1).then_some((start, end)),
+            last_zero.then_some((end, end)),
+        ]
+        .into_iter()
+        .flatten()
+        {
+            if let Some((previous_start, previous_end)) = root_span {
+                // Adjacent Bezier spans share a knot root; count it only once.
+                if previous_start != previous_end || span.0 != span.1 || span.0 != previous_start {
+                    return None;
+                }
+            } else {
+                root_span = Some(span);
+            }
+        }
+    }
+    let Some((root0, root1)) = root_span else {
+        return Some(None);
+    };
+    let (a, b) = curve.range_tuple();
+    let t = (a + b) / 2.;
+    let mut uv = blend.search_nearest_parameter(curve.subs(t), None, 100)?;
+    uv.0 = (root0 + root1) / 2.;
+    let ((u, v), t) = algo::surface::search_intersection_parameter(blend, uv, curve, t, 100)?;
+    let ((u0, u1), (v0, v1)) = surface.range_tuple();
+    if !t.is_finite() || !u.is_finite() || !v.is_finite() {
+        return None;
+    }
+    if u < root0 - TOLERANCE || u > root1 + TOLERANCE {
+        return None;
+    }
+    if t < a - TOLERANCE || t > b + TOLERANCE || v < v0 - TOLERANCE || v > v1 + TOLERANCE {
+        return Some(None);
+    }
+    let point = curve.subs(t.clamp(a, b));
+    point
+        .near(&blend.subs(u.clamp(u0, u1), v.clamp(v0, v1)))
+        .then_some(Some(point))
+}
+
 fn can_continue_chamfer_contacts(shell: &Shell, wire: &Wire) -> bool {
     use truck_modeling::*;
-    if !wire.iter().any(|e| matches!(e.curve(), Curve::Conic(_)))
-        || wire
-            .iter()
-            .any(|e| !matches!(e.curve(), Curve::Line(_) | Curve::Conic(_)))
-    {
-        return false;
-    }
     let Some(cap) = shell.iter().find(|f| {
         matches!(
             f.oriented_surface().elementary(),
@@ -972,7 +1129,7 @@ fn can_continue_chamfer_contacts(shell: &Shell, wire: &Wire) -> bool {
         .map(|f| f.oriented_surface().elementary())
         .collect();
     let Some(axis) = walls.iter().find_map(|w| match w {
-        Some((Elementary::Cylinder { axis, .. }, true)) => Some(*axis),
+        Some((Elementary::Cylinder { axis, .. }, _)) => Some(*axis),
         _ => None,
     }) else {
         return false;
@@ -985,7 +1142,7 @@ fn can_continue_chamfer_contacts(shell: &Shell, wire: &Wire) -> bool {
     }
     walls.iter().all(|w| match w {
         Some((Elementary::Plane(p), _)) => p.normal().dot(axis).abs() < 1e-8,
-        Some((Elementary::Cylinder { axis: other, .. }, true)) => {
+        Some((Elementary::Cylinder { axis: other, .. }, _)) => {
             axis.cross(*other).magnitude() < 1e-8
         }
         _ => false,
@@ -1311,5 +1468,177 @@ mod output_tests {
         let error = finish(&input, 0, shell, 0.001).unwrap_err();
         assert_eq!(error.code, Code::BlendConstructionFailed);
         assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
+    }
+}
+
+#[cfg(test)]
+mod consumed_terminal_tests {
+    use super::*;
+    use truck_modeling::*;
+
+    #[test]
+    fn consumed_terminal_rejects_two_crossings_on_one_curved_exit() {
+        let plane = Surface::Plane(Plane::new(
+            Point3::origin(),
+            Point3::new(0., 0., 1.),
+            Point3::new(1., 0., 0.),
+        ));
+        // y(t) = (t - 0.2)(t - 0.7), so this single edge crosses y = 0 twice.
+        let curve = Curve::BSplineCurve(BSplineCurve::new(
+            KnotVec::bezier_knot(2),
+            vec![
+                Point3::new(0., 0.14, 0.),
+                Point3::new(0.5, -0.31, 0.),
+                Point3::new(1., 0.24, 0.),
+            ],
+        ));
+        for t in [0.2, 0.7] {
+            assert!(curve.subs(t).y.abs() < 1e-12);
+        }
+        let uv = plane
+            .search_nearest_parameter(curve.subs(0.5), None, 100)
+            .unwrap();
+        let (_, root) =
+            algo::surface::search_intersection_parameter(&plane, uv, &curve, 0.5, 100).unwrap();
+        assert!((root - 0.7).abs() < TOLERANCE);
+        let before = serde_json::to_string(&curve).unwrap();
+        assert!(consumed_chamfer_exit(&curve, &plane).is_none());
+        assert_eq!(before, serde_json::to_string(&curve).unwrap());
+    }
+
+    #[test]
+    fn consumed_ruled_exits_require_a_unique_bounded_root() {
+        let section = BSplineCurve::new(
+            KnotVec::bezier_knot(2),
+            vec![
+                Point3::new(-1., 1., 1.),
+                Point3::new(0., -1., 1.),
+                Point3::new(1., 1., 1.),
+            ],
+        );
+        let outer = section.transformed(Matrix4::from_scale(2.));
+        for (a, b) in [(section.clone(), outer.clone()), (outer, section)] {
+            let blend = Surface::BSplineSurface(BSplineSurface::homotopy(a, b));
+            let before = serde_json::to_string(&blend).unwrap();
+            let unique = Curve::Line(Line(Point3::new(0.5, 0., 1.5), Point3::new(0.5, 2., 1.5)));
+            for curve in [unique.clone(), unique.inverse()] {
+                let point = consumed_chamfer_exit(&curve, &blend).unwrap().unwrap();
+                assert_near!(point, Point3::new(0.5, 1. / 6., 1.5));
+            }
+            for curve in [
+                Curve::Line(Line(Point3::new(3., 0., 1.5), Point3::new(3., 2., 1.5))),
+                Curve::Line(Line(Point3::new(0.5, 10., 1.5), Point3::new(0.5, 11., 1.5))),
+            ] {
+                assert_eq!(consumed_chamfer_exit(&curve, &blend), Some(None));
+            }
+            // At z=1.5 the section is y=x²/1.5; y=0.5 has two roots ±sqrt(0.75).
+            let twice = Curve::Line(Line(Point3::new(-2., 0.5, 1.5), Point3::new(2., 0.5, 1.5)));
+            assert!(consumed_chamfer_exit(&twice, &blend).is_none());
+            assert_eq!(before, serde_json::to_string(&blend).unwrap());
+        }
+    }
+
+    #[test]
+    fn consumed_ruled_exits_count_shared_knot_and_endpoint_roots_once() {
+        let mut section = BSplineCurve::new(
+            KnotVec::bezier_knot(2),
+            vec![
+                Point3::new(-1., 1., 1.),
+                Point3::new(0., -1., 1.),
+                Point3::new(1., 1., 1.),
+            ],
+        );
+        section.add_knot(0.5);
+        let blend = Surface::BSplineSurface(BSplineSurface::homotopy(
+            section.clone(),
+            section.transformed(Matrix4::from_scale(2.)),
+        ));
+        for x in [-1.5, 0., 1.5] {
+            let curve = Curve::Line(Line(Point3::new(x, -1., 1.5), Point3::new(x, 2., 1.5)));
+            let point = consumed_chamfer_exit(&curve, &blend).unwrap().unwrap();
+            assert_near!(point, Point3::new(x, x * x / 1.5, 1.5));
+        }
+        let twice = Curve::Line(Line(Point3::new(-2., 0.5, 1.5), Point3::new(2., 0.5, 1.5)));
+        assert!(consumed_chamfer_exit(&twice, &blend).is_none());
+    }
+
+    #[test]
+    fn consumed_ruled_exits_reject_distinct_roots_near_a_shared_knot() {
+        let epsilon = 5e-13;
+        let slope = 1e-8;
+        // S(u,v) = (100u, (u-0.5)^2 + slope*|u-0.5| - epsilon, v).
+        let section = BSplineCurve::new(
+            KnotVec::from(vec![0., 0., 0., 0.5, 0.5, 1., 1., 1.]),
+            vec![
+                Point3::new(0., 0.25 + 0.5 * slope - epsilon, 0.),
+                Point3::new(25., 0.25 * slope - epsilon, 0.),
+                Point3::new(50., -epsilon, 0.),
+                Point3::new(75., 0.25 * slope - epsilon, 0.),
+                Point3::new(100., 0.25 + 0.5 * slope - epsilon, 0.),
+            ],
+        );
+        let blend = Surface::BSplineSurface(BSplineSurface::homotopy(
+            section.clone(),
+            section.transformed(Matrix4::from_translation(Vector3::unit_z())),
+        ));
+        let offset = ((slope * slope + 4. * epsilon).sqrt() - slope) / 2.;
+        assert!(offset < TOLERANCE);
+        assert!(200. * offset > 100. * TOLERANCE);
+        for u in [0.5 - offset, 0.5 + offset] {
+            assert!(blend.subs(u, 0.5).y.abs() < 1e-16);
+        }
+        let curve = Curve::Line(Line(Point3::new(0., 0., 0.5), Point3::new(100., 0., 0.5)));
+        let before = serde_json::to_string(&blend).unwrap();
+        for curve in [curve.clone(), curve.inverse()] {
+            let result = consumed_chamfer_exit(&curve, &blend);
+            assert!(result.is_none(), "two distinct roots accepted: {result:?}");
+        }
+        assert_eq!(before, serde_json::to_string(&blend).unwrap());
+    }
+
+    #[test]
+    fn consumed_ruled_exits_use_the_fitted_patch_not_an_ideal_cone() {
+        let a = BSplineCurve::new(
+            KnotVec::bezier_knot(2),
+            vec![
+                Point3::new(-1., 1., 0.),
+                Point3::new(0., -1., 0.),
+                Point3::new(1., 1., 0.),
+            ],
+        );
+        let b = BSplineCurve::new(
+            KnotVec::bezier_knot(2),
+            vec![
+                Point3::new(-1., 1., 1.),
+                Point3::new(1., 0., 1.),
+                Point3::new(3., 3., 1.),
+            ],
+        );
+        let blend = Surface::BSplineSurface(BSplineSurface::homotopy(a, b));
+        let curve = Curve::Line(Line(Point3::new(0.8, -1., 0.5), Point3::new(0.8, 2., 0.5)));
+        let point = consumed_chamfer_exit(&curve, &blend).unwrap().unwrap();
+        // At z=0.5 the patch is (1.5u+0.5, u²+0.5u+0.5, 0.5).
+        assert_near!(point, Point3::new(0.8, 0.64, 0.5));
+    }
+
+    #[test]
+    fn consumed_terminal_linear_exits_are_bounded_and_unique() {
+        let plane = Surface::Plane(Plane::new(
+            Point3::origin(),
+            Point3::new(0., 0., 1.),
+            Point3::new(1., 0., 0.),
+        ));
+        for (a, b, expected) in [(-1., 1., Some(Point3::new(0.5, 0., 0.))), (1., 2., None)] {
+            let line = Curve::Line(Line(Point3::new(0., a, 0.), Point3::new(1., b, 0.)));
+            for curve in [
+                line.clone(),
+                line.inverse(),
+                Curve::NurbsCurve(NurbsCurve::try_from(&line).unwrap()),
+            ] {
+                assert_eq!(consumed_chamfer_exit(&curve, &plane).unwrap(), expected);
+            }
+        }
+        let coplanar = Curve::Line(Line(Point3::origin(), Point3::new(1., 0., 0.)));
+        assert!(consumed_chamfer_exit(&coplanar, &plane).is_none());
     }
 }

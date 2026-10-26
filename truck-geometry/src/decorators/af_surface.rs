@@ -26,6 +26,7 @@ impl<S0, S1> ApproxFilletSurface<S0, S1> {
         {
             return None;
         }
+        self.search_grid = Default::default();
         self.knot_vec = knots.iter().map(|knot| (knot - a) / span).collect();
         Some(self)
     }
@@ -64,6 +65,7 @@ impl<S0, S1> ApproxFilletSurface<S0, S1> {
             tangent_vecs0,
             tangent_vecs1,
             weights,
+            ..
         } = self;
         let degree = self.vdegree();
         let basis = knot_vec
@@ -129,6 +131,41 @@ const fn bezier_3rd_basis(n: usize, u: f64) -> [f64; 4] {
     }
 }
 
+// Differentiate the rational cubic's endpoint and tangent controls along v.
+fn first_section_ders(
+    surface: &impl ParametricSurface3D,
+    uv: [Vector2; 3],
+    b: [Vector2; 2],
+    w: [f64; 2],
+) -> [[Vector4; 2]; 2] {
+    let s = surface.ders(2, uv[0].x, uv[0].y);
+    let p = s[0][0];
+    let dp = s[1][0] * uv[1].x + s[0][1] * uv[1].y;
+    let ddp = s[2][0] * uv[1].x.powi(2)
+        + s[1][1] * (2. * uv[1].x * uv[1].y)
+        + s[0][2] * uv[1].y.powi(2)
+        + s[1][0] * uv[2].x
+        + s[0][1] * uv[2].y;
+    let normalize = |x: Vector3, dx: Vector3| {
+        let length = x.magnitude();
+        let unit = x / length;
+        (unit, (dx - unit * unit.dot(dx)) / length)
+    };
+    let (t, dt) = normalize(dp, ddp);
+    let dn = (s[2][0] * uv[1].x + s[1][1] * uv[1].y).cross(s[0][1])
+        + s[1][0].cross(s[1][1] * uv[1].x + s[0][2] * uv[1].y);
+    let (n, dn) = normalize(s[1][0].cross(s[0][1]), dn);
+    let axis = t.cross(n);
+    let daxis = dt.cross(n) + t.cross(dn);
+    let q = w[0] * p + (axis * b[0].x + t * b[0].y) / 3.;
+    let dq =
+        w[1] * p + w[0] * dp + (daxis * b[0].x + axis * b[1].x + dt * b[0].y + t * b[1].y) / 3.;
+    [
+        [p.extend(1.), dp.extend(0.)],
+        [q.extend(w[0]), dq.extend(w[1])],
+    ]
+}
+
 mod subders {
     use super::*;
     fn v_axis_ders(p_ders: &CurveDers<Vector3>) -> CurveDers<Vector3> {
@@ -186,6 +223,9 @@ where
     type Point = Point3;
     type Vector = Vector3;
     fn ders(&self, max_order: usize, u: f64, v: f64) -> SurfaceDers<Vector3> {
+        if max_order == 1 {
+            return self.first_ders(u, v);
+        }
         let degree = self.vdegree();
         let [mut uv0_ders, mut uv1_ders, mut b0_ders, mut b1_ders] =
             [CurveDers::<Vector2>::new(max_order + 1); 4];
@@ -276,11 +316,81 @@ where
 }
 
 impl<S0: ParametricSurface3D, S1: ParametricSurface3D> ApproxFilletSurface<S0, S1> {
-    fn presearch(
+    fn first_ders(&self, u: f64, v: f64) -> SurfaceDers<Vector3> {
+        let basis = std::array::from_fn::<_, 3, _>(|order| {
+            self.knot_vec
+                .bspline_basis_functions(self.vdegree(), order, v)
+        });
+        let weight = std::array::from_fn::<_, 2, _>(|order| {
+            let b = &basis[order];
+            b.as_slice()
+                .iter()
+                .zip(&self.weights[b.base()..])
+                .map(tmul)
+                .sum::<f64>()
+        });
+        let section = |points: &[Point2], tangents: &[Vector2]| {
+            let uv = std::array::from_fn::<_, 3, _>(|order| {
+                let b = &basis[order];
+                b.as_slice()
+                    .iter()
+                    .zip(&points[b.base()..])
+                    .map(pmul)
+                    .sum::<Vector2>()
+            });
+            let tangent = std::array::from_fn::<_, 2, _>(|order| {
+                let b = &basis[order];
+                b.as_slice()
+                    .iter()
+                    .zip(&tangents[b.base()..])
+                    .map(tmul)
+                    .sum::<Vector2>()
+            });
+            (uv, tangent)
+        };
+        let (uv0, b0) = section(&self.side_control_points0, &self.tangent_vecs0);
+        let (uv1, b1) = section(&self.side_control_points1, &self.tangent_vecs1);
+        let [p0, q0] = first_section_ders(&self.surface0, uv0, b0, weight);
+        let [p1, q1] = first_section_ders(&self.surface1, uv1, b1, weight);
+        let controls = [p0, q0, q1, p1];
+        let b = bezier_3rd_basis(0, u);
+        let db = bezier_3rd_basis(1, u);
+        let h: Vector4 = (0..4).map(|i| controls[i][0] * b[i]).sum();
+        let hu: Vector4 = (0..4).map(|i| controls[i][0] * db[i]).sum();
+        let hv: Vector4 = (0..4).map(|i| controls[i][1] * b[i]).sum();
+        let p = h.truncate() / h.w;
+        let mut result = SurfaceDers::new(1);
+        result[0][0] = p;
+        result[1][0] = (hu.truncate() - p * hu.w) / h.w;
+        result[0][1] = (hv.truncate() - p * hv.w) / h.w;
+        result
+    }
+
+    fn presearch(&self, point: Point3, range: ((f64, f64), (f64, f64))) -> (f64, f64) {
+        let temporary;
+        let grid = if range == self.range_tuple() {
+            self.search_grid
+                .get_or_init(|| self.make_search_grid(range))
+        } else {
+            temporary = self.make_search_grid(range);
+            &temporary
+        };
+        let mut result = (0.0, 0.0);
+        let mut distance = f64::INFINITY;
+        for &(u, v, candidate) in grid {
+            let d = candidate.distance2(point);
+            if d < distance {
+                distance = d;
+                result = (u, v);
+            }
+        }
+        result
+    }
+
+    fn make_search_grid(
         &self,
-        point: Point3,
         ((u0, u1), (v0, v1)): ((f64, f64), (f64, f64)),
-    ) -> (f64, f64) {
+    ) -> Vec<(f64, f64, Point3)> {
         // All u samples at a given v share the same rational Bezier cross-section.
         let sections: Vec<_> = (0..=PRESEARCH_DIVISION)
             .map(|j| {
@@ -289,8 +399,7 @@ impl<S0: ParametricSurface3D, S1: ParametricSurface3D> ApproxFilletSurface<S0, S
                 (v, self.section_control_points(v))
             })
             .collect();
-        let mut result = (0.0, 0.0);
-        let mut distance = f64::INFINITY;
+        let mut result = Vec::with_capacity((PRESEARCH_DIVISION + 1).pow(2));
         for i in 0..=PRESEARCH_DIVISION {
             let p = i as f64 / PRESEARCH_DIVISION as f64;
             let u = u0 * (1.0 - p) + u1 * p;
@@ -298,11 +407,7 @@ impl<S0: ParametricSurface3D, S1: ParametricSurface3D> ApproxFilletSurface<S0, S
             for &(v, [p0, p1, p2, p3]) in &sections {
                 let candidate =
                     Point3::from_homogeneous(b[0] * p0 + b[1] * p1 + b[2] * p2 + b[3] * p3);
-                let d = candidate.distance2(point);
-                if d < distance {
-                    distance = d;
-                    result = (u, v);
-                }
+                result.push((u, v, candidate));
             }
         }
         result
@@ -354,6 +459,7 @@ where
 impl<S0, S1> From<ApproxFilletSurface<S0, S1>> for ApproxFilletSurface<Box<S0>, Box<S1>> {
     fn from(
         ApproxFilletSurface {
+            search_grid,
             knot_vec,
             surface0,
             side_control_points0,
@@ -365,6 +471,7 @@ impl<S0, S1> From<ApproxFilletSurface<S0, S1>> for ApproxFilletSurface<Box<S0>, 
         }: ApproxFilletSurface<S0, S1>,
     ) -> Self {
         Self {
+            search_grid,
             knot_vec,
             surface0: Box::new(surface0),
             side_control_points0,
@@ -510,6 +617,7 @@ where
             let weights = weights_points.into_iter().map(|x| x.x).collect();
 
             let approx = ApproxFilletSurface {
+                search_grid: Default::default(),
                 knot_vec,
                 surface0,
                 side_control_points0: parameter_curve0.destruct().1,
@@ -530,6 +638,7 @@ where
             }
             if added_ccs.is_empty() {
                 return Some(Self {
+                    search_grid: approx.search_grid,
                     knot_vec: approx.knot_vec,
                     surface0: S0::clone(approx.surface0),
                     side_control_points0: approx.side_control_points0,
@@ -583,6 +692,19 @@ fn regular_contact(
     // Check the converged contact, not intermediate Newton iterates, which may cross a fold.
     let orientation = offset_du.cross(offset_dv).dot(du.cross(dv));
     orientation.is_finite() && orientation > 0.0
+}
+
+impl<S0: PartialEq, S1: PartialEq> PartialEq for ApproxFilletSurface<S0, S1> {
+    fn eq(&self, other: &Self) -> bool {
+        self.knot_vec == other.knot_vec
+            && self.surface0 == other.surface0
+            && self.surface1 == other.surface1
+            && self.side_control_points0 == other.side_control_points0
+            && self.side_control_points1 == other.side_control_points1
+            && self.tangent_vecs0 == other.tangent_vecs0
+            && self.tangent_vecs1 == other.tangent_vecs1
+            && self.weights == other.weights
+    }
 }
 
 #[cfg(test)]
@@ -643,6 +765,7 @@ mod tests {
     #[test]
     fn normalize_longitudinal_parameters_preserves_geometry() {
         let original = ApproxFilletSurface {
+            search_grid: Default::default(),
             knot_vec: KnotVec::bezier_knot(2),
             surface0: Plane::xy(),
             side_control_points0: vec![(-1., 0.).into(), (-2., 0.25).into(), (-1., 1.).into()],
@@ -707,9 +830,59 @@ mod tests {
     impl ParametricSurface3D for CountedPlane {}
 
     #[test]
+    fn search_reuses_grid_across_clones() {
+        let calls = std::rc::Rc::new(std::cell::Cell::new(0));
+        let surface = ApproxFilletSurface {
+            search_grid: Default::default(),
+            knot_vec: KnotVec::bezier_knot(1),
+            surface0: CountedPlane(Plane::xy(), calls.clone()),
+            side_control_points0: vec![(-1.0, 0.0).into(), (-1.0, 1.0).into()],
+            tangent_vecs0: vec![(f64::sqrt(2.0), 0.0).into(); 2],
+            surface1: CountedPlane(Plane::yz(), calls.clone()),
+            side_control_points1: vec![(0.0, -1.0).into(), (1.0, -1.0).into()],
+            tangent_vecs1: vec![(-f64::sqrt(2.0), 0.0).into(); 2],
+            weights: vec![(1.0 + f64::sqrt(2.0)) / 3.0; 2],
+        };
+        let point = surface.subs(0.4, 0.6);
+        let expected = surface.presearch(point, surface.range_tuple());
+        calls.set(0);
+        assert_eq!(
+            surface.clone().presearch(point, surface.range_tuple()),
+            expected
+        );
+        assert_eq!(
+            calls.get(),
+            0,
+            "unchanged clones must reuse the search grid"
+        );
+        let mut normalized = surface.clone();
+        normalized.knot_vec = KnotVec::from(vec![2., 2., 4., 4.]);
+        normalized.search_grid = Default::default();
+        normalized.presearch(point, normalized.range_tuple());
+        normalized.try_vknot_normalize().unwrap();
+        calls.set(0);
+        assert_eq!(
+            normalized.presearch(point, normalized.range_tuple()),
+            expected
+        );
+        assert!(
+            calls.get() > 0,
+            "normalization must invalidate the parameter grid"
+        );
+        calls.set(0);
+        assert_eq!(surface.presearch(point, surface.range_tuple()), expected);
+        assert_eq!(
+            calls.get(),
+            0,
+            "normalization must not invalidate other clones"
+        );
+    }
+
+    #[test]
     fn search_reuses_cross_sections() {
         let calls = std::rc::Rc::new(std::cell::Cell::new(0));
         let surface = ApproxFilletSurface {
+            search_grid: Default::default(),
             knot_vec: KnotVec::bezier_knot(1),
             surface0: CountedPlane(Plane::xy(), calls.clone()),
             side_control_points0: vec![(-1.0, 0.0).into(), (-1.0, 1.0).into()],
@@ -731,6 +904,93 @@ mod tests {
             let count = calls.get();
             assert_near!(surface.subs(u, v), point);
             assert!(count < 1000, "repeated support evaluations: {count}");
+        }
+    }
+
+    #[test]
+    fn first_derivatives_match_general_evaluator() {
+        let fillet = RbfSurface::new(
+            Processor::with_transform(
+                UnitCircle::<Point3>::new(),
+                Matrix4::from_scale(300_f64.sqrt()),
+            ),
+            Sphere::new(Point3::new(0., 0., 10.), 20.),
+            Sphere::new(Point3::new(0., 0., -10.), 20.),
+            10.,
+        );
+        let surface =
+            ApproxFilletSurface::approx_rolling_ball_fillet(&fillet, (0.3, 5.7), 0.001).unwrap();
+        for u in [0., 0.13, 0.5, 0.87, 1.] {
+            for v in (0..=32).map(|i| 0.3 + 5.4 * i as f64 / 32.) {
+                let fast = surface.ders(1, u, v);
+                let general = surface.ders(2, u, v);
+                for (m, n) in [(0, 0), (1, 0), (0, 1)] {
+                    assert!(
+                        (fast[m][n] - general[m][n]).magnitude()
+                            < 1e-10 * general[m][n].magnitude().max(1.)
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn first_derivatives_match_curved_supports_and_rescaled_domains() {
+        let mut asymmetric = curved_support_fixture();
+        asymmetric.surface1.transform_by(
+            Matrix4::from_translation(Vector3::new(0.3, -0.2, 0.4))
+                * Matrix4::from_nonuniform_scale(1.3, 0.8, 1.7),
+        );
+        asymmetric.weights = vec![0.6, 2.3, 1.2];
+        let mut transformed = asymmetric.clone();
+        let transform = Matrix4::from_translation(Vector3::new(13., -7., 23.))
+            * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.73));
+        transformed.surface0.transform_by(transform);
+        transformed.surface1.transform_by(transform);
+        let mut reversed = transformed.clone();
+        reversed.surface0.invert();
+        reversed.surface1.invert();
+        for original in [curved_support_fixture(), asymmetric, transformed, reversed] {
+            for (scale, offset) in [(1., 0.), (1e-9, -3e-9), (1e9, -3e9)] {
+                let mut surface = original.clone();
+                surface.knot_vec.transform(scale, offset);
+                for u in [0., 0.13, 0.5, 0.87, 1.] {
+                    for v in [0., 0.17, 0.5, 0.79, 1.] {
+                        let parameter = offset + scale * v;
+                        let fast = surface.ders(1, u, parameter);
+                        let general = surface.ders(2, u, parameter);
+                        let reference = original.ders(2, u, v);
+                        for (m, n) in [(0, 0), (1, 0), (0, 1)] {
+                            // Compare derivatives in the original domain's units, including
+                            // tiny derivatives on large domains (no absolute-tolerance escape).
+                            let factor = if n == 1 { scale } else { 1. };
+                            let actual = fast[m][n] * factor;
+                            for expected in [general[m][n] * factor, reference[m][n]] {
+                                assert!(
+                                    (actual - expected).magnitude()
+                                        < 1e-10 * expected.magnitude().max(1.),
+                                    "u={u}, v={v}, scale={scale}, derivative=({m},{n})"
+                                );
+                            }
+                        }
+                        if u > 0. && u < 1. && v > 0. && v < 1. {
+                            let h = 1e-5;
+                            let du = (surface.subs(u + h, parameter)
+                                - surface.subs(u - h, parameter))
+                                / (2. * h);
+                            let dv = (surface.subs(u, parameter + scale * h)
+                                - surface.subs(u, parameter - scale * h))
+                                / (2. * h);
+                            for (actual, expected) in [(fast[1][0], du), (fast[0][1] * scale, dv)] {
+                                assert!(
+                                    (actual - expected).magnitude()
+                                        < 1e-7 * expected.magnitude().max(1.)
+                                );
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -801,6 +1061,7 @@ mod tests {
     #[property_test]
     fn plane_cylinder(#[strategy = 0.0..=1.0] u: f64, #[strategy = 0.0..=1.0] v: f64) {
         let surface = ApproxFilletSurface {
+            search_grid: Default::default(),
             knot_vec: KnotVec::bezier_knot(1),
             surface0: Plane::xy(),
             side_control_points0: vec![(-1.0, 0.0).into(), (-1.0, 1.0).into()],
@@ -824,10 +1085,10 @@ mod tests {
         prop_assert_near!(surface.ders(3, u, v), nurbs_surface.ders(3, u, v));
     }
 
-    #[property_test]
-    fn test_ders(#[strategy = 0.0..=1.0] u: f64, #[strategy = 0.0..=1.0] v: f64) {
+    fn curved_support_fixture(
+    ) -> ApproxFilletSurface<BSplineSurface<Point3>, BSplineSurface<Point3>> {
         #[rustfmt::skip]
-        let surface0 = &BSplineSurface::<Point3>::new(
+        let surface0 = BSplineSurface::<Point3>::new(
             (KnotVec::bezier_knot(2), KnotVec::bezier_knot(2)),
             vec![
                 vec![(-1.0, 0.0, 0.0).into(), (-1.0, 0.5, 0.0).into(), (-1.0, 1.0, 0.0).into()],
@@ -836,7 +1097,7 @@ mod tests {
             ]
         );
         #[rustfmt::skip]
-        let surface1 = &BSplineSurface::<Point3>::new(
+        let surface1 = BSplineSurface::<Point3>::new(
             (KnotVec::bezier_knot(2), KnotVec::bezier_knot(2)),
             vec![
                 vec![(0.0, 0.0, -1.0).into(), (0.0, 0.0, -0.5).into(), (0.0, 0.0, 0.0).into()],
@@ -845,7 +1106,8 @@ mod tests {
             ]
         );
 
-        let surface = ApproxFilletSurface {
+        ApproxFilletSurface {
+            search_grid: Default::default(),
             knot_vec: KnotVec::bezier_knot(2),
             surface0,
             side_control_points0: vec![(0.8, 0.0).into(), (0.5, 0.5).into(), (0.8, 1.0).into()],
@@ -854,7 +1116,13 @@ mod tests {
             side_control_points1: vec![(0.0, 0.8).into(), (0.5, 0.5).into(), (1.0, 0.8).into()],
             tangent_vecs1: vec![(-0.2, -0.1).into(), (-0.4, 0.0).into(), (-0.2, 0.1).into()],
             weights: vec![1.0, 2.0, 1.0],
-        };
+        }
+    }
+
+    #[property_test]
+    fn test_ders(#[strategy = 0.0..=1.0] u: f64, #[strategy = 0.0..=1.0] v: f64) {
+        let surface = curved_support_fixture();
+        let (surface0, surface1) = (surface.surface0(), surface.surface1());
 
         let pt = surface.subs(u, v);
         let ders = surface.ders(3, u, v);

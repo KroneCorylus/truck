@@ -113,13 +113,25 @@ fn prepare_curve(curve: &Curve, tol: f64) -> Option<Curve> {
         {
             return Some(circle);
         }
-        let leader = intersection.leader();
-        let (a, b) = curve.range_tuple();
-        if (0..=64).all(|i| {
-            let t = a + (b - a) * i as f64 / 64.0;
-            curve.subs(t).distance(leader.subs(t)) <= tol * 0.5
-        }) {
-            return prepare_curve(leader, tol * 0.5);
+        if let Curve::BSplineCurve(leader) = intersection.leader().as_ref() {
+            let (a, b) = curve.range_tuple();
+            let agrees = |t| {
+                intersection
+                    .search_triple(t, 100)
+                    .is_some_and(|(point, _, _)| point.distance(leader.subs(t)) <= tol * 0.5)
+            };
+            let (knots, _) = leader.knot_vec().to_single_multi();
+            // A uniform grid can hit only exact guide nodes and miss chord sagitta.
+            // Check each knot-span interior before substituting the guide.
+            if (0..=64).all(|i| agrees(a + (b - a) * i as f64 / 64.))
+                && knots.windows(2).all(|span| {
+                    let lo = span[0].max(a);
+                    let hi = span[1].min(b);
+                    lo >= hi || (1..=3).all(|i| agrees(lo + (hi - lo) * i as f64 / 4.))
+                })
+            {
+                return Some(Curve::BSplineCurve(leader.clone()));
+            }
         }
     }
     if let Curve::PCurve(pcurve) = curve {
@@ -140,48 +152,87 @@ fn prepare_curve(curve: &Curve, tol: f64) -> Option<Curve> {
     }
     match curve {
         Curve::PCurve(_) | Curve::IntersectionCurve(_) => {
-            let (a, b) = curve.range_tuple();
-            // A coarse adaptive fit can miss a localized deviation. Retry with finer
-            // initial intervals and tighter fitting error, keeping total dyadic depth 16.
-            for level in 0..=4 {
-                let segments = 1 << level;
-                let mut fitted: Option<BSplineCurve<Point3>> = None;
-                for i in 0..segments {
-                    let range = (
-                        a + (b - a) * i as f64 / segments as f64,
-                        if i + 1 == segments {
-                            b
-                        } else {
-                            a + (b - a) * (i + 1) as f64 / segments as f64
-                        },
-                    );
-                    let piece = BSplineCurve::cubic_approximation(
-                        curve,
-                        range,
-                        tol * 0.25 / 4.0_f64.powi(level as i32),
-                        tol.sqrt(),
-                        16 - level,
-                    );
-                    let piece = piece?;
-                    fitted = Some(match fitted {
-                        None => piece,
-                        Some(previous) => previous.try_concat(&piece).ok()?,
-                    });
-                }
-                let spline = fitted?;
-                let valid = (0..=256).all(|i| {
-                    let t = a + (b - a) * i as f64 / 256.;
-                    let error = spline.subs(t).distance(curve.subs(t));
-                    error.is_finite() && error <= tol
-                });
-                if valid {
-                    return Some(spline.into());
-                }
-            }
-            None
+            Some(fit_procedural_curve(curve, tol)?.into())
         }
         _ => Some(curve.clone()),
     }
+}
+
+fn fit_procedural_curve(curve: &Curve, tol: f64) -> Option<BSplineCurve<Point3>> {
+    if let Curve::IntersectionCurve(intersection) = curve {
+        if let Curve::BSplineCurve(leader) = intersection.leader().as_ref() {
+            let (knots, _) = leader.knot_vec().to_single_multi();
+            let (a, b) = curve.range_tuple();
+            let mut remaining = curve.clone();
+            let mut fitted: Option<BSplineCurve<Point3>> = None;
+            // Cut the guide as well, so each span uses its own endpoint derivatives.
+            for knot in knots.into_iter().filter(|&t| a < t && t < b).chain([b]) {
+                let next = (knot < b).then(|| remaining.cut(knot));
+                let mut piece = fit_procedural_span(&remaining, tol * 0.5)?;
+                fitted = Some(match fitted {
+                    None => piece,
+                    Some(previous) => {
+                        // Separate Newton solves can differ at the join. Share one
+                        // control to keep STEP knot multiplicity <= degree, budgeting
+                        // this displacement separately from the span's fitting error.
+                        let join = previous.back();
+                        if piece.front().distance(join) > tol * 0.5 {
+                            return None;
+                        }
+                        *piece.control_point_mut(0) = join;
+                        previous.try_concat(&piece).ok()?
+                    }
+                });
+                if let Some(next) = next {
+                    remaining = next;
+                }
+            }
+            return fitted;
+        }
+    }
+    fit_procedural_span(curve, tol)
+}
+
+fn fit_procedural_span(curve: &Curve, tol: f64) -> Option<BSplineCurve<Point3>> {
+    let (a, b) = curve.range_tuple();
+    // A coarse adaptive fit can miss a localized deviation. Retry with finer
+    // initial intervals and tighter fitting error, keeping total dyadic depth 16.
+    for level in 0..=4 {
+        let segments = 1 << level;
+        let mut fitted: Option<BSplineCurve<Point3>> = None;
+        for i in 0..segments {
+            let range = (
+                a + (b - a) * i as f64 / segments as f64,
+                if i + 1 == segments {
+                    b
+                } else {
+                    a + (b - a) * (i + 1) as f64 / segments as f64
+                },
+            );
+            let piece = BSplineCurve::cubic_approximation(
+                curve,
+                range,
+                tol * 0.25 / 4.0_f64.powi(level as i32),
+                tol.sqrt(),
+                16 - level,
+            );
+            let piece = piece?;
+            fitted = Some(match fitted {
+                None => piece,
+                Some(previous) => previous.try_concat(&piece).ok()?,
+            });
+        }
+        let spline = fitted?;
+        let valid = (0..=256).all(|i| {
+            let t = a + (b - a) * i as f64 / 256.;
+            let error = spline.subs(t).distance(curve.subs(t));
+            error.is_finite() && error <= tol
+        });
+        if valid {
+            return Some(spline);
+        }
+    }
+    None
 }
 
 fn circular_bezier(curve: &NurbsCurve<Vector4>) -> Option<Curve> {
@@ -566,6 +617,64 @@ fn fillet_to_nurbs(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn intersection_export_does_not_substitute_its_polyline_guide() {
+        let parabola = |t: f64| {
+            let x = 2. * t - 1.;
+            Point3::new(x, 0., x * x)
+        };
+        let profile = BSplineCurve::new(
+            KnotVec::bezier_knot(2),
+            vec![
+                Point3::new(-1., 0., 1.),
+                Point3::new(0., 0., -1.),
+                Point3::new(1., 0., 1.),
+            ],
+        );
+        let surface = Surface::Extruded(ExtrudedCurve::by_extrusion(
+            profile.into(),
+            Vector3::unit_y(),
+        ));
+        let plane = Surface::Plane(Plane::new(
+            Point3::origin(),
+            Point3::new(1., 0., 0.),
+            Point3::new(0., 0., 1.),
+        ));
+        // All 65 old shortcut samples hit exact guide nodes, hiding the chord error.
+        let guide = BSplineCurve::new(
+            KnotVec::from_iter(
+                std::iter::once(0.)
+                    .chain((0..=64).map(|i| i as f64 / 64.))
+                    .chain(std::iter::once(1.)),
+            ),
+            (0..=64).map(|i| parabola(i as f64 / 64.)).collect(),
+        );
+        let curve = Curve::IntersectionCurve(IntersectionCurve::new(
+            Box::new(surface),
+            Box::new(plane),
+            Box::new(Curve::BSplineCurve(guide)),
+        ));
+        let tol = 0.00005;
+        let prepared = prepare_curve(&curve, tol).unwrap();
+        let Curve::BSplineCurve(spline) = &prepared else {
+            panic!("expected a fitted spline");
+        };
+        let (_, multiplicities) = spline.knot_vec().to_single_multi();
+        assert!(multiplicities[1..multiplicities.len() - 1]
+            .iter()
+            .all(|&m| m <= spline.degree()));
+        for i in 0..=1024 {
+            let t = i as f64 / 1024.;
+            let raw = curve.subs(t);
+            let point = prepared.subs(t);
+            assert!(raw.y.abs() < 1e-8 && (raw.z - raw.x * raw.x).abs() < 1e-8);
+            assert!(point.y.abs() <= tol && (point.z - point.x * point.x).abs() <= tol);
+            assert!(point.distance(raw) <= tol);
+        }
+        assert!(prepared.front().distance(parabola(0.)) < 1e-10);
+        assert!(prepared.back().distance(parabola(1.)) < 1e-10);
+    }
 
     #[test]
     fn extruded_ellipse_step_preserves_trim_and_normal_direction() {

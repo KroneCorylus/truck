@@ -410,7 +410,13 @@ pub(super) fn neighborhood(
             && sides[chosen[0]].iter().all(|&f| planes[f].is_some());
         let analytic_end = analytic_corner
             && edges.len() == 3
-            && (chosen.len() == 1 || chosen.len() == 3)
+            && (chosen.len() == 1
+                || chosen.len() == 3
+                || (chosen.len() == 2
+                    && edges
+                        .iter()
+                        .flat_map(|&k| sides[k])
+                        .any(|f| extrusion_supports[f])))
             && edges.iter().flat_map(|&k| sides[k]).all(|f| {
                 planes[f].is_some()
                     || cylinders[f].is_some()

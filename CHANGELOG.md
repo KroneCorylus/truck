@@ -6,6 +6,24 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Reject malformed STEP B-spline knot order, multiplicity lengths and nonpositive values
+  with conversion errors for curves and both surface directions instead of panicking.
+- Support consumed chamfer neighbors on open line–arc–line contours across distance
+  conventions, including multi-face terminations. Reject ambiguous exits and empty contact
+  intervals without mutating input. Six C2 captures now pass; all 486 chamfer replays retain
+  their previous checks (357 construct, 332 limited comparisons).
+- Construct the bounded quadratic G2 remote fillet junction with independent material,
+  contact and STEP checks. OCCT uses a different Coons corner construction here; its failed
+  rolling-ball comparison remains recorded separately in the G2 oracle evidence.
+- Preserve intersection accuracy during STEP preparation by checking guide knot-span
+  interiors and fitting spans separately instead of substituting an aliased polyline guide.
+- Reuse immutable fillet search grids and both orientations of intersection samples; batch
+  Newton derivative evaluation, evaluate first fillet derivatives directly and accept
+  spatially checked support hints. Cache invalidation follows geometry mutations. Matched
+  single-core G2 construction falls from 201.32 to 25.46 ms versus OCCT 29.70 ms, with
+  unchanged checks and about 217 KB more peak live allocation. Add reproducible matched
+  timing/allocation harnesses and derivative/cache/periodic-hint regression coverage.
+
 - Chamfer fully selected convex three-edge corners with OCCT's corner rule. The corner face
   is the triangle of bevel crossings, or, when one bevel reaches past the others, a quad
   through its crossings: planar when its four points are coplanar, otherwise a bilinear

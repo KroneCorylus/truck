@@ -284,6 +284,10 @@ pub struct IntersectionCurve<C, S0, S1> {
     leader: C,
     #[serde(skip)]
     division: std::sync::Arc<std::sync::Mutex<Option<intersection_curve::Division>>>,
+    #[serde(skip)]
+    inverse_division: std::sync::Arc<std::sync::Mutex<Option<intersection_curve::Division>>>,
+    #[serde(skip)]
+    surface1_hint: Option<BSplineCurve<Point2>>,
 }
 
 /// trimmed curve for parametric curve
@@ -350,8 +354,10 @@ pub struct RbfContactCurve<C, S0, S1, R> {
 }
 
 /// Approximation surface of fillets
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, SelfSameGeometry)]
+#[derive(Clone, Debug, Serialize, Deserialize, SelfSameGeometry)]
 pub struct ApproxFilletSurface<S0, S1> {
+    #[serde(skip)]
+    search_grid: std::sync::Arc<std::sync::OnceLock<Vec<(f64, f64, Point3)>>>,
     knot_vec: KnotVec,
     surface0: S0,
     side_control_points0: Vec<Point2>,
