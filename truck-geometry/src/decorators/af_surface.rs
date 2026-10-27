@@ -68,13 +68,14 @@ impl<S0, S1> ApproxFilletSurface<S0, S1> {
             ..
         } = self;
         let degree = self.vdegree();
-        let basis = knot_vec
-            .bspline_basis_functions(degree, 0, v)
-            .to_full_array();
-        let dbasis = knot_vec
-            .bspline_basis_functions(degree, 1, v)
-            .to_full_array();
-        let weight: f64 = basis.iter().zip(weights).map(|(&b, &w)| b * w).sum();
+        let basis = knot_vec.bspline_basis_functions(degree, 0, v);
+        let dbasis = knot_vec.bspline_basis_functions(degree, 1, v);
+        let weight: f64 = basis
+            .as_slice()
+            .iter()
+            .zip(&weights[basis.base()..])
+            .map(|(&b, &w)| b * w)
+            .sum();
         let striple0 = (surface0, side_control_points0, tangent_vecs0);
         let striple1 = (surface1, side_control_points1, tangent_vecs1);
         let (pt0, pt1) = u_control_points(&basis, &dbasis, striple0, weight);
@@ -89,18 +90,33 @@ fn tmul<S: Copy, T: Copy + Mul<S>>((b, v): (&S, &T)) -> <T as Mul<S>>::Output { 
 
 type SurfaceTriple<'a, S> = (S, &'a Vec<Point2>, &'a Vec<Vector2>);
 fn u_control_points<S: ParametricSurface3D>(
-    basis: &[f64],
-    dbasis: &[f64],
+    basis: &BasisWindow,
+    dbasis: &BasisWindow,
     (surface, side_control_points, tangent_vecs): SurfaceTriple<'_, S>,
     weight: f64,
 ) -> (Vector4, Vector4) {
-    let uv: Vector2 = basis.iter().zip(side_control_points).map(pmul).sum();
+    let uv: Vector2 = basis
+        .as_slice()
+        .iter()
+        .zip(&side_control_points[basis.base()..])
+        .map(pmul)
+        .sum();
     let sders = surface.ders(1, uv.x, uv.y);
     let (p, uder, vder) = (sders[0][0], sders[1][0], sders[0][1]);
-    let duv: Vector2 = dbasis.iter().zip(side_control_points).map(pmul).sum();
+    let duv: Vector2 = dbasis
+        .as_slice()
+        .iter()
+        .zip(&side_control_points[dbasis.base()..])
+        .map(pmul)
+        .sum();
     let cder = (uder * duv.x + vder * duv.y).normalize();
     let axis = cder.cross(uder.cross(vder).normalize());
-    let tuv: Vector2 = basis.iter().zip(tangent_vecs).map(tmul).sum();
+    let tuv: Vector2 = basis
+        .as_slice()
+        .iter()
+        .zip(&tangent_vecs[basis.base()..])
+        .map(tmul)
+        .sum();
     let wq = weight * p + (axis * tuv.x + cder * tuv.y) / 3.0;
     (p.extend(1.0), wq.extend(weight))
 }
@@ -168,18 +184,104 @@ fn first_section_ders(
 
 mod subders {
     use super::*;
+    fn composite_ders(
+        surface: &SurfaceDers<Vector3>,
+        uv: &CurveDers<Vector2>,
+        offset: (usize, usize),
+    ) -> CurveDers<Vector3> {
+        let order = (surface.max_order() - offset.0 - offset.1).min(uv.max_order());
+        if order > 3 {
+            return match offset {
+                (1, 0) => surface.uder().composite_ders(uv),
+                (0, 1) => surface.vder().composite_ders(uv),
+                _ => surface.composite_ders(uv),
+            };
+        }
+        fn term<const N: usize>(
+            surface: &SurfaceDers<Vector3>,
+            uv: &CurveDers<Vector2>,
+            offset: (usize, usize),
+            indices: [usize; N],
+        ) -> Vector3 {
+            (0..1 << N).fold(Vector3::zero(), |sum, mut bits| {
+                let (v, coefficient) = indices.iter().fold((0, 1.), |(v, coefficient), &i| {
+                    let axis = bits % 2;
+                    bits /= 2;
+                    (v + axis, coefficient * uv[i][axis])
+                });
+                sum + surface[offset.0 + N - v][offset.1 + v] * coefficient
+            })
+        }
+        let mut result = CurveDers::new(order);
+        result[0] = surface[offset.0][offset.1];
+        // Preserve the general composition evaluator's term and accumulation order.
+        for i in 1..=order {
+            let mut value = Vector3::zero() + term(surface, uv, offset, [i]);
+            if i == 2 {
+                value += term(surface, uv, offset, [1, 1]);
+            } else if i == 3 {
+                value += term(surface, uv, offset, [2, 1]) * 3.;
+                value += term(surface, uv, offset, [1, 1, 1]);
+            }
+            result[i] = value;
+        }
+        result
+    }
+    #[test]
+    fn composition_preserves_general_evaluator_bits() {
+        for seed in 0..32 {
+            for order in 1..=6 {
+                let mut surface = SurfaceDers::new(order);
+                let mut uv = CurveDers::new(order);
+                let value = |i: usize| {
+                    ((seed * 37 + i * 19 + 1) as f64).sin() * 10_f64.powi((seed % 9) as i32 - 4)
+                };
+                for i in 0..=order {
+                    uv[i] = Vector2::new(value(i), value(i + 11));
+                    for j in 0..=order - i {
+                        surface[i][j] = Vector3::new(
+                            value(i * 7 + j),
+                            value(i + j * 3 + 9),
+                            value(i * 5 + j + 13),
+                        );
+                    }
+                }
+                for offset in [(0, 0), (1, 0), (0, 1)] {
+                    let expected = match offset {
+                        (1, 0) => surface.uder().composite_ders(&uv),
+                        (0, 1) => surface.vder().composite_ders(&uv),
+                        _ => surface.composite_ders(&uv),
+                    };
+                    let actual = composite_ders(&surface, &uv, offset);
+                    assert_eq!(actual.max_order(), expected.max_order());
+                    for i in 0..=actual.max_order() {
+                        for axis in 0..3 {
+                            assert_eq!(
+                                actual[i][axis].to_bits(),
+                                expected[i][axis].to_bits(),
+                                "seed={seed}, order={order}, offset={offset:?}, i={i}, axis={axis}"
+                            );
+                        }
+                    }
+                }
+            }
+        }
+    }
+    #[inline(always)]
     fn v_axis_ders(p_ders: &CurveDers<Vector3>) -> CurveDers<Vector3> {
         let p_derders = p_ders.der();
         let homog_ders = p_derders.element_wise_ders(&p_derders.abs_ders(), Vector3::extend);
         homog_ders.rat_ders()
     }
+    #[inline(always)]
     fn n_ders(s_ders: &SurfaceDers<Vector3>, uv_ders: &CurveDers<Vector2>) -> CurveDers<Vector3> {
-        let uders = s_ders.uder().composite_ders(uv_ders);
-        let vders = s_ders.vder().composite_ders(uv_ders);
+        let uders = composite_ders(s_ders, uv_ders, (1, 0));
+        let vders = composite_ders(s_ders, uv_ders, (0, 1));
         let lnders = uders.combinatorial_ders(&vders, Vector3::cross);
         let homog = lnders.element_wise_ders(&lnders.abs_ders(), Vector3::extend);
         homog.rat_ders()
     }
+    #[inline(always)]
     fn wq_ders(
         w_ders: &CurveDers<f64>,
         p_ders: &CurveDers<Vector3>,
@@ -196,18 +298,20 @@ mod subders {
             .element_wise_ders(&aders, Add::add)
             .element_wise_ders(&bders, Add::add)
     }
+    #[inline(always)]
     fn lift_p_ders(p_ders: &CurveDers<Vector3>) -> CurveDers<Vector4> {
         let mut w_ders = CurveDers::<f64>::new(p_ders.max_order());
         w_ders[0] = 1.0;
         p_ders.element_wise_ders(&w_ders, Vector3::extend)
     }
+    #[inline(always)]
     pub fn control_points_ders(
         s_ders: &SurfaceDers<Vector3>,
         uv_ders: &CurveDers<Vector2>,
         b_ders: &CurveDers<Vector2>,
         w_ders: &CurveDers<f64>,
     ) -> (CurveDers<Vector4>, CurveDers<Vector4>) {
-        let p_ders = s_ders.composite_ders(uv_ders);
+        let p_ders = composite_ders(s_ders, uv_ders, (0, 0));
         let lift_p_ders = lift_p_ders(&p_ders);
         let wq_ders = wq_ders(w_ders, &p_ders, b_ders, &n_ders(s_ders, uv_ders));
         let lift_q_ders = wq_ders.element_wise_ders(w_ders, |x, y| x.extend(y));
@@ -231,15 +335,30 @@ where
             [CurveDers::<Vector2>::new(max_order + 1); 4];
         let mut w_ders = CurveDers::<f64>::new(max_order + 1);
         (0..=max_order + 1).for_each(|order| {
-            let basis = self
-                .knot_vec
-                .bspline_basis_functions(degree, order, v)
-                .to_full_array();
-            uv0_ders[order] = basis.iter().zip(&self.side_control_points0).map(pmul).sum();
-            uv1_ders[order] = basis.iter().zip(&self.side_control_points1).map(pmul).sum();
-            b0_ders[order] = basis.iter().zip(&self.tangent_vecs0).map(tmul).sum();
-            b1_ders[order] = basis.iter().zip(&self.tangent_vecs1).map(tmul).sum();
-            w_ders[order] = basis.iter().zip(&self.weights).map(tmul).sum();
+            let basis = self.knot_vec.bspline_basis_functions(degree, order, v);
+            let start = basis.base();
+            let basis = basis.as_slice();
+            uv0_ders[order] = basis
+                .iter()
+                .zip(&self.side_control_points0[start..])
+                .map(pmul)
+                .sum();
+            uv1_ders[order] = basis
+                .iter()
+                .zip(&self.side_control_points1[start..])
+                .map(pmul)
+                .sum();
+            b0_ders[order] = basis
+                .iter()
+                .zip(&self.tangent_vecs0[start..])
+                .map(tmul)
+                .sum();
+            b1_ders[order] = basis
+                .iter()
+                .zip(&self.tangent_vecs1[start..])
+                .map(tmul)
+                .sum();
+            w_ders[order] = basis.iter().zip(&self.weights[start..]).map(tmul).sum();
         });
         let Vector2 { x: u0, y: v0 } = uv0_ders[0];
         let s0_ders = self.surface0.ders(max_order + 1, u0, v0);
@@ -995,6 +1114,111 @@ mod tests {
     }
 
     #[test]
+    fn section_evaluation_matches_general_evaluator() {
+        let fillet = RbfSurface::new(
+            Processor::with_transform(
+                UnitCircle::<Point3>::new(),
+                Matrix4::from_scale(300_f64.sqrt()),
+            ),
+            Sphere::new(Point3::new(0., 0., 10.), 20.),
+            Sphere::new(Point3::new(0., 0., -10.), 20.),
+            10.,
+        );
+        let surface =
+            ApproxFilletSurface::approx_rolling_ball_fillet(&fillet, (0.3, 5.7), 0.001).unwrap();
+        for u in [0., 0.13, 0.5, 0.87, 1.] {
+            for v in (0..=32).map(|i| 0.3 + 5.4 * i as f64 / 32.) {
+                let fast = surface.ders(2, u, v);
+                let general = surface.ders(3, u, v);
+                let first = surface.ders(1, u, v);
+                for (m, n) in [(0, 0), (1, 0), (0, 1)] {
+                    assert!(
+                        (first[m][n] - general[m][n]).magnitude()
+                            < 1e-10 * general[m][n].magnitude().max(1.)
+                    );
+                }
+                assert!((surface.subs(u, v).to_vec() - general[0][0]).magnitude() < 1e-10);
+                for (m, n) in [(0, 0), (1, 0), (0, 1), (2, 0), (1, 1), (0, 2)] {
+                    assert!(
+                        (fast[m][n] - general[m][n]).magnitude()
+                            < 1e-10 * general[m][n].magnitude().max(1.)
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn first_and_second_derivatives_match_curved_supports_and_rescaled_domains() {
+        let mut asymmetric = curved_support_fixture();
+        asymmetric.surface1.transform_by(
+            Matrix4::from_translation(Vector3::new(0.3, -0.2, 0.4))
+                * Matrix4::from_nonuniform_scale(1.3, 0.8, 1.7),
+        );
+        asymmetric.weights = vec![0.6, 2.3, 1.2];
+        let mut transformed = asymmetric.clone();
+        let transform = Matrix4::from_translation(Vector3::new(13., -7., 23.))
+            * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.73));
+        transformed.surface0.transform_by(transform);
+        transformed.surface1.transform_by(transform);
+        let mut reversed = transformed.clone();
+        reversed.surface0.invert();
+        reversed.surface1.invert();
+        for original in [curved_support_fixture(), asymmetric, transformed, reversed] {
+            for (scale, offset) in [(1., 0.), (1e-9, -3e-9), (1e9, -3e9)] {
+                let mut surface = original.clone();
+                surface.knot_vec.transform(scale, offset);
+                for u in [0., 0.13, 0.5, 0.87, 1.] {
+                    for v in [0., 0.17, 0.5, 0.79, 1.] {
+                        let parameter = offset + scale * v;
+                        let fast = surface.ders(2, u, parameter);
+                        let general = surface.ders(3, u, parameter);
+                        let reference = original.ders(3, u, v);
+                        let first = surface.ders(1, u, parameter);
+                        for (m, n) in [(0, 0), (1, 0), (0, 1)] {
+                            let factor = scale.powi(n as i32);
+                            for expected in [general[m][n] * factor, reference[m][n]] {
+                                assert!(
+                                    (first[m][n] * factor - expected).magnitude()
+                                        < 1e-10 * expected.magnitude().max(1.)
+                                );
+                            }
+                        }
+                        for (m, n) in [(0, 0), (1, 0), (0, 1), (2, 0), (1, 1), (0, 2)] {
+                            // Compare derivatives in the original domain's units, including
+                            // tiny derivatives on large domains (no absolute-tolerance escape).
+                            let factor = scale.powi(n as i32);
+                            let actual = fast[m][n] * factor;
+                            for expected in [general[m][n] * factor, reference[m][n]] {
+                                assert!(
+                                    (actual - expected).magnitude()
+                                        < 1e-10 * expected.magnitude().max(1.),
+                                    "u={u}, v={v}, scale={scale}, derivative=({m},{n})"
+                                );
+                            }
+                        }
+                        if u > 0. && u < 1. && v > 0. && v < 1. {
+                            let h = 1e-5;
+                            let du = (surface.subs(u + h, parameter)
+                                - surface.subs(u - h, parameter))
+                                / (2. * h);
+                            let dv = (surface.subs(u, parameter + scale * h)
+                                - surface.subs(u, parameter - scale * h))
+                                / (2. * h);
+                            for (actual, expected) in [(fast[1][0], du), (fast[0][1] * scale, dv)] {
+                                assert!(
+                                    (actual - expected).magnitude()
+                                        < 1e-7 * expected.magnitude().max(1.)
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
     fn presearch_matches_the_original_grid() {
         let fillet = RbfSurface::new(
             Processor::with_transform(
@@ -1083,6 +1307,73 @@ mod tests {
 
         prop_assert_near!(surface.subs(u, v), nurbs_surface.subs(u, v));
         prop_assert_near!(surface.ders(3, u, v), nurbs_surface.ders(3, u, v));
+    }
+
+    #[derive(Clone)]
+    struct CountedDerivatives<S>(S, std::rc::Rc<std::cell::Cell<usize>>);
+
+    impl<S: ParametricSurface3D> ParametricSurface for CountedDerivatives<S> {
+        type Point = Point3;
+        type Vector = Vector3;
+        fn subs(&self, u: f64, v: f64) -> Point3 { self.0.subs(u, v) }
+        fn uder(&self, u: f64, v: f64) -> Vector3 { self.0.uder(u, v) }
+        fn vder(&self, u: f64, v: f64) -> Vector3 { self.0.vder(u, v) }
+        fn uuder(&self, u: f64, v: f64) -> Vector3 { self.0.uuder(u, v) }
+        fn uvder(&self, u: f64, v: f64) -> Vector3 { self.0.uvder(u, v) }
+        fn vvder(&self, u: f64, v: f64) -> Vector3 { self.0.vvder(u, v) }
+        fn der_mn(&self, m: usize, n: usize, u: f64, v: f64) -> Vector3 {
+            self.ders(m + n, u, v)[m][n]
+        }
+        fn ders(&self, order: usize, u: f64, v: f64) -> SurfaceDers<Vector3> {
+            self.1.set(self.1.get() + 1);
+            self.0.ders(order, u, v)
+        }
+    }
+
+    #[test]
+    fn processed_fillet_reuses_each_derivative_order_without_changing_bits() {
+        let calls = std::rc::Rc::new(std::cell::Cell::new(0));
+        for (scale, offset) in [(1., 0.), (1e-9, -3e-9), (1e9, -3e9)] {
+            let mut surface = curved_support_fixture();
+            surface.weights = vec![0.6, 2.3, 1.2];
+            surface.knot_vec.transform(scale, offset);
+            let transform = Matrix4::from_translation(Vector3::new(7., -11., 13.))
+                * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.73))
+                * Matrix4::from_nonuniform_scale(2.5, 0.8, 1.3);
+            let mut processor =
+                Processor::with_transform(CountedDerivatives(surface, calls.clone()), transform);
+            for inverse in [false, true] {
+                if inverse {
+                    processor.invert();
+                }
+                for u in [0., 0.17, 0.5, 1.] {
+                    for v in [0., 0.29, 0.79, 1.] {
+                        let v = offset + scale * v;
+                        let (u, v) = if inverse { (v, u) } else { (u, v) };
+                        for order in 0..=3 {
+                            calls.set(0);
+                            let actual = processor.ders(order, u, v);
+                            assert_eq!(
+                                calls.get(),
+                                order,
+                                "one support batch per derivative order"
+                            );
+                            for m in 0..=order {
+                                for n in 0..=order - m {
+                                    let expected = processor.der_mn(m, n, u, v);
+                                    for axis in 0..3 {
+                                        assert_eq!(
+                                            actual[m][n][axis].to_bits(),
+                                            expected[axis].to_bits()
+                                        );
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     fn curved_support_fixture(

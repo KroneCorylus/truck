@@ -181,6 +181,26 @@ where
 {
     type Point = S::Point;
     type Vector = S::Vector;
+    fn ders(&self, max_order: usize, u: f64, v: f64) -> SurfaceDers<Self::Vector> {
+        let mut result = SurfaceDers::new(max_order);
+        result[0][0] = self.subs(u, v).to_vec();
+        let (u, v) = if self.orientation { (u, v) } else { (v, u) };
+        // Keep each derivative's original evaluation order: lower-order evaluators
+        // can use different floating-point arithmetic from a higher-order batch.
+        for order in 1..=max_order {
+            let derivatives = self.entity.ders(order, u, v);
+            for m in 0..=order {
+                let n = order - m;
+                let value = if self.orientation {
+                    derivatives[m][n]
+                } else {
+                    derivatives[n][m]
+                };
+                result[m][n] = self.transform.transform_vector(value);
+            }
+        }
+        result
+    }
     #[inline(always)]
     fn der_mn(&self, m: usize, n: usize, u: f64, v: f64) -> Self::Vector {
         if (m, n) == (0, 0) {

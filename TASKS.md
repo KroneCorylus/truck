@@ -1,7 +1,7 @@
 # Open work
 
 The single list of open kernel work and how to split it across agents. Read
-[AGENTS.md](AGENTS.md) first; its rules win over anything here. Updated 2026-10-25.
+[AGENTS.md](AGENTS.md) first; its rules win over anything here. Updated 2026-10-27.
 
 The main program is OCCT-level fillet/chamfer capability: dimensions, validity, editing
 behavior and latency on equivalent modeling tasks, not matching OCCT's API or face structure.
@@ -33,68 +33,62 @@ results since:
 bound. The nine-case cohort ([report](audits/fillet-chamfer/capture/2026-10-24-nine-case-cohort/REPORT.md))
 adds `blend/complex/D2` (construction failure) and 8 no-solid cases.
 
+## Current stopping point — 2026-10-27
+
+Stopped at the user's request after completing validation, reviews and benchmarks.
+No agents or test/build processes remain active. Do not resume until requested.
+
+Completed batch: bounded quarter-cylinder and fully selected cylindrical chamfer networks,
+bounded parabolic chamfer continuation, quartic G6 wall-first fillets, and shared derivative
+optimizations. Tests, geometry/material oracles and CHANGELOG describe the accepted scopes.
+The latest full chamfer replay covers **486 operations: 358 constructions, 333 limited
+comparison passes**. A7 is the new gain; no lost checks. All 30 C2 passes remain. The eight
+C1 failures and 21 remaining A2 failures preserve inputs. No fresh full native recapture.
+
+Final broad shapeops run: 538 passes, one existing skip; seven doctests and 77 replay tests.
+The subsequent guard-only regression addition passes all six network tests and Clippy.
+Geometry optimization validation: 173 passes, one existing skip and the known
+pcurve_derivation precision failure; 139 geometry doctests. Scoped formatting, release
+Clippy and benchmark smoke pass. Independent reviews approved bounded geometry and
+performance changes. A2 review's guard-coverage gap was closed by an axis-edge-only
+unequal setback test: bypassing only the symmetric-planar guard constructs the rejected
+fixture; restoring it passes scaled/reordered controls. No tolerance or sampling changes.
+
+Serial matched benchmarks, CPU0 / one worker / 40 samples per configuration:
+- G6: 25.54 ms median versus OCCT 30.81 ms (previous Truck 46.67 ms).
+- G2: 18.12 ms versus OCCT 29.05 ms (previous Truck 25.13 ms).
+- A7 network: 0.206472 ms median / 0.271100 ms P95 versus OCCT
+  2.984592 / 3.174877 ms. Fresh sampled distance at most 8.52e-15.
+- Old bounded A2 remains faster than OCCT; no material neighboring regression shown.
+- C1 standalone approximately 9 ms; a matched OCCT comparator is still unvalidated.
+These measurements do not establish universal performance. No new persistent caches;
+allocation totals were not measured in this batch.
+
+G2 and G6 native comparisons **remain failed**. Independent local sphere/canal material
+witnesses support Truck's rolling-ball construction; they are not global uniqueness,
+containment or nonintersection proofs. G6 corner distance ~0.185900501 and canal distance
+~0.001881877 remain recorded. Fresh native tracing observes three-boundary Coons filling,
+but does not establish original-capture binary provenance. Reference-exception accounting
+remains a user decision; never count these as native comparison passes.
+
+Retained evidence (under target; do not delete before reproducing or archiving):
+- g6-performance-20261027/RESULTS.txt, baseline archives and final/validation logs.
+- g6-combined-integration-20261027/validation-results.json.
+- a2-assembly-20261027-092345/validation-results.json, implementation.patch,
+  guard-bypassed.log, guard-restored.log and guard-clippy.log.
+- a7-network-benchmarks-20261027/RESULTS.txt and raw samples/provenance.
+- c1-integration-validation-20261027/validation-results.json.
+Durable G6 witness/oracle sources are in audits/fillet-chamfer/oracles/.
+
+Remaining priorities: A2 two-edge/unequal planar networks and elliptic patches; broader
+C1 continuation; H1 cubic fillets; matched C1 OCCT timing. Preserve the bounded guards
+rather than broadening whole-shell replacement. Existing scratch worktrees and their
+uncommitted copies are retained for evidence, not active work; main contains the integrated
+batch. Do not overwrite main from those older copies.
+
 ## Streams
 
-### Completed batch — 2026-10-26
-
-STEP malformed-knot handling, G2 quadratic remote fillets, C2 consumed chamfers, STEP
-intersection export accuracy and G2 performance work are implemented and reviewed.
-The changelog and committed tests/oracles describe the behavior; no agent remains active
-from that batch. Original implementation baseline was `afedac31`.
-
-Latest full existing-corpus replay: **486 chamfer operations, 357 constructions, 332 limited
-comparison passes**, six C2 gains and no lost checks. Optimization retained every replay
-status, diagnostic and sampled distance. A new full native recapture has not been run.
-The broader optimization suite passed 893 tests with the documented pcurve_derivation
-precision failure and two existing skips, plus 179 doctests and 77 replay tests. Final
-review follow-ups added tests/docs only: 35 geometry unit tests, 5 integration tests and
-139 doctests pass. Release Clippy retains the two known shapeops test warnings.
-
-Matched G2 benchmark: **201.320 -> 25.463 ms**, fresh OCCT **29.703 ms**, 40 samples each
-across alternating rounds on CPU0 with one worker. Repeated sampling/search grids and
-first derivatives were the dominant costs. Approximately 217 KB more peak live cached
-memory; no general never-slower guarantee. Neighboring benchmark medians showed no slowdown.
-Independent review and derivative tests across weights, transforms, reversals and tiny/large
-domains passed. Source/binary hashes and raw evidence are retained under:
-
-- `target/g2-performance-20261026/RESULTS.txt` and `review-followups/validation.json`
-- `target/g2-integration-validation-20261026/validation-results.json`
-- `target/c2-panicfix-validation-20261026/comparison-details.json`
-- `target/g2-matched-benchmark-20261026/RESULTS.txt`
-- `target/integration-benchmarks-20261026/REPORT.md`
-
-G2 reference accounting remains pending: native distances 1.13947 / 1.15467 exceed 0.001.
-Independent sphere/material witnesses support Truck's rolling-ball result. Runtime tracing
-shows OCCT chooses a three-boundary Coons fill, not a guaranteed constant-radius corner;
-100x tighter approximation tolerance leaves the discrepancy unchanged. Treat this as a
-mismatch with our rolling-ball contract, not a demonstrated OCCT API violation or intentional
-speed shortcut. **Do not count it as a comparison pass.** Durable evidence:
-[oracles/G2_MATERIAL.txt](audits/fillet-chamfer/oracles/G2_MATERIAL.txt),
-`g2_corner_witness.cpp`, `g2_material.py`, and the matched benchmark harnesses.
-
-### Active batch — 2026-10-26
-
-All three agents started from committed baseline `b0ba3f2b`. Coordinator owns this tracker
-and integration; agents return uncommitted changes from separate worktrees. Release only,
-CARGO_BUILD_JOBS=8 and NEXTEST_TEST_THREADS=6. Benchmarks run serially after builds stop.
-
-- **A2 curved chamfer corners — running.** Worktree `../truck-curved-chamfers`; task `node:delegated-task:command%3Amcp%3Adae5ab29-ba77-4737-96db-da406439be91%3Adelegate-task%3Atruck-a2-20261026-1`.
-- **B1 higher-degree fillet junctions — running.** Worktree `../truck-higher-fillets`; task `node:delegated-task:command%3Amcp%3Adae5ab29-ba77-4737-96db-da406439be91%3Adelegate-task%3Atruck-b-g6h1-20261026-1`.
-- **D remaining C1 chamfer sequences — running.** Worktree `../truck-c1-sequences`; task `node:delegated-task:command%3Amcp%3Adae5ab29-ba77-4737-96db-da406439be91%3Adelegate-task%3Atruck-d-c1-20261026-1`.
-
-A2 owns chamfer_miter.rs/chamfer_edges.rs; B owns planar_fillet.rs/planar.rs;
-D owns along_wire.rs and chamfer.rs terminal assembly, with modeling.rs chamfer helpers
-reserved to D. All streams own their focused tests. Request coordination before expanding
-shared-file ownership. Previous scratch worktrees remain preserved until their evidence
-and uncommitted differences can be safely cleaned up.
-
-Each stream owns the files listed and can run in parallel with the others. A file marked
-*shared* is edited by one stream at a time; ask the coordinator first. Notes under
-[audits/fillet-chamfer/notes/](audits/fillet-chamfer/notes) are earlier agents' read-only
-investigations: their measurements are leads, not proof, and none was run against current
-`master`.
-
-### A. Chamfer corners (22 construction failures, 3 discrepancies)
+### A. Chamfer corners (21 construction failures, 3 discrepancies)
 
 Owns `truck-shapeops/src/fillet/chamfer_miter.rs`, `chamfer_edges.rs`. Policy: follow OCCT's
 corner construction (decided 2026-10-24). Reproduce OCCT behavior with
@@ -112,19 +106,19 @@ corner construction (decided 2026-10-24). Reproduce OCCT behavior with
    (0.053 / 0.038 / 0.014) remains after the three-edge corner rule (`2cf44b16`).
 2. **Corners on curved supports and arc edges** (conical bevels):
    `chamfer/{equal_dist,dist_dist,dist_angle}_complex/{A4..A9,C2}` (21) and
-   `chamfer/equal_dist_complex/C1`. Their final error `intersect_straight_blends` is the
+   `chamfer/equal_dist_complex/C1`. Exclude equal_dist_complex/A7/001, now passing. Their final error `intersect_straight_blends` is the
    straight-edge fallback, not the first failure: record the first failing constructor per
    case before designing. Selections expand to 8–21 edges; partition them into local
    corners first. Lead: [triage §3](audits/fillet-chamfer/notes/triage-fillet-junctions-and-chamfers.txt).
 
-### B. Fillet junctions on curved supports (22 cases)
+### B. Fillet junctions on curved supports
 
 Owns `truck-shapeops/src/fillet/planar_fillet.rs`, `planar.rs`.
 
-1. **G6 (quartic), then H1 (cubic).** G2's bounded quadratic remote-junction construction
-   is implemented; extend only with independently derived geometry and parent-failing
-   regressions. See `tests/extrusion_remote_junction.rs` and the G2 oracle for the existing
-   contract. Current guards intentionally exclude these higher-degree cases.
+1. **H1 (cubic), then broader quartic cases.** Bounded G2 and G6 remote junctions are
+   implemented; extend only with independently derived geometry and parent-failing
+   regressions. Preserve `tests/extrusion_remote_junction.rs`, `quartic_remote_junction.rs`
+   and their independent oracles. G2/G6 native comparisons remain failed.
 2. **F9, then G8, then G4**: two selected straight edges meeting at an extrusion corner with
    the curved cap edge unselected. Not the G2 topology and not a three-edge sphere. Exact
    source geometry and an oracle plan are in
@@ -224,7 +218,7 @@ N05, W03, W05, W07, W09). The rest, with the next concrete case to try:
 | G02 | Plane/cone and drafted rims | partial | Oblique plane/cone intersections, varied cone angles toward apex/contact collapse |
 | G03 | Cylinder/cylinder, sphere, torus, spline pairs | partial | E9 torus trimming, G9 diagonal surface-curve import, non-coaxial cylinder/spline pairs |
 | G04 | Analytic versus NURBS representations | partial | Non-cylindrical curved support pairs and split faces across analytic/NURBS/STEP |
-| G05 | Curved and closed spline spines | partial | G1 discrepancy, F9/G2 (stream B), the six `bug30940` cases |
+| G05 | Curved and closed spline spines | partial | G1 discrepancy, F9/H1 (stream B), the six `bug30940` cases |
 | T01 | Tangent propagation across support changes | partial | Open contours; several neighboring supports within one original edge |
 | T02 | Closed chains and periodic seams | partial | Toroidal seams through terminations; closed single-edge spline contours |
 | T03 | Branching or ambiguous chain selection | partial | A vertex with two tangent candidates; decide selection semantics |

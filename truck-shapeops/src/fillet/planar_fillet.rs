@@ -39,6 +39,7 @@ pub(super) fn fillet(
             .signum()
     };
     let mut extrusion_parameters = HashMap::default();
+    let mut private_supports = HashMap::default();
     let mut extrusion_miters = Vec::<ExtrusionMiter>::new();
     let mut spheres = Vec::new();
     let mut tori = Vec::new();
@@ -106,6 +107,7 @@ pub(super) fn fillet(
                     points,
                     cylinder,
                     guides,
+                    extension,
                 } = extrusion_miter_geometry(
                     &support,
                     data.planes[cap].unwrap(),
@@ -122,9 +124,9 @@ pub(super) fn fillet(
                 .ok_or_else(|| error(Code::OutsideNeighbour))?;
                 let [p, q, r] = points.map(Vertex::new);
                 contact(curved, cap, &p);
-                contact(curved, f, &q);
+                contact(curved, f, if extension.is_some() { &r } else { &q });
                 contact(straight, cap, &p);
-                contact(straight, wall, &r);
+                contact(straight, wall, if extension.is_some() { &q } else { &r });
                 for j in data.sides[ruling] {
                     contact(ruling, j, &r);
                 }
@@ -134,12 +136,23 @@ pub(super) fn fillet(
                         miter: None,
                     });
                 }
+                let fit_endpoint = extension.as_ref().map(|(_, uv)| *uv);
+                if let Some((private, _)) = &extension {
+                    private_supports.insert(f, private.clone());
+                }
                 extrusion_parameters.insert((curved, end_index(curved)), [uvq, uvp]);
                 curved_terminals.insert(straight);
                 extrusion_miters.push(ExtrusionMiter {
                     curved: (curved, end_index(curved)),
                     straight: (straight, end_index(straight)),
-                    support,
+                    support: if extension.is_some() {
+                        bounded_plane_chart(&shell[wall])
+                            .ok_or_else(|| error(Code::UnsupportedGeometry))?
+                    } else {
+                        support
+                    },
+                    fit_endpoint,
+                    wall_first: extension.is_some(),
                     cylinder,
                     points: [p, q, r],
                     guides,
@@ -1193,7 +1206,10 @@ pub(super) fn fillet(
         };
         let plane = if a == f { b } else { a };
         let (n, d) = data.planes[plane].ok_or_else(|| error(Code::UnsupportedGeometry))?;
-        let support = shell[f].oriented_surface();
+        let support = private_supports
+            .get(&f)
+            .cloned()
+            .unwrap_or_else(|| shell[f].oriented_surface());
         let mut uv = [extrusion_parameters[&(k, 0)], extrusion_parameters[&(k, 1)]];
         if let Some(period) = support.u_period() {
             let c = edge.curve();
@@ -1221,6 +1237,13 @@ pub(super) fn fillet(
         let station = |p: (f64, f64)| if vary_u { p.0 } else { p.1 };
         let increasing = station(uv[1][0]) > station(uv[0][0]);
         let xs = std::array::from_fn::<_, 2, _>(|end| {
+            if let Some(uv) = extrusion_miters
+                .iter()
+                .find(|m| m.curved == (k, end))
+                .and_then(|m| m.fit_endpoint)
+            {
+                return station(uv);
+            }
             let values = uv[end].map(station);
             if (end == 1) == increasing {
                 values.into_iter().fold(f64::NEG_INFINITY, f64::max)
@@ -1231,7 +1254,12 @@ pub(super) fn fillet(
         if !xs.iter().all(|x| x.is_finite()) || (xs[1] - xs[0]).abs() < 1e-10 {
             return Err(error(Code::OutsideNeighbour));
         }
-        let surfaces = [shell[a].oriented_surface(), shell[b].oriented_surface()];
+        let surfaces = [a, b].map(|j| {
+            private_supports
+                .get(&j)
+                .cloned()
+                .unwrap_or_else(|| shell[j].oriented_surface())
+        });
         let solve_circle = |t: f64, parameter_span: f64| {
             let x = xs[0] + (xs[1] - xs[0]) * t;
             let (mut u, mut v) = (
@@ -1372,6 +1400,9 @@ pub(super) fn fillet(
                     // The two side contacts have different stations. Retain each
                     // side only to its own endpoint, before assembling the miter.
                     contacts[k][side][end].set_point(curve.subs(*t));
+                    if miter.wall_first && [a, b][side] == f {
+                        continue;
+                    }
                     let cylinder = &miter.cylinder;
                     let uv = cylinder
                         .search_nearest_parameter(curve.subs(*t), None, 100)
@@ -1425,7 +1456,7 @@ pub(super) fn fillet(
             &q,
             blend,
             &miter.cylinder,
-            seam_guide,
+            (seam_guide, miter.wall_first),
             miter.witness_axes,
             tol,
         )
@@ -1433,19 +1464,31 @@ pub(super) fn fillet(
         let continuation = guided_intersection(
             &q,
             &r,
-            &miter.cylinder,
+            if miter.wall_first {
+                blend
+            } else {
+                &miter.cylinder
+            },
             &miter.support,
-            continuation_guide,
+            (continuation_guide, miter.wall_first),
             miter.witness_axes,
             tol,
         )
         .ok_or_else(|| error(Code::BlendConstructionFailed))?;
         cache_arc(&mut shared_arcs, &continuation);
-        let mut curved_end = Wire::from(vec![seam.clone()]);
+        let mut curved_end = Wire::from(if miter.wall_first {
+            vec![seam.clone(), continuation.clone()]
+        } else {
+            vec![seam.clone()]
+        });
         if contacts[miter.curved.0][0][miter.curved.1] != p {
             curved_end.invert();
         }
-        let mut straight_end = Wire::from(vec![seam, continuation]);
+        let mut straight_end = Wire::from(if miter.wall_first {
+            vec![seam]
+        } else {
+            vec![seam, continuation]
+        });
         if contacts[miter.straight.0][0][miter.straight.1] != p {
             straight_end.invert();
         }
@@ -1610,28 +1653,38 @@ pub(super) fn fillet(
             let c1 = arc1[0].oriented_curve().lift_up();
             NurbsSurface::new(BSplineSurface::homotopy(c0, c1)).into()
         };
+        // Fitted longitudinal ranges need not contain 0.5.
+        let sample = if matches!(surface, Surface::Fillet(_)) {
+            let (u, v) = surface.try_range_tuple();
+            let ((u0, u1), (v0, v1)) = u
+                .zip(v)
+                .ok_or_else(|| error(Code::BlendConstructionFailed))?;
+            ((u0 + u1) / 2., (v0 + v1) / 2.)
+        } else {
+            (0.5, 0.5)
+        };
         let mut outward = n + m;
         if let Some((origin, axis, _)) = cylinder {
-            let delta = surface.subs(0.5, 0.5) - origin;
+            let delta = surface.subs(sample.0, sample.1) - origin;
             outward += (delta - axis * delta.dot(axis)).normalize();
         }
         if let Some((origin, _)) = sphere {
-            outward += (surface.subs(0.5, 0.5) - origin).normalize();
+            outward += (surface.subs(sample.0, sample.1) - origin).normalize();
         }
         if let Some(cone) = cone {
-            outward += cone_normal(cone, surface.subs(0.5, 0.5));
+            outward += cone_normal(cone, surface.subs(sample.0, sample.1));
         }
         if let Some(torus) = torus {
-            outward += torus_normal(torus, surface.subs(0.5, 0.5));
+            outward += torus_normal(torus, surface.subs(sample.0, sample.1));
         }
         if let Some(f) = extrusion {
             let support = shell[f].oriented_surface();
             let (u, v) = support
-                .search_nearest_parameter(surface.subs(0.5, 0.5), None, 100)
+                .search_nearest_parameter(surface.subs(sample.0, sample.1), None, 100)
                 .ok_or_else(|| error(Code::BlendConstructionFailed))?;
             outward += support.normal(u, v).normalize();
         }
-        if surface.normal(0.5, 0.5).dot(outward) < 0. {
+        if surface.normal(sample.0, sample.1).dot(outward) < 0. {
             surface.invert();
         }
         let mut boundary = Wire::from(vec![line_a.inverse()]);
@@ -2117,6 +2170,8 @@ struct ExtrusionMiter {
     curved: (usize, usize),
     straight: (usize, usize),
     support: Surface,
+    fit_endpoint: Option<(f64, f64)>,
+    wall_first: bool,
     cylinder: Surface,
     points: [Vertex; 3],
     guides: [Vec<Point3>; 2],
@@ -2189,6 +2244,7 @@ fn bracketed_root(
 }
 
 struct ExtrusionMiterGeometry {
+    extension: Option<(Surface, (f64, f64))>,
     uvp: (f64, f64),
     uvq: (f64, f64),
     center: Point3,
@@ -2197,7 +2253,7 @@ struct ExtrusionMiterGeometry {
     guides: [Vec<Point3>; 2],
 }
 
-// This branch needs no extension of the generating curve or change of chart.
+// The quadratic branch retains the original generating curve and chart.
 fn extrusion_miter_geometry(
     support: &Surface,
     cap: (Vector3, f64),
@@ -2213,6 +2269,17 @@ fn extrusion_miter_geometry(
     let Curve::BSplineCurve(basis) = extrusion.entity_curve() else {
         return None;
     };
+    if basis.degree() == 4 {
+        return quartic_miter_geometry(
+            support,
+            cap,
+            wall,
+            [edge, straight, ruling],
+            hint,
+            radius,
+            tol,
+        );
+    }
     if basis.degree() != 2 || basis.control_points().len() != 3 {
         return None;
     }
@@ -2416,6 +2483,7 @@ fn extrusion_miter_geometry(
     let cylinder =
         ExtrudedCurve::by_extrusion(section.curve(), along * (positions[1] - positions[0])).into();
     Some(ExtrusionMiterGeometry {
+        extension: None,
         uvp,
         uvq,
         center,
@@ -2430,7 +2498,7 @@ fn guided_intersection(
     q: &Vertex,
     a: &Surface,
     b: &Surface,
-    mut guide: Vec<Point3>,
+    (mut guide, surface_leader): (Vec<Point3>, bool),
     axes: [Vector3; 2],
     tol: f64,
 ) -> Option<Edge> {
@@ -2445,13 +2513,66 @@ fn guided_intersection(
     guide[0] = p.point();
     let last = guide.len() - 1;
     guide[last] = q.point();
-    let knots = std::iter::once(0.)
-        .chain((0..=last).map(|i| i as f64 / last as f64))
-        .chain(std::iter::once(1.));
-    let leader = Curve::BSplineCurve(BSplineCurve::new(KnotVec::from_iter(knots), guide.clone()));
+    let mut parameters: Vec<_> = (0..=last).map(|i| i as f64 / last as f64).collect();
+    let leader = if surface_leader {
+        // A smooth guide on one support avoids off-surface seeds at tangent
+        // endpoints. Chord-length stations keep the turning-point split regular.
+        parameters[0] = 0.;
+        for i in 1..=last {
+            parameters[i] = parameters[i - 1] + guide[i].distance(guide[i - 1]);
+        }
+        let length = parameters[last];
+        if !length.is_finite() || length <= 0. {
+            return None;
+        }
+        for t in &mut parameters {
+            *t /= length;
+        }
+        let uv = guide
+            .iter()
+            .map(|p| b.search_parameter(*p, None, 100).map(Point2::from))
+            .collect::<Option<Vec<_>>>()?;
+        let tangents: Vec<_> = (0..=last)
+            .map(|i| {
+                let left = i.saturating_sub(1);
+                let right = (i + 1).min(last);
+                (uv[right] - uv[left]) / (parameters[right] - parameters[left])
+            })
+            .collect();
+        let mut controls = vec![uv[0]];
+        let mut knots = vec![0.; 4];
+        for i in 0..last {
+            let h = parameters[i + 1] - parameters[i];
+            if h <= 0. {
+                return None;
+            }
+            controls.extend([
+                uv[i] + tangents[i] * (h / 3.),
+                uv[i + 1] - tangents[i + 1] * (h / 3.),
+                uv[i + 1],
+            ]);
+            knots.extend(std::iter::repeat_n(
+                parameters[i + 1],
+                if i + 1 == last { 4 } else { 3 },
+            ));
+        }
+        Curve::PCurve(PCurve::new(
+            BSplineCurve::new(knots.into(), controls),
+            Box::new(b.clone()),
+        ))
+    } else {
+        let knots = std::iter::once(0.)
+            .chain(parameters.iter().copied())
+            .chain(std::iter::once(1.));
+        Curve::BSplineCurve(BSplineCurve::new(KnotVec::from_iter(knots), guide.clone()))
+    };
     let curve = IntersectionCurve::new(Box::new(a.clone()), Box::new(b.clone()), Box::new(leader));
     for i in 0..=2 * last {
-        let t = i as f64 / (2 * last) as f64;
+        let t = if i % 2 == 0 {
+            parameters[i / 2]
+        } else {
+            (parameters[i / 2] + parameters[i / 2 + 1]) / 2.
+        };
         let (point, uv0, uv1) = curve.search_triple(t, 100)?;
         if !finite_point(point) {
             return None;
@@ -2486,4 +2607,317 @@ fn guided_intersection(
         }
     }
     Some(Edge::new(p, q, Curve::IntersectionCurve(curve)))
+}
+
+// Blossom evaluation preserves the polynomial and its original parameter chart.
+fn bezier_interval(points: &[Point3], lo: f64, hi: f64) -> Vec<Point3> {
+    let degree = points.len() - 1;
+    (0..=degree)
+        .map(|i| {
+            let mut p = points.to_vec();
+            for j in 0..degree {
+                let t = if j < degree - i { lo } else { hi };
+                for k in 0..degree - j {
+                    p[k] = p[k] + (p[k + 1] - p[k]) * t;
+                }
+            }
+            p[0]
+        })
+        .collect()
+}
+
+// A single convex quartic with wall-first termination. Only the private fit
+// uses the extended basis; the extrusion contact ends on the original ruling.
+fn quartic_miter_geometry(
+    support: &Surface,
+    cap: (Vector3, f64),
+    wall: (Vector3, f64),
+    [edge, straight, ruling]: [&Edge; 3],
+    hint: (f64, f64),
+    radius: f64,
+    tol: f64,
+) -> Option<ExtrusionMiterGeometry> {
+    let Surface::Extruded(extrusion) = support else {
+        return None;
+    };
+    let Curve::BSplineCurve(basis) = extrusion.entity_curve() else {
+        return None;
+    };
+    let (lo, hi) = basis.range_tuple();
+    let controls = basis.control_points();
+    if basis.degree() != 4
+        || controls.len() != 5
+        || !lo.is_finite()
+        || !hi.is_finite()
+        || lo >= hi
+        || (0..5).any(|i| basis.knot(i) != lo || basis.knot(i + 5) != hi)
+        || !finite_uv(hint)
+        || !radius.is_finite()
+        || radius <= 0.
+        || !tol.is_finite()
+        || tol <= 0.
+        || controls.iter().any(|p| !finite_point(*p))
+    {
+        return None;
+    }
+    let (n, d) = cap;
+    let (m, e) = wall;
+    let a = extrusion.extruding_vector();
+    let na = n.dot(a);
+    let nm = n.dot(m);
+    if !finite_vector(a)
+        || !finite_vector(n)
+        || !finite_vector(m)
+        || !d.is_finite()
+        || !e.is_finite()
+        || !na.is_finite()
+        || !nm.is_finite()
+        || na.abs() <= TOLERANCE * a.magnitude()
+        || m.dot(a).abs() > TOLERANCE * a.magnitude()
+        || 1. - nm * nm <= TOLERANCE
+        || controls
+            .iter()
+            .any(|p| n.dot(*p - controls[0]).abs() > tol / 10.)
+    {
+        return None;
+    }
+    let endpoint = if (hint.0 - lo).abs() < (hint.0 - hi).abs() {
+        lo
+    } else {
+        hi
+    };
+    if (hint.0 - endpoint).abs() > TOLERANCE * (hi - lo) {
+        return None;
+    }
+    let speed_bound = controls
+        .windows(2)
+        .map(|p| 4. * p[1].distance(p[0]))
+        .fold(0_f64, f64::max);
+    if !speed_bound.is_finite() || speed_bound <= 0. {
+        return None;
+    }
+    // A conservative parameter budget, not a bound on the whole extended arc.
+    let extension = (radius / speed_bound).min(0.125);
+    let (left, right) = if endpoint == lo {
+        (-extension, 1.)
+    } else {
+        (0., 1. + extension)
+    };
+    let extended = bezier_interval(controls, left, right);
+    let outer_point = if endpoint == lo {
+        extended[0]
+    } else {
+        extended[4]
+    };
+    // This additionally bounds endpoint displacement only.
+    if outer_point.distance(basis.subs(endpoint)) > radius {
+        return None;
+    }
+    let axis = a.normalize();
+    let project = |x: Vector3| x - axis * x.dot(axis);
+    let mut convex_sign = 0_f64;
+    // Bernstein convex-hull bounds certify regularity, convexity and absence
+    // of offset folds on each subinterval, including the private extension.
+    for i in 0..64 {
+        let p = bezier_interval(&extended, i as f64 / 64., (i + 1) as f64 / 64.);
+        let ds: Vec<_> = p.windows(2).map(|p| project(4. * (p[1] - p[0]))).collect();
+        let dds: Vec<_> = ds.windows(2).map(|v| 3. * (v[1] - v[0])).collect();
+        let direction = ds[0].normalize();
+        let min_speed = ds
+            .iter()
+            .map(|v| v.dot(direction))
+            .fold(f64::INFINITY, f64::min);
+        let max_cross = ds
+            .iter()
+            .flat_map(|v| dds.iter().map(move |w| v.cross(*w).magnitude()))
+            .fold(0_f64, f64::max);
+        if min_speed <= 0. || !max_cross.is_finite() || radius * max_cross >= min_speed.powi(3) {
+            return None;
+        }
+        for v in &ds {
+            for w in &dds {
+                let sign = v.cross(*w).dot(axis);
+                if !sign.is_finite() || sign == 0. {
+                    return None;
+                }
+                if convex_sign == 0. {
+                    convex_sign = sign.signum();
+                }
+                if sign * convex_sign <= 0. {
+                    return None;
+                }
+            }
+        }
+    }
+    let ext_lo = lo + left * (hi - lo);
+    let ext_hi = lo + right * (hi - lo);
+    let knots =
+        KnotVec::from_iter(std::iter::repeat_n(ext_lo, 5).chain(std::iter::repeat_n(ext_hi, 5)));
+    let private: Surface =
+        ExtrudedCurve::by_extrusion(Curve::BSplineCurve(BSplineCurve::new(knots, extended)), a)
+            .into();
+    let [bottom, top] = [ruling.front().point(), ruling.back().point()];
+    let heights = [n.dot(bottom.to_vec()), n.dot(top.to_vec())];
+    let in_slab = |p: Point3| {
+        finite_point(p)
+            && n.dot(p.to_vec()) >= heights[0].min(heights[1]) - tol / 10.
+            && n.dot(p.to_vec()) <= heights[0].max(heights[1]) + tol / 10.
+    };
+    let frame = |u: f64| {
+        if !u.is_finite() || u < ext_lo || u > ext_hi {
+            return None;
+        }
+        let normal = private.normal(u, hint.1).normalize();
+        let b = private.subs(u, hint.1);
+        let v = hint.1 + (d - radius - n.dot((b - radius * normal).to_vec())) / na;
+        let c = private.subs(u, v) - radius * normal;
+        let lateral = normal - n * n.dot(normal);
+        if !finite_point(c) || !in_slab(c + radius * normal) || lateral.so_small() {
+            return None;
+        }
+        Some(((u, v), c, lateral.normalize(), n.dot(normal).acos()))
+    };
+    let beta = nm.acos();
+    let vw = (m - n * nm).normalize();
+    let center_line = Point3::from_vec(
+        n * ((d - radius - nm * (e - radius)) / (1. - nm * nm))
+            + m * ((e - radius - nm * (d - radius)) / (1. - nm * nm)),
+    );
+    let curve = edge.curve();
+    let (t0, t1) = curve.range_tuple();
+    let mid = support
+        .search_parameter(curve.subs((t0 + t1) / 2.), None, 100)?
+        .0;
+    let outer = if endpoint == lo { ext_lo } else { ext_hi };
+    let interval = (mid, outer);
+    let station = |phi: f64| {
+        bracketed_root(
+            |u| {
+                let (_, c, lateral, _) = frame(u)?;
+                if beta <= std::f64::consts::FRAC_PI_2 {
+                    return None;
+                }
+                Some(vw.dot(c - center_line) + radius * phi.sin() * (vw.dot(lateral) - 1.))
+            },
+            interval,
+            tol / 100.,
+        )
+    };
+    station(std::f64::consts::FRAC_PI_2)?;
+    let mut seam = Vec::new();
+    // Split at the sine turning point so every guide segment remains monotone.
+    let turning = std::f64::consts::FRAC_PI_2;
+    let angles = (0..=64)
+        .map(|i| turning * i as f64 / 64.)
+        .chain((1..=64).map(|i| turning + (beta - turning) * i as f64 / 64.));
+    for phi in angles {
+        let (_, c, lateral, alpha) = frame(station(phi)?)?;
+        if alpha <= beta {
+            return None;
+        }
+        seam.push(c + radius * (n * phi.cos() + lateral * phi.sin()));
+    }
+    let uvp = frame(station(0.)?)?.0;
+    let (uvr, _, _, alpha) = frame(endpoint)?;
+    let wall_station = station(beta)?;
+    let mut continuation = Vec::new();
+    for i in 0..=64 {
+        let phi = beta + (alpha - beta) * i as f64 / 64.;
+        let u = bracketed_root(
+            |u| {
+                let (_, c, lateral, _) = frame(u)?;
+                Some(m.dot((c + radius * (n * phi.cos() + lateral * phi.sin())).to_vec()) - e)
+            },
+            (endpoint, outer),
+            tol / 100.,
+        )?;
+        let (_, c, lateral, _) = frame(u)?;
+        continuation.push(c + radius * (n * phi.cos() + lateral * phi.sin()));
+    }
+    let points = [seam[0], *seam.last()?, support.subs(uvr.0, uvr.1)];
+    if points[1].distance(continuation[0]) > tol / 10.
+        || points[2].distance(continuation[64]) > tol / 10.
+        || (wall_station - endpoint) * (outer - endpoint) <= 0.
+    {
+        return None;
+    }
+    continuation[0] = points[1];
+    continuation[64] = points[2];
+    for p in seam.iter().chain(&continuation) {
+        if !in_slab(*p) || m.dot(p.to_vec()) > e + tol / 10. {
+            return None;
+        }
+        for i in 0..=128 {
+            let u = lo + (hi - lo) * i as f64 / 128.;
+            let normal = support.normal(u, hint.1).normalize();
+            if normal.dot(*p - support.subs(u, hint.1)) > tol / 10. {
+                return None;
+            }
+        }
+    }
+    let (_, center, _, _) = frame(uvp.0)?;
+    let along = (straight.back().point() - straight.front().point()).normalize();
+    let positions = [straight.front(), straight.back()].map(|v| (v.point() - center).dot(along));
+    for p in seam.iter().chain(&continuation) {
+        let t = (*p - center).dot(along);
+        if t < positions[0] - tol / 10. || t > positions[1] + tol / 10. {
+            return None;
+        }
+    }
+    let origin = center + along * positions[0];
+    let section = circle(
+        &Vertex::new(origin + radius * n),
+        &Vertex::new(origin + radius * m),
+        origin,
+    );
+    let cylinder =
+        ExtrudedCurve::by_extrusion(section.curve(), along * (positions[1] - positions[0])).into();
+    let fit_endpoint = frame(outer)?.0;
+    Some(ExtrusionMiterGeometry {
+        uvp,
+        uvq: uvr,
+        center,
+        points,
+        cylinder,
+        guides: [seam, continuation],
+        extension: Some((private, fit_endpoint)),
+    })
+}
+
+// Plane charts from STEP may use any origin and scale. Bound a private chart
+// by the source face vertices rather than by the plane's nominal unit square.
+fn bounded_plane_chart(face: &Face) -> Option<Surface> {
+    let Surface::Plane(plane) = face.oriented_surface() else {
+        return None;
+    };
+    if face.boundaries().len() != 1
+        || face
+            .edge_iter()
+            .any(|e| !matches!(e.curve(), Curve::Line(_)))
+    {
+        return None;
+    }
+    let mut lo = Point2::new(f64::INFINITY, f64::INFINITY);
+    let mut hi = Point2::new(f64::NEG_INFINITY, f64::NEG_INFINITY);
+    for vertex in face.vertex_iter() {
+        let (u, v) = plane.search_parameter(vertex.point(), None, 100)?;
+        if !finite_uv((u, v)) {
+            return None;
+        }
+        lo.x = lo.x.min(u);
+        lo.y = lo.y.min(v);
+        hi.x = hi.x.max(u);
+        hi.y = hi.y.max(v);
+    }
+    if lo.x >= hi.x || lo.y >= hi.y {
+        return None;
+    }
+    Some(
+        Plane::new(
+            plane.subs(lo.x, lo.y),
+            plane.subs(hi.x, lo.y),
+            plane.subs(lo.x, hi.y),
+        )
+        .into(),
+    )
 }

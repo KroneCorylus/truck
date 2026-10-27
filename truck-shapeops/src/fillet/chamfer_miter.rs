@@ -4,11 +4,12 @@ use std::result::Result;
 use truck_base::diagnostics::{Code, Diagnostic};
 use truck_modeling::*;
 
-pub(super) fn chamfer(
+fn miter(
     shell: &Shell,
     selected: &HashSet<EdgeID>,
     distances: &HashMap<EdgeID, [f64; 2]>,
     tol: f64,
+    data: super::planar::Neighborhood,
 ) -> Result<Shell, Diagnostic> {
     let distance = distances
         .values()
@@ -19,9 +20,10 @@ pub(super) fn chamfer(
         Diagnostic::new(code, "chamfer_solid_edges", "construct_miter")
             .parameter("distance", distance)
     };
-    let data = neighborhood(shell, selected, "chamfer_solid_edges", false)?;
     let epsilon = tol.min(TOLERANCE);
     let mut bevels = vec![None; data.original_edges.len()];
+    let mut cones = vec![None; data.original_edges.len()];
+    let mut shared = HashMap::default();
     // Each original edge has one endpoint pair per adjacent face. Bevels separate the pairs.
     let mut contacts: Vec<_> = data
         .original_edges
@@ -31,6 +33,35 @@ pub(super) fn chamfer(
     for (k, edge) in data.original_edges.iter().enumerate() {
         if selected.contains(&edge.id()) {
             let [a, b] = data.sides[k];
+            if data.planes[a].is_none() || data.planes[b].is_none() {
+                if !matches!(edge.curve(), Curve::Line(_)) {
+                    continue;
+                }
+                let (cylinder, planar) = if data.cylinders[a].is_some() {
+                    (a, b)
+                } else {
+                    (b, a)
+                };
+                let (origin, axis, radius) = data.cylinders[cylinder].unwrap();
+                let radial = edge.front().point() - origin;
+                let z = (radial - axis * radial.dot(axis)).normalize();
+                let y = -data.planes[planar].unwrap().0;
+                if y.dot(z).abs() > TOLERANCE {
+                    return Err(error(Code::UnsupportedGeometry));
+                }
+                let d = distances[&edge.id()];
+                let flat = d[usize::from(planar == a.max(b))];
+                let tangent = d[usize::from(cylinder == a.max(b))];
+                let p = edge.front().point() - flat * z;
+                let q = edge.front().point() - radius * z
+                    + radius * (tangent * y + radius * z) / radius.hypot(tangent);
+                let mut normal = (q - p).cross(axis).normalize();
+                if normal.dot(edge.front().point() - p) < 0. {
+                    normal = -normal;
+                }
+                bevels[k] = Some((normal, normal.dot(p.to_vec())));
+                continue;
+            }
             let (n, m) = (data.planes[a].unwrap().0, data.planes[b].unwrap().0);
             let mut d = distances[&edge.id()];
             if a > b {
@@ -69,7 +100,7 @@ pub(super) fn chamfer(
         let chosen: Vec<_> = incident
             .iter()
             .copied()
-            .filter(|&k| bevels[k].is_some())
+            .filter(|&k| selected.contains(&data.original_edges[k].id()))
             .collect();
         if chosen.is_empty() {
             continue;
@@ -82,6 +113,29 @@ pub(super) fn chamfer(
             let end = usize::from(data.original_edges[k].front() != &data.vertices[v]);
             contacts[k][side][end] = point.clone();
         };
+        let curved = incident
+            .iter()
+            .flat_map(|&k| data.sides[k])
+            .find(|&f| data.cylinders[f].is_some());
+        if let Some(cylinder) = curved {
+            let corner = network_corner(&data, v, cylinder, distances, tol)?;
+            for (k, f, vertex) in corner.contacts {
+                set_contact(k, f, &vertex);
+            }
+            let edge = Edge::new(&corner.vertices[0], &corner.vertices[2], corner.section);
+            shared.insert((edge.front().id(), edge.back().id()), edge.clone());
+            shared.insert((edge.back().id(), edge.front().id()), edge.inverse());
+            cones[corner.rim] = Some(corner.cone);
+            let mut polygon = corner.vertices;
+            if polygon_area(&polygon.iter().map(Vertex::point).collect::<Vec<_>>())
+                .dot(corner.normal)
+                < 0.
+            {
+                polygon.reverse();
+            }
+            transitions.push((corner.normal, polygon));
+            continue;
+        }
         if chosen.len() == 1 {
             let k = chosen[0];
             for &other in incident.iter().filter(|&&j| j != k) {
@@ -384,7 +438,7 @@ pub(super) fn chamfer(
             if (b.point() - a.point()).dot(direction) <= epsilon {
                 return Err(error(Code::OutsideNeighbour));
             }
-            if bevels[k].is_none() {
+            if !selected.contains(&edge.id()) {
                 // Termination faces can grow into the material exposed at an inset corner.
                 let can_extend = |vertex: &Vertex| {
                     let v = data.vertices.iter().position(|v| v == vertex).unwrap();
@@ -411,7 +465,60 @@ pub(super) fn chamfer(
             }
         }
     }
-    let mut shared = HashMap::default();
+    if data.cylinders.iter().any(Option::is_some) {
+        for vertex in contacts.iter().flatten().flatten() {
+            if data
+                .planes
+                .iter()
+                .flatten()
+                .any(|&(n, d)| n.dot(vertex.point().to_vec()) > d + epsilon)
+            {
+                return Err(error(Code::OutsideNeighbour));
+            }
+            for &(origin, axis, radius) in data.cylinders.iter().flatten() {
+                let delta = vertex.point() - origin;
+                if (delta - axis * delta.dot(axis)).magnitude() > radius + epsilon {
+                    return Err(error(Code::OutsideNeighbour));
+                }
+            }
+        }
+    }
+    for (k, cone) in cones.iter().enumerate() {
+        if cone.is_none() {
+            continue;
+        }
+        let cylinder = data.sides[k]
+            .iter()
+            .copied()
+            .find(|&f| data.cylinders[f].is_some())
+            .unwrap();
+        let (origin, axis, _) = data.cylinders[cylinder].unwrap();
+        for [a, b] in &contacts[k] {
+            let center = origin + axis * (a.point() - origin).dot(axis);
+            let u = a.point() - center;
+            let w = b.point() - center;
+            if (u.magnitude() - w.magnitude()).abs() > TOLERANCE {
+                return Err(error(Code::UnsupportedGeometry));
+            }
+            let normal = u.cross(w).normalize();
+            let angle = u.angle(w).0;
+            if !angle.is_finite() || angle <= TOLERANCE || angle >= std::f64::consts::PI {
+                return Err(error(Code::OutsideNeighbour));
+            }
+            let curve = Curve::Conic(Processor::with_transform(
+                TrimmedCurve::new(UnitCircle::<Point3>::new(), (0., angle)),
+                Matrix4::from_cols(
+                    u.extend(0.),
+                    normal.cross(u).extend(0.),
+                    normal.extend(0.),
+                    center.to_homogeneous(),
+                ),
+            ));
+            let edge = Edge::new(a, b, curve);
+            shared.insert((a.id(), b.id()), edge.clone());
+            shared.insert((b.id(), a.id()), edge.inverse());
+        }
+    }
     let mut result = Shell::new();
     for (f, face) in shell.iter().enumerate() {
         let mut boundaries = Vec::new();
@@ -425,7 +532,7 @@ pub(super) fn chamfer(
                     pair.reverse();
                 }
                 let mut points = vec![pair[0].clone(), pair[1].clone()];
-                if bevels[k].is_none() && contacts[k][0] != contacts[k][1] {
+                if !selected.contains(&edge.id()) && contacts[k][0] != contacts[k][1] {
                     // Different corner contacts leave a longer segment on one face; split
                     // it at the other contact so both faces reuse the common remainder.
                     let start = pair[0].point();
@@ -481,10 +588,17 @@ pub(super) fn chamfer(
                     .map_err(|e| error(Code::InvalidOutputTopology).with_coded_source(e))?,
             );
         } else {
-            if boundaries != face.boundaries() {
-                return Err(error(Code::NonPlanarFace).face(f));
+            if data.cylinders[f].is_some() {
+                result.push(
+                    Face::try_new(boundaries, face.oriented_surface())
+                        .map_err(|e| error(Code::InvalidOutputTopology).with_coded_source(e))?,
+                );
+            } else {
+                if boundaries != face.boundaries() {
+                    return Err(error(Code::NonPlanarFace).face(f));
+                }
+                result.push(face.clone());
             }
-            result.push(face.clone());
         }
     }
     let bevel_polygons = bevels.iter().enumerate().filter_map(|(k, bevel)| {
@@ -513,6 +627,27 @@ pub(super) fn chamfer(
                 surface.into(),
             )
             .map_err(|e| error(Code::InvalidOutputTopology).with_coded_source(e))?,
+        );
+    }
+    for (k, cone) in cones.into_iter().enumerate() {
+        let Some(mut surface) = cone else {
+            continue;
+        };
+        let [[a, b], [c, d]] = contacts[k].clone();
+        let polygon = [b, a, c, d];
+        let wire = (0..4)
+            .map(|i| shared_line(&polygon[i], &polygon[(i + 1) % 4], &mut shared))
+            .collect::<Result<Wire, _>>()?;
+        let points: Vec<_> = polygon.iter().map(Vertex::point).collect();
+        let uv = surface
+            .search_nearest_parameter(points[0], None, 100)
+            .ok_or_else(|| error(Code::IntersectionFailed))?;
+        if surface.normal(uv.0, uv.1).dot(polygon_area(&points)) < 0. {
+            surface.invert();
+        }
+        result.push(
+            Face::try_new(vec![wire], surface)
+                .map_err(|e| error(Code::InvalidOutputTopology).with_coded_source(e))?,
         );
     }
     for polygon in patches {
@@ -555,4 +690,589 @@ fn shared_line(
         .clone();
     shared.insert((b.id(), a.id()), edge.inverse());
     Ok(edge)
+}
+
+// Reconstructs a whole five-face quarter-cylinder with one fully selected corner
+// and a nonelliptic corner section. The two axial setbacks must coincide, so the
+// longitudinal bevel ends at a single cylinder section. This is not local corner
+// assembly: the network path shares contact/section construction but preserves the
+// original boundary loops instead of broadening these whole-shell topology guards.
+fn quarter_cylinder_corner(
+    shell: &Shell,
+    selected: &HashSet<EdgeID>,
+    distances: &HashMap<EdgeID, [f64; 2]>,
+    tol: f64,
+) -> Option<Result<Shell, Diagnostic>> {
+    if shell.len() != 5 || selected.len() != 3 {
+        return None;
+    }
+    let data = neighborhood(shell, selected, "chamfer_solid_edges", true).ok()?;
+    let curved: Vec<_> = data
+        .cylinders
+        .iter()
+        .enumerate()
+        .filter_map(|(f, c)| c.map(|c| (f, c)))
+        .collect();
+    let [(cylinder, (on_axis, axis, radius))] = curved[..] else {
+        return None;
+    };
+    if data.original_edges.len() != 9
+        || data.vertices.len() != 6
+        || shell.iter().any(|f| f.boundaries().len() != 1)
+        || data.planes.iter().filter(|p| p.is_some()).count() != 4
+    {
+        return None;
+    }
+    let v = data.incident.iter().position(|ks| {
+        ks.len() == 3
+            && ks
+                .iter()
+                .all(|&k| selected.contains(&data.original_edges[k].id()))
+    })?;
+    let chosen = &data.incident[v];
+    let faces: HashSet<_> = chosen.iter().flat_map(|&k| data.sides[k]).collect();
+    let cap = faces
+        .iter()
+        .copied()
+        .find(|&f| data.planes[f].is_some_and(|(n, _)| n.cross(axis).so_small()))?;
+    let radial = faces.iter().copied().find(|&f| f != cylinder && f != cap)?;
+    let x = data.planes[cap]?.0;
+    let y = -data.planes[radial]?.0;
+    let vertex = data.vertices[v].point();
+    let delta = vertex - on_axis;
+    let z = (delta - axis * delta.dot(axis)).normalize();
+    if x.dot(y).abs() > TOLERANCE || y.dot(z).abs() > TOLERANCE {
+        return None;
+    }
+    let far = (0..shell.len())
+        .find(|&f| f != cap && data.planes[f].is_some_and(|(n, _)| n.dot(x) < -1. + TOLERANCE))?;
+    let floor = (0..shell.len()).find(|&f| f != cap && f != far && f != radial && f != cylinder)?;
+    if data.planes[floor]?.0.dot(z) > -1. + TOLERANCE {
+        return None;
+    }
+    let length = x.dot(vertex.to_vec()) + data.planes[far]?.1;
+    let origin = vertex - radius * z - length * x;
+    let point = |a: f64, b: f64, c: f64| origin + a * x + b * y + c * z;
+    // Recognize the expected vertices and curve representations, and sample sector
+    // containment. These checks do not prove global winding, incidence or trim equivalence.
+    let expected = [
+        point(0., 0., 0.),
+        point(0., radius, 0.),
+        point(0., 0., radius),
+        point(length, 0., 0.),
+        point(length, radius, 0.),
+        point(length, 0., radius),
+    ];
+    if expected
+        .iter()
+        .any(|p| !data.vertices.iter().any(|v| v.point().near(p)))
+    {
+        return None;
+    }
+    for edge in &data.original_edges {
+        let curve = edge.curve();
+        if !matches!(curve, Curve::Line(_) | Curve::Conic(_)) {
+            return None;
+        }
+        let (lo, hi) = curve.range_tuple();
+        for i in 0..=16 {
+            let delta = curve.subs(lo + (hi - lo) * i as f64 / 16.) - origin;
+            let (a, b, c) = (delta.dot(x), delta.dot(y), delta.dot(z));
+            if a < -TOLERANCE
+                || a > length + TOLERANCE
+                || b < -TOLERANCE
+                || c < -TOLERANCE
+                || b * b + c * c > radius * radius + TOLERANCE
+            {
+                return None;
+            }
+        }
+    }
+    let between = |a, b| {
+        chosen
+            .iter()
+            .copied()
+            .find(|&k| data.sides[k].contains(&a) && data.sides[k].contains(&b))
+    };
+    let rim = between(cap, cylinder)?;
+    let lip = between(radial, cylinder)?;
+    let straight = between(cap, radial)?;
+    let setback = |k: usize, f: usize| {
+        distances[&data.original_edges[k].id()]
+            [usize::from(f == *data.sides[k].iter().max().unwrap())]
+    };
+    let (axial, inset) = (setback(rim, cylinder), setback(rim, cap));
+    let (flat, tangent) = (setback(lip, radial), setback(lip, cylinder));
+    let (other_axial, side) = (setback(straight, radial), setback(straight, cap));
+    if (axial - other_axial).abs() > 64. * f64::EPSILON * axial.max(other_axial) {
+        return None;
+    }
+    let error = |code| Diagnostic::new(code, "chamfer_solid_edges", "quarter_cylinder_corner");
+    Some((|| {
+        if axial >= length - TOLERANCE
+            || inset >= radius - TOLERANCE
+            || flat >= radius - TOLERANCE
+            || side >= radius - inset - TOLERANCE
+        {
+            return Err(error(Code::OutsideNeighbour));
+        }
+        let [cy, cz, rz] = cylinder_corner_contacts(radius, inset, flat, tangent, side)
+            .ok_or_else(|| error(Code::OutsideNeighbour))?;
+        let coords = [
+            (0., 0., 0.),
+            (length - axial, 0., 0.),
+            (length, side, 0.),
+            (length, radius - inset, 0.),
+            (length - axial, radius, 0.),
+            (0., radius, 0.),
+            (0., cy, cz),
+            (0., 0., radius - flat),
+            (length - axial, cy, cz),
+            (length - axial, 0., radius - flat),
+            (length, side, rz),
+        ];
+        let vertices: Vec<_> = coords
+            .iter()
+            .map(|&(a, b, c)| Vertex::new(point(a, b, c)))
+            .collect();
+        let mut shared = HashMap::default();
+        let mut cache = |a: usize, b: usize, curve: Curve| {
+            let edge = Edge::new(&vertices[a], &vertices[b], curve);
+            shared.insert((vertices[a].id(), vertices[b].id()), edge.clone());
+            shared.insert((vertices[b].id(), vertices[a].id()), edge.inverse());
+        };
+        for (a, b, r) in [(5, 6, radius), (4, 8, radius), (3, 10, radius - inset)] {
+            let start = coords[a].2.atan2(coords[a].1);
+            let end = coords[b].2.atan2(coords[b].1);
+            cache(
+                a,
+                b,
+                Curve::Conic(Processor::with_transform(
+                    TrimmedCurve::new(UnitCircle::<Point3>::new(), (start, end)),
+                    Matrix4::from_cols(
+                        (y * r).extend(0.),
+                        (z * r).extend(0.),
+                        y.cross(z).extend(0.),
+                        point(coords[a].0, 0., 0.).to_homogeneous(),
+                    ),
+                )),
+            );
+        }
+        let generator = Curve::Line(Line(vertices[4].point(), vertices[3].point()));
+        let cone = Surface::RevolutedCurve(Processor::new(RevolutedCurve::by_revolution(
+            generator,
+            origin,
+            y.cross(z),
+        )));
+        let (p, q, r) = (
+            vertices[8].point(),
+            vertices[9].point(),
+            vertices[10].point(),
+        );
+        let mut normal = (q - p).cross(r - p).normalize();
+        if normal.dot(vertex - p) < 0. {
+            normal = -normal;
+        }
+        let u = (q - p).normalize();
+        let plane = Surface::Plane(Plane::new(p, p + u, p + normal.cross(u)));
+        let reach = 2. * (length + radius);
+        // Sampled containment rejects obvious excursions; it is not a global curve bound.
+        let within_corner = |curve: &Curve| {
+            let (a, b) = curve.range_tuple();
+            (0..=16).all(|i| {
+                let d = curve.subs(a + (b - a) * i as f64 / 16.) - origin;
+                [
+                    (d.dot(x), length - axial, length),
+                    (d.dot(y), 0., radius),
+                    (d.dot(z), 0., radius),
+                ]
+                .iter()
+                .all(|&(v, lo, hi)| v >= lo - TOLERANCE && v <= hi + TOLERANCE)
+            })
+        };
+        let section = cone_plane_section(&plane, &cone, p, r, reach, tol, within_corner)?;
+        cache(8, 10, section);
+        let mut result = Shell::new();
+        let mut add =
+            |indices: &[usize], mut surface: Surface, outward: Vector3| -> Result<(), Diagnostic> {
+                let points: Vec<_> = indices.iter().map(|&i| vertices[i].point()).collect();
+                let mut ids = indices.to_vec();
+                if polygon_area(&points).dot(outward) < 0. {
+                    ids.reverse();
+                }
+                let wire = (0..ids.len())
+                    .map(|i| {
+                        shared_line(
+                            &vertices[ids[i]],
+                            &vertices[ids[(i + 1) % ids.len()]],
+                            &mut shared,
+                        )
+                    })
+                    .collect::<Result<Wire, _>>()?;
+                let center =
+                    points.iter().map(|p| p.to_vec()).sum::<Vector3>() / points.len() as f64;
+                let uv = surface
+                    .search_nearest_parameter(Point3::from_vec(center), None, 100)
+                    .ok_or_else(|| error(Code::IntersectionFailed))?;
+                if surface.normal(uv.0, uv.1).dot(outward) < 0. {
+                    surface.invert();
+                }
+                result.push(
+                    Face::try_new(vec![wire], surface)
+                        .map_err(|e| error(Code::InvalidOutputTopology).with_coded_source(e))?,
+                );
+                Ok(())
+            };
+        // Original face order is retained for the modeling history.
+        for (f, face) in shell.iter().enumerate() {
+            let (ids, normal): (&[usize], Vector3) = if f == cylinder {
+                (&[5, 4, 8, 6], y + z)
+            } else if f == floor {
+                (&[2, 3, 4, 5, 0, 1], -z)
+            } else if f == far {
+                (&[5, 6, 7, 0], -x)
+            } else if f == cap {
+                (&[3, 2, 10], x)
+            } else {
+                (&[0, 7, 9, 1], -y)
+            };
+            add(ids, face.oriented_surface(), normal)?;
+        }
+        add(&[8, 4, 3, 10], cone, x * inset + y * axial + z * axial)?;
+        let flat_face = |ids: [usize; 3]| {
+            Surface::Plane(Plane::new(
+                vertices[ids[0]].point(),
+                vertices[ids[1]].point(),
+                vertices[ids[2]].point(),
+            ))
+        };
+        add(&[7, 6, 8, 9], flat_face([7, 6, 8]), z - y)?;
+        add(&[2, 1, 9, 10], flat_face([2, 1, 9]), x - y)?;
+        add(&[9, 8, 10], plane, normal)?;
+        if result.shell_condition() != ShellCondition::Closed {
+            return Err(error(Code::InvalidOutputTopology));
+        }
+        Ok(result)
+    })())
+}
+
+fn curved_network(
+    shell: &Shell,
+    selected: &HashSet<EdgeID>,
+    distances: &HashMap<EdgeID, [f64; 2]>,
+) -> Option<super::planar::Neighborhood> {
+    let data =
+        super::planar::collect_neighborhood(shell, selected, "chamfer_solid_edges", true).ok()?;
+    if selected.len() != data.original_edges.len()
+        || data.incident.iter().any(|edges| edges.len() != 3)
+        || data.cylinders.iter().filter(|c| c.is_some()).count() != 1
+        || data.planes.iter().filter(|p| p.is_none()).count() != 1
+        || shell.iter().any(|f| f.boundaries().len() != 1)
+        || data
+            .original_edges
+            .iter()
+            .any(|e| !matches!(e.curve(), Curve::Line(_) | Curve::Conic(_)))
+    {
+        return None;
+    }
+    for (k, edge) in data.original_edges.iter().enumerate() {
+        if let [Some((n, _)), Some((m, _))] = data.sides[k].map(|f| data.planes[f]) {
+            if n.cross(m).dot(edge.back().point() - edge.front().point()) <= TOLERANCE {
+                return None;
+            }
+        }
+    }
+    for edge in &data.original_edges {
+        let curve = edge.curve();
+        let (lo, hi) = curve.range_tuple();
+        if (0..=32).any(|i| {
+            let point = curve.subs(lo + (hi - lo) * i as f64 / 32.);
+            data.planes
+                .iter()
+                .flatten()
+                .any(|&(n, d)| n.dot(point.to_vec()) > d + TOLERANCE)
+        }) {
+            return None;
+        }
+    }
+    // Unequal planar corners need a separate native corner policy. The symmetric
+    // three-bevel cap has the independently determined triangular section.
+    for edges in &data.incident {
+        if edges
+            .iter()
+            .flat_map(|&k| data.sides[k])
+            .all(|f| data.planes[f].is_some())
+        {
+            let values: Vec<_> = edges
+                .iter()
+                .flat_map(|&k| distances[&data.original_edges[k].id()])
+                .collect();
+            if values
+                .iter()
+                .any(|&v| (v - values[0]).abs() > 64. * f64::EPSILON * v.max(values[0]))
+            {
+                return None;
+            }
+        }
+    }
+    Some(data)
+}
+
+struct NetworkCorner {
+    contacts: Vec<(usize, usize, Vertex)>,
+    vertices: Vec<Vertex>,
+    normal: Vector3,
+    section: Curve,
+    cone: Surface,
+    rim: usize,
+}
+
+fn network_corner(
+    data: &super::planar::Neighborhood,
+    v: usize,
+    cylinder: usize,
+    distances: &HashMap<EdgeID, [f64; 2]>,
+    tol: f64,
+) -> Result<NetworkCorner, Diagnostic> {
+    let error = |code| Diagnostic::new(code, "chamfer_solid_edges", "curved_network_corner");
+    let (on_axis, axis, radius) = data.cylinders[cylinder].unwrap();
+    let incident = &data.incident[v];
+    let faces: HashSet<_> = incident.iter().flat_map(|&k| data.sides[k]).collect();
+    let cap = faces
+        .iter()
+        .copied()
+        .find(|&f| data.planes[f].is_some_and(|(n, _)| n.cross(axis).so_small()))
+        .ok_or_else(|| error(Code::UnsupportedGeometry))?;
+    let radial = faces
+        .iter()
+        .copied()
+        .find(|&f| f != cylinder && f != cap)
+        .ok_or_else(|| error(Code::UnsupportedGeometry))?;
+    let x = data.planes[cap].unwrap().0;
+    let y = -data.planes[radial]
+        .ok_or_else(|| error(Code::UnsupportedGeometry))?
+        .0;
+    let vertex = data.vertices[v].point();
+    let delta = vertex - on_axis;
+    let z = (delta - axis * delta.dot(axis)).normalize();
+    if x.dot(y).abs() > TOLERANCE || y.dot(z).abs() > TOLERANCE {
+        return Err(error(Code::UnsupportedGeometry));
+    }
+    let between = |a, b| {
+        incident
+            .iter()
+            .copied()
+            .find(|&k| data.sides[k].contains(&a) && data.sides[k].contains(&b))
+            .ok_or_else(|| error(Code::UnsupportedTopology))
+    };
+    let rim = between(cap, cylinder)?;
+    let lip = between(radial, cylinder)?;
+    let straight = between(cap, radial)?;
+    if matches!(data.original_edges[rim].curve(), Curve::Line(_))
+        || !matches!(data.original_edges[lip].curve(), Curve::Line(_))
+        || !matches!(data.original_edges[straight].curve(), Curve::Line(_))
+    {
+        return Err(error(Code::UnsupportedGeometry));
+    }
+    let setback = |k: usize, f: usize| {
+        distances[&data.original_edges[k].id()]
+            [usize::from(f == *data.sides[k].iter().max().unwrap())]
+    };
+    let (axial, inset) = (setback(rim, cylinder), setback(rim, cap));
+    let (flat, tangent) = (setback(lip, radial), setback(lip, cylinder));
+    let (other_axial, side) = (setback(straight, radial), setback(straight, cap));
+    if (axial - other_axial).abs() > 64. * f64::EPSILON * axial.max(other_axial) {
+        return Err(error(Code::UnsupportedGeometry));
+    }
+    let [cy, cz, rz] = cylinder_corner_contacts(radius, inset, flat, tangent, side)
+        .ok_or_else(|| error(Code::OutsideNeighbour))?;
+    let origin = vertex - radius * z;
+    let p = origin - axial * x + cy * y + cz * z;
+    let q = vertex - axial * x - flat * z;
+    let r = origin + side * y + rz * z;
+    let vertices = vec![Vertex::new(p), Vertex::new(q), Vertex::new(r)];
+    let mut normal = (q - p).cross(r - p).normalize();
+    if normal.dot(vertex - p) < 0. {
+        normal = -normal;
+    }
+    let u = (q - p).normalize();
+    let plane = Surface::Plane(Plane::new(p, p + u, p + normal.cross(u)));
+    let cone = Surface::RevolutedCurve(Processor::new(RevolutedCurve::by_revolution(
+        Curve::Line(Line(vertex - axial * x, vertex - inset * z)),
+        origin,
+        y.cross(z),
+    )));
+    let within = |curve: &Curve| {
+        let (a, b) = curve.range_tuple();
+        (0..=16).all(|i| {
+            let d = curve.subs(a + (b - a) * i as f64 / 16.) - origin;
+            [
+                (d.dot(x), -axial, 0.),
+                (d.dot(y), 0., radius),
+                (d.dot(z), 0., radius),
+            ]
+            .iter()
+            .all(|&(v, lo, hi)| v >= lo - TOLERANCE && v <= hi + TOLERANCE)
+        })
+    };
+    let section = cone_plane_section(&plane, &cone, p, r, 4. * (radius + axial), tol, within)?;
+    let contacts = [
+        (rim, cylinder, 0),
+        (lip, cylinder, 0),
+        (lip, radial, 1),
+        (straight, radial, 1),
+        (rim, cap, 2),
+        (straight, cap, 2),
+    ]
+    .map(|(k, f, i)| (k, f, vertices[i].clone()))
+    .to_vec();
+    Ok(NetworkCorner {
+        contacts,
+        vertices,
+        normal,
+        section,
+        cone,
+        rim,
+    })
+}
+
+fn cylinder_corner_contacts(
+    radius: f64,
+    inset: f64,
+    flat: f64,
+    tangent: f64,
+    side: f64,
+) -> Option<[f64; 3]> {
+    if inset >= radius - TOLERANCE
+        || flat >= radius - TOLERANCE
+        || side >= radius - inset - TOLERANCE
+    {
+        return None;
+    }
+    // The lip uses tangent-projection setback, while the cap contact is a circle/line intersection.
+    let cy = radius * tangent / radius.hypot(tangent);
+    let cz = radius * radius / radius.hypot(tangent);
+    let rz = ((radius - inset).powi(2) - side * side).sqrt();
+    if cy >= side || cz <= radius - flat || rz >= radius - flat {
+        return None;
+    }
+    Some([cy, cz, rz])
+}
+
+fn cone_plane_section(
+    plane: &Surface,
+    cone: &Surface,
+    p: Point3,
+    r: Point3,
+    reach: f64,
+    tol: f64,
+    within_corner: impl Fn(&Curve) -> bool,
+) -> Result<Curve, Diagnostic> {
+    let error = |code| Diagnostic::new(code, "chamfer_solid_edges", "quarter_cylinder_corner");
+    let curves = crate::local::try_intersect_surfaces(
+        plane,
+        ((-reach, reach), (-reach, reach)),
+        cone,
+        ((0., 1.), (0., std::f64::consts::TAU)),
+        tol,
+    )?;
+    for mut curve in curves {
+        // Elliptic native corners need a four-boundary patch, not this three-contact section.
+        if matches!(curve, Curve::Conic(_)) {
+            return Err(error(Code::UnsupportedGeometry));
+        }
+        let Some(a) = curve.search_parameter(p, None, 100) else {
+            continue;
+        };
+        let Some(b) = curve.search_parameter(r, None, 100) else {
+            continue;
+        };
+        if (a - b).abs() <= TOLERANCE {
+            continue;
+        }
+        let (lo, hi) = curve.range_tuple();
+        if a.min(b) < lo - TOLERANCE || a.max(b) > hi + TOLERANCE {
+            continue;
+        }
+        if a.max(b) < hi {
+            curve.cut(a.max(b));
+        }
+        if a.min(b) > lo {
+            curve = curve.cut(a.min(b));
+        }
+        if a > b {
+            curve.invert();
+        }
+        if within_corner(&curve) {
+            return Ok(curve);
+        }
+    }
+    Err(error(Code::IntersectionFailed))
+}
+
+pub(super) fn chamfer(
+    shell: &Shell,
+    selected: &HashSet<EdgeID>,
+    distances: &HashMap<EdgeID, [f64; 2]>,
+    tol: f64,
+) -> Result<Shell, Diagnostic> {
+    if let Some(result) = quarter_cylinder_corner(shell, selected, distances, tol) {
+        return result;
+    }
+    match neighborhood(shell, selected, "chamfer_solid_edges", false) {
+        Ok(data) => miter(shell, selected, distances, tol, data),
+        Err(original) => {
+            if let Some(data) = curved_network(shell, selected, distances) {
+                if let Ok(result) = miter(shell, selected, distances, tol, data) {
+                    return Ok(result);
+                }
+            }
+            Err(original)
+        }
+    }
+}
+
+#[cfg(test)]
+mod network_tests {
+    use super::*;
+
+    #[test]
+    fn collected_curved_network_does_not_expand_fillet_admission() {
+        let start = Vertex::new(Point3::new(0., 1., 0.));
+        let arc = builder::rsweep(
+            &start,
+            Point3::origin(),
+            Vector3::unit_x(),
+            Rad(std::f64::consts::FRAC_PI_2),
+            1,
+        );
+        let center = Vertex::new(Point3::origin());
+        let mut wire = arc.clone();
+        wire.extend([
+            builder::line(arc.back_vertex().unwrap(), &center),
+            builder::line(&center, &start),
+        ]);
+        let solid = builder::tsweep(
+            &builder::try_attach_plane(&[wire]).unwrap(),
+            Vector3::unit_x(),
+        );
+        let shell = &solid.boundaries()[0];
+        let selected: HashSet<_> = shell.edge_iter().map(|e| e.id()).collect();
+        let collected = super::super::planar::collect_neighborhood(
+            shell,
+            &selected,
+            "fillet_solid_edges",
+            true,
+        )
+        .unwrap();
+        assert_eq!(collected.original_edges.len(), 9);
+        assert_eq!(collected.cylinders.iter().flatten().count(), 1);
+        for curved in [false, true] {
+            let error = neighborhood(shell, &selected, "fillet_solid_edges", curved)
+                .err()
+                .unwrap();
+            assert_eq!(error.code, Code::NonPlanarFace);
+            assert_eq!(error.stage, "validate_neighborhood");
+        }
+    }
 }

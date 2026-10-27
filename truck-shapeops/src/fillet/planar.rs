@@ -250,6 +250,17 @@ pub(super) fn neighborhood(
     operation: &'static str,
     curved_fillets: bool,
 ) -> Result<Neighborhood, Diagnostic> {
+    let data = collect_neighborhood(shell, selected, operation, curved_fillets)?;
+    validate_neighborhood(shell, selected, operation, curved_fillets, &data)?;
+    Ok(data)
+}
+
+pub(super) fn collect_neighborhood(
+    shell: &Shell,
+    selected: &HashSet<EdgeID>,
+    operation: &'static str,
+    curved_fillets: bool,
+) -> Result<Neighborhood, Diagnostic> {
     let error = |code| Diagnostic::new(code, operation, "validate_neighborhood");
     let mut vertices = Vec::new();
     let mut vertex_index = HashMap::default();
@@ -354,6 +365,41 @@ pub(super) fn neighborhood(
             }
         }
     }
+    Ok(Neighborhood {
+        vertices,
+        original_edges,
+        edge_index,
+        planes,
+        incident,
+        sides,
+        cylinders,
+        sphere_supports,
+        cone_supports,
+        torus_supports,
+        extrusion_supports,
+    })
+}
+
+fn validate_neighborhood(
+    shell: &Shell,
+    selected: &HashSet<EdgeID>,
+    operation: &'static str,
+    curved_fillets: bool,
+    data: &Neighborhood,
+) -> Result<(), Diagnostic> {
+    let error = |code| Diagnostic::new(code, operation, "validate_neighborhood");
+    let Neighborhood {
+        original_edges,
+        planes,
+        cylinders,
+        extrusion_supports,
+        torus_supports,
+        cone_supports,
+        sphere_supports,
+        incident,
+        sides,
+        ..
+    } = data;
     let analytic_corner = selected.len() == 3
         && incident.iter().any(|edges| {
             if edges.len() != 3
@@ -383,7 +429,7 @@ pub(super) fn neighborhood(
                         || (torus_supports[f].is_some() || extrusion_supports[f])
                 })
         });
-    for edges in &incident {
+    for edges in incident {
         if !edges
             .iter()
             .any(|&k| selected.contains(&original_edges[k].id()))
@@ -488,19 +534,7 @@ pub(super) fn neighborhood(
             }
         }
     }
-    Ok(Neighborhood {
-        vertices,
-        original_edges,
-        edge_index,
-        planes,
-        incident,
-        sides,
-        cylinders,
-        sphere_supports,
-        cone_supports,
-        torus_supports,
-        extrusion_supports,
-    })
+    Ok(())
 }
 
 fn loops_touch(a: &[Point3], b: &[Point3], normal: Vector3, clearance: f64) -> bool {

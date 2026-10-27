@@ -746,6 +746,9 @@ fn separate_chamfer_wires(
 /// terminal neighbor trims its surviving adjacent faces together; newly crossed exits require
 /// a planar or certified ruled blend and straight single-span boundaries. Cylindrical terminal supports
 /// retain their analytic geometry while their parameter domains grow to include the new boundary.
+/// A single quadratic extrusion rim with a perpendicular planar cap may continue past a
+/// prior planar bevel. This requires a convex source, polynomial boundaries, monotone planar
+/// terminations, and certified clearance and injectivity; distance-angle continuation is excluded.
 pub fn chamfer_solid_along_wire(
     solid: &Solid,
     wire: &Wire,
@@ -899,11 +902,36 @@ fn chamfer_solid_wire(
             (d0, d1),
             tol,
             trim,
-            (continued, consumed_chamfer_exit),
+            (continued, consumed_chamfer_exit, None),
             mode,
         )
     };
     let shell = build(false)
+        .or_else(|error| {
+            if solid.boundaries().len() != 1
+                || error.stage != "trim_faces"
+                || matches!(
+                    mode,
+                    super::chamfer::DistanceMode::NormalSectionAngle { .. }
+                )
+            {
+                return Err(error);
+            }
+            let Some(continuation) =
+                quadratic_chamfer_continuation(&solid.boundaries()[index], wire, [d0, d1])
+            else {
+                return Err(error);
+            };
+            super::chamfer::try_chamfer_along_wire_with_trim(
+                &solid.boundaries()[index],
+                wire,
+                (d0, d1),
+                tol,
+                trim,
+                (false, consumed_chamfer_exit, Some(&continuation)),
+                mode,
+            )
+        })
         .or_else(|error| {
             if error.code == Code::BlendConstructionFailed
                 && error.stage == "trim_faces"
@@ -1109,6 +1137,327 @@ fn consumed_ruled_exit(
     point
         .near(&blend.subs(u.clamp(u0, u1), v.clamp(v0, v1)))
         .then_some(Some(point))
+}
+
+fn quadratic_chamfer_continuation(
+    shell: &Shell,
+    wire: &Wire,
+    distances: [f64; 2],
+) -> Option<super::chamfer::ContactContinuation<truck_modeling::Curve, Surface>> {
+    use truck_modeling::*;
+    if wire.len() != 1
+        || shell
+            .iter()
+            .any(|face| face.boundaries().len() != 1 || !face.is_geometric_consistent())
+    {
+        return None;
+    }
+    let distance = distances[0].max(distances[1]);
+    let edge = &wire[0];
+    let Curve::BSplineCurve(guide) = edge.oriented_curve() else {
+        return None;
+    };
+    if guide.degree() != 2 || guide.control_points().len() != 3 || !guide.is_clamped() {
+        return None;
+    }
+    let mut supports = [None, None];
+    let mut cap = None;
+    let mut wall = None;
+    let mut wall_face = None;
+    let mut cap_face = None;
+    for (index, face) in shell.iter().enumerate() {
+        let surface = face.oriented_surface();
+        if let Some(found) = face.edge_iter().find(|e| e.id() == edge.id()) {
+            let side = usize::from(found.front() != edge.front());
+            if matches!(surface.elementary(), Some((Elementary::Plane(_), _))) {
+                cap = Some(side);
+                cap_face = Some(index);
+            } else {
+                wall = Some(side);
+                wall_face = Some(index);
+            }
+            supports[side] = Some(surface);
+        } else if !matches!(surface.elementary(), Some((Elementary::Plane(_), _))) {
+            return None;
+        }
+    }
+    let (cap, wall) = (cap?, wall?);
+    let (cap_face, wall_face) = (cap_face?, wall_face?);
+    let [Some(s0), Some(s1)] = supports else {
+        return None;
+    };
+    let mut supports = [s0, s1];
+    let Some((Elementary::Plane(plane), _)) = supports[cap].elementary() else {
+        return None;
+    };
+    let normal = plane.normal();
+    let Surface::BSplineSurface(wall_surface) = &supports[wall] else {
+        return None;
+    };
+    let rows = wall_surface.control_points();
+    if wall_surface.udegree() != 2
+        || wall_surface.vdegree() != 1
+        || !wall_surface.uknot_vec().is_clamped(2)
+        || !wall_surface.vknot_vec().is_clamped(1)
+        || rows.len() != 3
+        || rows.iter().any(|r| r.len() != 2)
+    {
+        return None;
+    }
+    let extrusion = rows[0][1] - rows[0][0];
+    let extrusion_roundoff = 512. * f64::EPSILON * extrusion.magnitude();
+    if extrusion.cross(normal).magnitude() > extrusion_roundoff
+        || rows
+            .iter()
+            .any(|r| (r[1] - r[0] - extrusion).magnitude() > extrusion_roundoff)
+    {
+        return None;
+    }
+    let (a, b) = guide.range_tuple();
+    let p = guide.subs(a);
+    let derivative = guide.der(a);
+    let second = guide.der2(a);
+    let linear = derivative - second * (derivative.dot(second) / second.magnitude2());
+    let speed = linear.magnitude();
+    if !continuation_curvature_admissible(distance, second.magnitude(), speed) {
+        return None;
+    }
+    let axis = linear / speed;
+    let inward = second.normalize();
+    let curvature = second.magnitude() / speed.powi(2);
+    let vertex_parameter = a - derivative.dot(second) / second.magnitude2();
+    let origin =
+        p + derivative * (vertex_parameter - a) + second * ((vertex_parameter - a).powi(2) / 2.);
+    let scale = shell
+        .vertex_iter()
+        .map(|v| (v.point() - origin).magnitude())
+        .fold(distance, f64::max);
+    let roundoff = 512. * f64::EPSILON * scale.max(1.);
+    if inward.dot(normal).abs() > 512. * f64::EPSILON
+        || axis.dot(normal).abs() > 512. * f64::EPSILON
+        || guide
+            .control_points()
+            .iter()
+            .any(|q| (*q - p).dot(normal).abs() > roundoff)
+    {
+        return None;
+    }
+    let (wa, wb) = wall_surface.range_tuple().0;
+    let middle = (wa + wb) / 2.;
+    let point = wall_surface.subs(middle, 0.5);
+    let x = (point - origin).dot(axis);
+    if wall_surface
+        .normal(middle, 0.5)
+        .dot(inward - axis * (curvature * x))
+        >= 0.
+    {
+        return None;
+    }
+    let mut lo = a;
+    let mut hi = b;
+    let mut boundaries = Vec::new();
+    for edge in shell.edge_iter() {
+        let curve = NurbsCurve::try_from(&edge.curve()).ok()?;
+        if curve.degree() > 2
+            || curve.control_points().len() != curve.degree() + 1
+            || !curve.is_clamped()
+        {
+            return None;
+        }
+        let weight = curve.control_points()[0].w;
+        if !weight.is_finite()
+            || weight <= 0.
+            || curve.control_points().iter().any(|p| p.w != weight)
+        {
+            return None;
+        }
+        let mut controls = Vec::new();
+        for point in curve.control_points() {
+            let point = Point3::new(point.x / point.w, point.y / point.w, point.z / point.w);
+            let t = a + (point - p).dot(linear) / speed.powi(2);
+            lo = lo.min(t - distance / speed);
+            hi = hi.max(t + distance / speed);
+            controls.push(point);
+        }
+        boundaries.push(controls);
+    }
+    // Bernstein products certify every boundary lies in the convex parabolic epigraph.
+    // Together with the planar halfspaces and single closed face loops this identifies
+    // the source as their convex intersection; holes and additional curved faces reject.
+    let choose = |n: usize, k: usize| (0..k).fold(1., |v, i| v * (n - i) as f64 / (i + 1) as f64);
+    let mut checked_curves = boundaries.clone();
+    checked_curves.extend((0..2).map(|side| rows.iter().map(|row| row[side]).collect()));
+    for (index, controls) in checked_curves.iter().enumerate() {
+        let degree = controls.len() - 1;
+        for k in 0..=2 * degree {
+            let value = (k.saturating_sub(degree)..=k.min(degree))
+                .map(|i| {
+                    let j = k - i;
+                    let pi = controls[i] - origin;
+                    let pj = controls[j] - origin;
+                    (0.5 * (pi.dot(inward) + pj.dot(inward))
+                        - 0.5 * curvature * pi.dot(axis) * pj.dot(axis))
+                        * choose(degree, i)
+                        * choose(degree, j)
+                        / choose(2 * degree, k)
+                })
+                .sum::<f64>();
+            if !value.is_finite()
+                || value < -roundoff
+                || (index >= boundaries.len() && value.abs() > roundoff)
+            {
+                return None;
+            }
+        }
+    }
+    let at = |t: f64| p + derivative * (t - a) + second * ((t - a).powi(2) / 2.);
+    let controls_for = |l: f64, r: f64| {
+        [
+            at(l),
+            at(l) + (derivative + second * (l - a)) * ((r - l) / 2.),
+            at(r),
+        ]
+    };
+    let excluded = |l: f64, r: f64| {
+        shell.iter().any(|face| {
+            let Some((Elementary::Plane(plane), _)) = face.oriented_surface().elementary() else {
+                return false;
+            };
+            let n = plane.normal();
+            let o = plane.subs(0., 0.);
+            let minimum = controls_for(l, r)
+                .iter()
+                .map(|p| (*p - o).dot(n))
+                .fold(f64::INFINITY, f64::min);
+            let offset = (-distances[wall] * n.dot(normal))
+                .min(-distances[cap] * (n - normal * n.dot(normal)).magnitude());
+            minimum + offset > roundoff
+        })
+    };
+    // Discard only slabs whose entire ruling rectangle violates an original plane.
+    for _ in 0..32 {
+        let middle = (lo + a) / 2.;
+        if !excluded(lo, middle) {
+            break;
+        }
+        lo = middle;
+    }
+    for _ in 0..32 {
+        let middle = (hi + b) / 2.;
+        if !excluded(middle, hi) {
+            break;
+        }
+        hi = middle;
+    }
+    let first = at(lo);
+    let last = at(hi);
+    let extended = BSplineCurve::new(
+        KnotVec::from(vec![lo, lo, lo, hi, hi, hi]),
+        vec![
+            first,
+            first + (derivative + second * (lo - a)) * ((hi - lo) / 2.),
+            last,
+        ],
+    );
+    // P(t,l) = G(t) - (1-l) dw*n + l*dc*N(t). The normal chart
+    // determinant is q*(1-l*dc*k/q³)>0. Its x derivative is positive,
+    // and at fixed x its inward derivative is positive: global injectivity.
+    // |P_x-G_x|<=dc gives the finite enclosure above, including every
+    // possible retained component, without extending a fitted contact curve.
+    let dw = distances[wall];
+    let dc = distances[cap];
+    let inside_station = (a + b) / 2.;
+    let station = at(inside_station);
+    let station_x = (station - origin).dot(axis);
+    let station_inward = (inward - axis * (curvature * station_x)).normalize();
+    let section = [station - normal * dw, station + station_inward * dc];
+    let mut terminal_signs = Vec::new();
+    let mut terminal_directions = Vec::new();
+    let mut terminal_planes = Vec::new();
+    let mut remote_planes = Vec::new();
+    for (index, face) in shell.iter().enumerate() {
+        if index == wall_face {
+            continue;
+        }
+        let Some((Elementary::Plane(plane), _)) = face.oriented_surface().elementary() else {
+            return None;
+        };
+        let n = plane.normal();
+        let o = plane.subs(0., 0.);
+        if boundaries
+            .iter()
+            .flatten()
+            .any(|p| (*p - o).dot(n) > roundoff)
+        {
+            return None;
+        }
+        if index == cap_face {
+            continue;
+        }
+        let terminal = n.cross(normal).magnitude() > roundoff
+            && face
+                .edge_iter()
+                .any(|e| shell[wall_face].edge_iter().any(|w| w.id() == e.id()));
+        if terminal {
+            let slopes = [lo, hi].map(|t| n.dot(derivative + second * (t - a)));
+            if slopes[0] * slopes[1] <= 0.
+                || slopes.iter().any(|v| v.abs() <= roundoff)
+                || section.iter().any(|p| (*p - o).dot(n) >= -roundoff)
+            {
+                return None;
+            }
+            terminal_signs.push(slopes[0].is_sign_positive());
+            terminal_directions.push(n * slopes[0].signum());
+            terminal_planes.push((o, n));
+        } else {
+            // A hull bound excludes every remote face over the entire construction box.
+            let maximum = extended
+                .control_points()
+                .iter()
+                .map(|p| (*p - o).dot(n))
+                .fold(f64::NEG_INFINITY, f64::max);
+            let offset = (-dw * n.dot(normal)).max(dc * (n - normal * n.dot(normal)).magnitude());
+            if maximum + offset >= -roundoff {
+                return None;
+            }
+            remote_planes.push((o, n));
+        }
+    }
+    // Each terminal inequality is strictly monotone at every section fraction.
+    // A common interior ruling separates the two ends for all fractions, so their
+    // intersection is one strip; the existing end walk must classify all its seams.
+    if terminal_signs.len() != 3
+        || terminal_signs.iter().all(|v| *v)
+        || terminal_signs.iter().all(|v| !*v)
+    {
+        return None;
+    }
+    let mut bottom = extended.clone();
+    bottom.transform_by(Matrix4::from_translation(-normal * extrusion.magnitude()));
+    let mut surface = BSplineSurface::homotopy(bottom, extended.clone());
+    if surface
+        .normal((lo + hi) / 2., 0.5)
+        .dot(supports[wall].normal(0.5, 0.5))
+        < 0.
+    {
+        surface.invert();
+    }
+    supports[wall] = surface.into();
+    Some(super::chamfer::ContactContinuation {
+        guide: extended.into(),
+        supports,
+        chart: super::chamfer::QuadraticContactChart {
+            origin,
+            axes: [axis, inward],
+            curvature,
+            cap_side: cap,
+            remote_planes,
+            terminal_directions,
+            terminal_planes,
+            interior_parameter: inside_station,
+            cap_normal: normal,
+        },
+    })
 }
 
 fn can_continue_chamfer_contacts(shell: &Shell, wire: &Wire) -> bool {
@@ -1640,5 +1989,29 @@ mod consumed_terminal_tests {
         }
         let coplanar = Curve::Line(Line(Point3::origin(), Point3::new(1., 0., 0.)));
         assert!(consumed_chamfer_exit(&coplanar, &plane).is_none());
+    }
+}
+
+fn continuation_curvature_admissible(distance: f64, second: f64, speed: f64) -> bool {
+    if !speed.is_finite() || speed <= 0. || distance * second / speed.powi(2) >= 0.5 {
+        return false;
+    }
+    true
+}
+
+#[cfg(test)]
+mod continuation_curvature_tests {
+    use super::continuation_curvature_admissible;
+
+    #[test]
+    fn continuation_curvature_certificate_boundary() {
+        for speed in [0.01_f64, 1., 100.] {
+            let second = 0.2 * speed.powi(2);
+            assert!(continuation_curvature_admissible(2.49, second, speed));
+            assert!(!continuation_curvature_admissible(2.51, second, speed));
+        }
+        assert!(!continuation_curvature_admissible(2.5, 0.2, 1.));
+        assert!(!continuation_curvature_admissible(1., 0.2, 0.));
+        assert!(!continuation_curvature_admissible(1., 0.2, f64::INFINITY));
     }
 }

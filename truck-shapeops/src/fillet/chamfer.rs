@@ -655,9 +655,118 @@ where
         (d0, d1),
         tol,
         along_wire::trim_contact_edge,
-        (false, |_, _| None),
+        (false, |_, _| None, None),
         DistanceMode::TangentProjection,
     )
+}
+
+pub(super) struct ContactContinuation<C, S> {
+    pub guide: C,
+    pub supports: [S; 2],
+    pub chart: QuadraticContactChart,
+}
+
+pub(super) struct QuadraticContactChart {
+    pub origin: Point3,
+    pub axes: [Vector3; 2],
+    pub curvature: f64,
+    pub cap_side: usize,
+    pub remote_planes: Vec<(Point3, Vector3)>,
+    pub terminal_directions: Vec<Vector3>,
+    pub terminal_planes: Vec<(Point3, Vector3)>,
+    pub interior_parameter: f64,
+    pub cap_normal: Vector3,
+}
+
+impl QuadraticContactChart {
+    fn accepts(&self, curves: [&BSplineCurve<Point3>; 2]) -> bool {
+        let curves = [curves[1 - self.cap_side], curves[self.cap_side]];
+        if curves.iter().any(|curve| {
+            let point = curve.subs(self.interior_parameter);
+            self.terminal_planes
+                .iter()
+                .any(|(origin, normal)| (point - origin).dot(*normal) >= -TOLERANCE)
+        }) {
+            return false;
+        }
+        let [wall, cap] = curves.map(|curve| curve.clone().bezier_decomposition());
+        if wall.len() != cap.len() {
+            return false;
+        }
+        let choose =
+            |n: usize, k: usize| (0..k).fold(1., |v, i| v * (n - i) as f64 / (i + 1) as f64);
+        let [x, y] = self.axes;
+        for (wall, cap) in wall.iter().zip(&cap) {
+            if wall.degree() != 3 || cap.degree() != 3 || wall.range_tuple() != cap.range_tuple() {
+                return false;
+            }
+            let rows = [wall.control_points(), cap.control_points()];
+            if rows.iter().flat_map(|row| row.iter()).any(|p| {
+                (*p - self.origin).dot(self.cap_normal) > TOLERANCE * 0.1
+                    || self
+                        .remote_planes
+                        .iter()
+                        .any(|(origin, normal)| (*p - origin).dot(*normal) >= -TOLERANCE)
+            }) {
+                return false;
+            }
+            let across: Vec<_> = (0..4).map(|i| rows[1][i] - rows[0][i]).collect();
+            if across.iter().any(|v| v.dot(y) <= TOLERANCE2) {
+                return false;
+            }
+            for row in rows {
+                let along: Vec<_> = row.windows(2).map(|p| p[1] - p[0]).collect();
+                if along.iter().any(|v| {
+                    v.dot(x) <= TOLERANCE2
+                        || self
+                            .terminal_directions
+                            .iter()
+                            .any(|n| v.dot(*n) <= TOLERANCE2)
+                }) {
+                    return false;
+                }
+                // Bernstein products bound the projected Jacobian over the entire span
+                // and both ruling endpoints. Positive diagonal minors give global
+                // injectivity of this chart on its parameter rectangle.
+                for k in 0..=5_usize {
+                    let determinant = (k.saturating_sub(3)..=k.min(2))
+                        .map(|i| {
+                            let j = k - i;
+                            along[i].cross(across[j]).dot(x.cross(y)) * choose(2, i) * choose(3, j)
+                                / choose(5, k)
+                        })
+                        .sum::<f64>();
+                    if !determinant.is_finite() || determinant <= TOLERANCE2 {
+                        return false;
+                    }
+                }
+            }
+            // Bound y-k*x²/2 for the fitted ruled patch, allowing only the unchanged
+            // contact fitter's geometric error budget at the original wall.
+            for v in 0..=2_usize {
+                for k in 0..=6_usize {
+                    let mut margin = 0.;
+                    for side in v.saturating_sub(1)..=v.min(1) {
+                        for i in k.saturating_sub(3)..=k.min(3) {
+                            let j = k - i;
+                            let p = rows[side][i] - self.origin;
+                            let q = rows[v - side][j] - self.origin;
+                            margin += (0.5 * (p.dot(y) + q.dot(y))
+                                - 0.5 * self.curvature * p.dot(x) * q.dot(x))
+                                * choose(3, i)
+                                * choose(3, j)
+                                / choose(6, k)
+                                / choose(2, v);
+                        }
+                    }
+                    if !margin.is_finite() || margin < -TOLERANCE * 0.1 {
+                        return false;
+                    }
+                }
+            }
+        }
+        true
+    }
 }
 
 pub(super) fn try_chamfer_along_wire_with_trim<C, S>(
@@ -666,7 +775,11 @@ pub(super) fn try_chamfer_along_wire_with_trim<C, S>(
     (d0, d1): (f64, f64),
     tol: f64,
     trim: impl Fn(&mut C, &Edge<Point3, C>, bool) -> Option<along_wire::TrimmedContact<C>>,
-    (continue_contacts, intersect_exit): (bool, impl Fn(&C, &S) -> Option<Option<Point3>>),
+    (continue_contacts, intersect_exit, continuation): (
+        bool,
+        impl Fn(&C, &S) -> Option<Option<Point3>>,
+        Option<&ContactContinuation<C, S>>,
+    ),
     mode: DistanceMode,
 ) -> Result<Shell<Point3, C, S>, Diagnostic>
 where
@@ -735,13 +848,17 @@ where
                 }
             }
         }
-        let [Some(s0), Some(s1)] = adjacent else {
+        let [Some(mut s0), Some(mut s1)] = adjacent else {
             return Err(
                 Diagnostic::new(Code::UnsupportedTopology, operation, "validate_wire")
                     .selection(index),
             );
         };
-        let curve = edge.oriented_curve();
+        let mut curve = edge.oriented_curve();
+        if let Some(prepared) = continuation {
+            curve = prepared.guide.clone();
+            [s0, s1] = prepared.supports.clone();
+        }
         let (a, b) = curve.range_tuple();
         let range = if continue_contacts {
             let speeds = [curve.der(a).magnitude(), curve.der(b).magnitude()];
@@ -762,6 +879,9 @@ where
         let (params, pcurves, [c0, c1]) =
             fit_contact_curves(&curve, &s0, &s1, (d0, d1), tol, range, mode)
                 .ok_or_else(|| failed().stage("find_contact").selection(index))?;
+        if continuation.is_some_and(|prepared| !prepared.chart.accepts([&c0, &c1])) {
+            return Err(failed().stage("validate_continuation").selection(index));
+        }
         let mut contact: [C; 2] = pcurves.each_ref().map(|curve| curve.to_same_geometry());
         // Reject collapsed/reversed offsets and fits that separate the contact edge from
         // either its supporting face or the ruled chamfer by more than the fitting tolerance.
@@ -1212,5 +1332,83 @@ mod contact_interpolation_tests {
                 }
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod continuation_certificate_tests {
+    use super::*;
+
+    fn chart() -> QuadraticContactChart {
+        QuadraticContactChart {
+            origin: Point3::new(0., 0., 0.),
+            axes: [Vector3::unit_x(), Vector3::unit_y()],
+            curvature: 0.2,
+            cap_side: 1,
+            remote_planes: vec![],
+            terminal_directions: vec![],
+            terminal_planes: vec![],
+            interior_parameter: 0.5,
+            cap_normal: Vector3::unit_z(),
+        }
+    }
+
+    fn curve(y: f64, slope: f64, shift: f64, z: f64) -> BSplineCurve<Point3> {
+        BSplineCurve::new(
+            KnotVec::bezier_knot(3),
+            (0..4)
+                .map(|i| {
+                    let t = i as f64 / 3.;
+                    Point3::new(t + shift, y + slope * t, z)
+                })
+                .collect(),
+        )
+    }
+
+    #[test]
+    fn continuation_certificate_material_bounds() {
+        let mut chart = chart();
+        let wall = curve(1., 0., 0., -1.);
+        let cap = curve(2., 0., 0., 0.);
+        assert!(chart.accepts([&wall, &cap]));
+        chart.curvature = 3.;
+        assert!(!chart.accepts([&wall, &cap]));
+        chart.curvature = 0.2;
+        let above_cap = curve(2., 0., 0., TOLERANCE);
+        assert!(!chart.accepts([&wall, &above_cap]));
+    }
+
+    #[test]
+    fn continuation_certificate_jacobian() {
+        let chart = chart();
+        let wall = curve(2., 2., 0., -1.);
+        let cap = curve(3., 2., 0., 0.);
+        assert!(chart.accepts([&wall, &cap]));
+        // Both diagonal derivatives stay positive; the cross term folds the chart.
+        let folded = curve(3., 2., 1., 0.);
+        assert!(!chart.accepts([&wall, &folded]));
+    }
+
+    #[test]
+    fn continuation_certificate_terminal_and_remote_exclusion() {
+        let wall = curve(1., 0., 0., -1.);
+        let cap = curve(2., 0., 0., 0.);
+        let mut chart = chart();
+        chart.terminal_directions.push(Vector3::unit_x());
+        chart
+            .terminal_planes
+            .push((Point3::new(2., 0., 0.), Vector3::unit_x()));
+        chart
+            .remote_planes
+            .push((Point3::new(0., 3., 0.), Vector3::unit_y()));
+        assert!(chart.accepts([&wall, &cap]));
+        chart.terminal_directions[0] = -Vector3::unit_x();
+        assert!(!chart.accepts([&wall, &cap]));
+        chart.terminal_directions[0] = Vector3::unit_x();
+        chart.terminal_planes[0].0.x = 0.25;
+        assert!(!chart.accepts([&wall, &cap]));
+        chart.terminal_planes[0].0.x = 2.;
+        chart.remote_planes[0].0.y = 1.5;
+        assert!(!chart.accepts([&wall, &cap]));
     }
 }

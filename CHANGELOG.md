@@ -6,6 +6,24 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Assemble bounded fully selected cylindrical chamfer networks using shared curved
+  corner edges and original face loops. A7 now passes native sampled comparison;
+  full chamfer replay reaches 358 constructions and 333 limited passes without lost
+  checks. Unequal planar corners and partial networks remain conservative rejections.
+  Matched single-core A7 latency is 0.206 ms versus OCCT 2.985 ms (40 samples each).
+
+- Construct bounded three-edge quarter-cylinder chamfer corners with shared exact
+  cone–plane boundaries, and bounded parabolic chamfer support continuation with
+  material and injectivity checks. Broader captured A2/C1 failures remain unresolved.
+- Construct bounded quartic G6 wall-first fillet junctions with separately trimmed
+  contacts and shared canal–wall continuation. Independent local material witnesses
+  support the rolling-ball result; the native comparison remains a failure.
+- Reuse transformed derivative batches and local basis windows while preserving
+  composition arithmetic order. Matched single-core G6 latency falls from 46.67 to
+  25.54 ms versus OCCT 30.81 ms; G2 falls from 25.13 to 18.12 ms. Regression tests,
+  replay results and local material witnesses are preserved. Add matched benchmark
+  harnesses for G6 and bounded chamfers.
+
 - Reject malformed STEP B-spline knot order, multiplicity lengths and nonpositive values
   with conversion errors for curves and both surface directions instead of panicking.
 - Support consumed chamfer neighbors on open line–arc–line contours across distance

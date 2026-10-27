@@ -83,6 +83,42 @@ fn body(reversed: bool, depth: f64) -> (Solid, [Point3; 3]) {
     )
 }
 
+#[test]
+fn quadratic_remote_construction_preserves_all_similarity_and_reversal_cases() {
+    for radius in [0.3, 0.5, 0.6] {
+        for (moved, reversed) in [(false, false), (true, false), (false, true), (true, true)] {
+            let (original, witnesses) = body(reversed, 20.);
+            let factor = if moved { 2.5 } else { 1. };
+            let matrix = if moved {
+                Matrix4::from_translation(Vector3::new(7., -11., 13.))
+                    * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.73))
+                    * Matrix4::from_scale(factor)
+            } else {
+                Matrix4::identity()
+            };
+            let input = builder::transformed(&original, matrix);
+            let before = serde_json::to_string(&input.compress()).unwrap();
+            let mut selected: Vec<_> = witnesses
+                .into_iter()
+                .map(|p| {
+                    common::blend::edge_through(&input.boundaries()[0], matrix.transform_point(p))
+                        .id()
+                })
+                .collect();
+            for _ in 0..2 {
+                let result =
+                    try_fillet_solid_edges(&input, &selected, radius * factor, 1e-5 * factor);
+                assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
+                let result = result.unwrap_or_else(|error| {
+                    panic!("radius={radius}, moved={moved}, reversed={reversed}: {error:?}")
+                });
+                assert!(result.solid.is_geometric_consistent());
+                selected.reverse();
+            }
+        }
+    }
+}
+
 fn selected_center(radius: f64) -> Point3 {
     let mut low = 0_f64;
     let mut high = 1_f64;
