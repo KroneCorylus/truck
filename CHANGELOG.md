@@ -6,6 +6,72 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Construct bounded equal-distance two-cylinder extrusion chamfers with shared tangent
+  generators and exact plane/cone/cylinder trims, preserving all original supports.
+  The complex C2 capture passes sampled comparison and independent material checks;
+  unsupported two-distance and distance-angle cases still reject. No C2 latency claim.
+
+- Assemble bounded A5 planar corners within partial tangent chamfer networks while
+  preserving original face loops and holes. Equal-distance A5 passes sampled comparison;
+  supported two-distance and distance-angle sections require explicit corner preferences.
+  Distance-angle support includes bounded signed convex and reentrant sections with
+  independent whole-boundary material checks. Missing or invalid preferences reject
+  without input mutation; A6 admission remains unchanged. Matched distance-angle
+  construction meets the measured valid-native latency target; neighbor parity is unproven.
+
+- Construct bounded G4 oblique two-cylinder fillet junctions while retaining original
+  supports. Propagate represented-profile, contact, frame and curve-fitting errors within
+  the unchanged geometric budget. The captured case passes sampled comparison and
+  independent material checks. Combined correctness validation passed; neighboring
+  performance parity remains unproven.
+
+- Construct bounded partial chamfer contours across tangent cylinder/plane seams with
+  shared cone/plane generators and conservative remote-trim exclusion. Three A4 modes
+  pass sampled comparison and independent material checks; reentrant planar chamfer
+  face-history behavior is preserved. Reuse selected-rim adjacency during admission
+  without changing geometric checks or output.
+- Construct bounded G8 cubic two-cylinder fillet junctions, retaining original supports
+  and the residual cap arc through its turning point. Independent material and interval
+  clearance checks pass; native agreement remains a sampled comparison.
+
+- Breaking: `try_chamfer_solid_edges_with_distances` now takes
+  `preferences: &[ChamferCornerPreference]` before `tol`. Pass `&[]` for existing behavior;
+  for supported tied corners, supply an explicit selected edge for each tied vertex.
+  Preferences are independent of selection order. Missing, invalid or unused preferences
+  reject without fallback or input mutation. Uniform-distance and wire APIs are unchanged.
+- Construct bounded tied four-contact chamfer corners according to explicit preferences,
+  updating the bilinear patch and surrounding trims together. Annotated A6/A8/A9 outputs
+  pass sampled comparison and local material checks; unannotated captures retain rejection.
+  Matched explicit-shape construction medians are 1.75–1.80 ms versus OCCT 4.09–4.12 ms
+  (40 samples per engine/case); measured neighbors show no reproducible median regression.
+
+- Admit bounded unequal triangular chamfer networks through local geometric distance
+  relations and coincident contacts. Four distance-distance/distance-angle A7/A9 captures
+  now pass sampled comparison; full chamfer replay reaches 362 constructions and 340
+  limited passes without lost checks. Tied four-contact corners still reject by default.
+- Construct bounded cubic H1 wall-first fillets without extending the original support.
+  Independent contact and material checks support the rolling-ball construction; the
+  native comparison remains failed.
+- Construct bounded unequal-radius rectangular-box fillets with a shared cylinder crease
+  and residual cap arc. Account for frame and arithmetic error in the spline fitting budget
+  and reject rational straight-edge representations with poles. P9 passes sampled comparison.
+- Construct bounded F9 two-cylinder junctions with the required short cap continuation.
+  Fine tessellation completes; native comparison and chart-sensitive imported-STEP
+  classification discrepancies remain unresolved.
+- Balance single-direction CDT refinement using division spacing and avoid duplicate
+  boundary-constraint traversal. Store welding attributes once per spatial cell while
+  preserving legacy candidate discovery, accumulation and representative choice. G2 fine
+  replay completes within its retained memory limit. Focused plate, cylinder and welding
+  measurements meet the tested baseline; geometry checks and tolerances are unchanged.
+- Add matched blend benchmark harnesses with build/input-bound smoke approval, exclusive
+  campaign outputs and identity checks before publication. Invalid native F9 construction
+  remains excluded from valid matched timings.
+
+- Intersect the bevel planes at convex two-edge chamfer junctions instead of adding
+  an unequal-root triangle. Independent wedge-volume regressions and all three A1
+  native captures pass; full chamfer replay reaches 358 constructions and 336 limited
+  comparison passes with no lost checks. Concave junctions retain their existing path.
+
 - Assemble bounded fully selected cylindrical chamfer networks using shared curved
   corner edges and original face loops. A7 now passes native sampled comparison;
   full chamfer replay reaches 358 constructions and 333 limited passes without lost

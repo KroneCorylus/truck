@@ -197,3 +197,29 @@ must still satisfy their documented contracts; diagnostic APIs do not catch arbi
 Crate-specific causes use the `TRUCK_TOPOLOGY_`, `TRUCK_GEOMETRY_`, `TRUCK_MODELING_`,
 `TRUCK_DRAFTING_` and `TRUCK_MESH_` namespaces. Transparent wrappers preserve the underlying
 code. Their `code()` methods are the authoritative mappings.
+
+Explicit chamfer corner preferences are passed as the third argument of
+`try_chamfer_solid_edges_with_distances`; pass `&[]` for the existing policy.
+`ChamferCornerPreference { vertex, edge }` names original topology, with one
+selected incident cap edge per tied vertex. The bounded fully selected convex
+one-cylinder family requires orthogonal planar trihedra and equal cap setbacks
+`d = 2h`, where `h` is the equal axis setback. Opposite cap choices are independent.
+Selection and preference order do not choose the pivot. Missing preferences retain
+rejection. Uniform and wire APIs retain their existing behavior.
+
+Invalid, duplicate (including identical), stale, unselected, nonincident, axis,
+non-tied or unused preferences return `InvalidParameter` at
+`validate_corner_preference`, `corner_preference_network`,
+`nonplanar_corner_preference`, `select_corner_preference` or
+`unused_corner_preference`. Preference-bearing calls
+never retry through a route that ignores the preference. Geometry/extent failures
+from the simultaneous construction retain their diagnostic and leave input unchanged.
+
+`replay_occt_blend captured-prefix [preference-file]` optionally takes an explicit
+JSON record containing `input_step` (the exact STEP input text), `input_json` (the
+exact captured input JSON text), and `preferences`. Each preference contains a `vertex`
+coordinate triple and an `edge` descriptor with `points`, using the existing
+geometric selection matcher. Both descriptors must resolve uniquely. The input
+identity must match; there is no implicit annotation lookup. Reports mark annotated
+calls with `explicit_corner_preferences`; compare these separately from unannotated
+baseline runs.

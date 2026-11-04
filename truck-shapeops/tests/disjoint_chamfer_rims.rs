@@ -87,7 +87,7 @@ fn check_rims(full: bool, sizes: [[f64; 2]; 2], reject: bool) {
         if transformed {
             selected.reverse();
         }
-        let result = try_chamfer_solid_edges_with_distances(&input, &selected, TOL);
+        let result = try_chamfer_solid_edges_with_distances(&input, &selected, &[], TOL);
         if reject {
             assert!(result.is_err(), "overlapping end cuts must fail");
             assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());

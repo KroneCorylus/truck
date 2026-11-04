@@ -1122,10 +1122,84 @@ fn replay(prefix: &str, stage: &Cell<&'static str>) -> Result<Value, String> {
     } else {
         TOL / 20.
     };
-    let mut report = replay_task(prefix, stage, &task, schema, step_tol)?;
+    let preference_file: Option<Value> = std::env::args()
+        .nth(2)
+        .map(|path| {
+            serde_json::from_str(&std::fs::read_to_string(path).map_err(|e| e.to_string())?)
+                .map_err(|e| e.to_string())
+        })
+        .transpose()?;
+    if let Some(record) = &preference_file {
+        let step =
+            std::fs::read_to_string(format!("{prefix}.input.step")).map_err(|e| e.to_string())?;
+        if record["input_step"].as_str() != Some(step.as_str())
+            || record["input_json"].as_str()
+                != Some(
+                    std::fs::read_to_string(format!("{prefix}.input.json"))
+                        .map_err(|e| e.to_string())?
+                        .as_str(),
+                )
+        {
+            return Err("Preference input identity mismatch".into());
+        }
+        if task["operation"] != "chamfer" {
+            return Err("Preferences require chamfer".into());
+        }
+    }
+    let mut report = replay_task(
+        prefix,
+        stage,
+        &task,
+        schema,
+        step_tol,
+        preference_file.as_ref(),
+    )?;
+    report["explicit_corner_preferences"] = json!(preference_file.is_some());
     report["selection_scope"] = json!(scope);
     report["step_fitting_tolerance"] = json!(step_tol);
     Ok(report)
+}
+
+fn resolve_corner_preferences(
+    input: &Solid,
+    record: &Value,
+) -> Result<Vec<ChamferCornerPreference>, String> {
+    let records = record["preferences"]
+        .as_array()
+        .ok_or("Missing preferences")?;
+    if records.is_empty() {
+        return Err("Empty preference annotation".into());
+    }
+    records
+        .iter()
+        .map(|item| {
+            let p = &item["vertex"];
+            let point = Point3::new(
+                p[0].as_f64().ok_or("Invalid vertex x")?,
+                p[1].as_f64().ok_or("Invalid vertex y")?,
+                p[2].as_f64().ok_or("Invalid vertex z")?,
+            );
+            if !point.to_vec().is_finite() {
+                return Err("Nonfinite preference vertex".into());
+            }
+            let mut seen = HashSet::new();
+            let vertices: Vec<_> = input
+                .vertex_iter()
+                .filter(|v| seen.insert(v.id()) && v.point().distance(point) <= TOL / 100.)
+                .collect();
+            if vertices.len() != 1 {
+                return Err("Preference vertex must resolve uniquely".into());
+            }
+            let edges = match_selection(input, &item["edge"])?;
+            if edges.len() != 1 {
+                return Err("Preference edge must resolve uniquely".into());
+            }
+            Ok(ChamferCornerPreference {
+                vertex: vertices[0].id(),
+                edge: edges[0].id(),
+            })
+        })
+        .collect()
 }
 
 fn replay_task(
@@ -1134,6 +1208,7 @@ fn replay_task(
     task: &Value,
     schema: u64,
     step_tol: f64,
+    preference_file: Option<&Value>,
 ) -> Result<Value, String> {
     stage.set("import-and-preprocess");
     let input = match import(&format!("{prefix}.input.step")) {
@@ -1144,6 +1219,10 @@ fn replay_task(
     if !input.is_geometric_consistent() {
         return Ok(json!({"status":"input-inconsistent"}));
     }
+    let preferences = preference_file
+        .map(|record| resolve_corner_preferences(&input, record))
+        .transpose()?
+        .unwrap_or_default();
     let before = serde_json::to_string(&input.compress()).map_err(|e| e.to_string())?;
     let selection = task["selection"].as_array().ok_or("Missing selection")?;
     let (ids, result) = if task["operation"] == "chamfer" {
@@ -1178,7 +1257,12 @@ fn replay_task(
                             && face.oriented_surface().elementary().is_none()
                     })
             });
-        let result = if let Some(result) = angle_result {
+        let result = if !preferences.is_empty() {
+            if assignments.len() != edges.len() {
+                return Err("Preferences require distance chamfers".into());
+            }
+            try_chamfer_solid_edges_with_distances(&input, &assignments, &preferences, TOL)
+        } else if let Some(result) = angle_result {
             result
         } else {
             (if normal_section {
@@ -1188,7 +1272,7 @@ fn replay_task(
                     "validate_wire",
                 ))
             } else {
-                try_chamfer_solid_edges_with_distances(&input, &assignments, TOL)
+                try_chamfer_solid_edges_with_distances(&input, &assignments, &[], TOL)
             })
             .or_else(|error| {
                 if let Some(wire) = as_wire(&edges) {
@@ -3456,9 +3540,13 @@ mod parallel_cylinder_chord_tests {
         assert_eq!(edges.len(), 1);
         let angle = 2. * (0.7_f64 / 10.).asin();
         let distance = 5. * angle.tan();
-        let output =
-            try_chamfer_solid_edges_with_distances(&input, &[(edges[0].id(), [distance; 2])], TOL)
-                .unwrap();
+        let output = try_chamfer_solid_edges_with_distances(
+            &input,
+            &[(edges[0].id(), [distance; 2])],
+            &[],
+            TOL,
+        )
+        .unwrap();
         assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
         let phi = 4_f64.atan2(3.) + angle;
         let (x, y) = (5. * phi.cos(), 5. * phi.sin());
@@ -3686,7 +3774,8 @@ mod cylindrical_terminal_fan_tests {
                 .unwrap();
         assert_eq!(selected.len(), count);
         let assignments: Vec<_> = selected.iter().map(|(edge, d)| (edge.id(), *d)).collect();
-        let output = try_chamfer_solid_edges_with_distances(&input, &assignments, TOL).unwrap();
+        let output =
+            try_chamfer_solid_edges_with_distances(&input, &assignments, &[], TOL).unwrap();
         assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
         replay_common::assert_solid(&output.solid, expected, &[0], TOL);
         replay_common::blend::assert_step(&output.solid, expected, TOL);
@@ -4530,7 +4619,8 @@ mod curved_terminal_junction_tests {
                 replay_common::assert_topology(&output, &[0]);
                 replay_common::blend::assert_step(&output, expected, TOL);
                 let tight =
-                    replay_task(prefix, &Cell::new("start"), &task, 3, TOLERANCE / 10.).unwrap();
+                    replay_task(prefix, &Cell::new("start"), &task, 3, TOLERANCE / 10., None)
+                        .unwrap();
                 assert_eq!(tight["status"], "operation-succeeded", "{name}: {tight}");
                 assert_eq!(tight["step_prepared"], true);
                 let output = import(&format!("{prefix}.truck.step")).unwrap();
@@ -4625,7 +4715,7 @@ mod chamfer_transition_orientation_tests {
                 chamfer_distance_selection(&input, task["selection"].as_array().unwrap(), true)
                     .unwrap();
             let assignments: Vec<_> = selected.iter().map(|(edge, d)| (edge.id(), *d)).collect();
-            let solid = try_chamfer_solid_edges_with_distances(&input, &assignments, TOL)
+            let solid = try_chamfer_solid_edges_with_distances(&input, &assignments, &[], TOL)
                 .unwrap()
                 .solid;
             replay_common::assert_solid(&solid, 1.0929679122618834, &[0], TOL);

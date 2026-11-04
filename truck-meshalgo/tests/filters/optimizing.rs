@@ -190,3 +190,30 @@ fn put_together_same_attrs_test() {
     assert_eq!(mesh.uv_coords().len(), 18);
     assert_eq!(mesh.normals().len(), 17);
 }
+
+#[test]
+fn welding_preserves_tetrahedron_winding_geometry_and_topology() {
+    use truck_meshalgo::analyzers::*;
+    let corners = [
+        Point3::origin(),
+        Point3::new(1.0, 0.0, 0.0),
+        Point3::new(0.0, 1.0, 0.0),
+        Point3::new(0.0, 0.0, 1.0),
+    ];
+    let triangles = [[0, 2, 1], [0, 1, 3], [0, 3, 2], [1, 2, 3]];
+    let positions: Vec<_> = triangles.iter().flatten().map(|&i| corners[i]).collect();
+    let mut mesh = PolygonMesh::new(
+        StandardAttributes {
+            positions: positions.clone(),
+            ..Default::default()
+        },
+        Faces::from_iter([[0, 1, 2], [3, 4, 5], [6, 7, 8], [9, 10, 11]]),
+    );
+    mesh.put_together_same_attrs(1e-7).remove_unused_attrs();
+    assert_eq!(mesh.shell_condition(), ShellCondition::Closed);
+    assert_eq!(mesh.positions().len(), 4);
+    assert!((mesh.volume() - 1.0 / 6.0).abs() < 1e-14);
+    for (vertex, point) in mesh.faces().face_iter().flatten().zip(positions) {
+        assert_eq!(mesh.positions()[vertex.pos], point);
+    }
+}

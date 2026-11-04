@@ -105,7 +105,7 @@ fn check(equal: bool, moved: bool, reversed: bool) {
     let result = if equal {
         try_chamfer_solid_edges(&input, &[edge], top * scale, TOL)
     } else {
-        try_chamfer_solid_edges_with_distances(&input, &[(edge, distances)], TOL)
+        try_chamfer_solid_edges_with_distances(&input, &[(edge, distances)], &[], TOL)
     }
     .unwrap();
     assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());

@@ -86,7 +86,8 @@ fn mixed_chamfer_pairs_have_a_planar_corner_transition() {
                         })
                         .collect();
                     let result =
-                        try_chamfer_solid_edges_with_distances(&input, &selected, TOL).unwrap();
+                        try_chamfer_solid_edges_with_distances(&input, &selected, &[], TOL)
+                            .unwrap();
                     // Integrate the concave fill, convex cut, and tapered corner cross sections.
                     let expected =
                         3000. + 10. * c * e / 2. - 10. * a * b / 2. + c * b * (a - e) / 6.;
@@ -106,7 +107,8 @@ fn mixed_chamfer_pairs_have_a_planar_corner_transition() {
                     }
                     selected.reverse();
                     let reversed =
-                        try_chamfer_solid_edges_with_distances(&input, &selected, TOL).unwrap();
+                        try_chamfer_solid_edges_with_distances(&input, &selected, &[], TOL)
+                            .unwrap();
                     assert_eq!(
                         serde_json::to_string(&result.solid.compress()).unwrap(),
                         serde_json::to_string(&reversed.solid.compress()).unwrap()
@@ -129,14 +131,15 @@ fn transitions_at_both_ends_share_the_vertical_bevel_and_reject_collisions() {
     .map(|p| common::blend::edge_through(&input.boundaries()[0], p).id());
     let before = serde_json::to_string(&input.compress()).unwrap();
     let selected = ids.map(|id| (id, [0.2; 2]));
-    let result = try_chamfer_solid_edges_with_distances(&input, &selected, TOL).unwrap();
+    let result = try_chamfer_solid_edges_with_distances(&input, &selected, &[], TOL).unwrap();
     assert!(result.solid.is_geometric_consistent());
     common::assert_solid(&result.solid, 2999.8, &[0], TOL);
     common::blend::assert_step(&result.solid, 2999.8, TOL);
     assert_eq!(result.generated_faces.len(), 5);
     for d in [10., 20.] {
         let selected = ids.map(|id| (id, [d; 2]));
-        let error = try_chamfer_solid_edges_with_distances(&input, &selected, TOL).unwrap_err();
+        let error =
+            try_chamfer_solid_edges_with_distances(&input, &selected, &[], TOL).unwrap_err();
         assert_eq!(error.code, truck_base::diagnostics::Code::OutsideNeighbour);
     }
     assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());

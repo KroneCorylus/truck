@@ -160,7 +160,7 @@ fn connected_channel_rims_share_exact_miters_and_preserve_the_circular_channel()
                                 (id, [sizes[0], sizes[1]])
                             })
                             .collect();
-                        try_chamfer_solid_edges_with_distances(&input, &distances, TOL)
+                        try_chamfer_solid_edges_with_distances(&input, &distances, &[], TOL)
                     }
                 };
                 let result = operation(&selected).unwrap_or_else(|error| panic!(
@@ -236,7 +236,7 @@ fn cylindrical_channel_lips_chamfer_with_equal_and_unequal_distances() {
                         (ids[i], [sizes[0], sizes[1]])
                     })
                     .collect();
-                let result = try_chamfer_solid_edges_with_distances(&input, &selected, TOL)
+                let result = try_chamfer_solid_edges_with_distances(&input, &selected, &[], TOL)
                     .unwrap_or_else(|error| {
                         panic!("distances [{plane}, {cylinder}], sides {indices:?}: {error:?}")
                     });
@@ -264,7 +264,7 @@ fn cylindrical_channel_lips_chamfer_with_equal_and_unequal_distances() {
                 }
                 selected.reverse();
                 let reversed =
-                    try_chamfer_solid_edges_with_distances(&input, &selected, TOL).unwrap();
+                    try_chamfer_solid_edges_with_distances(&input, &selected, &[], TOL).unwrap();
                 assert_eq!(
                     serde_json::to_string(&result.solid.compress()).unwrap(),
                     serde_json::to_string(&reversed.solid.compress()).unwrap()
@@ -285,7 +285,7 @@ fn channel_lip_blends_reject_collapsed_outer_walls_without_mutation() {
         for selected in [vec![ids[0]], ids.to_vec()] {
             assert!(try_fillet_solid_edges(&input, &selected, size, TOL).is_err());
             let chamfers: Vec<_> = selected.iter().map(|&id| (id, [size; 2])).collect();
-            assert!(try_chamfer_solid_edges_with_distances(&input, &chamfers, TOL).is_err());
+            assert!(try_chamfer_solid_edges_with_distances(&input, &chamfers, &[], TOL).is_err());
             assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
         }
     }

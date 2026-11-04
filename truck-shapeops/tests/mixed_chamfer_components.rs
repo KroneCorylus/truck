@@ -82,7 +82,7 @@ fn check(top_axial: f64, bottom_axial: f64, reject: bool) {
                 assignments.reverse();
             }
             let before = serde_json::to_string(&input.compress()).unwrap();
-            let result = try_chamfer_solid_edges_with_distances(&input, &assignments, TOL);
+            let result = try_chamfer_solid_edges_with_distances(&input, &assignments, &[], TOL);
             if reject {
                 assert!(result.is_err(), "overlapping components must fail");
                 assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());

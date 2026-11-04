@@ -100,7 +100,7 @@ fn check(radius: f64, length: f64, distances: [f64; 5], transform: Matrix4, reve
     }
     let selected = setbacks(&input, &ids, radius, distances, inverse, axial);
     let before = serde_json::to_string(&input.compress()).unwrap();
-    let result = try_chamfer_solid_edges_with_distances(&input, &selected, 0.001).unwrap();
+    let result = try_chamfer_solid_edges_with_distances(&input, &selected, &[], 0.001).unwrap();
     assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
     assert_eq!(result.modified_faces.len(), 5);
     assert_eq!(result.generated_faces.len(), 4);
@@ -269,7 +269,7 @@ fn unsupported_elliptic_corner_contract_leaves_input_unchanged() {
         0.2,
     );
     let before = serde_json::to_string(&input.compress()).unwrap();
-    let error = try_chamfer_solid_edges_with_distances(&input, &selected, 0.001).unwrap_err();
+    let error = try_chamfer_solid_edges_with_distances(&input, &selected, &[], 0.001).unwrap_err();
     assert_eq!(
         error.code,
         truck_base::diagnostics::Code::UnsupportedGeometry
@@ -279,7 +279,7 @@ fn unsupported_elliptic_corner_contract_leaves_input_unchanged() {
 
 fn immutable_attempt(input: &Solid, selected: &[(EdgeID, [f64; 2])]) -> Option<Solid> {
     let before = serde_json::to_string(&input.compress()).unwrap();
-    let result = try_chamfer_solid_edges_with_distances(input, selected, 0.001);
+    let result = try_chamfer_solid_edges_with_distances(input, selected, &[], 0.001);
     assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
     match result {
         Ok(result) => Some(result.solid),

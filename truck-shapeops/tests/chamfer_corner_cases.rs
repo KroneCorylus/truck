@@ -118,7 +118,7 @@ fn check(case: Case) {
         if transformed {
             selected.reverse();
         }
-        let result = try_chamfer_solid_edges_with_distances(&input, &selected, TOL).unwrap();
+        let result = try_chamfer_solid_edges_with_distances(&input, &selected, &[], TOL).unwrap();
         common::assert_solid(&result.solid, volume * scale.powi(3), &[0], TOL);
         common::blend::assert_step(&result.solid, volume * scale.powi(3), TOL);
         assert!(result

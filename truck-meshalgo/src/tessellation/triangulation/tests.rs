@@ -715,3 +715,137 @@ fn twisted_bilinear_patch_is_refined_within_tolerance() {
         .collect();
     assert!(mesh.neighborhood_include(&samples, tol));
 }
+
+#[test]
+fn division_metric_preserves_anisotropic_parabolic_geometry() {
+    use crate::analyzers::Topology;
+    use truck_geometry::prelude::*;
+    let tol = 0.001;
+    for length in [10000., 1., 0.001] {
+        for (shift, span) in [(0., 1.), (7., 0.125), (-3., 32.)] {
+            for (reversed, reflected) in
+                [(true, false), (false, false), (false, true), (true, true)]
+            {
+                let mut surface = BSplineSurface::new(
+                    (
+                        KnotVec::from(vec![
+                            shift,
+                            shift,
+                            shift,
+                            shift + span,
+                            shift + span,
+                            shift + span,
+                        ]),
+                        KnotVec::from(vec![-2., -2., 3., 3.]),
+                    ),
+                    {
+                        let mut controls = vec![
+                            vec![Point3::new(0., 0., 0.), Point3::new(0., length, 0.)],
+                            vec![Point3::new(0.5, 0., 0.), Point3::new(0.5, length, 0.)],
+                            vec![Point3::new(1., 0., 1.), Point3::new(1., length, 1.)],
+                        ];
+                        if reflected {
+                            controls.reverse();
+                        }
+                        controls
+                    },
+                );
+                if reversed {
+                    surface.invert();
+                }
+                let transform = Matrix4::from_translation(Vector3::new(2., -3., 5.))
+                    * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.73));
+                let inverse = transform.invert().unwrap();
+                let surface = surface.transformed(transform);
+                let uv = |x: f64, y: f64| {
+                    let p = Point2::new(
+                        shift + span * if reflected { 1. - x } else { x },
+                        -2. + 5. * y,
+                    );
+                    if reversed {
+                        Point2::new(p.y, p.x)
+                    } else {
+                        p
+                    }
+                };
+                let corners = [(0., 0.), (1., 0.), (0.8, 1.), (0.2, 1.)];
+                let mut points = Vec::new();
+                for i in 0..4 {
+                    let (a, b) = (corners[i], corners[(i + 1) % 4]);
+                    for j in 0..64 {
+                        let t = j as f64 / 64.;
+                        let (x, y) = (a.0 + t * (b.0 - a.0), a.1 + t * (b.1 - a.1));
+                        points.push(SurfacePoint::from((
+                            uv(x, y),
+                            transform.transform_point(Point3::new(x, length * y, x * x)),
+                        )));
+                    }
+                }
+                if reversed != reflected {
+                    points.reverse();
+                }
+                let boundary = PolyBoundary::from_loops(vec![points]);
+                let mesh = trimming_tessellation(&surface, &boundary, tol);
+                eprintln!(
+                    "vertices length={length} shift={shift} reversed={reversed}: {}",
+                    mesh.positions().len()
+                );
+                // A generous resource budget: sixteen times the shared boundary size.
+                assert!(
+                    mesh.positions().len() < 4096,
+                    "length={length}: {} vertices",
+                    mesh.positions().len()
+                );
+                assert!(consistent_winding(&mesh));
+                assert_eq!(mesh.extract_boundaries().len(), 1);
+                assert_eq!(mesh.extract_boundaries()[0].len(), 256);
+                for p in mesh.positions() {
+                    let p = inverse.transform_point(*p);
+                    assert!((p.z - p.x * p.x).abs() < 1e-10);
+                    assert!(p.x >= 0.2 * p.y / length - 1e-10);
+                    assert!(p.x <= 1. - 0.2 * p.y / length + 1e-10);
+                }
+                // Intersect vertical rays with the facets in normalized XY coordinates;
+                // this avoids a scale-dependent degenerate-triangle distance predicate.
+                for i in 0..=16 {
+                    for j in 0..=16 {
+                        let y = j as f64 / 16.;
+                        let x = 0.2 * y + (1. - 0.4 * y) * i as f64 / 16.;
+                        assert!(mesh.tri_faces().iter().any(|tri| {
+                            let p = tri.map(|v| inverse.transform_point(mesh.positions()[v.pos]));
+                            let [a, b, c] = p.map(|p| Point2::new(p.x, p.y / length));
+                            let d = (b - a).perp_dot(c - a);
+                            let q = Point2::new(x, y) - a;
+                            let u = q.perp_dot(c - a) / d;
+                            let v = (b - a).perp_dot(q) / d;
+                            u >= -1e-8
+                                && v >= -1e-8
+                                && u + v <= 1. + 1e-8
+                                && (p[0].z + u * (p[1].z - p[0].z) + v * (p[2].z - p[0].z) - x * x)
+                                    .abs()
+                                    <= tol
+                        }));
+                    }
+                }
+                let mut projected_area = 0.;
+                for tri in mesh.tri_faces() {
+                    let [a, b, c] = tri.map(|v| inverse.transform_point(mesh.positions()[v.pos]));
+                    projected_area += (b - a).cross(c - a).z.abs() / 2.;
+                    for (s, t) in [(0.5, 0.), (0., 0.5), (0.5, 0.5), (1. / 3., 1. / 3.)] {
+                        let p = a + s * (b - a) + t * (c - a);
+                        let mut x = p.x;
+                        // Closest point on the independent analytic parabola z=x².
+                        for _ in 0..12 {
+                            x -= (x - p.x + 2. * x * (x * x - p.z)) / (1. + 6. * x * x - 2. * p.z);
+                        }
+                        assert!(
+                            Point2::new(p.x, p.z).distance(Point2::new(x, x * x)) <= tol,
+                            "{p:?}"
+                        );
+                    }
+                }
+                assert!((projected_area / length - 0.8).abs() < 1e-8);
+            }
+        }
+    }
+}

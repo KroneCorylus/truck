@@ -26,7 +26,7 @@ struct MeshMetric {
     scale: Vector2,
 }
 impl MeshMetric {
-    fn new(surface: &impl PreMeshableSurface, bounds: BoundingBox<Point2>, refine: bool) -> Self {
+    fn new(bounds: BoundingBox<Point2>, divisions: &(Vec<f64>, Vec<f64>), refine: bool) -> Self {
         if !refine {
             return Self {
                 origin: Point2::origin(),
@@ -34,11 +34,16 @@ impl MeshMetric {
             };
         }
         let origin = bounds.min().midpoint(bounds.max());
-        let lengths = Vector2::new(
-            surface.uder(origin.x, origin.y).magnitude(),
-            surface.vder(origin.x, origin.y).magnitude(),
+        // Average grid spacing encodes the requested curvature resolution. Unlike
+        // tangent lengths, it permits long triangles along an uncurved ruling.
+        // Under u' = a*u+b, spacing scales by |a|, so metric coordinates only
+        // reflect/translate (up to a common scale); likewise for v and axis swaps.
+        let spacing = Vector2::new(
+            (bounds.max().x - bounds.min().x) / (divisions.0.len() - 1) as f64,
+            (bounds.max().y - bounds.min().y) / (divisions.1.len() - 1) as f64,
         );
-        let mut scale = lengths / lengths.x.max(lengths.y);
+        let mut scale = Vector2::new(1. / spacing.x, 1. / spacing.y);
+        scale /= scale.x.max(scale.y);
         if !scale.x.is_finite() || !scale.y.is_finite() || scale.x <= 0. || scale.y <= 0. {
             scale = Vector2::new(1., 1.);
         }
@@ -980,15 +985,12 @@ impl PolyBoundary {
                 let Some(vj) = poly2tri[j] else { return };
                 if let Some(p) = prev {
                     let Some(v) = poly2tri[p] else { return };
-                    if triangulation.can_add_constraint(v, vj) {
-                        triangulation.add_constraint(v, vj);
+                    if v == vj || !triangulation.try_add_constraint(v, vj).is_empty() {
                         prev = None;
                     }
                 } else {
                     let Some(vi) = poly2tri[i] else { return };
-                    if triangulation.can_add_constraint(vi, vj) {
-                        triangulation.add_constraint(vi, vj);
-                    } else {
+                    if vi != vj && triangulation.try_add_constraint(vi, vj).is_empty() {
                         prev = Some(i);
                     }
                 }
@@ -1035,8 +1037,8 @@ where S: PreMeshableSurface {
         divisions.0.insert(1, (udiv[0] + udiv[1]) / 2.);
     }
     // Trims on a grid curved in only one direction still need free refinement.
-    // Balance those triangles in physical space to avoid repeated UV slivers.
-    let metric = MeshMetric::new(surface, bounds, single_direction);
+    // Balance triangles in units of the surface sampling grid.
+    let metric = MeshMetric::new(bounds, &divisions, single_direction);
     polyboundary.insert_to(&mut triangulation, &mut boundary_map, &metric);
     insert_surface(
         &mut triangulation,

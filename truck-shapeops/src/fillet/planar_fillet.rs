@@ -1,3 +1,9 @@
+#[path = "f9.rs"]
+mod f9;
+#[path = "g8.rs"]
+mod g8;
+#[path = "g4.rs"]
+mod g4;
 use super::planar::{neighborhood, valid_boundaries};
 use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};
 use std::result::Result;
@@ -21,6 +27,15 @@ pub(super) fn fillet(
         Diagnostic::new(code, "fillet_solid_edges", "construct_local_fillet")
             .parameter("radius", radius)
     };
+    if let Some(result) = f9::build(shell, selected, radius, tol) {
+        return Ok(result);
+    }
+    if let Some(result) = g8::build(shell, selected, radius, tol) {
+        return Ok(result);
+    }
+    if let Some(result) = g4::build(shell, selected, radius, tol) {
+        return Ok(result);
+    }
     let data = neighborhood(shell, selected, "fillet_solid_edges", selected.len() > 1)?;
     let mut contacts: Vec<[[Vertex; 2]; 2]> = data
         .original_edges
@@ -108,6 +123,7 @@ pub(super) fn fillet(
                     cylinder,
                     guides,
                     extension,
+                    wall_first,
                 } = extrusion_miter_geometry(
                     &support,
                     data.planes[cap].unwrap(),
@@ -124,9 +140,9 @@ pub(super) fn fillet(
                 .ok_or_else(|| error(Code::OutsideNeighbour))?;
                 let [p, q, r] = points.map(Vertex::new);
                 contact(curved, cap, &p);
-                contact(curved, f, if extension.is_some() { &r } else { &q });
+                contact(curved, f, if wall_first { &r } else { &q });
                 contact(straight, cap, &p);
-                contact(straight, wall, if extension.is_some() { &q } else { &r });
+                contact(straight, wall, if wall_first { &q } else { &r });
                 for j in data.sides[ruling] {
                     contact(ruling, j, &r);
                 }
@@ -145,14 +161,14 @@ pub(super) fn fillet(
                 extrusion_miters.push(ExtrusionMiter {
                     curved: (curved, end_index(curved)),
                     straight: (straight, end_index(straight)),
-                    support: if extension.is_some() {
+                    support: if wall_first {
                         bounded_plane_chart(&shell[wall])
                             .ok_or_else(|| error(Code::UnsupportedGeometry))?
                     } else {
                         support
                     },
                     fit_endpoint,
-                    wall_first: extension.is_some(),
+                    wall_first,
                     cylinder,
                     points: [p, q, r],
                     guides,
@@ -2244,6 +2260,7 @@ fn bracketed_root(
 }
 
 struct ExtrusionMiterGeometry {
+    wall_first: bool,
     extension: Option<(Surface, (f64, f64))>,
     uvp: (f64, f64),
     uvq: (f64, f64),
@@ -2269,6 +2286,17 @@ fn extrusion_miter_geometry(
     let Curve::BSplineCurve(basis) = extrusion.entity_curve() else {
         return None;
     };
+    if basis.degree() == 3 {
+        return cubic_miter_geometry(
+            support,
+            cap,
+            wall,
+            [edge, straight, ruling],
+            hint,
+            radius,
+            tol,
+        );
+    }
     if basis.degree() == 4 {
         return quartic_miter_geometry(
             support,
@@ -2483,6 +2511,7 @@ fn extrusion_miter_geometry(
     let cylinder =
         ExtrudedCurve::by_extrusion(section.curve(), along * (positions[1] - positions[0])).into();
     Some(ExtrusionMiterGeometry {
+        wall_first: false,
         extension: None,
         uvp,
         uvq,
@@ -2880,7 +2909,320 @@ fn quartic_miter_geometry(
         points,
         cylinder,
         guides: [seam, continuation],
+        wall_first: true,
         extension: Some((private, fit_endpoint)),
+    })
+}
+
+fn cubic_miter_geometry(
+    support: &Surface,
+    cap: (Vector3, f64),
+    wall: (Vector3, f64),
+    [_edge, straight, ruling]: [&Edge; 3],
+    hint: (f64, f64),
+    radius: f64,
+    tol: f64,
+) -> Option<ExtrusionMiterGeometry> {
+    let Surface::Extruded(extrusion) = support else {
+        return None;
+    };
+    let Curve::BSplineCurve(basis) = extrusion.entity_curve() else {
+        return None;
+    };
+    let (lo, hi) = basis.range_tuple();
+    let controls = basis.control_points();
+    if basis.degree() != 3
+        || controls.len() != 4
+        || !lo.is_finite()
+        || !hi.is_finite()
+        || lo >= hi
+        || (0..4).any(|i| basis.knot(i) != lo || basis.knot(i + 4) != hi)
+        || !finite_uv(hint)
+        || !radius.is_finite()
+        || radius <= 0.
+        || !tol.is_finite()
+        || tol <= 0.
+        || controls.iter().any(|p| !finite_point(*p))
+    {
+        return None;
+    }
+    let (n, d) = cap;
+    let (m, e) = wall;
+    let a = extrusion.extruding_vector();
+    let na = n.dot(a);
+    let nm = n.dot(m);
+    if !finite_vector(a)
+        || !finite_vector(n)
+        || !finite_vector(m)
+        || !d.is_finite()
+        || !e.is_finite()
+        || !na.is_finite()
+        || !nm.is_finite()
+        || na.abs() <= TOLERANCE * a.magnitude()
+        || m.dot(a).abs() > TOLERANCE * a.magnitude()
+        || 1. - nm * nm <= TOLERANCE
+        || controls
+            .iter()
+            .any(|p| n.dot(*p - controls[0]).abs() > tol / 10.)
+    {
+        return None;
+    }
+    let endpoint = if (hint.0 - lo).abs() < (hint.0 - hi).abs() {
+        lo
+    } else {
+        hi
+    };
+    if (hint.0 - endpoint).abs() > TOLERANCE * (hi - lo) {
+        return None;
+    }
+    let chord = controls[3] - controls[0];
+    if chord.so_small()
+        || a.dot(chord).abs() > TOLERANCE * a.magnitude() * chord.magnitude()
+        || controls.windows(2).any(|p| (p[1] - p[0]).dot(chord) <= 0.)
+        || controls.iter().any(|p| m.dot(p.to_vec()) > e + tol / 10.)
+    {
+        return None;
+    }
+    let axis = a.normalize();
+    let project = |x: Vector3| x - axis * x.dot(axis);
+    // Bernstein bounds on projected speed and curvature exclude offset folds.
+    for i in 0..64 {
+        let p = bezier_interval(controls, i as f64 / 64., (i + 1) as f64 / 64.);
+        let ds: Vec<_> = p.windows(2).map(|p| project(3. * (p[1] - p[0]))).collect();
+        let dds: Vec<_> = ds.windows(2).map(|v| 2. * (v[1] - v[0])).collect();
+        let direction = ds[0].normalize();
+        let min_speed = ds
+            .iter()
+            .map(|v| v.dot(direction))
+            .fold(f64::INFINITY, f64::min);
+        let max_cross = ds
+            .iter()
+            .flat_map(|v| dds.iter().map(move |w| v.cross(*w).magnitude()))
+            .fold(0_f64, f64::max);
+        if min_speed <= 0. || !max_cross.is_finite() || radius * max_cross >= min_speed.powi(3) {
+            return None;
+        }
+    }
+    // An exact-arithmetic rolling-disk inequality, evaluated numerically without
+    // outward rounding, including pairs across the inflection. For projected B
+    // and s != t, divide the squared clearance
+    // |B(s) - (B(t)-rN(t))|²-r² by (s-t)². The result is
+    // |D(s,t)|² + 2r N(t).E(s,t), where D is the divided difference
+    // and E=(B(s)-B(t)-(s-t)B'(t))/(s-t)². Bound both on parameter boxes.
+    let p1 = project(3. * (controls[1] - controls[0]));
+    let p2 =
+        project(3. * (controls[2].to_vec() - 2. * controls[1].to_vec() + controls[0].to_vec()));
+    let p3 = project(
+        controls[3].to_vec() - 3. * controls[2].to_vec() + 3. * controls[1].to_vec()
+            - controls[0].to_vec(),
+    );
+    let orientation = support.normal(lo, hint.1).dot(axis.cross(p1)).signum();
+    let lower = |coefficient: f64, bounds: (f64, f64)| {
+        coefficient
+            * if coefficient >= 0. {
+                bounds.0
+            } else {
+                bounds.1
+            }
+    };
+    for i in 0..32 {
+        let (t0, t1) = (i as f64 / 32., (i + 1) as f64 / 32.);
+        let p = bezier_interval(controls, t0, t1);
+        let derivatives: Vec<_> = p.windows(2).map(|p| project(96. * (p[1] - p[0]))).collect();
+        let direction = derivatives[1].normalize();
+        let speed = derivatives
+            .iter()
+            .map(|v| v.dot(direction))
+            .fold(f64::INFINITY, f64::min);
+        if speed <= 0. {
+            return None;
+        }
+        for j in 0..32 {
+            let (s0, s1) = (j as f64 / 32., (j + 1) as f64 / 32.);
+            let sm = (s0 + s1) / 2.;
+            let tm = (t0 + t1) / 2.;
+            let direction = (p1 + p2 * (sm + tm) + p3 * (sm * sm + sm * tm + tm * tm)).normalize();
+            let distance = p1.dot(direction)
+                + lower(p2.dot(direction), (s0 + t0, s1 + t1))
+                + lower(
+                    p3.dot(direction),
+                    (s0 * s0 + s0 * t0 + t0 * t0, s1 * s1 + s1 * t1 + t1 * t1),
+                );
+            let mut numerator = 0_f64;
+            for derivative in &derivatives {
+                for value in [s0 + 2. * t0, s1 + 2. * t1] {
+                    numerator =
+                        numerator.min(orientation * axis.cross(*derivative).dot(p2 + p3 * value));
+                }
+            }
+            if !distance.is_finite()
+                || distance <= 0.
+                || distance * distance + 2. * radius * numerator / speed <= 0.
+            {
+                return None;
+            }
+        }
+    }
+    let [bottom, top] = [ruling.front().point(), ruling.back().point()];
+    let heights = [n.dot(bottom.to_vec()), n.dot(top.to_vec())];
+    if 2. * radius >= (heights[1] - heights[0]).abs() {
+        return None;
+    }
+    let in_slab = |p: Point3| {
+        finite_point(p)
+            && n.dot(p.to_vec()) >= heights[0].min(heights[1]) - tol / 10.
+            && n.dot(p.to_vec()) <= heights[0].max(heights[1]) + tol / 10.
+    };
+    let frame = |u: f64| {
+        if !u.is_finite() || u < lo || u > hi {
+            return None;
+        }
+        let normal = support.normal(u, hint.1).normalize();
+        let b = support.subs(u, hint.1);
+        let v = hint.1 + (d - radius - n.dot((b - radius * normal).to_vec())) / na;
+        let c = support.subs(u, v) - radius * normal;
+        let lateral = normal - n * n.dot(normal);
+        if !finite_point(c) || !in_slab(c + radius * normal) || lateral.so_small() {
+            return None;
+        }
+        Some(((u, v), c, lateral.normalize(), n.dot(normal).acos()))
+    };
+    let beta = nm.acos();
+    let vw = (m - n * nm).normalize();
+    let center_line = Point3::from_vec(
+        n * ((d - radius - nm * (e - radius)) / (1. - nm * nm))
+            + m * ((e - radius - nm * (d - radius)) / (1. - nm * nm)),
+    );
+    // Keep the remote root in its own endpoint neighbourhood. Bernstein
+    // derivative bounds make both seam and wall residuals strictly monotone
+    // throughout it, for every section angle, not just the guide samples.
+    let fraction = if endpoint == lo {
+        (0., 1. / 16.)
+    } else {
+        (15. / 16., 1.)
+    };
+    let local = bezier_interval(controls, fraction.0, fraction.1);
+    let ds: Vec<_> = local.windows(2).map(|p| 48. * (p[1] - p[0])).collect();
+    let dds: Vec<_> = ds.windows(2).map(|p| 32. * (p[1] - p[0])).collect();
+    let direction = project(ds[1]).normalize();
+    let speed = ds
+        .iter()
+        .map(|v| project(*v).dot(direction))
+        .fold(f64::INFINITY, f64::min);
+    let acceleration = dds
+        .iter()
+        .map(|v| project(*v).magnitude())
+        .fold(0_f64, f64::max);
+    let normal_derivative = acceleration / speed;
+    let derivative_error =
+        radius * normal_derivative * (1. + a.magnitude() / na.abs() + a.magnitude() / na.abs());
+    if speed <= 0. || !derivative_error.is_finite() {
+        return None;
+    }
+    for normal in [vw, m] {
+        let sign = normal.dot(ds[1]).signum();
+        if ds.iter().any(|v| sign * normal.dot(*v) <= derivative_error) {
+            return None;
+        }
+    }
+    let nz_bound = ds
+        .iter()
+        .map(|v| n.dot(axis.cross(*v)).abs() / speed)
+        .fold(0_f64, f64::max);
+    if nz_bound >= 1.
+        || nm <= 0.
+        || nm * beta.sin().min((1. - nz_bound * nz_bound).sqrt()) <= nz_bound
+        || ds
+            .iter()
+            .any(|v| orientation * vw.dot(axis.cross(*v)) >= 0.)
+    {
+        return None;
+    }
+    let mid = if endpoint == lo {
+        lo + (hi - lo) / 16.
+    } else {
+        hi - (hi - lo) / 16.
+    };
+    let interval = (mid, endpoint);
+    let station = |phi: f64| {
+        bracketed_root(
+            |u| {
+                let (_, c, lateral, _) = frame(u)?;
+                if beta >= std::f64::consts::FRAC_PI_2 {
+                    return None;
+                }
+                Some(vw.dot(c - center_line) + radius * phi.sin() * (vw.dot(lateral) - 1.))
+            },
+            interval,
+            tol / 100.,
+        )
+    };
+    let mut seam = Vec::new();
+    let angles = (0..=64).map(|i| beta * i as f64 / 64.);
+    for phi in angles {
+        let (_, c, lateral, alpha) = frame(station(phi)?)?;
+        if alpha <= beta {
+            return None;
+        }
+        seam.push(c + radius * (n * phi.cos() + lateral * phi.sin()));
+    }
+    let uvp = frame(station(0.)?)?.0;
+    let (uvr, _, _, alpha) = frame(endpoint)?;
+    let wall_station = station(beta)?;
+    let mut continuation = Vec::new();
+    for i in 0..=64 {
+        let phi = beta + (alpha - beta) * i as f64 / 64.;
+        let u = bracketed_root(
+            |u| {
+                let (_, c, lateral, _) = frame(u)?;
+                Some(m.dot((c + radius * (n * phi.cos() + lateral * phi.sin())).to_vec()) - e)
+            },
+            (endpoint, wall_station),
+            tol / 100.,
+        )?;
+        let (_, c, lateral, _) = frame(u)?;
+        continuation.push(c + radius * (n * phi.cos() + lateral * phi.sin()));
+    }
+    let points = [seam[0], *seam.last()?, support.subs(uvr.0, uvr.1)];
+    if points[1].distance(continuation[0]) > tol / 10.
+        || points[2].distance(continuation[64]) > tol / 10.
+        || (wall_station - endpoint) * (mid - endpoint) <= 0.
+    {
+        return None;
+    }
+    continuation[0] = points[1];
+    continuation[64] = points[2];
+    for p in seam.iter().chain(&continuation) {
+        if !in_slab(*p) || m.dot(p.to_vec()) > e + tol / 10. {
+            return None;
+        }
+    }
+    let (_, center, _, _) = frame(uvp.0)?;
+    let along = (straight.back().point() - straight.front().point()).normalize();
+    let positions = [straight.front(), straight.back()].map(|v| (v.point() - center).dot(along));
+    for p in seam.iter().chain(&continuation) {
+        let t = (*p - center).dot(along);
+        if t < positions[0] - tol / 10. || t > positions[1] + tol / 10. {
+            return None;
+        }
+    }
+    let origin = center + along * positions[0];
+    let section = circle(
+        &Vertex::new(origin + radius * n),
+        &Vertex::new(origin + radius * m),
+        origin,
+    );
+    let cylinder =
+        ExtrudedCurve::by_extrusion(section.curve(), along * (positions[1] - positions[0])).into();
+    Some(ExtrusionMiterGeometry {
+        uvp,
+        uvq: uvr,
+        center,
+        points,
+        cylinder,
+        guides: [seam, continuation],
+        wall_first: true,
+        extension: None,
     })
 }
 

@@ -135,14 +135,15 @@ fn asymmetric_inset_chamfers_keep_their_contact_distances_and_order() {
         let before = serde_json::to_string(&input.compress()).unwrap();
         for count in [1, 2] {
             let mut chosen = distances_on_top(&input, &selected(&input)[..count], a, b);
-            let result = try_chamfer_solid_edges_with_distances(&input, &chosen, TOL).unwrap();
+            let result = try_chamfer_solid_edges_with_distances(&input, &chosen, &[], TOL).unwrap();
             let expected = 3000.0
                 - count as f64 * 10.0 * a * b / 2.0
                 - if count == 2 { a * a * b / 3.0 } else { 0.0 };
             common::assert_solid(&result.solid, expected, &[0], TOL);
             common::blend::assert_step(&result.solid, expected, TOL);
             chosen.reverse();
-            let reverse = try_chamfer_solid_edges_with_distances(&input, &chosen, TOL).unwrap();
+            let reverse =
+                try_chamfer_solid_edges_with_distances(&input, &chosen, &[], TOL).unwrap();
             assert_eq!(
                 serde_json::to_string(&result.solid.compress()).unwrap(),
                 serde_json::to_string(&reverse.solid.compress()).unwrap()
@@ -206,7 +207,7 @@ fn asymmetric_three_edge_corner_matches_an_affine_scaled_reference() {
             (edge.id(), sizes.try_into().unwrap())
         })
         .into();
-    let result = try_chamfer_solid_edges_with_distances(&input, &chosen, TOL).unwrap();
+    let result = try_chamfer_solid_edges_with_distances(&input, &chosen, &[], TOL).unwrap();
     // The affine image of the equal-distance cube corner, including its corner triangle.
     let expected = 1.5 * (1000.0 - 15.0 * 0.2_f64.powi(2) + 2.0 * 0.2_f64.powi(3) / 3.0);
     common::assert_solid(&result.solid, expected, &[0], TOL);
@@ -227,7 +228,7 @@ fn oversized_unequal_distances_preserve_the_input() {
     for count in [1, 2] {
         for (a, b) in [(20.0, 0.2), (0.2, 20.0), (f64::MAX, 0.2)] {
             let chosen = distances_on_top(&input, &selected(&input)[..count], a, b);
-            let error = try_chamfer_solid_edges_with_distances(&input, &chosen, TOL)
+            let error = try_chamfer_solid_edges_with_distances(&input, &chosen, &[], TOL)
                 .expect_err("oversized chamfer");
             assert_eq!(error.code, truck_base::diagnostics::Code::OutsideNeighbour);
             assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
@@ -421,8 +422,8 @@ fn concave_chamfers_reject_collapsed_neighbours() {
     let before = serde_json::to_string(&input.compress()).unwrap();
     let id = common::blend::edge_through(&input.boundaries()[0], Point3::new(10.0, 10.0, 5.0)).id();
     for distances in [[10.0, 10.0], [10.0, 0.2], [0.2, 20.0], [f64::MAX, 0.2]] {
-        let error =
-            try_chamfer_solid_edges_with_distances(&input, &[(id, distances)], TOL).unwrap_err();
+        let error = try_chamfer_solid_edges_with_distances(&input, &[(id, distances)], &[], TOL)
+            .unwrap_err();
         assert_eq!(error.code, truck_base::diagnostics::Code::OutsideNeighbour);
         assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
     }
@@ -444,7 +445,7 @@ fn concave_chamfers_measure_distances_on_oblique_support_faces() {
         )
         .id();
         let result =
-            try_chamfer_solid_edges_with_distances(&input, &[(id, [0.2, 0.3])], TOL).unwrap();
+            try_chamfer_solid_edges_with_distances(&input, &[(id, [0.2, 0.3])], &[], TOL).unwrap();
         let expected = 3000.0 + 10.0 * 0.2 * 0.3 / (2.0 * (1.0 + shear * shear).sqrt());
         common::assert_solid(&result.solid, expected, &[0], TOL);
         common::blend::assert_step(&result.solid, expected, TOL);
@@ -568,7 +569,8 @@ fn mixed_corner_transitions_support_distinct_setbacks_and_both_ends() {
                     (id, [distances[0], distances[1]])
                 })
                 .collect();
-            let result = try_chamfer_solid_edges_with_distances(&input, &request, TOL).unwrap();
+            let result =
+                try_chamfer_solid_edges_with_distances(&input, &request, &[], TOL).unwrap();
             assert_eq!(result.generated_faces.len(), 1 + 3 * ends);
             let k = 2.0 - 2.0_f64.sqrt();
             let expected = 3000.0

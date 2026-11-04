@@ -62,7 +62,7 @@ fn check(vertical: f64, scale: f64, reversed_faces: bool) {
     let result = if vertical == 2. {
         try_chamfer_solid_edges(&input, &[edge], 2. * scale, TOL)
     } else {
-        try_chamfer_solid_edges_with_distances(&input, &[(edge, distances)], TOL)
+        try_chamfer_solid_edges_with_distances(&input, &[(edge, distances)], &[], TOL)
     }
     .unwrap();
     assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());

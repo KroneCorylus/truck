@@ -2,7 +2,9 @@
 
 use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};
 use truck_base::diagnostics::{validate_tolerance, Code, Diagnostic};
-use truck_modeling::{EdgeID, Face, FaceID, Rad, ScalarFunctionD1, Shell, Solid, Surface, Wire};
+use truck_modeling::{
+    EdgeID, Face, FaceID, Rad, ScalarFunctionD1, Shell, Solid, Surface, VertexID, Wire,
+};
 
 /// A modeling solid after a blend, with face correspondence for downstream naming.
 ///
@@ -297,8 +299,12 @@ pub fn try_fillet_solid_edges(
 /// Equal radii use [`try_fillet_solid_edges`] and retain its supported scope.
 /// Unequal radii support separate straight edges between planes or an axial cylindrical
 /// support, with the end-face restrictions of the existing straight-edge construction.
-/// Selected edges must belong to one shell and must not share vertices. Contacts must fit
-/// the supporting faces; unequal-radius corner junctions are unsupported. This operation
+/// Selected edges must belong to one shell. Two adjacent edges of an unsplit rectangular
+/// box may meet in a two-cylinder crease miter, with positive distinct radii and clearance
+/// from all opposite supports. Radii and their difference must exceed the construction
+/// clearance (`max(8 * tol, 100 * TOLERANCE)`). Cavities and other unequal shared-vertex
+/// selections are unsupported.
+/// Contacts must fit the supporting faces. This operation
 /// does not detect intersections with distant faces or other shells.
 /// Selection order does not affect construction order. Face history relates the original
 /// solid to the final result. Empty selection returns the original solid and empty history;
@@ -324,6 +330,12 @@ pub fn try_fillet_solid_edges_with_radii(
     })?;
     let index = validate_selection(solid, &ids, operation)?;
     let shell = &solid.boundaries()[index];
+    if let Some(result) = (solid.boundaries().len() == 1)
+        .then(|| super::planar_edge::unequal_box(shell, edges, tol))
+        .flatten()
+    {
+        return finish(solid, index, result, tol).map_err(|e| e.operation(operation));
+    }
     let mut vertices = HashSet::default();
     for (i, id) in ids.iter().enumerate() {
         let edge = shell.edge_iter().find(|e| e.id() == *id).unwrap();
@@ -437,8 +449,8 @@ fn separate_contours(
 /// Three meet at a point, except where two
 /// convex edges meet a concave edge: a planar transition joins the common face to the
 /// inside bevel. Reversing selection order has no effect.
-/// Nonconvex shells and one-, two- and three-edge junctions are supported. Two-edge bevels
-/// use a triangular transition when their contacts on the unselected edge differ.
+/// Nonconvex shells and one-, two- and three-edge junctions are supported. Convex two-edge
+/// bevels trim along their plane intersection; concave junctions retain their transition.
 /// Planar intersections also handle some higher-valence junctions, including one through
 /// four selected ridges at a square pyramid's apex.
 /// Unrelated curved faces, curved boundary segments and inner loops are preserved. Contact
@@ -495,6 +507,9 @@ pub fn try_chamfer_solid_edges(
     let shell =
         super::chamfer_edges::chamfer_edges(&solid.boundaries()[index], edges, distance, tol)
             .or_else(|error| {
+                if error.stage == "certify_planar_corner" {
+                    return Err(error);
+                }
                 let retry_outside = edges.len() == 1 && error.code == Code::OutsideNeighbour;
                 if matches!(
                     error.code,
@@ -537,7 +552,33 @@ pub fn try_chamfer_solid_edges(
     finish(solid, index, shell, tol).map_err(|e| e.operation(operation))
 }
 
+/// Resolves a supported tied chamfer corner by selecting an incident edge.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct ChamferCornerPreference {
+    /// Original corner vertex.
+    pub vertex: VertexID,
+    /// Selected incident edge whose bevel is the pivot; A6 requires a cap edge.
+    pub edge: EdgeID,
+}
+
 /// Chamfers selected edges with separate distances on their two adjacent faces.
+///
+/// Preferences select an incident cap-edge pivot at tied orthogonal planar corners of
+/// a fully selected convex one-cylinder network with equal cap setbacks twice the axis
+/// setback. Bounded partial tangent networks also accept the regular section pivot
+/// where two orthogonal convex planar candidates compete between that section and
+/// an exactly collapsed triangle;
+/// the triangle preference is unsupported. Supply one preference per tied vertex.
+/// Missing preferences for those ambiguous partial corners reject.
+/// Explicit signed-section preferences also support certified convex corners with no
+/// monotone pivot, and a fully reentrant corner with one monotone section pivot.
+/// These require an embedded projected chart, source-sector contacts and retained
+/// trim/footprint certificates. The same-concavity physical-length collapse policy
+/// applies to the nominated section, including a triangle result at a convex corner.
+/// Existing unannotated reentrant triangle cases remain supported. The regular,
+/// noncollapsed reentrant section family requires a preference and rejects without it.
+/// Preferences are unordered and must be unique; calls carrying them never use fallback
+/// constructions that discard the chosen pivot.
 ///
 /// Each tuple contains an edge ID and distances in shell face order. All selected edges
 /// must lie in one shell. Planar neighborhoods have three edges per touched vertex;
@@ -548,14 +589,15 @@ pub fn try_chamfer_solid_edges(
 /// An isolated chamfer may consume short neighboring edges while retaining their support faces.
 /// Planar chamfers may cross curved terminal edges within their existing parameter bounds.
 /// On cylindrical supports, distances use the nearest point to the perpendicular tangent
-/// offset. Unrelated curved faces and inner boundary loops are preserved. Two-edge bevels
-/// use a triangular transition when their contacts on the unselected edge differ. Mixed three-edge corners use a
+/// offset. Unrelated curved faces and inner boundary loops are preserved. Convex two-edge
+/// bevels trim along their plane intersection; concave junctions retain their transition. Mixed three-edge corners use a
 /// transition when the convex bevels have matching setbacks on their common face;
 /// otherwise they use a three-plane miter. Other restrictions are those of
 /// [`chamfer_solid_edges`]. The input remains unchanged on failure.
 pub fn try_chamfer_solid_edges_with_distances(
     solid: &Solid,
     edges: &[(EdgeID, [f64; 2])],
+    preferences: &[ChamferCornerPreference],
     tol: f64,
 ) -> Result<BlendResult, Diagnostic> {
     let operation = "chamfer_solid_edges";
@@ -564,11 +606,27 @@ pub fn try_chamfer_solid_edges_with_distances(
         positive(distances[0], "d0", operation)?;
         positive(distances[1], "d1", operation)?;
     }
-    if edges.is_empty() {
+    if preferences.is_empty() && edges.is_empty() {
         return try_chamfer_solid_edges(solid, &[], 1.0, tol);
     }
+    let mut vertices = HashSet::default();
+    for preference in preferences {
+        if !vertices.insert(preference.vertex)
+            || !edges.iter().any(|(id, _)| *id == preference.edge)
+            || !solid.edge_iter().any(|edge| {
+                edge.id() == preference.edge
+                    && [edge.front().id(), edge.back().id()].contains(&preference.vertex)
+            })
+        {
+            return Err(Diagnostic::new(
+                Code::InvalidParameter,
+                operation,
+                "validate_corner_preference",
+            ));
+        }
+    }
     let ids: Vec<_> = edges.iter().map(|&(id, _)| id).collect();
-    if edges.iter().all(|(_, d)| *d == [edges[0].1[0]; 2]) {
+    if preferences.is_empty() && edges.iter().all(|(_, d)| *d == [edges[0].1[0]; 2]) {
         return try_chamfer_solid_edges(solid, &ids, edges[0].1[0], tol);
     }
     Solid::try_new(solid.boundaries().clone()).map_err(|e| {
@@ -578,9 +636,23 @@ pub fn try_chamfer_solid_edges_with_distances(
     let index = validate_selection(solid, &ids, operation)?;
     let distances = edges.iter().copied().collect();
     let selected = ids.into_iter().collect();
+    if !preferences.is_empty() {
+        let shell = super::chamfer_miter::chamfer(
+            &solid.boundaries()[index],
+            &selected,
+            &distances,
+            preferences,
+            tol,
+        )
+        .map_err(|e| e.shell(index))?;
+        return finish(solid, index, shell, tol).map_err(|e| e.operation(operation));
+    }
     let shell =
-        super::chamfer_miter::chamfer(&solid.boundaries()[index], &selected, &distances, tol)
+        super::chamfer_miter::chamfer(&solid.boundaries()[index], &selected, &distances, &[], tol)
             .or_else(|error| {
+                if error.stage == "certify_planar_corner" {
+                    return Err(error);
+                }
                 let retry_outside = edges.len() == 1 && error.code == Code::OutsideNeighbour;
                 if matches!(
                     error.code,
@@ -1535,7 +1607,7 @@ pub fn try_chamfer_solid_edge(
     positive(d0, "d0", operation)?;
     positive(d1, "d1", operation)?;
 
-    match try_chamfer_solid_edges_with_distances(solid, &[(edge, [d0, d1])], tol) {
+    match try_chamfer_solid_edges_with_distances(solid, &[(edge, [d0, d1])], &[], tol) {
         Ok(result) => return Ok(result),
         Err(error)
             if matches!(

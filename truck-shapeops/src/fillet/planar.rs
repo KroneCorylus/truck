@@ -380,7 +380,7 @@ pub(super) fn collect_neighborhood(
     })
 }
 
-fn validate_neighborhood(
+pub(super) fn validate_neighborhood(
     shell: &Shell,
     selected: &HashSet<EdgeID>,
     operation: &'static str,

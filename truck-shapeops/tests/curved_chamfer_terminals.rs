@@ -75,7 +75,7 @@ fn check(equal: bool, moved: bool) {
     let result = if equal {
         try_chamfer_solid_edges(&input, &[edge], 0.2 * scale, TOL)
     } else {
-        try_chamfer_solid_edges_with_distances(&input, &[(edge, distances)], TOL)
+        try_chamfer_solid_edges_with_distances(&input, &[(edge, distances)], &[], TOL)
     }
     .unwrap();
     assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
@@ -125,7 +125,8 @@ fn curved_terminal_chamfers_reject_consumed_supports_without_mutation() {
     for distance in [1., 2., 10.] {
         assert!(try_chamfer_solid_edges(&input, &[edge], distance, TOL).is_err());
         assert!(
-            try_chamfer_solid_edges_with_distances(&input, &[(edge, [distance; 2])], TOL).is_err()
+            try_chamfer_solid_edges_with_distances(&input, &[(edge, [distance; 2])], &[], TOL)
+                .is_err()
         );
         assert_eq!(before, serde_json::to_string(&input.compress()).unwrap());
     }

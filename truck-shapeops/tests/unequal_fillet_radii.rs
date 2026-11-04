@@ -182,7 +182,7 @@ fn unequal_radii_validate_every_assignment_and_preserve_input_on_failure() {
 }
 
 #[test]
-fn unequal_radius_junctions_and_overlapping_parallel_rounds_are_rejected() {
+fn unequal_box_crease_junctions_and_parallel_round_guards() {
     let solid = primitive::cuboid(BoundingBox::from_iter([
         Point3::origin(),
         Point3::new(10., 10., 10.),
@@ -200,12 +200,15 @@ fn unequal_radius_junctions_and_overlapping_parallel_rounds_are_rejected() {
     };
     let first = edge(Point3::origin(), Point3::new(0., 0., 10.));
     let connected = edge(Point3::origin(), Point3::new(10., 0., 0.));
-    assert_eq!(
-        try_fillet_solid_edges_with_radii(&solid, &[(first, 1.), (connected, 2.)], 0.001)
-            .unwrap_err()
-            .code,
-        Code::UnsupportedTopology
-    );
+    // A rectangular convex corner has a two-cylinder crease miter.
+    for order in [
+        [(first, 1.), (connected, 2.)],
+        [(connected, 2.), (first, 1.)],
+    ] {
+        let result = try_fillet_solid_edges_with_radii(&solid, &order, 0.001).unwrap();
+        common::assert_solid(&result.solid, 8. * 123.69042579279512, &[0], 0.001);
+        common::blend::assert_step(&result.solid, 8. * 123.69042579279512, 0.001);
+    }
     let opposite = edge(Point3::new(10., 0., 0.), Point3::new(10., 0., 10.));
     for order in [[(first, 6.), (opposite, 5.)], [(opposite, 5.), (first, 6.)]] {
         assert!(try_fillet_solid_edges_with_radii(&solid, &order, 0.001).is_err());

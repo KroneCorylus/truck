@@ -76,7 +76,7 @@ fn check_lip(convex: bool, height: f64) {
             let result = if fillet {
                 try_fillet_solid_edges(&input, &[id], size, tol)
             } else {
-                try_chamfer_solid_edges_with_distances(&input, &[(id, [size; 2])], tol)
+                try_chamfer_solid_edges_with_distances(&input, &[(id, [size; 2])], &[], tol)
             }
             .unwrap_or_else(|error| {
                 panic!(

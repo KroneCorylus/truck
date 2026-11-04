@@ -228,8 +228,13 @@ fn main() {
             try_chamfer_solid_along_wire_chord(black_box(&input), black_box(&wire), 1., 1., 0.001)
                 .unwrap()
         } else {
-            try_chamfer_solid_edges_with_distances(black_box(&input), black_box(&distances), 0.001)
-                .unwrap()
+            try_chamfer_solid_edges_with_distances(
+                black_box(&input),
+                black_box(&distances),
+                &[],
+                0.001,
+            )
+            .unwrap()
         });
         let ms = start.elapsed().as_secs_f64() * 1000.;
         assert!(result.solid.is_geometric_consistent());

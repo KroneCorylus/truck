@@ -501,6 +501,7 @@ pub use chamfer::{chamfer_along_wire, chamfer_with_side, simple_chamfer, try_cha
 
 mod additive;
 mod chamfer_edges;
+mod chamfer_extrusion;
 mod chamfer_miter;
 mod convex;
 mod edges;
@@ -516,5 +517,5 @@ pub use modeling::{
     fillet_solid_edges, try_chamfer_solid_along_wire, try_chamfer_solid_along_wire_angle,
     try_chamfer_solid_along_wire_chord, try_chamfer_solid_edge, try_chamfer_solid_edges,
     try_chamfer_solid_edges_with_distances, try_fillet_solid_along_wire, try_fillet_solid_edges,
-    try_fillet_solid_edges_with_radii, BlendResult,
+    try_fillet_solid_edges_with_radii, BlendResult, ChamferCornerPreference,
 };

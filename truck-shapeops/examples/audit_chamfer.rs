@@ -72,7 +72,7 @@ fn unequal_two_edge_box_corner() {
     let ids = [at(&input, [5.0, 0.0, 10.0]), at(&input, [0.0, 5.0, 10.0])];
     for sizes in [[0.2, 0.3], [0.3, 0.2]] {
         let selected: Vec<_> = ids.iter().map(|&id| (id, sizes)).collect();
-        let result = try_chamfer_solid_edges_with_distances(&input, &selected, TOL).unwrap();
+        let result = try_chamfer_solid_edges_with_distances(&input, &selected, &[], TOL).unwrap();
         common::assert_topology(&result.solid, &[0]);
         common::assert_mesh_closed(&result.solid, TOL);
         assert!(result.solid.is_geometric_consistent());

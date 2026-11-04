@@ -1,8 +1,11 @@
+#[path = "unequal_box.rs"]
+mod unequal_box;
 use super::planar::{sample_wire, valid_boundaries};
 use rustc_hash::FxHashMap as HashMap;
 use std::result::Result;
 use truck_base::diagnostics::{Code, Diagnostic};
 use truck_modeling::*;
+pub(super) use unequal_box::build as unequal_box;
 
 #[derive(Clone, Copy)]
 pub(super) enum Blend {

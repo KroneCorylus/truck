@@ -226,9 +226,7 @@ type BlockMap<T> = HashMap<<T as CastIntVector>::IntVector, Vec<usize>>;
 fn create_blocks<T: SameAttr>(attrs: &[T], tol: f64) -> BlockMap<T> {
     let mut map = HashMap::default();
     attrs.iter().enumerate().for_each(|(i, attr)| {
-        attr.round(tol).neighborhood().into_iter().for_each(|idx| {
-            map.entry(idx).or_insert_with(Vec::new).push(i);
-        });
+        map.entry(attr.round(tol)).or_insert_with(Vec::new).push(i);
     });
     map
 }
@@ -238,6 +236,7 @@ fn create_components<T: SameAttr>(
     attrs: &[T],
     tol: f64,
 ) -> impl Iterator<Item = Vec<usize>> + '_ {
+    let mut remaining = attrs.len();
     let mut already = vec![false; attrs.len()];
     (0..attrs.len()).filter_map(move |i| {
         if already[i] {
@@ -245,12 +244,19 @@ fn create_components<T: SameAttr>(
         }
         let mut stack = vec![i];
         already[i] = true;
+        remaining -= 1;
         let mut component = Vec::new();
+        let mut discovered = Vec::new();
         while let Some(i) = stack.pop() {
             component.push(i);
-            // Consume discovered neighbors instead of storing every matching pair.
-            // Each discovered attribute is still searched, preserving transitive welding.
-            for key in attrs[i].round(tol).neighborhood() {
+            if remaining == 0 {
+                component.extend(stack.drain(..).rev());
+                break;
+            }
+            // The old duplicated buckets visited each candidate at its first shared
+            // cell, then by index. Restore that order before pushing onto the LIFO
+            // stack: centralize depends on both summation order and first-minimum ties.
+            for (key, rank) in attrs[i].round(tol).search_cells() {
                 let Some(candidates) = blocks.get_mut(&key) else {
                     continue;
                 };
@@ -260,12 +266,15 @@ fn create_components<T: SameAttr>(
                     }
                     if attrs[i].distance2(attrs[j]) < tol * tol {
                         already[j] = true;
-                        stack.push(j);
+                        remaining -= 1;
+                        discovered.push((rank, j));
                         return false;
                     }
                     true
                 });
             }
+            discovered.sort_unstable();
+            stack.extend(discovered.drain(..).map(|(_, j)| j));
         }
         Some(component)
     })
@@ -365,66 +374,201 @@ impl_cast_int!(Vector3, 3);
 impl_cast_int!(Point3, 3);
 
 trait IntVector: Copy + std::hash::Hash + Eq {
+    fn search_cells(self) -> impl Iterator<Item = (Self, usize)>;
+    #[cfg(test)]
     type Neighborhood: IntoIterator<Item = Self>;
+    #[cfg(test)]
     fn neighborhood(self) -> Self::Neighborhood;
 }
 
-impl IntVector for [i64; 2] {
-    type Neighborhood = [[i64; 2]; 9];
-    fn neighborhood(self) -> Self::Neighborhood {
-        let [a, b] = self;
-        [
-            [a - 1, b - 1],
-            [a, b - 1],
-            [a + 1, b - 1],
-            [a - 1, b],
-            [a, b],
-            [a + 1, b],
-            [a - 1, b + 1],
-            [a, b + 1],
-            [a + 1, b + 1],
-        ]
-    }
+macro_rules! impl_int_vector {
+    ($n:expr, $search:expr, $neighbors:expr) => {
+        impl IntVector for [i64; $n] {
+            fn search_cells(self) -> impl Iterator<Item = (Self, usize)> {
+                // Two overlapping radius-one neighborhoods span radius two.
+                // Keep that exact candidate set even at floating-point bin boundaries
+                // or unusual tolerances; no new finite/range assumptions are needed.
+                (0..$search).map(move |mut index| {
+                    let mut key = self;
+                    let mut rank = 0;
+                    let mut stride = 1;
+                    for coordinate in &mut key {
+                        let offset = (index % 5) as i64 - 2;
+                        index /= 5;
+                        *coordinate = coordinate.wrapping_add(offset);
+                        rank += offset.max(0) as usize * stride;
+                        stride *= 3;
+                    }
+                    (key, rank)
+                })
+            }
+            #[cfg(test)]
+            type Neighborhood = [Self; $neighbors];
+            #[cfg(test)]
+            fn neighborhood(self) -> Self::Neighborhood {
+                std::array::from_fn(|mut index| {
+                    let mut key = self;
+                    for coordinate in &mut key {
+                        *coordinate = coordinate.wrapping_add((index % 3) as i64 - 1);
+                        index /= 3;
+                    }
+                    key
+                })
+            }
+        }
+    };
 }
-
-impl IntVector for [i64; 3] {
-    type Neighborhood = [[i64; 3]; 27];
-    fn neighborhood(self) -> Self::Neighborhood {
-        let [a, b, c] = self;
-        [
-            [a - 1, b - 1, c - 1],
-            [a, b - 1, c - 1],
-            [a + 1, b - 1, c - 1],
-            [a - 1, b, c - 1],
-            [a, b, c - 1],
-            [a + 1, b, c - 1],
-            [a - 1, b + 1, c - 1],
-            [a, b + 1, c - 1],
-            [a + 1, b + 1, c - 1],
-            [a - 1, b - 1, c],
-            [a, b - 1, c],
-            [a + 1, b - 1, c],
-            [a - 1, b, c],
-            [a, b, c],
-            [a + 1, b, c],
-            [a - 1, b + 1, c],
-            [a, b + 1, c],
-            [a + 1, b + 1, c],
-            [a - 1, b - 1, c + 1],
-            [a, b - 1, c + 1],
-            [a + 1, b - 1, c + 1],
-            [a - 1, b, c + 1],
-            [a, b, c + 1],
-            [a + 1, b, c + 1],
-            [a - 1, b + 1, c + 1],
-            [a, b + 1, c + 1],
-            [a + 1, b + 1, c + 1],
-        ]
-    }
-}
+impl_int_vector!(2, 25, 9);
+impl_int_vector!(3, 125, 27);
 #[cfg(test)]
 mod tests {
     use super::*;
+    fn legacy_blocks<T: SameAttr>(attrs: &[T], tol: f64) -> BlockMap<T> {
+        let mut map = HashMap::default();
+        attrs.iter().enumerate().for_each(|(i, attr)| {
+            attr.round(tol).neighborhood().into_iter().for_each(|idx| {
+                map.entry(idx).or_insert_with(Vec::new).push(i);
+            });
+        });
+        map
+    }
+
+    fn legacy_components<T: SameAttr>(
+        mut blocks: BlockMap<T>,
+        attrs: &[T],
+        tol: f64,
+    ) -> impl Iterator<Item = Vec<usize>> + '_ {
+        let mut already = vec![false; attrs.len()];
+        (0..attrs.len()).filter_map(move |i| {
+            if already[i] {
+                return None;
+            }
+            let mut stack = vec![i];
+            already[i] = true;
+            let mut component = Vec::new();
+            while let Some(i) = stack.pop() {
+                component.push(i);
+                // Consume discovered neighbors instead of storing every matching pair.
+                // Each discovered attribute is still searched, preserving transitive welding.
+                for key in attrs[i].round(tol).neighborhood() {
+                    let Some(candidates) = blocks.get_mut(&key) else {
+                        continue;
+                    };
+                    candidates.retain(|&j| {
+                        if already[j] {
+                            return false;
+                        }
+                        if attrs[i].distance2(attrs[j]) < tol * tol {
+                            already[j] = true;
+                            stack.push(j);
+                            return false;
+                        }
+                        true
+                    });
+                }
+            }
+            Some(component)
+        })
+    }
+
+    fn check_legacy_cell_ranks<T: IntVector>(origin: T) {
+        let query: Vec<_> = origin.neighborhood().into_iter().collect();
+        let mut expected = HashMap::default();
+        for (rank, key) in query.into_iter().enumerate() {
+            for cell in key.neighborhood() {
+                expected.entry(cell).or_insert(rank);
+            }
+        }
+        let actual: HashMap<_, _> = origin.search_cells().collect();
+        assert!(actual == expected);
+    }
+
+    #[test]
+    fn search_cells_preserve_first_shared_rank_including_integer_edges() {
+        for x in [i64::MIN, -2, -1, 0, 1, 2, i64::MAX] {
+            check_legacy_cell_ranks([x, x]);
+            check_legacy_cell_ranks([x, x, x]);
+        }
+    }
+
+    #[test]
+    fn separated_attributes_have_one_membership() {
+        let attrs: Vec<_> = (0..4096)
+            .map(|i| Vector3::new(i as f64 * 4.0, 0.0, 0.0))
+            .collect();
+        let blocks = create_blocks(&attrs, 1.0);
+        assert_eq!(blocks.values().map(Vec::len).sum::<usize>(), attrs.len());
+        assert_eq!(blocks.len(), attrs.len());
+    }
+
+    fn compare_legacy<T: SameAttr>(attrs: &[T], tol: f64) {
+        let expected: Vec<_> = legacy_components(legacy_blocks(attrs, tol), attrs, tol).collect();
+        let actual: Vec<_> = create_components(create_blocks(attrs, tol), attrs, tol).collect();
+        assert_eq!(actual, expected, "component encounter order");
+        assert_eq!(
+            sub_put_together_same_attrs(attrs, tol),
+            centralize(expected.into_iter(), attrs)
+        );
+    }
+
+    #[test]
+    fn legacy_order_boundaries_chains_duplicates_and_ties() {
+        for xs in [
+            vec![0.0, 0.5],
+            vec![0.5, 0.0],
+            vec![0.0, 0.75, 1.5, 2.25],
+            vec![0.0, 0.5, -0.5],
+        ] {
+            compare_legacy(
+                &xs.iter()
+                    .map(|&x| Point3::new(x, 0.0, 0.0))
+                    .collect::<Vec<_>>(),
+                1.0,
+            );
+            compare_legacy(
+                &xs.iter()
+                    .map(|&x| Vector3::new(x, 0.0, 0.0))
+                    .collect::<Vec<_>>(),
+                1.0,
+            );
+            compare_legacy(
+                &xs.iter().map(|&x| Vector2::new(x, 0.0)).collect::<Vec<_>>(),
+                1.0,
+            );
+        }
+        for tol in [1.0, 1e-7, 0.3, -0.3, 1e-200, 1e200] {
+            let values = [
+                -2.01, -1.99, -1.0, -0.99, -0.01, 0.0, 0.01, 0.99, 1.0, 1.01, 1.99, 2.01, 10.0,
+                10.75, 11.5, 20.0, 21.0, 30.0, 30.0, 30.5,
+            ];
+            for axis in 0..3 {
+                let points: Vec<_> = values
+                    .iter()
+                    .map(|x| {
+                        let mut p = Point3::origin();
+                        p[axis] = x * tol;
+                        p
+                    })
+                    .collect();
+                compare_legacy(&points, tol);
+                compare_legacy(&points.iter().map(|p| p.to_vec()).collect::<Vec<_>>(), tol);
+                compare_legacy(&values.map(|x| Vector2::new(x * tol, 0.0)), tol);
+            }
+        }
+    }
+
+    proptest::proptest! {
+        #[test]
+        fn exact_legacy_representatives(
+            coords in proptest::collection::vec((-40i32..40, -40i32..40, -40i32..40), 0..160),
+            scale in proptest::sample::select(vec![1.0, 1e-7, 0.3]),
+        ) {
+            let points: Vec<_> = coords.into_iter().map(|(x,y,z)| Point3::new(x as f64 * scale / 8.0, y as f64 * scale / 8.0, z as f64 * scale / 8.0)).collect();
+            compare_legacy(&points, scale);
+            compare_legacy(&points.iter().map(|p| p.to_vec()).collect::<Vec<_>>(), scale);
+            compare_legacy(&points.iter().map(|p| Vector2::new(p.x,p.y)).collect::<Vec<_>>(), scale);
+        }
+    }
 
     #[test]
     fn large_equal_attribute_groups() {

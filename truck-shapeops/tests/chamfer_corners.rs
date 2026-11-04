@@ -126,7 +126,7 @@ fn check(case: Case, planar: bool) {
                 let ids: Vec<_> = selected.iter().map(|(id, _)| *id).collect();
                 try_chamfer_solid_edges(&input, &ids, case.setbacks[0][0] * scale, TOL * scale)
             } else {
-                try_chamfer_solid_edges_with_distances(&input, &selected, TOL * scale)
+                try_chamfer_solid_edges_with_distances(&input, &selected, &[], TOL * scale)
             }
             .unwrap();
             let volume = expected * scale.powi(3);
