@@ -2320,6 +2320,7 @@ fn cone_plane_section(
 
 pub(super) fn chamfer(
     shell: &Shell,
+    single_shell: bool,
     selected: &HashSet<EdgeID>,
     distances: &HashMap<EdgeID, [f64; 2]>,
     preferences: &[super::ChamferCornerPreference],
@@ -2374,8 +2375,10 @@ pub(super) fn chamfer(
         }
         return miter(shell, selected, distances, tol, preferences, data);
     }
-    if let Some(result) = super::chamfer_extrusion::construct(shell, selected, distances, tol) {
-        return Ok(result);
+    if single_shell {
+        if let Some(result) = super::chamfer_extrusion::construct(shell, selected, distances, tol) {
+            return Ok(result);
+        }
     }
     if let Some(result) = quarter_cylinder_corner(shell, selected, distances, tol) {
         return result;

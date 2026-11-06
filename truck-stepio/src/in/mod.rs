@@ -24,7 +24,9 @@ pub mod diagnostics;
 /// Geometry parsed from STEP that can be handled by truck
 pub mod step_geometry;
 mod support_domain;
+mod trimmed_conic;
 use step_geometry::*;
+pub use trimmed_conic::*;
 
 /// the exchange structure corresponds to a graph in STEP file
 #[derive(Clone, Debug, Default, PartialEq)]
@@ -53,6 +55,7 @@ pub struct Table {
     pub rational_b_spline_curve: HashMap<u64, RationalBSplineCurveHolder>,
     pub circle: HashMap<u64, CircleHolder>,
     pub ellipse: HashMap<u64, EllipseHolder>,
+    pub trimmed_curve: HashMap<u64, TrimmedConicHolder>,
     pub hyperbola: HashMap<u64, HyperbolaHolder>,
     pub parabola: HashMap<u64, ParabolaHolder>,
     pub pcurve: HashMap<u64, PcurveHolder>,
@@ -170,6 +173,10 @@ impl Table {
                 }
                 "CIRCLE" => {
                     self.circle.insert(*id, Deserialize::deserialize(record)?);
+                }
+                "TRIMMED_CURVE" => {
+                    self.trimmed_curve
+                        .insert(*id, Deserialize::deserialize(&record.parameter)?);
                 }
                 "ELLIPSE" => {
                     self.ellipse.insert(*id, Deserialize::deserialize(record)?);
@@ -1257,6 +1264,8 @@ where
 #[holder(generate_deserialize)]
 pub enum BoundedCurveAny {
     #[holder(use_place_holder)]
+    TrimmedConic(Box<TrimmedConic>),
+    #[holder(use_place_holder)]
     Polyline(Box<Polyline>),
     #[holder(use_place_holder)]
     BSplineCurve(Box<BSplineCurveAny>),
@@ -1268,6 +1277,7 @@ impl TryFrom<&BoundedCurveAny> for Curve2D {
     fn try_from(value: &BoundedCurveAny) -> Result<Self, Self::Error> {
         use BoundedCurveAny::*;
         Ok(match value {
+            TrimmedConic(x) => x.as_ref().try_into()?,
             Polyline(x) => Self::Polyline(x.as_ref().into()),
             BSplineCurve(x) => x.as_ref().try_into()?,
         })
@@ -1280,6 +1290,7 @@ impl TryFrom<&BoundedCurveAny> for Curve3D {
     fn try_from(value: &BoundedCurveAny) -> Result<Self, Self::Error> {
         use BoundedCurveAny::*;
         Ok(match value {
+            TrimmedConic(x) => x.as_ref().try_into()?,
             Polyline(x) => Self::Polyline(x.as_ref().into()),
             BSplineCurve(x) => x.as_ref().try_into()?,
         })
@@ -1911,6 +1922,10 @@ impl TryFrom<&SurfaceCurve> for Curve3D {
             return Ok(Self::PCurve(curve));
         }
         let curve_3d = Self::try_from(&value.curve_3d);
+        if matches!(&value.curve_3d, CurveAny::BoundedCurve(c) if matches!(c.as_ref(), BoundedCurveAny::TrimmedConic(_)))
+        {
+            return curve_3d;
+        }
         let pcurve_index = match value.master_representation {
             PSCR::Curve3D => return curve_3d,
             PSCR::PcurveS1 => 0,
@@ -2521,8 +2536,7 @@ where
 fn trim_bounded_edge<C, P>(mut curve: C, p: P, q: P) -> Result<C, StepConvertingError>
 where
     C: Cut<Point = P> + SearchParameter<D1, Point = P>,
-    P: Copy + Tolerance,
-{
+    P: Copy + Tolerance, {
     if !curve.front().near(&p) {
         let u = curve
             .search_parameter(p, None, 100)
@@ -2797,6 +2811,10 @@ impl EdgeCurve {
                 }
                 // Canonical spatial geometry or fallback; the inner call applies `same_sense`.
                 let curve_3d = Self::sub_parse_curve3d(&c.curve_3d, p, q, same_sense);
+                if matches!(&c.curve_3d, CurveAny::BoundedCurve(c) if matches!(c.as_ref(), BoundedCurveAny::TrimmedConic(_)))
+                {
+                    return curve_3d;
+                }
                 use PreferredSurfaceCurveRepresentation::*;
                 let pcurve_index = match c.master_representation {
                     Curve3D => return curve_3d,

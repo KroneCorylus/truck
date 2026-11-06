@@ -208,6 +208,43 @@ class CampaignIntegrity(unittest.TestCase):
             script.save(self.out / "inputs.json", self.records)
             self.assertNotEqual(original, script.campaign_identity(self.out))
 
+    def test_optional_input_presence_is_bound(self):
+        preference = self.folder / '001.preferences.json'
+        with patch.object(script, 'sources', return_value={}):
+            script.campaign_identity(self.out)
+            preference.write_text('{}')
+            with self.assertRaisesRegex(AssertionError, 'Input inventory'):
+                script.campaign_identity(self.out)
+            self.records[0]['hashes'][preference.name] = script.digest(preference)
+            script.save(self.out/'inputs.json', self.records)
+            script.campaign_identity(self.out)
+            preference.unlink()
+            with self.assertRaisesRegex(AssertionError, 'Input inventory'):
+                script.campaign_identity(self.out)
+
+    def test_added_preference_blocks_before_timing(self):
+        with patch.object(script, 'sources', return_value={}):
+            identity = script.campaign_identity(self.out)
+            self.material_approval(identity)
+            (self.folder/'001.preferences.json').write_text('{}')
+            with patch.object(script, 'run', side_effect=self.successful_fake_run) as run:
+                with self.assertRaisesRegex(AssertionError, 'Input inventory'):
+                    script.execute(self.out, self.records, False, 1, 1, None)
+                run.assert_not_called()
+        self.assertFalse((self.out/'time').exists())
+
+    def test_preference_added_during_execution_blocks_publication(self):
+        def fake_run(command, log, **kwargs):
+            self.successful_fake_run(command, log, **kwargs)
+            (self.folder/'001.preferences.json').write_text('{}')
+        with patch.object(script, 'sources', return_value={}):
+            self.material_approval(script.campaign_identity(self.out))
+            with patch.object(script, 'run', side_effect=fake_run):
+                with self.assertRaisesRegex(AssertionError, 'Input inventory'):
+                    script.execute(self.out, self.records, False, 1, 1, None)
+        self.assertTrue((self.out/'time/records.jsonl').exists())
+        self.assertFalse((self.out/'time/summary.json').exists())
+
     def test_timing_requires_both_engine_comparisons(self):
         (self.out / "smoke").mkdir()
         identity = {"validated_build": True}

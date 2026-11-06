@@ -1,7 +1,7 @@
 # Open work
 
 The single list of open kernel work and how to split it across agents. Read
-[AGENTS.md](AGENTS.md) first; its rules win over anything here. Updated 2026-11-04.
+[AGENTS.md](AGENTS.md) first; its rules win over anything here. Updated 2026-11-05.
 
 The main program is OCCT-level fillet/chamfer capability: dimensions, validity, editing
 behavior and latency on equivalent modeling tasks, not matching OCCT's API or face structure.
@@ -11,18 +11,205 @@ are `native case/capture`; the capture is `001` unless shown.
 
 ## State
 
-Work stopped at the user's request on 2026-11-04 after completing the current batch.
-No delegated work or validation processes remain active. Resume only on a new request.
-Final C2 evidence: target/c2-constructor-results.json and c2-constructor-delta.patch.
+Work resumed at the user's request on 2026-11-05 from Truck d2d7be32 and app c27269d.
+Both working trees were clean on entry. Continue until asked to stop; no new commit,
+push or PR is authorized. The previous stop request is superseded for ongoing work.
+Current bounded streams:
+- I2: derivative/control bounds and independent material oracle added; prospective
+  revolved_cone_junction capability test is deliberately red on the frozen baseline.
+  Physical shared endpoints, CI UV and positive-weight canal control construction now
+  exist in independent Python probes. All seven paired analytic traces now have
+  bounded ledgers, but candidate coefficients/controller differ from oracle controls;
+  circle construction and runtime trig terms remain unbound. Rust builder must bind
+  actual controls and evaluation before consuming those analytical budgets;
+  production admission stays disabled until complete budgets and tests pass. Evidence:
+  target/i2-implementation-20261105/REPORT.txt and
+  target/i2-endpoint-trace-20261105/REPORT.txt and
+  target/i2-paired-trace-20261105-a/REPORT.txt. Do not claim a green full workspace;
+  C2-scoped validation explicitly excludes this unfinished integration target.
+- C2 admission corrections implemented: single-shell scope, retained-plane residuals,
+  cap signs and conic endpoints. Independent correction review approved both blockers
+  resolved, with no essential remaining defect in the five-file delta. Five new
+  rejection tests fail isolated d2d7be32; 15 focused and 630 affected tests pass.
+  Full486 remains 367/345 with no lost checks. Evidence:
+  target/c2-admission-fix-20261105/results.json. I2 integration remains excluded/red.
+- DD/DA complex C2 contract reviewed: actual cases fit the existing family, subject
+  to the corrections and numerical/branch acceptance obligations recorded below.
+  Both actual cases share labelled cap/axial intercept pairs along the tangent chain,
+  so no new transition surface is proposed. Evidence:
+  target/c2-unequal-contract-20261105/contract.txt. Admission fixes approved; bounded
+  unequal candidate now validates both actual targets. Full486 records 369/347,
+  exactly two gains and no lost checks; 30 sequence and three preference controls
+  remain passing. Final focused tests: 21; library: 98; integration: 541 plus one
+  skip; seven docs and 77 replay tests pass. Native exact QA and 13,280 independent
+  material witness positions pass. Independent unequal-construction review gives
+  bounded approval with no blocking findings; all 164 stored-conic certificates and
+  3,981 evidence hashes independently checked. Latency remains unmeasured.
+  Evidence: target/c2-unequal-validation-20261105/results.json. This is scoped
+  validation, not a globally frozen checkout or performance claim.
+I2 private builder remains disabled in production. Stored derivative-control and
+cone-transform coefficient corrections now compile and pass seven private tests,
+including material/STEP, and all-target release Clippy. CS uses an affine UV PCurve
+on the actual canal. Evidence: target/i2-certificate-corrections-20261105/REPORT.txt.
+Physical endpoint boxes/sliver bounds and CI stationary isolation with signed
+separation now pass eight private tests including three radii/material/STEP; Clippy
+and formatting pass. Evidence: target/i2-paired-runtime-gate-20261105/REPORT.txt.
+Actual paired UV compositions and support/trig evaluation allowances remain unfinished;
+separation charges are provisional until those terms are included. The prospective
+public test remains unchanged/red and admission disabled. No geometric obstruction
+was found. All processes joined and builds released. Freeze production/tests/harness
+sources for C2 fresh build/smoke/material work; that worker now owns the heavy slot.
+I2 composition implementation may proceed only in new scratch patch artifacts during
+this freeze, without Cargo/rustc or changes to campaign-bound repository sources.
+I2 scratch UV proposal is preserved but NOT ready to apply:
+target/i2-uv-composition-20261105/REPORT.txt. Adapter samples pass, but paired
+support composition, chart endpoint allowances and evaluation terms remain absent.
+Next bounded work must compute actual coefficient-based K/F in K + F*epsilon_trig
+for every pair, complete nontrig terms and state the evaluator contract explicitly;
+no arbitrary epsilon or nominal factor substitutes for that analysis. Live I2 source
+remains unchanged during C2 validation; new I2 work stays scratch-only.
+I2 support composition produced 42 conditional K/F ledgers in
+ target/i2-support-composition-20261105/REPORT.txt, but the scratch patch rejects all
+frames/profiles except exact retained synthetic fixture constants. This is research
+corroboration, NOT an acceptable general admission implementation; do not apply as such.
+Rust trig precision remains an explicit unresolved external assumption. Independent
+review must assess ledger soundness, remove fixture-only guards in the design and
+identify the smallest justified numerical contract without speculative global rewrites.
+C2 matched benchmark preparation is complete: 14 cases, unchanged adapters and
+23 lightweight integrity tests. Evidence: target/c2-benchmark-prep-20261105/REPORT.txt.
+Independent harness review found an optional-input inventory hole. Coordinator fixed
+the shared identity check to require the exact prepared directory inventory, binding
+preference-file absence as well as presence. Three new regressions fail archived incoming
+code; all 26 lightweight integrity tests pass. Evidence:
+target/c2-input-inventory-fix-20261105/. No builds or timings ran for the correction. C2 fresh build/smoke now owns the build
+slot. Both-engine smoke/material approval and serialized timings
+remain required; no historical approval substitutes for the new campaign.
+C2 fresh smoke found exact serialization repeatability failures in all three modes:
+chamfer_extrusion.rs starts each output wire from HashMap::values().next(). Campaign
+remains failed; preserve its material/QA evidence without timing approval. Worker will
+finish bounded evidence, join processes and release its freeze/build slot. Coordinator
+then fixes deterministic wire ordering with a parent-failing regression before a new
+exclusive campaign; do not weaken repeatability or reuse this failed approval.
+C2 campaign finished failed and released its freeze/build slot. Coordinator replaced
+hash-based wire starts with earliest surviving construction-order edge. New exact
+repeatability regression fails incoming source; 22 focused STEP tests, scoped Clippy
+and nightly formatting pass. Evidence: target/c2-wire-order-fix-20261105/results.json.
+Fresh fixed-source validation/smoke remains pending. G4 Truck/OCCT STEP and G8 Truck
+STEP failed exact QA in the frozen campaign despite original/fresh native BREPs passing;
+attribute these export/import failures independently, preserve failed statuses.
+G4/G8 STEP attribution: target/g4-g8-step-qa-20261105/REPORT.txt. Historical and
+current Truck exports import to byte-identical BREPs. Historical G4 output-check
+set exact mode after construction/Init, so its reported exact success was ordinary QA;
+that evidence must not be cited as exported exact validity. Current proper checks pass
+all original/fresh native BREPs. Failures localize to reconstructed ellipse pcurves,
+Truck exported spline/cylinder residuals, and G4 OCCT STEP lowered edge tolerance.
+Raw Truck versus prepare_for_step ownership still needs frozen raw/prepared dumps.
+Preserve failures; no geometry, tolerance, QA or timing waiver follows from material passes.
+Deterministic C2 validation completed: target/c2-wire-order-validation-20261105/REPORT.txt.
+644 scoped tests/one skip, 22 focused STEP, seven docs, 77 replay tests and all-target
+Clippy pass; full486 retains 369/347 with no lost checks. All 14 both-engine smoke cases
+now pass exact serialization; all 28 material rows pass. Three exported G4/G8 STEP
+exact-QA failures remain; 12 cases are individually eligible but no timing approved.
+All processes joined; build slot released to frozen raw/prepared G4/G8 attribution.
+No production/test/harness source edits during that diagnostic capture. I2 scratch
+composition review proceeds independently; public prospective test remains red.
+Raw/prepared G4/G8 attribution completed (target/g4-g8-raw-prepared-20261105/REPORT.txt).
+G4 spatial residual already exists in its Hermite trim; preparation is byte-identical.
+G8 raw intersection agrees with the cylinder, but prepare_curve's procedural cubic fit
+introduces the residual; serialization preserves coefficients. Both errors fit their
+current approximation contract, so correction must add an explicit stricter support
+agreement contract with parent-failing regressions, not claim old budget violation.
+Separate ellipse/import-pcurve and G4 OCCT round-trip failures remain unresolved.
+Build slot is released to bounded G4/G8 spatial support corrections; I2 typed-composition
+and supported-libm analysis may proceed independently without heavy builds.
+I2 review (target/i2-composition-review-20261105/REPORT.txt) rejects literal fixture
+admission, identifies Python derivative-domain sliver omission, and supplies typed
+Rodrigues coefficient/frame formulas. Fix endpoint convex-hull coverage; conditional
+Python rows are not proof of uncompiled Rust controls. Do not claim stored stationary
+uniqueness from analytic CI isolation; use uniform position bounds for minimum value.
+I2 typed scratch proposal remains incomplete (target/i2-typed-composition-20261105/REPORT.txt).
+Typed harmonic/dual-frame extraction and endpoint hull corrections exist; finish rational
+extrapolation denominator/derivative bounds, actual affine intermediate error, plane
+projection magnification, chart reversal tests and typed ledger bridge before application.
+Coordinator inspected live i2.rs drift 9d5bf019 -> d81cf69c: whitespace-only function
+formatting, not a semantic change. Preserve/disclose it; no source cleanup during builds.
+I2 libm source analysis completed: target/i2-libm-contract-20261105/REPORT.txt.
+Matching Fedora source/installed IFUNC variants yield claimed conditional scalar
+sin/cos/sincos error <6.074e-14 on [-4,4], conservative contract 2^-40. Independent
+numerical/runtime review pending. Not a generic Rust guarantee; final candidate's
+scalar lowering, numerical environment and actual argument hulls must satisfy the
+stated contract. No machine-hash geometric gate or public I2 admission authorized.
+G4/G8 spatial support fixes completed (target/g4-g8-support-fix-20261105/REPORT.txt):
+G4 whole-span trim budget capped at 5e-8; eligible G8 procedural export fits check
+both represented extrusions. Parent regressions fail and targeted spatial exact-QA
+pairs now pass. 244 scoped tests/13 docs pass; material witnesses remain passing.
+Independent review pending. Three ellipse/pcurve pairs per Truck case and G4 OCCT
+round-trip failure still block whole STEP QA. New g8-support-curve.json fixture is
+ignored by *.json and must be explicitly included if a later commit is authorized.
+I2 libm review gives bounded numerical approval, including independent compensation,
+FMA/tie and reduction arguments (target/i2-libm-review-20261105/REPORT.txt).
+Actual final argument hulls, scalar lowering and folded constants remain integration
+requirements. I2 closure worker now has permission to apply its owned patch and the
+exclusive build slot, max eight jobs. Public admission remains disabled pending full
+executed gate and independent review. Other work is read-only during this build.
+Spatial support review requests two general-contract fixes: final assembled spline
+must be rechecked after endpoint replacement, and eligible guide reuse must pass the
+same support gate. G4 cap and recorded G8 fixture correction have bounded approval;
+whole STEP still failed. Coordinator applied the return-path fixes and guide/join
+regressions: both fail incoming behavior, 135 STEP tests and six doctests pass,
+release all-target Clippy and scoped nightly formatting pass. Final joined coefficients
+are checked after endpoint mutation; eligible guide returns use the same support gate.
+Evidence: target/step-support-final-validation-fix-20261105/results.json. Reader precision
+wording is corrected; no new replay or performance claim for this narrow delta.
+Ellipse export research demonstrates bounded UV PCURVEs referencing existing face
+surface identities; scratch outputs pass paired exact QA and material checks. Production
+writer/numerical-budget implementation is in scratch while I2 owns the build slot.
+Evidence: target/g4-g8-ellipse-contract-20261105scratch/REPORT.txt. The separate G4 native
+STEP tolerance-loss failure remains unresolved.
+I2 closure passed 16 private library and 18 integration/material/STEP tests, Clippy,
+formatting and runtime mapping checks, with public positive still red. Evidence audit
+then found reversal argument-formation magnitude must include absolute range endpoints.
+The phase-formation correction now passes its parent-failing mechanism regression,
+17 private library and 19 integration/material/STEP tests, Clippy and formatting.
+Final source 40886121 and executable 994a41de bind 70 actual Rust UV rows and runtime
+mapping/state evidence. See target/i2-composition-closure-20261105/REPORT.txt.
+Complete-gate review blocks public admission: source profile recognition is incomplete,
+only seven of 18 output edges have paired certificates, the reviewed runtime epsilon
+is not enforced by construction, and expanded canal fit error uses an unjustified
+factor two. Evidence: target/i2-complete-gate-review-20261105/REPORT.txt.
+Coordinator applied the typed runtime-budget enforcement: the mechanism regression
+fails incoming behavior, and 18 private library plus 20 integration/material/STEP tests
+pass; release all-target Clippy and scoped formatting pass. Evidence:
+ target/i2-runtime-budget-enforcement-20261105/results.json, final source 42a6c517.
+The initial parent harness compile failure is preserved, not counted as proof.
+Deployment eligibility remains separate. Complete the three geometric certificate gaps
+in scratch, preserving all thresholds and evidence; the heavy slot is now released.
+Public admission stays disabled and the prospective positive test stays red.
+Ellipse writer candidate is incomplete and admission-disabled in
+ target/g4-g8-ellipse-writer-20261105. Continue numerical closure and type/graph validation;
+its diagnostic stored-control checks do not establish extraction or evaluator bounds.
+Extended scalar trig contract now has independent bounded approval on [-8,8]:
+per-component error <=1.778973623518272e-15 <2^-48 under the recorded implementation
+and FP assumptions. Evidence: target/ellipse-libm-contract-20261105/REPORT.txt and
+ target/ellipse-libm-review-20261105/REPORT.txt. Research-description correction:
+JSON selection windows are conservative supersets, not threshold-clipped intervals;
+the proof uses a global reduction enclosure, so this does not change the bound.
+Final writer/OCCT mapping, actual argument hulls/formation error, serialized coefficients
+and complete evaluation budgets remain required. This does not widen I2's contract
+or authorize geometry admission by itself.
+No concurrent timing campaign. Coordinator owns this
+tracker, CHANGELOG, combined validation and subsequent serialized measurements.
+
+Committed equal-C2 evidence: target/c2-constructor-results.json and c2-constructor-delta.patch.
 The release suite passed 623 tests with one existing skip; nine final focused tests,
 seven doctests, 77 replay tests, Clippy, formatting and actions smoke passed. Full486
 now records 367 constructions / 345 limited passes, with no lost checks. All 30 C2
 sequence controls remain passing. The equal-distance complex C2 gain passes fresh
 native QA and 3,412 independent material witnesses. C2 latency has not been measured.
 App changes are committed as c27269d; their files match the validated app snapshot.
-I2 remains research-only with shared-trim numerical budgets unresolved. Existing
+I2 remains a private candidate with shared-trim numerical budgets unresolved. Existing
 native comparison failures and neighboring performance uncertainty remain open.
-The dated entries below retain historical evidence, not authorization to restart work.
+The dated entries below retain historical evidence; current scope is the bounded streams above.
 
 - Start every stream from current `master`.
 - Known accepted test state: one ignored test, two existing Clippy warnings in shapeops
@@ -703,6 +890,29 @@ batch. Do not overwrite main from those older copies.
 
 ## Streams
 
+Unequal C2 review corrections (2026-11-05; admission fixes now approved):
+- Map public shell-face-order distances explicitly: for incident indices a,b, cap setback
+  u=d[usize::from(cap==max(a,b))], axial v is the other entry. data.sides order is
+  oriented-edge order, not the public distance indexing. Test reversed stored edges and
+  shell reordering with correctly remapped unequal distances.
+- DA bottom requires the nondegenerate parabolic Q seam (equal Ro/H slopes). It must
+  succeed, with nearby slopes on both sides, cylinder continuation and generator limits;
+  endpoint matching alone does not establish the positive-x/monotone-axial branch.
+- Combine both cap offset laws instead of selecting by the axial halfway point. The
+  coordinator's target/c2-unequal-corrections-20261105/classifier.py fixes this independent
+  classifier, preserves all 9,208 recorded captured classifications and checks the legal
+  asymmetric L=1.5 fixture plus its reflection. Prior artifacts remain hash-identical.
+- Budget u/v sensitivity, axial coordinate error and near-parabolic conic construction;
+  reject uncertain conditioning rather than inheriting equal-case bounds unchanged.
+  Derive the numerical volume allowance for each admitted scale/profile.
+- Constant mismatch h_i-h_o yields constant radius sum and an affine intersection plane,
+  hence may reduce to a conic. General independently varying slopes can produce quartics.
+  Incompatible tangent-chain pairs remain excluded; no new policy is authorized.
+No unequal C2 construction gain yet. P1 other-shell and P2 plane-displacement corrections
+are resolved by the reviewed five-file admission correction. Unequal contract review:
+target/c2-unequal-review-20261105. Original equal-C2 review findings were delivered in
+thread messages; no target/c2-independent-review-20261105 directory was produced.
+
 Bounded equal-distance complex C2 is implemented in the private chamfer_extrusion
 constructor with narrow dispatch. It preserves nine original supports and builds shared
 tangent generators and exact plane/cone/cylinder trims, including the longer high-side
@@ -1130,3 +1340,459 @@ python3 audits/fillet-chamfer/capture/run_capture.py \
 
 Older trackers, handoffs and status reports were removed on 2026-10-25; they remain in git
 history (`d86c6cfb` and earlier).
+
+Current ellipse-writer closure remains incomplete/admission-disabled. Its stored-control
+and phase certificates compile, but inward serialized endpoint knots, reader-projected
+trim coverage, normalized frame differences and cache/fallback evaluator bounds remain
+open. Seven helper tests, 142 explicitly scoped preservation tests, six doctests and
+Clippy pass; the parent and candidate production graph positives remain red. Evidence:
+target/g4-g8-ellipse-writer-closure-20261105/REPORT.txt. Split remaining reader-domain
+and evaluator proof work in scratch; no production QA or performance acceptance.
+
+I2 complete-boundary scratch patch is ready for application/validation, not approval:
+target/i2-whole-boundary-20261105/delta.patch (base42a6c517, candidate4fed7b1d).
+It adds whole-source quarter-profile recognition, all36 paired support rows and
+expanded rational/Hermite fit transfer. 62 lightweight checks only so far. A new
+validation owner receives the exclusive heavy slot to apply/debug, prove incoming
+failures, run complete private material/STEP controls and bind final ledgers/runtime.
+Public admission and deployment eligibility remain closed; STEP reader work stays
+scratch-only during this source freeze.
+
+Ellipse reader-domain scratch patch now encloses actual gp_Ax2 frames, certified phase
+shifts and outward serialized knot coverage, but Project/extrema and G8 zero-seam
+branches remain unclosed (target/ellipse-reader-domains-20261105/REPORT.txt).
+Coordinator source inspection found a narrower candidate route: emit a parameter-master
+TRIMMED_CURVE around the unchanged analytic ellipse; ShapeAnalysis_Curve::Project
+checks bounded-curve endpoint distances before ProjectAct, even with AdjustToEnds=false.
+Validate exact trim/map/vertex bounds and normalization before adopting this route;
+no imported acceptance is claimed. I2 retains the heavy slot; writer work remains scratch.
+
+I2 whole-boundary candidate now compiles and passes 26 library/28 private integration
+material/STEP tests, 180 source/input/candidate-bound support rows, Clippy and format.
+Final source d0628360, executable764cc291. Six expected incoming regression failures
+and one preserved pass are recorded, with test-adapter/projection-witness limits.
+Evidence: target/i2-whole-boundary-validation-20261105/REPORT.txt. Slot released;
+independent follow-up gate review is required. Public positive remains NonPlanarFace;
+deployment eligibility and unrelated STEP graph failure remain open.
+
+OCCT cubic pcurve evaluator helper now has independent bounded approval:
+target/ellipse-reader-evaluation-review-20261105/REPORT.txt (998 exact coefficient
+checks, source-path and retained disassembly analysis). Consume only under its knot,
+selection, arithmetic and mutation-exclusion assumptions. Final reader mapping,
+endpoint hulls/frames and complete export inequality remain open; no geometry
+admission follows from helper approval. Bounded-analytic-trim integration continues
+in scratch; I2 source is frozen for independent review and heavy slot is free.
+
+Bounded-analytic-trim writer endpoint patch and mesh-free diagnostics are ready.
+Coordinator grants scoped application of out/{geometry,topology,mod}.rs and exclusive
+max-eight-job build slot for endpoint/graph validation. I2 d0628360 remains frozen
+for read-only review; out/modeling.rs dd7b9e02 remains unchanged. Final writer admission
+is disabled pending complete budgets/runtime/mutation exclusions.
+
+Independent I2 whole-boundary review approves closure of all four private-gate findings
+under the reviewed scalar contract: target/i2-whole-boundary-review-20261105/REPORT.txt.
+Public routing still needs complete-solid single-shell/selection/radius validation and
+a supported build/execution policy with per-calling-thread FP eligibility. Do not equate
+the private runtime assumption token or startup MXCSR capture with deployment approval.
+Prepare minimal routing/policy in scratch during the STEP build; no public enablement yet.
+
+Ellipse bounded-trim endpoint changes are applied in out/{geometry,topology,mod}.rs.
+Six original fixtures pass; the Python evaluator bridge gives a conditional total
+within 5e-8. Final library has 26 passes and the intentionally red production graph;
+Clippy, formatting and six doctests pass. Evidence: target/ellipse-bounded-trim-20261105.
+Next: independent endpoint/graph review and typed evaluator integration, preserving
+reader mutation and runtime eligibility as explicit gates. Only the typed evaluator
+owner receives the heavy build slot; I2 and out/modeling.rs remain frozen.
+
+I2 public routing/runtime proposal is scratch-only: target/i2-public-route-20261105.
+Review the feature-off default, whole-solid/selection/history routing, per-thread
+fegetenv boundary and native Fedora deployment proposal before application. No
+packaging activation, public admission or global-green claim is authorized by the
+private gate approval. Independent design review runs without builds or live edits.
+
+Independent endpoint/graph review approves archived geometry29c53e5b under its
+stated assumptions (target/ellipse-bounded-trim-review-20261105). It verifies all
+71 artifact hashes and six original endpoint fixtures. Added the required
+DisplayByStep migration note to CHANGELOG; concrete PiezaCAD points need no change.
+Typed total must include source_trim_error jointly, not as a separate threshold.
+Reader mutation/array association and final runtime mapping remain open; assign
+a parallel scratch-only source-path audit while typed implementation owns builds.
+
+I2 routing review found consumer duplicate/side validation could be bypassed and
+its allow_i2 flag did not constrain the later ordinary kernel call. Coordinator
+corrected the scratch candidate at target/i2-public-route-corrected-20261105: private
+family helper, ordinary whole-solid API, raw validation before chain expansion,
+and complete inter-chain junction dispatch before grouping with no subset retry.
+Both patches apply cleanly; compilation and actual route regressions remain pending.
+No live source/deployment activation. Native Fedora is the provisional supported
+build approach; broader packaging is unnecessary for disabled-source validation.
+STEP typed evaluator retains the exclusive heavy build slot.
+
+Typed ellipse evaluator/combined ledger is implemented at geometry83d257bf,
+topology6baadc3c (target/ellipse-typed-evaluator-20261105). Six actual fixtures
+majorize the rational helper within unchanged5e-8; source_trim_error participates
+in the same total. 150 scoped tests/six doctests/Clippy/format pass; production
+graph remains explicitly red. Independent typed review and reader mutation audit
+run read-only. Writer sources freeze while I2 receives the exclusive max-eight-job
+build slot for corrected feature-off public route application and enabled-test
+validation. No launcher/deployment activation, timing, or public acceptance claim.
+
+Typed ellipse review gives bounded approval (target/ellipse-typed-evaluator-review-20261105).
+Reader audit found all six complete retained arrays/associations preserved, but
+.U. closedness, neighboring-wire healing and two additional opposite-side pcurves
+need explicit handling (target/ellipse-reader-mutation-20261105). Coordinator
+prepared the narrow .F. formatter correction/regression in scratch
+target/ellipse-open-pcurve-20261105; no live writer edit during I2 freeze.
+Use an exact post-transfer representation/association guard for the bounded
+validation consumer, rejecting changed arrays/ranges/frames or missing sides.
+This is not an unrestricted guarantee for arbitrary STEP readers/healing settings.
+All emitted associations need actual typed ledgers. Admission stays closed pending
+this integration and runtime binding; I2 retains the exclusive heavy slot.
+
+Post-transfer guard scratch is prepared at target/ellipse-post-transfer-20261105.
+It resolves source transfer binders, requires final-shape membership and complete
+edge/face/pcurve association, and checks arrays/ranges/frames before and after a
+callback under exclusive ownership. Native guard and nine mutation controls are
+uncompiled. Eight original-input topology bindings are verified; actual eight-side
+Rust ledgers and the STEP/normalized-frame binding stream still need execution.
+Coordinator .F. formatter patch and eight-side fixture patch jointly apply cleanly.
+Queue their application, native compile/controls and final binding for the writer
+slot after I2 releases. No numerical, whole-STEP or runtime acceptance inferred.
+
+Corrected I2 route is applied with defaults off (target/i2-public-validation-20261105).
+Enabled34 integration tests, final app249 library tests, fresh180 paired rows and
+full486369/347 pass. Feature-on/off checks and owned Clippy pass. Final source
+32fa66f1 and executable snapshots are recorded; old mutable Cargo executable was
+not archived before rebuilding, so historical executable-byte preservation is
+not claimed. Independent route/FP review remains required; no deployment activation.
+Broader run exposed eight STEP preparation failures plus B1 replay STEP failure;
+identical failures occur with incoming I2 sources/current writer. These remain
+open, not waived as pre-existing kernel behavior. Attribute current writer changes
+against their own incoming source before combined acceptance.
+
+Writer receives exclusive max-eight-job slot for explicit-open correction, eight
+actual association ledgers, native guard compilation and mutation controls, exact
+source/STEP/frame binding and guarded QA. I2 source/test/app files freeze for review.
+Production writer stays disabled until final integration review/runtime eligibility;
+G4 native tolerance-loss roundtrip remains independently unresolved.
+
+Independent final I2 review approves the default-disabled source within scope
+(target/i2-public-final-review-20261105):3821 artifact hashes,11 source pins, both
+new executable snapshots and180 paired rows verified. Activation remains a finite
+supported-artifact task, not a private-geometry proof restart. Prepare the minimal
+native Fedora build/runtime-selection checks and reachable-hook audit in scratch;
+no launcher/default/deployment edits while STEP owns the build slot. Coordinator
+will assess concrete final artifacts under existing implementation authorization.
+
+STEP attribution corrects the earlier I2 comparison: incoming B1 failed reading
+--exact as a preference filename, not preparing STEP. Preserved logs/report have
+a separate B1-COMPARISON-ERRATUM.txt; no identical incoming B1 failure is claimed.
+All eight tests and B1 passed earlier writerc4a37805. Current support-fit regression
+window remains open. Unsupported supports already bypass the strict certificate;
+no broad bypass fix is justified. Prepare mesh-free capture/instrumentation and
+strict bounded-chart/guide-degree corrections in scratch; actual subreasons need
+execution after ellipse guard releases the build slot. Preserve5e-8 guide/join/
+final coefficient checks and original G4/G8 support improvements.
+
+Supported I2 artifact candidate is scratch-only at
+target/i2-supported-artifact-20261105: build recipe, eligibility helper, explicit
+run-supported entry point, lightweight negative tests. Ordinary run.sh remains
+feature-off; no approved manifest or installed artifact exists. Review helper
+input/runtime identity, build-option enforcement and fail-closed launch behavior
+before any final-artifact build. Avoid broad security/packaging machinery. Final
+GUI code/runtime and reachable-hook/ownership evidence remain finite open checks.
+
+Strict support-fitting candidate/capture package is prepared at
+target/step-support-regression-fix-20261105. Root inspected the narrow chart clamp
+and degree-elevation budget; no epsilon/domain extension or return-check bypass.
+Patch remains unapplied/uncompiled and named failures unresolved. Next heavy slot
+after ellipse guard joins processes goes to same-dependency c4a/b293/dd7/candidate
+mesh-free captures and mechanism tests, then evidence-driven application/full tests.
+Ellipse owner notified; no interruption or overlapping build authorization.
+
+Eight-side staged ellipse validation completed (target/ellipse-guard-validation-20261105).
+All8actual ledgers fit5e-8 after axis-L1-aware interpolation allocation; guarded
+G4/G8 exactQA/all24pairs/material806/770/repeatability pass. All9mutation controls
+reject in both solids;153scopedtests+6docs/Clippy/format pass. Geometry168b07f2,
+topologyc246bb14 freeze for independent integration review. Production stillNone;
+nativeG4roundtrip failed. Heavy slot released to strict STEP preparation diagnosis
+and correction in out/modeling.rs; no overlapping builds or writer-graph changes.
+
+Supported artifact helper review approved preparation with one inventory hole.
+Coordinator fixed exact before/after source and toolchain inventories in scratch
+target/i2-supported-inventory-fix-20261105, also preserving byte checks and guarding
+provenance record changes/escaping links/overlapping mutable paths. Seven lightweight
+tests pass; identical added-input regression fails incoming in four subcases.
+All build subprocesses were mocked; no artifact build/manifest/activation occurred.
+Use corrected helper/recipe, retaining original final build/runtime obligations.
+
+Independent final ellipse integration review approves the bounded serialized
+agreement and exclusive guarded consumer (target/ellipse-guard-final-review-20261105).
+All8ledgers/144framecoordinates/completeassociations and runtime evidence verified.
+Production remainsNone; arbitrary readers and deployed runtime are not approved.
+Prepare the smallest supported writer eligibility/activation delta in scratch,
+including construction-to-format lifetime and default-off behavior. Reuse existing
+FFI scalar policy without adding an OCCT product dependency or a generic framework;
+the exact post-transfer guard remains validation-consumer evidence. STEP fitting
+owner keeps the exclusive build slot and live source ownership.
+
+Ellipse production-route candidate is prepared in
+target/ellipse-production-route-20261105, not applied or compiled. It adds
+default-off supported-lane admission, exact built-in type gating, stable-index
+construction/format eligibility, shell buffering, and fallible app exports.
+Coordinator inspected the patch; independent review of formatting lifetime,
+type/API scope and failure propagation precedes application. STEP fitting keeps
+the exclusive build slot. Final artifact/runtime selection and fresh guarded
+G4/G8 exports remain required; native G4 roundtrip stays failed.
+
+Production-route review found one default-off staged-test regression. Coordinator
+corrected it in target/ellipse-route-review-fix-20261105: the identity-only test
+uses private body formatting with all assertions retained; optional whole-solid
+staging now explicitly requires the eligible feature build. New scratch tests
+cover ineligible construction, delayed controls through two shells/void solid/
+assembly, sink errors, and both app exports retaining destination bytes after a
+real formatter error. App serialization shares one private fallible writer.
+Nightly parsing/formatting and both patch applicability checks pass; incoming
+live pins are unchanged. No Rust compilation or runtime pass claimed. Add the
+remaining deceptive curve/surface metadata controls and execute incoming/mutant
+proofs during the next exclusive slot, after STEP fitting releases it. Original
+candidate/review artifacts remain untouched; no production activation.
+
+Strict STEP fitting correction completed at modeling a0773491
+(target/step-support-regression-validation-20261105). All eight named failures
+and correctly invoked B1 pass; 700 enabled shapeops tests, 157 STEP tests plus
+the known disabled-graph failure, 77 replay tests and 13 doctests pass. Full486
+remains369/347 with no lost checks. Finite polynomial/conic chart witnesses are
+clamped with full displacement charged; lower-degree elevation is charged.
+Independent correction review proceeds read-only. Heavy slot is released and
+assigned to application/compile validation of ellipse-route-review-fix-20261105.
+That owner may edit only the reviewed writer/runtime/Cargo and app export files;
+modeling a0773491 and I2 remain frozen. Refresh combined guarded G4/G8 evidence;
+defaults/deployment stay off. Coordinator owns the Breaking migration entry.
+
+Independent strict-fitting review approves modeling a0773491 and its fixture
+without required changes (target/step-support-correction-review-20261105).
+Full displacement/elevation charges, unchanged strict guards, 595 capture pairs,
+70 actual parent-failing curves and369/347 replay parity were independently
+checked. The eight fitting regressions and correctly invoked B1 are resolved
+within this scope; preserve the historical B1 invocation erratum. Ongoing ellipse
+route validation is separate, as are deployment and performance acceptance.
+
+User closeout instruction: finish current working points, then stop. The active
+ellipse application/validation owner is completing only its existing scope and
+joining all processes. No new research streams, measurements, deployment,
+supported-artifact installation or commits are authorized by this closeout.
+Coordinator will inspect the final evidence and record remaining limitations;
+default-off features and historical failures stay explicit.
+
+Closeout: ellipse application/validation finished in
+target/ellipse-production-validation-20261105. Coordinator verified all eleven
+final source hashes, default-off feature declarations and both repository diff
+checks. Enabled STEP167/167 passes; default161 passes plus the intentional graph
+failure. Full486 stays369/347, all30C2 sequences/three preference controls and
+fresh guarded G4/G8 QA/material/repeatability/18 mutation rejections pass.
+Activation remains blocked: ellipse-enabled shapeops has17 downstream Truck
+reader failures and replay has2 (TRIMMED_CURVE support); ellipse-off controls
+pass. G4's actual guarded consumer reaches scalar argument12.184038203338222,
+outside the reviewed[-8,8] runtime contract. That failure is retained, not waived.
+Final supported-artifact/runtime audit and original native G4 tolerance-loss
+roundtrip remain unresolved. Defaults and deployment are unchanged, no commits.
+All assigned processes have joined and the exclusive slot is released. Work is
+stopped at the user's request; do not launch follow-up work without a new request.
+
+2026-11-06: user requested continuing until told to stop; the previous stop is
+lifted. Resume with Truck TRIMMED_CURVE import support for the guarded writer
+and attribution of G4's out-of-contract scalar call. Defaults remain off and
+no commits/deployment are authorized. Reader implementation owns the exclusive
+heavy build slot; scalar attribution uses retained artifacts and scratch only.
+Preserve the complete prior validation and frozen writer/I2 sources; resolve
+the actual activation blockers without loosening numerical or reader checks.
+
+G4 scalar attribution completed in target/g4-scalar-domain-20261106: OCCT
+line/ellipse wire-healing alignment adds one period after a one-ulp endpoint
+mismatch. Certified writer/control hulls stay within[-8,8]. A separate rational
+[-16,16] scalar proof proposes the same2^-48 component error, not a geometric
+tolerance increase. Independently review that proof and the smallest consumer
+validation policy before changing any interposer. Prefer a uniformly proved
+consumer scalar contract over callsite/phase machinery if it preserves all
+geometric domains and checks. Existing strict abort/evidence remains failed.
+
+Independent g4-scalar-review-20261106 approves uniform[-16,16]2^-48 scalar
+accuracy under existing premises and recommends the simple separate consumer
+policy, without callsite exceptions. Coordinator prepared the one-predicate
+interposer delta and boundary/control probe in target/ellipse-consumer-runtime-20261106.
+No builds ran: reader implementation retains the exclusive slot. Native policy
+negative tests and full guarded G4/G8 validation follow its release. Writer8,
+geometric domains8 and I24 remain unchanged; no deployment approval.
+
+Trimmed conic reader implemented (target/trimmed-conic-reader-20261106): bounded
+singleton parameter trims preserve explicit branch/orientation; all17 former
+shapeops reader failures and replay77 pass, with full486369/347 unchanged.
+Independent review is pending. Heavy slot released and assigned to the separate
+consumer-runtime16 validation, with frozen production sources. No defaults or
+deployment change; retain original strict8 abort and native G4 roundtrip failure.
+
+Separate consumer16 validation completed in target/ellipse-consumer-validation-20261106:
+84 boundary/environment probes, guarded G4/G8 exact QA/all24pairs/material806/770,
+repeatability and18mutation rejections pass. Fresh ordinary writer exports match
+DATA bytes;8ledger hulls/144frames verified. Strict8 originalG4abort retained.
+Independent evidence review pending; heavy slot released. Serial interposer is
+an audit tool, not a production/thread-safety policy. Final application-artifact
+build/selection/ownership audit remains separate, after reader review settles.
+
+Reader review found shifted-full-turn, large-phase and overflowing-placement
+admission defects. Coordinator corrected both owned files; all15 focused tests
+pass, including the three incoming failures and positive reversed interior trim.
+Evidence in target/trimmed-conic-admission-fix-20261106; broad validation and
+independent numerical review follow. Root's saved parent-test-binary was the
+other feature variant, not the14-test failing binary; preserve it but do not
+claim correspondence. Reproduce final fixtures in an isolated incoming source
+tree to obtain correct final parent binary evidence. Heavy slot released by root.
+
+Consumer16 review accepts retained results but requires a successor harness:
+claim empty output before writes, explicit effective environment, integrated
+expected-pin checks before launching. Historical originals remain untouched;
+root will make these small harness corrections, not delegate new research.
+
+Reader numerical correction received bounded source approval; root fixed the
+remaining test-only gap by adding a separate valid2Dplacement large-phase test
+and small-phase positive controls. Final testSHA1114ac7c; production20181ade
+unchanged. Active validation owner has final fixtures for isolated parent proof.
+
+Root prepared successor consumer replay in target/consumer-harness-successor-20261106:
+exclusive new output claim, explicit effective environment, pinned executable/
+preload checks on actual launch path, before/after source/dependency verification
+and exclusive final manifest. Six mock integrity tests pass; native replay is
+not executed while reader validation owns the heavy slot. This replays immutable
+reviewed binaries, not a compiler rebuild; retained original evidence untouched.
+
+Final reader validation completed:16focused tests pass; isolated incoming has
+four intended failures including valid2Dlargephase. Identical production bytes
+pass700shapeops/replay77/B1/13docs/Clippy; full486369/347 unchanged. Source review
+approved correction, final test-gap proof now supplied. See trimmed-conic-admission-validation-20261106.
+Root executed consumer-controlled-replay-20261106-01 with successor harness:
+84probes, guarded QA/material/repeatability and18mutation rejections pass.
+Actual launch wrong-pin controls reject; all effective environments recorded.
+Manifest verified; a second invocation rejects before modifying any evidence.
+Heavy slot released. Next is frozen application audit-candidate build and finite
+source ownership/hook audit; no installation, defaults or deployment activation.
+
+Source ownership audit completed (target/supported-app-ownership-20261106): no
+concrete aliased-input write; actual setter provenance and synchronous I2/STEP
+publication traced. Bind its source pins to final frozen build. Remaining checks
+are actual binary/runtime signal chaining, returning context changes, allocator/
+scalar bindings and renderer-loaded modules. Final builder received these finite
+requirements; no generic locking/deep copy or deployment approval follows.
+
+Both combined-feature audit artifacts built in target/supported-app-build-20261106:
+exact inventories and ownership pins match; ten helper tests and argument-only
+smokes pass. No numerical operation, renderer policy or deployment approval follows.
+Continue with final-binary scalar/folded-constant and production hull mapping,
+and separate observed numerical-path providers/signals in isolated runtime.
+Preserve frozen binaries and default-off features; do not manufacture approval
+records. Native G4 roundtrip and historical failures remain unchanged.
+
+Final static map in target/supported-app-numerical-map-20261106 binds evaluator
+call edges and seven rational constant checks to both frozen app artifacts.
+No production ledger execution is claimed; gates1/2 remain open. Exact runtime
+capture requests were supplied to the active runtime owner. Continue the finite
+derivative-helper and folded-constant boundary rather than repeat the same map.
+
+Final cadc runtime audit passes ordinary rebuild/export but I2 rejects. Root
+localized the exact36-row production ledger: DC/base-plane row0 has projection
+allowance1.2985843e-5; other35 rows fit1e-9. See target/i2-final-document-rejection-20261106.
+Investigate correlated implicit-root interval overestimation for the ideal DC
+z=0 trace, retaining stored spatial/error charges and actual plane displacement.
+No budget relaxation; require parent-failing plane-chart/app controls. Original
+final binaries/evidence remain immutable; defaults stay off.
+
+Helper continuation (target/supported-app-helper-closure-20261106) resolves finite
+quotient/composition mechanisms but does not close gate1. Its source finding is
+that the writer scans elementary descriptors before edge eligibility, so generic
+Fillet/Sphere extraction cannot be claimed globally unreachable. I2 accepted
+D0 types are narrower; its certificate does not consume arbitrary high-order
+surface derivatives. Keep these scopes distinct; do not require unrelated
+high-order proofs or claim a new numerical defect without a reachable counterexample.
+Current active implementation is only the root-localized DC/base-plane budget
+correction, with heavy slot assigned and default-off activation preserved.
+
+Ideal DC zero-coordinate correction completed (target/i2-plane-trace-fix-20261106):
+only actual ledger row0 changes, other35 bit-identical; incoming fails final
+mechanism/public/app regressions. Root reviewed sign-bracket/monotonicity proof
+and retained plane displacement/spatial charges.37 Truck and14 app controls pass.
+Root explicit STEP rerun also37 passes (target/i2-plane-trace-step-20261106).
+Erratum: original step-test WAS active via default feature, not a coverage gap.
+New i2 source370ee6c3 requires refreshed final app artifact identities; prior
+frozen binaries remain immutable historical evidence. No activation/default change.
+
+Refreshed final cad-app195fbbab/cadc0630499e built and frozen in
+ target/supported-app-refresh-20261106. Exact saved I2 document now succeeds
+through production check/export; all36 executed budgets fit, other35 unchanged.
+Discriminating child-only rounding negative rejects and clean positive recovers.
+Fresh exported I2 STEP exact QA fails imported edge15/face8 same-parameter check:
+3.1306699e-7 exceeds stored3.1291271e-7; nearest-surface distance2.48e-14.
+Attribute raw/prepared/imported representations before any correction; retain
+ordinary-control edge29..32 failures and nativeG4 roundtrip. No activation.
+
+I2 STEP attribution completed (target/i2-final-step-attribution-20261106): imported
+edge15/face8 maps to CS, raw affine UV on stored canal boundary. Preparation
+replaces it with a single Hermite cubic; reader UV error is only about1e-14.
+Scratch exact stored-isocurve replacement passes QA without tolerance change.
+Implement bounded exact boundary restriction in preparation with original range/
+orientation and numerical checks; avoid a generic pcurve export framework.
+Four thin-boundary native material mismatches persist in original and control;
+keep them failed pending attribution. Span-aware volume corroborates CS error;
+CLI coarse-mesh volume is separate and not an exact-material measurement.
+
+Bounded PCurve boundary restriction implemented in stepio/out/modeling.rs4a3ffeff
+(target/i2-exact-isocurve-20261106): affine UV on clamped polynomial boundary,
+original parameter trim retained. Parent regression fails; enabled186STEP+6docs,
+37I2tests andClippy pass. Fresh scoped actual document export passes exact QA;
+original remainsfailed, other STEPentities unchanged moduloCSreference shift.
+Independent rounding/admission review required before finalartifact refresh.
+Four material discrepancies and ordinary-control QA remainfailed and separate.
+
+Independent boundary review found unsafe mapped-span arithmetic outside the retained
+I2 fixture (target/i2-isocurve-review-20261106). Root correction now rejects collapsed
+and unsafe mapped/cut spans, uses fallible spline construction, and checks final
+controls. A valid-source regression panics on incoming production and passes the
+correction; focused controls pass. Broader allowance proof remains open: do not
+interpret finite arithmetic or the retained fixture certificate as universal
+PCurve evaluation certification. Validation evidence is being collected in
+target/i2-isocurve-arithmetic-20261106; root holds the heavy slot.
+
+Thin-witness attribution (target/i2-thin-material-20261106) supports ideal and
+stored-coefficient IN at both unchanged points. P1 OUT is rejected classifier
+fallback after repeated ON-trim ray retries; P2 ON follows requested1e-8 base
+tolerance semantics. All four original rows remain FAILED. The lower-level DC
+knot ON classification is not repaired; no Truck material-removal defect is
+demonstrated by these probes. Native G4 roundtrip and ordinary-control QA stay
+separate. All attribution processes joined.
+
+Root transformed-arithmetic correction validation complete:187 enabled STEP
+tests+6docs,37 I2 integration/material/STEP, Clippy/format/diff pass. Final
+valid-source regression fails incoming4a3ffeff inside mapped spline construction;
+original1e-308 exploratory source was rejected earlier and is not counted as
+proof. Four original material discrepancies remainfailed with comparator
+attribution. Universal allowance proof and final supported-artifact refresh
+remain open. Evidence:target/i2-isocurve-arithmetic-20261106. All processes
+joined; heavy slot released.
+
+Root replaces the unproved boundary epsilon multiplier with an explicit
+stored-coefficient certificate (target/i2-boundary-bound-20261106): outward
+normalization/map enclosures, paired knot-cell transport bound, and interval
+Boehm restriction checked against actual output controls. Scope is real stored
+curves, not full floating PCurve or arbitrary reader evaluation. Eight focused
+tests and exact-rational checks of4242 transport samples/1272 actual control
+enclosures pass; existing serialized424-pole result is reproduced after its
+existing FloatDisplay rounding. Raw-vs-serialized exact identity was an invalid
+comparison and its failed exploratory check remains recorded. Broad scoped
+validation underway; no activation/performance claim. Root holds heavy slot.
+
+Explicit boundary coefficient check validated:191 enabled STEP+6docs,37 I2,
+Clippy/format pass. Final modeling c1835b08 and private boundary7742d03a;
+source/binary identities and actual424-pole interval audit are retained under
+target/i2-boundary-bound-20261106. Explicit proof replaces heuristic allowance
+for real in-memory curves only; no floating-evaluator/reader/runtime approval.
+Independent proof/code review and supported-artifact refresh remain gates.
+All spawned processes joined; root heavy slot released.

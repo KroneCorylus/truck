@@ -6,10 +6,44 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Add a default-off guarded ellipse-pcurve writer path and fallible app STEP
+  serialization that preserves existing destination files on formatting failure.
+  Activation remains blocked by downstream reader support and final runtime
+  eligibility; this does not enable the feature in ordinary builds.
+
+- Restore STEP preparation at bounded support-chart endpoints by charging the full
+  displacement of clamped polynomial and conic witnesses. Certify linear and
+  quadratic guides through charged degree elevation, retaining the existing
+  support, fitting, join and final-spline error limits.
+
+- Breaking: STEP `StepModel` conversions from compressed shells/solids and shell
+  collection require `'static` point, curve and surface types in addition to their
+  existing bounds. Add `'static` to generic callers and use owned geometry types;
+  borrowing the shell or solid is still supported. Use fallible formatting for
+  guarded STEP output; the app now returns serialization errors before writing.
+
+- Breaking: STEP `StepModel` conversions from compressed shells/solids and shell
+  collection now require `P: Copy + DisplayByStep` (previously `P: Copy`). Add
+  `DisplayByStep` to generic callers and implement it for custom point types. The
+  optional `step_point_coordinates` hook may remain `None`; implement it only when
+  it returns the exact serialized/read-back 3D point coordinates.
+
+- Make C2 chamfer boundary ordering deterministic across repeated constructions,
+  preserving geometry and exact serialized-output repeatability.
+
+- Extend bounded C2 extrusion chamfers to compatible two-distance and distance-angle
+  setback chains, including exact rational parabolic trims. Preserve original supports
+  and both cap laws; reject incompatible or ill-conditioned requests. Both complex C2
+  cases pass sampled comparison and independent material checks. Latency is unmeasured.
+
+- Restrict the bounded C2 extrusion constructor to single-shell solids and account for
+  retained plane displacement, cap orientation and source conic endpoints in admission.
+  Preserve supported C2 output geometry and unrelated multishell chamfer behavior.
+
 - Construct bounded equal-distance two-cylinder extrusion chamfers with shared tangent
   generators and exact plane/cone/cylinder trims, preserving all original supports.
   The complex C2 capture passes sampled comparison and independent material checks;
-  unsupported two-distance and distance-angle cases still reject. No C2 latency claim.
+  incompatible setback chains still reject. No C2 latency claim.
 
 - Assemble bounded A5 planar corners within partial tangent chamfer networks while
   preserving original face loops and holes. Equal-distance A5 passes sampled comparison;

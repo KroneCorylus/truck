@@ -144,15 +144,21 @@ impl<I: Clone + IntoIterator<Item = usize>> Display for SliceDisplay<'_, IndexSl
 
 /// trait for outputting by STEP file format.
 pub trait DisplayByStep {
+    /// Decimal coordinates emitted by this formatter, when it represents a 3D point.
+    #[doc(hidden)]
+    fn step_point_coordinates(&self) -> Option<[f64; 3]> { None }
+
     ///  formatter
     fn fmt(&self, idx: usize, f: &mut Formatter<'_>) -> Result;
 }
 
 impl<T: DisplayByStep> DisplayByStep for &T {
+    fn step_point_coordinates(&self) -> Option<[f64; 3]> { (*self).step_point_coordinates() }
     fn fmt(&self, idx: usize, f: &mut Formatter<'_>) -> Result { DisplayByStep::fmt(*self, idx, f) }
 }
 
 impl<T: DisplayByStep> DisplayByStep for Box<T> {
+    fn step_point_coordinates(&self) -> Option<[f64; 3]> { self.as_ref().step_point_coordinates() }
     fn fmt(&self, idx: usize, f: &mut Formatter<'_>) -> Result {
         DisplayByStep::fmt(self.as_ref(), idx, f)
     }
@@ -240,34 +246,44 @@ macro_rules! impl_const_step_length {
 
 /// Additional information for output to `edge_curve`.
 pub trait StepCurve {
+    /// Optional bounded ellipse export coefficients.
+    #[doc(hidden)]
+    fn step_ellipse(&self) -> Option<StepEllipse> { None }
     /// the parameter `same_sense`.
     #[inline(always)]
     fn same_sense(&self) -> bool { true }
 }
 
 impl<T: StepCurve> StepCurve for &T {
+    fn step_ellipse(&self) -> Option<StepEllipse> { (*self).step_ellipse() }
     #[inline(always)]
     fn same_sense(&self) -> bool { (*self).same_sense() }
 }
 
 impl<T: StepCurve> StepCurve for Box<T> {
+    fn step_ellipse(&self) -> Option<StepEllipse> { self.as_ref().step_ellipse() }
     #[inline(always)]
     fn same_sense(&self) -> bool { self.as_ref().same_sense() }
 }
 
 /// Additional information for output to `face_surface`.
 pub trait StepSurface {
+    /// Cylinder chart used by the actual surface formatter.
+    #[doc(hidden)]
+    fn step_cylinder(&self) -> Option<StepCylinder> { None }
     /// the parameter `same_sense`.
     #[inline(always)]
     fn same_sense(&self) -> bool { true }
 }
 
 impl<T: StepSurface> StepSurface for &T {
+    fn step_cylinder(&self) -> Option<StepCylinder> { (*self).step_cylinder() }
     #[inline(always)]
     fn same_sense(&self) -> bool { (*self).same_sense() }
 }
 
 impl<T: StepSurface> StepSurface for Box<T> {
+    fn step_cylinder(&self) -> Option<StepCylinder> { self.as_ref().step_cylinder() }
     #[inline(always)]
     fn same_sense(&self) -> bool { self.as_ref().same_sense() }
 }
@@ -398,10 +414,12 @@ impl<T> StepDisplay<T> {
 }
 
 mod assy;
+mod ellipse_runtime;
 mod geometry;
 mod topology;
 pub use geometry::MatrixAsAxis;
 pub use geometry::VectorAsDirection;
+pub use geometry::{StepCylinder, StepEllipse};
 
 use crate::common::PartAttrs;
 

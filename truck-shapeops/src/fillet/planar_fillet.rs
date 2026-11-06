@@ -1,9 +1,12 @@
 #[path = "f9.rs"]
 mod f9;
-#[path = "g8.rs"]
-mod g8;
 #[path = "g4.rs"]
 mod g4;
+#[path = "g8.rs"]
+mod g8;
+#[cfg(any(test, feature = "i2-reviewed-glibc"))]
+#[path = "i2.rs"]
+pub(super) mod i2;
 use super::planar::{neighborhood, valid_boundaries};
 use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};
 use std::result::Result;
@@ -2194,9 +2197,15 @@ struct ExtrusionMiter {
     witness_axes: [Vector3; 2],
 }
 
-fn finite_point(p: Point3) -> bool { [p.x, p.y, p.z].into_iter().all(f64::is_finite) }
-fn finite_vector(v: Vector3) -> bool { [v.x, v.y, v.z].into_iter().all(f64::is_finite) }
-fn finite_uv(uv: (f64, f64)) -> bool { uv.0.is_finite() && uv.1.is_finite() }
+fn finite_point(p: Point3) -> bool {
+    [p.x, p.y, p.z].into_iter().all(f64::is_finite)
+}
+fn finite_vector(v: Vector3) -> bool {
+    [v.x, v.y, v.z].into_iter().all(f64::is_finite)
+}
+fn finite_uv(uv: (f64, f64)) -> bool {
+    uv.0.is_finite() && uv.1.is_finite()
+}
 
 fn bounded_surface_point(
     surface: &Surface,

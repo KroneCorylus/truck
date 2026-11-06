@@ -34,6 +34,21 @@ impl Table {
     /// Turns a failed lookup into a reason naming the unimplemented or unreadable entity behind it.
     fn reason(&self, e: ruststep::error::Error) -> StepConvertingError {
         if let UnknownEntity(idx) = e {
+            let curve_id = self
+                .surface_curve
+                .get(&idx)
+                .map_or(idx, |curve| ref_id(&curve.curve_3d));
+            if let Some(trim) = self.trimmed_curve.get(&curve_id) {
+                return ConversionError::Unreadable {
+                    id: curve_id,
+                    message: format!(
+                        "TRIMMED_CURVE basis #{} could not resolve to a nonrecursive conic",
+                        ref_id(&trim.basis_curve)
+                    ),
+                }
+                .into();
+            }
+
             if let Some(dummy) = self.dummy.get(&idx) {
                 return ConversionError::Unsupported {
                     id: idx,

@@ -131,6 +131,9 @@ def campaign_identity(out):
     assert resolved_libraries == provenance['libraries'], 'Runtime library resolution changed'
     inputs = {}
     for case in json.loads((out/'inputs.json').read_text()):
+        entries = list(Path(case['folder']).iterdir())
+        assert ({p.name for p in entries} == set(case['hashes'])
+                and all(p.is_file() for p in entries)), f"Input inventory changed: {case['folder']}"
         for name, expected in case['hashes'].items():
             path = Path(case['folder'])/name
             inputs[str(path)] = digest(path)

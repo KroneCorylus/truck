@@ -6,6 +6,46 @@ use truck_modeling::{
     EdgeID, Face, FaceID, Rad, ScalarFunctionD1, Shell, Solid, Surface, VertexID, Wire,
 };
 
+#[cfg(all(
+    feature = "i2-reviewed-glibc",
+    not(all(target_arch = "x86_64", target_os = "linux", target_env = "gnu"))
+))]
+compile_error!("i2-reviewed-glibc requires the audited x86_64 GNU/Linux deployment");
+#[cfg(feature = "i2-reviewed-glibc")]
+#[path = "i2_runtime.rs"]
+mod i2_runtime;
+
+/// Attempts only the bounded three-edge revolved junction family before contour splitting.
+/// Returns None when ineligible; the caller retains its ordinary routing and diagnostics.
+/// The input and calling thread's FP control state are never changed.
+fn fillet_solid_revolved_junction(
+    solid: &Solid,
+    edges: &[EdgeID],
+    radius: f64,
+    tol: f64,
+) -> Option<BlendResult> {
+    #[cfg(not(feature = "i2-reviewed-glibc"))]
+    {
+        let _ = (solid, edges, radius, tol);
+        None
+    }
+    #[cfg(feature = "i2-reviewed-glibc")]
+    {
+        if solid.boundaries().len() != 1 || edges.len() != 3 || !i2_runtime::eligible() {
+            return None;
+        }
+        validate_tolerance(tol, "fillet_solid_edges").ok()?;
+        positive(radius, "radius", "fillet_solid_edges").ok()?;
+        Solid::try_new(solid.boundaries().clone()).ok()?;
+        validate_selection(solid, edges, "fillet_solid_edges").ok()?;
+        let selected = edges.iter().copied().collect();
+        let shell =
+            super::planar_fillet::i2::build_for_solid(&solid.boundaries()[0], &selected, radius)?;
+        let result = finish(solid, 0, shell, tol).ok()?;
+        i2_runtime::eligible().then_some(result)
+    }
+}
+
 /// A modeling solid after a blend, with face correspondence for downstream naming.
 ///
 /// IDs identify topology in this process; they are not persistent names across recomputations.
@@ -223,6 +263,16 @@ pub fn try_fillet_solid_edges(
     radius: f64,
     tol: f64,
 ) -> Result<BlendResult, Diagnostic> {
+    try_fillet_solid_edges_impl(solid, edges, radius, tol, true)
+}
+
+fn try_fillet_solid_edges_impl(
+    solid: &Solid,
+    edges: &[EdgeID],
+    radius: f64,
+    tol: f64,
+    allow_i2: bool,
+) -> Result<BlendResult, Diagnostic> {
     let operation = "fillet_solid_edges";
     validate_tolerance(tol, operation)?;
     Solid::try_new(solid.boundaries().clone()).map_err(|e| {
@@ -239,6 +289,11 @@ pub fn try_fillet_solid_edges(
         });
     };
     let index = validate_selection(solid, edges, operation)?;
+    if allow_i2 {
+        if let Some(result) = fillet_solid_revolved_junction(solid, edges, radius, tol) {
+            return Ok(result);
+        }
+    }
     let shell = super::try_fillet_edges(&solid.boundaries()[index], edges, radius, tol)
         .or_else(|error| match error.code {
             Code::UnsupportedGeometry | Code::UnsupportedTopology | Code::NonPlanarFace => {
@@ -426,7 +481,7 @@ fn separate_contours(
             try_fillet_solid_along_wire(&current, &wire, radius, tol)
         } else {
             let selected: Vec<_> = wire.iter().map(|e| e.id()).collect();
-            try_fillet_solid_edges(&current, &selected, radius, tol)
+            try_fillet_solid_edges_impl(&current, &selected, radius, tol, false)
         }
         .ok()?;
         if result
@@ -504,51 +559,56 @@ pub fn try_chamfer_solid_edges(
         });
     }
     let index = validate_selection(solid, edges, operation)?;
-    let shell =
-        super::chamfer_edges::chamfer_edges(&solid.boundaries()[index], edges, distance, tol)
-            .or_else(|error| {
-                if error.stage == "certify_planar_corner" {
-                    return Err(error);
-                }
-                let retry_outside = edges.len() == 1 && error.code == Code::OutsideNeighbour;
-                if matches!(
-                    error.code,
-                    Code::NonPlanarFace | Code::UnsupportedGeometry | Code::UnsupportedTopology
-                ) || retry_outside
-                {
-                    super::planar_edge::blend_edges(
-                        &solid.boundaries()[index],
-                        &edges
-                            .iter()
-                            .map(|&id| (id, super::planar_edge::Blend::Chamfer([distance; 2])))
-                            .collect::<Vec<_>>(),
-                        tol,
-                    )
-                    .map_err(|next| if retry_outside { error } else { next })
-                } else {
-                    Err(error)
-                }
-            })
-            .or_else(|error| {
-                if matches!(
-                    error.code,
-                    Code::NonPlanarFace | Code::UnsupportedGeometry | Code::UnsupportedTopology
-                ) {
-                    separate_chamfer_wires(
-                        solid,
-                        index,
-                        &edges
-                            .iter()
-                            .map(|&id| (id, [distance; 2]))
-                            .collect::<Vec<_>>(),
-                        tol,
-                    )
-                    .ok_or(error)
-                } else {
-                    Err(error)
-                }
-            })
-            .map_err(|e| e.shell(index))?;
+    let shell = super::chamfer_edges::chamfer_edges(
+        &solid.boundaries()[index],
+        solid.boundaries().len() == 1,
+        edges,
+        distance,
+        tol,
+    )
+    .or_else(|error| {
+        if error.stage == "certify_planar_corner" {
+            return Err(error);
+        }
+        let retry_outside = edges.len() == 1 && error.code == Code::OutsideNeighbour;
+        if matches!(
+            error.code,
+            Code::NonPlanarFace | Code::UnsupportedGeometry | Code::UnsupportedTopology
+        ) || retry_outside
+        {
+            super::planar_edge::blend_edges(
+                &solid.boundaries()[index],
+                &edges
+                    .iter()
+                    .map(|&id| (id, super::planar_edge::Blend::Chamfer([distance; 2])))
+                    .collect::<Vec<_>>(),
+                tol,
+            )
+            .map_err(|next| if retry_outside { error } else { next })
+        } else {
+            Err(error)
+        }
+    })
+    .or_else(|error| {
+        if matches!(
+            error.code,
+            Code::NonPlanarFace | Code::UnsupportedGeometry | Code::UnsupportedTopology
+        ) {
+            separate_chamfer_wires(
+                solid,
+                index,
+                &edges
+                    .iter()
+                    .map(|&id| (id, [distance; 2]))
+                    .collect::<Vec<_>>(),
+                tol,
+            )
+            .ok_or(error)
+        } else {
+            Err(error)
+        }
+    })
+    .map_err(|e| e.shell(index))?;
     finish(solid, index, shell, tol).map_err(|e| e.operation(operation))
 }
 
@@ -639,6 +699,7 @@ pub fn try_chamfer_solid_edges_with_distances(
     if !preferences.is_empty() {
         let shell = super::chamfer_miter::chamfer(
             &solid.boundaries()[index],
+            solid.boundaries().len() == 1,
             &selected,
             &distances,
             preferences,
@@ -647,42 +708,48 @@ pub fn try_chamfer_solid_edges_with_distances(
         .map_err(|e| e.shell(index))?;
         return finish(solid, index, shell, tol).map_err(|e| e.operation(operation));
     }
-    let shell =
-        super::chamfer_miter::chamfer(&solid.boundaries()[index], &selected, &distances, &[], tol)
-            .or_else(|error| {
-                if error.stage == "certify_planar_corner" {
-                    return Err(error);
-                }
-                let retry_outside = edges.len() == 1 && error.code == Code::OutsideNeighbour;
-                if matches!(
-                    error.code,
-                    Code::NonPlanarFace | Code::UnsupportedGeometry | Code::UnsupportedTopology
-                ) || retry_outside
-                {
-                    super::planar_edge::blend_edges(
-                        &solid.boundaries()[index],
-                        &edges
-                            .iter()
-                            .map(|&(id, d)| (id, super::planar_edge::Blend::Chamfer(d)))
-                            .collect::<Vec<_>>(),
-                        tol,
-                    )
-                    .map_err(|next| if retry_outside { error } else { next })
-                } else {
-                    Err(error)
-                }
-            })
-            .or_else(|error| {
-                if matches!(
-                    error.code,
-                    Code::NonPlanarFace | Code::UnsupportedGeometry | Code::UnsupportedTopology
-                ) {
-                    separate_chamfer_wires(solid, index, edges, tol).ok_or(error)
-                } else {
-                    Err(error)
-                }
-            })
-            .map_err(|e| e.shell(index))?;
+    let shell = super::chamfer_miter::chamfer(
+        &solid.boundaries()[index],
+        solid.boundaries().len() == 1,
+        &selected,
+        &distances,
+        &[],
+        tol,
+    )
+    .or_else(|error| {
+        if error.stage == "certify_planar_corner" {
+            return Err(error);
+        }
+        let retry_outside = edges.len() == 1 && error.code == Code::OutsideNeighbour;
+        if matches!(
+            error.code,
+            Code::NonPlanarFace | Code::UnsupportedGeometry | Code::UnsupportedTopology
+        ) || retry_outside
+        {
+            super::planar_edge::blend_edges(
+                &solid.boundaries()[index],
+                &edges
+                    .iter()
+                    .map(|&(id, d)| (id, super::planar_edge::Blend::Chamfer(d)))
+                    .collect::<Vec<_>>(),
+                tol,
+            )
+            .map_err(|next| if retry_outside { error } else { next })
+        } else {
+            Err(error)
+        }
+    })
+    .or_else(|error| {
+        if matches!(
+            error.code,
+            Code::NonPlanarFace | Code::UnsupportedGeometry | Code::UnsupportedTopology
+        ) {
+            separate_chamfer_wires(solid, index, edges, tol).ok_or(error)
+        } else {
+            Err(error)
+        }
+    })
+    .map_err(|e| e.shell(index))?;
     finish(solid, index, shell, tol).map_err(|e| e.operation(operation))
 }
 

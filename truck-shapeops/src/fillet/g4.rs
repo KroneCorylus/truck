@@ -526,7 +526,9 @@ pub(super) fn build(shell: &Shell, selected: &HashSet<EdgeID>, r: f64, tol: f64)
     };
     let dg = profile(d, g, 0., 1., t);
     let fh = profile(fv, h, length, t, remote(dc));
-    let fit_budget = eps / 2.;
+    // Reserve half the STEP default edge precision (1e-7) for spatial support
+    // agreement; the existing whole-span control/evaluation certificate still applies.
+    let fit_budget = (eps / 2.).min(5e-8);
     let (fourth, inverse_lower) =
         remote_fourth_bound(&x_coefficients, &f_coefficients, r / scale, k)?;
     let fourth = fourth * scale;

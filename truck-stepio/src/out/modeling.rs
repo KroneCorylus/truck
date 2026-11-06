@@ -4,6 +4,9 @@ use truck_geometry::prelude::*;
 use truck_modeling::{Curve, Elementary, Surface};
 use truck_topology::compress::CompressedSolid;
 
+mod boundary;
+use boundary::BoundaryCertificate;
+
 /// Prepares a modeling solid for [`super::StepModel`] at the given geometric tolerance.
 ///
 /// Contact and intersection curves become spatial splines (exact forms are retained when
@@ -11,6 +14,10 @@ use truck_topology::compress::CompressedSolid;
 /// quadratic splines become circles, and spherical octants align their parameter axes with
 /// their circular boundaries. Fillet surfaces use normalized longitudinal parameters and
 /// include the sampled extent of curved trims beyond their contact endpoints.
+/// Eligible affine UV trims on clamped constant-weight spline boundaries retain the
+/// stored boundary coefficients, with restricted domains and an outward-rounded bound
+/// on the real curves defined by the stored coefficients. This accounts for knot mapping,
+/// normalization and cut rounding; it does not bound floating evaluation or reader pcurves.
 /// Other geometry stays exact. Topology, indices, face order and
 /// orientation are preserved, and the input is not modified. Use this before exporting a blend:
 /// the STEP formatter cannot directly represent [`Surface::Fillet`] or [`Curve::PCurve`].
@@ -18,6 +25,9 @@ use truck_topology::compress::CompressedSolid;
 /// `tol` is a positive finite distance in model units. Approximation is checked at sampled
 /// parameters, not a certified global error bound. A curve and its supporting surface can each
 /// deviate by `tol`, so allow up to `2 * tol` for their agreement in the exported model.
+/// Fitted intersections of two extrusions with single-span polynomial profiles of degree at most three or affine conic profiles
+/// additionally require whole-span spatial support agreement within `min(tol, 5e-8)`.
+/// This reserves half of the target OCCT reader's default edge precision; it does not certify imported pcurves.
 /// Returns `None` for invalid tolerances or if approximation fails within the subdivision limit.
 /// Keep the original solid for further modeling and topology naming. Use
 /// `truck_meshalgo::tessellation::RobustMeshableShape::robust_triangulation` when tessellating a
@@ -129,12 +139,16 @@ fn prepare_curve(curve: &Curve, tol: f64) -> Option<Curve> {
                     let hi = span[1].min(b);
                     lo >= hi || (1..=3).all(|i| agrees(lo + (hi - lo) * i as f64 / 4.))
                 })
+                && supports_agree(leader, curve, tol)
             {
                 return Some(Curve::BSplineCurve(leader.clone()));
             }
         }
     }
     if let Curve::PCurve(pcurve) = curve {
+        if let Some(boundary) = affine_boundary(pcurve, tol) {
+            return Some(boundary.into());
+        }
         if let Surface::Plane(plane) = pcurve.surface().as_ref() {
             return Some(
                 BSplineCurve::new(
@@ -158,6 +172,212 @@ fn prepare_curve(curve: &Curve, tol: f64) -> Option<Curve> {
     }
 }
 
+// Restrict stored coefficients, rather than fitting another spatial curve. The
+// narrow initial contract is a linear UV spline and a constant-weight boundary.
+fn affine_boundary(
+    pcurve: &PCurve<BSplineCurve<Point2>, Box<Surface>>,
+    tol: f64,
+) -> Option<BSplineCurve<Point3>> {
+    let uv = pcurve.curve();
+    let [p, q] = uv.control_points().as_slice() else {
+        return None;
+    };
+    let (a, b) = uv.range_tuple();
+    if uv.degree() != 1
+        || uv.knot_vec().as_slice() != [a, a, b, b]
+        || !a.is_finite()
+        || !b.is_finite()
+        || a >= b
+        || ![p.x, p.y, q.x, q.y].iter().all(|x| x.is_finite())
+    {
+        return None;
+    }
+    let Surface::NurbsSurface(surface) = pcurve.surface().as_ref() else {
+        return None;
+    };
+    let surface = surface.non_rationalized();
+    let fixed = if p.x == q.x && p.y != q.y {
+        0
+    } else if p.y == q.y && p.x != q.x {
+        1
+    } else {
+        return None;
+    };
+    let (fixed_knots, knots, fixed_degree, degree) = if fixed == 0 {
+        (
+            surface.uknot_vec(),
+            surface.vknot_vec(),
+            surface.udegree(),
+            surface.vdegree(),
+        )
+    } else {
+        (
+            surface.vknot_vec(),
+            surface.uknot_vec(),
+            surface.vdegree(),
+            surface.udegree(),
+        )
+    };
+    if degree == 0
+        || degree > 3
+        || fixed_degree == 0
+        || fixed_degree > 3
+        || !fixed_knots
+            .iter()
+            .chain(knots.iter())
+            .all(|x| x.is_finite())
+    {
+        return None;
+    }
+    let clamped = |k: &KnotVec, d: usize| {
+        k.len() >= 2 * (d + 1)
+            && k[0] < k[d + 1]
+            && k[k.len() - d - 2] < k[k.len() - 1]
+            && k[d + 1..k.len() - d - 1]
+                .windows(d + 1)
+                .all(|w| w[0] != w[d])
+            && k[..=d].iter().all(|x| *x == k[0])
+            && k[k.len() - d - 1..].iter().all(|x| *x == k[k.len() - 1])
+            && k.windows(2).all(|w| w[0] <= w[1])
+    };
+    if !clamped(fixed_knots, fixed_degree) || !clamped(knots, degree) {
+        return None;
+    }
+    let rows = surface.control_points();
+    if rows
+        .iter()
+        .flatten()
+        .any(|p| ![p.x, p.y, p.z, p.w].iter().all(|x| x.is_finite()) || p.w <= 0.)
+    {
+        return None;
+    }
+    let last = if fixed == 0 {
+        rows.len() - 1
+    } else {
+        rows[0].len() - 1
+    };
+    let row = if p[fixed] == fixed_knots[0] {
+        0
+    } else if p[fixed] == fixed_knots[fixed_knots.len() - 1] {
+        last
+    } else {
+        return None;
+    };
+    let poles: Vec<_> = if fixed == 0 {
+        rows[row].clone()
+    } else {
+        rows.iter().map(|r| r[row]).collect()
+    };
+    let weight = poles[0].w;
+    if !weight.is_normal()
+        || weight < f64::MIN_POSITIVE.sqrt()
+        || weight > f64::MAX.sqrt()
+        || poles.iter().any(|p| {
+            p.w != weight
+                || ![p.x, p.y, p.z, p.w]
+                    .iter()
+                    .all(|x| x.abs() <= f64::MAX.sqrt())
+        })
+    {
+        return None;
+    }
+    let varying = 1 - fixed;
+    let slope = (q[varying] - p[varying]) / (b - a);
+    let offset = p[varying] - slope * a;
+    if !slope.is_normal() || !offset.is_finite() {
+        return None;
+    }
+    let low = p[varying].min(q[varying]);
+    let high = p[varying].max(q[varying]);
+    if low < knots[0] || high > knots[knots.len() - 1] {
+        return None;
+    }
+    let mut mapped: Vec<_> = knots.iter().map(|k| (k - offset) / slope).collect();
+    if knots
+        .windows(2)
+        .zip(mapped.windows(2))
+        .any(|(before, after)| before[0] != before[1] && after[0] == after[1])
+    {
+        return None;
+    }
+    let mut points: Vec<_> = poles
+        .iter()
+        .map(|p| {
+            if weight == 1. {
+                Point3::new(p.x, p.y, p.z)
+            } else {
+                p.to_point()
+            }
+        })
+        .collect();
+    if slope < 0. {
+        mapped.reverse();
+        points.reverse();
+    }
+    if !mapped.iter().all(|x| x.is_finite())
+        || mapped.windows(2).any(|w| w[0] > w[1])
+        || a < mapped[0]
+        || b > mapped[mapped.len() - 1]
+    {
+        return None;
+    }
+    // Cuts introduce additional denominators. Check their positive spacings
+    // before knot insertion; finite mapped knots alone do not make it safe.
+    let safe_span = |width: f64| width.is_normal() && width > 0. && width.recip().is_finite();
+    if !safe_span(b - a)
+        || !safe_span(mapped[mapped.len() - 1] - mapped[0])
+        || mapped.windows(2).any(|w| {
+            (w[0] != w[1] && !safe_span(w[1] - w[0]))
+                || [a, b]
+                    .into_iter()
+                    .any(|t| w[0] < t && t < w[1] && (!safe_span(t - w[0]) || !safe_span(w[1] - t)))
+        })
+    {
+        return None;
+    }
+    let spacing = knots
+        .windows(2)
+        .filter(|w| w[0] < w[1])
+        .map(|w| w[1] - w[0])
+        .fold(f64::INFINITY, f64::min);
+    let scale = knots
+        .iter()
+        .fold(low.abs().max(high.abs()), |m, x| m.max(x.abs()));
+    let parameter_scale = slope.abs() * a.abs().max(b.abs()) + offset.abs() + scale;
+    if (q[varying] - p[varying]).abs() <= 64. * f64::EPSILON * parameter_scale {
+        return None;
+    }
+    if !spacing.is_normal() || !parameter_scale.is_finite() {
+        return None;
+    }
+    // A rounded affine map must still reproduce both stored UV coefficients.
+    let map_error = (slope * a + offset - p[varying])
+        .abs()
+        .max((slope * b + offset - q[varying]).abs());
+    if map_error > 8. * f64::EPSILON * parameter_scale {
+        return None;
+    }
+    let mut curve = BSplineCurve::try_new(mapped.into(), points).ok()?;
+    let certificate =
+        BoundaryCertificate::new(knots, &poles, &curve, (a, b), (p[varying], q[varying]))?;
+    if a > curve.range_tuple().0 {
+        curve = curve.cut(a);
+    }
+    if b < curve.range_tuple().1 {
+        curve.cut(b);
+    }
+    if curve
+        .control_points()
+        .iter()
+        .any(|p| ![p.x, p.y, p.z].into_iter().all(f64::is_finite))
+    {
+        return None;
+    }
+    let (knots, points) = curve.destruct();
+    let curve = BSplineCurve::try_new(knots, points).ok()?;
+    (certificate.error(&curve)? <= tol.min(SUPPORT_AGREEMENT)).then_some(curve)
+}
+
 fn fit_procedural_curve(curve: &Curve, tol: f64) -> Option<BSplineCurve<Point3>> {
     if let Curve::IntersectionCurve(intersection) = curve {
         if let Curve::BSplineCurve(leader) = intersection.leader().as_ref() {
@@ -168,29 +388,233 @@ fn fit_procedural_curve(curve: &Curve, tol: f64) -> Option<BSplineCurve<Point3>>
             // Cut the guide as well, so each span uses its own endpoint derivatives.
             for knot in knots.into_iter().filter(|&t| a < t && t < b).chain([b]) {
                 let next = (knot < b).then(|| remaining.cut(knot));
-                let mut piece = fit_procedural_span(&remaining, tol * 0.5)?;
+                let piece = fit_procedural_span(&remaining, tol * 0.5)?;
                 fitted = Some(match fitted {
                     None => piece,
-                    Some(previous) => {
-                        // Separate Newton solves can differ at the join. Share one
-                        // control to keep STEP knot multiplicity <= degree, budgeting
-                        // this displacement separately from the span's fitting error.
-                        let join = previous.back();
-                        if piece.front().distance(join) > tol * 0.5 {
-                            return None;
-                        }
-                        *piece.control_point_mut(0) = join;
-                        previous.try_concat(&piece).ok()?
-                    }
+                    Some(previous) => join_procedural_spans(&previous, piece, curve, tol)?,
                 });
                 if let Some(next) = next {
                     remaining = next;
                 }
             }
-            return fitted;
+            return fitted.filter(|spline| supports_agree(spline, curve, tol));
         }
     }
     fit_procedural_span(curve, tol)
+}
+
+fn join_procedural_spans(
+    previous: &BSplineCurve<Point3>,
+    mut piece: BSplineCurve<Point3>,
+    curve: &Curve,
+    tol: f64,
+) -> Option<BSplineCurve<Point3>> {
+    // Independent endpoint solves can differ. Charge the shared endpoint against
+    // the support budget after overwriting it, as well as the fitting tolerance.
+    let join = previous.back();
+    if piece.front().distance(join) > tol * 0.5 {
+        return None;
+    }
+    *piece.control_point_mut(0) = join;
+    if !supports_agree(&piece, curve, tol) {
+        return None;
+    }
+    previous.try_concat(&piece).ok()
+}
+
+// Half the target OCCT reader's default edge precision; parameter correspondence is separate.
+const SUPPORT_AGREEMENT: f64 = 5e-8;
+
+// A linear path in an extrusion's chart has curvature only in its profile.
+// Restrict polynomial profiles to a single Bezier span: no derivative jump is hidden.
+fn support_curvature(surface: &Surface) -> Option<f64> {
+    let Surface::Extruded(surface) = surface else {
+        return None;
+    };
+    match surface.entity_curve() {
+        Curve::BSplineCurve(profile) => {
+            if profile.degree() > 3 || profile.knot_vec().to_single_multi().0.len() != 2 {
+                return None;
+            }
+            Some(
+                profile
+                    .derivation()
+                    .derivation()
+                    .control_points()
+                    .iter()
+                    .map(|v| v.magnitude())
+                    .fold(0., f64::max),
+            )
+        }
+        Curve::Conic(profile) => {
+            let m = profile.transform();
+            (m[0].w == 0. && m[1].w == 0. && m[2].w == 0. && m[3].w == 1.)
+                .then(|| m[0].truncate().magnitude() + m[1].truncate().magnitude())
+        }
+        _ => None,
+    }
+}
+
+fn supports_agree(spline: &BSplineCurve<Point3>, curve: &Curve, tol: f64) -> bool {
+    let Curve::IntersectionCurve(intersection) = curve else {
+        return true;
+    };
+    let supports = [
+        intersection.surface0().as_ref(),
+        intersection.surface1().as_ref(),
+    ];
+    let [Some(m0), Some(m1)] = supports.map(support_curvature) else {
+        return true;
+    };
+    let budget = tol.min(SUPPORT_AGREEMENT);
+    for (surface, curvature) in supports.into_iter().zip([m0, m1]) {
+        let mut remaining = 131072usize;
+        for span in spline.bezier_decomposition() {
+            let source = span.control_points();
+            if source.is_empty() || source.len() > 4 {
+                return false;
+            }
+            let mut elevated = source.clone();
+            while elevated.len() < 4 {
+                let n = elevated.len();
+                elevated = std::iter::once(elevated[0])
+                    .chain((1..n).map(|i| {
+                        elevated[i] + (elevated[i - 1] - elevated[i]) * (i as f64 / n as f64)
+                    }))
+                    .chain(std::iter::once(elevated[n - 1]))
+                    .collect();
+            }
+            // At most three convex elevation passes. Charge their arithmetic
+            // against the original stored guide, in addition to subdivision error.
+            let scale = source
+                .iter()
+                .map(|p| p.to_vec().magnitude())
+                .fold(1., f64::max);
+            let ops = if source.len() < 4 {
+                64. * f64::EPSILON
+            } else {
+                0.
+            };
+            let elevation_error = ops / (1. - ops) * scale;
+            let Ok(points) = <[Point3; 4]>::try_from(elevated.as_slice()) else {
+                return false;
+            };
+            if !elevation_error.is_finite()
+                || elevation_error >= budget
+                || !support_span(
+                    points,
+                    surface,
+                    curvature,
+                    budget - elevation_error,
+                    0,
+                    &mut remaining,
+                )
+            {
+                return false;
+            }
+        }
+    }
+    true
+}
+
+fn support_span(
+    p: [Point3; 4],
+    surface: &Surface,
+    curvature: f64,
+    budget: f64,
+    depth: usize,
+    remaining: &mut usize,
+) -> bool {
+    if *remaining == 0 {
+        return false;
+    }
+    *remaining -= 1;
+    let Some(mut a) = surface.search_nearest_parameter(p[0], None, 100) else {
+        return false;
+    };
+    let Some(mut b) = surface.search_nearest_parameter(p[3], Some(a), 100) else {
+        return false;
+    };
+    let Surface::Extruded(extrusion) = surface else {
+        return false;
+    };
+    let (lo, hi) = extrusion.entity_curve().range_tuple();
+    if ![a.0, a.1, b.0, b.1, curvature]
+        .into_iter()
+        .all(f64::is_finite)
+        || !lo.is_finite()
+        || !hi.is_finite()
+        || lo > hi
+    {
+        return false;
+    }
+    // Keep the witness path inside the retained chart. The chord hull charges
+    // the full displacement for polynomial and conic profiles alike.
+    a.0 = a.0.clamp(lo, hi);
+    b.0 = b.0.clamp(lo, hi);
+    let q = [surface.subs(a.0, a.1), surface.subs(b.0, b.1)];
+    // Convexity bounds the stored cubic minus the endpoint chord. The chart
+    // chord's interpolation remainder is M |du|²/8, independently of the solver:
+    // any finite chart endpoints give a path on the represented support.
+    let chord_error = (0..4)
+        .map(|i| p[i].distance(q[0] + (q[1] - q[0]) * (i as f64 / 3.)))
+        .fold(0., f64::max);
+    let profile_scale = match extrusion.entity_curve() {
+        Curve::BSplineCurve(profile) => profile
+            .control_points()
+            .iter()
+            .map(|p| p.to_vec().magnitude())
+            .sum::<f64>(),
+        Curve::Conic(profile) => {
+            if a.0.abs().max(b.0.abs()) > std::f64::consts::TAU {
+                return false;
+            }
+            (0..4)
+                .map(|i| profile.transform()[i].truncate().magnitude())
+                .sum::<f64>()
+        }
+        _ => return false,
+    };
+    let scale = p
+        .into_iter()
+        .chain(q)
+        .map(|x| x.to_vec().magnitude())
+        .fold(1., f64::max);
+    let scale =
+        scale + profile_scale + extrusion.extruding_vector().magnitude() * a.1.abs().max(b.1.abs());
+    // gamma(256) per subdivision level covers cubic de Casteljau/de Boor,
+    // chart evaluation, chord arithmetic and the curvature remainder. Include
+    // support coefficients before cancellation, not just the resulting points.
+    let operations = 256. * (depth + 1) as f64;
+    let roundoff = operations * f64::EPSILON / (1. - operations * f64::EPSILON) * scale;
+    let bound = chord_error + curvature * (b.0 - a.0).powi(2) / 8. + roundoff;
+    if bound.is_finite() && bound <= budget {
+        return true;
+    }
+    if depth == 16 || !bound.is_finite() || roundoff >= budget {
+        return false;
+    }
+    let a = p[0] + (p[1] - p[0]) * 0.5;
+    let b = p[1] + (p[2] - p[1]) * 0.5;
+    let c = p[2] + (p[3] - p[2]) * 0.5;
+    let d = a + (b - a) * 0.5;
+    let e = b + (c - b) * 0.5;
+    let f = d + (e - d) * 0.5;
+    support_span(
+        [p[0], a, d, f],
+        surface,
+        curvature,
+        budget,
+        depth + 1,
+        remaining,
+    ) && support_span(
+        [f, e, c, p[3]],
+        surface,
+        curvature,
+        budget,
+        depth + 1,
+        remaining,
+    )
 }
 
 fn fit_procedural_span(curve: &Curve, tol: f64) -> Option<BSplineCurve<Point3>> {
@@ -228,7 +652,7 @@ fn fit_procedural_span(curve: &Curve, tol: f64) -> Option<BSplineCurve<Point3>> 
             let error = spline.subs(t).distance(curve.subs(t));
             error.is_finite() && error <= tol
         });
-        if valid {
+        if valid && supports_agree(&spline, curve, tol) {
             return Some(spline);
         }
     }
@@ -617,6 +1041,370 @@ fn fillet_to_nurbs(
 #[cfg(test)]
 mod tests {
     use super::*;
+    fn stored_canal() -> Curve {
+        let fixture: serde_json::Value =
+            serde_json::from_str(include_str!("../../tests/fixtures/i2-stored-canal.json"))
+                .unwrap();
+        assert_eq!(
+            fixture["source_step_sha256"],
+            "88e8492e7450fc7c80f0352e24f1432b7d622bd58521765b809aa82b1bc38d62"
+        );
+        serde_json::from_value(fixture["curve"].clone()).unwrap()
+    }
+
+    #[test]
+    fn stored_canal_boundary_restriction() {
+        for reverse in [false, true] {
+            for swap in [false, true] {
+                for moved in [false, true] {
+                    for partial in [false, true] {
+                        let Curve::PCurve(raw) = stored_canal() else {
+                            unreachable!()
+                        };
+                        let (mut uv, mut surface) = raw.decompose();
+                        if reverse {
+                            uv.invert();
+                        }
+                        if swap {
+                            surface.invert();
+                            for p in uv.control_points_mut() {
+                                std::mem::swap(&mut p.x, &mut p.y);
+                            }
+                        }
+                        if moved {
+                            surface.transform_by(
+                                Matrix4::from_translation(Vector3::new(13., -7., 23.))
+                                    * Matrix4::from_axis_angle(
+                                        Vector3::new(1., 2., 3.).normalize(),
+                                        Rad(0.73),
+                                    ),
+                            );
+                        }
+                        if partial {
+                            uv = uv.cut(-3.7);
+                            uv.cut(-1.4);
+                        }
+                        let raw = Curve::PCurve(PCurve::new(uv, surface));
+                        let before = serde_json::to_string(&raw).unwrap();
+                        let prepared = prepare_curve(&raw, 0.00005).unwrap();
+                        let Curve::BSplineCurve(ref spline) = prepared else {
+                            panic!("boundary row")
+                        };
+                        assert!(
+                            spline.control_points().len() > 100,
+                            "must retain stored spans"
+                        );
+                        assert_eq!(prepared.range_tuple(), raw.range_tuple());
+                        let (a, b) = raw.range_tuple();
+                        for i in 0..=2048 {
+                            let t = a + (b - a) * i as f64 / 2048.;
+                            assert!(prepared.subs(t).distance(raw.subs(t)) < 5e-8);
+                        }
+                        assert_eq!(serde_json::to_string(&raw).unwrap(), before);
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn boundary_restriction_upper_endpoint_and_scaled_parameter() {
+        let surface = NurbsSurface::new(BSplineSurface::new(
+            (KnotVec::bezier_knot(1), KnotVec::bezier_knot(2)),
+            vec![
+                vec![
+                    Vector4::new(0., 0., 0., 2.),
+                    Vector4::new(0., 2., 0., 2.),
+                    Vector4::new(0., 4., 0., 2.),
+                ],
+                vec![
+                    Vector4::new(2., 0., 0., 2.),
+                    Vector4::new(2., 2., 2., 2.),
+                    Vector4::new(2., 4., 0., 2.),
+                ],
+            ],
+        ));
+        let uv = BSplineCurve::new(
+            vec![2., 2., 3., 3.].into(),
+            vec![Point2::new(1., 0.25), Point2::new(1., 0.75)],
+        );
+        let raw = PCurve::new(uv, Box::new(Surface::NurbsSurface(surface)));
+        let result = affine_boundary(&raw, 0.00005).unwrap();
+        assert_eq!(result.range_tuple(), (2., 3.));
+        assert_eq!(result.degree(), 2);
+        for i in 0..=100 {
+            let t = 2. + i as f64 / 100.;
+            assert!(raw.subs(t).distance(result.subs(t)) < 1e-12);
+        }
+        let invalid = BSplineCurve::new_unchecked(
+            vec![2., 2., 2., 2.].into(),
+            vec![Point2::new(1., 0.), Point2::new(1., 1.)],
+        );
+        assert!(affine_boundary(&PCurve::new(invalid, raw.surface().clone()), 0.00005).is_none());
+    }
+
+    #[test]
+    fn boundary_restriction_rejects_unsafe_mapped_spans() {
+        let row: Vec<_> = [0., 0.25, 0.5, 0.75, 1.]
+            .into_iter()
+            .map(|x| Vector4::new(x, 0., 0., 1.))
+            .collect();
+        let surface = Surface::NurbsSurface(NurbsSurface::new(BSplineSurface::new(
+            (
+                KnotVec::bezier_knot(1),
+                vec![0., 0., 0.25, 0.5, 0.75, 1., 1.].into(),
+            ),
+            vec![row.clone(), row],
+        )));
+        // The incoming map passes its positional allowance, but cutting it
+        // creates knot spans with unrepresentable derivative arithmetic.
+        for (a, b, lo, hi) in [(0., 2e-308, 0.125, 0.875), (1e-308, 1., 1e-308, 1.)] {
+            let uv = BSplineCurve::new(
+                vec![a, a, b, b].into(),
+                vec![Point2::new(0., lo), Point2::new(0., hi)],
+            );
+            let raw = PCurve::new(uv, Box::new(surface.clone()));
+            let before = serde_json::to_string(&raw).unwrap();
+            assert!(affine_boundary(&raw, 0.00005).is_none(), "domain {a}..{b}");
+            assert_eq!(serde_json::to_string(&raw).unwrap(), before);
+        }
+    }
+
+    #[test]
+    fn boundary_restriction_rejects_ineligible_coefficients() {
+        for kind in 0..6 {
+            let Curve::PCurve(raw) = stored_canal() else {
+                unreachable!()
+            };
+            let (mut uv, surface) = raw.decompose();
+            match kind {
+                0 => uv.control_point_mut(1).x = 0.1,
+                1 => {
+                    uv.control_point_mut(0).x = 0.1;
+                    uv.control_point_mut(1).x = 0.1;
+                }
+                2 => *uv.control_point_mut(1) = *uv.control_point(0),
+                3 => uv.control_point_mut(0).y = f64::NAN,
+                4 => uv.control_point_mut(0).y = 6.,
+                _ => uv.control_point_mut(1).y = uv.control_point(0).y - 1e-14,
+            }
+            let raw = PCurve::new(uv, surface);
+            assert!(affine_boundary(&raw, 0.00005).is_none(), "case {kind}");
+        }
+    }
+
+    #[test]
+    fn retained_raw_support_preparation_regressions() {
+        let fixtures: serde_json::Value = serde_json::from_str(include_str!(
+            "../../tests/fixtures/step-support-regression-curves.json"
+        ))
+        .unwrap();
+        let mut failures = Vec::new();
+        for fixture in fixtures.as_array().unwrap() {
+            let curve: Curve = serde_json::from_value(fixture["curve"].clone()).unwrap();
+            let before = serde_json::to_string(&curve).unwrap();
+            if let Some(prepared) = prepare_curve(&curve, 0.00005) {
+                let Curve::BSplineCurve(spline) = &prepared else {
+                    panic!("expected fitted intersection")
+                };
+                assert!(supports_agree(spline, &curve, 0.00005));
+                let (a, b) = curve.range_tuple();
+                for i in 0..=256 {
+                    let t = a + (b - a) * i as f64 / 256.;
+                    assert!(prepared.subs(t).distance(curve.subs(t)) <= 0.00005);
+                }
+            } else {
+                failures.push(format!("{} {}", fixture["case"], fixture["edge"]));
+            }
+            assert_eq!(before, serde_json::to_string(&curve).unwrap());
+        }
+        assert!(failures.is_empty(), "failed raw curves: {failures:?}");
+    }
+
+    #[test]
+    fn bounded_conic_chart_charges_endpoint_displacement() {
+        let profile = Curve::Conic(Processor::with_transform(
+            TrimmedCurve::new(UnitCircle::new(), (0., std::f64::consts::FRAC_PI_2)),
+            Matrix4::identity(),
+        ));
+        let surface = Surface::Extruded(ExtrudedCurve::by_extrusion(profile, Vector3::unit_z()));
+        for (angle, expected) in [(-1e-8, true), (-1e-6, false)] {
+            let point = surface.subs(angle, 0.);
+            let uv = surface.search_nearest_parameter(point, None, 100).unwrap();
+            assert!(uv.0 < 0.);
+            assert_eq!(
+                support_span(
+                    [point; 4],
+                    &surface,
+                    support_curvature(&surface).unwrap(),
+                    SUPPORT_AGREEMENT,
+                    0,
+                    &mut 131072
+                ),
+                expected
+            );
+        }
+    }
+
+    #[test]
+    fn bounded_chart_endpoint_witness() {
+        let profile = BSplineCurve::new(
+            KnotVec::bezier_knot(3),
+            (0..4).map(|i| Point3::new(i as f64 / 3., 0., 0.)).collect(),
+        );
+        let surface = Surface::Extruded(ExtrudedCurve::by_extrusion(
+            profile.into(),
+            Vector3::unit_y(),
+        ));
+        for (offset, expected) in [(-1e-8, true), (-1e-6, false)] {
+            let p = std::array::from_fn(|i| Point3::new(offset + i as f64 / 3., 0., 0.));
+            let uv = surface.search_nearest_parameter(p[0], None, 100).unwrap();
+            assert!(uv.0 < 0., "witness must exercise original chart rejection");
+            assert_eq!(
+                support_span(
+                    p,
+                    &surface,
+                    support_curvature(&surface).unwrap(),
+                    SUPPORT_AGREEMENT,
+                    0,
+                    &mut 131072
+                ),
+                expected
+            );
+        }
+    }
+    #[test]
+    fn eligible_linear_and_quadratic_guide_certificate() {
+        for degree in [1, 2] {
+            for offset in [0., 1e-6] {
+                let guide = BSplineCurve::new(
+                    KnotVec::bezier_knot(degree),
+                    (0..=degree)
+                        .map(|i| Point3::new(i as f64 / degree as f64, 0., offset))
+                        .collect(),
+                );
+                let curve = planar_extrusion_intersection(guide.clone());
+                assert_eq!(supports_agree(&guide, &curve, 0.00005), offset == 0.);
+            }
+        }
+    }
+
+    fn planar_extrusion_intersection(guide: BSplineCurve<Point3>) -> Curve {
+        let profile = BSplineCurve::new(
+            KnotVec::bezier_knot(3),
+            vec![
+                Point3::new(-2., 0., 0.),
+                Point3::new(-2. / 3., 0., 0.),
+                Point3::new(2. / 3., 0., 0.),
+                Point3::new(2., 0., 0.),
+            ],
+        );
+        Curve::IntersectionCurve(IntersectionCurve::new(
+            Box::new(Surface::Extruded(ExtrudedCurve::by_extrusion(
+                profile.clone().into(),
+                Vector3::unit_y(),
+            ))),
+            Box::new(Surface::Extruded(ExtrudedCurve::by_extrusion(
+                profile.into(),
+                Vector3::unit_z(),
+            ))),
+            Box::new(Curve::BSplineCurve(guide)),
+        ))
+    }
+
+    #[test]
+    fn intersection_guide_return_respects_support_budget() {
+        let guide = BSplineCurve::new(
+            KnotVec::bezier_knot(3),
+            (0..4)
+                .map(|i| Point3::new(i as f64 / 3., 0., 1e-6))
+                .collect(),
+        );
+        let curve = planar_extrusion_intersection(guide);
+        let before = serde_json::to_string(&curve).unwrap();
+        let prepared = prepare_curve(&curve, 0.00005).expect("straight intersection fit");
+        for i in 0..=128 {
+            let point = prepared.subs(i as f64 / 128.);
+            assert!(point.y.abs().max(point.z.abs()) <= SUPPORT_AGREEMENT);
+        }
+        assert_eq!(serde_json::to_string(&curve).unwrap(), before);
+    }
+
+    #[test]
+    fn intersection_join_rechecks_overwritten_endpoint() {
+        let piece = BSplineCurve::new(
+            KnotVec::bezier_knot(3),
+            [-4., 8., 0., 0.]
+                .into_iter()
+                .enumerate()
+                .map(|(i, z)| Point3::new(i as f64 / 3., 0., z * 1e-8))
+                .collect(),
+        );
+        let curve = planar_extrusion_intersection(piece.clone());
+        let tol = 0.00005;
+        assert!(supports_agree(&piece, &curve, tol));
+        for height in [-4e-8, 4e-8] {
+            let previous = BSplineCurve::new(
+                vec![-1., -1., -1., -1., 0., 0., 0., 0.].into(),
+                (0..4)
+                    .map(|i| Point3::new(-1. + i as f64 / 3., 0., height))
+                    .collect(),
+            );
+            assert!(supports_agree(&previous, &curve, tol));
+            let joined = join_procedural_spans(&previous, piece.clone(), &curve, tol);
+            if height > 0. {
+                let mut unchecked = piece.clone();
+                *unchecked.control_point_mut(0) = previous.back();
+                assert!(unchecked.subs(0.2).z > SUPPORT_AGREEMENT);
+                assert!(
+                    joined.is_none(),
+                    "joining must not invalidate the support bound"
+                );
+            } else {
+                let joined = joined.expect("unchanged endpoint remains admissible");
+                assert!(supports_agree(&joined, &curve, tol));
+                for i in 0..=256 {
+                    assert!(joined.subs(-1. + i as f64 / 128.).z.abs() <= SUPPORT_AGREEMENT);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn g8_preparation_preserves_incident_support_agreement() {
+        let raw: Curve =
+            serde_json::from_str(include_str!("../../tests/fixtures/g8-support-curve.json"))
+                .unwrap();
+        let before = serde_json::to_string(&raw).unwrap();
+        let prepared = prepare_curve(&raw, 0.00005).expect("bounded support fit");
+        let Curve::IntersectionCurve(intersection) = &raw else {
+            unreachable!()
+        };
+        let cylinder_error = |p: Point3| {
+            ((p.y - 24.099019513592765).hypot(p.z - 95.00000000000003) - 4.999999999999975).abs()
+        };
+        for t in (0..=2048)
+            .map(|i| i as f64 / 2048.)
+            .chain([0.031258539993374024])
+        {
+            let (p, uv0, uv1) = intersection.search_triple(t, 100).unwrap();
+            assert!(cylinder_error(p) < 1e-9);
+            assert!(p.distance(intersection.surface0().subs(uv0.x, uv0.y)) < 1e-9);
+            assert!(p.distance(intersection.surface1().subs(uv1.x, uv1.y)) < 1e-9);
+            let q = prepared.subs(t);
+            assert!(cylinder_error(q) <= SUPPORT_AGREEMENT);
+            assert!(p.distance(q) <= 0.00005);
+            for surface in [intersection.surface0(), intersection.surface1()] {
+                let uv = surface.search_nearest_parameter(q, None, 100).unwrap();
+                assert!(q.distance(surface.subs(uv.0, uv.1)) <= SUPPORT_AGREEMENT);
+            }
+        }
+        assert_eq!(before, serde_json::to_string(&raw).unwrap());
+        let Curve::BSplineCurve(spline) = prepared else {
+            unreachable!()
+        };
+        assert!(supports_agree(&spline, &raw, 0.00005));
+    }
 
     #[test]
     fn intersection_export_does_not_substitute_its_polyline_guide() {

@@ -6,6 +6,7 @@ use truck_modeling::*;
 
 pub(super) fn chamfer_edges(
     shell: &Shell,
+    single_shell: bool,
     edges: &[EdgeID],
     distance: f64,
     tol: f64,
@@ -27,7 +28,14 @@ pub(super) fn chamfer_edges(
         }
         _ => {
             let distances = selected.iter().map(|&id| (id, [distance; 2])).collect();
-            return super::chamfer_miter::chamfer(shell, &selected, &distances, &[], tol);
+            return super::chamfer_miter::chamfer(
+                shell,
+                single_shell,
+                &selected,
+                &distances,
+                &[],
+                tol,
+            );
         }
     };
     let convex::ConvexShell {

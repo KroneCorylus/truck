@@ -8,6 +8,8 @@ repository = "https://github.com/ricosjp/truck"
 license = "Apache-2.0"
 
 [features]
+# Audited deployment contract, never a generic numerical guarantee.
+i2-reviewed-glibc = []
 default = ["step-test"]
 step-test = ["truck-stepio"]
 

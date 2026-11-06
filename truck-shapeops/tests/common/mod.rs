@@ -6,7 +6,7 @@ pub mod blend;
 use rustc_hash::FxHashSet as HashSet;
 use std::f64::consts::PI;
 use truck_meshalgo::prelude::*;
-use truck_topology::{shell::ShellCondition, Shell, Solid};
+use truck_topology::{Shell, Solid, shell::ShellCondition};
 
 /// Asserts that `solid` is a well-formed closed solid with the expected volume.
 ///

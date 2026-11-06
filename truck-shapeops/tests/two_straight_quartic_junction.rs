@@ -527,6 +527,35 @@ fn bounded_g4_imported_representation() {
             } else {
                 let output = result.expect("imported represented G4").solid;
                 structure(&input, &output);
+                for face in output.face_iter() {
+                    let surface = face.surface();
+                    let Some((
+                        truck_modeling::Elementary::Cylinder {
+                            origin,
+                            axis,
+                            radius,
+                        },
+                        _,
+                    )) = surface.elementary()
+                    else {
+                        continue;
+                    };
+                    for edge in face.edge_iter() {
+                        let Curve::BSplineCurve(curve) = edge.curve() else {
+                            continue;
+                        };
+                        for span in curve.bezier_decomposition() {
+                            let (a, b) = span.range_tuple();
+                            for i in 0..=16 {
+                                let p = curve.subs(a + (b - a) * i as f64 / 16.);
+                                let v = p - origin;
+                                assert!(
+                                    ((v - axis * v.dot(axis)).magnitude() - radius).abs() <= 5e-8
+                                );
+                            }
+                        }
+                    }
+                }
                 assert!(output.is_geometric_consistent());
                 common::assert_solid(
                     &output,

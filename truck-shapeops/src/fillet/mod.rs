@@ -1,3 +1,12 @@
+//! The off-by-default `i2-reviewed-glibc` feature permits a bounded complete
+//! revolved junction through the ordinary solid API on reviewed x86_64 GNU/Linux
+//! builds only. It requires matched scalar glibc error <= 2^-40 on [-4,4], faithful
+//! compilation without fast/reassociated/vector math or symbol interposition,
+//! and callees preserving thread FP controls throughout the synchronous call.
+//! Entry/exit reads reject incompatible FP controls; they do not establish those
+//! build assumptions. Default builds keep this route disabled. Enabling tests
+//! does not approve production deployment or launcher activation.
+//!
 //! Fillets and chamfers, including operations on [`truck_modeling::Solid`].
 //!
 //! Use [`crate::fillet::fillet_solid_along_wire`] for constant or variable radii on a tangent-continuous chain,
@@ -56,7 +65,8 @@ pub trait FilletedCurve<S>:
     + BoundedCurve
     + Cut
     + Invertible
-    + std::fmt::Debug {
+    + std::fmt::Debug
+{
 }
 impl<
         C: ParametricCurve3D
@@ -72,7 +82,8 @@ impl<
 
 /// condition of sufaces to attach fillet
 pub trait FilletedSurface<C>:
-    ParametricSurface3D + SearchParameter<D2, Point = Point3> + Invertible {
+    ParametricSurface3D + SearchParameter<D2, Point = Point3> + Invertible
+{
 }
 impl<C, S: ParametricSurface3D + SearchParameter<D2, Point = Point3> + Invertible>
     FilletedSurface<C> for S
