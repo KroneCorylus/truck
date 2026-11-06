@@ -1796,3 +1796,11 @@ target/i2-boundary-bound-20261106. Explicit proof replaces heuristic allowance
 for real in-memory curves only; no floating-evaluator/reader/runtime approval.
 Independent proof/code review and supported-artifact refresh remain gates.
 All spawned processes joined; root heavy slot released.
+
+Catalog publication cleanup: generated catalog JSON/HTML are ignored and the
+generator emits execution summaries with links to full evidence. All historical
+case/capture outcomes remain in the index; manifests and archives are untouched.
+Original pre-cleanup commits are retained locally at
+backup/pre-catalog-cleanup-20261106, with original catalog bytes and validation
+in target/catalog-cleanup-20261106. Only unpublished master history is being
+rewritten to remove those two generated paths; published ancestry is preserved.

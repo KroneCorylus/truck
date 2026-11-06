@@ -97,6 +97,38 @@ void registerCommands() {
         self.assertNotIn("</script><script>alert(1)", result["catalog.html"])
         self.assertEqual(json.loads(result["catalog.json"])["payload"], "</script><script>alert(1)</script>")
 
+    def test_output_links_full_evidence_without_embedding_it(self):
+        large = "RAW_EVIDENCE" * 10000
+        run = dict(manifest="capture/first/results.json", manifest_sha256="digest",
+                   native=dict(status="failed"), artifacts=[dict(path=large, sha256=large)],
+                   source_sha256={"source": large}, captures=[
+                       dict(prefix="001", task=large, comparison="unverified",
+                            truck=dict(result=dict(status="operation-succeeded", details=large)),
+                            native_result=dict(status="failed"),
+                            sampled_comparison=dict(status="compared", passed=False, details=large)),
+                       dict(prefix="002", status="capture-incomplete")])
+        data = dict(schema_version=1, counts=dict(cases=1), cases=[dict(
+            id="example", comparison="unverified", truck_executions=[run])],
+            captured_executions=[dict(manifest=run['manifest'], manifest_sha256="digest",
+                                      kernel_source_sha256={"file": large})])
+        original = json.dumps(data)
+        files = audit.outputs(data)
+        result = json.loads(files['catalog.json'])
+        self.assertNotIn('RAW_EVIDENCE', files['catalog.json'])
+        self.assertNotIn('RAW_EVIDENCE', files['catalog.html'])
+        self.assertLess(len(files['catalog.json']), 5000)
+        self.assertEqual(result['counts'], data['counts'])
+        summary = result['cases'][0]['truck_executions'][0]
+        self.assertEqual(summary['manifest'], run['manifest'])
+        self.assertEqual(summary['manifest_sha256'], 'digest')
+        self.assertEqual(summary['native_status'], 'failed')
+        self.assertEqual(summary['captures'][0]['truck_status'], 'operation-succeeded')
+        self.assertIs(summary['captures'][0]['sampled_passed'], False)
+        self.assertEqual(summary['captures'][1]['status'], 'capture-incomplete')
+        self.assertEqual(result['cases'][0]['comparison'], 'unverified')
+        self.assertEqual(json.dumps(data), original)
+        self.assertEqual(audit.outputs(result), files)
+
     def test_committing_the_audit_does_not_change_the_kernel_baseline(self):
         audit.git(self.root, "init", "-q")
         def commit():
@@ -112,6 +144,17 @@ void registerCommands() {
         changed = commit()
         self.assertNotEqual(changed, baseline)
         self.assertEqual(audit.truck_revision(self.root), changed)
+
+    def test_generated_catalogs_stay_ignored_despite_json_fixture_exception(self):
+        audit.git(self.root, 'init', '-q')
+        for name in ['.gitignore', 'audits/fillet-chamfer/.gitignore']:
+            self.put(name, (audit.TRUCK / name).read_text())
+        for name in ['catalog.json', 'catalog.html', 'coverage.json']:
+            self.put('audits/fillet-chamfer/' + name, 'fixture')
+        status = audit.git(self.root, 'status', '--porcelain', '--untracked-files=all')
+        self.assertNotIn('catalog.json', status)
+        self.assertNotIn('catalog.html', status)
+        self.assertIn('coverage.json', status)
 
     def execution_fixture(self):
         source = self.put('occt/tests/bugs/grid/a', 'blend result s 1 e\n')

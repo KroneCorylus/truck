@@ -6,6 +6,9 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Generate compact audit indexes with links to full execution evidence, preserving
+  every recorded outcome. Stop tracking generated catalog JSON/HTML in Git.
+
 - Add a default-off guarded ellipse-pcurve writer path and fallible app STEP
   serialization that preserves existing destination files on formatting failure.
   Activation remains blocked by downstream reader support and final runtime

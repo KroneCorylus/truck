@@ -1,2 +1,6 @@
 __pycache__/
 !*.json
+
+# Regenerated indexes; keep source fixtures and manifests tracked.
+/catalog.json
+/catalog.html

@@ -346,6 +346,7 @@ def apply_runs(cases, occt, directory, captured=False):
             raise ValueError(f'Unknown execution schema: {path}')
         run = {k: v for k, v in manifest.items() if k != 'cases'}
         run['manifest'] = Path(os.path.relpath(path, HERE)).as_posix()
+        run['manifest_sha256'] = sha(path)
         runs.append(run)
         archived = None
         if 'artifact_archive' in manifest:
@@ -403,7 +404,8 @@ def apply_runs(cases, occt, directory, captured=False):
                     raise ValueError(f'Missing or stale execution artifact: {name}')
                 link = archive if archived is not None else artifact
                 artifacts.append({'path': name, 'url': Path(os.path.relpath(link, HERE)).as_posix(), 'sha256': digest})
-            execution = {**result, 'manifest': run['manifest'], 'artifacts': artifacts}
+            execution = {**result, 'manifest': run['manifest'],
+                         'manifest_sha256': run['manifest_sha256'], 'artifacts': artifacts}
             if captured:
                 report = path.parent / 'REPORT.md'
                 if report.is_file():
@@ -457,7 +459,55 @@ def build(occt, app):
     }
 
 
+def compact_catalog(data):
+    """Keep every observed outcome, linking detailed evidence instead of copying it."""
+    if 'cases' not in data or data.get('schema_version') == 2:
+        return data
+
+    def select(value, keys):
+        return {key: value[key] for key in keys if key in value}
+
+    def execution(run):
+        summary = select(run, ('manifest', 'manifest_sha256', 'report', 'status',
+                               'harness_detail', 'elapsed_seconds', 'returncode', 'comparison'))
+        if 'native' in run:
+            summary['native_status'] = run['native'].get('status')
+        if 'captures' in run:
+            captures = []
+            for capture in run['captures']:
+                item = select(capture, ('prefix', 'status', 'comparison'))
+                if capture.get('truck'):
+                    item['truck_status'] = capture['truck'].get('result', {}).get('status')
+                if capture.get('native_result'):
+                    item['native_status'] = capture['native_result'].get('status')
+                if capture.get('sampled_comparison'):
+                    comparison = capture['sampled_comparison']
+                    item['sampled_status'] = comparison.get('status')
+                    if 'passed' in comparison:
+                        item['sampled_passed'] = comparison['passed']
+                captures.append(item)
+            summary['captures'] = captures
+        return summary
+
+    result = dict(data, schema_version=2)
+    result['execution_details'] = 'Full tasks, artifacts, hashes and measurements remain in the linked manifests.'
+    result['cases'] = []
+    for case in data['cases']:
+        case = dict(case)
+        for key in ('occt_executions', 'truck_executions'):
+            if key in case:
+                case[key] = [execution(run) for run in case[key]]
+        result['cases'].append(case)
+    for key in ('occt_executions', 'captured_executions'):
+        if key in data:
+            result[key] = [select(run, ('manifest', 'manifest_sha256', 'started_utc',
+                                      'kernel_revision', 'artifact_archive', 'artifact_archive_sha256'))
+                           for run in data[key]]
+    return result
+
+
 def outputs(data):
+    data = compact_catalog(data)
     encoded = json.dumps(data, ensure_ascii=False, indent=2) + "\n"
     embedded = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c").replace("\u2028", "\\u2028").replace("\u2029", "\\u2029")
     template = read(HERE / "viewer.html")
