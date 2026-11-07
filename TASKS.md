@@ -1855,7 +1855,9 @@ native PCurves are constant-v UV cubics on ruled NURBS cylinders or on the top b
 The cubic refit sat8.8e-6/1.2e-5 off one face. Exact section export now makes Truck's
 own re-import consistent (was inconsistent). OCCT exact QA still fails: the native
 cylinder and top-blend surfaces differ by8.8e-7/7.4e-7 along these edges (within
-TOLERANCE), and the reader keeps1e-7 edge tolerance for the exact-looking edge. Next:
-tighten the native top-blend fit along its contacts, or emit the edge with an explicit
-tolerance contract; no QA tolerance change. I2 positive export still passes exact QA.
-Evidence: target/ordinary-qa-20261107.
+TOLERANCE), and the reader keeps1e-7 edge tolerance for the exact-looking edge. The top
+face is chamfer.rs's ruled BSpline between contact curves fitted at the app blend
+tolerance (1e-3 contract; actual8.8e-7). Decision for the user: exact rational cones for
+plane/coaxial-cylinder chamfers (rational chamfer surfaces in that path), or tighter
+contact fits (latency cost, needs benchmarks). No QA tolerance change. I2 positive export
+still passes exact QA. Evidence: target/ordinary-qa-20261107.
