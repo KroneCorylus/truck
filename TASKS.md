@@ -1804,3 +1804,31 @@ Original pre-cleanup commits are retained locally at
 backup/pre-catalog-cleanup-20261106, with original catalog bytes and validation
 in target/catalog-cleanup-20261106. Only unpublished master history is being
 rewritten to remove those two generated paths; published ancestry is preserved.
+
+2026-11-07 reconciliation from Truck 68d44c2b and app 66b943f (both clean on entry).
+The review's subnormal mapped-span overflow is resolved in committed source:
+safe_span guards b-a, mapped and cut spans before insertion, construction is
+fallible and the interval certificate (c1835b08/7742d03a) rechecks actual poles.
+Root re-derived the PROOF.txt transport/derivative inequalities; no gap found.
+A scratch fuzz of 98,676 admitted affine_boundary inputs (degrees1..3, knots to
+1e307, spans near MIN_POSITIVE, nonunit weights) found no panic or nonfinite
+output; 201 sampled accepted cases fit exact rational checks (max1.6e-10), and
+the one floating-oracle excess was oracle rounding (exact3.7e-13). Root review,
+not an independent one. Evidence: target/combined-validation-20261107.
+Combined validation on HEAD: STEP ellipse-on191/191, default185/186 (intentional
+topology.rs:958 graph red); shapeops with both features705/705, default699/700
+(prospective I2 positive red with I2 off, as recorded); other crates435/436
+(pcurve_derivation); I2 integration37; Clippy both states only the two known
+test warnings; doctests pass. App cad-core showed a routing regression: 66b943f
+sent every cross-chain fillet junction to one whole-solid call, beyond the
+reviewed singleton-chain scope, so workflow_audit notch fillets failed with
+features on and off. App fix restores that scope (blend.rs one condition);
+notch passes, I2 app tests pass, remaining six failures are app TASKS A1.
+Fresh combined-feature cadc 4fab93c5 (ordinary cargo build, not the hermetic
+recipe) exports the saved I2 document with DATA byte-identical to the scoped
+isocurve export: exact QA passes; ordinary control still exit5; all64 material
+rows identical, four attributed failures remain FAILED. Activation stays blocked
+on: independent certificate review, hermetic supported-artifact rebuild with
+ledger/hull/folded-constant correspondence, renderer/hook/signal audit, ordinary
+control QA, native G4 roundtrip, and explicit activation authorization. Defaults
+off; no commits.
