@@ -160,7 +160,9 @@ impl Table {
                 })
         };
         let vertices = (vertex(&edge.edge_start)?, vertex(&edge.edge_end)?);
-        let curve = self.edge_curve_owned(edge)?.parse_curve3d()?;
+        let curve = self
+            .edge_curve_owned(edge)?
+            .parse_curve3d_with_tolerance(self.edge_tolerance.unwrap_or(TOLERANCE))?;
         Ok(CompressedEdge { vertices, curve })
     }
 
@@ -638,7 +640,9 @@ impl Table {
         let mut product_entities = Vec::<ProductEntity>::new();
         let mut indices_map = HashMap::<u64, usize>::new();
         let mut assy_nodes = Vec::<(AssembleEntity, (u64, u64))>::new();
-        for (&pds_idx, pds) in &self.product_definition_shape {
+        let mut definitions: Vec<_> = self.product_definition_shape.iter().collect();
+        definitions.sort_by_key(|(id, _)| **id);
+        for (&pds_idx, pds) in definitions {
             let &PlaceHolder::Ref(Name::Entity(idx)) = &pds.definition else {
                 return Err(ConversionError::Reference {
                     message: "failed to reference `product_definition_shape.definition`".into(),

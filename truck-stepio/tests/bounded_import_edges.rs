@@ -133,3 +133,40 @@ fn polyline_edges_trim_inside_one_or_multiple_segments() {
         }
     }
 }
+
+#[test]
+fn explicit_endpoint_allowance_preserves_geometry_and_rejects_excess() {
+    let (entity, original) = spline(false);
+    let p = original.subs(0.2) + Vector3::new(0.0, 0.0, 3e-5);
+    let q = original.subs(0.8);
+    let e = edge(entity, p, q, false);
+    assert!(e.parse_curve3d().is_err());
+    let curve = e.parse_curve3d_with_tolerance(5e-5).unwrap();
+    assert!((curve.front().distance(p) - 3e-5).abs() < 1e-8);
+    for i in 0..=16 {
+        let (a, b) = curve.range_tuple();
+        let t = a + (b - a) * i as f64 / 16.0;
+        assert!(curve.subs(t).distance(original.subs(t)) < 1e-10);
+    }
+    assert!(e.parse_curve3d_with_tolerance(2e-5).is_err());
+    assert!(e.parse_curve3d_with_tolerance(f64::NAN).is_err());
+}
+
+#[test]
+fn length_uncertainty_keeps_its_unit_and_rejects_nonpositive_values() {
+    for value in ["2.E-5", "0.", "-2.E-5"] {
+        let data: DataSection = format!(
+            "DATA;#1=UNCERTAINTY_MEASURE_WITH_UNIT(LENGTH_MEASURE({value}),#42,'','');ENDSEC;"
+        )
+        .parse()
+        .unwrap();
+        let table = Table::from_data_section(&data);
+        if value == "2.E-5" {
+            assert_eq!(table.length_uncertainties, vec![(2e-5, 42)]);
+            assert!(table.errors.is_empty());
+        } else {
+            assert!(table.length_uncertainties.is_empty());
+            assert_eq!(table.errors.len(), 1);
+        }
+    }
+}

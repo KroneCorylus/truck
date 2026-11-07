@@ -145,10 +145,24 @@ where
         + TryFrom<PCurve<Line<Point2>, S>>,
     S: ParametricSurface3D,
 {
-    let Face { boundaries, .. } = &shell.faces[face_index];
-    let divisor = find_non_simple_wire_divisor(boundaries, &shell.edges, &shell.vertices)
-        .or_else(|| find_touching_boundary_divisor(boundaries, &shell.edges, &shell.vertices))?;
-    split_face_by_divisor(face_index, divisor, shell, poly_edges, sp, tol)
+    // A failed cut may discover a nearer boundary crossing. Re-select the divisor
+    // using those new vertices instead of abandoning an otherwise splittable seam.
+    for _ in 0..8 {
+        let Face { boundaries, .. } = &shell.faces[face_index];
+        let divisor = find_non_simple_wire_divisor(boundaries, &shell.edges, &shell.vertices)
+            .or_else(|| {
+                find_touching_boundary_divisor(boundaries, &shell.edges, &shell.vertices)
+            })?;
+        let previous_vertices = shell.vertices.len();
+        if let Some(faces) = split_face_by_divisor(face_index, divisor, shell, poly_edges, &sp, tol)
+        {
+            return Some(faces);
+        }
+        if shell.vertices.len() == previous_vertices {
+            return None;
+        }
+    }
+    None
 }
 
 // --- find_non_simple_wire_divisor ---

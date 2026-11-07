@@ -68,20 +68,24 @@ impl TryFrom<&Curve3D> for ModelingCurve {
             Curve3D::NurbsCurve(curve) => Self::NurbsCurve(curve.clone()),
             Curve3D::PCurve(pcurve) => {
                 if let Curve2D::BSplineCurve(trace) = pcurve.curve().as_ref() {
-                    let Surface::SweptCurve(SweptCurve::ExtrudedCurve(surface)) =
-                        pcurve.surface().as_ref()
-                    else {
-                        return Err("unsupported imported spline pcurve".into());
+                    let mapped_surface = match pcurve.surface().as_ref() {
+                        Surface::ElementarySurface(
+                            surface @ (ElementarySurface::CylindricalSurface(_)
+                            | ElementarySurface::ConicalSurface(_)),
+                        ) => elementary_parameter_surface(surface)?,
+                        Surface::SweptCurve(SweptCurve::ExtrudedCurve(surface))
+                            if matches!(
+                                surface.entity_curve(),
+                                Curve3D::Line(_)
+                                    | Curve3D::Conic(Conic3D::Ellipse(_))
+                                    | Curve3D::BSplineCurve(_)
+                                    | Curve3D::NurbsCurve(_)
+                            ) =>
+                        {
+                            ModelingSurface::try_from(pcurve.surface().as_ref())?
+                        }
+                        _ => return Err("unsupported imported spline pcurve".into()),
                     };
-                    if !matches!(
-                        surface.entity_curve(),
-                        Curve3D::Line(_)
-                            | Curve3D::Conic(Conic3D::Ellipse(_))
-                            | Curve3D::BSplineCurve(_)
-                            | Curve3D::NurbsCurve(_)
-                    ) {
-                        return Err("unsupported imported spline pcurve profile".into());
-                    }
                     if trace
                         .control_points()
                         .iter()
@@ -91,15 +95,12 @@ impl TryFrom<&Curve3D> for ModelingCurve {
                         return Err("non-finite imported spline pcurve".into());
                     }
                     let controls = trace.control_points();
-                    if controls.iter().all(|p| p == &controls[0])
-                        || (surface.extruding_vector() == Vector3::zero()
-                            && controls.iter().all(|p| p.x == controls[0].x))
-                    {
+                    if controls.iter().all(|p| p == &controls[0]) {
                         return Err("degenerate imported spline pcurve geometry".into());
                     }
                     let curve = Self::PCurve(truck_modeling::PCurve::new(
                         trace.clone(),
-                        Box::new(ModelingSurface::try_from(pcurve.surface().as_ref())?),
+                        Box::new(mapped_surface),
                     ));
                     let (knots, _) = trace.knot_vec().to_single_multi();
                     let mut regular = false;
@@ -250,6 +251,12 @@ fn elementary_pcurve(
     surface: &ElementarySurface,
     line: &Line<Point2>,
 ) -> std::result::Result<ModelingCurve, StepConvertingError> {
+    parameter_pcurve(elementary_parameter_surface(surface)?, line)
+}
+
+fn elementary_parameter_surface(
+    surface: &ElementarySurface,
+) -> std::result::Result<ModelingSurface, StepConvertingError> {
     let revolved = match surface {
         ElementarySurface::CylindricalSurface(surface)
         | ElementarySurface::ConicalSurface(surface) => surface.map_ref(|revolved| {
@@ -281,7 +288,7 @@ fn elementary_pcurve(
     {
         return Err("invalid imported pcurve transform".into());
     }
-    parameter_pcurve(ModelingSurface::RevolutedCurve(revolved), line)
+    Ok(ModelingSurface::RevolutedCurve(revolved))
 }
 
 fn parameter_pcurve(

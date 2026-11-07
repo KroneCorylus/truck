@@ -1798,7 +1798,43 @@ where
             SPHint2D::Range(range0, range1) => self.presearch(point, (range0, range1)),
             SPHint2D::None => self.presearch(point, self.range_tuple()),
         };
-        algo::surface::search_parameter(self, point, hint, trials)
+        let search = |hint| algo::surface::search_parameter(self, point, hint, trials);
+        let ranges = self.range_tuple();
+        let inside = |&(u, v): &(f64, f64)| {
+            [u, v]
+                .into_iter()
+                .zip([ranges.0, ranges.1])
+                .all(|(t, (a, b))| {
+                    let eps = 64.0 * f64::EPSILON * a.abs().max(b.abs()).max(1.0);
+                    t >= a - eps && t <= b + eps
+                })
+        };
+        let initial = search(hint);
+        if trials == 0 {
+            return initial;
+        }
+        if initial.as_ref().is_some_and(inside) {
+            return initial;
+        }
+        let (us, _) = self.uknot_vec().to_single_multi();
+        let (vs, _) = self.vknot_vec().to_single_multi();
+        let mut candidates = Vec::new();
+        for u in us.windows(2) {
+            for v in vs.windows(2) {
+                let hint = self.presearch(point, ((u[0], u[1]), (v[0], v[1])));
+                if let Some(uv) = search(hint).filter(inside) {
+                    candidates.push(uv);
+                }
+            }
+        }
+        candidates
+            .into_iter()
+            .min_by(|&(u, v), &(x, y)| {
+                self.subs(u, v)
+                    .distance2(point)
+                    .total_cmp(&self.subs(x, y).distance2(point))
+            })
+            .or(initial)
     }
 }
 
@@ -1817,11 +1853,59 @@ where
         trials: usize,
     ) -> Option<(f64, f64)> {
         let hint = match hint.into() {
-            SPHint2D::Parameter(x, y) => (x, y),
+            // Explicit hints also serve callers intentionally extending a support chart.
+            SPHint2D::Parameter(x, y) => {
+                return algo::surface::search_nearest_parameter(self, point, (x, y), trials);
+            }
             SPHint2D::Range(range0, range1) => self.presearch(point, (range0, range1)),
             SPHint2D::None => self.presearch(point, self.range_tuple()),
         };
-        algo::surface::search_nearest_parameter(self, point, hint, trials)
+        let search = |hint| algo::surface::search_nearest_parameter(self, point, hint, trials);
+        let ranges = self.range_tuple();
+        let clamp = |(u, v): (f64, f64)| {
+            (
+                u.clamp(ranges.0 .0, ranges.0 .1),
+                v.clamp(ranges.1 .0, ranges.1 .1),
+            )
+        };
+        let initial = search(hint);
+        if trials == 0 {
+            return initial;
+        }
+        if initial.is_some_and(|(u, v)| {
+            [u, v]
+                .into_iter()
+                .zip([ranges.0, ranges.1])
+                .all(|(t, (a, b))| {
+                    let eps = 64.0 * f64::EPSILON * a.abs().max(b.abs()).max(1.0);
+                    t >= a - eps && t <= b + eps
+                })
+        }) {
+            return initial;
+        }
+        let initial = initial.map(clamp);
+        if initial.is_some_and(|(u, v)| self.subs(u, v).distance2(point) <= TOLERANCE2) {
+            return initial;
+        }
+        let (us, _) = self.uknot_vec().to_single_multi();
+        let (vs, _) = self.vknot_vec().to_single_multi();
+        let mut candidates: Vec<_> = initial.into_iter().collect();
+        for u in us.windows(2) {
+            for v in vs.windows(2) {
+                let hint = self.presearch(point, ((u[0], u[1]), (v[0], v[1])));
+                if let Some(uv) = search(hint).map(clamp) {
+                    candidates.push(uv);
+                }
+            }
+        }
+        candidates
+            .into_iter()
+            .min_by(|&(u, v), &(x, y)| {
+                self.subs(u, v)
+                    .distance2(point)
+                    .total_cmp(&self.subs(x, y).distance2(point))
+            })
+            .or(initial)
     }
 }
 

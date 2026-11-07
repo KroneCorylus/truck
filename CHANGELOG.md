@@ -6,6 +6,15 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Import bounded STEP edges with an explicit caller-selected endpoint allowance while
+  retaining the source curves; read declared length uncertainties and reject invalid
+  allowances. Map spline parameter curves on cylinders and cones without changing their
+  surface charts. Order assembly product traversal by entity ID.
+- Resolve multi-turn spline ribbons using knot-aware projection seeds and bounded-sheet
+  fallback; preserve explicitly hinted support extensions. Robust tessellation retries
+  projection without a continuation hint. Retry periodic seam splitting when a failed
+  cut discovers an intermediate boundary crossing.
+
 - Add `thread_groove_profile` with explicit transverse-plane flank angle and axial
   groove-bottom flat. `thread_groove` retains its original 60-degree included profile.
 

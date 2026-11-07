@@ -38,7 +38,6 @@
 //! - `SURFACE_SIDE_STYLE`
 //! - `SURFACE_STYLE_FILL_AREA`
 //! - `SURFACE_STYLE_USAGE`
-//! - `UNCERTAINTY_MEASURE_WITH_UNIT`
 //! - `VERTEX_LOOP`
 
 #![cfg_attr(not(debug_assertions), deny(warnings))]

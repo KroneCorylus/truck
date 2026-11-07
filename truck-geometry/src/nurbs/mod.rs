@@ -293,13 +293,27 @@ where
         LinearAxis::V => points.iter().map(|row| pair(row[0], row[1])).collect(),
     };
     let degree = knots.len() - coefficients.len() - 1;
-    algo::surface::presearch_rulings(point, range, PRESEARCH_DIVISION, axis, |t| {
-        let basis = knots.bspline_basis_functions(degree, 0, t);
-        let mut sum = [V::zero(); 2];
-        for (pair, b) in coefficients[basis.base..].iter().zip(basis.as_slice()) {
-            sum[0] = sum[0] + pair[0] * *b;
-            sum[1] = sum[1] + pair[1] * *b;
-        }
-        sum.map(&project)
-    })
+    let nonlinear_range = match axis {
+        LinearAxis::U => range.1,
+        LinearAxis::V => range.0,
+    };
+    let spans = knots
+        .windows(2)
+        .filter(|w| w[0] < w[1] && w[1] > nonlinear_range.0 && w[0] < nonlinear_range.1)
+        .count();
+    algo::surface::presearch_rulings(
+        point,
+        range,
+        PRESEARCH_DIVISION.max((spans + 1) * degree),
+        axis,
+        |t| {
+            let basis = knots.bspline_basis_functions(degree, 0, t);
+            let mut sum = [V::zero(); 2];
+            for (pair, b) in coefficients[basis.base..].iter().zip(basis.as_slice()) {
+                sum[0] = sum[0] + pair[0] * *b;
+                sum[1] = sum[1] + pair[1] * *b;
+            }
+            sum.map(&project)
+        },
+    )
 }

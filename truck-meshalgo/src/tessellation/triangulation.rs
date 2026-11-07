@@ -92,8 +92,8 @@ where
     surface
         .search_parameter(point, hint, 100)
         .or_else(|| surface.search_parameter(point, None, 100))
-        .or_else(|| surface.search_nearest_parameter(point, hint, 100))
         .or_else(|| surface.search_nearest_parameter(point, None, 100))
+        .or_else(|| surface.search_nearest_parameter(point, hint, 100))
 }
 
 fn edge_polyline<C: PolylineableCurve>(

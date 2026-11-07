@@ -31,6 +31,11 @@ pub use trimmed_conic::*;
 /// the exchange structure corresponds to a graph in STEP file
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct Table {
+    /// Optional caller-selected endpoint allowance in source length units. Defaults to
+    /// the kernel coincidence tolerance; it never changes curve or surface geometry.
+    pub edge_tolerance: Option<f64>,
+    /// Declared length uncertainties and their unit entity ids.
+    pub length_uncertainties: Vec<(f64, u64)>,
     // representation
     pub representation: HashMap<u64, RepresentationHolder>,
     pub representation_item: HashMap<u64, RepresentationItemHolder>,
@@ -121,6 +126,24 @@ impl Table {
     pub fn push_instance(&mut self, instance: &EntityInstance) -> ruststep::error::Result<()> {
         match instance {
             EntityInstance::Simple { id, record } => match record.name.as_str() {
+                "UNCERTAINTY_MEASURE_WITH_UNIT" => {
+                    if let Parameter::List(params) = &record.parameter {
+                        if let (
+                            Some(Parameter::Typed { keyword, parameter }),
+                            Some(Parameter::Ref(Name::Entity(unit))),
+                        ) = (params.first(), params.get(1))
+                        {
+                            if keyword == "LENGTH_MEASURE" {
+                                let value = f64::deserialize(parameter.as_ref())?;
+                                if value.is_finite() && value > 0.0 {
+                                    self.length_uncertainties.push((value, *unit));
+                                } else {
+                                    self.errors.push((*id, "invalid length uncertainty".into()));
+                                }
+                            }
+                        }
+                    }
+                }
                 "CARTESIAN_POINT" => {
                     self.cartesian_point
                         .insert(*id, Deserialize::deserialize(record)?);
@@ -2538,9 +2561,13 @@ where
     C: Cut<Point = P> + SearchParameter<D1, Point = P>,
     P: Copy + Tolerance + std::fmt::Debug, {
     if !curve.front().near(&p) {
-        let u = curve
-            .search_parameter(p, None, 100)
-            .ok_or_else(|| format!("cannot locate bounded edge start: vertex {p:?}, front {:?}, back {:?}", curve.front(), curve.back()))?;
+        let u = curve.search_parameter(p, None, 100).ok_or_else(|| {
+            format!(
+                "cannot locate bounded edge start: vertex {p:?}, front {:?}, back {:?}",
+                curve.front(),
+                curve.back()
+            )
+        })?;
         let (a, b) = curve.range_tuple();
         if !u.is_finite() || u < a || u >= b {
             return Err("bounded edge start lies outside its curve domain".into());
@@ -2549,9 +2576,13 @@ where
     }
     if !curve.back().near(&q) {
         // A polyline cut changes its parameterization; locate the end on the retained part.
-        let v = curve
-            .search_parameter(q, None, 100)
-            .ok_or_else(|| format!("cannot locate bounded edge end: vertex {q:?}, front {:?}, back {:?}", curve.front(), curve.back()))?;
+        let v = curve.search_parameter(q, None, 100).ok_or_else(|| {
+            format!(
+                "cannot locate bounded edge end: vertex {q:?}, front {:?}, back {:?}",
+                curve.front(),
+                curve.back()
+            )
+        })?;
         let (a, b) = curve.range_tuple();
         if !v.is_finite() || v <= a || v > b {
             return Err("bounded edge endpoints must follow the curve direction".into());
@@ -2560,6 +2591,59 @@ where
     }
     if !curve.front().near(&p) || !curve.back().near(&q) {
         return Err("bounded edge trimming does not preserve its vertices".into());
+    }
+    Ok(curve)
+}
+
+fn trim_spatial_edge(
+    mut curve: Curve3D,
+    p: Point3,
+    q: Point3,
+    tolerance: f64,
+) -> Result<Curve3D, StepConvertingError> {
+    let locate = |curve: &Curve3D, point: Point3| {
+        let (a, b) = curve.range_tuple();
+        // Several nearby seeds avoid converging to a neighbouring turn of a helix.
+        let mut seeds: Vec<_> = (0..=256)
+            .map(|i| {
+                let t = a + (b - a) * i as f64 / 256.0;
+                (curve.subs(t).distance2(point), t)
+            })
+            .collect();
+        seeds.sort_by(|s, t| s.0.total_cmp(&t.0));
+        seeds
+            .into_iter()
+            .take(8)
+            .filter_map(|(_, hint)| {
+                truck_geotrait::algo::curve::search_nearest_parameter(curve, point, hint, 100)
+            })
+            .filter(|t| {
+                t.is_finite() && *t >= a && *t <= b && curve.subs(*t).distance(point) <= tolerance
+            })
+            .min_by(|&s, &t| {
+                curve
+                    .subs(s)
+                    .distance2(point)
+                    .total_cmp(&curve.subs(t).distance2(point))
+            })
+    };
+    if curve.front().distance(p) > tolerance {
+        let u =
+            locate(&curve, p).ok_or("cannot locate bounded edge start within STEP uncertainty")?;
+        let (a, b) = curve.range_tuple();
+        if u < a || u >= b {
+            return Err("bounded edge start outside domain".into());
+        }
+        curve = curve.cut(u);
+    }
+    if curve.back().distance(q) > tolerance {
+        let v =
+            locate(&curve, q).ok_or("cannot locate bounded edge end within STEP uncertainty")?;
+        let (a, b) = curve.range_tuple();
+        if v <= a || v > b {
+            return Err("bounded edge end outside domain".into());
+        }
+        curve.cut(v);
     }
     Ok(curve)
 }
@@ -2676,23 +2760,39 @@ impl EdgeCurve {
         Ok(curve)
     }
     pub fn parse_curve3d(&self) -> Result<Curve3D, StepConvertingError> {
+        self.parse_curve3d_with_tolerance(TOLERANCE)
+    }
+    pub fn parse_curve3d_with_tolerance(
+        &self,
+        tolerance: f64,
+    ) -> Result<Curve3D, StepConvertingError> {
+        if !tolerance.is_finite() || tolerance <= 0.0 {
+            return Err("invalid STEP endpoint tolerance".into());
+        }
         let p = Point3::from(&self.edge_start.vertex_geometry);
         let q = Point3::from(&self.edge_end.vertex_geometry);
         let (p, q) = match self.same_sense {
             true => (p, q),
             false => (q, p),
         };
-        Self::sub_parse_curve3d(&self.edge_geometry, p, q, self.same_sense)
+        Self::sub_parse_curve3d(&self.edge_geometry, p, q, self.same_sense, tolerance)
     }
     fn sub_parse_curve3d(
         curve: &CurveAny,
         p: Point3,
         q: Point3,
         same_sense: bool,
+        tolerance: f64,
     ) -> Result<Curve3D, StepConvertingError> {
         let mut curve = match curve {
             CurveAny::Line(_) => Curve3D::Line(Line(p, q)),
-            CurveAny::BoundedCurve(b) => trim_bounded_edge(b.as_ref().try_into()?, p, q)?,
+            CurveAny::BoundedCurve(b) => {
+                if tolerance <= TOLERANCE {
+                    trim_bounded_edge(b.as_ref().try_into()?, p, q)?
+                } else {
+                    trim_spatial_edge(b.as_ref().try_into()?, p, q, tolerance)?
+                }
+            }
             CurveAny::Conic(curve) => match curve.as_ref() {
                 Conic::Circle(circle) => {
                     let mat =
@@ -2804,13 +2904,14 @@ impl EdgeCurve {
                             p,
                             q,
                             same_sense,
+                            tolerance,
                         ) {
                             return Ok(curve);
                         }
                     }
                 }
                 // Canonical spatial geometry or fallback; the inner call applies `same_sense`.
-                let curve_3d = Self::sub_parse_curve3d(&c.curve_3d, p, q, same_sense);
+                let curve_3d = Self::sub_parse_curve3d(&c.curve_3d, p, q, same_sense, tolerance);
                 if matches!(&c.curve_3d, CurveAny::BoundedCurve(c) if matches!(c.as_ref(), BoundedCurveAny::TrimmedConic(_)))
                 {
                     return curve_3d;
@@ -2828,9 +2929,13 @@ impl EdgeCurve {
                     Err(_) => {}
                 }
                 match c.associated_geometry.get(pcurve_index) {
-                    Some(PcurveOrSurface::Pcurve(c)) => {
-                        Self::sub_parse_curve3d(&CurveAny::Pcurve(c.clone()), p, q, true)?
-                    }
+                    Some(PcurveOrSurface::Pcurve(c)) => Self::sub_parse_curve3d(
+                        &CurveAny::Pcurve(c.clone()),
+                        p,
+                        q,
+                        true,
+                        tolerance,
+                    )?,
                     _ => {
                         return Err(format!(
                         "The {pcurve_index}-indexed associated geometry is nothing or not PCURVE."
