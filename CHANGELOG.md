@@ -6,6 +6,10 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Export isoparametric parameter curves across NURBS rulings (degree one in the fixed
+  direction, equal weights along each ruling) as their exact section, as a circle when it
+  is one. The ordinary fillet/chamfer control now re-imports into Truck consistently.
+
 - Export constant-v parameter curves on extruded round circles as the exact translated
   arc instead of a fitted cubic. Chamfer contacts on cylinder rims were exported 1.4e-6
   off their faces, so the re-imported solid was inconsistent and could not be grouped.

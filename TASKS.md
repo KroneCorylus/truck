@@ -1849,3 +1849,13 @@ so imported solids failed consistency and app component grouping. Such curves no
 export as the exact translated arc (control-hull bound, chart clamp<=TOLERANCE2).
 Parent-failing unit test; STEP192 and186/187 as recorded; shapeops706 and700/701 as
 recorded; app439/441. Evidence: target/chamfer-rim-step-20261107.
+
+2026-11-07 ordinary-control QA attribution: edges29..32 are z=9.8 corner arcs whose
+native PCurves are constant-v UV cubics on ruled NURBS cylinders or on the top blend.
+The cubic refit sat8.8e-6/1.2e-5 off one face. Exact section export now makes Truck's
+own re-import consistent (was inconsistent). OCCT exact QA still fails: the native
+cylinder and top-blend surfaces differ by8.8e-7/7.4e-7 along these edges (within
+TOLERANCE), and the reader keeps1e-7 edge tolerance for the exact-looking edge. Next:
+tighten the native top-blend fit along its contacts, or emit the edge with an explicit
+tolerance contract; no QA tolerance change. I2 positive export still passes exact QA.
+Evidence: target/ordinary-qa-20261107.

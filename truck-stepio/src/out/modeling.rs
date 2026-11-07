@@ -149,8 +149,8 @@ fn prepare_curve(curve: &Curve, tol: f64) -> Option<Curve> {
         if let Some(boundary) = affine_boundary(pcurve, tol) {
             return Some(boundary.into());
         }
-        if let Some(arc) = extruded_circle_isocurve(pcurve) {
-            return Some(arc);
+        if let Some(section) = ruled_isocurve(pcurve) {
+            return Some(section);
         }
         if let Surface::Plane(plane) = pcurve.surface().as_ref() {
             return Some(
@@ -175,57 +175,132 @@ fn prepare_curve(curve: &Curve, tol: f64) -> Option<Curve> {
     }
 }
 
-// A constant-v PCurve on an extruded round circle is an arc of that circle, translated.
-// The UV spline stays in its control hull, so monotone u controls and v controls within
-// TOLERANCE2 of the extrusion bound the arc exactly; a fitted cubic would leave the face.
-fn extruded_circle_isocurve(pcurve: &PCurve<BSplineCurve<Point2>, Box<Surface>>) -> Option<Curve> {
-    let Surface::Extruded(surface) = pcurve.surface().as_ref() else {
-        return None;
-    };
-    let Curve::Conic(circle) = surface.entity_curve() else {
-        return None;
-    };
-    let transform = circle.transform();
-    let (x, y) = (transform[0].truncate(), transform[1].truncate());
-    if !x.magnitude().near(&y.magnitude()) || !(x.dot(y) / x.magnitude2()).so_small() {
+// An isoparametric PCurve across the rulings of an extruded round circle, or of a NURBS
+// patch linear in the fixed direction with equal weights along each ruling, is exactly that
+// section. The UV spline stays in its control hull, so monotone varying controls and fixed
+// controls within TOLERANCE2 of the section motion bound the curve; a fitted cubic would
+// leave the face by up to the export tolerance.
+fn ruled_isocurve(pcurve: &PCurve<BSplineCurve<Point2>, Box<Surface>>) -> Option<Curve> {
+    let uv = pcurve.curve();
+    let points = uv.control_points();
+    if points.iter().any(|p| !p.x.is_finite() || !p.y.is_finite()) {
         return None;
     }
-    let height = surface.extruding_vector().magnitude();
-    let points = pcurve.curve().control_points();
-    let v = points.first()?.y;
-    if !height.is_finite()
-        || points
-            .iter()
-            .any(|p| !p.x.is_finite() || !p.y.is_finite() || (p.y - v).abs() * height > TOLERANCE2)
-    {
+    let (fixed, increasing) = [1, 0].into_iter().find_map(|fixed| {
+        let varying = 1 - fixed;
+        let increasing = points.windows(2).all(|w| w[0][varying] < w[1][varying]);
+        let decreasing = points.windows(2).all(|w| w[0][varying] > w[1][varying]);
+        (increasing || decreasing).then_some((fixed, increasing))
+    })?;
+    let value = points[0][fixed];
+    let (section, rate) = ruled_section(pcurve.surface(), fixed, value)?;
+    let spread = points
+        .iter()
+        .map(|p| (p[fixed] - value).abs())
+        .fold(0.0, f64::max);
+    if spread * rate > TOLERANCE2 {
         return None;
     }
-    let increasing = points.windows(2).all(|w| w[0].x < w[1].x);
-    if !increasing && !points.windows(2).all(|w| w[0].x > w[1].x) {
-        return None;
-    }
-    let (u0, u1) = (pcurve.curve().front().x, pcurve.curve().back().x);
-    let (a, b) = circle.range_tuple();
+    let varying = 1 - fixed;
+    let (s0, s1) = (uv.front()[varying], uv.back()[varying]);
+    let (a, b) = section.range_tuple();
     // Rounding may leave the chart by an ulp; the endpoint check below bounds the clamp.
-    if u0.min(u1) < a - TOLERANCE2 || u0.max(u1) > b + TOLERANCE2 {
+    if s0.min(s1) < a - TOLERANCE2 || s0.max(s1) > b + TOLERANCE2 {
         return None;
     }
-    let (lo, hi) = (u0.min(u1).max(a), u0.max(u1).min(b));
+    let (lo, hi) = (s0.min(s1).max(a), s0.max(s1).min(b));
     if lo >= hi {
         return None;
     }
-    let mut arc = circle.transformed(Matrix4::from_translation(surface.extruding_vector() * v));
+    let mut curve = section;
     if hi < b {
-        arc.cut(hi);
+        curve.cut(hi);
     }
     if lo > a {
-        arc = arc.cut(lo);
+        curve = curve.cut(lo);
     }
     if !increasing {
-        arc.invert();
+        curve.invert();
     }
-    let arc = Curve::Conic(arc);
-    (arc.front().near(&pcurve.front()) && arc.back().near(&pcurve.back())).then_some(arc)
+    if let Curve::NurbsCurve(nurbs) = &curve {
+        if let Some(circle) = circular_bezier(nurbs) {
+            curve = circle;
+        }
+    }
+    (curve.front().near(&pcurve.front()) && curve.back().near(&pcurve.back())).then_some(curve)
+}
+
+/// The exact section of a ruled surface at `value` of parameter `fixed` (0 = u, 1 = v),
+/// parametrized by the other parameter, and a bound on the surface speed along `fixed`.
+fn ruled_section(surface: &Surface, fixed: usize, value: f64) -> Option<(Curve, f64)> {
+    match surface {
+        Surface::Extruded(surface) if fixed == 1 => {
+            let Curve::Conic(circle) = surface.entity_curve() else {
+                return None;
+            };
+            let transform = circle.transform();
+            let (x, y) = (transform[0].truncate(), transform[1].truncate());
+            if !x.magnitude().near(&y.magnitude()) || !(x.dot(y) / x.magnitude2()).so_small() {
+                return None;
+            }
+            let vector = surface.extruding_vector();
+            let rate = vector.magnitude();
+            let section = circle.transformed(Matrix4::from_translation(vector * value));
+            rate.is_finite().then_some((Curve::Conic(section), rate))
+        }
+        Surface::NurbsSurface(surface) => {
+            let surface = surface.non_rationalized();
+            let rows = surface.control_points();
+            let (knots, ruling) = if fixed == 1 {
+                (surface.vknot_vec(), surface.vdegree())
+            } else {
+                (surface.uknot_vec(), surface.udegree())
+            };
+            let [k0, k1] = [knots[0], knots[knots.len() - 1]];
+            if ruling != 1
+                || knots.as_slice() != [k0, k0, k1, k1]
+                || !k0.is_finite()
+                || !k1.is_finite()
+                || k0 >= k1
+            {
+                return None;
+            }
+            let pairs: Vec<[Vector4; 2]> = if fixed == 1 {
+                rows.iter()
+                    .map(|row| <[Vector4; 2]>::try_from(row.as_slice()).ok())
+                    .collect::<Option<_>>()?
+            } else {
+                let [first, second] = rows.as_slice() else {
+                    return None;
+                };
+                first.iter().zip(second).map(|(a, b)| [*a, *b]).collect()
+            };
+            if pairs
+                .iter()
+                .any(|[a, b]| !a.w.is_finite() || a.w <= 0. || a.w != b.w)
+            {
+                return None;
+            }
+            let rate = pairs
+                .iter()
+                .map(|[a, b]| a.to_point().distance(b.to_point()))
+                .fold(0.0, f64::max)
+                / (k1 - k0);
+            let t = ((value - k0) / (k1 - k0)).clamp(0., 1.);
+            if value < k0 - TOLERANCE2 || value > k1 + TOLERANCE2 || !rate.is_finite() {
+                return None;
+            }
+            let along = if fixed == 1 {
+                surface.uknot_vec()
+            } else {
+                surface.vknot_vec()
+            };
+            let controls = pairs.iter().map(|[a, b]| *a * (1. - t) + *b * t).collect();
+            let section = BSplineCurve::try_new(along.clone(), controls).ok()?;
+            Some((Curve::NurbsCurve(NurbsCurve::new(section)), rate))
+        }
+        _ => None,
+    }
 }
 
 // Restrict stored coefficients, rather than fitting another spatial curve. The
@@ -1582,6 +1657,67 @@ mod tests {
                         prepare_curve(&bent, 0.00005),
                         Some(Curve::Conic(_))
                     ));
+                }
+            }
+        }
+        fn raw_knots(n: usize) -> KnotVec {
+            let mut knots = vec![0.; 4];
+            knots.extend((1..n - 3).map(|i| i as f64 / (n - 3) as f64));
+            knots.extend([1.; 4]);
+            knots.into()
+        }
+    }
+
+    #[test]
+    fn ruled_nurbs_isocurves_export_as_exact_sections() {
+        let w = std::f64::consts::FRAC_1_SQRT_2;
+        // A quarter cylinder of radius 1 and height 10, rational in u and linear in v.
+        let rows = [[1., 0.], [1., 1.], [0., 1.]].map(|[x, y]| {
+            let weight = if x == 1. && y == 1. { w } else { 1. };
+            [0., 10.].map(|z| Vector4::new(x * weight, y * weight, z * weight, weight))
+        });
+        for transposed in [false, true] {
+            for decreasing in [false, true] {
+                let mut controls: Vec<Vec<Vector4>> = rows.iter().map(|r| r.to_vec()).collect();
+                let mut knots = (KnotVec::bezier_knot(2), KnotVec::bezier_knot(1));
+                if transposed {
+                    controls = (0..2)
+                        .map(|j| controls.iter().map(|r| r[j]).collect())
+                        .collect();
+                    knots = (knots.1, knots.0);
+                }
+                let surface =
+                    Surface::NurbsSurface(NurbsSurface::new(BSplineSurface::new(knots, controls)));
+                let mut uv: Vec<_> = (0..=8)
+                    .map(|i| {
+                        let s = i as f64 / 8.;
+                        let along = s + 0.03 * (std::f64::consts::PI * s).sin();
+                        let across = 0.98 + f64::EPSILON * (i % 2) as f64;
+                        if transposed {
+                            Point2::new(across, along)
+                        } else {
+                            Point2::new(along, across)
+                        }
+                    })
+                    .collect();
+                if decreasing {
+                    uv.reverse();
+                }
+                let n = uv.len();
+                let raw = Curve::PCurve(PCurve::new(
+                    BSplineCurve::new(raw_knots(n), uv),
+                    Box::new(surface.clone()),
+                ));
+                let prepared = prepare_curve(&raw, 0.00005).unwrap();
+                let Curve::Conic(_) = prepared else {
+                    panic!("ruled section must stay exact: {transposed} {decreasing}")
+                };
+                assert!(prepared.front().near2(&raw.front()));
+                assert!(prepared.back().near2(&raw.back()));
+                for i in 0..=128 {
+                    let p = raw.subs(i as f64 / 128.);
+                    let u = prepared.search_nearest_parameter(p, None, 100).unwrap();
+                    assert!(prepared.subs(u).distance(p) < 1e-12);
                 }
             }
         }
