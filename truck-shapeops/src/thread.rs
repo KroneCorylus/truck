@@ -1,4 +1,4 @@
-//! Helical, single-start 60-degree thread cutting tools.
+//! Helical, single-start thread cutting tools.
 use std::f64::consts::TAU;
 use truck_base::diagnostics::{Code, Diagnostic};
 use truck_modeling::*;
@@ -28,7 +28,7 @@ fn error(stage: &'static str) -> Diagnostic {
     Diagnostic::new(Code::InvalidParameter, "thread_groove", stage)
 }
 
-/// Constructs a closed B-rep cutter with 60-degree flanks and a pitch/8 root flat.
+/// Constructs a closed B-rep cutter with a 60-degree included profile and a pitch/8 root flat.
 ///
 /// Rational quadratic spans retain exact circular radial sections; their axial
 /// helix approximation is sample-checked within 0.00001 units.
@@ -36,6 +36,32 @@ fn error(stage: &'static str) -> Diagnostic {
 /// travel beyond both ends of the cylinder before subtraction. Up to 100 turns
 /// are supported. Invalid dimensions return a diagnostic without changing input.
 pub fn thread_groove(spec: ThreadGroove) -> std::result::Result<Solid, Diagnostic> {
+    thread_groove_profile(spec, 30.0, spec.pitch / 8.0)
+}
+
+/// A symmetric groove with flank angle in degrees above the plane normal to the axis,
+/// and axial flat width at the deepest radius. The included tooth angle is 2*angle.
+/// Radial size allowances alone do not specify normal flank clearance.
+pub fn thread_groove_profile(
+    spec: ThreadGroove,
+    flank_angle: f64,
+    root_flat: f64,
+) -> std::result::Result<Solid, Diagnostic> {
+    if !flank_angle.is_finite()
+        || flank_angle <= 0.0
+        || flank_angle >= 90.0
+        || !root_flat.is_finite()
+        || root_flat <= TOLERANCE * 10.0
+    {
+        return Err(error("validate_profile"));
+    }
+    let axial = |radial: f64| {
+        if flank_angle == 30.0 {
+            radial / 3.0_f64.sqrt()
+        } else {
+            radial * flank_angle.to_radians().tan()
+        }
+    };
     let ThreadGroove {
         origin,
         axis,
@@ -54,7 +80,7 @@ pub fn thread_groove(spec: ThreadGroove) -> std::result::Result<Solid, Diagnosti
             .any(|v| !v.is_finite() || *v <= TOLERANCE * 10.0)
         || depth >= radius
         || length / pitch > 100.0
-        || depth / 3.0_f64.sqrt() * 2.0 + pitch / 8.0 >= pitch
+        || axial(depth) * 2.0 + root_flat >= pitch
     {
         return Err(error("validate_dimensions"));
     }
@@ -67,14 +93,18 @@ pub fn thread_groove(spec: ThreadGroove) -> std::result::Result<Solid, Diagnosti
     .normalize();
     let y = axis.cross(x);
     let sign = if left_handed { -1.0 } else { 1.0 };
-    let overlap = pitch * 0.1;
+    let overlap = if flank_angle == 30.0 && root_flat == pitch / 8.0 {
+        pitch * 0.1
+    } else {
+        (pitch * 0.1).min(((pitch - root_flat) / (2.0 * axial(1.0)) - depth) * 0.5)
+    };
     let r0 = radius + if internal { -overlap } else { overlap };
     let r1 = radius + if internal { depth } else { -depth };
     if r0 <= 0.0 || r1 <= 0.0 {
         return Err(error("validate_radii"));
     }
-    let half_root = pitch / 16.0;
-    let half_base = half_root + (depth + overlap) / 3.0_f64.sqrt();
+    let half_root = root_flat / 2.0;
+    let half_base = half_root + axial(depth + overlap);
     if 2.0 * half_base >= pitch {
         return Err(error("overlapping_turns"));
     }

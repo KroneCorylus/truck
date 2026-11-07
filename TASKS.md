@@ -9,6 +9,15 @@ Scope is the OCCT V7_9_3 inventory in
 [audits/fillet-chamfer/coverage.json](audits/fillet-chamfer/coverage.json). Case keys below
 are `native case/capture`; the capture is `001` unless shown.
 
+## Bag-insert import and printable threads
+
+- Repair current CadQuery bag-insert STEP pcurve endpoint/domain handling, seam wire
+  decomposition and face meshing without tolerance relaxation or skipped geometry.
+  App repro is `cad-core/examples/bag_import.rs`; source artifacts remain under
+  `/home/krone/Documents/PiezaCAD/robot-vacuum-bag-pla-threads/`.
+- Custom thread cutter profiles now have topology/closed-mesh/oriented-volume tests;
+  full-size mating subtraction and motion clearance acceptance remain open.
+
 ## State
 
 Work resumed at the user's request on 2026-11-05 from Truck d2d7be32 and app c27269d.

@@ -154,3 +154,37 @@ fn rotated_helix_keeps_pitch_radius_and_handedness() {
         }
     }
 }
+
+#[test]
+fn printable_profiles_have_closed_oriented_cutters_and_expected_volume() {
+    use truck_shapeops::thread::thread_groove_profile;
+    for internal in [false, true] {
+        let radius = if internal { 46.75 } else { 47.5 };
+        let flat = if internal {
+            2.0 * (-0.05 + 2.0_f64.sqrt() * 0.4)
+        } else {
+            0.8
+        };
+        let spec = ThreadGroove {
+            radius,
+            depth: 1.2,
+            pitch: 4.0,
+            length: 8.0,
+            internal,
+            origin: Point3::origin(),
+            ..spec()
+        };
+        let cutter = thread_groove_profile(spec, 45.0, flat).unwrap();
+        let overlap = 0.4_f64.min(((4.0 - flat) / 2.0 - 1.2) * 0.5);
+        let sign = if internal { 1.0 } else { -1.0 };
+        let f = |d: f64| (radius + sign * d) * (flat + 2.0 * (1.2 - d));
+        let integral =
+            (1.2 + overlap) / 6.0 * (f(-overlap) + 4.0 * f((1.2 - overlap) / 2.0) + f(1.2));
+        let volume = std::f64::consts::TAU * 2.0 * integral;
+        common::assert_solid(&cutter, volume, &[0], 0.01);
+        for angle in [0.0, 90.0, f64::NAN] {
+            assert!(thread_groove_profile(spec, angle, flat).is_err());
+        }
+        assert!(thread_groove_profile(spec, 45.0, 2.0).is_err());
+    }
+}

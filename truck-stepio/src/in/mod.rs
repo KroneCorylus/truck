@@ -2536,11 +2536,11 @@ where
 fn trim_bounded_edge<C, P>(mut curve: C, p: P, q: P) -> Result<C, StepConvertingError>
 where
     C: Cut<Point = P> + SearchParameter<D1, Point = P>,
-    P: Copy + Tolerance, {
+    P: Copy + Tolerance + std::fmt::Debug, {
     if !curve.front().near(&p) {
         let u = curve
             .search_parameter(p, None, 100)
-            .ok_or("cannot locate bounded edge start")?;
+            .ok_or_else(|| format!("cannot locate bounded edge start: vertex {p:?}, front {:?}, back {:?}", curve.front(), curve.back()))?;
         let (a, b) = curve.range_tuple();
         if !u.is_finite() || u < a || u >= b {
             return Err("bounded edge start lies outside its curve domain".into());
@@ -2551,7 +2551,7 @@ where
         // A polyline cut changes its parameterization; locate the end on the retained part.
         let v = curve
             .search_parameter(q, None, 100)
-            .ok_or("cannot locate bounded edge end")?;
+            .ok_or_else(|| format!("cannot locate bounded edge end: vertex {q:?}, front {:?}, back {:?}", curve.front(), curve.back()))?;
         let (a, b) = curve.range_tuple();
         if !v.is_finite() || v <= a || v > b {
             return Err("bounded edge endpoints must follow the curve direction".into());

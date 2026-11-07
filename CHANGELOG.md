@@ -6,6 +6,9 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Add `thread_groove_profile` with explicit transverse-plane flank angle and axial
+  groove-bottom flat. `thread_groove` retains its original 60-degree included profile.
+
 - Export isoparametric parameter curves across NURBS rulings (degree one in the fixed
   direction, equal weights along each ruling) as their exact section, as a circle when it
   is one. The ordinary fillet/chamfer control now re-imports into Truck consistently.
