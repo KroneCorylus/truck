@@ -481,7 +481,23 @@ where
     // A seam may lie entirely on the other surface. Project onto the exact curve
     // first so the Newton step does not divide by a zero normal derivative.
     let (cu, cv) = surface.search_nearest_parameter(pt0, surface_hint, 10)?;
-    if pt0.near(&surface.subs(cu, cv)) {
+    let foot = surface.subs(cu, cv);
+    if pt0.near(&foot) {
+        // A split vertex is shared by curves on both supports, so being within
+        // tolerance of one is not enough: refine while Newton steps shrink the gap.
+        let gap = pt0.distance(foot);
+        let step =
+            (foot - pt0).dot(surface.normal(cu, cv)) / curve.der(t).dot(surface.normal(cu, cv));
+        if gap > TOLERANCE2 && trials > 1 && step.is_finite() {
+            let point = pt0 + step * curve.der(t);
+            if let Some(refined) =
+                curve_surface_projection(curve, Some(t), surface, Some((cu, cv)), point, trials - 1)
+            {
+                if refined.0.distance(surface.subs(refined.2.x, refined.2.y)) < gap {
+                    return Some(refined);
+                }
+            }
+        }
         return Some((pt0, t, Point2::new(cu, cv)));
     }
     let (u, v) = surface.search_nearest_parameter(point, surface_hint, 10)?;

@@ -1832,3 +1832,13 @@ on: independent certificate review, hermetic supported-artifact rebuild with
 ledger/hull/folded-constant correspondence, renderer/hook/signal audit, ordinary
 control QA, native G4 roundtrip, and explicit activation authorization. Defaults
 off; no commits.
+
+2026-11-07 boolean split-vertex refinement: curve_surface_projection stopped once a
+vertex was componentwise within TOLERANCE of the cutting surface, so the app's
+slab-trimmed thread cutter kept exact plane sections up to1.6e-6 from vertices
+(is_geometric_consistent false) and STEP import skipped three edges. Refining
+while Newton steps shrink the gap leaves worst gap1.1e-12. New modeled_thread
+regression fails on parent. Shapeops706/706 both features, default700/701 (I2
+positive red as recorded), STEP191 and185/186 as recorded, Clippy unchanged; app
+threads round trip passes. Latency not measured. Evidence:
+target/thread-vertex-fix-20261107.

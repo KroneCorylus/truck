@@ -26,6 +26,33 @@ fn helical_cutter_is_closed_and_cuts_a_bore() {
     common::assert_mesh_closed(&threaded, 0.01);
 }
 #[test]
+fn trimmed_cutter_edges_meet_their_vertices() {
+    // The app trims the cutter to the bore length with this slab before cutting.
+    let cutter = thread_groove(ThreadGroove {
+        origin: Point3::new(0.0, 0.0, -4.25),
+        length: 5.5,
+        ..spec()
+    })
+    .unwrap();
+    let slab = common::modeling::cuboid(
+        Point3::new(-10.5, -10.5, -3.0),
+        Point3::new(10.5, 10.5, 0.0),
+    );
+    let trimmed = truck_shapeops::try_and(&cutter, &slab, 0.01).unwrap();
+    assert!(trimmed.is_geometric_consistent());
+    let block = common::modeling::cuboid(
+        Point3::new(-10.0, -10.0, -6.0),
+        Point3::new(10.0, 10.0, 0.0),
+    );
+    let bore = common::modeling::cylinder(Point3::new(0.0, 0.0, -3.0), Vector3::unit_z(), 3.4, 3.5);
+    let block = truck_shapeops::try_subtract(&block, &bore, 0.01).unwrap();
+    let threaded = truck_shapeops::try_subtract(&block, &trimmed, 0.01).unwrap();
+    assert!(threaded.is_geometric_consistent());
+    // A blind threaded bore leaves the block simply connected.
+    common::assert_topology(&threaded, &[0]);
+    common::assert_mesh_closed(&threaded, 0.01);
+}
+#[test]
 fn invalid_thread_dimensions_are_rejected() {
     for pitch in [0.0, -1.0, f64::NAN] {
         assert!(thread_groove(ThreadGroove { pitch, ..spec() }).is_err());

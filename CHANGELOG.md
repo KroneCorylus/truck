@@ -6,6 +6,11 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Refine boolean split vertices onto both supports instead of stopping once they are
+  within tolerance of the cutting surface. A modeled-thread cutter trimmed by a slab
+  left exact plane-section edges up to 1.6e-6 from their vertices, so the solid was
+  geometrically inconsistent and its STEP export lost edges on import.
+
 - Generate compact audit indexes with links to full execution evidence, preserving
   every recorded outcome. Stop tracking generated catalog JSON/HTML in Git.
 
