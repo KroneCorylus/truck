@@ -1842,3 +1842,10 @@ regression fails on parent. Shapeops706/706 both features, default700/701 (I2
 positive red as recorded), STEP191 and185/186 as recorded, Clippy unchanged; app
 threads round trip passes. Latency not measured. Evidence:
 target/thread-vertex-fix-20261107.
+
+2026-11-07 STEP isocurve export: chamfer contact edges on extruded cylinders are
+constant-v UV cubics; prepare_curve refit them as spatial cubics 1.4e-6 off the face,
+so imported solids failed consistency and app component grouping. Such curves now
+export as the exact translated arc (control-hull bound, chart clamp<=TOLERANCE2).
+Parent-failing unit test; STEP192 and186/187 as recorded; shapeops706 and700/701 as
+recorded; app439/441. Evidence: target/chamfer-rim-step-20261107.

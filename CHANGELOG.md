@@ -6,6 +6,10 @@ API and says how to migrate. The fork starts from upstream `ricosjp/truck` at `e
 
 ## Unreleased
 
+- Export constant-v parameter curves on extruded round circles as the exact translated
+  arc instead of a fitted cubic. Chamfer contacts on cylinder rims were exported 1.4e-6
+  off their faces, so the re-imported solid was inconsistent and could not be grouped.
+
 - Refine boolean split vertices onto both supports instead of stopping once they are
   within tolerance of the cutting surface. A modeled-thread cutter trimmed by a slab
   left exact plane-section edges up to 1.6e-6 from their vertices, so the solid was

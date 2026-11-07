@@ -149,6 +149,9 @@ fn prepare_curve(curve: &Curve, tol: f64) -> Option<Curve> {
         if let Some(boundary) = affine_boundary(pcurve, tol) {
             return Some(boundary.into());
         }
+        if let Some(arc) = extruded_circle_isocurve(pcurve) {
+            return Some(arc);
+        }
         if let Surface::Plane(plane) = pcurve.surface().as_ref() {
             return Some(
                 BSplineCurve::new(
@@ -170,6 +173,59 @@ fn prepare_curve(curve: &Curve, tol: f64) -> Option<Curve> {
         }
         _ => Some(curve.clone()),
     }
+}
+
+// A constant-v PCurve on an extruded round circle is an arc of that circle, translated.
+// The UV spline stays in its control hull, so monotone u controls and v controls within
+// TOLERANCE2 of the extrusion bound the arc exactly; a fitted cubic would leave the face.
+fn extruded_circle_isocurve(pcurve: &PCurve<BSplineCurve<Point2>, Box<Surface>>) -> Option<Curve> {
+    let Surface::Extruded(surface) = pcurve.surface().as_ref() else {
+        return None;
+    };
+    let Curve::Conic(circle) = surface.entity_curve() else {
+        return None;
+    };
+    let transform = circle.transform();
+    let (x, y) = (transform[0].truncate(), transform[1].truncate());
+    if !x.magnitude().near(&y.magnitude()) || !(x.dot(y) / x.magnitude2()).so_small() {
+        return None;
+    }
+    let height = surface.extruding_vector().magnitude();
+    let points = pcurve.curve().control_points();
+    let v = points.first()?.y;
+    if !height.is_finite()
+        || points
+            .iter()
+            .any(|p| !p.x.is_finite() || !p.y.is_finite() || (p.y - v).abs() * height > TOLERANCE2)
+    {
+        return None;
+    }
+    let increasing = points.windows(2).all(|w| w[0].x < w[1].x);
+    if !increasing && !points.windows(2).all(|w| w[0].x > w[1].x) {
+        return None;
+    }
+    let (u0, u1) = (pcurve.curve().front().x, pcurve.curve().back().x);
+    let (a, b) = circle.range_tuple();
+    // Rounding may leave the chart by an ulp; the endpoint check below bounds the clamp.
+    if u0.min(u1) < a - TOLERANCE2 || u0.max(u1) > b + TOLERANCE2 {
+        return None;
+    }
+    let (lo, hi) = (u0.min(u1).max(a), u0.max(u1).min(b));
+    if lo >= hi {
+        return None;
+    }
+    let mut arc = circle.transformed(Matrix4::from_translation(surface.extruding_vector() * v));
+    if hi < b {
+        arc.cut(hi);
+    }
+    if lo > a {
+        arc = arc.cut(lo);
+    }
+    if !increasing {
+        arc.invert();
+    }
+    let arc = Curve::Conic(arc);
+    (arc.front().near(&pcurve.front()) && arc.back().near(&pcurve.back())).then_some(arc)
 }
 
 // Restrict stored coefficients, rather than fitting another spatial curve. The
@@ -1462,6 +1518,79 @@ mod tests {
         }
         assert!(prepared.front().distance(parabola(0.)) < 1e-10);
         assert!(prepared.back().distance(parabola(1.)) < 1e-10);
+    }
+
+    #[test]
+    fn extruded_circle_isocurves_export_as_exact_arcs() {
+        use std::f64::consts::FRAC_PI_2;
+        for inverted in [false, true] {
+            for decreasing in [false, true] {
+                let matrix = Matrix4::from_translation(Vector3::new(13., -7., 23.))
+                    * Matrix4::from_axis_angle(Vector3::new(1., 2., 3.).normalize(), Rad(0.73));
+                let mut profile = Processor::with_transform(
+                    TrimmedCurve::new(UnitCircle::new(), (0., FRAC_PI_2)),
+                    matrix * Matrix4::from_scale(12.),
+                );
+                if inverted {
+                    profile.invert();
+                }
+                let (a, b) = profile.range_tuple();
+                let surface = Surface::Extruded(ExtrudedCurve::by_extrusion(
+                    Curve::Conic(profile),
+                    matrix.transform_vector(Vector3::new(0., 0., 23.5)),
+                ));
+                // A chamfer contact stores its UV trace as a fitted cubic: u is not linear in t,
+                // v carries ulp noise, and the first u leaves the chart by a rounding step.
+                let mut controls: Vec<_> = (0..=12)
+                    .map(|i| {
+                        let s = i as f64 / 12.;
+                        let u = a + (b - a) * (s + 0.02 * (std::f64::consts::PI * s).sin());
+                        Point2::new(u, 0.9791666666666666 + f64::EPSILON * (i % 3) as f64)
+                    })
+                    .collect();
+                controls[0].x = a - 4e-33;
+                if decreasing {
+                    controls.reverse();
+                }
+                let n = controls.len();
+                let uv = BSplineCurve::new(raw_knots(n), controls.clone());
+                let raw = Curve::PCurve(PCurve::new(uv, Box::new(surface.clone())));
+                let prepared = prepare_curve(&raw, 0.00005).unwrap();
+                let Curve::Conic(_) = prepared else {
+                    panic!("isocurve must stay an exact arc: {inverted} {decreasing}")
+                };
+                assert!(prepared.front().near2(&raw.front()));
+                assert!(prepared.back().near2(&raw.back()));
+                let (s, t) = prepared.range_tuple();
+                for i in 0..=256 {
+                    let p = raw.subs(i as f64 / 256.);
+                    let q = prepared.subs(s + (t - s) * i as f64 / 256.);
+                    let on = |c: &Curve, p| {
+                        let u = c.search_nearest_parameter(p, None, 100).unwrap();
+                        c.subs(u).distance(p)
+                    };
+                    assert!(on(&prepared, p) < 1e-12);
+                    let (u, v) = surface.search_nearest_parameter(q, None, 100).unwrap();
+                    assert!(surface.subs(u, v).distance(q) < 1e-12);
+                }
+                for (index, offset) in [(5, Vector2::new(0., 1e-6)), (5, Vector2::new(-1., 0.))] {
+                    let mut bent = controls.clone();
+                    bent[index] += offset;
+                    let uv = BSplineCurve::new(raw_knots(n), bent);
+                    let bent = Curve::PCurve(PCurve::new(uv, Box::new(surface.clone())));
+                    assert!(!matches!(
+                        prepare_curve(&bent, 0.00005),
+                        Some(Curve::Conic(_))
+                    ));
+                }
+            }
+        }
+        fn raw_knots(n: usize) -> KnotVec {
+            let mut knots = vec![0.; 4];
+            knots.extend((1..n - 3).map(|i| i as f64 / (n - 3) as f64));
+            knots.extend([1.; 4]);
+            knots.into()
+        }
     }
 
     #[test]
